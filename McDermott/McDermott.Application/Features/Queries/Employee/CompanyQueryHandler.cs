@@ -23,13 +23,12 @@ namespace McDermott.Application.Features.Queries.Employee
 
                 if (!_cache.TryGetValue(cacheKey, out List<Company>? result))
                 {
-                    result = await _unitOfWork.Repository<Company>().GetAsync(
-                        null,
-                        x => x
+                    result = await _unitOfWork.Repository<Company>().Entities
                         .Include(z => z.Country)
                         .Include(z => z.City)
-                        .Include(z => z.Province),
-                        cancellationToken);
+                        .Include(z => z.Province)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

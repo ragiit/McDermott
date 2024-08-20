@@ -25,6 +25,8 @@ namespace McDermott.Persistence.Extensions
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+            Console.WriteLine(connectionString);
+
             //services.AddDbContext<ApplicationDbContext>(options =>
             //   options.UseSqlServer(connectionString,
             //       builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
@@ -32,10 +34,31 @@ namespace McDermott.Persistence.Extensions
             //services.AddDbContextFactory<ApplicationDbContext>(options =>
             //   options.UseSqlServer(connectionString), ServiceLifetime.Transient);
 
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //{
+            //    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            //    options.UseSqlServer(connectionString);
+            //}, ServiceLifetime.Transient);
+
             services.AddDbContext<ApplicationDbContext>(options =>
             {
+                options.UseSqlServer(connectionString, sqlOptions =>
+                {
+                    // Mengaktifkan retry pada kegagalan sementara
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,  // Jumlah maksimal percobaan ulang
+                        maxRetryDelay: TimeSpan.FromSeconds(10),  // Jeda waktu antara percobaan ulang
+                        errorNumbersToAdd: null  // Nomor error SQL yang akan ditambahkan ke daftar retry
+                    );
+
+                    sqlOptions.CommandTimeout(60);  // Timeout untuk eksekusi perintah
+                    sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                    sqlOptions.MaxBatchSize(100);  // Batas maksimal batch dalam satu transaksi
+                });
+
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-                options.UseSqlServer(connectionString);
+                options.EnableSensitiveDataLogging();
+                options.EnableDetailedErrors();
             }, ServiceLifetime.Transient);
         }
 

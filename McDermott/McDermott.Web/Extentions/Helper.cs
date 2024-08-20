@@ -7,8 +7,38 @@ namespace McDermott.Web.Extentions
 {
     public static class Helper
     {
+        public class HomeStatusTemp
+        {
+            public string Code { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+        }
+
+        public static List<HomeStatusTemp> _homeStatusTemps = [
+            new()
+            {
+                Code = "1",
+                Name = "Meninggal",
+            },
+            new()
+            {
+                Code = "3",
+                Name = "Berobat Jalan",
+            },
+            new()
+            {
+                Code = "4",
+                Name = "Rujuk Vertikal",
+            },
+            new()
+            {
+                Code = "6",
+                Name = "Rujuk Horizontal",
+            },
+        ];
+
         public static string DefaultFormatDate => "dd MMMM yyyy";
         public static string DefaultFormatDateTime => "dd MMMM yyyy HH:mm:ss";
+
         public class AllergyType
         {
             public string Code { get; set; } = string.Empty;
@@ -57,6 +87,7 @@ namespace McDermott.Web.Extentions
             string base64Encoded = Convert.ToBase64String(bytesToEncode);
             return base64Encoded;
         }
+
         public static T EnumGetValue<T>(this Enum enumValue)
         {
             return (T)Convert.ChangeType(enumValue, typeof(T));
@@ -294,6 +325,7 @@ namespace McDermott.Web.Extentions
         }
 
         public static int ToInt32(this object o) => Convert.ToInt32(o);
+
         public static long ToLong(this object o) => Convert.ToInt64(o);
 
         public static async Task DownloadFile(string file, IHttpContextAccessor HttpContextAccessor, HttpClient Http, IJSRuntime JsRuntime)

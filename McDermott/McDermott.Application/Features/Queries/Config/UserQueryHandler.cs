@@ -182,7 +182,8 @@ namespace McDermott.Application.Features.Queries.Config
                 // nanti dihapus
                 request.UserDto.UserName = request.UserDto.Email;
 
-                var result = await _unitOfWork.Repository<User>().AddAsync(request.UserDto.Adapt<User>());
+                var req = request.UserDto.Adapt<CreateUpdateUserDto>();
+                var result = await _unitOfWork.Repository<User>().AddAsync(req.Adapt<User>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -208,7 +209,8 @@ namespace McDermott.Application.Features.Queries.Config
                 // nanti dihapus
                 request.UserDto.UserName = request.UserDto.Email;
 
-                var user = request.UserDto.Adapt<User>();
+                var req = request.UserDto.Adapt<CreateUpdateUserDto>();
+                var user = req.Adapt<User>();
 
                 var result = await _unitOfWork.Repository<User>().UpdateAsync(user);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

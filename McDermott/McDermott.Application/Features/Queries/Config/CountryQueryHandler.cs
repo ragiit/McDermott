@@ -16,16 +16,16 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                string cacheKey = $"GetCountryQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique 
+                string cacheKey = $"GetCountryQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
                 if (!_cache.TryGetValue(cacheKey, out List<Country>? result))
                 {
-                    result = await _unitOfWork.Repository<Country>().GetAsync(
-                        null,
-                        cancellationToken: cancellationToken);
+                    result = await _unitOfWork.Repository<Country>().Entities
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

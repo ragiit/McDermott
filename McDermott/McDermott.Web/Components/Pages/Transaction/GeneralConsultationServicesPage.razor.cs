@@ -99,32 +99,37 @@ namespace McDermott.Web.Components.Pages.Transaction
             else
             {
                 RiskOfFallingDetail = Geriati.ToList();
-
             }
         }
+
         private List<string> RiskOfFallingDetail = [];
+
         private List<string> HumptyDumpty =
         [
             "Risiko rendah 0-6",
             "Risiko sedang 7-11",
             "Risiko Tinggi >= 12"
         ];
+
         private List<string> InformationFrom =
         [
             "Auto Anamnesa",
             "Allo Anamnesa"
         ];
+
         private List<string> YesNoOptions =
        [
            "Yes",
             "No"
        ];
+
         private List<string> Morse =
         [
             "Risiko rendah 0-24",
             "Risiko sedang 25-44",
             "Risiko Tinggi >= 45"
         ];
+
         private List<string> RiwayatPenyakitKeluarga =
         [
             "DM",
@@ -135,6 +140,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Anemia",
             "Other",
         ];
+
         private List<string> Geriati =
        [
            "Risiko rendah 0-3",
@@ -321,7 +327,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (GeneralConsultanService.Height == 0 && GeneralConsultanService.Weight == 0)
                 {
-
                     var prev = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x
                         => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished)))
                         .OrderByDescending(x => x.CreatedDate)
@@ -594,35 +599,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Insurance",
             "BPJS"
         };
-
-        private class HomeStatusTemp
-        {
-            public string Code { get; set; } = string.Empty;
-            public string Name { get; set; } = string.Empty;
-        }
-
-        private List<HomeStatusTemp> _homeStatusTemps = [
-            new()
-            {
-                Code = "1",
-                Name = "Meninggal",
-            },
-            new()
-            {
-                Code = "3",
-                Name = "Berobat Jalan",
-            },
-            new()
-            {
-                Code = "4",
-                Name = "Rujuk Vertikal",
-            },
-            new()
-            {
-                Code = "6",
-                Name = "Rujuk Horizontal",
-            },
-        ];
 
         #region Methods
 
@@ -1267,13 +1243,12 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     //u.FamilyMedicalHistory = UserForm.FamilyMedicalHistory;
 
-                    await Mediator.Send(new UpdateUserRequest(u)); 
+                    await Mediator.Send(new UpdateUserRequest(u));
                     Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
                     Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
 
                     GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
                 }
-
 
                 // Ga Kepake
                 //PatientAllergy.UserId = GeneralConsultanService.PatientId.GetValueOrDefault();
@@ -1282,7 +1257,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //    PatientAllergy = await Mediator.Send(new CreatePatientAllergyRequest(PatientAllergy));
                 //else
                 //    PatientAllergy = await Mediator.Send(new UpdatePatientAllergyRequest(PatientAllergy));
-
             }
             catch (Exception ex)
             {
@@ -1643,7 +1617,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -1673,7 +1646,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                     case EnumStatusGeneralConsultantService.Confirmed:
 
-                        GeneralConsultanService.Status = EnumStatusGeneralConsultantService.NurseStation; 
+                        GeneralConsultanService.Status = EnumStatusGeneralConsultantService.NurseStation;
                         await GetClinicalAssesmentPatientHistory();
                         GeneralConsultanService = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
                         StagingText = EnumStatusGeneralConsultantService.Waiting;
@@ -1810,6 +1783,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private GeneralConsultanServiceDto SelectedDetailHistorical { get; set; } = new();
         private List<GeneralConsultanCPPTDto> SelectedDetailHistoricalGeneralConsultanCPPTs { get; set; } = new();
         private AccidentDto SelectedAccidentHistorical { get; set; } = new();
+
         private async Task OnClickDetailHistoricalRecordPatient(GeneralConsultanServiceDto e)
         {
             IsHistoricalRecordPatientDetailGC = false;
@@ -1834,6 +1808,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private bool IsLoadingHistoricalRecordPatient { get; set; } = false;
+
         private async Task OnClickPopUpHistoricalMedical()
         {
             IsLoadingHistoricalRecordPatient = true;
@@ -1864,7 +1839,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsReferTo = true;
 
             ReferToGeneralConsultanService = GeneralConsultanService.Adapt<GeneralConsultanServiceDto>();
-            ReferToGeneralConsultanService.Id = 0; 
+            ReferToGeneralConsultanService.Id = 0;
             await SendPCareGetRefrensiKhusus();
             await SendPcareGetSpesialis();
             await SendPcareGetSpesialisSarana();
@@ -1999,7 +1974,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             IsLoadingReferTo = true;
             try
-            {   
+            {
                 if (!ReferToGeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicyReferTo is null || SelectedInsurancePolicyReferTo.Id == 0))
                 {
                     IsLoadingFollowUp = false;
@@ -2030,6 +2005,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             IsLoadingReferTo = false;
         }
+
         private async Task HandleValidSubmitFollowUp()
         {
             IsLoadingFollowUp = true;
@@ -2230,7 +2206,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 catch
                 {
-
                 }
             }
         }

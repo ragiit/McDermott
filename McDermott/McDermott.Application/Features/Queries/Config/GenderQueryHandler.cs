@@ -21,10 +21,9 @@
 
                 if (!_cache.TryGetValue(cacheKey, out List<Gender>? result))
                 {
-                    result = await _unitOfWork.Repository<Gender>().GetAsync(
-                        null,
-                        null,
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<Gender>().Entities
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromHours(24)); // Simpan data dalam cache selama 10 menit
                 }

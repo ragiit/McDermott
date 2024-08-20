@@ -103,65 +103,66 @@
 
         #region Relation
 
-        [SetToNull]
+        //[SetToNull]
         public User? Supervisor { get; set; }
-        [SetToNull]
-        public Occupational? Occupational { get; set; } 
 
-        [SetToNull]
+        //[SetToNull]
+        public Occupational? Occupational { get; set; }
+
+        //[SetToNull]
         public virtual Group? Group { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Gender? Gender { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Country? IdCardCountry { get; set; } // KTP Negara
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Province? IdCardProvince { get; set; } // KTP Province
 
-        [SetToNull]
+        //[SetToNull]
         public virtual City? IdCardCity { get; set; } // KTP Negara
 
-        [SetToNull]
+        //[SetToNull]
         public virtual District? IdCardDistrict { get; set; } // KTP Negara
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Village? IdCardVillage { get; set; } // KTP Negara
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Country? DomicileCountry { get; set; } // Domisili Negara
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Province? DomicileProvince { get; set; } // Domisili Province
 
-        [SetToNull]
+        //[SetToNull]
         public virtual City? DomicileCity { get; set; } // Domisili City
 
-        [SetToNull]
+        //[SetToNull]
         public virtual District? DomicileDistrict { get; set; } // Domisili District
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Village? DomicileVillage { get; set; } // Domisili Village
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Religion? Religion { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Speciality? Speciality { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual JobPosition? JobPosition { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Department? Department { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual Degree? Degree { get; set; }
 
-        [SetToNull]
+        //[SetToNull]
         public virtual List<PatientAllergy>? PatientAllergies { get; set; }
 
-        #endregion
+        #endregion Relation
     }
 }

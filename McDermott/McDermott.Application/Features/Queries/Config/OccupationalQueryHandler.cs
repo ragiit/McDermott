@@ -23,10 +23,9 @@ namespace McDermott.Application.Features.Queries.Config
 
                 if (!_cache.TryGetValue(cacheKey, out List<Occupational>? result))
                 {
-                    result = await _unitOfWork.Repository<Occupational>().GetAsync(
-                        null,
-                        null,
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<Occupational>().Entities
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

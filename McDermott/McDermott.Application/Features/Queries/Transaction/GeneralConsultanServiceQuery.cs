@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {
@@ -65,7 +64,8 @@ namespace McDermott.Application.Features.Queries.Transaction
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultanService>().AddAsync(request.GeneralConsultanServiceDto.Adapt<GeneralConsultanService>());
+                var req = request.GeneralConsultanServiceDto.Adapt<CreateUpdateGeneralConsultanServiceDto>();
+                var result = await _unitOfWork.Repository<GeneralConsultanService>().AddAsync(req.Adapt<GeneralConsultanService>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -83,7 +83,8 @@ namespace McDermott.Application.Features.Queries.Transaction
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultanService>().AddAsync(request.GeneralConsultanServiceDtos.Adapt<List<GeneralConsultanService>>());
+                var req = request.GeneralConsultanServiceDtos.Adapt<CreateUpdateGeneralConsultanServiceDto>();
+                var result = await _unitOfWork.Repository<GeneralConsultanService>().AddAsync(req.Adapt<List<GeneralConsultanService>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -106,7 +107,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             try
             {
                 var result = await _unitOfWork.Repository<GeneralConsultanService>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id) ?? new();
-                
+
                 result.Status = request.Status;
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -125,7 +126,8 @@ namespace McDermott.Application.Features.Queries.Transaction
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultanService>().UpdateAsync(request.GeneralConsultanServiceDto.Adapt<GeneralConsultanService>());
+                var req = request.GeneralConsultanServiceDto.Adapt<CreateUpdateGeneralConsultanServiceDto>();
+                var result = await _unitOfWork.Repository<GeneralConsultanService>().UpdateAsync(req.Adapt<GeneralConsultanService>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -208,7 +210,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        #endregion GET
+        #endregion GET General Consultan Service Log
 
         #region CREATE General Consultan Service Log
 
@@ -248,7 +250,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        #endregion CREATE
+        #endregion CREATE General Consultan Service Log
 
         #region Update General Consultan Service Log
 
@@ -270,7 +272,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        #endregion Update
+        #endregion Update General Consultan Service Log
 
         #region Delete General Consultan Service Log
 
@@ -300,7 +302,6 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-
-        #endregion Delete
+        #endregion Delete General Consultan Service Log
     }
 }
