@@ -1,9 +1,4 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Pharmacy
 {
@@ -12,14 +7,17 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long Id { get; set; }
         public long? LinesId { get; set; }
         public long? TransactionStockId { get; set; }
+
         [Required(ErrorMessage = "Input Stock Not Null!!")]
         public long CutStock { get; set; } = 0;
+
         public long? CurrentStock { get; set; }
         public string? Batch { get; set; }
         public DateTime? ExpiredDate { get; set; }
 
         [SetToNull]
         public virtual ConcoctionLineDto? Lines { get; set; }
+
         [SetToNull]
         public virtual TransactionStockDto? TransactionStock { get; set; }
     }

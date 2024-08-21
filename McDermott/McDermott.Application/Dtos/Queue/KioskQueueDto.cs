@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Application.Dtos.Queue
 {
-    public class KioskQueueDto  : IMapFrom<KioskQueue>
+    public class KioskQueueDto : IMapFrom<KioskQueue>
     {
         public long Id { get; set; }
         public long? KioskId { get; set; }

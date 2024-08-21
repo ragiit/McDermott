@@ -1,9 +1,4 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Inventory
 {
@@ -13,6 +8,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [Required(ErrorMessage = "Please Select Product..")]
         public long? ProductId { get; set; }
+
         public string? ProductName { get; set; }
 
         [Required(ErrorMessage = "Please input Quantity..")]
@@ -24,10 +20,12 @@ namespace McDermott.Application.Dtos.Inventory
 
         [Required(ErrorMessage = "Please Select Source Location..")]
         public long? SourceId { get; set; }
+
         public string? SourceName { get; set; }
 
         [Required(ErrorMessage = "Please Select Destination Location..")]
         public long? DestinanceId { get; set; }
+
         public string? DestinanceName { get; set; }
 
         public string? Batch { get; set; }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Inventory
+﻿namespace McDermott.Application.Dtos.Inventory
 {
-    public class ReceivingLogDto :IMapFrom<ReceivingLog>
+    public class ReceivingLogDto : IMapFrom<ReceivingLog>
     {
         public long Id { get; set; }
         public long? ReceivingId { get; set; }

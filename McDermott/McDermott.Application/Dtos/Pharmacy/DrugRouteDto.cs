@@ -6,6 +6,7 @@
 
         [Required]
         public string Route { get; set; } = string.Empty;
+
         public string? Code { get; set; }
     }
 }

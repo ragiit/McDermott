@@ -13,15 +13,13 @@ namespace McDermott.Application.Dtos.Pharmacy
         public long? DrugRouteId { get; set; }
         public string? MedicamentName { get; set; }
         public string? MedicamenName { get; set; }
-        
+
         public string? DrugFormName { get; set; }
         public string? DrugDosageName { get; set; }
         public long ConcoctionQty { get; set; } = 0;
 
-
         [SetToNull]
         public DrugRouteDto? DrugRoute { get; set; }
-        
 
         [SetToNull]
         public DrugDosageDto? DrugDosage { get; set; }

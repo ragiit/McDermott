@@ -91,6 +91,5 @@ namespace McDermott.Application.Dtos.Inventory
         public string? EquipmentCondition { get; set; }
         public bool IsTopicalMedication { get; set; }
         public bool IsOralMedication { get; set; }
-
     }
 }

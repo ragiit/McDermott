@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Common;
-
-namespace McDermott.Application.Dtos.Inventory
+﻿namespace McDermott.Application.Dtos.Inventory
 {
     public record InventoryAdjusmentDetailDto : IMapFrom<InventoryAdjusmentDetail>
     {

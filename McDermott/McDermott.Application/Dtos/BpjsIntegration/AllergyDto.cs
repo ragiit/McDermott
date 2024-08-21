@@ -6,7 +6,6 @@ namespace McDermott.Application.Dtos.BpjsIntegration
     {
         public long Id { get; set; }
 
-
         [JsonPropertyName("kdAllergy")]
         public string KdAllergy { get; set; } = string.Empty;
 

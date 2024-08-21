@@ -11,10 +11,10 @@
         [StringLength(5)]
         public string Code { get; set; } = string.Empty;
 
-
         public string? Type { get; set; }
 
         private bool _isBPJSKesehatan = true;
+
         public bool IsBPJSKesehatan
         {
             get => _isBPJSKesehatan;
@@ -27,9 +27,11 @@
                 }
             }
         }
+
         public bool IsMcu { get; set; } = false;
 
         private bool _isBPJSTK;
+
         public bool IsBPJSTK
         {
             get => _isBPJSTK;
@@ -42,6 +44,7 @@
                 }
             }
         }
+
         public long? AdminFee { get; set; }
         public long? Presentase { get; set; }
         public long? AdminFeeMax { get; set; }
