@@ -1,20 +1,16 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Pharmacy
 {
-    public class StockOutPrescriptionDto:IMapFrom<StockOutPrescription>
+    public class StockOutPrescriptionDto : IMapFrom<StockOutPrescription>
     {
         public long Id { get; set; }
         public long? PrescriptionId { get; set; }
         public long? TransactionStockId { get; set; }
-        
+
         [Required(ErrorMessage = "Input Stock Not Null!!")]
         public long CutStock { get; set; } = 0;
+
         public long? CurrentStock { get; set; }
         public string? Batch { get; set; }
         public long? uomId { get; set; }
@@ -22,9 +18,8 @@ namespace McDermott.Application.Dtos.Pharmacy
 
         [SetToNull]
         public virtual PrescriptionDto? Prescription { get; set; }
+
         [SetToNull]
         public virtual TransactionStockDto? TransactionStock { get; set; }
-        
-
     }
 }

@@ -21,16 +21,20 @@ namespace McDermott.Application.Dtos.Pharmacy
 
         [SetToNull]
         public virtual ProductDto? Product { get; set; }
+
         [SetToNull]
         public virtual DrugDosageDto? Frequency { get; set; }
+
         [SetToNull]
         public virtual DrugFormDto? Form { get; set; }
+
         [SetToNull]
         public virtual DrugRouteDto? Route { get; set; }
+
         [SetToNull]
         public virtual UomDto? Uom { get; set; }
+
         [SetToNull]
         public virtual List<ActiveComponentDto>? ActiveComponent { get; set; }
-
     }
 }

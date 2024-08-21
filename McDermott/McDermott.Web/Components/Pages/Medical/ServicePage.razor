@@ -52,7 +52,7 @@
                                         var a = (ServiceDto)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-captionS" Caption="Service Name" ColSpanMd="12">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service Name" ColSpanMd="12">
                                             <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
                                             <ValidationMessage For="@(()=>a.Name)" />
                                         </DxFormLayoutItem>
@@ -83,6 +83,10 @@
                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mcu" ColSpanMd="12">
                                             <DxCheckBox @bind-Checked="@a.IsMcu" />
                                             <ValidationMessage For="@(()=>a.IsMcu)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Vaccination" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@a.IsVaccination" />
+                                            <ValidationMessage For="@(()=>a.IsVaccination)" />
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </EditFormTemplate>

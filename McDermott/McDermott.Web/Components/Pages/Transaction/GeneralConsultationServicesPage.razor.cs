@@ -62,7 +62,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private string SelectedRujukanType { get; set; } = "Rujuk Internal";
         private string SelectedRujukanExternal { get; set; }
         private string SelectedRujukanVertical { get; set; }
-        private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External" };
+        private IEnumerable<string> RujukanTypes = new[] { "Rujuk Internal", "Rujukan External", "McDermott Internal Refferal" };
         private IEnumerable<string> RujukanExtenalTypes = new[] { "Rujukan Horizontal", "Rujukan Vertical" };
         private IEnumerable<string> RujukanExtenalVertical = new[] { "Kondisi Khusus", "Spesialis" };
         private IGrid GridRujukanRefer { get; set; }

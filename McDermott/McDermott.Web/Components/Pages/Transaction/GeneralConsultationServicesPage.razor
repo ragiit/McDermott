@@ -1,4 +1,5 @@
 ﻿@page "/clinic-service/general-consultation-service"
+@using McDermott.Web.Components.LayoutComponents
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Transaction General Consultation Service</PageTitle>
@@ -267,7 +268,29 @@
                                         </div>
                                     </div>
 
-                                    <div class="w-100">
+                                    <GCGeneralInformationLayoutComponent TGCForm="GeneralConsultanServiceDto"
+                                                                         GeneralConsultanService="GeneralConsultanService"
+                                                                         CbSelectedItemInsurancePolicyChanged="SelectedItemInsurancePolicyChanged"
+                                                                         CbSelectedItemPatientChanged="SelectedItemPatientChanged"
+                                                                         CbSelectedItemPaymentChanged="SelectedItemPaymentChanged"
+                                                                         CbSelectedItemRegisTypeChanged="SelectedItemRegisTypeChanged"
+                                                                         CbSelectedItemServiceChanged="SelectedItemServiceChanged"
+                                                                         CbSelectedMaternityStartDateChanged="SelectedMaternityStartDateChanged"
+                                                                         ClassTypes="ClassTypes"
+                                                                         InsurancePolicies="InsurancePolicies"
+                                                                         Patients="Patients"
+                                                                         Payments="Payments"
+                                                                         Physicions="Physicions"
+                                                                         RegisType="RegisType"
+                                                                         SelectedInsurancePolicy="SelectedInsurancePolicy"
+                                                                         Services="Services"
+                                                                         ReadOnlyService="true"
+                                                                         UserForm="UserForm">
+                                    </GCGeneralInformationLayoutComponent>
+
+
+
+                                   @*  <div class="w-100">
                                         <div class="w-100">
                                             <div class="card">
                                                 <div class="card-header">
@@ -358,20 +381,7 @@
                                                                                   ValueFieldName="Code">
                                                                     </MyDxComboBox>
                                                                 </DxFormLayoutItem>
-
-                                                                @*  <DxFormLayoutItem CaptionCssClass="" Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" Caption=" " ColSpanMd="12">
-
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem Visible="@(!string.IsNullOrWhiteSpace(GeneralConsultanService.TypeRegistration) && !GeneralConsultanService.TypeRegistration.Equals("General Consultation"))"
-                                                        CaptionCssClass="required-caption normal-caption"
-                                                        Caption="Medical Type" ColSpanMd="12">
-                                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                        Data="@Method"
-                                                        NullText="Select Method..."
-                                                        @bind-Value="@GeneralConsultanService.TypeMedical">
-                                                        </MyDxComboBox>
-                                                        </DxFormLayoutItem> *@
+                                                                 
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
                                                                     <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
@@ -520,7 +530,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> *@
 
                                     @*   <div class="w-100">
                             <div class="card">

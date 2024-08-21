@@ -1,5 +1,4 @@
-﻿
-namespace McDermott.Application.Dtos.Medical
+﻿namespace McDermott.Application.Dtos.Medical
 {
     public class LabTestDto : IMapFrom<LabTest>
     {
@@ -8,6 +7,7 @@ namespace McDermott.Application.Dtos.Medical
 
         [Required]
         public string Name { get; set; } = string.Empty;
+
         public string? Code { get; set; }
         public string ResultType { get; set; } = "Quantitative";
 

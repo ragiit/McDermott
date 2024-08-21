@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Common;
-
-namespace McDermott.Application.Dtos.Config
+﻿namespace McDermott.Application.Dtos.Config
 {
     public class UserDto : IMapFrom<User>
     {

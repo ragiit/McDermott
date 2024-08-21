@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Employee
+﻿namespace McDermott.Application.Dtos.Employee
 {
-    public class SickLeaveDto :IMapFrom<SickLeave>
+    public class SickLeaveDto : IMapFrom<SickLeave>
     {
         public long Id { get; set; }
         public long? GeneralConsultansId { get; set; }

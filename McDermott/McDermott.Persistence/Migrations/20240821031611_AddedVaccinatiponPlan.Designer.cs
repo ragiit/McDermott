@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240821031611_AddedVaccinatiponPlan")]
+    partial class AddedVaccinatiponPlan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2310,9 +2313,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("KioskQueueId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("LocationId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("M")
                         .HasColumnType("bigint");
 
@@ -2380,9 +2380,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReferVerticalSpesialisSaranaName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reference")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RegistrationDate")
@@ -2463,8 +2460,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("InsurancePolicyId");
 
                     b.HasIndex("KioskQueueId");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("PatientId");
 
@@ -3517,8 +3512,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<int?>("RepeatNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("RepeatWork")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("RepeatWork")
+                        .HasColumnType("int");
 
                     b.Property<long?>("RequestById")
                         .HasColumnType("bigint");
@@ -4263,9 +4258,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("EquipmentCondition")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("HighAlert")
-                        .HasColumnType("bit");
-
                     b.Property<string>("HospitalType")
                         .HasColumnType("nvarchar(max)");
 
@@ -4756,9 +4748,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsPatient")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsVaccination")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -6315,11 +6304,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("KioskQueueId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -6347,8 +6331,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("InsurancePolicy");
 
                     b.Navigation("KioskQueue");
-
-                    b.Navigation("Location");
 
                     b.Navigation("Patient");
 

@@ -21,7 +21,7 @@
         public bool IsFarmacologi { get; set; } = false;
         public bool IsFood { get; set; } = false;
         public EnumStatusPharmacy? Status { get; set; }
-        public DateTime? CreatedDate {  get; set; }
+        public DateTime? CreatedDate { get; set; }
 
         public LocationDto? Location { get; set; }
         public MedicamentGroupDto? MedicamentGroup { get; set; }

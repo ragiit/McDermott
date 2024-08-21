@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Inventory
+﻿namespace McDermott.Application.Dtos.Inventory
 {
     public class TransactionStockDto : IMapFrom<TransactionStock>
     {
-        
         public long Id { get; set; }
         public string? SourceTable { get; set; }
         public long? SourcTableId { get; set; }
@@ -21,7 +14,6 @@ namespace McDermott.Application.Dtos.Inventory
         public bool Validate { get; set; } = false;
         public long Quantity { get; set; } = 0;
         public DateTime? CreatedDate { get; set; } = null;
-
 
         public virtual ProductDto? Product { get; set; }
         public virtual LocationDto? Location { get; set; }

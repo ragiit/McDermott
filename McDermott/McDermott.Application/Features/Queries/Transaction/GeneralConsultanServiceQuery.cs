@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.EntityFrameworkCore;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {
@@ -67,6 +69,52 @@ namespace McDermott.Application.Features.Queries.Transaction
                 var req = request.GeneralConsultanServiceDto.Adapt<CreateUpdateGeneralConsultanServiceDto>();
                 var result = await _unitOfWork.Repository<GeneralConsultanService>().AddAsync(req.Adapt<GeneralConsultanService>());
 
+                var currentDate = DateTime.Now;
+                string year = currentDate.ToString("yyyy");
+                string month = currentDate.ToString("MM");
+
+                var lastTransaction = await _unitOfWork.Repository<GeneralConsultanService>().Entities
+                    .Where(x => x.CreatedDate.Value.Year == currentDate.Year
+                && x.CreatedDate.Value.Month == currentDate.Month).OrderByDescending(x => x.Id).Select(x => x.Reference).FirstOrDefaultAsync();
+
+                int newSequence = 1;
+
+                if (lastTransaction != null)
+                {
+                    string lastSequenceNumber = lastTransaction;
+
+                    // Pastikan lastSequenceNumber memiliki format yang benar
+                    if (lastSequenceNumber.Length == 16 && lastSequenceNumber.StartsWith("GC/"))
+                    {
+                        // Extract the sequence part (XXXXX) from the last sequence number
+                        string sequencePart = lastSequenceNumber.Substring(11, 5);
+
+                        if (int.TryParse(sequencePart, out int lastSequence))
+                        {
+                            // Increment sequence number
+                            newSequence = lastSequence + 1;
+                        }
+                        else
+                        {
+                            // Handle the case where the sequence part is not a valid number
+                            throw new FormatException($"The sequence part '{sequencePart}' is not a valid number.");
+                        }
+                    }
+                    else
+                    {
+                        // Handle the case where lastSequenceNumber does not match expected format
+                        throw new FormatException($"The last sequence number '{lastSequenceNumber}' does not match the expected format 'GC/YYYY/MM/XXXXX'.");
+                    }
+                }
+
+                // Generate the new sequence number with format GC/YYYY/MM/XXXXX
+                string sequenceNumber = $"GC/{year}/{month}/{newSequence:D5}";
+
+                result.Reference = sequenceNumber;
+
+                // Generate the new sequence number with format GC/YYYY/MM/XXXXX
+                //string sequenceNumber = $"GC/{year}/{month}/{newSequence:D5}";
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetGeneralConsultanServiceQuery_");
@@ -122,12 +170,91 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
+        public string GenerateGCSequenceNumberAsync(List<GeneralConsultanServiceDto> generalConsultanServices)
+        {
+            var currentDate = DateTime.Now;
+            string year = currentDate.ToString("yyyy");
+            string month = currentDate.ToString("MM");
+
+            // Ambil transaksi terakhir di bulan dan tahun ini
+            //var lastTransaction = await _context.Transactions
+            //    .Where(t => t.ConfirmDate.Year == currentDate.Year && t.ConfirmDate.Month == currentDate.Month)
+            //    .OrderByDescending(t => t.Id)
+            //    .FirstOrDefaultAsync();
+
+            var lastTransaction = generalConsultanServices.Where(x => x.CreatedDate.GetValueOrDefault().Year == currentDate.Year
+            && x.CreatedDate.GetValueOrDefault().Month == currentDate.Month).OrderByDescending(x => x.Id).FirstOrDefault();
+
+            int newSequence = 1;
+
+            if (lastTransaction != null)
+            {
+                // Extract the sequence part (XXXXX) from the last sequence number
+                string lastSequenceNumber = lastTransaction.Reference;
+                int lastSequence = int.Parse(lastSequenceNumber.Substring(10, 5));
+
+                // Increment sequence number
+                newSequence = lastSequence + 1;
+            }
+
+            // Generate the new sequence number with format GC/YYYY/MM/XXXXX
+            string sequenceNumber = $"GC/{year}/{month}/{newSequence:D5}";
+
+            return sequenceNumber;
+        }
+
         public async Task<GeneralConsultanServiceDto> Handle(UpdateGeneralConsultanServiceRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 var req = request.GeneralConsultanServiceDto.Adapt<CreateUpdateGeneralConsultanServiceDto>();
                 var result = await _unitOfWork.Repository<GeneralConsultanService>().UpdateAsync(req.Adapt<GeneralConsultanService>());
+
+                if (string.IsNullOrWhiteSpace(result.Reference))
+                {
+                    var currentDate = DateTime.Now;
+                    string year = currentDate.ToString("yyyy");
+                    string month = currentDate.ToString("MM");
+
+                    var lastTransaction = await _unitOfWork.Repository<GeneralConsultanService>().Entities
+                        .Where(x => x.CreatedDate.Value.Year == currentDate.Year
+                    && x.CreatedDate.Value.Month == currentDate.Month).OrderByDescending(x => x.Id).Select(x => x.Reference).FirstOrDefaultAsync();
+
+                    int newSequence = 1;
+
+                    if (lastTransaction != null)
+                    {
+                        string lastSequenceNumber = lastTransaction;
+
+                        // Pastikan lastSequenceNumber memiliki format yang benar
+                        if (lastSequenceNumber.Length == 16 && lastSequenceNumber.StartsWith("GC/"))
+                        {
+                            // Extract the sequence part (XXXXX) from the last sequence number
+                            string sequencePart = lastSequenceNumber.Substring(11, 5);
+
+                            if (int.TryParse(sequencePart, out int lastSequence))
+                            {
+                                // Increment sequence number
+                                newSequence = lastSequence + 1;
+                            }
+                            else
+                            {
+                                // Handle the case where the sequence part is not a valid number
+                                throw new FormatException($"The sequence part '{sequencePart}' is not a valid number.");
+                            }
+                        }
+                        else
+                        {
+                            // Handle the case where lastSequenceNumber does not match expected format
+                            throw new FormatException($"The last sequence number '{lastSequenceNumber}' does not match the expected format 'GC/YYYY/MM/XXXXX'.");
+                        }
+                    }
+
+                    // Generate the new sequence number with format GC/YYYY/MM/XXXXX
+                    string sequenceNumber = $"GC/{year}/{month}/{newSequence:D5}";
+
+                    result.Reference = sequenceNumber;
+                }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -6,6 +6,8 @@ namespace McDermott.Application.Dtos.Transaction
     {
         public long Id { get; set; }
 
+        public string? Reference { get; set; }
+
         public long? KioskQueueId { get; set; }
 
         //[Required(ErrorMessage = "The Patient field is required.")]
@@ -232,6 +234,13 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion Clinical Assesment
 
+        #region Vaccination
+
+        public long? LocationId { get; set; }
+
+        #endregion Vaccination
+
+        public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
         public virtual KioskQueueDto? KioskQueue { get; set; }
         public virtual ClassTypeDto? ClassType { get; set; }
@@ -249,6 +258,7 @@ namespace McDermott.Application.Dtos.Transaction
     public class CreateUpdateGeneralConsultanServiceDto
     {
         public long Id { get; set; }
+        public string? Reference { get; set; }
 
         public long? KioskQueueId { get; set; }
 
@@ -459,5 +469,10 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion Clinical Assesment
 
+        #region Vaccination
+
+        public long? LocationId { get; set; }
+
+        #endregion Vaccination
     }
 }

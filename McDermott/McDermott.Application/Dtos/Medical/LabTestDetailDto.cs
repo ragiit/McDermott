@@ -6,8 +6,10 @@
 
         public long? LabTestId { get; set; }
         public long? LabUomId { get; set; }
+
         [Required]
         public string Name { get; set; } = string.Empty;
+
         public string? ResultType { get; set; }
         public string? Parameter { get; set; }
         public string? NormalRangeMale { get; set; }

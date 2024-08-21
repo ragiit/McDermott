@@ -8,10 +8,12 @@ namespace McDermott.Application.Dtos.Inventory
 
         [Required]
         public string Name { get; set; } = string.Empty;
+
         public long? UomCategoryId { get; set; }
 
         [NotMapped]
         private string _type = "Bigger than the reference Unit of Measure";
+
         public string Type
         {
             get { return _type; }

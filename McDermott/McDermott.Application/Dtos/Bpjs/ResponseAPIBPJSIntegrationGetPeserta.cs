@@ -6,6 +6,7 @@ namespace McDermott.Application.Dtos.Bpjs
     public class ResponseAPIBPJSIntegrationGetPeserta
     {
         public long Id { get; set; }
+
         [JsonPropertyName("noKartu")]
         public string? NoKartu { get; set; }
 

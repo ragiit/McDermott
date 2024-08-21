@@ -1,5 +1,4 @@
-﻿
-namespace McDermott.Application.Dtos.Medical
+﻿namespace McDermott.Application.Dtos.Medical
 {
     public class LocationDto : IMapFrom<Location>
     {

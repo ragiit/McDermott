@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Pharmacy
+﻿namespace McDermott.Application.Dtos.Pharmacy
 {
     public class PharmacyLogDto : IMapFrom<PharmacyLog>
     {
@@ -18,6 +12,5 @@ namespace McDermott.Application.Dtos.Pharmacy
 
         public PharmacyDto? Pharmacy { get; set; }
         public UserDto? UserBy { get; set; }
-
     }
 }

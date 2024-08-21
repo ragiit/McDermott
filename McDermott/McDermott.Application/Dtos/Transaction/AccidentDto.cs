@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Transaction
+﻿namespace McDermott.Application.Dtos.Transaction
 {
     public class AccidentDto : IMapFrom<Accident>
     {
@@ -15,13 +9,17 @@ namespace McDermott.Application.Dtos.Transaction
         [Display(Name = "Date Of Occurrence")]
         [Required]
         public DateTime? DateOfOccurrence { get; set; }
+
         [Required]
         public DateTime? DateOfFirstTreatment { get; set; }
+
         public bool RibbonSpecialCase { get; set; } = false;
         public string? Sent { get; set; }
         public string? EmployeeClass { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EstimatedDisability { get; set; }
+
         public string? AreaOfYard { get; set; }
 
         public EnumStatusAccident Status { get; set; } = EnumStatusAccident.Draft;
@@ -30,6 +28,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string AccidentLocation { get; set; } = "Inside";
 
         #region Employee Cause Of Injury
+
         public IEnumerable<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
         public IEnumerable<string> SelectedEmployeeCauseOfInjury2 { get; set; } = [];
         public IEnumerable<string> SelectedEmployeeCauseOfInjury3 { get; set; } = [];
@@ -60,7 +59,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? EmployeeCauseOfInjury13 { get; set; }
         public string? EmployeeCauseOfInjury14 { get; set; }
 
-        #endregion
+        #endregion Employee Cause Of Injury
 
         #region Nature Of Injury
 
@@ -81,7 +80,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? NatureOfInjury7 { get; set; }
         public string? NatureOfInjury8 { get; set; }
 
-        #endregion
+        #endregion Nature Of Injury
 
         #region Part Of Body
 
@@ -98,7 +97,6 @@ namespace McDermott.Application.Dtos.Transaction
         public IEnumerable<string> SelectedPartOfBody11 { get; set; } = [];
         public IEnumerable<string> SelectedPartOfBody12 { get; set; } = [];
 
-
         public string? PartOfBody1 { get; set; }
         public string? PartOfBody2 { get; set; }
         public string? PartOfBody3 { get; set; }
@@ -112,9 +110,10 @@ namespace McDermott.Application.Dtos.Transaction
         public string? PartOfBody11 { get; set; }
         public string? PartOfBody12 { get; set; }
 
-        #endregion
+        #endregion Part Of Body
 
         #region Treatment
+
         public IEnumerable<string> SelectedTreatment1 { get; set; } = [];
         public IEnumerable<string> SelectedTreatment2 { get; set; } = [];
         public IEnumerable<string> SelectedTreatment3 { get; set; } = [];
@@ -129,7 +128,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Treatment5 { get; set; }
         public string? Treatment6 { get; set; }
         public string? Treatment7 { get; set; }
-        #endregion
+
+        #endregion Treatment
 
         public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public virtual UserDto? Employee { get; set; }

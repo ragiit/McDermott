@@ -1,13 +1,8 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Inventory
 {
-    public class MaintainanceDto :IMapFrom<Maintainance>
+    public class MaintainanceDto : IMapFrom<Maintainance>
     {
         public long Id { get; set; }
         public long? RequestById { get; set; }
@@ -32,8 +27,10 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual UserDto? RequestBy { get; set; }
+
         [SetToNull]
         public virtual UserDto? ResponsibleBy { get; set; }
+
         [SetToNull]
         public virtual ProductDto? Equipment { get; set; }
     }
