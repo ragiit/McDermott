@@ -10,6 +10,16 @@
 
             <div class="card-body">
                 <div class="row">
+                    <div class="col-md-12">
+                        <DxFormLayout>
+                            @if (GeneralConsultanService.Id != 0)
+                            {
+                                <DxFormLayoutItem ColSpanMd="12">
+                                    <h3 class="fw-bolder">@GeneralConsultanService.Reference</h3>
+                                </DxFormLayoutItem>
+                            }
+                        </DxFormLayout>
+                    </div>
                     <div class="col-md-6">
                         @{
                             if (GeneralConsultanService.Patient is null)
@@ -166,6 +176,16 @@
                                 </DxDateEdit>
                             </DxFormLayoutItem>
 
+                            <DxFormLayoutItem Visible="IsVaccinationLocation" CaptionCssClass="normal-caption" Caption="Location" ColSpanMd="12">
+                                <MyDxComboBox Data="@Locations"
+                                              NullText="Select Location..."
+                                              TextFieldName="NameAndParent"
+                                              ValueFieldName="Id"
+                                              @bind-Value="GeneralConsultanService.LocationId">
+                                </MyDxComboBox>
+                                <ValidationMessage For="@(() => GeneralConsultanService.LocationId)" />
+                            </DxFormLayoutItem>
+
                             <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
                                 <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsSickLeave" />
                             </DxFormLayoutItem>
@@ -241,47 +261,25 @@
         </div>
     </div>
 </div>
- 
+
 
 
 @code {
-    [Parameter]
-    public PatientAllergyDto PatientAllergy { get; set; } = new();
-    [Parameter]
-    public InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
-    [Parameter]
-    public UserDto UserForm { get; set; }
-    [Parameter]
-    public TGCForm GeneralConsultanService { get; set; }
-
-    [Parameter]
-    public IEnumerable<UserDto> Patients { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<string> RegisType { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<ClassTypeDto> ClassTypes { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<ServiceDto> Services { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<UserDto> Physicions { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<string> Payments { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
-
-    [Parameter]
-    public IEnumerable<AllergyDto> WeatherAllergies { get; set; } = [];
-    [Parameter]
-    public IEnumerable<AllergyDto> FoodAllergies { get; set; } = [];
-    [Parameter]
-    public IEnumerable<AllergyDto> PharmacologyAllergies { get; set; } = [];
-
+    [Parameter] public PatientAllergyDto PatientAllergy { get; set; } = new();
+    [Parameter] public InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
+    [Parameter] public UserDto UserForm { get; set; }
+    [Parameter] public TGCForm GeneralConsultanService { get; set; }
+    [Parameter] public IEnumerable<UserDto> Patients { get; set; } = [];
+    [Parameter] public IEnumerable<string> RegisType { get; set; } = [];
+    [Parameter] public IEnumerable<ClassTypeDto> ClassTypes { get; set; } = [];
+    [Parameter] public IEnumerable<ServiceDto> Services { get; set; } = [];
+    [Parameter] public IEnumerable<UserDto> Physicions { get; set; } = [];
+    [Parameter] public IEnumerable<string> Payments { get; set; } = [];
+    [Parameter] public IEnumerable<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
+    [Parameter] public IEnumerable<AllergyDto> WeatherAllergies { get; set; } = [];
+    [Parameter] public IEnumerable<AllergyDto> FoodAllergies { get; set; } = [];
+    [Parameter] public IEnumerable<AllergyDto> PharmacologyAllergies { get; set; } = [];
+    [Parameter] public IEnumerable<LocationDto> Locations { get; set; } = [];
     [Parameter] public EventCallback<UserDto> CbSelectedItemPatientChanged { get; set; }
     [Parameter] public EventCallback<string> CbSelectedItemRegisTypeChanged { get; set; }
     [Parameter] public EventCallback<ServiceDto> CbSelectedItemServiceChanged { get; set; }
@@ -289,9 +287,13 @@
     [Parameter] public EventCallback<string> CbSelectedItemPaymentChanged { get; set; }
     [Parameter] public EventCallback<DateTime> CbSelectedMaternityStartDateChanged { get; set; }
     [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedFoodAllergies { get; set; }
-    [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedPharmacologyAllergies { get; set; } 
+    [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedPharmacologyAllergies { get; set; }
     [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedWeatherAllergies { get; set; }
-    [Parameter] public bool ReadOnlyService {get;set;}
+
+    [Parameter] public bool ReadOnlyService { get; set; } = false;
+    [Parameter] public bool IsVaccinationLocation { get; set; } = false;
+
+
     private IEnumerable<AllergyDto> _selectedPharmacologyAllergies;
     protected IEnumerable<AllergyDto> SelectedPharmacologyAllergies
     {
@@ -324,7 +326,7 @@
             // Invoke the callback to notify the parent component
             CbSelectedWeatherAllergies.InvokeAsync(value);
         }
-    }  
+    }
     protected void SelectedItemInsurancePolicyChanged(InsurancePolicyDto selectedItem)
     {
         CbSelectedItemInsurancePolicyChanged.InvokeAsync(selectedItem);
@@ -355,18 +357,18 @@
         CbSelectedItemPatientChanged.InvokeAsync(selectedItem);
     }
     private List<string> YesNoOptions =
-       [
-           "Yes",
-    "No"
-       ];
+    [
+    "Yes",
+        "No"
+    ];
     private List<string> RiwayatPenyakitKeluarga =
-       [
-       "DM",
+    [
+    "DM",
         "Hipertensi",
         "Cancer",
         "Jantung",
         "TBC",
         "Anemia",
         "Other",
-    ];
-}
+        ];
+        }

@@ -161,16 +161,14 @@
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Location" ColSpanMd="12">
-                                                    <DxComboBox ShowValidationIcon="true" Data="@Locations"
-                                                                NullText="Select Location..."
-                                                                TextFieldName="NameAndParent"
-                                                                ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
-                                                                ValueFieldName="Id"
-                                                                SelectedItemChanged="@((LocationDto freq)=>SelectLocation(freq))"
-                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                @bind-Value="InventoryAdjusment.LocationId">
-                                                    </DxComboBox>
+                                                    <MyDxComboBox Data="@Locations"
+                                                                  NullText="Select Location..."
+                                                                  TextFieldName="NameAndParent"
+                                                                  ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
+                                                                  ValueFieldName="Id"
+                                                                  SelectedItemChanged="@((LocationDto freq)=>SelectLocation(freq))"
+                                                                  @bind-Value="InventoryAdjusment.LocationId">
+                                                    </MyDxComboBox>
                                                     <ValidationMessage For="@(() => InventoryAdjusment.LocationId)" />
                                                 </DxFormLayoutItem>
 

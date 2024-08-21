@@ -12,6 +12,7 @@
         public bool IsPatient { get; set; }
         public bool IsKiosk { get; set; }
         public bool IsMcu { get; set; } = false;
+        public bool IsVaccination { get; set; } = false;
         public long? ServicedId { get; set; }
 
         [SetToNull]

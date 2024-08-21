@@ -8,6 +8,7 @@
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
         public long? ClassTypeId { get; set; }
+        public string? Reference { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
         public string? Payment { get; set; }
@@ -93,7 +94,17 @@
 
         #endregion Clinical Assesment
 
+
+
+        #region Vaccination
+
+        public long? LocationId { get; set; }
+
+        #endregion Vaccination
+
         public long? ProjectId { get; set; }
+
+        public virtual Location? Location { get; set; }
 
         //[SetToNull]
         public virtual Project? Project { get; set; }

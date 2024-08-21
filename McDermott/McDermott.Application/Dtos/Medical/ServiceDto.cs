@@ -15,6 +15,7 @@
         public bool IsPatient { get; set; } = false;
         public bool IsKiosk { get; set; } = false;
         public bool IsMcu { get; set; } = false;
+        public bool IsVaccination { get; set; } = false;
         public string Flag { get; set; } = string.Empty;
         public string KioskName { get; set; } = string.Empty;
         public long? ServicedId { get; set; }

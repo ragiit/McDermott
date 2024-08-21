@@ -215,6 +215,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         }
 
         private List<ProductDto> Products = [];
+        private List<LocationDto> Locations = [];
         private VaccinationPlanDto VaccinationPlan { get; set; } = new();
         private VaccinationPlanDto VaccinationGiven { get; set; } = new();
         private List<VaccinationPlanDto> VaccinationPlans { get; set; } = [];
@@ -233,7 +234,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (e == null) return;
 
-                var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id)) ?? []);
+                var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == GeneralConsultanService.LocationId)) ?? []);
                 if (e.TraceAbility)
                 {
                     Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
@@ -255,6 +256,21 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                if (GeneralConsultanService.PatientId is null)
+                {
+                    await GridVaccinationPlan.StartEditNewRowAsync();
+                    return;
+                }
+
+                if (GeneralConsultanService.LocationId is null)
+                {
+                    ToastService.ShowInfo("Please select the Location");
+                    await GridVaccinationPlan.StartEditNewRowAsync();
+                    return;
+                }
+
+                VaccinationPlan.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
+
                 if (VaccinationPlan.Id == 0)
                 {
                     await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationPlan));
@@ -263,6 +279,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationPlan));
                 }
+
+                await LoadVaccinationPlans();
             }
             catch (Exception ex)
             {
@@ -274,14 +292,17 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                VaccinationGiven.GeneralConsultanServiceId = GeneralConsultanService.Id;
                 if (VaccinationGiven.Id == 0)
                 {
-                    await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationPlan));
+                    await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationGiven));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationPlan));
+                    await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationGiven));
                 }
+
+                await LoadVaccinationGivens();
             }
             catch (Exception ex)
             {
@@ -303,11 +324,39 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task EditItemDetailVaccinationGiven_Click(IGrid context)
         {
+            // Ensure the context is not null and has selected data item
+            if (context.SelectedDataItem != null)
+            {
+                VaccinationGiven = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
+                try
+                {
+                    var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == VaccinationGiven.ProductId)) ?? []);
+                    if (VaccinationGiven.Product?.TraceAbility ?? false)
+                    {
+                        Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                        Batch = Batch.Distinct().ToList();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+                StateHasChanged();
+            }
+
             await GridVaccinationGiven.StartEditRowAsync(FocusedRowVisibleIndexVaccinationGiven);
         }
 
         private async Task EditItemDetailVaccinationPlan_Click(IGrid context)
         {
+            // Ensure the context is not null and has selected data item
+            if (context.SelectedDataItem != null)
+            {
+                VaccinationPlan = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
+
+                StateHasChanged();
+            }
+
             await GridVaccinationPlan.StartEditRowAsync(FocusedRowVisibleIndexVaccinationPlan);
         }
 
@@ -357,11 +406,33 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadVaccinationGivens()
         {
             IsLoadingVaccinationGiven = true;
-            VaccinationGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.GeneralConsultanServiceId != null));
+            VaccinationGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.GeneralConsultanServiceId != null && x.GeneralConsultanServiceId == GeneralConsultanService.Id));
             IsLoadingVaccinationGiven = false;
         }
 
-        private async Task OnDeleteInventoryAdjusmentDetail(GridDataItemDeletingEventArgs e)
+        private async Task OnDeleteVaccinationGiven(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataVaccinationGivenItems is null || SelectedDataVaccinationGivenItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(((VaccinationPlanDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataVaccinationGivenItems.Adapt<List<VaccinationPlanDto>>();
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                SelectedDataVaccinationGivenItems = [];
+                await LoadVaccinationGivens();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnDeleteVaccinationPlan(GridDataItemDeletingEventArgs e)
         {
             try
             {
@@ -543,6 +614,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task LoadComboBox()
         {
+            Locations = await Mediator.Send(new GetLocationQuery());
             Products = await Mediator.Send(new GetProductQuery(x => x.HospitalType != null && x.HospitalType.Equals("Vactination")));
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
             Services = await Mediator.Send(new GetServiceQuery(x => x.Name.Equals("Vaccination")));
@@ -870,6 +942,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                         StagingText = EnumStatusGeneralConsultantService.NurseStation;
 
+                        Id = GeneralConsultanService.Id;
                         NavigationManager.NavigateTo($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{GeneralConsultanService.Id}");
 
                         break;
@@ -925,6 +998,37 @@ namespace McDermott.Web.Components.Pages.Transaction
                             //    await Mediator.Send(new CreateSickLeaveRequest(SickLeaves));
                             //}
                         }
+
+                        #region Cut Product Stock
+
+                        var vaccinations = await Mediator.Send(new GetVaccinationPlanQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+                        var stocks = new List<TransactionStockDto>();
+
+                        foreach (var i in vaccinations)
+                        {
+                            i.Status = EnumStatusVaccination.Done;
+
+                            var s = (await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == i.ProductId && x.Batch == i.Batch && x.LocationId == GeneralConsultanService.LocationId))).FirstOrDefault() ?? new();
+
+                            stocks.Add(new TransactionStockDto
+                            {
+                                SourceTable = nameof(VaccinationPlan),
+                                SourcTableId = i.Id,
+                                ProductId = i.ProductId,
+                                Reference = GeneralConsultanService.Reference,
+                                Batch = i.Batch,
+                                LocationId = GeneralConsultanService.LocationId,
+                                Quantity = -i.Quantity,
+                                Validate = true,
+                                ExpiredDate = s.ExpiredDate,
+                                UomId = s.UomId
+                            });
+                        }
+
+                        await Mediator.Send(new UpdateListVaccinationPlanRequest(vaccinations));
+                        await Mediator.Send(new CreateListTransactionStockRequest(stocks));
+
+                        #endregion Cut Product Stock
 
                         break;
 

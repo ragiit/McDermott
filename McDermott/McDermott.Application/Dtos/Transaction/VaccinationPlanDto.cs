@@ -25,6 +25,9 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Observations { get; set; }
         public EnumStatusVaccination Status { get; set; } = EnumStatusVaccination.Scheduled;
 
+        [NotMapped]
+        public string StatusName => Status.GetDisplayName();
+
         public UserDto? Patient { get; set; }
         public UserDto? Physician { get; set; }
         public UserDto? SalesPerson { get; set; }
@@ -36,7 +39,7 @@ namespace McDermott.Application.Dtos.Transaction
     public class CreateUpdateVaccinationPlanDto
     {
         public long Id { get; set; }
-        public long GeneralConsultanServiceId { get; set; }
+        public long? GeneralConsultanServiceId { get; set; }
         public long PatientId { get; set; }
         public long ProductId { get; set; }
         public long? PhysicianId { get; set; }
