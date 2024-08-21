@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
@@ -37,6 +38,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<LocationDto> Locations = [];
         private List<StockProductDto> StockProducts = [];
         private List<TransactionStockDto> TransactionStocks = [];
+        private List<MaintainanceDto> getMaintainance = [];
         private TransactionStockDto FormTransactionStocks = new();
         private ProductDetailDto FormProductDetails = new();
         private ProductDto FormProducts = new();
@@ -54,7 +56,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool FormStockPopUp { get; set; } = false;
         private bool StockProductView { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
-        private bool showTabs { get; set; } = true;
+        private bool showTabs { get; set; } = false;
         private bool Checkins { get; set; } = false;
         private bool Chronis { get; set; } = false;
         private bool IsLoading { get; set; } = false;
@@ -224,6 +226,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
                 Locations = await Mediator.Send(new GetLocationQuery());
+                getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
 
                 // Mengambil data stok produk dan menghitung jumlahnya
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
@@ -358,8 +361,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 // Kelola informasi stok
-                TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate == true).Sum(z => z.Quantity);
-
+                if (products.HospitalType != "Medical Equipment")
+                {
+                    TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate == true).Sum(z => z.Quantity);
+                }
+                else
+                {
+                    TotalQty = getMaintainance.Where(x=>x.EquipmentId == products.Id).Count();
+                }
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
 
@@ -713,6 +722,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
+        private async Task NewTableEquipment_Item() { }
 
         private async Task NewItemStock_Click()
         {

@@ -9,7 +9,6 @@
 
         <BaseHeaderPage Title="Product" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
 
-
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -81,21 +80,37 @@
                                             <div class="col-md-3 col-sm-5 col-12 align-self-center">
                                                 <h5 class="fw-bolder ">Action: </h5>
                                             </div>
+                                            @if (FormProductDetails.HospitalType != "Medical Equipment")
+                                            {
+                                                <div class="col-md-4 col-sm-6 col-12 ">
+                                                    <div class="info-box shadow border">
+                                                        <DxButton class="info-box-icon bg-info" style="border:none" Click="NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></DxButton>
 
-                                            <div class="col-md-4 col-sm-6 col-12 ">
-                                                <div class="info-box shadow border">
-                                                    <DxButton class="info-box-icon bg-info" style="border:none" Click="NewTableStock_Item"><i class="fa-solid fa-boxes-stacked"></i></DxButton>
-
-                                                    <div class="info-box-content">
-                                                        <h3 class="info-box-number"> @TotalQty </h3>
-                                                        <h4 class="info-box-text"> @NameUom</h4>
-                                                        <span class="info-box-text">On Hand</span>
+                                                        <div class="info-box-content">
+                                                            <h3 class="info-box-number"> @TotalQty </h3>
+                                                            <h4 class="info-box-text"> @NameUom</h4>
+                                                            <span class="info-box-text">On Hand</span>
+                                                        </div>
+                                                        <!-- /.info-box-content -->
                                                     </div>
-                                                    <!-- /.info-box-content -->
+                                                    <!-- /.info-box -->
                                                 </div>
-                                                <!-- /.info-box -->
-                                            </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-4 col-sm-6 col-12 ">
+                                                    <div class="info-box shadow border">
+                                                        <DxButton class="info-box-icon bg-info" style="border:none" Click="NewTableEquipment_Item"><i class="fa-solid fa-screwdriver-wrench"></i></DxButton>
 
+                                                        <div class="info-box-content">
+                                                            <h3 class="info-box-number text-start"> @TotalQty </h3>
+                                                            <span class="info-box-text">Maintainance</span>
+                                                        </div>
+                                                        <!-- /.info-box-content -->
+                                                    </div>
+                                                    <!-- /.info-box -->
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -116,9 +131,9 @@
                                         <hr />
                                         <div class="cw-480">
                                             <DxTabs>
-                                                @if (showTabs)
-                                                {
-                                                    <DxTabPage Text="MEDICAMENT" TabIconCssClass="fa-solid fa-pills">
+                                               @*  @if (showTabs)
+                                                { *@
+                                                    <DxTabPage Text="MEDICAMENT" Visible="@(FormProductDetails.HospitalType == "Medicament")" TabIconCssClass="fa-solid fa-pills">
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <DxFormLayout CssClass="mt w-100">
@@ -134,27 +149,27 @@
                                                                     </DxFormLayoutItem>
 
                                                                     @* <DxFormLayoutItem Caption="Drug Form" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                        <DxComboBox Data="@colors" Context="contexta" @bind-Value="@selectedColor" TextFieldName="Name" ValueFieldName="Color">
-                                                                            <ItemTemplate>
-                                                                                @{
-                                                                                    var item = contexta as ColorItem;
-                                                                                }
-                                                                                <div style="display: flex; align-items: center;">
-                                                                                    <div style="width: 15px; height: 15px; background-color: @(item?.Color); margin-right: 10px;"></div>
-                                                                                    <span>@item?.Name</span>
-                                                                                </div>
-                                                                            </ItemTemplate>
-                                                                            <EditBoxTemplate>
-                                                                                @{
-                                                                                    var selectedItem = colors.FirstOrDefault(c => c.Color == selectedColor);
-                                                                                }
-                                                                                <div style="display: flex; align-items: center;">
-                                                                                    <div style="width: 15px; height: 15px; background-color: @(selectedItem?.Color); margin-right: 10px;"></div>
-                                                                                    <span>@selectedItem?.Name</span>
-                                                                                </div>
-                                                                            </EditBoxTemplate>
-                                                                        </DxComboBox>
-                                                                    </DxFormLayoutItem> *@
+                                                        <DxComboBox Data="@colors" Context="contexta" @bind-Value="@selectedColor" TextFieldName="Name" ValueFieldName="Color">
+                                                        <ItemTemplate>
+                                                        @{
+                                                        var item = contexta as ColorItem;
+                                                        }
+                                                        <div style="display: flex; align-items: center;">
+                                                        <div style="width: 15px; height: 15px; background-color: @(item?.Color); margin-right: 10px;"></div>
+                                                        <span>@item?.Name</span>
+                                                        </div>
+                                                        </ItemTemplate>
+                                                        <EditBoxTemplate>
+                                                        @{
+                                                        var selectedItem = colors.FirstOrDefault(c => c.Color == selectedColor);
+                                                        }
+                                                        <div style="display: flex; align-items: center;">
+                                                        <div style="width: 15px; height: 15px; background-color: @(selectedItem?.Color); margin-right: 10px;"></div>
+                                                        <span>@selectedItem?.Name</span>
+                                                        </div>
+                                                        </EditBoxTemplate>
+                                                        </DxComboBox>
+                                                        </DxFormLayoutItem> *@
 
                                                                     <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                         <DxComboBox Data="@DrugRoutes"
@@ -207,6 +222,9 @@
                                                                             <DxTextBox @bind-Text="@FormProductDetails.MontlyMax" NullText="0.00" />
                                                                         </DxFormLayoutItem>
                                                                     }
+                                                                    <DxFormLayoutItem Caption="High Alert" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                        <DxCheckBox @bind-Checked="@FormProductDetails.HighAlert" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                                    </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </div>
                                                             <div class="col-md-6">
@@ -232,14 +250,14 @@
                                                                     <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass=" normal-caption" ColSpanMd="12">
                                                                         <DxCheckBox @bind-Checked="@FormProductDetails.PregnancyWarning" />
                                                                     </DxFormLayoutItem>
-                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
-                                                                    <DxCheckBox CssClass="normal-caption" @bind-Checked="@FormProductDetails.IsTopicalMedication">
-                                                                        <div class="normal-caption">Topical Medication</div>
-                                                                    </DxCheckBox>
-                                                                    <DxCheckBox @bind-Checked="@(FormProductDetails.IsOralMedication)">
-                                                                        <div class="normal-caption">Oral Medication</div>
-                                                                    </DxCheckBox>
-                                                                </DxFormLayoutItem> 
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
+                                                                        <DxCheckBox CssClass="normal-caption" @bind-Checked="@FormProductDetails.IsTopicalMedication">
+                                                                            <div class="normal-caption">Topical Medication</div>
+                                                                        </DxCheckBox>
+                                                                        <DxCheckBox @bind-Checked="@(FormProductDetails.IsOralMedication)">
+                                                                            <div class="normal-caption">Oral Medication</div>
+                                                                        </DxCheckBox>
+                                                                    </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </div>
                                                             @* <DxFormLayout CssClass="mt-1">
@@ -257,7 +275,7 @@
                                                 </DxFormLayout> *@
                                                         </div>
                                                     </DxTabPage>
-                                                }
+                                                @* } *@
                                                 <DxTabPage Text="GENERAL INFORMATION" TabIconCssClass="fa-solid fa-circle-info">
                                                     <div class="row">
                                                         <div class="col-md-6">
@@ -398,7 +416,7 @@
                                                                             NullText="Internal Reference.."
                                                                             ShowValidationIcon="true" />
                                                                 </DxFormLayoutItem>
-                                                               
+
                                                             </DxFormLayout>
                                                         </div>
                                                     </div>
@@ -440,7 +458,7 @@
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
-                                        <Columns> 
+                                        <Columns>
                                             <DxGridDataColumn FieldName="DestinanceName" Caption="Location" GroupIndex="0" />
                                             @if (FieldHideStock == true)
                                             {

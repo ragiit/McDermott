@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
 {
@@ -131,6 +132,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 PanelVisible = true;
+                showForm = false;
                 getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
                 getEquipment = await Mediator.Send(new GetProductQuery(x => x.HospitalType == "Medical Equipment"));
                 getRequestBy = await Mediator.Send(new GetUserQuery());
@@ -305,9 +307,42 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
-        private async Task Repaired_Click() { }
-        private async Task Scrap_Click() { }
-        private async Task onDiscard() { }
+        private async Task Repaired_Click()
+        {
+            try
+            {
+                PanelVisible = true;
+                postMaintainance.Status = EnumStatusMaintainance.Repaired;
+                getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
+                PanelVisible = false;
+                await EditItem_Click(getMaintainanceById);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        private async Task Scrap_Click()
+        {
+            try
+            {
+                PanelVisible = true;
+                postMaintainance.Status = EnumStatusMaintainance.Scrap;
+                getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
+                PanelVisible = false;
+                await EditItem_Click(getMaintainanceById);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+        private async Task onDiscard()
+        {
+            await LoadData();
+            StateHasChanged();
+        }
+
         private async Task Refresh_Click()
         {
             await LoadData();
@@ -320,9 +355,32 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #region Delete
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        { }
+        {
+            try
+            {
+                PanelVisible = true;
+                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteMaintainanceRequest(((MaintainanceDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<MaintainanceDto>>();
+                    await Mediator.Send(new DeleteMaintainanceRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                await LoadData();
+                StateHasChanged();
+            }
+        }
         #endregion
-
 
         #region save
         MaintainanceDto getMaintainanceById = new();
