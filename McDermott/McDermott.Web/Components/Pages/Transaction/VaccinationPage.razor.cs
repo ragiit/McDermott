@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel;
 using System.Security.Policy;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -178,6 +180,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<ServiceDto> Services { get; set; } = [];
         private List<ClassTypeDto> ClassTypes = [];
         private List<UserDto> Physicions { get; set; } = [];
+        private List<UserDto> SalesPerson { get; set; } = [];
+        private List<UserDto> Educators { get; set; } = [];
         private List<UserDto> Patients { get; set; } = [];
         private UserDto UserForm = new();
         private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
@@ -195,6 +199,191 @@ namespace McDermott.Web.Components.Pages.Transaction
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+
+        #region Vaccination Tabs
+
+        private async Task OnClickGiveVaccine(VaccinationPlanDto e)
+        {
+            var s = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == e.Id))).FirstOrDefault();
+            if (s is not null)
+            {
+                s.Status = EnumStatusVaccination.InProgress;
+                s.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                await Mediator.Send(new UpdateVaccinationPlanRequest(s));
+                await LoadVaccinationPlans();
+            }
+        }
+
+        private List<ProductDto> Products = [];
+        private VaccinationPlanDto VaccinationPlan { get; set; } = new();
+        private VaccinationPlanDto VaccinationGiven { get; set; } = new();
+        private List<VaccinationPlanDto> VaccinationPlans { get; set; } = [];
+        private List<VaccinationPlanDto> VaccinationGivens { get; set; } = [];
+        private IGrid GridVaccinationPlan { get; set; }
+        private IGrid GridVaccinationGiven { get; set; }
+        private IReadOnlyList<object> SelectedDataVaccinationPlanItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataVaccinationGivenItems { get; set; } = [];
+        private List<string> Batch = [];
+
+        private async Task OnSelectProduct(ProductDto e)
+        {
+            try
+            {
+                Batch.Clear();
+
+                if (e == null) return;
+
+                var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id)) ?? []);
+                if (e.TraceAbility)
+                {
+                    Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                    Batch = Batch.Distinct().ToList();
+                }
+                else
+                {
+                }
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SaveVaccinationPlan(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                if (VaccinationPlan.Id == 0)
+                {
+                    await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationPlan));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationPlan));
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SaveVaccinationGiven(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                if (VaccinationGiven.Id == 0)
+                {
+                    await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationPlan));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationPlan));
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task NewItemDetailVaccinationPlan_Click()
+        {
+            if (GeneralConsultanService.PatientId == null || GeneralConsultanService.PatientId == 0)
+            {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please select the Patient first");
+                return;
+            }
+
+            await GridVaccinationPlan.StartEditNewRowAsync();
+        }
+
+        private async Task EditItemDetailVaccinationGiven_Click(IGrid context)
+        {
+            await GridVaccinationGiven.StartEditRowAsync(FocusedRowVisibleIndexVaccinationGiven);
+        }
+
+        private async Task EditItemDetailVaccinationPlan_Click(IGrid context)
+        {
+            await GridVaccinationPlan.StartEditRowAsync(FocusedRowVisibleIndexVaccinationPlan);
+        }
+
+        private async Task NewItemDetailGiven_Click()
+        {
+            //if (InventoryAdjusment.LocationId is null || InventoryAdjusment.LocationId == 0)
+            //{
+            //    ToastService.ClearInfoToasts();
+            //    ToastService.ShowInfo("Please select the Location first.");
+            //    return;
+            //}
+
+            //Products = await Mediator.Send(new GetProductQuery());
+            //AllProducts = Products.Select(x => x).ToList();
+
+            //FormInventoryAdjusmentDetail = new();
+            //TotalQty = 0;
+            //LotSerialNumber = "-";
+            //UomId = null;
+
+            //await GridDetail.StartEditNewRowAsync();
+        }
+
+        private int FocusedRowVisibleIndexVaccinationPlan { get; set; }
+        private int FocusedRowVisibleIndexVaccinationGiven { get; set; }
+
+        private void GridDetailVaccinationPlan_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexVaccinationPlan = args.VisibleIndex;
+        }
+
+        private void GridDetailVaccinationGiven_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexVaccinationGiven = args.VisibleIndex;
+        }
+
+        private bool IsLoadingVaccinationPlan = false;
+        private bool IsLoadingVaccinationGiven = false;
+
+        private async Task LoadVaccinationPlans()
+        {
+            IsLoadingVaccinationPlan = true;
+            VaccinationPlans = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && (x.GeneralConsultanServiceId == 0 || x.GeneralConsultanServiceId == null)));
+            IsLoadingVaccinationPlan = false;
+        }
+
+        private async Task LoadVaccinationGivens()
+        {
+            IsLoadingVaccinationGiven = true;
+            VaccinationGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.GeneralConsultanServiceId != null));
+            IsLoadingVaccinationGiven = false;
+        }
+
+        private async Task OnDeleteInventoryAdjusmentDetail(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataVaccinationPlanItems is null || SelectedDataVaccinationPlanItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(((VaccinationPlanDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataVaccinationPlanItems.Adapt<List<VaccinationPlanDto>>();
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                SelectedDataVaccinationPlanItems = [];
+                await LoadVaccinationPlans();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        #endregion Vaccination Tabs
 
         public List<string> InformationFrom =
         [
@@ -354,6 +543,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task LoadComboBox()
         {
+            Products = await Mediator.Send(new GetProductQuery(x => x.HospitalType != null && x.HospitalType.Equals("Vactination")));
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
             Services = await Mediator.Send(new GetServiceQuery(x => x.Name.Equals("Vaccination")));
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
@@ -384,6 +574,13 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Service != null && x.Service.Name.Equals("Vaccination")));
             PanelVisible = false;
+        }
+
+        private bool IsVaccinationPlan = false;
+
+        private void OnClickVaccinationPlan()
+        {
+            IsVaccinationPlan = true;
         }
 
         private async Task EditItem_Click(bool isParam = false)

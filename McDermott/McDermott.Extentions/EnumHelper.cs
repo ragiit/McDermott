@@ -47,6 +47,18 @@ namespace McDermott.Application.Extentions
             Invalidate = 0,
         }
 
+        public enum EnumStatusVaccination
+        {
+            [Display(Name = "Scheduled")]
+            Scheduled = 1,
+
+            [Display(Name = "In Progress")]
+            InProgress = 2,
+
+            [Display(Name = "Done")]
+            Done = 3,
+        }
+
         public enum EnumStatusAccident
         {
             [Display(Name = "Draft")]
