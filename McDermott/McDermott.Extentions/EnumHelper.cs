@@ -180,5 +180,31 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Cancel")]
             Cancel = 5,
         }
+        public enum EnumWorksDays
+        {
+            [Display(Name = "Days")]
+            Days = 0,
+            [Display(Name = "Weeks")]
+            Weeks = 1,
+            [Display(Name = "Months")]
+            Months = 2,
+            [Display(Name = "Years")]
+            Years = 3,
+        }
+        public enum EnumStatusMaintainance
+        {
+            [Display(Name = "Request")]
+            Request = 0,
+            [Display(Name = "InProgress")]
+            InProgress = 1,
+            [Display(Name = "Repaired")]
+            Repaired = 2,
+            [Display(Name = "Scrap")]
+            Scrap = 3,
+            [Display(Name = "Done")]
+            Done = 4,
+            [Display(Name = "Canceled")]
+            Canceled = 5
+        }
     }
 }

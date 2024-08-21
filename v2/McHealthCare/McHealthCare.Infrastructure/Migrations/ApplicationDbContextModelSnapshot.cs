@@ -5267,8 +5267,8 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("QtyStock")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("QtyStock")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("TransferStockId")
                         .HasColumnType("uniqueidentifier");

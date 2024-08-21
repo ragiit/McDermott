@@ -20,4 +20,8 @@
 	  <ProjectReference Include="..\McHealthCare.Application\McHealthCare.Application.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+
 </Project>

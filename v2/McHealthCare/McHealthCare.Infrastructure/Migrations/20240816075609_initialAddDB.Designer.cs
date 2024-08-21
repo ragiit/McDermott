@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McHealthCare.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240815082202_Refresh")]
-    partial class Refresh
+    [Migration("20240816075609_initialAddDB")]
+    partial class initialAddDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -3233,7 +3233,7 @@ namespace McHealthCare.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChronicCategory");
+                    b.ToTable("CronisCategories");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.Diagnosis", b =>
@@ -3295,6 +3295,9 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<string>("ParentCategory")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -3302,6 +3305,8 @@ namespace McHealthCare.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("DiseaseCategories");
                 });
@@ -4132,39 +4137,6 @@ namespace McHealthCare.Persistence.Migrations
                     b.HasIndex("UomId");
 
                     b.ToTable("ConcoctionLines");
-                });
-
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.CronisCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnOrder(0);
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CronisCategories");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Pharmacies.MedicamentGroup", b =>
@@ -5298,8 +5270,8 @@ namespace McHealthCare.Persistence.Migrations
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("QtyStock")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<long?>("QtyStock")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("TransferStockId")
                         .HasColumnType("uniqueidentifier");
@@ -6223,7 +6195,7 @@ namespace McHealthCare.Persistence.Migrations
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.Building", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Medical.HealthCenter", "HealthCenter")
-                        .WithMany("Buildings")
+                        .WithMany()
                         .HasForeignKey("HealthCenterId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -6233,7 +6205,7 @@ namespace McHealthCare.Persistence.Migrations
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.BuildingLocation", b =>
                 {
                     b.HasOne("McHealthCare.Domain.Entities.Medical.Building", "Building")
-                        .WithMany("BuildingLocations")
+                        .WithMany()
                         .HasForeignKey("BuildingId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -6262,6 +6234,16 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("ChronicCategory");
 
                     b.Navigation("DiseaseCategory");
+                });
+
+            modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.DiseaseCategory", b =>
+                {
+                    b.HasOne("McHealthCare.Domain.Entities.Medical.DiseaseCategory", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.DoctorSchedule", b =>
@@ -7082,19 +7064,9 @@ namespace McHealthCare.Persistence.Migrations
                     b.Navigation("InventoryAdjusmentDetails");
                 });
 
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.Building", b =>
-                {
-                    b.Navigation("BuildingLocations");
-                });
-
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.DoctorSchedule", b =>
                 {
                     b.Navigation("Physicion");
-                });
-
-            modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.HealthCenter", b =>
-                {
-                    b.Navigation("Buildings");
                 });
 
             modelBuilder.Entity("McHealthCare.Domain.Entities.Medical.LabTest", b =>

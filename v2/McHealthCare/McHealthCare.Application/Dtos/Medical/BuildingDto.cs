@@ -1,3 +1,4 @@
+using McHealthCare.Domain.Common;
 using McHealthCare.Domain.Entities.Medical;
 
 namespace McHealthCare.Application.Dtos.Medical

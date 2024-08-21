@@ -10,7 +10,6 @@
 
         [Required(ErrorMessage = "Please Input Stock Quantity...")]
         public long QtyStock { get; set; } = 0;
-
         public long CurrentStock { get; set; } = 0;
         public Guid? UomId { get; set; }
         public Guid? TransactionStockId { get; set; }

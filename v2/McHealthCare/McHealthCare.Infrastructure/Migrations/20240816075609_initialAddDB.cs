@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McHealthCare.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Refresh : Migration
+    public partial class initialAddDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -78,23 +78,6 @@ namespace McHealthCare.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChronicCategory",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChronicCategory", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ClassTypes",
                 columns: table => new
                 {
@@ -132,8 +115,8 @@ namespace McHealthCare.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -168,6 +151,7 @@ namespace McHealthCare.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ParentCategory = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -178,6 +162,12 @@ namespace McHealthCare.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DiseaseCategories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DiseaseCategories_DiseaseCategories_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "DiseaseCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -654,9 +644,9 @@ namespace McHealthCare.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Diagnoses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Diagnoses_ChronicCategory_ChronicCategoryId",
+                        name: "FK_Diagnoses_CronisCategories_ChronicCategoryId",
                         column: x => x.ChronicCategoryId,
-                        principalTable: "ChronicCategory",
+                        principalTable: "CronisCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1627,7 +1617,7 @@ namespace McHealthCare.Persistence.Migrations
                     ExpiredDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TransferStockId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    QtyStock = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    QtyStock = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -3722,6 +3712,11 @@ namespace McHealthCare.Persistence.Migrations
                 column: "DiseaseCategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DiseaseCategories_ParentId",
+                table: "DiseaseCategories",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Districts_CityId",
                 table: "Districts",
                 column: "CityId");
@@ -4536,9 +4531,6 @@ namespace McHealthCare.Persistence.Migrations
                 name: "Counters");
 
             migrationBuilder.DropTable(
-                name: "CronisCategories");
-
-            migrationBuilder.DropTable(
                 name: "DetailQueueDisplays");
 
             migrationBuilder.DropTable(
@@ -4632,7 +4624,7 @@ namespace McHealthCare.Persistence.Migrations
                 name: "QueueDisplays");
 
             migrationBuilder.DropTable(
-                name: "ChronicCategory");
+                name: "CronisCategories");
 
             migrationBuilder.DropTable(
                 name: "DiseaseCategories");
