@@ -23,6 +23,7 @@
         public string? EquipmentCondition { get; set; }
         public bool IsTopicalMedication { get; set; }
         public bool IsOralMedication { get; set; }
+        public bool? HighAlert { get; set; }
 
         [SetToNull]
         public BpjsClassification? BpjsClassification { get; set; }

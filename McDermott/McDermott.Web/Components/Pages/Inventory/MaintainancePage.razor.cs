@@ -15,28 +15,28 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool PanelVisible { get; set; } = false;
         private bool isActiveButton { get; set; } = false;
         private bool showForm { get; set; } = false;
-        private bool FormValidationState {  get; set; } = false;
+        private bool FormValidationState { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowVisibleIndexDetail { get; set; }
 
-        private void unCheckIN( bool newValue)
+        private void unCheckIN(bool newValue)
         {
             postMaintainance.isInternal = true;
-            if(newValue)
+            if (newValue)
                 postMaintainance.isExternal = false;
             else
                 postMaintainance.isInternal = false;
-           
-        } 
-        private void unCheckEX( bool newValue)
+
+        }
+        private void unCheckEX(bool newValue)
         {
             postMaintainance.isExternal = true;
-            if(newValue)
+            if (newValue)
                 postMaintainance.isInternal = false;
             else
                 postMaintainance.isExternal = false;
-           
+
         }
         private void unCheckCR(bool newValue)
         {
@@ -54,6 +54,19 @@ namespace McDermott.Web.Components.Pages.Inventory
             else
                 postMaintainance.isPreventive = false;
         }
+        private void unCheckRE(bool newValue)
+        {
+            postMaintainance.Recurrent = true;
+
+        }
+
+        private List<string> RepeatWork = new List<string>()
+        {
+            "Days",
+            "Weeks",
+            "Months",
+            "Years"
+        };
         #endregion
         #region UserLoginAndAccessRole
 
@@ -141,26 +154,35 @@ namespace McDermott.Web.Components.Pages.Inventory
             switch (status)
             {
                 case EnumStatusMaintainance.Request:
-                    priorityClass = "request";
+                    priorityClass = "info";
                     title = "Request";
                     break;
 
                 case EnumStatusMaintainance.InProgress:
-                    priorityClass = "inprogress";
+                    priorityClass = "primary";
                     title = "In Progress";
                     break;
 
                 case EnumStatusMaintainance.Repaired:
-                    priorityClass = "repaired";
+                    priorityClass = "warning";
                     title = "Repaire";
                     break;
 
                 case EnumStatusMaintainance.Scrap:
-                    priorityClass = "scrap";
+                    priorityClass = "warning";
                     title = "Scrap";
                     break;
+                case EnumStatusMaintainance.Done:
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+                case EnumStatusMaintainance.Canceled:
+                    priorityClass = "danger";
+                    title = "Cancel";
+                    break;
 
-               
+
+
                 default:
                     return new MarkupString("");
             }
@@ -196,10 +218,10 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             try
             {
-                if ((TransferStockDto)args.DataItem is null)
+                if ((MaintainanceDto)args.DataItem is null)
                     return;
 
-                isActiveButton = ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusMaintainance.Request);
+                isActiveButton = ((MaintainanceDto)args.DataItem)!.Status!.Equals(EnumStatusMaintainance.Request);
             }
             catch (Exception ex)
             {
@@ -232,14 +254,57 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             showForm = true;
         }
-        private async Task EditItem_Click()
-        {
 
+        private async Task EditItem_Click(MaintainanceDto? p = null)
+        {
+            try
+            {
+                showForm = true;
+                PanelVisible = true;
+
+                if (p != null)
+                {
+                    postMaintainance = p;
+                }
+                else if (SelectedDataItems.Count > 0)
+                {
+                    postMaintainance = SelectedDataItems[0].Adapt<MaintainanceDto>();
+                }
+                else
+                {
+                    ToastService.ShowWarning("No item selected for editing.");
+                    return;
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
-        private async Task Request_Click() { }
         private async Task Cancel_Click() { }
-        private async Task InProgress_Click() { }
+        private async Task InProgress_Click()
+        {
+            try
+            {
+                PanelVisible = true;
+                postMaintainance.Status = EnumStatusMaintainance.InProgress;
+                getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
+                PanelVisible = false;
+                await EditItem_Click(getMaintainanceById);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
         private async Task Repaired_Click() { }
         private async Task Scrap_Click() { }
         private async Task onDiscard() { }
@@ -260,6 +325,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
 
         #region save
+        MaintainanceDto getMaintainanceById = new();
         private async Task OnSave()
         {
             try
@@ -271,14 +337,32 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 if (postMaintainance.Id == 0)
                 {
-                    await Mediator.Send(new CreateMaintainanceRequest(postMaintainance));
+                    string prefix = "MNT-";
+                    string datePart = DateTime.Now.ToString("ddMMyy");
+
+                    var lastSequence = getMaintainance.Where(x => x.Sequence is null || x.Sequence.Substring(7, 4) == DateTime.Now.ToString("MMyy")).OrderByDescending(x => x.Sequence).FirstOrDefault();
+
+                    int nextSequence = 1;
+                    if (lastSequence != null)
+                    {
+                        var lastNumberPart = lastSequence?.Sequence?.Substring(lastSequence.Sequence.Length - 3);
+                        nextSequence = int.Parse(lastNumberPart) + 1;
+                    }
+
+                    postMaintainance.Sequence = $"{prefix}{datePart}-{nextSequence.ToString("D3")}";
+                    postMaintainance.Status = EnumStatusMaintainance.Request;
+
+                    getMaintainanceById = await Mediator.Send(new CreateMaintainanceRequest(postMaintainance));
+                    ToastService.ShowSuccess("Save Data Success..");
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
+                    getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
+                    ToastService.ShowSuccess("Update Data Success..");
                 }
-                PanelVisible = false;
 
+                PanelVisible = false;
+                await EditItem_Click(getMaintainanceById);
             }
             catch (Exception ex)
             {

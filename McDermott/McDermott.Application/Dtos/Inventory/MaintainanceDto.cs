@@ -13,8 +13,8 @@ namespace McDermott.Application.Dtos.Inventory
         public long? RequestById { get; set; }
         public string? Title { get; set; }
         public string? Sequence { get; set; }
-        public DateTime? RequestDate { get; set; }
-        public DateTime? ScheduleDate { get; set; }
+        public DateTime RequestDate { get; set; } = DateTime.Now;
+        public DateTime ScheduleDate { get; set; } = DateTime.Now;
         public long? ResponsibleById { get; set; }
         public long? EquipmentId { get; set; }
         public string? SerialNumber { get; set; }
@@ -25,9 +25,10 @@ namespace McDermott.Application.Dtos.Inventory
         public string? VendorBy { get; set; }
         public bool Recurrent { get; set; } = false;
         public int? RepeatNumber { get; set; }
-        public EnumWorksDays? RepeatWork { get; set; }
+        public string? RepeatWork { get; set; }
         public EnumStatusMaintainance? Status { get; set; }
         public string? Note {  get; set; }
+        public DateTime CreatedDate {  get; set; } = DateTime.UtcNow;
 
         [SetToNull]
         public virtual UserDto? RequestBy { get; set; }

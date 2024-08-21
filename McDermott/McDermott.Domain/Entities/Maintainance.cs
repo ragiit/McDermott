@@ -23,7 +23,7 @@ namespace McDermott.Domain.Entities
         public string? VendorBy { get; set; }
         public bool? Recurrent {  get; set; }
         public int? RepeatNumber {  get; set; }
-        public EnumWorksDays? RepeatWork {  get; set; }
+        public string? RepeatWork {  get; set; }
         public EnumStatusMaintainance? Status {  get; set; }
         public string? Note {  get; set; }
 
