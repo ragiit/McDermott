@@ -4,6 +4,7 @@ namespace McHealthCare.Application.Dtos.Medical
 {
     public class LabTestDetailDto : IMapFrom<LabTestDetail>
     {
+        public Guid Id { get; set; }
         public Guid? LabTestId { get; set; }
         public Guid? LabUomId { get; set; }
         public string? Name { get; set; }
@@ -21,6 +22,7 @@ namespace McHealthCare.Application.Dtos.Medical
 
     public class CreateUpdateLabTestDetailDto : IMapFrom<LabTestDetail>
     {
+        public Guid Id { get; set; }
         public Guid? LabTestId { get; set; }
         public Guid? LabUomId { get; set; }
         public string? Name { get; set; }

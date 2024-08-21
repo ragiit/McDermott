@@ -97,6 +97,7 @@ namespace McDermott.Persistence.Context
         public DbSet<GeneralConsultanMedicalSupport> GeneralConsultanMedicalSupports { get; set; }
 
         public DbSet<GeneralConsultationLog> GeneralConsultationLogs { get; set; }
+        public DbSet<VaccinationPlan> VaccinationPlans { get; set; }
 
         #endregion Transfer
 
@@ -200,17 +201,17 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<StockOutPrescription>()
                 .HasOne(h => h.Prescription)
                 .WithMany(x => x.StockOutPrescription)
-                .OnDelete(DeleteBehavior.SetNull);   
-            
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<StockOutPrescription>()
                 .HasOne(h => h.TransactionStock)
                 .WithMany(x => x.StockOutPrescription)
-                .OnDelete(DeleteBehavior.SetNull);   
-            
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<StockOutLines>()
                 .HasOne(h => h.TransactionStock)
                 .WithMany(x => x.StockOutLines)
-                .OnDelete(DeleteBehavior.SetNull);          
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<TransferStockProduct>()
                 .HasOne(h => h.TransferStock)

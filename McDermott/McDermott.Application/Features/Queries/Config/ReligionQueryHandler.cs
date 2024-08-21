@@ -21,10 +21,9 @@
 
                 if (!_cache.TryGetValue(cacheKey, out List<Religion>? result))
                 {
-                    result = await _unitOfWork.Repository<Religion>().GetAsync(
-                        null,
-                        null,
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<Religion>().Entities
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

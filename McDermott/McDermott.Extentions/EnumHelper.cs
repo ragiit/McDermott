@@ -20,6 +20,18 @@ namespace McDermott.Application.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
+        public enum EnumPageMode
+        {
+            [Display(Name = "new")]
+            Create = 1,
+
+            [Display(Name = "edit")]
+            Update = 2,
+
+            [Display(Name = "delete")]
+            Delete = 3,
+        }
+
         public enum EnumStatusInventoryAdjustment
         {
             [Display(Name = "Draft")]
@@ -33,6 +45,18 @@ namespace McDermott.Application.Extentions
 
             [Display(Name = "Invalidate")]
             Invalidate = 0,
+        }
+
+        public enum EnumStatusVaccination
+        {
+            [Display(Name = "Scheduled")]
+            Scheduled = 1,
+
+            [Display(Name = "In Progress")]
+            InProgress = 2,
+
+            [Display(Name = "Done")]
+            Done = 3,
         }
 
         public enum EnumStatusAccident
@@ -85,22 +109,30 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Finish")]
             Finish = 3
         }
+
         public enum EnumStatusGeneralConsultantService
         {
             [Display(Name = "Planned")]
             Planned = 1,
+
             [Display(Name = "Confirmed")]
             Confirmed = 2,
+
             [Display(Name = "Nurse Station")]
             NurseStation = 3,
+
             [Display(Name = "Waiting")]
             Waiting = 4,
+
             [Display(Name = "Physician")]
             Physician = 6,
+
             [Display(Name = "Finished")]
             Finished = 7,
+
             [Display(Name = "Canceled")]
             Canceled = 0,
+
             [Display(Name = "Procedure Room")]
             ProcedureRoom = 5
         }
@@ -142,6 +174,7 @@ namespace McDermott.Application.Extentions
 
             [Display(Name = "done")]
             Done = 5,
+
             [Display(Name = "cancel")]
             Cancel = 6
         }
@@ -177,6 +210,7 @@ namespace McDermott.Application.Extentions
 
             [Display(Name = "Done")]
             Done = 4,
+
             [Display(Name = "Cancel")]
             Cancel = 5,
         }

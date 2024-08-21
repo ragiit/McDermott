@@ -1,4 +1,4 @@
-﻿namespace McDermott.Application.Features.Commands.BpjsIntegration
+﻿namespace McHealthCare.Application.Features.Commands.BpjsIntegration
 {
     public class AwarenessCommand
     {

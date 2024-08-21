@@ -11,47 +11,47 @@ namespace EsemkaHeHo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectsController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly EsemkaHeHoContext _context;
 
-        public ProjectsController(EsemkaHeHoContext context)
+        public UsersController(EsemkaHeHoContext context)
         {
             _context = context;
         }
 
-        // GET: api/Projects
+        // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProjects()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Projects.ToListAsync();
+            return await _context.Users.Include(x => x.Department).ToListAsync();
         }
 
-        // GET: api/Projects/5
+        // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Project>> GetProject(Guid id)
+        public async Task<ActionResult<User>> GetUser(Guid id)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var user = await _context.Users.FindAsync(id);
 
-            if (project == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return project;
+            return user;
         }
 
-        // PUT: api/Projects/5
+        // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProject(Guid id, Project project)
+        public async Task<IActionResult> PutUser(Guid id, User user)
         {
-            if (id != project.Id)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(project).State = EntityState.Modified;
+            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace EsemkaHeHo.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProjectExists(id))
+                if (!UserExists(id))
                 {
                     return NotFound();
                 }
@@ -72,19 +72,19 @@ namespace EsemkaHeHo.Controllers
             return NoContent();
         }
 
-        // POST: api/Projects
+        // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Project>> PostProject(Project project)
+        public async Task<ActionResult<User>> PostUser(User user)
         {
-            _context.Projects.Add(project);
+            _context.Users.Add(user);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (ProjectExists(project.Id))
+                if (UserExists(user.Id))
                 {
                     return Conflict();
                 }
@@ -94,28 +94,28 @@ namespace EsemkaHeHo.Controllers
                 }
             }
 
-            return CreatedAtAction("GetProject", new { id = project.Id }, project);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // DELETE: api/Projects/5
+        // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProject(Guid id)
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
-            var project = await _context.Projects.FindAsync(id);
-            if (project == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Projects.Remove(project);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool ProjectExists(Guid id)
+        private bool UserExists(Guid id)
         {
-            return _context.Projects.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

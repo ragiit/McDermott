@@ -1,0 +1,974 @@
+﻿@page "/clinic-service/vaccinations"
+@page "/clinic-service/vaccinations/{PageMode}"
+@page "/clinic-service/vaccinations/{PageMode}/{Id:long}"
+
+@using McDermott.Web.Components.LayoutComponents
+
+<PageTitle>@Helper.APP_NAME - Vaccinations</PageTitle>
+
+@if (IsAccess && !IsLoadingPage)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Vaccinations" OnClickBack="OnCancelBack" ShowBackButton="ShowForm" />
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        @if (!ShowForm)
+                        {
+                            <div class="card">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+
+
+                                    <MyGrid @ref="Grid"
+                                            Data="GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            DataItemDeleting="OnDelete"
+                                            RowDoubleClick="@(async () => await EditItem_Click())"
+                                            FocusedRowChanged="Grid_FocusedRowChanged1"
+                                            KeyFieldName="Id">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="GeneralConsultanServiceDto"
+                                                             Items="@GeneralConsultanServices"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@(() => InitializeNew(false))"
+                                                             Grid="Grid"
+                                                             EditItem_Click="@(async () => await EditItem_Click(false))"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@(async () => await Refresh_Click())"
+                                                             EnableDelete="IsDeletedConsultantService || SelectedDataItems.Count > 1"
+                                                             IsImport="false" />
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200"
+                                                              FieldName="RegistrationDate"
+                                                              FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                                                              DisplayFormat="ddd, dd MMM yyyy"
+                                                              Caption="Registration Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                                                <CellDisplayTemplate>
+                                                    @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
+                                        </Columns>
+                                        <GroupSummary>
+                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="StatusName" />
+                                        </GroupSummary>
+                                    </MyGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row justify-content-end mb-3">
+                                <div class="col-auto align-self-end">
+                                    <DxTabs>
+                                        <DxTab Text="Planned" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Planned)"></DxTab>
+                                        <DxTab Text="Confirmed" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Confirmed)"></DxTab>
+                                        <DxTab Text="Nurse Station" Enabled="@IsStatus(EnumStatusGeneralConsultantService.NurseStation)"></DxTab>
+                                        <DxTab Text="Waiting" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Waiting)"></DxTab>
+                                        @if (IsStatus(EnumStatusGeneralConsultantService.ProcedureRoom))
+                                        {
+                                            <DxTab Text="Procedure Room" Enabled="@IsStatus(EnumStatusGeneralConsultantService.ProcedureRoom)"></DxTab>
+                                        }
+                                        else
+                                        {
+                                            <DxTab Text="Physician" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Physician)"></DxTab>
+                                        }
+                                        <DxTab Text="Finished" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Finished)"></DxTab>
+                                        <DxTab Text="Canceled" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Canceled)"></DxTab>
+                                    </DxTabs>
+                                </div>
+                            </div>
+
+                            <DxLoadingPanel @bind-Visible="IsLoading"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+
+                                <EditForm Model="@GeneralConsultanService" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
+                                          OnInvalidSubmit="@HandleInvalidSubmit">
+                                    <DataAnnotationsValidator />
+
+                                    @if (GeneralConsultanService.Status != EnumStatusGeneralConsultantService.ProcedureRoom && GeneralConsultanService.Status != EnumStatusGeneralConsultantService.Finished && GeneralConsultanService.Status != EnumStatusGeneralConsultantService.Canceled)
+                                    {
+                                        <div class="card sticky">
+                                            <div class="card-body">
+                                                <div class=" row w-100">
+                                                    <div class="col-auto pe-0 ">
+                                                        <DxButton Enabled="!IsLoading"
+                                                                  IconCssClass="fa-solid fa-check"
+                                                                  Text="@StagingText.GetDisplayName()"
+                                                                  Click="OnClickConfirm"
+                                                                  Visible="@(!(GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Waiting && Convert.ToBoolean(UserLogin.IsNurse)))"
+                                                                  RenderStyle="ButtonRenderStyle.Primary">
+                                                        </DxButton>
+                                                        <DxButton Visible="@(GeneralConsultanService.Id > 0)"
+                                                                  Enabled="!IsLoading"
+                                                                  IconCssClass="fa-solid fa-xmark"
+                                                                  Text="Cancel"
+                                                                  Click="OnCancelStatus"
+                                                                  RenderStyle="ButtonRenderStyle.Danger">
+                                                        </DxButton>
+                                                    </div>
+
+                                                    @if (!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Waiting) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Confirmed) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished) && !GeneralConsultanService.StatusName.Equals("Canceled"))
+                                                    {
+                                                        <div class="col-sm align-self-end">
+                                                            <div class="row justify-content-end">
+                                                                <div class="col-auto">
+                                                                    <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="OnCancelBack"></DxButton>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="w-100">
+                                                <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                                                    <Items>
+                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                                       IconCssClass="fa-solid fa-notes-medical"
+                                                                       Click="OnClickVaccinationPlan"
+                                                                       Text="Vaccination Plan" />
+
+                                                    </Items>
+                                                </DxToolbar>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <GCGeneralInformationLayoutComponent TGCForm="GeneralConsultanServiceDto"
+                                                                         GeneralConsultanService="GeneralConsultanService"
+                                                                         CbSelectedItemInsurancePolicyChanged="SelectedItemInsurancePolicyChanged"
+                                                                         CbSelectedItemPatientChanged="SelectedItemPatientChanged"
+                                                                         CbSelectedItemPaymentChanged="SelectedItemPaymentChanged"
+                                                                         CbSelectedItemRegisTypeChanged="SelectedItemRegisTypeChanged"
+                                                                         CbSelectedItemServiceChanged="SelectedItemServiceChanged"
+                                                                         CbSelectedMaternityStartDateChanged="SelectedMaternityStartDateChanged"
+                                                                         ClassTypes="ClassTypes"
+                                                                         InsurancePolicies="InsurancePolicies"
+                                                                         Patients="Patients"
+                                                                         Payments="Payments"
+                                                                         Physicions="Physicions"
+                                                                         RegisType="RegisType"
+                                                                         SelectedInsurancePolicy="SelectedInsurancePolicy"
+                                                                         Services="Services"
+                                                                         ReadOnlyService="true"
+                                                                         UserForm="UserForm">
+                                    </GCGeneralInformationLayoutComponent>
+
+                                    <div class="w-100">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-bolder">History</span>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="w-100">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <span class="fw-bolder">Allergy Data</span>
+                                                        </div>
+
+                                                        <div class="card-body">
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-1">
+                                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsWeather" />
+                                                                        </div>
+                                                                        <div class="col-md-11">
+                                                                            @if (PatientAllergy.Weather is not null || GeneralConsultanService.IsWeather)
+                                                                            {
+                                                                                <DxTagBox Data="@WeatherAllergies"
+                                                                                          NullText="Select Allergy..."
+                                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                                                          @bind-Values="@SelectedWeatherAllergies"
+                                                                                          EditFormat="{1}"
+                                                                                          InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                        Caption="Code"
+                                                                                                        Width="100px" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                        Caption="Type" />
+                                                                                </DxTagBox>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-1">
+                                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsPharmacology" />
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            @if (PatientAllergy.Farmacology is not null || GeneralConsultanService.IsPharmacology)
+                                                                            {
+                                                                                <DxTagBox Data="@PharmacologyAllergies"
+                                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                                                          NullText="Select Allergy..."
+                                                                                          @bind-Values="@SelectedPharmacologyAllergies"
+                                                                                          EditFormat="{1}"
+                                                                                          InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                        Caption="Code"
+                                                                                                        Width="100px" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                        Caption="Type" />
+                                                                                </DxTagBox>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-1">
+                                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsFood" />
+                                                                        </div>
+                                                                        <div class="col-md-11">
+                                                                            @if (PatientAllergy.Food is not null || GeneralConsultanService.IsFood)
+                                                                            {
+                                                                                <DxTagBox Data="@FoodAllergies"
+                                                                                          NullText="Select Allergy..."
+                                                                                          @bind-Values="@SelectedFoodAllergies"
+                                                                                          EditFormat="{1}"
+                                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && !GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                                                          InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
+                                                                                                        Caption="Code"
+                                                                                                        Width="100px" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
+                                                                                                        Caption="Type" />
+                                                                                </DxTagBox>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </DxFormLayoutItem>
+
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="w-100 mt-2">
+                                                    <div class="row w-100">
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem Caption="Family Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@YesNoOptions"
+                                                                                                      NullText="Yes/No"
+                                                                                                      @bind-Value="@UserForm.IsFamilyMedicalHistory">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="0" Visible="@(UserForm.IsFamilyMedicalHistory == "Yes")" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@RiwayatPenyakitKeluarga"
+                                                                                                      NullText="Select Family Medical History..."
+                                                                                                      @bind-Value="@UserForm.FamilyMedicalHistory">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption=" " Visible="@(UserForm.FamilyMedicalHistory is not null && UserForm.FamilyMedicalHistory.Equals("Other"))" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <MyTextBox @bind-Text="@UserForm.FamilyMedicalHistoryOther"
+                                                                               NullText="Family MedicalHistory Other" />
+                                                                </DxFormLayoutItem>
+
+
+                                                                <DxFormLayoutItem Caption="Medication History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@YesNoOptions"
+                                                                                                      NullText="Yes/No"
+                                                                                                      @bind-Value="@UserForm.IsMedicationHistory">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Visible="@(UserForm.IsMedicationHistory == "Yes")" Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <MyTextBox @bind-Text="@UserForm.MedicationHistory"
+                                                                                                   NullText="Medication History" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem Caption="Past Medical History" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <MyTextBox @bind-Text="@UserForm.PastMedicalHistory"
+                                                                               NullText="Past Medical History" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    @if (IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Waiting) || IsStatus(EnumStatusGeneralConsultantService.Physician) || IsStatus(EnumStatusGeneralConsultantService.Finished) || IsStatus(EnumStatusGeneralConsultantService.Canceled))
+                                    {
+                                        <div class="w-100">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <DxTabs>
+                                                        <DxTabPage CssClass="w-100" Text="Clinical Assesment">
+                                                            <GCClinicalAssesmentLayoutPage Awareness="Awareness"
+                                                                                           ClinicVisitTypes="ClinicVisitTypes"
+                                                                                           GeneralConsultanService="GeneralConsultanService"
+                                                                                           InformationFrom="InformationFrom"
+                                                                                           TGCForm="GeneralConsultanServiceDto" />
+                                                        </DxTabPage>
+
+                                                        <DxTabPage CssClass="w-100" Text="CPPT">
+
+                                                            @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                                                            {
+
+                                                                <div class="w-100 mt-2">
+                                                                    <div class="card">
+                                                                        <div class="card-header">
+                                                                            <span class="fw-bolder">Input CPPT</span>
+                                                                        </div>
+
+                                                                        <div class="card-body">
+                                                                            <div class="row w-100">
+                                                                                <div class="col-md-12">
+                                                                                    <DxFormLayout CssClass="w-100">
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="User" ColSpanMd="12">
+                                                                                            <label>@UserLogin.Name</label>
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Subjective" ColSpanMd="12">
+                                                                                            <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Subjective" NullText="Subjective" />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Objective" ColSpanMd="12">
+                                                                                            <DxMaskedInput @bind-Value="@FormInputCPPTGeneralConsultan.Objective"
+                                                                                                           NullText="Objective">
+                                                                                                <Buttons>
+                                                                                                    <DxEditorButton CssClass="text-bold btn-primary" Text="Get Objectives" Click="OnClickGetObjectives" />
+                                                                                                </Buttons>
+                                                                                            </DxMaskedInput>
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        @if (IsStatus(EnumStatusGeneralConsultantService.Physician))
+                                                                                        {
+                                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                                                                <MyDxComboBox Data="@Diagnoses"
+                                                                                                              @bind-Value="@SelectedDiagnosis"
+                                                                                                              NullText="Select Diagnosis..."
+                                                                                                              EditFormat="{0} - {1}">
+                                                                                                    <Columns>
+                                                                                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)"
+                                                                                                                            Caption="Code" />
+
+                                                                                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)"
+                                                                                                                            Caption="Name" />
+                                                                                                    </Columns>
+                                                                                                </MyDxComboBox>
+                                                                                            </DxFormLayoutItem>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                                                                <MyDxComboBox Data="@NursingDiagnoses"
+                                                                                                              @bind-Value="@SelectedNursingDiagnosis"
+                                                                                                              NullText="Select Diagnosis..."
+                                                                                                              EditFormat="{0} - {1}">
+                                                                                                    <Columns>
+                                                                                                        <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Code)"
+                                                                                                                            Caption="Code" />
+
+                                                                                                        <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Problem)"
+                                                                                                                            Caption="Problem" />
+                                                                                                    </Columns>
+                                                                                                </MyDxComboBox>
+                                                                                            </DxFormLayoutItem>
+                                                                                        }
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Planning" ColSpanMd="12">
+                                                                                            <DxTextBox @bind-Text="@FormInputCPPTGeneralConsultan.Plan" NullText="Planning" />
+                                                                                        </DxFormLayoutItem>
+
+
+                                                                                    </DxFormLayout>
+                                                                                </div>
+
+                                                                                <div class="col-md-12">
+                                                                                    <div class="ml-2 mt-1 mb-2 mr-3">
+                                                                                        <div class="row justify-content-end">
+                                                                                            <div class="col-auto align-self-end">
+                                                                                                <DxButton Text="Add CPPT"
+                                                                                                          Click="OnClickConfirmCPPT"
+                                                                                                          RenderStyle="ButtonRenderStyle.Primary"
+                                                                                                          IconCssClass="fa-solid fa-floppy-disk"
+                                                                                                          CssClass="w-20 ml" />
+                                                                                                <DxButton Text="Clear"
+                                                                                                          RenderStyle="ButtonRenderStyle.Danger"
+                                                                                                          Click="OnClickClearCPPT"
+                                                                                                          IconCssClass="fa-solid fa-xmark"
+                                                                                                          CssClass="w-20 ml" />
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <hr />
+                                                            }
+
+                                                            <div class="w-100 mt-2">
+                                                                <div class="card w-100">
+                                                                    <div class="card-header">
+                                                                        <span class="fw-bolder">CPPT</span>
+                                                                    </div>
+
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-12 w-100">
+                                                                            <DxFormLayout CssClass="w-100">
+                                                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGrid @ref="GridCppt"
+                                                                                            Data="GeneralConsultanCPPTs"
+                                                                                            @bind-SelectedDataItems="@SelectedDataItemsCPPT"
+                                                                                            EditModelSaving="OnClickConfirmCPPT"
+                                                                                            DataItemDeleting="OnDeleteTabCPPTConfirm"
+                                                                                            FocusedRowChanged="GridTabCPPT_FocusedRowChanged">
+                                                                                        <Columns>
+                                                                                            <DxGridDataColumn FieldName="Title" />
+                                                                                            <DxGridDataColumn FieldName="Body" />
+                                                                                            @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                                                                                            {
+                                                                                                <DxGridCommandColumn NewButtonVisible="false" EditButtonVisible="false" Width="160px" />
+                                                                                            }
+                                                                                        </Columns>
+                                                                                    </MyGrid>
+                                                                                </DxLoadingPanel>
+                                                                            </DxFormLayout>
+                                                                        </div>
+
+                                                                        @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                                                                        {
+                                                                            <div class="col-md-12 w-100">
+                                                                                <div class="ml-2 mt-1 mb-2">
+                                                                                    <div class="row justify-content-end">
+                                                                                        <div class="col-auto align-self-end">
+                                                                                            <DxButton Text="Save CPPT"
+                                                                                                      Click="OnClickSaveCPPT"
+                                                                                                      RenderStyle="ButtonRenderStyle.Primary"
+                                                                                                      IconCssClass="fa-solid fa-floppy-disk"
+                                                                                                      CssClass="w-20 ml" />
+                                                                                            <DxButton Text="Clear All"
+                                                                                                      RenderStyle="ButtonRenderStyle.Danger"
+                                                                                                      Click="OnClickClearAllCPPT"
+                                                                                                      IconCssClass="fa-solid fa-xmark"
+                                                                                                      CssClass="w-20 ml" />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </DxTabPage>
+
+                                                        <DxTabPage CssClass="w-100" Text="Vaccination">
+                                                            <DxTabs>
+                                                                <DxTabPage CssClass="w-100" Text="Vaccination Given">
+                                                                    <DxFormLayout>
+                                                                        <DxFormLayoutGroup Caption="Vaccination Given" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                                                                            <Items>
+                                                                                <DxLoadingPanel @bind-Visible="IsLoadingVaccinationGiven"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGrid @ref="GridVaccinationGiven"
+                                                                                            Data="VaccinationGivens"
+                                                                                            @bind-SelectedDataItems="@SelectedDataVaccinationGivenItems"
+                                                                                            EditModelSaving="SaveVaccinationGiven"
+                                                                                            RowDoubleClick="@(async () => await EditItemDetailVaccinationGiven_Click(GridVaccinationGiven))"
+                                                                                            DataItemDeleting="OnDeleteInventoryAdjusmentDetail"
+                                                                                            EditFormButtonsVisible="false"
+                                                                                            FocusedRowChanged="GridDetailVaccinationGiven_FocusedRowChanged"
+                                                                                            KeyFieldName="Id">
+
+                                                                                        <ToolbarTemplate>
+                                                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                                                <DxToolbarItem Text="Edit" Click="async () => await EditItemDetailVaccinationGiven_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataVaccinationGivenItems.Count > 0 && VaccinationGivens.Count > 0 " />
+                                                                                                <DxToolbarItem Text="Delete" Click="(() =>    GridVaccinationGiven.ShowRowDeleteConfirmation(FocusedRowVisibleIndexVaccinationGiven))" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataVaccinationGivenItems.Count > 0 && VaccinationGivens.Count > 0" />
+                                                                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="(async () => await LoadVaccinationGivens())" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(GridVaccinationGiven))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                                                                    <Items>
+                                                                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(GridVaccinationGiven))" />
+                                                                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(GridVaccinationGiven))" />
+                                                                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(GridVaccinationGiven))" />
+                                                                                                    </Items>
+                                                                                                </DxToolbarItem>
+                                                                                            </DxToolbar>
+                                                                                        </ToolbarTemplate>
+
+                                                                                        <Columns>
+                                                                                            <DxGridSelectionColumn Width="15px" />
+                                                                                            <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn>
+                                                                                            <DxGridDataColumn FieldName="Product.Name" Caption="Vaccination" />
+                                                                                            <DxGridDataColumn FieldName="ReminderDate" Caption="Reminder Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn FieldName="Batch" Caption="Lot/Serial Number" />
+                                                                                            <DxGridDataColumn FieldName="Dose" Caption="Dose" />
+                                                                                            <DxGridDataColumn FieldName="NextDoseDate" Caption="Next Dose Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn FieldName="Physician.Name" Caption="Physician" />
+                                                                                            <DxGridDataColumn FieldName="Observations" Caption="Observations" />
+                                                                                            <DxGridDataColumn FieldName="SalesPerson.Name" Caption="SalesPerson" />
+                                                                                            <DxGridDataColumn FieldName="Educator.Name" Caption="Educator" />
+                                                                                            <DxGridDataColumn FieldName="StatusName" Caption="Status" /> 
+                                                                                        </Columns>
+
+                                                                                        <EditFormTemplate Context="EditFormContextGivens">
+                                                                                            @{
+                                                                                                if (EditFormContextGivens.DataItem is null)
+                                                                                                {
+                                                                                                    VaccinationGiven = (VaccinationPlanDto)EditFormContextGivens.EditModel;
+                                                                                                }
+                                                                                                var IsBatch = Products.FirstOrDefault(x => x.Id == VaccinationGiven.ProductId)?.TraceAbility ?? false;
+                                                                                            }
+
+                                                                                            <div class="row w-100">
+                                                                                                <DxFormLayout CssClass="w-100">
+                                                                                                    <div class="col-md-4">
+                                                                                                        <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyTextBox @bind-Value="@VaccinationGiven.Name"
+                                                                                                                       NullText="Name..."
+                                                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                                       ShowValidationIcon="true" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.Name)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxComboBox Data="@Products"
+                                                                                                                        @bind-Value="@VaccinationGiven.ProductId"
+                                                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                                                        NullText="Select Vaccination..."
+                                                                                                                        TextFieldName="Name"
+                                                                                                                        ReadOnly="@(VaccinationGiven.Id != 0)"
+                                                                                                                        ValueFieldName="Id"
+                                                                                                                        SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                                        ShowValidationIcon="true" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.ProductId)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quantity" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxSpinEdit ShowValidationIcon="true"
+                                                                                                                        MinValue="0"
+                                                                                                                        @bind-Value="@VaccinationGiven.Quantity"
+                                                                                                                        NullText="Teoritical Qty"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.Quantity)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                                                          NullText="Select Sales Person..."
+                                                                                                                          @bind-Value="@VaccinationGiven.SalesPersonId"
+                                                                                                                          TextFieldName="Name"
+                                                                                                                          ValueFieldName="Id">
+                                                                                                            </MyDxComboBox>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                    </div>
+                                                                                                    <div class="col-md-4">
+                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Batch"
+                                                                                                                          NullText="Select Batch..."
+                                                                                                                          AllowUserInput="true"
+                                                                                                                          @bind-Value="@VaccinationGiven.Batch"
+                                                                                                                          @bind-Text="@VaccinationGiven.Batch" />
+                                                                                                            <ValidationMessage For="@(() => VaccinationGiven.Batch)" />
+
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Reminder Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxDateEdit ShowValidationIcon="true"
+                                                                                                                        DisplayFormat="@Helper.DefaultFormatDate"
+                                                                                                                        @bind-Date="@VaccinationGiven.ReminderDate"
+                                                                                                                        NullText="Reminder Date">
+                                                                                                            </DxDateEdit>
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dose" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxSpinEdit ShowValidationIcon="true"
+                                                                                                                        MinValue="0"
+                                                                                                                        @bind-Value="@VaccinationGiven.Dose"
+                                                                                                                        NullText="Dose"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.Dose)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Educator" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                                                          NullText="Select Educator..."
+                                                                                                                          @bind-Value="@VaccinationGiven.EducatorId"
+                                                                                                                          TextFieldName="Name"
+                                                                                                                          ValueFieldName="Id">
+                                                                                                            </MyDxComboBox>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                    </div>
+                                                                                                    <div class="col-md-4">
+                                                                                                        <DxFormLayoutItem Caption="Next Dose Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxDateEdit ShowValidationIcon="true"
+                                                                                                                        DisplayFormat="@Helper.DefaultFormatDate"
+                                                                                                                        @bind-Date="@VaccinationGiven.NextDoseDate"
+                                                                                                                        NullText="Next Dose Date">
+                                                                                                            </DxDateEdit>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                        <DxFormLayoutItem Caption="Physicion" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                                                          NullText="Select Physicion..."
+                                                                                                                          @bind-Value="@VaccinationGiven.PhysicianId"
+                                                                                                                          TextFieldName="Name"
+                                                                                                                          ValueFieldName="Id">
+                                                                                                            </MyDxComboBox>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                        <DxFormLayoutItem Caption="Observations" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyTextBox @bind-Value="@VaccinationGiven.Observations"
+                                                                                                                       NullText="Observations..."
+                                                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                                       ShowValidationIcon="true" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.Observations)"   />
+                                                                                                        </DxFormLayoutItem>
+                                                                                                    </div>
+                                                                                                </DxFormLayout>
+                                                                                            </div>
+                                                                                        </EditFormTemplate>
+                                                                                    </MyGrid>
+                                                                                </DxLoadingPanel>
+                                                                            </Items>
+                                                                        </DxFormLayoutGroup>
+                                                                    </DxFormLayout>
+                                                                </DxTabPage>
+
+                                                                <DxTabPage CssClass="w-100" Text="Reminder Plan">
+                                                                    <DxFormLayout>
+                                                                        <DxFormLayoutGroup Caption="Vaccination Plan" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                                                                            <Items>
+                                                                                <DxLoadingPanel @bind-Visible="IsLoadingVaccinationPlan"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGrid @ref="GridVaccinationPlan"
+                                                                                            Data="VaccinationPlans"
+                                                                                            @bind-SelectedDataItems="@SelectedDataVaccinationPlanItems"
+                                                                                            EditModelSaving="SaveVaccinationPlan"
+                                                                                            RowDoubleClick="@(async () => await EditItemDetailVaccinationPlan_Click(GridVaccinationPlan))"
+                                                                                            DataItemDeleting="OnDeleteInventoryAdjusmentDetail" 
+                                                                                            FocusedRowChanged="GridDetailVaccinationPlan_FocusedRowChanged"
+                                                                                            KeyFieldName="Id">
+
+                                                                                        <ToolbarTemplate>
+                                                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                                                <DxToolbarItem Text="New" Click="NewItemDetailVaccinationPlan_Click" IconCssClass="fa-solid fa-plus" />
+                                                                                                <DxToolbarItem Text="Edit" Click="async () => await EditItemDetailVaccinationPlan_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataVaccinationPlanItems.Count > 0 && VaccinationPlans.Count > 0 " />
+                                                                                                <DxToolbarItem Text="Delete" Click="(() =>    GridVaccinationPlan.ShowRowDeleteConfirmation(FocusedRowVisibleIndexVaccinationPlan))" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataVaccinationPlanItems.Count > 0 && VaccinationPlans.Count > 0" />
+                                                                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="(async () => await LoadVaccinationPlans())" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(GridVaccinationPlan))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                                                                    <Items>
+                                                                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(GridVaccinationPlan))" />
+                                                                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(GridVaccinationPlan))" />
+                                                                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(GridVaccinationPlan))" />
+                                                                                                    </Items>
+                                                                                                </DxToolbarItem>
+                                                                                            </DxToolbar>
+                                                                                        </ToolbarTemplate>
+
+                                                                                        <Columns>
+                                                                                            <DxGridSelectionColumn Width="15px" />
+                                                                                            <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn>
+                                                                                            <DxGridDataColumn FieldName="Product.Name" Caption="Vaccination" />
+                                                                                            <DxGridDataColumn FieldName="ReminderDate" Caption="Reminder Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn FieldName="Batch" Caption="Lot/Serial Number" />
+                                                                                            <DxGridDataColumn FieldName="Dose" Caption="Dose" />
+                                                                                            <DxGridDataColumn FieldName="NextDoseDate" Caption="Next Dose Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn FieldName="Physician.Name" Caption="Physician" />
+                                                                                            <DxGridDataColumn FieldName="Observations" Caption="Observations" />
+                                                                                            <DxGridDataColumn FieldName="SalesPerson.Name" Caption="SalesPerson" />
+                                                                                            <DxGridDataColumn FieldName="Educator.Name" Caption="Educator" />
+                                                                                            <DxGridDataColumn FieldName="StatusName" Caption="Status" />
+                                                                                            <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                                                                                                <CellDisplayTemplate>
+                                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                                                              Click="@(()=> OnClickGiveVaccine((context.DataItem as VaccinationPlanDto)))"
+                                                                                                              CssClass="me-1" />
+                                                                                                </CellDisplayTemplate>
+                                                                                                <HeaderCaptionTemplate>Give Vaccine</HeaderCaptionTemplate>
+                                                                                            </DxGridDataColumn>
+                                                                                        </Columns>
+
+                                                                                        <EditFormTemplate Context="EditFormContextPlans">
+                                                                                            @{
+                                                                                                if (EditFormContextPlans.DataItem is null)
+                                                                                                {
+                                                                                                    VaccinationPlan = (VaccinationPlanDto)EditFormContextPlans.EditModel;
+                                                                                                }
+                                                                                                var IsBatch = Products.FirstOrDefault(x => x.Id == VaccinationPlan.ProductId)?.TraceAbility ?? false;
+                                                                                            }
+
+                                                                                            <div class="row w-100">
+                                                                                                <DxFormLayout CssClass="w-100">
+                                                                                                    <div class="col-md-4">
+                                                                                                        <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyTextBox @bind-Text="@VaccinationPlan.Name"
+                                                                                                                       NullText="Name..."
+                                                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                                       ShowValidationIcon="true" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.Name)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxComboBox Data="@Products"
+                                                                                                                        @bind-Value="@VaccinationPlan.ProductId"
+                                                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                                                        NullText="Select Vaccination..."
+                                                                                                                        TextFieldName="Name"
+                                                                                                                        ReadOnly="@(VaccinationPlan.Id != 0)"
+                                                                                                                        ValueFieldName="Id"
+                                                                                                                        SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                                        ShowValidationIcon="true" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.ProductId)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quantity" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxSpinEdit ShowValidationIcon="true"
+                                                                                                                        MinValue="0"
+                                                                                                                        @bind-Value="@VaccinationPlan.Quantity"
+                                                                                                                        NullText="Teoritical Qty"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.Quantity)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                                                          NullText="Select Sales Person..."
+                                                                                                                          @bind-Value="@VaccinationPlan.SalesPersonId"
+                                                                                                                          TextFieldName="Name"
+                                                                                                                          ValueFieldName="Id">
+                                                                                                            </MyDxComboBox>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                    </div>
+                                                                                                    <div class="col-md-4">
+                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Batch"
+                                                                                                                          NullText="Select Batch..."
+                                                                                                                          AllowUserInput="true"
+                                                                                                                          @bind-Value="@VaccinationPlan.Batch"
+                                                                                                                          @bind-Text="@VaccinationPlan.Batch" />
+                                                                                                            <ValidationMessage For="@(() => VaccinationPlan.Batch)" />
+
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Reminder Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxDateEdit ShowValidationIcon="true"
+                                                                                                                        DisplayFormat="@Helper.DefaultFormatDate"
+                                                                                                                        @bind-Date="@VaccinationPlan.ReminderDate"
+                                                                                                                        NullText="Reminder Date">
+                                                                                                            </DxDateEdit>
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dose" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxSpinEdit ShowValidationIcon="true"
+                                                                                                                        MinValue="0"
+                                                                                                                        @bind-Value="@VaccinationPlan.Dose"
+                                                                                                                        NullText="Dose"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.Dose)"   />
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem Caption="Educator" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                                                          NullText="Select Educator..."
+                                                                                                                          @bind-Value="@VaccinationPlan.EducatorId"
+                                                                                                                          TextFieldName="Name"
+                                                                                                                          ValueFieldName="Id">
+                                                                                                            </MyDxComboBox>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                    </div>
+                                                                                                    <div class="col-md-4">
+                                                                                                        <DxFormLayoutItem Caption="Next Dose Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxDateEdit ShowValidationIcon="true"
+                                                                                                                        DisplayFormat="@Helper.DefaultFormatDate"
+                                                                                                                        @bind-Date="@VaccinationPlan.NextDoseDate"
+                                                                                                                        NullText="Next Dose Date">
+                                                                                                            </DxDateEdit>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                        <DxFormLayoutItem Caption="Physicion" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                                                          NullText="Select Physicion..."
+                                                                                                                          @bind-Value="@VaccinationPlan.PhysicianId"
+                                                                                                                          TextFieldName="Name"
+                                                                                                                          ValueFieldName="Id">
+                                                                                                            </MyDxComboBox>
+                                                                                                        </DxFormLayoutItem>
+                                                                                                        <DxFormLayoutItem Caption="Observations" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                                        <MyTextBox @bind-Text="@VaccinationPlan.Observations"
+                                                                                                                       NullText="Observations..."
+                                                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                                       ShowValidationIcon="true" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.Observations)"   />
+                                                                                                        </DxFormLayoutItem>
+                                                                                                    </div>
+                                                                                                </DxFormLayout>
+                                                                                                 
+                                                                                            </div>
+                                                                                        </EditFormTemplate>
+                                                                                    </MyGrid>
+                                                                                </DxLoadingPanel>
+                                                                            </Items>
+                                                                        </DxFormLayoutGroup>
+                                                                    </DxFormLayout>
+                                                                </DxTabPage>
+                                                            </DxTabs>
+                                                        </DxTabPage>
+                                                    </DxTabs>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </EditForm>
+
+                            </DxLoadingPanel>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+@*  <DxPopup HeaderText="Vaccination Plan" @bind-Visible="@IsVaccinationPlan" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+     <DxLoadingPanel @bind-Visible="IsLoadingVaccinationPlan"
+                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                     IsContentBlocked="true"
+                     ApplyBackgroundShading="true"
+                     IndicatorAreaVisible="false"
+                     Text="Fetching Data...">
+         <MyGrid @ref="Grid"
+                 Data="VaccinationPlans"
+                 KeyFieldName="Id"
+                 AllowSelectRowByClick="false"
+                 FocusedRowEnabled="false"
+                 @bind-SelectedDataItems="@SelectedDataItems">
+
+             <Columns>
+                 <DxGridDataColumn FieldName="TypeRegistration" Caption="Type Registration" GroupIndex="0" />
+                 <DxGridDataColumn FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" SortIndex="0" />
+                 <DxGridDataColumn FieldName="Patient.Name" Caption="Patient" />
+                 <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
+                 <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
+                 <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
+                 <DxGridDataColumn FieldName="StatusName" Caption="Status" />
+                 <DxGridDataColumn FieldName="AppointmentDate" Caption="Appoiment" />
+                 <DxGridDataColumn FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                     <CellDisplayTemplate>
+                         @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                     </CellDisplayTemplate>
+                 </DxGridDataColumn>
+                 <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                     <CellDisplayTemplate>
+                         <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                   Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
+                                   IconCssClass="fa-solid fa-circle-info"
+                                   Click="@(()=> OnClickDetailHistoricalRecordPatient((context.DataItem as GeneralConsultanServiceDto)))"
+                                   CssClass="me-1" />
+                     </CellDisplayTemplate>
+                     <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                 </DxGridDataColumn>
+             </Columns>
+
+             <GroupSummary>
+                 <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="TypeRegistration" />
+             </GroupSummary>
+         </MyGrid>
+     </DxLoadingPanel>
+ </DxPopup> *@
+
+
+

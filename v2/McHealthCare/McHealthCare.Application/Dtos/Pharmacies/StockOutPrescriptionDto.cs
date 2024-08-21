@@ -11,7 +11,7 @@
 
         public long? CurrentStock { get; set; }
         public string? Batch { get; set; }
-        public long? uomId { get; set; }
+        public Guid? uomId { get; set; }
         public DateTime? ExpiredDate { get; set; }
 
         public virtual PrescriptionDto? Prescription { get; set; }

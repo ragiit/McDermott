@@ -3558,7 +3558,10 @@
           "Serilog.Formatting.Compact": "3.0.0"
         },
         "runtime": {
-          "McDermott.Application.dll": {}
+          "McDermott.Application.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "McDermott.Domain/1.0.0": {
@@ -3568,12 +3571,18 @@
           "Microsoft.Extensions.DependencyInjection": "8.0.0"
         },
         "runtime": {
-          "McDermott.Domain.dll": {}
+          "McDermott.Domain.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "McDermott.Extentions/1.0.0": {
         "runtime": {
-          "McDermott.Extentions.dll": {}
+          "McDermott.Extentions.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       },
       "McDermott.Persistence/1.0.0": {
@@ -3583,7 +3592,10 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.7"
         },
         "runtime": {
-          "McDermott.Persistence.dll": {}
+          "McDermott.Persistence.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }

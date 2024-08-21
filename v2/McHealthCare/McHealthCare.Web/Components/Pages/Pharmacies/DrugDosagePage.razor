@@ -1,0 +1,141 @@
+﻿@page "/pharmacy/drug-dosage"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Regimen of Use</PageTitle>
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Medicine Dosage" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="true"
+                                                Text="Fetching Data...">
+
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="DrugDosages"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            AllowSelectRowByClick="true"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            PopupEditFormHeaderText="@(IsAddForm ? "Add Drug Dosage" : "Edit Drug Dosage")"
+                                            CssClass="ch-480"
+                                            ShowFilterRow="true"
+                                            TextWrapEnabled="false"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem  Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem  Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DrugDosages.Count > 0" />
+                                                <DxToolbarItem  Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DrugDosages.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Frequency" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
+                                            <DxGridDataColumn MinWidth="100" FieldName="TotalQtyPerDay" Caption="Total Qty Per Day" />
+                                            <DxGridDataColumn MinWidth="100" FieldName="Days" Caption="Days" />
+
+                                        </Columns>
+                                        <EditFormTemplate Context="EditFormContext">
+                                            @{
+                                                var a = (DrugDosageDto)EditFormContext.EditModel;
+                                            }
+                                            <DxFormLayout CssClass="w-100">
+
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Frequency" ColSpanMd="12">
+                                                    <DxTextBox @bind-Text="@a.Frequency"
+                                                               ShowValidationIcon="true"
+                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                               NullText="Frequency" />
+                                                    <ValidationMessage For="@(()=> a.Frequency)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Route" ColSpanMd="12">
+                                                    <DxComboBox ShowValidationIcon="true"
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                Data="@DrugRoutes"
+                                                                NullText="Select Route..."
+                                                                @bind-Value="@a.DrugRouteId"
+                                                                TextFieldName="Route"
+                                                                ValueFieldName="Id">
+                                                    </DxComboBox>
+                                                    <ValidationMessage For="@(()=>a.DrugRouteId)" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Total Qty Per Day" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.TotalQtyPerDay"
+                                                                NullText="Total Qty Per Day..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
+                                                    <ValidationMessage For="@(()=> a.TotalQtyPerDay)"   />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Days" ColSpanMd="12">
+                                                    <DxSpinEdit @bind-Value="@a.Days"
+                                                                NullText="Days..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                BindValueMode="BindValueMode.OnInput" />
+                                                    <ValidationMessage For="@(()=> a.Days)"   />
+                                                </DxFormLayoutItem>
+
+                                            </DxFormLayout>
+                                        </EditFormTemplate>
+                                    </DxGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Regimen of Use" />
+
+        <LoadingIndicatorLayout></LoadingIndicatorLayout>
+    </div>
+}

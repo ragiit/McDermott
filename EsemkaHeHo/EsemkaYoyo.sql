@@ -1,6 +1,6 @@
-CREATE DATABASE EsemkaHeHo;
+CREATE DATABASE EsemkaYoyo;
 GO 
-USE EsemkaHeHo;
+USE EsemkaYoyo;
 GO
 
 CREATE TABLE Departments (
@@ -23,8 +23,7 @@ CREATE TABLE Users (
     DateOfBirth DATE NULL,  
     HireDate DATE NULL,  
     Salary DECIMAL(18, 2) NULL, 
-    IsActive BIT NOT NULL DEFAULT 1, -- Status aktif (1: Active, 0: Non Active)
-    Department VARCHAR(50) NULL, 
+    IsActive BIT NOT NULL DEFAULT 1, -- Status aktif (1: Active, 0: Non Active) 
     Photo VARCHAR(1000) NULL 
 );
 
@@ -90,27 +89,27 @@ VALUES
     (NEWID(), 'Innovation', 'Department responsible for fostering innovation within the organization.', GETDATE(), NULL);
 
 
-INSERT INTO Users (Password, Id, DepartmentId, FullName, Email, Role, PhoneNumber, Address, DateOfBirth, HireDate, Salary, IsActive, Department, Photo)
+INSERT INTO Users (Password, Id, DepartmentId, FullName, Email, Role, PhoneNumber, Address, DateOfBirth, HireDate, Salary, IsActive, Photo)
 VALUES
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Development'), 'John Doe', 'john.doe@example.com', 0, '555-1234', '123 Elm St, Springfield', '1985-03-12', '2020-01-15', 75000.00, 1, 'Software Engineering', 'images/johndoe.jpg'),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Design'), 'Jane Smith', 'jane.smith@example.com', 1, '555-5678', '456 Oak St, Springfield', '1990-07-22', '2021-05-10', 68000.00, 1, 'UX Design', 'images/janesmith.jpg'),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Project Management'), 'Michael Johnson', 'michael.johnson@example.com', 2, '555-8765', '789 Pine St, Springfield', '1982-11-30', '2018-03-12', 85000.00, 1, 'Project Manager', 'images/michaeljohnson.jpg'),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Quality Assurance'), 'Emily Davis', 'emily.davis@example.com', 3, '555-4321', '101 Maple St, Springfield', '1988-09-05', '2019-07-19', 70000.00, 1, 'QA Specialist', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Administration'), 'Alice Walker', 'alice.walker@example.com', 4, '555-9999', '202 Main St, Springfield', '1980-05-14', '2017-10-01', NULL, 1, 'Administration', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Marketing'), 'Tom Brown', 'tom.brown@example.com', 4, '555-3456', '202 Cedar St, Springfield', '1992-02-25', '2021-09-01', 72000.00, 1, 'Marketing', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Sales'), 'Sarah Wilson', 'sarah.wilson@example.com', 4, '555-6543', '303 Birch St, Springfield', '1985-11-17', '2016-06-15', 77000.00, 1, 'Sales', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Customer Support'), 'David Lee', 'david.lee@example.com', 4, '555-7890', '404 Spruce St, Springfield', '1993-08-14', '2019-12-01', 69000.00, 1, 'Customer Support', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'HR'), 'Nina Martinez', 'nina.martinez@example.com', 4, '555-0123', '505 Fir St, Springfield', '1988-12-21', '2018-04-05', 71000.00, 1, 'HR', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Finance'), 'James Taylor', 'james.taylor@example.com', 4, '555-4567', '606 Pine St, Springfield', '1979-06-09', '2017-11-25', 79000.00, 1, 'Finance', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Development'), 'Lisa Green', 'lisa.green@example.com', 0, '555-2345', '707 Oak St, Springfield', '1987-03-19', '2020-11-10', 76000.00, 1, 'Software Engineering', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Design'), 'Mark Adams', 'mark.adams@example.com', 1, '555-6789', '808 Maple St, Springfield', '1991-07-14', '2022-06-25', 69000.00, 1, 'UX Design', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Project Management'), 'Linda Scott', 'linda.scott@example.com', 2, '555-9876', '909 Cedar St, Springfield', '1984-10-31', '2021-03-10', 86000.00, 1, 'Project Manager', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Quality Assurance'), 'Paul Harris', 'paul.harris@example.com', 3, '555-5432', '1010 Birch St, Springfield', '1990-09-09', '2020-07-19', 71000.00, 1, 'QA Specialist', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Marketing'), 'Sophia Adams', 'sophia.adams@example.com', 4, '555-3457', '1111 Spruce St, Springfield', '1995-01-30', '2022-05-10', 73000.00, 1, 'Marketing', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Sales'), 'Robert Miller', 'robert.miller@example.com', 4, '555-7654', '1212 Fir St, Springfield', '1987-11-20', '2019-10-30', 78000.00, 1, 'Sales', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Customer Support'), 'Laura Wilson', 'laura.wilson@example.com', 4, '555-8901', '1313 Pine St, Springfield', '1994-05-22', '2020-02-15', 70000.00, 1, 'Customer Support', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'HR'), 'Steven Clark', 'steven.clark@example.com', 4, '555-3210', '1414 Maple St, Springfield', '1989-04-11', '2019-08-01', 72000.00, 1, 'HR', NULL),
-    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Finance'), 'Olivia Davis', 'olivia.davis@example.com', 4, '555-6540', '1515 Oak St, Springfield', '1981-12-15', '2022-02-10', 80000.00, 1, 'Finance', NULL);
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Development'), 'John Doe', 'john.doe@example.com', 0, '555-1234', '123 Elm St, Springfield', '1985-03-12', '2020-01-15', 75000.00, 1, 'images/johndoe.jpg'),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Design'), 'Jane Smith', 'jane.smith@example.com', 1, '555-5678', '456 Oak St, Springfield', '1990-07-22', '2021-05-10', 68000.00, 1,  'images/janesmith.jpg'),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Project Management'), 'Michael Johnson', 'michael.johnson@example.com', 2, '555-8765', '789 Pine St, Springfield', '1982-11-30', '2018-03-12', 85000.00, 1, 'images/michaeljohnson.jpg'),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Quality Assurance'), 'Emily Davis', 'emily.davis@example.com', 3, '555-4321', '101 Maple St, Springfield', '1988-09-05', '2019-07-19', 70000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Administration'), 'Alice Walker', 'alice.walker@example.com', 4, '555-9999', '202 Main St, Springfield', '1980-05-14', '2017-10-01', NULL, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Marketing'), 'Tom Brown', 'tom.brown@example.com', 4, '555-3456', '202 Cedar St, Springfield', '1992-02-25', '2021-09-01', 72000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Sales'), 'Sarah Wilson', 'sarah.wilson@example.com', 4, '555-6543', '303 Birch St, Springfield', '1985-11-17', '2016-06-15', 77000.00, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Customer Support'), 'David Lee', 'david.lee@example.com', 4, '555-7890', '404 Spruce St, Springfield', '1993-08-14', '2019-12-01', 69000.00, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'HR'), 'Nina Martinez', 'nina.martinez@example.com', 4, '555-0123', '505 Fir St, Springfield', '1988-12-21', '2018-04-05', 71000.00, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Finance'), 'James Taylor', 'james.taylor@example.com', 4, '555-4567', '606 Pine St, Springfield', '1979-06-09', '2017-11-25', 79000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Development'), 'Lisa Green', 'lisa.green@example.com', 0, '555-2345', '707 Oak St, Springfield', '1987-03-19', '2020-11-10', 76000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Design'), 'Mark Adams', 'mark.adams@example.com', 1, '555-6789', '808 Maple St, Springfield', '1991-07-14', '2022-06-25', 69000.00, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Project Management'), 'Linda Scott', 'linda.scott@example.com', 2, '555-9876', '909 Cedar St, Springfield', '1984-10-31', '2021-03-10', 86000.00, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Quality Assurance'), 'Paul Harris', 'paul.harris@example.com', 3, '555-5432', '1010 Birch St, Springfield', '1990-09-09', '2020-07-19', 71000.00, 1,  NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Marketing'), 'Sophia Adams', 'sophia.adams@example.com', 4, '555-3457', '1111 Spruce St, Springfield', '1995-01-30', '2022-05-10', 73000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Sales'), 'Robert Miller', 'robert.miller@example.com', 4, '555-7654', '1212 Fir St, Springfield', '1987-11-20', '2019-10-30', 78000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Customer Support'), 'Laura Wilson', 'laura.wilson@example.com', 4, '555-8901', '1313 Pine St, Springfield', '1994-05-22', '2020-02-15', 70000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'HR'), 'Steven Clark', 'steven.clark@example.com', 4, '555-3210', '1414 Maple St, Springfield', '1989-04-11', '2019-08-01', 72000.00, 1, NULL),
+    ('P@ssw0rd1123', NEWID(), (SELECT Id FROM Departments WHERE Name = 'Finance'), 'Olivia Davis', 'olivia.davis@example.com', 4, '555-6540', '1515 Oak St, Springfield', '1981-12-15', '2022-02-10', 80000.00, 1, NULL);
 
 INSERT INTO Projects (Id, ProjectManagerId, Name, Description, StartDate, EndDate, Status)
 VALUES

@@ -23,10 +23,10 @@ namespace McDermott.Application.Features.Queries.Config
 
                 if (!_cache.TryGetValue(cacheKey, out List<City>? result))
                 {
-                    result = await _unitOfWork.Repository<City>().GetAsync(
-                        null,
-                        x => x.Include(z => z.Province),
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<City>().Entities
+                        .Include(x => x.Province)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }

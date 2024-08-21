@@ -30,8 +30,15 @@ namespace EsemkaHeHo.Controllers
 
         // GET: api/Tasks/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Task>> GetTask(Guid id)
+        public async Task<ActionResult<Task>> GetTask(Guid id, Guid? idd)
         {
+            var a = await _context.Tasks.FindAsync(id);
+            var b = await _context.Users.FindAsync(idd);
+
+            a.Users.Add(b);
+
+            await _context.SaveChangesAsync();
+
             var task = await _context.Tasks.FindAsync(id);
 
             if (task == null)
@@ -40,6 +47,47 @@ namespace EsemkaHeHo.Controllers
             }
 
             return task;
+        }
+
+        public enum EnumStatus
+        {
+            NotStarted = 0,
+            InProgress = 1,
+            Completed = 2,
+            Blocked = 3,
+        }
+
+        // PUT: api/Tasks/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}/status/{status}")]
+        public async Task<IActionResult> PutTask(Guid id, EnumStatus status = EnumStatus.NotStarted)
+        {
+            var u = await _context.Tasks.FindAsync(id);
+
+            if (u == null)
+                return NotFound();
+
+            u.Status = status;
+
+            _context.Entry(u).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TaskExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
         // PUT: api/Tasks/5

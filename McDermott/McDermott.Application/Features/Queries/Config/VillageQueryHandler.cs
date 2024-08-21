@@ -14,7 +14,8 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetDistrictsQuery, PaginatedList<VillageDto>>,
         IRequestHandler<DeleteVillageRequest, bool>
     {
-        #region GET 
+        #region GET
+
         public async Task<List<VillageDto>> Handle(GetVillageQuery request, CancellationToken cancellationToken)
         {
             try
@@ -33,13 +34,12 @@ namespace McDermott.Application.Features.Queries.Config
                     //    .AsNoTracking()
                     //    .ToListAsync(cancellationToken);
 
-                    result = await _unitOfWork.Repository<Village>().GetAsync(
-                        null,
-                        x => x
-                        .Include(z => z.Province)
-                        .Include(z => z.City)
-                        .Include(z => z.District),
-                        cancellationToken);
+                    result = await _unitOfWork.Repository<Village>().Entities
+                        .Include(x => x.Province)
+                        .Include(x => x.City)
+                        .Include(x => x.District)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
 
                     //result = await _unitOfWork.Repository<Village>().Entities
                     //    .Include(x => x.Province)
@@ -88,7 +88,6 @@ namespace McDermott.Application.Features.Queries.Config
                 if (request.Predicate is not null)
                     result = result.Where(request.Predicate);
 
-
                 return result.Adapt<IQueryable<VillageDto>>();
             }
             catch (Exception)
@@ -96,7 +95,6 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
-
 
         #endregion GET
 

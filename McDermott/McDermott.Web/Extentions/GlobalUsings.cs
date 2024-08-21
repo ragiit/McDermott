@@ -62,7 +62,6 @@ global using static McDermott.Application.Features.Commands.Patient.ClassTypeCom
 global using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 global using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
 global using static McDermott.Application.Features.Commands.Config.CityCommand;
-global using static McDermott.Application.Features.Commands.Config.CountryCommand;
 global using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
 global using static McDermott.Application.Features.Commands.Config.DistrictCommand;
 global using static McDermott.Application.Features.Commands.Employee.JobPositionCommand;
@@ -78,6 +77,7 @@ global using static McDermott.Application.Features.Commands.Queue.KioskCommand;
 global using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
 global using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 global using static McDermott.Application.Features.Commands.Config.GenderCommand;
+global using static McDermott.Application.Features.Commands.Config.CountryCommand;
 global using static McDermott.Application.Features.Commands.Config.MenuCommand;
 global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 global using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
