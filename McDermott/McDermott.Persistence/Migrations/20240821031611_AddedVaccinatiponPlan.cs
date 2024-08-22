@@ -11,12 +11,7 @@ namespace McDermott.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Note",
-                table: "Maintainances",
-                type: "nvarchar(max)",
-                nullable: true);
-
+           
             migrationBuilder.CreateTable(
                 name: "VaccinationPlans",
                 columns: table => new
@@ -120,9 +115,7 @@ namespace McDermott.Persistence.Migrations
             migrationBuilder.DropTable(
                 name: "VaccinationPlans");
 
-            migrationBuilder.DropColumn(
-                name: "Note",
-                table: "Maintainances");
+            
         }
     }
 }
