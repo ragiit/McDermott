@@ -34,7 +34,11 @@ namespace McDermott.Web.Components.Pages.Config
                 IsLoading = false;
                 StateHasChanged();
 
-                Grid?.SelectRow(0, true);
+                try
+                {
+                    Grid?.SelectRow(0, true);
+                }
+                catch { }
             }
         }
 
@@ -206,7 +210,6 @@ namespace McDermott.Web.Components.Pages.Config
                 ToastService.ShowInfo("The Identity Number already exist");
                 return;
             }
-
 
             if (Convert.ToBoolean(UserForm.IsPatient))
             {

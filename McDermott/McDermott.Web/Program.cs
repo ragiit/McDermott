@@ -1,4 +1,3 @@
-
 using DinkToPdf.Contracts;
 using DinkToPdf;
 using McDermott.Application.Extentions;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.CodeAnalysis.Options;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -38,6 +38,52 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 //    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
 //    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
 //});
+builder.Services.AddWebOptimizer(pipeline =>
+{
+    // Bundle and minify CSS
+    pipeline.AddCssBundle("/css/site.min.css",
+        "css/switcher-resources/themes/lumen/bootstrap.min.css",
+        "css/my-style.css",
+        "AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css",
+        "AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css",
+        "AdminLTE/plugins/jqvmap/jqvmap.min.css",
+        "AdminLTE/dist/css/adminlte.min.css",
+        "AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css",
+        "AdminLTE/plugins/daterangepicker/daterangepicker.css",
+        "AdminLTE/plugins/summernote/summernote-bs4.min.css",
+        "fontawesome/css/all.css",
+        "_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css");
+
+    pipeline.AddJavaScriptBundle("/js/site.min.js",
+              "_content/Blazored.TextEditor/quill-blot-formatter.min.js",
+              "_content/Blazored.TextEditor/Blazored-BlazorQuill.js",
+              "AdminLTE/plugins/jquery/jquery.min.js",
+              "AdminLTE/plugins/jquery-ui/jquery-ui.min.js",
+              "AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js",
+              "AdminLTE/plugins/chart.js/Chart.min.js",
+              "AdminLTE/plugins/sparklines/sparkline.js",
+              "AdminLTE/plugins/jqvmap/jquery.vmap.min.js",
+              "AdminLTE/plugins/jqvmap/maps/jquery.vmap.usa.js",
+              "AdminLTE/plugins/jquery-knob/jquery.knob.min.js",
+              "AdminLTE/plugins/moment/moment.min.js",
+              "AdminLTE/plugins/daterangepicker/daterangepicker.js",
+              "AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js",
+              "AdminLTE/plugins/summernote/summernote-bs4.min.js",
+              "AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js",
+              "AdminLTE/dist/js/adminlte.js",
+              "https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js",
+              "canvasScript.js",
+              "js/jspdf.umd.min.js",
+              "js/quill.js",
+              "CetakEtiket.js");
+});
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true; // Mengaktifkan kompresi untuk HTTPS
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/javascript", "text/css", "application/json" });
+});
+
 builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers(); // Menambahkan layanan Controllers
 builder.Services.AddControllersWithViews();
@@ -52,7 +98,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"] ?? "http://localhost:5001/");
-}); 
+});
 // Add services to the container.
 //builder.WebHost.UseUrls("http://*:5001");
 builder.Services.AddAuthenticationCore();
@@ -63,14 +109,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery();
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    options.Secure = CookieSecurePolicy.Always; 
+    options.Secure = CookieSecurePolicy.Always;
 });
 
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPCareService, PCareService>();
 builder.Services.AddScoped<IDocumentProvider, DocumentProvider>();
-builder.Services.AddScoped<IFileExportService, FileExportService>(); 
+builder.Services.AddScoped<IFileExportService, FileExportService>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
@@ -137,6 +183,8 @@ app.UseRouting();
 
 app.MapControllers();
 app.UseStaticFiles();
+app.UseResponseCompression();
+app.UseWebOptimizer();
 app.UseAntiforgery();
 app.MapHub<RealTimeHub>("/realTimeHub");
 //app.UseMiddleware<RateLimitMiddleware>();

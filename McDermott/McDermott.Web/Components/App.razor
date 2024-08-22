@@ -6,217 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/">
 
+    <link rel="stylesheet" href="css/site.min.css" />
+    <link href="McDermott.Web.styles.css" rel="stylesheet">
+
+     <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+     <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+
+    @DxResourceManager.RegisterScripts()
+    <HeadOutlet @rendermode="InteractiveServer" />
+
     @*  < link rel="stylesheet" href="bootstrap/bootstrap.min.css" /> *@
-    <link rel="stylesheet" href="app.css" />
-    <link rel="stylesheet" href="Etiket.css" /> 
     @*     <link rel="stylesheet" href="McDermott.styles.css" />
+    <link rel="stylesheet" href="Etiket.css" />
     *@
-     
-    @* <link rel="icon" type="image/png" href="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" /> *@
-    <link rel="icon" type="image/png" href="image/mcdermott_logo.png" /> 
-    <link href="_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.bs5.css" rel="stylesheet" asp-append-version="true" />
     <!-- Google Font: Source Sans Pro -->
     @*  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"> *@
     <!-- Font Awesome -->
     @* <link rel="stylesheet" href="AdminLTE/plugins/fontawesome-free/css/all.min.css"> *@
     <!-- Ionicons -->
     @* <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> *@
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <!-- JQVMap -->
-    <link rel="stylesheet" href="AdminLTE/plugins/jqvmap/jqvmap.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="AdminLTE/dist/css/adminlte.min.css">
-    <!-- overlayScrollbars -->
-    <link rel="stylesheet" href="AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
-    <!-- Daterange picker -->
-    <link rel="stylesheet" href="AdminLTE/plugins/daterangepicker/daterangepicker.css">
-    <!-- summernote -->
-    <link rel="stylesheet" href="AdminLTE/plugins/summernote/summernote-bs4.min.css">
 
-    <link rel="stylesheet" href="fontawesome/css/all.css" />
     @* <link rel="stylesheet" href="/css/Ticket.css" /> *@
     @* <link rel="stylesheet" href="_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.bs5.css" /> *@
-
-    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
 
     @*...*@
     @* Bootstrap 5 *@
     @* <link href="_content/DevExpress.Blazor.Themes/office-white.bs5.min.css" asp-append-version="true" rel="stylesheet" /> *@
-    @* Bootstrap 4 *@
-     <link href="css/switcher-resources/themes/lumen/bootstrap.min.css" asp-append-version="true" rel="stylesheet" /> 
 
-    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" />
     @* bootstrap-external for Bootstrap 4 *@
     @* <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs4.min.css" /> *@
     @*...*@
 
     @* Blazor Bootstrap *@
+  
 
-    <link href="McDermott.Web.styles.css" rel="stylesheet">
+    @* <link rel="stylesheet" href="app.css" />
+    <link rel="icon" type="image/png" href="image/mcdermott_logo.png" />
+    <link href="_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.bs5.css" rel="stylesheet" asp-append-version="true" />
 
-    @DxResourceManager.RegisterScripts()
-
-    <HeadOutlet @rendermode="InteractiveServer" />
-
-    <style>
-        .loading-panel-container {
-            position: relative;
-            height: 60vh; /* Menggunakan tinggi viewport untuk mengisi seluruh tinggi layar */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-        }
-
-        .custom-width-grid-popup {
-            min-width: 800px;
-            max-width: 1000px;
-        }
-
-        .loading-panel {
-            position: absolute;
-        }
-
-        .highlighted-item > td {
-            background-color: rgba(245, 198, 203, 0.5);
-        }
-
-        .alt-item > td {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .header-bold span {
-            /* font-weight: 700; */
-        }
-
-        .normal-caption {
-            font-weight: normal !important;
-        }
-
-        .mt {
-            margin-top: 3px;
-        }
-
-        .ml {
-            margin-left: 3px;
-        }
-
-        .required-caption:after {
-            content: ' *';
-            color: red;
-        }
-
-        .pop-warning:hover::after {
-            content: "*Form ini wajib di isi";
-            position: fixed;
-            color: #EF0F0F;
-            font-style: italic;
-            border-radius: 5px;
-            margin-top: 2px;
-            margin-left: 5px;
-            white-space: nowrap;
-            z-index: 1;
-        }
-
-        .no-underline {
-            text-decoration: none;
-        }
-
-        .required-caption:hover .pop-warning {
-            display: block;
-        }
-
-        .breadcrumb-item {
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        .breadcrumb {
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        .invalid {
-            outline: 1px solid #e50000;
-        }
-
-        .validation-message {
-            color: #e50000;
-        }
-
-        .sticky {
-            position: -webkit-sticky; /* Safari */
-            position: sticky;
-            top: 60px;
-            z-index: 1;
-            
-        }
-
-        .dxbl-tabs {
-            display: inline !important;
-            border-top: 1px !important;
-        }
-
-        /* .dxbl-btn-standalone.dxbl-btn-primary {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    border-radius: 13px !important;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
-
-        .rounded-button .dxbl-toolbar-item {
-            border-radius: 50px;
-            transition: background-color 0.3s;
-        }
-
-            .rounded-button .dxbl-toolbar-item:hover {
-                background-color: #f0f0f0;
-            }
-
-            .rounded-button .dxbl-toolbar-item:active {
-                background-color: #e0e0e0;
-            }
-
-        .dxbl-btn-standalone {
-            border-radius: 10px !important;
-            padding-inline-start: 25px !important;
-            padding-inline-end: 25px !important;
-            box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.3) !important;
-        }
-
-        .dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
-            background-color: rgb(10, 172, 200 ) !important;
-            color: white !important;
-            font-weight: bolder;
-            border: 1px solid;
-            box-shadow: rgba(0,2, 5, 0.24) 1px 3px 8px;
-        }
-
-        .dxbl-tabs-item {
-            border-radius: 20px !important;
-        }
-
-        .dxbl-tabs > .dxbl-tabs-tablist {
-            border-radius: 20px !important;
-        }
-
-        .dxbl-scroll-viewer > .dxbl-scroll-viewer-content {
-            padding: 3px 0 !important;
-        }
-    </style>
+    <link rel="stylesheet" href="AdminLTE/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="AdminLTE/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="AdminLTE/plugins/jqvmap/jqvmap.min.css">
+    <link rel="stylesheet" href="AdminLTE/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="AdminLTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <link rel="stylesheet" href="AdminLTE/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="AdminLTE/plugins/summernote/summernote-bs4.min.css">
+    <link rel="stylesheet" href="fontawesome/css/all.css" />
+    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="//cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+    <link href="css/switcher-resources/themes/lumen/bootstrap.min.css" asp-append-version="true" rel="stylesheet" />
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css" /> *@ 
 </head>
 
 @* <body class="hold-transition sidebar-mini  layout-fixed hold-transition white-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed"> *@
 <body class="hold-transition sidebar-mini sidebar-collapse layout-navbar-fixed layout-footer-fixed layout-fixed">
     <Routes @rendermode="InteractiveServer" />
+
     <script src="_framework/blazor.web.js"></script>
 
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="_content/Blazored.TextEditor/quill-blot-formatter.min.js"></script>
-    <script src="_content/Blazored.TextEditor/Blazored-BlazorQuill.js"></script>
+   @*  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script> *@
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="js/site.min.js"></script> 
     <script>
         // Fixed
         function downloadFileFromStream(fileName, streamReference) {
@@ -364,8 +215,8 @@
             removeItem: function (key) {
                 localStorage.removeItem(key);
             }
-        }; 
-        
+        };
+
         function downloadFileFromStreamApi(fileName, byteBase64) {
             var link = document.createElement('a');
             link.download = fileName;
@@ -395,7 +246,7 @@
             printWindow.focus();
             printWindow.print();
             printWindow.close();
-        } 
+        }
 
         function printJSX(contentToPrint) {
             var printWindow = window.open('', '_blank');
@@ -412,7 +263,7 @@
                 printWindow.close();
             }, 500); // Delay of 500ms to ensure window is fully initialized
         }
-        
+
         function printJS2(contentToPrint) {
             // Create a Blob object with the HTML content
             var blob = new Blob([contentToPrint], { type: 'application/pdf' });
@@ -532,39 +383,7 @@
 
     </script>
 
-    <!-- jQuery -->
-    <script src="AdminLTE/plugins/jquery/jquery.min.js"></script>
-    <!-- jQuery UI 1.11.4 -->
-    <script src="AdminLTE/plugins/jquery-ui/jquery-ui.min.js"></script>
-    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-    <script>
-        $.widget.bridge('uibutton', $.ui.button)
-    </script>
-    <!-- Bootstrap 4 -->
-    <script src="AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- ChartJS -->
-    <script src="AdminLTE/plugins/chart.js/Chart.min.js"></script>
-    <!-- Sparkline -->
-    <script src="AdminLTE/plugins/sparklines/sparkline.js"></script>
-    <!-- JQVMap -->
-    <script src="AdminLTE/plugins/jqvmap/jquery.vmap.min.js"></script>
-    <script src="AdminLTE/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
-    <!-- jQuery Knob Chart -->
-    <script src="AdminLTE/plugins/jquery-knob/jquery.knob.min.js"></script>
-    <!-- daterangepicker -->
-    <script src="AdminLTE/plugins/moment/moment.min.js"></script>
-    <script src="AdminLTE/plugins/daterangepicker/daterangepicker.js"></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="AdminLTE/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-    <!-- Summernote -->
-    <script src="AdminLTE/plugins/summernote/summernote-bs4.min.js"></script>
-    <!-- overlayScrollbars -->
-    <script src="AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="AdminLTE/dist/js/adminlte.js"></script>
-    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
-      <script src="canvasScript.js"></script>  
-      <script src="/CetakEtiket.js"></script>  
+     
 
     @* <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> *@
     @* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> *@
@@ -608,62 +427,62 @@
     }
     </script> *@
     @*<script>
-        window.initializeCanvas = (canvasId) => {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) {
-                console.error("Canvas element not found.");
-                return;
-            }
-            const ctx = canvas.getContext('2d');
-            let markerCount = 0;
-            let markers = [];
+    window.initializeCanvas = (canvasId) => {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+    console.error("Canvas element not found.");
+    return;
+    }
+    const ctx = canvas.getContext('2d');
+    let markerCount = 0;
+    let markers = [];
 
-            const img = new Image();
-            img.src = '/image/logo.png'; // Replace with the correct image path
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                redrawMarkers();
-            }
+    const img = new Image();
+    img.src = '/image/logo.png'; // Replace with the correct image path
+    img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    redrawMarkers();
+    }
 
-            canvas.addEventListener('click', (e) => {
-                const x = e.offsetX;
-                const y = e.offsetY;
+    canvas.addEventListener('click', (e) => {
+    const x = e.offsetX;
+    const y = e.offsetY;
 
-                const clickedMarkerIndex = markers.findIndex(marker => {
-                    const dx = marker.x - x;
-                    const dy = marker.y - y;
-                    return Math.sqrt(dx * dx + dy * dy) < 10; // Adjust radius as needed
-                });
+    const clickedMarkerIndex = markers.findIndex(marker => {
+    const dx = marker.x - x;
+    const dy = marker.y - y;
+    return Math.sqrt(dx * dx + dy * dy) < 10; // Adjust radius as needed
+    });
 
-                if (clickedMarkerIndex !== -1) {
-                    markers.splice(clickedMarkerIndex, 1);
-                } else {
-                    markerCount++;
-                    markers.push({ number: markerCount, x, y });
-                }
-                redrawMarkers();
-            });
+    if (clickedMarkerIndex !== -1) {
+    markers.splice(clickedMarkerIndex, 1);
+    } else {
+    markerCount++;
+    markers.push({ number: markerCount, x, y });
+    }
+    redrawMarkers();
+    });
 
-            window.resetMarkers = () => {
-                markerCount = 0;
-                markers = [];
-                redrawMarkers();
-            }
+    window.resetMarkers = () => {
+    markerCount = 0;
+    markers = [];
+    redrawMarkers();
+    }
 
-            function redrawMarkers() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                markers.forEach(marker => {
-                    ctx.fillStyle = 'purple';
-                    ctx.beginPath();
-                    ctx.arc(marker.x, marker.y, 12, 0, 2 * Math.PI);
-                    ctx.fill();
-                    ctx.fillStyle = 'white';
-                    ctx.font = 'bold 12px Arial';
-                    ctx.fillText(marker.number, marker.x - 5, marker.y + 5);
-                });
-            }
-        };
+    function redrawMarkers() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    markers.forEach(marker => {
+    ctx.fillStyle = 'purple';
+    ctx.beginPath();
+    ctx.arc(marker.x, marker.y, 12, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText(marker.number, marker.x - 5, marker.y + 5);
+    });
+    }
+    };
     </script> *@
 
 </body>
