@@ -54,6 +54,8 @@ builder.Services.AddWebOptimizer(pipeline =>
         "fontawesome/css/all.css",
         "_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css");
 
+    //"https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js",
+
     pipeline.AddJavaScriptBundle("/js/site.min.js",
               "_content/Blazored.TextEditor/quill-blot-formatter.min.js",
               "_content/Blazored.TextEditor/Blazored-BlazorQuill.js",
@@ -71,10 +73,10 @@ builder.Services.AddWebOptimizer(pipeline =>
               "AdminLTE/plugins/summernote/summernote-bs4.min.js",
               "AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js",
               "AdminLTE/dist/js/adminlte.js",
-              "https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js",
               "canvasScript.js",
               "js/jspdf.umd.min.js",
               "js/quill.js",
+              "js/my-js.js",
               "CetakEtiket.js");
 });
 builder.Services.AddResponseCompression(options =>
