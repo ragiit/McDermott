@@ -13,7 +13,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        @if (!showForm && !StockProductView)
+                        @if (!showForm && !StockProductView && !StockEquipmentView)
                         {
                             <div class="card">
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -70,7 +70,7 @@
                                 </DxLoadingPanel>
                             </div>
                         }
-                        else if (showForm && !StockProductView)
+                        else if (showForm && !StockProductView && !StockEquipmentView)
                         {
                             @if (smartButtonShow)
                             {
@@ -435,7 +435,7 @@
                                 </div>
                             </div>
                         }
-                        else if (!showForm && StockProductView)
+                        else if (!showForm && StockProductView && !StockEquipmentView)
                         {
                             <div class="card">
                                 <div class="card-header">
@@ -471,6 +471,45 @@
                                             {
                                                 <DxGridDataColumn FieldName="Expired" Caption="Expired Date" DisplayFormat="dd MMMM yyyy" />
                                             }
+                                        </Columns>
+                                    </MyGrid>
+                                </DxLoadingPanel>
+                            </div>
+                        }
+                        else if (!showForm && !StockProductView && StockEquipmentView)
+                        {
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5> @(getMaintainance.Select(x=>x.Equipment.Name).FirstOrDefault())</h5>
+                                </div>
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="true"
+                                                Text="Fetching Data...">
+                                    <MyGrid @ref="GridStock"
+                                            Data="@getMaintainance"
+                                            FocusedRowEnabled="false"
+                                            KeyFieldName="Id"
+                                            DataItemDeleting="onDeleteStock"
+                                            AllowSelectRowByClick="false">
+                                        <ToolbarTemplate>
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                            </DxToolbar>
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridDataColumn FieldName="Title" Caption="Title" />
+                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Request By" />
+                                            <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
+                                            <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
+                                            <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
+                                            <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                <CellDisplayTemplate>
+                                                    @((MarkupString)GetIssueStatusIconHtmlMaintainance((context.DataItem as MaintainanceDto).Status))
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn> 
                                         </Columns>
                                     </MyGrid>
                                 </DxLoadingPanel>
@@ -554,6 +593,3 @@ else
     </EditForm>
 </DxPopup>
 
-@code {
-
-}

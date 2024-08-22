@@ -55,6 +55,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool showForm { get; set; } = false;
         private bool FormStockPopUp { get; set; } = false;
         private bool StockProductView { get; set; } = false;
+        private bool StockEquipmentView { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
         private bool showTabs { get; set; } = false;
         private bool Checkins { get; set; } = false;
@@ -135,6 +136,53 @@ namespace McDermott.Web.Components.Pages.Inventory
                     Chronis = false;
                 }
             }
+        }
+
+        public MarkupString GetIssueStatusIconHtmlMaintainance(EnumStatusMaintainance? status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case EnumStatusMaintainance.Request:
+                    priorityClass = "info";
+                    title = "Request";
+                    break;
+
+                case EnumStatusMaintainance.InProgress:
+                    priorityClass = "primary";
+                    title = "In Progress";
+                    break;
+
+                case EnumStatusMaintainance.Repaired:
+                    priorityClass = "warning";
+                    title = "Repaire";
+                    break;
+
+                case EnumStatusMaintainance.Scrap:
+                    priorityClass = "warning";
+                    title = "Scrap";
+                    break;
+                case EnumStatusMaintainance.Done:
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+                case EnumStatusMaintainance.Canceled:
+                    priorityClass = "danger";
+                    title = "Cancel";
+                    break;
+
+
+
+                default:
+                    return new MarkupString("");
+            }
+
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
         }
 
         #endregion Static
@@ -367,7 +415,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
-                    TotalQty = getMaintainance.Where(x=>x.EquipmentId == products.Id).Count();
+                    TotalQty = getMaintainance.Where(x => x.EquipmentId == products.Id).Count();
                 }
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
@@ -625,6 +673,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await NewTableStock_Item();
         }
+        private async Task RefreshEquiptment_Click()
+        {
+            await NewTableEquipment_Item();
+        }
 
         private async Task NewTableStock_Item()
         {
@@ -723,7 +775,14 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-        private async Task NewTableEquipment_Item() { }
+        private async Task NewTableEquipment_Item()
+        {
+            StockEquipmentView = true;
+            showForm = false;
+            PanelVisible = true;
+            getMaintainance = getMaintainance.Where(x => x.EquipmentId == FormProductDetails.Id).ToList();
+            PanelVisible = false;
+        }
 
         private async Task NewItemStock_Click()
         {
