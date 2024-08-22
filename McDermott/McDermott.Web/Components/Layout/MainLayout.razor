@@ -85,24 +85,21 @@
                             </a>
                         </li>
                         <li class="nav-item dropdown mr-2">
-                            <a class="nav-link" data-toggle="dropdown" href="#">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-user" aria-hidden="true"></i>
-                                <label class="ml-2">@User?.Name</label>
+                                <span class="ml-2">@User?.Name</span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" @onclick="OnClickLogout">
-                                    <i class="fa-solid fa-right-from-bracket mr-2"></i>
-                                    Logout
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#" @onclick="OnClickLogout">
+                                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Logout
                                 </a>
-                                <div class="dropdown-divider"></div>
                             </div>
                         </li>
                     </ul>
                 </nav>
                 <aside class="main-sidebar sidebar-light-info elevation-4">
                     <a href="/" class="brand-link no-underline">
-                        <img src="https://www.ikariera.cz/uploads/companies/file/28129/22192/17871/c1c103e1-56b0-45cf-b02d-f6acbc7276b8/Logo%20-%20mcdermott_symbol_color%20500x500%2C%2050hrana.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                        <img src="image/mcdermott_logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                         <span class="ms-2 brand-text font-weight-bold">McHealthCare</span>
                     </a>
 
