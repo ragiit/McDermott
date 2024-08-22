@@ -11,6 +11,8 @@ using static McDermott.Web.Components.Pages.Transaction.ProcedureRoomPage;
 using Microsoft.AspNetCore.HttpLogging;
 using Mapster;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+using FluentValidation.Results;
+using FluentValidation;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -548,6 +550,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private PatientAllergyDto PatientAllergy = new();
         private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
+
         private DiagnosisDto SelectedDiagnosis { get; set; } = new();
         private NursingDiagnosesDto SelectedNursingDiagnosis { get; set; } = new();
         private InsurancePolicyDto SelectedInsurancePolicyFollowUp { get; set; } = new();
@@ -700,9 +703,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedBPJSIntegration = new();
             FollowUpGeneralConsultanService.InsurancePolicyId = null;
 
+            SelectedInsurancePolicy = result;
+            GeneralConsultanService.InsurancePolicyId = result?.Id ?? null;
             if (result is null)
                 return;
-
             ToastService.ClearWarningToasts();
 
             var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
@@ -2056,6 +2060,41 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
+                // Execute the validator
+                ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
+
+                // Inspect any validation failures.
+                bool success = results.IsValid;
+                List<ValidationFailure> failures = results.Errors;
+
+                ToastService.ClearInfoToasts();
+                if (!success)
+                {
+                    foreach (var f in failures)
+                    {
+                        ToastService.ShowInfo(f.ErrorMessage);
+                    }
+                }
+
+                // Execute the validator
+                ValidationResult results2 = new GCGUserFormValidator().Validate(UserForm);
+
+                // Inspect any validation failures.
+                bool success2 = results2.IsValid;
+                List<ValidationFailure> failures2 = results2.Errors;
+
+                ToastService.ClearInfoToasts();
+                if (!success2)
+                {
+                    foreach (var f in failures2)
+                    {
+                        ToastService.ShowInfo(f.ErrorMessage);
+                    }
+                }
+
+                if (!success2 || !success)
+                    return;
+
                 if (!GeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicy is null || SelectedInsurancePolicy.Id == 0))
                 {
                     IsLoading = false;

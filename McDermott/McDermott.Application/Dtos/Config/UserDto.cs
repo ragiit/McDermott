@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Dtos.Config
+﻿using FluentValidation;
+
+namespace McDermott.Application.Dtos.Config
 {
     public class UserDto : IMapFrom<User>
     {
@@ -182,6 +184,15 @@
 
         //[SetToNull]
         public virtual PatientAllergyDto PatientAllergy { get; set; } = new();
+    }
+
+    public class GCGUserFormValidator : AbstractValidator<UserDto>
+    {
+        public GCGUserFormValidator()
+        {
+            RuleFor(x => x.CurrentMobile)
+                .NotEmpty().WithMessage("Current Mobile is required");
+        }
     }
 
     public class CreateUpdateUserDto

@@ -184,7 +184,15 @@ app.UseRouting();
 //app.UseHttpsRedirection();
 
 app.MapControllers();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Set the cache headers
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000");
+        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddYears(1).ToString("R"));
+    }
+});
 app.UseResponseCompression();
 app.UseWebOptimizer();
 app.UseAntiforgery();
