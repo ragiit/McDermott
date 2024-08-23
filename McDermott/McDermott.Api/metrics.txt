@@ -1,0 +1,54 @@
+# TIMESTAMP: 638599821901961192
+# MEASUREMENT: [appmetrics.internal] report_success  items
+# TAGS:
+                   item = App.Metrics.Reporting.TextFile.TextFileMetricsReporter
+                  mtype = counter
+                   unit = items
+# FIELDS:
+                  total = 1
+                percent = 100
+--------------------------------------------------------------
+# TIMESTAMP: 638599821901961192
+# MEASUREMENT: [appmetrics.internal] report_success
+# TAGS:
+                  mtype = counter
+                   unit = items
+# FIELDS:
+                  value = 1
+--------------------------------------------------------------
+# TIMESTAMP: 638599821901961192
+# MEASUREMENT: [Application] My Counter
+# TAGS:
+                  mtype = counter
+                   unit = calls
+# FIELDS:
+                  value = 6
+--------------------------------------------------------------
+# TIMESTAMP: 638599821901961192
+# MEASUREMENT: [Application] Request Duration
+# TAGS:
+                  mtype = timer
+                   unit = req
+               unit_dur = ms
+              unit_rate = min
+# FIELDS:
+            count.meter = 54
+                 rate1m = 3.048881559143799
+                 rate5m = 16.40082351579269
+                rate15m = 21.203183270841464
+              rate.mean = 13.05278358713599
+                samples = 54
+                   last = 0.6968
+             count.hist = 54
+                    sum = 5410.8624
+                    min = 0.32889999999999997
+                    max = 4971.788799999999
+                   mean = 47.67902313620145
+                 median = 0.6179
+                 stddev = 459.5384234659053
+                   p999 = 4971.788799999999
+                    p99 = 141.58339999999998
+                    p98 = 138.4799
+                    p95 = 6.9342
+                    p75 = 0.7455999999999999
+--------------------------------------------------------------

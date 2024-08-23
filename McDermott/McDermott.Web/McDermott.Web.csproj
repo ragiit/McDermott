@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
     <PackageReference Include="Aspose.Words" Version="24.7.0" />
     <PackageReference Include="Blazor.SignaturePad" Version="8.1.3" />
     <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />

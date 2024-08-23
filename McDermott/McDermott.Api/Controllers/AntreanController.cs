@@ -14,6 +14,7 @@ namespace McDermott.Api.Controllers
             return true; // Asumsikan valid untuk sementara
         }
 
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         [HttpGet("status/{kode_poli}/{tanggalperiksa}")]
         public IActionResult GetStatusAntrean([FromRoute] string kode_poli, [FromRoute] DateTime tanggalperiksa,
                                               [FromHeader(Name = "x-token")] string token, [FromHeader(Name = "x-username")] string username)
