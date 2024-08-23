@@ -1,23 +1,32 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using McDermott.Application.Extentions;
+using McDermott.Domain.Entities;
 using McDermott.Persistence.Extensions;
 using MediatR;
+using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
 //builder.Services.AddMediatR(options =>
 //{
 //    options.RegisterServicesFromAssemblies(typeof(Program).Assembly);
 //});
 
+builder.Services.AddControllers()
+        .AddOData(options =>
+            options.Select().Filter().OrderBy().Expand().Count()
+            .AddRouteComponents("odata", GetEdmModel()));
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 builder.Services.AddApplicationLayer();
-builder.Services.AddPersistenceLayer(builder.Configuration); 
+builder.Services.AddPersistenceLayer(builder.Configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -28,9 +37,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
 }
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -39,3 +49,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EntitySet<User>("Users");
+    return builder.GetEdmModel();
+}

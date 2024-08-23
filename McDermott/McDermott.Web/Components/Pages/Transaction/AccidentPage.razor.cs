@@ -29,12 +29,11 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task OnClickPopUpHistoricalMedical()
         {
-            if (GeneralConsultanService.PatientId == 0 || GeneralConsultanService.PatientId is null) 
+            if (GeneralConsultanService.PatientId == 0 || GeneralConsultanService.PatientId is null)
             {
                 ToastService.ShowInfo("Please select the Employee");
                 return;
             }
-
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -55,8 +54,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await LoadComboBox();
                 StateHasChanged();
-
-               
 
                 try
                 {
@@ -86,8 +83,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 Grid?.SelectRow(0, true);
                 StateHasChanged();
-
-
             }
         }
 
@@ -95,7 +90,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             isAccident = true;
         }
-       
 
         private async Task OnPopupShown()
         {
@@ -106,31 +100,32 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             await JsRuntime.InvokeVoidAsync("resetMarkers");
         }
+
         private string description { get; set; }
+
         private async Task SaveMarkers()
         {
-
             try
             {
-                var imageData = await JsRuntime.InvokeAsync<string>("getCanvasImageData", "MyCanvas");
-                await SaveImageToDatabase(imageData, description);
+                var canvasDataUrl = await JsRuntime.InvokeAsync<string>("getCompressedCanvasDataUrl", "MyCanvas");
+                ToastService.ShowInfo(canvasDataUrl);
+                //var imageData = await JsRuntime.InvokeAsync<string>("getCanvasImageData", "MyCanvas");
+                //await SaveImageToDatabase(imageData, description);
             }
             catch (Exception ex)
             {
                 // Log the exception (you can use any logging framework or just Console for simplicity)
                 Console.WriteLine($"Error in SaveMarkers: {ex.Message}");
             }
-
         }
 
         private async Task SaveImageToDatabase(string datas, string descript)
         {
             var asd = datas;
         }
-       
+
         private List<IBrowserFile> BrowserFiles = [];
 
-       
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
             var file = e.File;
@@ -274,6 +269,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Accident = new();
             await LoadData();
         }
+
         private async Task ClosePopUp()
         {
             isPrint = false;
@@ -1128,12 +1124,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //Accident.Employee = Employees.FirstOrDefault(x => x.Id == General);
                 //Accident.Department = Departments.FirstOrDefault(x => x.Id == Accident.DepartmentId);
 
-
-
                 GeneralConsultanService.Patient = Employees.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId);
 
                 RefreshStagingText();
-
 
                 var usr = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
                 if (usr is not null)
@@ -1146,7 +1139,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                         Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
                     }
                 }
-
 
                 ToastService.ClearInfoToasts();
                 ToastService.ShowSuccess("Saved Successfully");
@@ -1175,8 +1167,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 service.Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == service.Id))).FirstOrDefault() ?? new();
             }
-
-           
 
             GeneralConsultanService = new();
             Accident = new();
@@ -1286,17 +1276,20 @@ namespace McDermott.Web.Components.Pages.Transaction
         public long Id { get; set; }
 
         private List<ProjectDto> Projects { get; set; } = [];
+
         private List<string> InformationFrom =
         [
             "Auto Anamnesa",
             "Allo Anamnesa"
-        ]; 
+        ];
+
         private List<string> HumptyDumpty =
  [
      "Risiko rendah 0-6",
      "Risiko sedang 7-11",
      "Risiko Tinggi >= 12"
  ];
+
         private List<string> Geriati =
        [
            "Risiko rendah 0-3",
@@ -1308,14 +1301,15 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Humpty Dumpty",
             "Morse",
             "Geriatri",
-        ]; 
+        ];
+
         private List<string> Morse =
         [
             "Risiko rendah 0-24",
             "Risiko sedang 25-44",
             "Risiko Tinggi >= 45"
-        ]; 
-         
+        ];
+
         private void OnSelectRiskOfFalling(string e)
         {
             RiskOfFallingDetail.Clear();
@@ -1336,9 +1330,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             else
             {
                 RiskOfFallingDetail = Geriati.ToList();
-
             }
         }
+
         private List<string> Colors = new List<string>
         {
             "Red",
@@ -1346,7 +1340,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Green",
             "Black",
         };
+
         private List<string> RiskOfFallingDetail = [];
+
         private async Task EditItem_Click()
         {
             ShowForm = true;

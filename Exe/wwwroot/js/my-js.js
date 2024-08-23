@@ -21,6 +21,38 @@ window.BlazorDownloadFileExample = (fileName) => {
     document.body.removeChild(anchor);
 };
 
+function getCanvasDataUrl(canvasId) {
+    var canvas = document.getElementById(canvasId);
+    console.log(canvas.toDataURL('image/png'));
+    return canvas.toDataURL('image/png'); // atau format lain seperti 'image/jpeg'
+}
+
+function getCompressedCanvasDataUrl(canvasId, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+        var canvas = document.getElementById(canvasId);
+        var compressedCanvas = document.createElement('canvas');
+        compressedCanvas.width = canvas.width / 2; // Mengurangi ukuran gambar
+        compressedCanvas.height = canvas.height / 2;
+        var ctx = compressedCanvas.getContext('2d');
+
+        // Menggambar ulang dengan ukuran lebih kecil
+        ctx.drawImage(canvas, 0, 0, compressedCanvas.width, compressedCanvas.height);
+
+        compressedCanvas.toBlob((blob) => {
+            if (blob) {
+                var reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve(reader.result);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            } else {
+                reject('Blob creation failed');
+            }
+        }, 'image/jpeg', quality);
+    });
+}
+
 window.BlazorDownloadFile = async (fileName) => {
     const response = await fetch(`/${fileName}`);
     const blob = await response.blob();
