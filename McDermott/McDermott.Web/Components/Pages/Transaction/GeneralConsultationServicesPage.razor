@@ -287,7 +287,7 @@
                                                                          Physicions="Physicions"
                                                                          RegisType="RegisType"
                                                                          SelectedInsurancePolicy="SelectedInsurancePolicy"
-                                                                         Services="Services" 
+                                                                         Services="Services"
                                                                          UserForm="UserForm">
                                     </GCGeneralInformationLayoutComponent>
 
@@ -1819,7 +1819,7 @@ else
 
                             </DxLoadingPanel>
                         }
-                        else if (SelectedRujukanVertical is not null)
+                        else if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[1]))
                         {
                             <div class="w-100">
                                 <div class="w-100">
@@ -1935,6 +1935,100 @@ else
                                                             </Columns>
                                                         </MyGrid>
                                                     </DxLoadingPanel>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[2]))
+                        {
+                            <div class="w-100">
+                                <div class="w-100">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <span class="fw-bolder">Mcdermott Internal Referral</span>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <DxFormLayout CssClass="w-100">
+                                                        <!-- Number -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Number" ColSpanMd="12">
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Number" NullText="McD/RLH/Clinic/0001" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Date -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date" ColSpanMd="12">
+                                                            <DxDateEdit @bind-Date="@GeneralConsultanService.Date" NullText="Select Date" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Kepada/To -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Kepada/To" ColSpanMd="12">
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Kepada" NullText="Enter To" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Hospital -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Hospital" ColSpanMd="12">
+                                                            <DxComboBox Data="@Hospitals"
+                                                                        @bind-Value="@GeneralConsultanService.Hospital"
+                                                                        NullText="Select Hospital" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Examination Purpose -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Purpose" ColSpanMd="12">
+                                                            <DxComboBox Data="@ExaminationPurposes"
+                                                                        @bind-Value="@GeneralConsultanService.ExaminationPurpose"
+                                                                        NullText="Select Examination Purpose" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Category -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
+                                                            <DxComboBox Data="@Categories"
+                                                                        @bind-Value="@GeneralConsultanService.Category"
+                                                                        NullText="Select Category" />
+                                                        </DxFormLayoutItem> 
+                                                    </DxFormLayout>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <DxFormLayout>
+                                                        <!-- Exam For -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Exam For" ColSpanMd="12">
+                                                            <DxComboBox Data="@ExamFor"
+                                                                        @bind-Value="@GeneralConsultanService.ExamFor"
+                                                                        NullText="Select Exam For" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Name -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Name" NullText="Enter Name" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Job -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Job" ColSpanMd="12">
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Job" NullText="Enter Job" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Temporary Diagnosis -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temporary Diagnosis" ColSpanMd="12">
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.TemporaryDiagnosis" NullText="Enter Diagnosis" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Therapy Provided -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Therapy Provided" ColSpanMd="12">
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.TherapyProvided" NullText="Enter Therapy" />
+                                                        </DxFormLayoutItem>
+
+                                                        <!-- Inpatient Class -->
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Inpatient Class" ColSpanMd="12">
+                                                            <DxComboBox Data="@InpatientClasses"
+                                                                        @bind-Value="@GeneralConsultanService.InpatientClass"
+                                                                        NullText="Select Inpatient Class" />
+                                                        </DxFormLayoutItem>
+                                                    </DxFormLayout>
                                                 </div>
                                             </div>
                                         </div>

@@ -15,9 +15,19 @@ namespace McDermott.Application.Features.Queries.Transaction
         IRequestHandler<CreateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
         IRequestHandler<CreateListGeneralConsultationLogRequest, List<GeneralConsultanlogDto>>,
         IRequestHandler<UpdateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
-        IRequestHandler<DeleteGeneralConsultationLogRequest, bool>
+        IRequestHandler<DeleteGeneralConsultationLogRequest, bool>,
+        IRequestHandler<GetGeneralConsultanServiceCountQuery, int>
     {
         #region GET
+
+        public async Task<int> Handle(GetGeneralConsultanServiceCountQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<GeneralConsultanService>().Entities
+                .Where(request.Predicate)
+                .Include(x => x.Service)
+                .AsNoTracking()
+                .CountAsync(cancellationToken: cancellationToken);
+        }
 
         public async Task<List<GeneralConsultanServiceDto>> Handle(GetGeneralConsultanServiceQuery request, CancellationToken cancellationToken)
         {

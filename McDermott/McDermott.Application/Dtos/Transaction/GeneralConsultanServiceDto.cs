@@ -241,6 +241,19 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion Vaccination
 
+        public string Number { get; set; }
+        public DateTime Date { get; set; }
+        public string Kepada { get; set; }
+        public string Hospital { get; set; }
+        public string ExaminationPurpose { get; set; }
+        public string Category { get; set; }
+        public string ExamFor { get; set; }
+        public string Name { get; set; }
+        public string Job { get; set; }
+        public string TemporaryDiagnosis { get; set; }
+        public string TherapyProvided { get; set; }
+        public string InpatientClass { get; set; }
+
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
         public virtual KioskQueueDto? KioskQueue { get; set; }

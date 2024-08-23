@@ -37,11 +37,14 @@ namespace McDermott.Web.Components.Pages.Patient
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
+
         private List<string> YesNoOptions =
        [
            "Yes",
             "No"
+
        ]; private List<string> RiwayatPenyakitKeluarga =
+
         [
             "DM",
             "Hipertensi",
@@ -51,6 +54,7 @@ namespace McDermott.Web.Components.Pages.Patient
             "Anemia",
             "Other",
         ];
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -94,10 +98,13 @@ namespace McDermott.Web.Components.Pages.Patient
         [Parameter]
         public long PrescriptionCount { get; set; } = 0;
 
+        public int VaccinationCount { get; set; } = 0;
+
         public IGrid Grid { get; set; }
         public IGrid GridFamilyRelation { get; set; }
         private IEnumerable<AllergyDto> SelectedAllergies { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItemVaccinations { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataFamilyRelationItems { get; set; } = new ObservableRangeCollection<object>();
 
         private enum Opinion
@@ -289,8 +296,50 @@ namespace McDermott.Web.Components.Pages.Patient
 
         private bool PopUpVisible = false;
         private bool PrescriptionPopUp = false;
+        private bool IsVaccinations = false;
+        private bool IsLoadingGeneralConsultantServiceVaccinations = false;
+        private IGrid GridVaccinations { get; set; }
+        private List<GeneralConsultanServiceDto> GeneralConsultanServiceVaccinations { get; set; } = [];
 
-        private void OnClickSmartButton(string text)
+        public MarkupString GetIssuePriorityIconHtml(GeneralConsultanServiceDto priority)
+        {
+            if (priority is not null)
+            {
+                if (!priority.IsAlertInformationSpecialCase && priority.ClassType is null)
+                    return new MarkupString("");
+
+                string priorytyClass = "danger";
+                string title = string.Empty;
+
+                if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
+                    title = $" Priority, {priority.ClassType.Name}";
+                else
+                {
+                    if (priority.ClassType is not null)
+                        title = $"{priority.ClassType.Name}";
+                    if (priority.IsAlertInformationSpecialCase)
+                        title = $" Priority ";
+                }
+
+                string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+
+                return new MarkupString(html);
+            }
+            return new MarkupString("");
+        }
+
+        private GeneralConsultanServiceDto SelectedGeneralConsultanService { get; set; } = new();
+        private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs { get; set; } = [];
+        private bool IsDetailVaccinations { get; set; } = false;
+
+        private async Task OnClickDetailHistoricalRecordPatientVaccinations(GeneralConsultanServiceDto generalConsultanService)
+        {
+            IsDetailVaccinations = true;
+            SelectedGeneralConsultanService = generalConsultanService;
+            GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == generalConsultanService.Id));
+        }
+
+        private async Task OnClickSmartButton(string text)
         {
             //NavigationManager.NavigateTo("patient/insurance-policy");
             //var a = new InsurancePolicyPage();
@@ -304,6 +353,14 @@ namespace McDermott.Web.Components.Pages.Patient
             else if (text.Equals("Prescription"))
             {
                 PrescriptionPopUp = true;
+                return;
+            }
+            else if (text.Equals("Vaccinations"))
+            {
+                IsVaccinations = true;
+                IsLoadingGeneralConsultantServiceVaccinations = true;
+                GeneralConsultanServiceVaccinations = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"));
+                IsLoadingGeneralConsultantServiceVaccinations = false;
                 return;
             }
             TabIndex = text.ToInt32();
@@ -609,6 +666,7 @@ namespace McDermott.Web.Components.Pages.Patient
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
                 ShowForm = true;
 
+                VaccinationCount = await Mediator.Send(new GetGeneralConsultanServiceCountQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"));
                 PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
                 AllPatientFamilyRelations = [.. PatientFamilyRelations];
                 var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
