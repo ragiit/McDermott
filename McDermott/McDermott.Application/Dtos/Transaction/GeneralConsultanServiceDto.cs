@@ -1,5 +1,7 @@
 ﻿using McDermott.Application.Dtos.Queue;
 
+using FluentValidation;
+
 namespace McDermott.Application.Dtos.Transaction
 {
     public partial class GeneralConsultanServiceDto : IMapFrom<GeneralConsultanService>
@@ -37,7 +39,6 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         public string? Payment { get; set; } = "BPJS";
 
-        [Required]
         public string? TypeRegistration { get; set; } = "General Consultation";
 
         public string? MedexType { get; set; }
@@ -240,6 +241,19 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion Vaccination
 
+        public string Number { get; set; }
+        public DateTime Date { get; set; }
+        public string Kepada { get; set; }
+        public string Hospital { get; set; }
+        public string ExaminationPurpose { get; set; }
+        public string Category { get; set; }
+        public string ExamFor { get; set; }
+        public string Name { get; set; }
+        public string Job { get; set; }
+        public string TemporaryDiagnosis { get; set; }
+        public string TherapyProvided { get; set; }
+        public string InpatientClass { get; set; }
+
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
         public virtual KioskQueueDto? KioskQueue { get; set; }
@@ -253,6 +267,58 @@ namespace McDermott.Application.Dtos.Transaction
         // Add this property
         [NotMapped]
         public virtual AccidentDto? Accident { get; set; }
+    }
+
+    public class GeneralConsultanServiceValidator : AbstractValidator<GeneralConsultanServiceDto>
+    {
+        public GeneralConsultanServiceValidator()
+        {
+            // Validation for Patient field
+            RuleFor(x => x.PatientId)
+                .NotEmpty().WithMessage("Patient is required")
+                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
+
+            RuleFor(x => x.ServiceId)
+              .NotEmpty().WithMessage("Service is required")
+              .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
+
+            RuleFor(x => x.RegistrationDate)
+                 .NotEmpty().WithMessage("Registration Date is required")
+                 .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned))
+                 .GreaterThanOrEqualTo(DateTime.Now.Date).WithMessage("Registration Date cannot be in the past")
+                 .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
+
+            // Validation for Current Mobile field
+            //RuleFor(x => x.CurrentMobile)
+            //    .NotEmpty().WithMessage("Current Mobile is required")
+            //    .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned) ||
+            //              x.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) ||
+            //              x.Status.Equals(EnumStatusGeneralConsultantService.Physician));
+
+            // Validation for Type Registration field
+            RuleFor(x => x.TypeRegistration)
+                .NotEmpty().WithMessage("Registration Type is required")
+                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
+
+            // Validation for Return Status field
+            RuleFor(x => x.HomeStatus)
+                .NotEmpty().WithMessage("Return Status is required")
+                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Physician));
+
+            // Optional: If IsAlertInformationSpecialCase needs to be validated
+            RuleFor(x => x.IsAlertInformationSpecialCase)
+                .NotNull().WithMessage("Alert Information Special Case is required")
+                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
+
+            RuleFor(x => x.Payment)
+          .NotEmpty().WithMessage("Payment Method is required.");
+
+            When(x => x.Payment == "Insurance" || x.Payment == "BPJS", () =>
+            {
+                RuleFor(x => x.InsurancePolicyId)
+                    .NotNull().WithMessage("Insurance Policy is required when Payment Method is Insurance or BPJS.");
+            });
+        }
     }
 
     public class CreateUpdateGeneralConsultanServiceDto

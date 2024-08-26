@@ -55,7 +55,7 @@
                                   GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) ||
                                   GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician)))" ShowValidationIcon="true">
                                 </DxMaskedInput>
-                                <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
+                                <ValidationMessage For="@(() => UserForm.CurrentMobile)"   />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
                                 <Template>
@@ -174,6 +174,7 @@
                                             Mask="@DateTimeMask.ShortDate"
                                             NullText="Select Registration Date">
                                 </DxDateEdit>
+                                <ValidationMessage For="@(() => GeneralConsultanService.RegistrationDate)" />
                             </DxFormLayoutItem>
 
                             <DxFormLayoutItem Visible="IsVaccinationLocation" CaptionCssClass="normal-caption" Caption="Location" ColSpanMd="12">
@@ -282,8 +283,8 @@
     [Parameter] public IEnumerable<LocationDto> Locations { get; set; } = [];
     [Parameter] public EventCallback<UserDto> CbSelectedItemPatientChanged { get; set; }
     [Parameter] public EventCallback<string> CbSelectedItemRegisTypeChanged { get; set; }
-    [Parameter] public EventCallback<ServiceDto> CbSelectedItemServiceChanged { get; set; }
-    [Parameter] public EventCallback<InsurancePolicyDto> CbSelectedItemInsurancePolicyChanged { get; set; }
+    [Parameter] public EventCallback<ServiceDto> CbSelectedItemServiceChanged { get; set; } 
+    [Parameter] public EventCallback<InsurancePolicyDto> CbSelectedItemInsurancePolicyChanged { get; set; }  
     [Parameter] public EventCallback<string> CbSelectedItemPaymentChanged { get; set; }
     [Parameter] public EventCallback<DateTime> CbSelectedMaternityStartDateChanged { get; set; }
     [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedFoodAllergies { get; set; }
@@ -327,9 +328,10 @@
             CbSelectedWeatherAllergies.InvokeAsync(value);
         }
     }
-    protected void SelectedItemInsurancePolicyChanged(InsurancePolicyDto selectedItem)
+    private async Task SelectedItemInsurancePolicyChanged(InsurancePolicyDto selectedItem)
     {
-        CbSelectedItemInsurancePolicyChanged.InvokeAsync(selectedItem);
+        SelectedInsurancePolicy = selectedItem;
+        await CbSelectedItemInsurancePolicyChanged.InvokeAsync(selectedItem);
     }
 
     protected void SelectedMaternityStartDateChanged(DateTime selectedItem)

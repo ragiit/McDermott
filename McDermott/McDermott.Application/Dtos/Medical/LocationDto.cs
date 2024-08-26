@@ -21,6 +21,8 @@
 
                 return $"{ParentLocation.Name}/{Name}";
             }
+
+            set { }
         }
 
         [Required]

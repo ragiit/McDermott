@@ -1,4 +1,5 @@
 ﻿@page "/patient/patient-data"
+@using McDermott.Web.Components.LayoutComponents
 @using McDermott.Web.Components.Pages.Pharmacy
 @inject IHttpContextAccessor _httpContextAccessor
 
@@ -40,9 +41,10 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-notes-medical"
                                                                Text="@($"Data MCU")" />
-                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
+                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Vaccinations"))"
                                                                IconCssClass="fa-solid fa-syringe"
-                                                               Text="@($"Data Vaction")" />
+                                                               Text="@($"{VaccinationCount} Vaccinations")" />
+
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data wellness")" />
@@ -127,6 +129,9 @@
                                             </ToolbarTemplate>
 
 
+                                </DxToolbar>
+                                </ToolbarTemplate>
+                                *@
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
@@ -674,3 +679,53 @@ else
 <DxPopup HeaderText="History Prescription" @bind-Visible="@PrescriptionPopUp" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="auto" Closed="OnClickClosePrescriptionPopUp">
     <PrescriptionPage User="UserForm" IsPopUpForm="true"></PrescriptionPage>
 </DxPopup>
+
+<DxPopup HeaderText="Historical Vaccination Patients" @bind-Visible="@IsVaccinations" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <DxLoadingPanel @bind-Visible="IsLoadingGeneralConsultantServiceVaccinations"
+                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="false"
+                    Text="Fetching Data...">
+        <MyGrid @ref="GridVaccinations"
+                Data="GeneralConsultanServiceVaccinations"
+                KeyFieldName="Id"
+                AllowSelectRowByClick="false"
+                FocusedRowEnabled="false"
+                @bind-SelectedDataItems="@SelectedDataItemVaccinations">
+
+            <Columns>
+                <DxGridDataColumn FieldName="RegistrationDate" DisplayFormat="ddd, dd MMM yyyy" Caption="Registration Date" SortIndex="0" />
+                <DxGridDataColumn FieldName="Patient.Name" Caption="Patient" />
+                <DxGridDataColumn FieldName="Payment" Caption="Payment Methode" />
+                <DxGridDataColumn FieldName="Pratitioner.Name" Caption="Doctor" />
+                <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
+                <DxGridDataColumn FieldName="TypeRegistration" Caption="Type Registration" />
+                <DxGridDataColumn FieldName="StatusName" Caption="Status" />
+                <DxGridDataColumn FieldName="AppointmentDate" Caption="Appoiment" />
+                <DxGridDataColumn FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                    <CellDisplayTemplate>
+                        @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                    </CellDisplayTemplate>
+                </DxGridDataColumn>
+                <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                    <CellDisplayTemplate>
+                        <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                  Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
+                                  IconCssClass="fa-solid fa-circle-info"
+                                  Click="@(()=> OnClickDetailHistoricalRecordPatientVaccinations((context.DataItem as GeneralConsultanServiceDto)))"
+                                  CssClass="me-1" />
+                    </CellDisplayTemplate>
+                    <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                </DxGridDataColumn>
+            </Columns>
+        </MyGrid>
+    </DxLoadingPanel>
+</DxPopup>
+
+<DxPopup HeaderText="Historical Medical Record Patient Detail" @bind-Visible="@IsDetailVaccinations" Closed="( () => IsDetailVaccinations = false)" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+
+    <_PopUpDetailVaccination GeneralConsultanService="SelectedGeneralConsultanService"
+                             GeneralConsultanCPPTs="GeneralConsultanCPPTs" />
+</DxPopup>
+

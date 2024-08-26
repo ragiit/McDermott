@@ -1,0 +1,140 @@
+﻿.loading-panel-container {
+    position: relative;
+    height: 60vh; /* Menggunakan tinggi viewport untuk mengisi seluruh tinggi layar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+}
+
+.custom-width-grid-popup {
+    min-width: 800px;
+    max-width: 1000px;
+}
+
+.loading-panel {
+    position: absolute;
+}
+
+.highlighted-item > td {
+    background-color: rgba(245, 198, 203, 0.5);
+}
+
+.alt-item > td {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.header-bold span {
+    /* font-weight: 700; */
+}
+
+.normal-caption {
+    font-weight: normal !important;
+}
+
+.mt {
+    margin-top: 3px;
+}
+
+.ml {
+    margin-left: 3px;
+}
+
+.required-caption:after {
+    content: ' *';
+    color: red;
+}
+
+.pop-warning:hover::after {
+    content: "*Form ini wajib di isi";
+    position: fixed;
+    color: #EF0F0F;
+    font-style: italic;
+    border-radius: 5px;
+    margin-top: 2px;
+    margin-left: 5px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.no-underline {
+    text-decoration: none;
+}
+
+.required-caption:hover .pop-warning {
+    display: block;
+}
+
+.breadcrumb-item {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.breadcrumb {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+.sticky {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 60px;
+    z-index: 1;
+}
+
+.dxbl-tabs {
+    display: inline !important;
+    border-top: 1px !important;
+}
+
+/* .dxbl-btn-standalone.dxbl-btn-primary {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 13px !important;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
+
+.rounded-button .dxbl-toolbar-item {
+    border-radius: 50px;
+    transition: background-color 0.3s;
+}
+
+    .rounded-button .dxbl-toolbar-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .rounded-button .dxbl-toolbar-item:active {
+        background-color: #e0e0e0;
+    }
+
+.dxbl-btn-standalone {
+    border-radius: 10px !important;
+    padding-inline-start: 25px !important;
+    padding-inline-end: 25px !important;
+    box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dxbl-tabs > .dxbl-tabs-tablist > .dxbl-scroll-viewer > .dxbl-scroll-viewer-content > ul > li > .dxbl-tabs-item:not(.dxbl-tabs-tmpl):not(.dxbl-disabled):not(:disabled).dxbl-active {
+    background-color: rgb(10, 172, 200 ) !important;
+    color: white !important;
+    font-weight: bolder;
+    border: 1px solid;
+    box-shadow: rgba(0,2, 5, 0.24) 1px 3px 8px;
+}
+
+.dxbl-tabs-item {
+    border-radius: 20px !important;
+}
+
+.dxbl-tabs > .dxbl-tabs-tablist {
+    border-radius: 20px !important;
+}
+
+.dxbl-scroll-viewer > .dxbl-scroll-viewer-content {
+    padding: 3px 0 !important;
+}

@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
+using Microsoft.AspNetCore.RateLimiting;
+using AspNetCoreRateLimit;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -38,6 +40,15 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 //    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
 //    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
 //});
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddOptions();
+// Add rate limiting services
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<RateLimitOptions>(builder.Configuration.GetSection("RateLimiting"));
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+// Add rate limiting processing strategy
+builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
 builder.Services.AddWebOptimizer(pipeline =>
 {
     // Bundle and minify CSS
@@ -53,6 +64,8 @@ builder.Services.AddWebOptimizer(pipeline =>
         "AdminLTE/plugins/summernote/summernote-bs4.min.css",
         "fontawesome/css/all.css",
         "_content/DevExpress.Blazor.Themes/bootstrap-external.bs5.min.css");
+
+    //"https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js",
 
     pipeline.AddJavaScriptBundle("/js/site.min.js",
               "_content/Blazored.TextEditor/quill-blot-formatter.min.js",
@@ -71,10 +84,10 @@ builder.Services.AddWebOptimizer(pipeline =>
               "AdminLTE/plugins/summernote/summernote-bs4.min.js",
               "AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js",
               "AdminLTE/dist/js/adminlte.js",
-              "https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js",
               "canvasScript.js",
               "js/jspdf.umd.min.js",
               "js/quill.js",
+              "js/my-js.js",
               "CetakEtiket.js");
 });
 builder.Services.AddResponseCompression(options =>
@@ -177,15 +190,26 @@ else
 
 app.UseSerilogRequestLogging();
 app.UseRouting();
+app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
 //app.UseAuthorization();  // Gunakan otorisasi
 //app.UseHttpsRedirection();
 
 app.MapControllers();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Set the cache headers
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=31536000");
+        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddYears(1).ToString("R"));
+    }
+});
 app.UseResponseCompression();
 app.UseWebOptimizer();
 app.UseAntiforgery();
+// Tambahkan middleware logging untuk rate limiting
+app.UseMiddleware<RateLimitLoggingMiddleware>();
 app.MapHub<RealTimeHub>("/realTimeHub");
 //app.UseMiddleware<RateLimitMiddleware>();
 
@@ -224,17 +248,24 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-public class RateLimitMiddleware
+public class RateLimitLoggingMiddleware(RequestDelegate next, ILogger<RateLimitLoggingMiddleware> logger)
+{
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var rateLimitExceeded = context.Response.StatusCode == StatusCodes.Status429TooManyRequests;
+        if (rateLimitExceeded)
+        {
+            logger.LogWarning("Rate limit exceeded for {RequestPath}", context.Request.Path);
+        }
+
+        await next(context);
+    }
+}
+
+public class RateLimitMiddleware(RequestDelegate next)
 {
     private static Dictionary<string, DateTime> requestTimes = new Dictionary<string, DateTime>();
     private static TimeSpan limitPeriod = TimeSpan.FromSeconds(5); // Time period to check requests
-
-    private readonly RequestDelegate _next;
-
-    public RateLimitMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
 
     public async Task Invoke(HttpContext context)
     {
@@ -251,7 +282,7 @@ public class RateLimitMiddleware
         }
 
         requestTimes[ipAddress] = DateTime.UtcNow;
-        await _next(context);
+        await next(context);
     }
 }
 

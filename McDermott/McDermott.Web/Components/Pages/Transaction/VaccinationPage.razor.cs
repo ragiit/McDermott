@@ -1232,6 +1232,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             ToastService.ClearInfoToasts();
             SelectedBPJSIntegration = new();
 
+            SelectedInsurancePolicy = result;
+            GeneralConsultanService.InsurancePolicyId = result?.Id ?? null;
+
             if (result is null)
                 return;
 

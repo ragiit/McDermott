@@ -10,6 +10,11 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
+        public class GetGeneralConsultanServiceCountQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null) : IRequest<int>
+        {
+            public Expression<Func<GeneralConsultanService, bool>> Predicate { get; } = predicate!;
+        }
+
         #endregion GET
 
         #region Create
@@ -64,7 +69,7 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion GET
+        #endregion GET GeneralConsultan Logs
 
         #region Create GeneralConsultan Logs
 
@@ -78,7 +83,7 @@
             public List<GeneralConsultanlogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
         }
 
-        #endregion Create
+        #endregion Create GeneralConsultan Logs
 
         #region Update GeneralConsultan Logs
 
@@ -92,7 +97,7 @@
             public List<GeneralConsultanlogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
         }
 
-        #endregion Update
+        #endregion Update GeneralConsultan Logs
 
         #region Delete GeneralConsultan Logs
 
@@ -102,6 +107,6 @@
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion Delete
+        #endregion Delete GeneralConsultan Logs
     }
 }
