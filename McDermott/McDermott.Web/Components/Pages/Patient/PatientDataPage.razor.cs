@@ -296,6 +296,7 @@ namespace McDermott.Web.Components.Pages.Patient
 
         private bool PopUpVisible = false;
         private bool PrescriptionPopUp = false;
+        private bool DiseasePopUp = false;
         private bool IsVaccinations = false;
         private bool IsLoadingGeneralConsultantServiceVaccinations = false;
         private IGrid GridVaccinations { get; set; }
@@ -354,7 +355,8 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 PrescriptionPopUp = true;
                 return;
-            }else if (text.Equals("Desease"))
+            }
+            else if (text.Equals("Desease"))
             {
                 DiseasePopUp = true;
                 return;
