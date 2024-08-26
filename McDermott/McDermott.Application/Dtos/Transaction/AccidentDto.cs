@@ -26,6 +26,7 @@
         public string StatusName => Status.GetDisplayName();
         public string? EmployeeDescription { get; set; }
         public string AccidentLocation { get; set; } = "Inside";
+      
 
         #region Employee Cause Of Injury
 

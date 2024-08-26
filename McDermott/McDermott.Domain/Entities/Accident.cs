@@ -25,6 +25,8 @@ namespace McDermott.Domain.Entities
         public string? EmployeeDescription { get; set; }
         public string AccidentLocation { get; set; } = "Inside";
 
+       
+
         #region Employee Cause Of Injury
         public List<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
         public List<string> SelectedEmployeeCauseOfInjury2 { get; set; } = [];

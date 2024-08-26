@@ -81,7 +81,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var aaa = ex;
                 }
 
-                Grid?.SelectRow(0, true);
+                //Grid?.SelectRow(0, true);
                 StateHasChanged();
             }
         }
@@ -107,10 +107,18 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
-                var canvasDataUrl = await JsRuntime.InvokeAsync<string>("getCompressedCanvasDataUrl", "MyCanvas");
-                ToastService.ShowInfo(canvasDataUrl);
-                //var imageData = await JsRuntime.InvokeAsync<string>("getCanvasImageData", "MyCanvas");
-                //await SaveImageToDatabase(imageData, description);
+                if (GeneralConsultanService.Id != 0)
+                {
+                    var canvasDataUrl = await JsRuntime.InvokeAsync<string>("getCompressedCanvasDataUrl", "MyCanvas");
+                    GeneralConsultanService.ImageToBase64 = canvasDataUrl;
+                    GeneralConsultanService.Description = description;
+                   var apptd = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+                    await EditItem_Click();
+                }
+                else
+                {
+                    ToastService.ShowInfo("Data Accident not null");
+                }
             }
             catch (Exception ex)
             {
@@ -121,7 +129,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SaveImageToDatabase(string datas, string descript)
         {
-            var asd = datas;
+           
+
         }
 
         private List<IBrowserFile> BrowserFiles = [];
@@ -272,8 +281,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task ClosePopUp()
         {
-            isPrint = false;
+            isPrint = false;            
             await EditItem_Click();
+        }
+
+        private async Task ClosePopUpAccident()
+        {
+            isAccident = false;
+
         }
 
         private List<string> ClassType = new List<string>
@@ -1077,6 +1092,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
         }
 
         private async Task RefreshSupervisorName()

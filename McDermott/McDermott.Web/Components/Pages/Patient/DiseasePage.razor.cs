@@ -93,7 +93,7 @@ namespace McDermott.Web.Components.Pages.Patient
 
             foreach(var Gc in getGeneralConsultan)
             {
-                var GetDataCppt = getGeneralConsultanCPPT.Where(x => x.GeneralConsultanServiceId == Gc.Id && x.Title == "Diagnosis").FirstOrDefault();
+                var GetDataCppt = getGeneralConsultanCPPT.Where(x => x.GeneralConsultanServiceId == Gc.Id && x.Title == "Diagnosis").OrderBy(x=>x.CreatedDate).FirstOrDefault();
                 var getDataDisease = getDiagnosis.Where(x => x.Name == GetDataCppt?.Body && x.CronisCategoryId is not null).FirstOrDefault();
 
                 var diseases = new DiseaseDto()

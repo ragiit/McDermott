@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240826063103_AddAccidentTable")]
+    partial class AddAccidentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,6 +72,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<long?>("DepartmentId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeCauseOfInjury1")
                         .HasColumnType("nvarchar(max)");
@@ -126,6 +132,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<long>("GeneralConsultanServiceId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("ImageToBase64")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NatureOfInjury1")
                         .HasColumnType("nvarchar(max)");
@@ -2256,9 +2265,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("Diastole")
                         .HasColumnType("bigint");
 
@@ -2281,9 +2287,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("HomeStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageToBase64")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InformationFrom")

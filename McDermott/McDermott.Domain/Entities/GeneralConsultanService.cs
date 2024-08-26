@@ -43,6 +43,8 @@
         public string? ReferVerticalSpesialisSaranaCode { get; set; }
         public string? PPKRujukanName { get; set; }
         public string? PPKRujukanCode { get; set; }
+        public string? ImageToBase64 { get; set; }
+        public string? Description { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
 
         /// </BPJS Rujukan>

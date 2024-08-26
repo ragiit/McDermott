@@ -253,6 +253,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string TemporaryDiagnosis { get; set; }
         public string TherapyProvided { get; set; }
         public string InpatientClass { get; set; }
+        public string? ImageToBase64 { get; set; }
+        public string? Description { get; set; }
 
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
