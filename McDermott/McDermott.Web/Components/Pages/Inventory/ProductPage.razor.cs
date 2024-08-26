@@ -372,6 +372,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 showForm = true;
                 PanelVisible = true;
                 StockProductView = false;
+                StockEquipmentView = false;
                 smartButtonShow = true;
 
                 // Inisialisasi data produk

@@ -7,6 +7,7 @@
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public DateTime DateTime { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; }
 
         public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
     }

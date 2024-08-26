@@ -1,4 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -59,6 +60,13 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             postMaintainance.Recurrent = true;
 
+        }
+        private List<string> Batch = [];
+        private async Task selectByProduct(ProductDto value)
+        {
+            var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id));
+            Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
+            Batch = Batch.Distinct().ToList();
         }
 
         private List<string> RepeatWork = new List<string>()
@@ -331,6 +339,23 @@ namespace McDermott.Web.Components.Pages.Inventory
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;
                 await EditItem_Click(getMaintainanceById);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task Done_Click()
+        {
+            try
+            {
+                PanelVisible = true;
+                postMaintainance.Status = EnumStatusMaintainance.Done;
+                getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
+                PanelVisible = false;
+                await EditItem_Click(getMaintainanceById);
+
             }
             catch (Exception ex)
             {

@@ -44,10 +44,11 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Title" Caption="Title" />
-                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Request By" />
-                                            <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Responsible By" />
-                                            <DxGridDataColumn FieldName="Equipment.Name" Caption="Equipment" />
+                                            <DxGridDataColumn FieldName="Title" Caption="Subject" />
+                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
+                                            <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
+                                            <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
+                                            <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand" />
                                             <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
                                             <DxGridDataColumn FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>
@@ -86,10 +87,11 @@
                                             <div class="row justify-content-between">
                                                 <div class="col-auto align-self-start">
                                                     <DxButton Text="In Progress" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="InProgress_Click"></DxButton>
-                                                    <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
+                                                    <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
                                                    <DxButton Text="Repair" Visible="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Repaired_Click"></DxButton>
                                                     <DxButton Text="Scrap" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired || postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Scrap_Click"></DxButton>
-                                                    <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired ||postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
+                                                    <DxButton Text="Done" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired || postMaintainance.Status == EnumStatusMaintainance.Scrap)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-check" Click="Done_Click"></DxButton>
+                                                    <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired ||postMaintainance.Status == EnumStatusMaintainance.InProgress || postMaintainance.Status == EnumStatusMaintainance.Scrap)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
                                                 </div>
                                                 <div class="col-auto align-self-start">
                                                     <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@(postMaintainance.Id == 0 || postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
@@ -143,11 +145,12 @@
                                                                           NullText="select Equipment..."
                                                                           ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
                                                                           @bind-Value="@postMaintainance.EquipmentId"
+                                                                          SelectedItemChanged="@((ProductDto value)=>selectByProduct(value))"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"></MyDxComboBox>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Serial Number/Batch">
-                                                            <MyTextBox @bind-Text="@postMaintainance.SerialNumber" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)" NullText="Input Serial Number..." ShowValidationIcon="true" />
+                                                            <MyDxComboBox Data="@Batch" @bind-Value="@postMaintainance.SerialNumber" NullText="Serial Number" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></MyDxComboBox>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Maintainance By">
                                                             <DxCheckBox Checked="postMaintainance.isInternal"

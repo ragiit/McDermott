@@ -148,13 +148,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         private IReadOnlyList<object> SelectedDataItemsConcoction { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsConcoctionLines { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsStockOut { get; set; } = [];
-
-        [Parameter]
         public bool showForm { get; set; } = false;
 
         [Parameter]
+        public bool IsPopUpForm { get; set; } = false;
+        [Parameter]
         public UserDto User { get; set; } = new()
         {
+           
             Name = "-"
         };
 
@@ -1203,6 +1204,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                var aopop = User;
                 PanelVisible = true;
                 Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
                 Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
@@ -1220,7 +1222,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
                 ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-                Pharmacies = await Mediator.Send(new GetPharmacyQuery());
+                if (User.Id == null)
+                {
+                    Pharmacies = await Mediator.Send(new GetPharmacyQuery());
+                }
+                else
+                {
+                    Pharmacies = await Mediator.Send(new GetPharmacyQuery(x=>x.PatientId == User.Id));
+                }
                 Concoctions = new List<ConcoctionDto>();
                 PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
                 allergies = await Mediator.Send(new GetAllergyQuery());

@@ -28,6 +28,9 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Prescription"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"{PrescriptionCount} History Prescription")" />
+                                                <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("Desease"))"
+                                                               IconCssClass="fa-solid fa-syringe"
+                                                               Text="@($"History Desease")" />
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-virus-slash"
                                                                Text="@($"Data General Examination")" />
@@ -40,10 +43,10 @@
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data Vaction")" />
-
                                                 <DxToolbarItem Alignment="ToolbarItemAlignment.Right" BeginGroup="true" Click="@((e) => OnClickSmartButton("0"))"
                                                                IconCssClass="fa-solid fa-syringe"
                                                                Text="@($"Data wellness")" />
+                                                
                                             </Items>
                                         </DxToolbar>
 
@@ -123,30 +126,13 @@
                                                                  VisibleDelete="UserAccessCRUID.Delete" />
                                             </ToolbarTemplate>
 
-                                            @*  <ToolbarTemplate>
-                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Users.Count > 0 && !IsDeleted" />
-                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                <DxToolbarItem Text="Column Chooser" BeginGroup="true" Click="ColumnChooserButton_Click" IconCssClass="fa-solid fa-table-columns" />
-                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                <Items>
-                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                </Items>
-                                </DxToolbarItem>
 
-                                            </DxToolbar>
-                                            </ToolbarTemplate>
-                                    *@
-                                <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="Name" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date of Birth" />
-                                </Columns>
+                                            <Columns>
+                                                <DxGridSelectionColumn Width="15px" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="Name" />
+                                                <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date of Birth" />
+                                            </Columns>
                                         </MyGrid>
                                     </DxLoadingPanel>
                                 }
@@ -553,51 +539,6 @@
                                                         <MyTextBox @bind-Text="@UserForm.PastMedicalHistory"
                                                                    NullText="Past Medical History" />
                                                     </DxFormLayoutItem>
-
-                                                    @*  <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Farmacologi" ColSpanMd="3">
-                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.FarmacologiCode"
-                                        ShowValidationIcon="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Code" />
-                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.FarmacologiCode)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
-                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Farmacology"
-                                        NullText="Farmacologi"
-                                        ShowValidationIcon="true"
-                                        Rows="1" />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather Code" ColSpanMd="3">
-                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.WeatherCode"
-                                        ShowValidationIcon="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Code" />
-                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.WeatherCode)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
-                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Weather"
-                                        ShowValidationIcon="true"
-                                        NullText="Weather"
-                                        Rows="1" />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Food" ColSpanMd="3">
-                                        <DxTextBox @bind-Text="@UserForm.PatientAllergy.FoodCode"
-                                        ShowValidationIcon="true"
-                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                        NullText="Code" />
-                                        <ValidationMessage For="@(() => UserForm.PatientAllergy.FoodCode)"   />
-                                        </DxFormLayoutItem>
-
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="9" Caption="">
-                                        <DxMemo @bind-Text="@UserForm.PatientAllergy.Food"
-                                        ShowValidationIcon="true"
-                                        NullText="Food"
-                                        Rows="1" />
-                                        </DxFormLayoutItem> *@
                                                 </Items>
                                             </DxFormLayoutGroup>
 

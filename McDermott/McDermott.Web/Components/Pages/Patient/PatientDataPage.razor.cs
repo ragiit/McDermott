@@ -289,6 +289,7 @@ namespace McDermott.Web.Components.Pages.Patient
 
         private bool PopUpVisible = false;
         private bool PrescriptionPopUp = false;
+        private bool DiseasePopUp = false;
 
         private void OnClickSmartButton(string text)
         {
@@ -304,6 +305,10 @@ namespace McDermott.Web.Components.Pages.Patient
             else if (text.Equals("Prescription"))
             {
                 PrescriptionPopUp = true;
+                return;
+            }else if (text.Equals("Desease"))
+            {
+                DiseasePopUp = true;
                 return;
             }
             TabIndex = text.ToInt32();

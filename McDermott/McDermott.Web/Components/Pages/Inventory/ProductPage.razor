@@ -480,7 +480,7 @@
                         {
                             <div class="card">
                                 <div class="card-header">
-                                    <h5> @(getMaintainance.Select(x=>x.Equipment.Name).FirstOrDefault())</h5>
+                                    <h4 class="fw-bolder"> @(getMaintainance.Select(x=>x.Equipment.Name).FirstOrDefault())</h4>
                                 </div>
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IsContentBlocked="true"
@@ -500,10 +500,11 @@
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
-                                            <DxGridDataColumn FieldName="Title" Caption="Title" />
-                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Request By" />
+                                            <DxGridDataColumn FieldName="Title" Caption="Subject" />
+                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
                                             <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
                                             <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
+                                            <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand"  />
                                             <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
                                             <DxGridDataColumn FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>

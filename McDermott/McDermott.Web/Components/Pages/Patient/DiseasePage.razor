@@ -1,0 +1,42 @@
+﻿@page "/patient/disease-history"
+@rendermode InteractiveServer
+
+ @if (!IsPopUpForm)
+{ 
+    <PageTitle>McHealthCare - Disease History</PageTitle>
+ } 
+
+@if (IsAccess)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Patients" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGrid @ref="Grid"
+                                        Data="getDisease">
+
+                                    <Columns>
+                                        <DxGridDataColumn FieldName="PatientName" Caption="Patient" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="DiseaseName" Caption="Disease" />
+                                        <DxGridDataColumn FieldName="PhycisianName" Caption="Phicisian " />
+                                        <DxGridDataColumn FieldName="DateDisease" DisplayFormat="dd MMMM yyyy" />
+                                    </Columns>
+                                </MyGrid>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
