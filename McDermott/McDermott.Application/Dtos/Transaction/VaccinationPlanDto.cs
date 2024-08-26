@@ -18,6 +18,7 @@ namespace McDermott.Application.Dtos.Transaction
         public long? EducatorId { get; set; }
         public string Name { get; set; } = string.Empty;
         public long Quantity { get; set; }
+        public long TeoriticalQty { get; set; }
         public DateTime? ReminderDate { get; set; }
         public string? Batch { get; set; }
         public int Dose { get; set; }

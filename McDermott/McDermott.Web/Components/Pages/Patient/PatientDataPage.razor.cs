@@ -63,7 +63,32 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 try
                 {
+                    Allergies = await Mediator.Send(new GetAllergyQuery());
+
+                    Allergies.ForEach(x =>
+                    {
+                        var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                        if (a is not null)
+                            x.TypeString = a.Name;
+                    });
+
+                    Countries = await Mediator.Send(new GetCountryQuery());
+                    Provinces = await Mediator.Send(new GetProvinceQuery());
+                    Cities = await Mediator.Send(new GetCityQuery());
+                    Districts = await Mediator.Send(new GetDistrictQuery());
+                    Villages = await Mediator.Send(new GetVillageQuery());
+                    Religions = await Mediator.Send(new GetReligionQuery());
+                    Genders = await Mediator.Send(new GetGenderQuery());
+                    Departments = await Mediator.Send(new GetDepartmentQuery());
+                    JobPositions = await Mediator.Send(new GetJobPositionQuery());
+                    Families = await Mediator.Send(new GetFamilyQuery());
+                    StateHasChanged();
+
                     await GetUserInfo();
+                    StateHasChanged();
+
+                    await LoadData();
+                    StateHasChanged();
                 }
                 catch { }
             }
@@ -146,29 +171,6 @@ namespace McDermott.Web.Components.Pages.Patient
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-
-            Allergies = await Mediator.Send(new GetAllergyQuery());
-
-            Allergies.ForEach(x =>
-            {
-                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                if (a is not null)
-                    x.TypeString = a.Name;
-            });
-
-            Countries = await Mediator.Send(new GetCountryQuery());
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
-            Districts = await Mediator.Send(new GetDistrictQuery());
-            Villages = await Mediator.Send(new GetVillageQuery());
-            Religions = await Mediator.Send(new GetReligionQuery());
-            Genders = await Mediator.Send(new GetGenderQuery());
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            JobPositions = await Mediator.Send(new GetJobPositionQuery());
-            Families = await Mediator.Send(new GetFamilyQuery());
-
-            await GetUserInfo();
-            await LoadData();
 
             return;
             // Create an instance of Form B

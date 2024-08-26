@@ -144,21 +144,21 @@
                                         </div>
                                     }
 
-                                   @*   <div class="card">
-                                         <div class="card-body">
-                                             <div class="w-100">
-                                                 <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
-                                                     <Items>
-                                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
-                                                                        IconCssClass="fa-solid fa-notes-medical"
-                                                                        Click="OnClickVaccinationPlan"
-                                                                        Text="Vaccination Plan" />
+                                    @*   <div class="card">
+                            <div class="card-body">
+                            <div class="w-100">
+                            <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                            <Items>
+                            <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                            IconCssClass="fa-solid fa-notes-medical"
+                            Click="OnClickVaccinationPlan"
+                            Text="Vaccination Plan" />
 
-                                                     </Items>
-                                                 </DxToolbar>
-                                             </div>
-                                         </div>
-                                     </div> *@
+                            </Items>
+                            </DxToolbar>
+                            </div>
+                            </div>
+                            </div> *@
 
                                     <GCGeneralInformationLayoutComponent TGCForm="GeneralConsultanServiceDto"
                                                                          GeneralConsultanService="GeneralConsultanService"
@@ -566,7 +566,8 @@
                                                                                             KeyFieldName="Id">
 
                                                                                         <ToolbarTemplate>
-                                                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" hidden="@(GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Finished)">
+                                                                                                <DxToolbarItem Text="New" Click="NewItemDetailVaccinationGiven_Click" IconCssClass="fa-solid fa-plus" />
                                                                                                 <DxToolbarItem Text="Edit" Click="async () => await EditItemDetailVaccinationGiven_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataVaccinationGivenItems.Count > 0 && VaccinationGivens.Count > 0 " />
                                                                                                 <DxToolbarItem Text="Delete" Click="(() =>    GridVaccinationGiven.ShowRowDeleteConfirmation(FocusedRowVisibleIndexVaccinationGiven))" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataVaccinationGivenItems.Count > 0 && VaccinationGivens.Count > 0" />
                                                                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="(async () => await LoadVaccinationGivens())" IconCssClass="fa-solid fa-arrows-rotate" />
@@ -581,9 +582,9 @@
                                                                                             </DxToolbar>
                                                                                         </ToolbarTemplate>
 
+
                                                                                         <Columns>
                                                                                             <DxGridSelectionColumn Width="15px" />
-                                                                                            <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn>
                                                                                             <DxGridDataColumn FieldName="Product.Name" Caption="Vaccination" />
                                                                                             <DxGridDataColumn FieldName="ReminderDate" Caption="Reminder Date" DisplayFormat="@Helper.DefaultFormatDate" />
                                                                                             <DxGridDataColumn FieldName="Batch" Caption="Lot/Serial Number" />
@@ -594,6 +595,24 @@
                                                                                             <DxGridDataColumn FieldName="SalesPerson.Name" Caption="SalesPerson" />
                                                                                             <DxGridDataColumn FieldName="Educator.Name" Caption="Educator" />
                                                                                             <DxGridDataColumn FieldName="StatusName" Caption="Status" />
+
+                                                                                            @if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.NurseStation || GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Physician)
+                                                                                            {
+                                                                                                <DxGridDataColumn AllowSort="false" Width="150px" TextAlignment="GridTextAlignment.Center">
+                                                                                                    <CellDisplayTemplate>
+                                                                                                        @{
+                                                                                                            var item = context.DataItem as VaccinationPlanDto;
+                                                                                                            if (item != null && item.Status == EnumStatusVaccination.InProgress)
+                                                                                                            {
+                                                                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger"
+                                                                                                                          Click="@(()=> OnClickCancelGiveVaccine(item))"
+                                                                                                                          CssClass="me-1"
+                                                                                                                          Text="Cancel" />
+                                                                                                            }
+                                                                                                        }
+                                                                                                    </CellDisplayTemplate>
+                                                                                                </DxGridDataColumn>
+                                                                                            }
                                                                                         </Columns>
 
                                                                                         <EditFormTemplate Context="EditFormContextGivens">
@@ -608,36 +627,48 @@
                                                                                             <div class="row w-100">
                                                                                                 <DxFormLayout CssClass="w-100">
                                                                                                     <div class="col-md-4">
-                                                                                                        <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                            <MyTextBox @bind-Text="@VaccinationGiven.Name"
-                                                                                                                       NullText="Name..."
-                                                                                                                       ReadOnly
-                                                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                                                       ShowValidationIcon="true" />
-                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.Name)"   />
-                                                                                                        </DxFormLayoutItem>
-
                                                                                                         <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyDxComboBox Data="@Products"
                                                                                                                           @bind-Value="@VaccinationGiven.ProductId"
                                                                                                                           NullText="Select Vaccination..."
-                                                                                                                          ReadOnly
                                                                                                                           TextFieldName="Name"
                                                                                                                           ValueFieldName="Id"
                                                                                                                           SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))" />
                                                                                                             <ValidationMessage For="@(()=> VaccinationGiven.ProductId)"   />
                                                                                                         </DxFormLayoutItem>
 
+                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Batch"
+                                                                                                                          NullText="Select Batch..."
+                                                                                                                          SelectedItemChanged="@((string a)=> SelectedBatchGiven(a))"
+                                                                                                                          AllowUserInput="true"
+                                                                                                                          @bind-Value="@VaccinationGiven.Batch"
+                                                                                                                          @bind-Text="@VaccinationGiven.Batch" />
+                                                                                                            <ValidationMessage For="@(() => VaccinationGiven.Batch)" />
+
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Teoritical Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxSpinEdit ShowValidationIcon="true"
+                                                                                                                        ReadOnly
+                                                                                                                        MinValue="0"
+                                                                                                                        @bind-Value="@VaccinationGiven.TeoriticalQty"
+                                                                                                                        NullText="Teoritical Qty"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationGiven.TeoriticalQty)"   />
+                                                                                                        </DxFormLayoutItem>
+
                                                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quantity" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <DxSpinEdit ShowValidationIcon="true"
                                                                                                                         MinValue="0"
                                                                                                                         @bind-Value="@VaccinationGiven.Quantity"
-                                                                                                                        ReadOnly
                                                                                                                         NullText="Teoritical Qty"
                                                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                                                             <ValidationMessage For="@(()=> VaccinationGiven.Quantity)"   />
                                                                                                         </DxFormLayoutItem>
 
+                                                                                                    </div>
+                                                                                                    <div class="col-md-4">
                                                                                                         <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyDxComboBox Data="@Physicions"
                                                                                                                           NullText="Select Sales Person..."
@@ -646,22 +677,10 @@
                                                                                                                           ValueFieldName="Id">
                                                                                                             </MyDxComboBox>
                                                                                                         </DxFormLayoutItem>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                            <MyDxComboBox Data="@Batch"
-                                                                                                                          NullText="Select Batch..."
-                                                                                                                          AllowUserInput="true"
-                                                                                                                          @bind-Value="@VaccinationGiven.Batch"
-                                                                                                                          @bind-Text="@VaccinationGiven.Batch" />
-                                                                                                            <ValidationMessage For="@(() => VaccinationGiven.Batch)" />
-
-                                                                                                        </DxFormLayoutItem>
 
                                                                                                         <DxFormLayoutItem Caption="Reminder Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <DxDateEdit ShowValidationIcon="true"
                                                                                                                         DisplayFormat="@Helper.DefaultFormatDate"
-                                                                                                                        ReadOnly
                                                                                                                         @bind-Date="@VaccinationGiven.ReminderDate"
                                                                                                                         NullText="Reminder Date">
                                                                                                             </DxDateEdit>
@@ -679,7 +698,6 @@
                                                                                                         <DxFormLayoutItem Caption="Educator" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyDxComboBox Data="@Physicions"
                                                                                                                           NullText="Select Educator..."
-                                                                                                                          ReadOnly
                                                                                                                           @bind-Value="@VaccinationGiven.EducatorId"
                                                                                                                           TextFieldName="Name"
                                                                                                                           ValueFieldName="Id">
@@ -690,7 +708,6 @@
                                                                                                         <DxFormLayoutItem Caption="Next Dose Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <DxDateEdit ShowValidationIcon="true"
                                                                                                                         DisplayFormat="@Helper.DefaultFormatDate"
-                                                                                                                        ReadOnly
                                                                                                                         @bind-Date="@VaccinationGiven.NextDoseDate"
                                                                                                                         NullText="Next Dose Date">
                                                                                                             </DxDateEdit>
@@ -706,7 +723,6 @@
                                                                                                         <DxFormLayoutItem Caption="Observations" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyTextBox @bind-Text="@VaccinationGiven.Observations"
                                                                                                                        NullText="Observations..."
-                                                                                                                       ReadOnly
                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                                        ShowValidationIcon="true" />
                                                                                                             <ValidationMessage For="@(()=> VaccinationGiven.Observations)"   />
@@ -760,7 +776,6 @@
 
                                                                                         <Columns>
                                                                                             <DxGridSelectionColumn Width="15px" />
-                                                                                            <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn>
                                                                                             <DxGridDataColumn FieldName="Product.Name" Caption="Vaccination" />
                                                                                             <DxGridDataColumn FieldName="ReminderDate" Caption="Reminder Date" DisplayFormat="@Helper.DefaultFormatDate" />
                                                                                             <DxGridDataColumn FieldName="Batch" Caption="Lot/Serial Number" />
@@ -793,14 +808,6 @@
                                                                                             <div class="row w-100">
                                                                                                 <DxFormLayout CssClass="w-100">
                                                                                                     <div class="col-md-4">
-                                                                                                        <DxFormLayoutItem Caption="Name" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                            <MyTextBox @bind-Text="@VaccinationPlan.Name"
-                                                                                                                       NullText="Name..."
-                                                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                                                       ShowValidationIcon="true" />
-                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.Name)"   />
-                                                                                                        </DxFormLayoutItem>
-
                                                                                                         <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <DxComboBox Data="@Products"
                                                                                                                         @bind-Value="@VaccinationPlan.ProductId"
@@ -815,6 +822,27 @@
                                                                                                             <ValidationMessage For="@(()=> VaccinationPlan.ProductId)"   />
                                                                                                         </DxFormLayoutItem>
 
+                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <MyDxComboBox Data="@Batch"
+                                                                                                                          NullText="Select Batch..."
+                                                                                                                          SelectedItemChanged="@((string a)=> SelectedBatchPlan(a))"
+                                                                                                                          AllowUserInput="true"
+                                                                                                                          @bind-Value="@VaccinationPlan.Batch"
+                                                                                                                          @bind-Text="@VaccinationPlan.Batch" />
+                                                                                                            <ValidationMessage For="@(() => VaccinationPlan.Batch)" />
+
+                                                                                                        </DxFormLayoutItem>
+
+                                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Teoritical Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                            <DxSpinEdit ShowValidationIcon="true"
+                                                                                                                        ReadOnly
+                                                                                                                        MinValue="0"
+                                                                                                                        @bind-Value="@VaccinationPlan.TeoriticalQty"
+                                                                                                                        NullText="Teoritical Qty"
+                                                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.TeoriticalQty)"   />
+                                                                                                        </DxFormLayoutItem>
+
                                                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quantity" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <DxSpinEdit ShowValidationIcon="true"
                                                                                                                         MinValue="0"
@@ -824,6 +852,9 @@
                                                                                                             <ValidationMessage For="@(()=> VaccinationPlan.Quantity)"   />
                                                                                                         </DxFormLayoutItem>
 
+
+                                                                                                    </div>
+                                                                                                    <div class="col-md-4">
                                                                                                         <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyDxComboBox Data="@Physicions"
                                                                                                                           NullText="Select Sales Person..."
@@ -831,17 +862,6 @@
                                                                                                                           TextFieldName="Name"
                                                                                                                           ValueFieldName="Id">
                                                                                                             </MyDxComboBox>
-                                                                                                        </DxFormLayoutItem>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                            <MyDxComboBox Data="@Batch"
-                                                                                                                          NullText="Select Batch..."
-                                                                                                                          AllowUserInput="true"
-                                                                                                                          @bind-Value="@VaccinationPlan.Batch"
-                                                                                                                          @bind-Text="@VaccinationPlan.Batch" />
-                                                                                                            <ValidationMessage For="@(() => VaccinationPlan.Batch)" />
-
                                                                                                         </DxFormLayoutItem>
 
                                                                                                         <DxFormLayoutItem Caption="Reminder Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -898,6 +918,44 @@
 
                                                                                             </div>
                                                                                         </EditFormTemplate>
+                                                                                    </MyGrid>
+                                                                                </DxLoadingPanel>
+                                                                            </Items>
+                                                                        </DxFormLayoutGroup>
+                                                                    </DxFormLayout>
+                                                                </DxTabPage>
+
+                                                                <DxTabPage Click="@(async () => await LoadVaccinationHistoryGivens())" CssClass="w-100" Text="Vaccination History">
+                                                                    <DxFormLayout>
+                                                                        <DxFormLayoutGroup Caption="Vaccination History" ColSpanMd="12" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                                                                            <Items>
+                                                                                <DxLoadingPanel @bind-Visible="IsLoadingVaccinationHistoryGiven"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGrid @ref="GridVaccinationHistoryGiven"
+                                                                                            Data="VaccinationHistoryGivens"
+                                                                                            @bind-SelectedDataItems="@SelectedDataVaccinationHistoryGivenItems"
+                                                                                            KeyFieldName="Id"
+                                                                                            AllowSelectRowByClick="false"
+                                                                                            FocusedRowEnabled="false">
+
+                                                                                        <Columns>
+                                                                                            <DxGridSelectionColumn Width="15px" />
+                                                                                            <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn>
+                                                                                            <DxGridDataColumn FieldName="Product.Name" Caption="Vaccination" />
+                                                                                            <DxGridDataColumn FieldName="ReminderDate" Caption="Reminder Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn FieldName="Batch" Caption="Lot/Serial Number" />
+                                                                                            <DxGridDataColumn FieldName="Dose" Caption="Dose" />
+                                                                                            <DxGridDataColumn FieldName="NextDoseDate" Caption="Next Dose Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn FieldName="Physician.Name" Caption="Physician" />
+                                                                                            <DxGridDataColumn FieldName="Observations" Caption="Observations" />
+                                                                                            <DxGridDataColumn FieldName="SalesPerson.Name" Caption="SalesPerson" />
+                                                                                            <DxGridDataColumn FieldName="Educator.Name" Caption="Educator" />
+                                                                                            <DxGridDataColumn FieldName="StatusName" Caption="Status" />
+                                                                                        </Columns>
                                                                                     </MyGrid>
                                                                                 </DxLoadingPanel>
                                                                             </Items>
