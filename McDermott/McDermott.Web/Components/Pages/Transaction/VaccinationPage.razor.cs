@@ -202,6 +202,18 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Vaccination Tabs
 
+        private async Task OnClickCancelGiveVaccine(VaccinationPlanDto e)
+        {
+            var s = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == e.Id))).FirstOrDefault();
+            if (s is not null)
+            {
+                s.Status = EnumStatusVaccination.Scheduled;
+                s.GeneralConsultanServiceId = null;
+                await Mediator.Send(new UpdateVaccinationPlanRequest(s));
+                await LoadVaccinationGivens();
+            }
+        }
+
         private async Task OnClickGiveVaccine(VaccinationPlanDto e)
         {
             var s = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == e.Id))).FirstOrDefault();
@@ -220,11 +232,66 @@ namespace McDermott.Web.Components.Pages.Transaction
         private VaccinationPlanDto VaccinationGiven { get; set; } = new();
         private List<VaccinationPlanDto> VaccinationPlans { get; set; } = [];
         private List<VaccinationPlanDto> VaccinationGivens { get; set; } = [];
+        private List<VaccinationPlanDto> VaccinationHistoryGivens { get; set; } = [];
         private IGrid GridVaccinationPlan { get; set; }
         private IGrid GridVaccinationGiven { get; set; }
+        private IGrid GridVaccinationHistoryGiven { get; set; }
         private IReadOnlyList<object> SelectedDataVaccinationPlanItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataVaccinationGivenItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataVaccinationHistoryGivenItems { get; set; } = [];
         private List<string> Batch = [];
+
+        private async Task SelectedBatchGiven(string stockProduct)
+        {
+            VaccinationGiven.TeoriticalQty = 0;
+
+            if (stockProduct is null)
+            {
+                return;
+            }
+
+            VaccinationGiven.Batch = stockProduct;
+
+            if (VaccinationGiven.ProductId != 0)
+            {
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                    s.ProductId == VaccinationGiven.ProductId &&
+                    s.LocationId == GeneralConsultanService.LocationId &&
+                    s.Validate == true
+                ));
+
+                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == VaccinationGiven.ProductId
+                && x.LocationId == GeneralConsultanService.LocationId && x.Batch == VaccinationGiven.Batch));
+
+                VaccinationGiven.TeoriticalQty = aa.Sum(x => x.Quantity);
+            }
+        }
+
+        private async Task SelectedBatchPlan(string stockProduct)
+        {
+            VaccinationPlan.TeoriticalQty = 0;
+
+            if (stockProduct is null)
+            {
+                return;
+            }
+
+            VaccinationPlan.Batch = stockProduct;
+
+            if (VaccinationPlan.ProductId != 0)
+            {
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                    s.ProductId == VaccinationPlan.ProductId &&
+                    s.LocationId == GeneralConsultanService.LocationId &&
+                    s.Validate == true
+                ));
+
+                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == VaccinationPlan.ProductId
+                && x.LocationId == GeneralConsultanService.LocationId && x.Batch == VaccinationPlan.Batch));
+
+                VaccinationPlan.TeoriticalQty = aa.Sum(x => x.Quantity);
+            }
+        }
 
         private async Task OnSelectProduct(ProductDto e)
         {
@@ -258,27 +325,38 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (GeneralConsultanService.PatientId is null)
                 {
-                    await GridVaccinationPlan.StartEditNewRowAsync();
+                    ToastService.ShowInfo("Please select the Patient");
+                    e.Cancel = true;
                     return;
                 }
 
                 if (GeneralConsultanService.LocationId is null)
                 {
                     ToastService.ShowInfo("Please select the Location");
-                    await GridVaccinationPlan.StartEditNewRowAsync();
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationPlan.TeoriticalQty <= 0)
+                {
+                    ToastService.ShowInfo("The Theoretical quantity must be greater than zero. Please adjust the quantity and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationPlan.Quantity > VaccinationPlan.TeoriticalQty)
+                {
+                    ToastService.ShowInfo("The quantity cannot exceed the theoretical quantity. Please enter a valid amount and try again.");
+                    e.Cancel = true;
                     return;
                 }
 
                 VaccinationPlan.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
 
                 if (VaccinationPlan.Id == 0)
-                {
                     await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationPlan));
-                }
                 else
-                {
                     await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationPlan));
-                }
 
                 await LoadVaccinationPlans();
             }
@@ -292,15 +370,42 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
+                if (GeneralConsultanService.PatientId is null)
+                {
+                    ToastService.ShowInfo("Please select the Patient");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (GeneralConsultanService.LocationId is null)
+                {
+                    ToastService.ShowInfo("Please select the Location");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationGiven.TeoriticalQty <= 0)
+                {
+                    ToastService.ShowInfo("The Theoretical quantity must be greater than zero. Please adjust the quantity and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationGiven.Quantity > VaccinationGiven.TeoriticalQty)
+                {
+                    ToastService.ShowInfo("The quantity cannot exceed the theoretical quantity. Please enter a valid amount and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                VaccinationGiven.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
                 VaccinationGiven.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                VaccinationGiven.Status = EnumStatusVaccination.InProgress;
+
                 if (VaccinationGiven.Id == 0)
-                {
                     await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationGiven));
-                }
                 else
-                {
                     await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationGiven));
-                }
 
                 await LoadVaccinationGivens();
             }
@@ -308,6 +413,18 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 ex.HandleException(ToastService);
             }
+        }
+
+        private async Task NewItemDetailVaccinationGiven_Click()
+        {
+            if (GeneralConsultanService.PatientId == null || GeneralConsultanService.PatientId == 0)
+            {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please select the Patient first");
+                return;
+            }
+
+            await GridVaccinationGiven.StartEditNewRowAsync();
         }
 
         private async Task NewItemDetailVaccinationPlan_Click()
@@ -336,6 +453,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                         Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
                         Batch = Batch.Distinct().ToList();
                     }
+
+                    await SelectedBatchGiven(VaccinationGiven.Batch);
                 }
                 catch (Exception ex)
                 {
@@ -353,6 +472,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (context.SelectedDataItem != null)
             {
                 VaccinationPlan = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
+
+                await SelectedBatchPlan(VaccinationGiven.Batch);
 
                 StateHasChanged();
             }
@@ -395,6 +516,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private bool IsLoadingVaccinationPlan = false;
         private bool IsLoadingVaccinationGiven = false;
+        private bool IsLoadingVaccinationHistoryGiven = false;
+
+        private async Task LoadVaccinationHistoryGivens()
+        {
+            IsLoadingVaccinationHistoryGiven = true;
+            VaccinationHistoryGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.Status == EnumStatusVaccination.Done && (x.GeneralConsultanServiceId != 0 || x.GeneralConsultanServiceId != null)));
+            IsLoadingVaccinationHistoryGiven = false;
+        }
 
         private async Task LoadVaccinationPlans()
         {

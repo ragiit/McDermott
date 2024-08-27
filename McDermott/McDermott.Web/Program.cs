@@ -15,7 +15,6 @@ using Serilog;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
-using AspNetCoreRateLimit;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -40,14 +39,14 @@ builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 //    options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(1);
 //    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
 //});
-builder.Services.AddInMemoryRateLimiting();
+//builder.Services.AddInMemoryRateLimiting();
 builder.Services.AddOptions();
 // Add rate limiting services
-builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
-builder.Services.Configure<RateLimitOptions>(builder.Configuration.GetSection("RateLimiting"));
-builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+//builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+//builder.Services.Configure<RateLimitOptions>(builder.Configuration.GetSection("RateLimiting"));
+//builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 // Add rate limiting processing strategy
-builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+//builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
@@ -190,7 +189,7 @@ else
 
 app.UseSerilogRequestLogging();
 app.UseRouting();
-app.UseIpRateLimiting();
+//app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
 //app.UseAuthorization();  // Gunakan otorisasi
 //app.UseHttpsRedirection();
@@ -209,7 +208,7 @@ app.UseResponseCompression();
 app.UseWebOptimizer();
 app.UseAntiforgery();
 // Tambahkan middleware logging untuk rate limiting
-app.UseMiddleware<RateLimitLoggingMiddleware>();
+//app.UseMiddleware<RateLimitLoggingMiddleware>();
 app.MapHub<RealTimeHub>("/realTimeHub");
 //app.UseMiddleware<RateLimitMiddleware>();
 
