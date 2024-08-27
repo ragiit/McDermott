@@ -112,7 +112,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var canvasDataUrl = await JsRuntime.InvokeAsync<string>("getCompressedCanvasDataUrl", "MyCanvas");
                     GeneralConsultanService.ImageToBase64 = canvasDataUrl;
                     GeneralConsultanService.Description = description;
-                   var apptd = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
+                    var a = GeneralConsultanService;
+                    var apptd = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(a));
                     await EditItem_Click();
                 }
                 else
@@ -129,7 +130,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SaveImageToDatabase(string datas, string descript)
         {
-           
+
 
         }
 
@@ -281,7 +282,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task ClosePopUp()
         {
-            isPrint = false;            
+            isPrint = false;
             await EditItem_Click();
         }
 

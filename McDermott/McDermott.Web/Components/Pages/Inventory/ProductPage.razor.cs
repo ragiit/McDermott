@@ -39,6 +39,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<StockProductDto> StockProducts = [];
         private List<TransactionStockDto> TransactionStocks = [];
         private List<MaintainanceDto> getMaintainance = [];
+        private List<MaintainanceDto> getMaintainanceDone = [];
+        private List<MaintainanceDto> getMaintainanceScrap = [];
         private TransactionStockDto FormTransactionStocks = new();
         private ProductDetailDto FormProductDetails = new();
         private ProductDto FormProducts = new();
@@ -56,6 +58,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool FormStockPopUp { get; set; } = false;
         private bool StockProductView { get; set; } = false;
         private bool StockEquipmentView { get; set; } = false;
+        private bool StockEquipmentScrap { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
         private bool showTabs { get; set; } = false;
         private bool Checkins { get; set; } = false;
@@ -64,6 +67,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         private bool? FieldHideStock { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private long? TotalQty { get; set; }
+        private long? TotalMaintainanceQty { get; set; }
+        private long? TotalScrapQty { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsStock { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
@@ -373,6 +378,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 PanelVisible = true;
                 StockProductView = false;
                 StockEquipmentView = false;
+                StockEquipmentScrap = false;
                 smartButtonShow = true;
 
                 // Inisialisasi data produk
@@ -416,7 +422,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
-                    TotalQty = getMaintainance.Where(x => x.EquipmentId == products.Id).Count();
+                    TotalScrapQty = getMaintainance.Where(x => x.EquipmentId == products.Id && x.Status == EnumStatusMaintainance.Scrap).Count();
+                    TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate == true).Sum(z => z.Quantity);
+                    TotalMaintainanceQty = getMaintainance.Where(x => x.EquipmentId == products.Id && x.Status != EnumStatusMaintainance.Scrap).Count();
                 }
                 // Ambil nama satuan ukur
                 NameUom = Uoms.FirstOrDefault(u => u.Id == FormProductDetails.UomId)?.Name;
@@ -781,7 +789,16 @@ namespace McDermott.Web.Components.Pages.Inventory
             StockEquipmentView = true;
             showForm = false;
             PanelVisible = true;
-            getMaintainance = getMaintainance.Where(x => x.EquipmentId == FormProductDetails.Id).ToList();
+            getMaintainanceDone = await Mediator.Send(new GetMaintainanceQuery(x => x.EquipmentId == FormProductDetails.Id && x.Status != EnumStatusMaintainance.Scrap));
+            PanelVisible = false;
+        }
+
+        private async Task NewTableEquipment_Scrap()
+        {
+            StockEquipmentScrap = true;
+            showForm = false;
+            PanelVisible = true;
+            getMaintainanceScrap = await Mediator.Send(new GetMaintainanceQuery(x => x.EquipmentId == FormProductDetails.Id && x.Status == EnumStatusMaintainance.Scrap));
             PanelVisible = false;
         }
 

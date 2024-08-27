@@ -366,6 +366,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? TypeMedical { get; set; }
 
         public string? ScheduleTime { get; set; }
+        public string? ImageToBase64 { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
