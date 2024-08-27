@@ -9,6 +9,7 @@ namespace McDermott.Domain.Entities
     public class Maintainance : BaseAuditableEntity
     {
         public long? RequestById { get; set; }
+        public long? LocationId { get; set; }
         public string? Title { get; set; }
         public string? Sequence { get; set; }
         public DateTime? RequestDate { get; set; }
@@ -33,6 +34,8 @@ namespace McDermott.Domain.Entities
         public virtual User? ResponsibleBy { get; set; }
         [SetToNull]
         public virtual Product? Equipment { get; set; }
+        [SetToNull]
+        public virtual Location? Location { get; set; }
 
 
     }

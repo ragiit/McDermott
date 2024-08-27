@@ -79,7 +79,7 @@
                             }
 
 
-                            @if (postMaintainance.Status != EnumStatusMaintainance.Done && postMaintainance.Status != EnumStatusMaintainance.Canceled)
+                            @if (postMaintainance.Status != EnumStatusMaintainance.Done && postMaintainance.Status != EnumStatusMaintainance.Canceled && postMaintainance.Status != EnumStatusMaintainance.Scrap)
                             {
                                 <div class="sticky">
                                     <div class="card">
@@ -88,9 +88,9 @@
                                                 <div class="col-auto align-self-start">
                                                     <DxButton Text="In Progress" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="InProgress_Click"></DxButton>
                                                     <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
-                                                   <DxButton Text="Repair" Visible="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Repaired_Click"></DxButton>
+                                                    <DxButton Text="Repair" Visible="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Repaired_Click"></DxButton>
                                                     <DxButton Text="Scrap" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired || postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Scrap_Click"></DxButton>
-                                                    <DxButton Text="Done" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired || postMaintainance.Status == EnumStatusMaintainance.Scrap)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-check" Click="Done_Click"></DxButton>
+                                                    <DxButton Text="Done" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-check" Click="Done_Click"></DxButton>
                                                     <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired ||postMaintainance.Status == EnumStatusMaintainance.InProgress || postMaintainance.Status == EnumStatusMaintainance.Scrap)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
                                                 </div>
                                                 <div class="col-auto align-self-start">
@@ -124,8 +124,8 @@
                                                     <DxFormLayout CssClass="mt w-100">
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Title">
                                                             <MyTextBox @bind-Text="@postMaintainance.Title"
-                                                                       NullText="Input Title..." 
-                                                                       ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)" 
+                                                                       NullText="Input Title..."
+                                                                       ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
                                                                        ShowValidationIcon="true" />
                                                             <ValidationMessage For="@(()=>postMaintainance.Title)"></ValidationMessage>
                                                         </DxFormLayoutItem>
@@ -140,6 +140,15 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Request Date">
                                                             <DxDateEdit @bind-Date="@postMaintainance.RequestDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxDateEdit>
                                                         </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Location">
+                                                            <MyDxComboBox Data="@getLocation"
+                                                                          NullText="select Location..."
+                                                                          ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                          @bind-Value="@postMaintainance.LocationId"
+                                                                          SelectedItemChanged="@((LocationDto value)=>selectByLocation(value))"
+                                                                          TextFieldName="Name"
+                                                                          ValueFieldName="Id"></MyDxComboBox>
+                                                        </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Equipment">
                                                             <MyDxComboBox Data="@getEquipment"
                                                                           NullText="select Equipment..."
@@ -148,9 +157,25 @@
                                                                           SelectedItemChanged="@((ProductDto value)=>selectByProduct(value))"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"></MyDxComboBox>
-                                                        </DxFormLayoutItem>
+                                                        </DxFormLayoutItem>                                                        
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Serial Number/Batch">
                                                             <MyDxComboBox Data="@Batch" @bind-Value="@postMaintainance.SerialNumber" NullText="Serial Number" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></MyDxComboBox>
+                                                        </DxFormLayoutItem>
+
+                                                    </DxFormLayout>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <DxFormLayout CssClass="mt w-100">
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Responsible">
+                                                            <MyDxComboBox Data="@getResponsibleBy"
+                                                                          NullText="select Responsible..."
+                                                                          @bind-Value="@postMaintainance.ResponsibleById"
+                                                                          ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                          TextFieldName="Name"
+                                                                          ValueFieldName="Id"></MyDxComboBox>
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Schedule Date">
+                                                            <DxDateEdit @bind-Date="@postMaintainance.ScheduleDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxDateEdit>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Maintainance By">
                                                             <DxCheckBox Checked="postMaintainance.isInternal"
@@ -181,21 +206,6 @@
                                                                     </div>
                                                                 }
                                                             </div>
-                                                        </DxFormLayoutItem>
-                                                    </DxFormLayout>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <DxFormLayout CssClass="mt w-100">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Responsible">
-                                                            <MyDxComboBox Data="@getResponsibleBy"
-                                                                          NullText="select Responsible..."
-                                                                          @bind-Value="@postMaintainance.ResponsibleById"
-                                                                          ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Id"></MyDxComboBox>
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Schedule Date">
-                                                            <DxDateEdit @bind-Date="@postMaintainance.ScheduleDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxDateEdit>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Maintainance Type">
                                                             <DxCheckBox Checked="postMaintainance.isCorrective"
@@ -245,7 +255,7 @@
                                                     </DxFormLayout>
                                                 </div>
                                                 <DxFormLayout CssClass="w-100">
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Note" CaptionPosition="CaptionPosition.Vertical" >
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Note" CaptionPosition="CaptionPosition.Vertical">
                                                         <DxMemo @bind-Text="@postMaintainance.Note" NullText="Input Note.." ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxMemo>
                                                     </DxFormLayoutItem>
                                                 </DxFormLayout>

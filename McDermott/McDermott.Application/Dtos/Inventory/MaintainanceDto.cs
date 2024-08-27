@@ -6,12 +6,16 @@ namespace McDermott.Application.Dtos.Inventory
     {
         public long Id { get; set; }
         public long? RequestById { get; set; }
+        public long? LocationId { get; set; }
         public string? Title { get; set; }
         public string? Sequence { get; set; }
+        public string? RequestName { get; set; }
+        public string? ResponsibleName { get; set; }
         public DateTime RequestDate { get; set; } = DateTime.Now;
         public DateTime ScheduleDate { get; set; } = DateTime.Now;
         public long? ResponsibleById { get; set; }
         public long? EquipmentId { get; set; }
+        public string? EquipmentName { get; set; }
         public string? SerialNumber { get; set; }
         public bool isCorrective { get; set; } = false;
         public bool isPreventive { get; set; } = false;
@@ -33,5 +37,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual ProductDto? Equipment { get; set; }
+        [SetToNull]
+        public virtual LocationDto? Location { get; set; }
     }
 }

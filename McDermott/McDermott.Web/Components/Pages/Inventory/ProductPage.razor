@@ -526,15 +526,15 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshMaintainance_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridDataColumn FieldName="Title" Caption="Subject" />
-                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
-                                            <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
+                                            <DxGridDataColumn FieldName="RequestName" Caption="Employee" />
+                                            <DxGridDataColumn FieldName="ResponsibleName" Caption="Technical" />
                                             <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                                            <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand" />
+                                            <DxGridDataColumn FieldName="EquipmentName" Caption="Brand" />
                                             <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
                                             <DxGridDataColumn FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>
@@ -564,15 +564,15 @@
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                                                 <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshStock_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshScrap_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridDataColumn FieldName="Title" Caption="Subject" />
-                                            <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
-                                            <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
+                                            <DxGridDataColumn FieldName="RequestName" Caption="Employee" />
+                                            <DxGridDataColumn FieldName="ResponsibleName" Caption="Technical" />
                                             <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                                            <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand" />
+                                            <DxGridDataColumn FieldName="EquipmentName" Caption="Brand" />
                                             <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
                                             <DxGridDataColumn FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>

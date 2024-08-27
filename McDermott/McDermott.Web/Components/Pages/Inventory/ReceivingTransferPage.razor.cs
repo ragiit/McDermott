@@ -763,11 +763,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     if (r.TraceAbility == true)
                     {
-                        if (r.Batch == null || r.ExpiredDate == null)
-                        {
-
-                            return;
-                        }
+                        
+                            if (r.Batch == null || r.ExpiredDate == null)
+                            {
+                                ToastService.ShowInfo("Batch And Expired Date not null");
+                            }
+                       
                     }
 
                     ReceivingStockProductDto updates = new();

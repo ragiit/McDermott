@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 
@@ -10,7 +11,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<UserDto> getResponsibleBy = [];
         private List<UserDto> getRequestBy = [];
         private List<ProductDto> getEquipment = [];
+        private List<LocationDto> getLocation = [];
+        private List<TransactionStockDto> TransactionStocks = [];
         private MaintainanceDto postMaintainance = new();
+        private TransactionStockDto postTransactionStock = new();
 
         #region Variable
         private IGrid Grid { get; set; }
@@ -64,9 +68,16 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<string> Batch = [];
         private async Task selectByProduct(ProductDto value)
         {
-            var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id));
+            var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id && s.LocationId == postMaintainance.LocationId));
             Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
             Batch = Batch.Distinct().ToList();
+        } 
+        private async Task selectByLocation(LocationDto value)
+        {
+
+            postMaintainance.LocationId = value.Id;
+            postMaintainance.EquipmentId = null;
+            postMaintainance.SerialNumber = null;
         }
 
         private List<string> RepeatWork = new List<string>()
@@ -144,6 +155,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
                 getEquipment = await Mediator.Send(new GetProductQuery(x => x.HospitalType == "Medical Equipment"));
                 getRequestBy = await Mediator.Send(new GetUserQuery());
+                getLocation = await Mediator.Send(new GetLocationQuery());
                 getResponsibleBy = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
             }
             catch (Exception ex)
@@ -335,6 +347,37 @@ namespace McDermott.Web.Components.Pages.Inventory
             try
             {
                 PanelVisible = true;
+                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
+                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Maintainance))
+                           .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                int NextReferenceNumber = 1;
+                if (cekReference != null)
+                {
+                    int.TryParse(cekReference?.Substring("MNT#".Length), out NextReferenceNumber);
+                    NextReferenceNumber++;
+                }
+                string referenceNumber = $"MNT#{NextReferenceNumber:D3}";
+
+                foreach(var items in getMaintainance)
+                {
+                    var cekUom = getEquipment.Where(x=>x.Id == postMaintainance.EquipmentId).Select(x=>x.UomId).FirstOrDefault();
+
+                    postTransactionStock.SourceTable = nameof(Maintainance);
+                    postTransactionStock.SourcTableId = postMaintainance.Id;
+                    postTransactionStock.ProductId = items.EquipmentId;
+                    postTransactionStock.LocationId = items.LocationId;
+                    postTransactionStock.Batch = items.SerialNumber;
+                    postTransactionStock.ExpiredDate =  null;
+                    postTransactionStock.Reference = referenceNumber;
+                    postTransactionStock.Quantity = -1;
+                    postTransactionStock.UomId = cekUom;
+                    postTransactionStock.Validate = true;
+
+                    await Mediator.Send(new CreateTransactionStockRequest(postTransactionStock));
+                }
+
+                //update Maintainance
                 postMaintainance.Status = EnumStatusMaintainance.Scrap;
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;

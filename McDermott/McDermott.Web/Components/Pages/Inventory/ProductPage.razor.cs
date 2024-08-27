@@ -422,6 +422,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 else
                 {
+                    var productScrap = getMaintainance.Where(x => x.Status == EnumStatusMaintainance.Scrap).FirstOrDefault();
+                    var productMaintainance = getMaintainance.Where(x => x.Status != EnumStatusMaintainance.Scrap).FirstOrDefault();
                     TotalScrapQty = getMaintainance.Where(x => x.EquipmentId == products.Id && x.Status == EnumStatusMaintainance.Scrap).Count();
                     TotalQty = TransactionStocks.Where(x => x.ProductId == products.Id && x.Validate == true).Sum(z => z.Quantity);
                     TotalMaintainanceQty = getMaintainance.Where(x => x.EquipmentId == products.Id && x.Status != EnumStatusMaintainance.Scrap).Count();
@@ -682,6 +684,14 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await NewTableStock_Item();
         }
+        private async Task RefreshMaintainance_Click()
+        {
+            await NewTableEquipment_Item();
+        }
+        private async Task RefreshScrap_Click()
+        {
+            await NewTableEquipment_Scrap();
+        }
         private async Task RefreshEquiptment_Click()
         {
             await NewTableEquipment_Item();
@@ -789,7 +799,33 @@ namespace McDermott.Web.Components.Pages.Inventory
             StockEquipmentView = true;
             showForm = false;
             PanelVisible = true;
-            getMaintainanceDone = await Mediator.Send(new GetMaintainanceQuery(x => x.EquipmentId == FormProductDetails.Id && x.Status != EnumStatusMaintainance.Scrap));
+
+            getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
+            // Filter TransactionStocks based on getMaintainanceDone and excluding Scrap status
+            getMaintainanceDone = TransactionStocks
+    .Where(ts => ts.Validate == true &&
+                 getMaintainance.Any(gm => gm.EquipmentId == ts.ProductId && gm.Status != EnumStatusMaintainance.Scrap))
+    .GroupBy(ts => new { ts.ProductId, ts.Batch, ts.LocationId })
+    .Select(y =>
+    {
+        var relevantMaintainance = getMaintainance
+            .Where(gm => gm.EquipmentId == y.Key.ProductId && gm.Status != EnumStatusMaintainance.Scrap)
+            .FirstOrDefault();
+
+        return new MaintainanceDto
+        {
+            Title = relevantMaintainance?.Title ?? "-",
+            RequestName = relevantMaintainance?.RequestBy?.Name ?? "-",
+            ResponsibleName = relevantMaintainance?.ResponsibleBy?.Name ?? "-",
+            SerialNumber = relevantMaintainance?.SerialNumber ?? "-",
+            EquipmentName = relevantMaintainance?.Equipment?.Name ?? "-",
+            ScheduleDate = relevantMaintainance.ScheduleDate,
+            Status = relevantMaintainance?.Status
+        };
+    })
+    .ToList();
+
+
             PanelVisible = false;
         }
 
@@ -798,7 +834,25 @@ namespace McDermott.Web.Components.Pages.Inventory
             StockEquipmentScrap = true;
             showForm = false;
             PanelVisible = true;
-            getMaintainanceScrap = await Mediator.Send(new GetMaintainanceQuery(x => x.EquipmentId == FormProductDetails.Id && x.Status == EnumStatusMaintainance.Scrap));
+
+            getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
+            // Filter TransactionStocks based on getMaintainanceDone and excluding Scrap status
+            getMaintainanceScrap = TransactionStocks
+                .Where(ts => ts.Validate == true &&
+                             getMaintainance.Any(gm => gm.EquipmentId == ts.ProductId && gm.Status == EnumStatusMaintainance.Scrap))
+                .GroupBy(ts => new { ts.ProductId, ts.Batch, ts.LocationId })
+                .Select(y => new MaintainanceDto
+                {
+                    Title = getMaintainance.First().Title,
+                    RequestName = getMaintainance.First()?.RequestBy?.Name ?? "-",
+                    ResponsibleName = getMaintainance.First()?.ResponsibleBy?.Name ?? "-",
+                    SerialNumber = getMaintainance.First().SerialNumber ?? "-",
+                    EquipmentName = getMaintainance.First()?.Equipment?.Name ?? "-",
+                    ScheduleDate = getMaintainance.First().ScheduleDate,
+                    Status = getMaintainance.First().Status
+                })
+                .ToList();
+
             PanelVisible = false;
         }
 
