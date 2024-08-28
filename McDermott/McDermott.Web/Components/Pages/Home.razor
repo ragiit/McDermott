@@ -5,6 +5,7 @@
 @using LZStringCSharp
 @using McDermott.Application.Features.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Net.Http.Headers
 @using static McDermott.Web.Components.Pages.Transaction.GeneralConsultanServicePage
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -23,22 +24,26 @@
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
 @* 
-            <DxButton Click="Clicktop" Text="Hayoo Tebakk"></DxButton>
-            <canvas id="pdfCanvas" style="display: none;"></canvas> *@
+            <DxButton Click="ClickAa" Text="Generate" />
 
-          @*   <input type="text" @bind="filePath" placeholder="Enter file path" />
-            <button @onclick="DownloadFile">Download File</button>
+            <a href="@aaaa">Okk</a> *@
+            @*
+        <DxButton Click="Clicktop" Text="Hayoo Tebakk"></DxButton>
+        <canvas id="pdfCanvas" style="display: none;"></canvas> *@
 
-            <DxGrid Data="@Data"
-                    TextWrapEnabled="false"
-                    ShowGroupPanel="true"
-                    AutoExpandAllGroupRows="true"
-                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                    VirtualScrollingEnabled="true">
-                <Columns>
-                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                </Columns>
-            </DxGrid> *@
+            @*   <input type="text" @bind="filePath" placeholder="Enter file path" />
+        <button @onclick="DownloadFile">Download File</button>
+
+        <DxGrid Data="@Data"
+        TextWrapEnabled="false"
+        ShowGroupPanel="true"
+        AutoExpandAllGroupRows="true"
+        ColumnResizeMode="GridColumnResizeMode.NextColumn"
+        VirtualScrollingEnabled="true">
+        <Columns>
+        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+        </Columns>
+        </DxGrid> *@
         </div>
     </div>
 }
@@ -47,7 +52,88 @@ else
     <LoadingIndicatorLayout />
 }
 
+
+
 @code {
+    private string aaaa = string.Empty;
+    public async Task ClickAa()
+    {
+        // var accessToken = "983znr0HS7ONhTbpefox4w"; Implementasikan fungsi ini untuk mendapatkan token akses Zoom
+
+        // var createMeetingRequest = new
+        // {
+        //     topic = "Meeting",
+        //     type = 1, Instant meeting
+        //     settings = new
+        //     {
+        //         host_video = true,
+        //         participant_video = true
+        //     }
+        // };
+
+        // var requestContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(createMeetingRequest), Encoding.UTF8, "application/json");
+        // var request = new HttpRequestMessage(HttpMethod.Post, "https:api.zoom.us/v2/users/me/meetings")
+        //     {
+        //         Headers =
+        //     {
+        //         Authorization = new AuthenticationHeaderValue("Bearer", accessToken)
+        //     },
+        //         Content = requestContent
+        //     };
+
+        // var _httpClient = new HttpClient();
+        // var response = await _httpClient.SendAsync(request);
+        // response.EnsureSuccessStatusCode();
+
+        // var responseBody = await response.Content.ReadAsStringAsync();
+        // var meetingResponse = System.Text.Json.JsonSerializer.Deserialize<MeetingResponse>(responseBody);
+
+        // aaaa = meetingResponse.JoinUrl;
+        aaaa = await GetAccessTokenAsync();
+    }
+    public class MeetingResponse
+    {
+        public string JoinUrl { get; set; }
+    }
+
+    public async Task<string> GetAccessTokenAsync()
+    {
+        var clientId = "0lDTn2MlQaefltFQ8xHI8Q";
+        var clientSecret = "sa3ztP83GXqfuGmoertxtYp485nDVVkC";
+        var tokenUrl = "https://zoom.us/oauth/token"; 
+        var redirectUri = "https://helohelo.com/auth/callback";
+
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, tokenUrl);
+
+        var credentials = $"{clientId}:{clientSecret}";
+        var base64Credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(credentials));
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64Credentials);
+        request.Content = new FormUrlEncodedContent(new[]
+        {
+            new KeyValuePair<string, string>("grant_type", "authorization_code"),
+            new KeyValuePair<string, string>("code", "983znr0HS7ONhTbpefox4w"),
+            new KeyValuePair<string, string>("redirect_uri", redirectUri)
+        });
+
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+        var tokenResponse = System.Text.Json.JsonSerializer.Deserialize<TokenResponse>(responseBody);
+
+        return tokenResponse.AccessToken;
+    }
+
+    public class TokenResponse
+    {
+        public string AccessToken { get; set; }
+        public string TokenType { get; set; }
+        public int ExpiresIn { get; set; }
+    }
+
+
     private string filePath { get; set; } = "Slip_Registration.pdf";
     object Data { get; set; }
 
@@ -248,7 +334,7 @@ else
             //             <div class='border'>
             //                 <div class='title'>PT. McDERMOTT INDONESIA</div>
             //                 <div class='title'>BASE CLINIC</div>
-            //                 <p>Nama : {report.Name}</p> 
+            //                 <p>Nama : {report.Name}</p>
             //                 <p>Obat Luar</p>
             //             </div>
             //         </body>
@@ -295,7 +381,7 @@ else
 
     private async Task Clicktop()
     {
-        await  GeneratePdf();
+        await GeneratePdf();
         // NavigationManager.NavigateTo($"https://teams.microsoft.com/l/call/0/0?users={mail}");
     }
 
@@ -759,4 +845,4 @@ else
     };
         }
     }
-}
+    }

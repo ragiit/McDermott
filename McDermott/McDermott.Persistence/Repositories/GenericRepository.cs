@@ -91,7 +91,6 @@ namespace McDermott.Persistence.Repositories
             }
         }
 
-
         // YG Lama
         //public async Task<List<T>> AddAsync(List<T> entities)
         //{
@@ -158,7 +157,6 @@ namespace McDermott.Persistence.Repositories
                 throw;
             }
         }
-
 
         // Yg Lama
         //public async Task<T> UpdateAsync(T entity)
@@ -237,7 +235,6 @@ namespace McDermott.Persistence.Repositories
                 throw;
             }
         }
-
 
         // Yg Lama
         //public async Task<List<T>> UpdateAsync(List<T> entities)
@@ -458,6 +455,11 @@ namespace McDermott.Persistence.Repositories
             }
 
             return await query.AsNoTracking().CountAsync(cancellationToken);
+        }
+
+        public IQueryable<T> GetAllQuerylable()
+        {
+            return _dbContext.Set<T>().AsQueryable();
         }
     }
 }

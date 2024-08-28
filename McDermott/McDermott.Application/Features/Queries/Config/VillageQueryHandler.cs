@@ -7,6 +7,8 @@ namespace McDermott.Application.Features.Queries.Config
     public class VillageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetVillageQuery, List<VillageDto>>,
         IRequestHandler<GetVillageQuery2, IQueryable<VillageDto>>,
+        IRequestHandler<GetVillageQuerylable, IQueryable<Village>>,
+        IRequestHandler<GetPagedDataQuery, (List<VillageDto> Data, int TotalCount)>,
         IRequestHandler<CreateVillageRequest, VillageDto>,
         IRequestHandler<CreateListVillageRequest, List<VillageDto>>,
         IRequestHandler<UpdateVillageRequest, VillageDto>,
@@ -35,10 +37,12 @@ namespace McDermott.Application.Features.Queries.Config
                     //    .ToListAsync(cancellationToken);
 
                     result = await _unitOfWork.Repository<Village>().Entities
+                        .OrderBy(x => x.Name)
                         .Include(x => x.Province)
                         .Include(x => x.City)
                         .Include(x => x.District)
                         .AsNoTracking()
+                        .Take(100)
                         .ToListAsync(cancellationToken);
 
                     //result = await _unitOfWork.Repository<Village>().Entities
@@ -218,5 +222,36 @@ namespace McDermott.Application.Features.Queries.Config
         }
 
         #endregion DELETE
+
+        public async Task<(List<VillageDto> Data, int TotalCount)> Handle(GetPagedDataQuery request, CancellationToken cancellationToken)
+        {
+            var skip = (request.PageNumber - 1) * request.PageSize;
+
+            var query = _unitOfWork.Repository<Village>().GetAllQuerylable();
+
+            // Apply the predicate if provided
+            if (request.Predicate != null)
+            {
+                query = query
+                .Where(request.Predicate);
+            }
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var data = await query
+                .Skip(skip)
+                .Take(request.PageSize)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var aa = data.Adapt<List<VillageDto>>();
+
+            return (aa, totalCount);
+        }
+
+        public async Task<IQueryable<Village>> Handle(GetVillageQuerylable request, CancellationToken cancellationToken)
+        {
+            return await Task.FromResult(_unitOfWork.Repository<Village>().GetAllQuerylable());
+        }
     }
 }
