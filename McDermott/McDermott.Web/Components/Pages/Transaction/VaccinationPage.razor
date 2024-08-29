@@ -29,6 +29,7 @@
                                             Data="GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             DataItemDeleting="OnDelete"
+
                                             RowDoubleClick="@(async () => await EditItem_Click())"
                                             FocusedRowChanged="Grid_FocusedRowChanged1"
                                             KeyFieldName="Id">
@@ -941,10 +942,10 @@
                                                                                             KeyFieldName="Id"
                                                                                             AllowSelectRowByClick="false"
                                                                                             FocusedRowEnabled="false">
-
+                                                                                             
                                                                                         <Columns>
                                                                                             <DxGridSelectionColumn Width="15px" />
-                                                                                            <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn>
+                                                                                            @* <DxGridDataColumn FieldName="Name" Caption="Product"></DxGridDataColumn> *@
                                                                                             <DxGridDataColumn FieldName="Product.Name" Caption="Vaccination" />
                                                                                             <DxGridDataColumn FieldName="ReminderDate" Caption="Reminder Date" DisplayFormat="@Helper.DefaultFormatDate" />
                                                                                             <DxGridDataColumn FieldName="Batch" Caption="Lot/Serial Number" />
@@ -955,7 +956,7 @@
                                                                                             <DxGridDataColumn FieldName="SalesPerson.Name" Caption="SalesPerson" />
                                                                                             <DxGridDataColumn FieldName="Educator.Name" Caption="Educator" />
                                                                                             <DxGridDataColumn FieldName="StatusName" Caption="Status" />
-                                                                                        </Columns>
+                                                                                        </Columns> 
                                                                                     </MyGrid>
                                                                                 </DxLoadingPanel>
                                                                             </Items>

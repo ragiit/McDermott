@@ -8,6 +8,8 @@ namespace McDermott.Application.Interfaces.Repositories
 
         Task<T> GetByIdAsync(long id);
 
+        IQueryable<T> GetAllQuerylable();
+
         Task<List<T>> GetAllAsync(CancellationToken cancellationToken = default);
 
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);

@@ -1,5 +1,21 @@
 ﻿@page "/test"
 @using DevExpress.Data.Linq
+@using System.Linq.Expressions
+@inject ITestDataVillageService Taa
+
+@* <style>
+    .grid-container {
+        width: 950px;
+    }
+
+    .pager-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        border: 1px solid #d2d2d2;
+        border-top: none;
+    }
+</style> *@
 
 <div class="content layout-fixed">
     <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -7,14 +23,17 @@
                     ApplyBackgroundShading="true"
                     IndicatorAreaVisible="true"
                     Text="Fetching Data...">
-        <GridTest @ref="Grid"
-                  @bind-SelectedDataItems="@SelectedDataItems"
-                  EditModelSaving="OnSave"
-                  DataItemDeleting="OnDelete"
-                  FocusedRowChanged="Grid_FocusedRowChanged"
-                  KeyFieldName="Id"
-                  FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                  Data="@Villages">
+        <DxGrid @ref="Grid"
+                Data="Villages"
+                @bind-PageIndex="@ActivePageIndex"
+                PagerPosition="GridPagerPosition.TopAndBottom"
+                ShowSearchBox="true"   
+                SearchTextChanged="OnSearchBoxChanged" 
+                PagerVisible="true"
+                PageSize="@PageSize" 
+                PageSizeSelectorVisible="false"
+                PageSizeChanged="OnPageSizeIndexChanged"
+                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })" >
             <Columns>
                 <DxGridSelectionColumn Width=" 15px" />
                 <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
@@ -23,60 +42,56 @@
                 <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
                 <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
             </Columns>
-
-            <ToolbarTemplate>
-                <MyDxToolbarBase TItem="VillageDto"
-                                 Items="@Villages"
-                                 SelectedDataItems="@SelectedDataItems"
-                                 NewItem_Click="@NewItem_Click"
-                                 Grid="Grid"
-                                 EditItem_Click="@EditItem_Click"
-                                 DeleteItem_Click="@DeleteItem_Click"
-                                 Refresh_Click="@Refresh_Click"
-                                 ExportToExcel="@ExportToExcel"
-                                 ImportFile="@ImportFile" />
-            </ToolbarTemplate>
-
-            <EditFormTemplate Context="EditFormContext">
-                @{
-                    var a = (VillageDto)EditFormContext.EditModel;
-                }
-                <DxFormLayout CssClass="w-100">
-                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                        <MyTextBox @bind-Text="@a.Name" />
-                        <ValidationMessage For="@(()=> a.Name)"   />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
-                        <MyTextBox @bind-Text="@a.PostalCode"
-                                   NullText="Postal Code" />
-                        <ValidationMessage For="@(()=> a.PostalCode)"   />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-                        <MyDxComboBox Data="@Provinces"
-                                      NullText="Select Province..."
-                                      @bind-Value="@a.ProvinceId" />
-                        <ValidationMessage For="@(()=>a.ProvinceId)" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
-                        <MyDxComboBox Data="@Cities"
-                                      NullText="Select City..."
-                                      @bind-Value="@a.CityId" />
-                        <ValidationMessage For="@(()=>a.CityId)" />
-                    </DxFormLayoutItem>
-                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
-                        <MyDxComboBox Data="@Districts"
-                                      NullText="Select District..."
-                                      @bind-Value="@a.DistrictId" />
-                        <ValidationMessage For="@(()=>a.DistrictId)" />
-                    </DxFormLayoutItem>
-                </DxFormLayout>
-            </EditFormTemplate>
-        </GridTest>
+          @*   <TotalSummary>
+                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                   FieldName="Name"
+                                   Visible="false" />
+            </TotalSummary> *@
+        </DxGrid>
+        <DxPager PageCount="totalCount" CssClass="mt-1"
+                     ActivePageIndexChanged="OnPageIndexChanged"
+                     ActivePageIndex="ActivePageIndex"
+                     VisibleNumericButtonCount="7"
+                     NavigationMode="PagerNavigationMode.NumericButtons">
+            </DxPager> 
     </DxLoadingPanel>
-
 </div>
 
+@* <div class="grid-container">
+    <DxGrid @ref="Grid"
+            Data="Villages"
+            @bind-PageIndex="@ActivePageIndex"
+            PagerVisible="false"
+            PageSize="@PageSize"
+            FooterDisplayMode="GridFooterDisplayMode.Never">
+        <Columns>
+            <DxGridDataColumn FieldName="ContactName" />
+            <DxGridDataColumn FieldName="CompanyName" />
+            <DxGridDataColumn FieldName="Country" />
+            <DxGridDataColumn FieldName="City" />
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                               FieldName="@RowCountField"
+                               Visible="false" />
+        </TotalSummary>
+    </DxGrid>
+    <div class="pager-container">
+        <DxPager PageCount="@PageCount" @bind-ActivePageIndex="@ActivePageIndex" />
+        <div>
+            Total: @TotalRecords records
+        </div>
+    </div>
+</div> *@
+
+
 @code {
+    int PageCount { get; set; }
+    int TotalRecords { get; set; }
+    int PageSize { get; set; } = 20;
+    int ActivePageIndex { get; set; } = 20;
+    string RowCountField { get; set; } = "Country";
+
     private bool IsLoading { get; set; } = false;
     private bool PanelVisible { get; set; } = false;
     private List<VillageDto> Villages = [];
@@ -190,7 +205,7 @@
     private async Task LoadData()
     {
         PanelVisible = true;
-        Villages = await Mediator.Send(new GetVillageQuery());
+        // Villages = await Mediator.Send(new GetVillageQuery());
 
         // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
         // {
@@ -223,18 +238,113 @@
             Grid.ExpandGroupRow(2);
         }
     }
-
     public void Dispose()
     {
         InstantFeedbackSource?.Dispose();
     }
+
+    private string searchTerm = string.Empty;
+    private int totalCount;
+
+    private Expression<Func<Village, bool>> BuildSearchPredicate()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+            return village => true; // No filter if search term is empty
+
+        return village => village.Name.Contains(searchTerm);
+    }
+
+    ITestDataVillageService _testDataVillageService { get; set; }
+
+    private async Task OnSearchBoxChanged(string x)
+    {
+        ToastService.ShowInfo(x);
+        searchTerm = x;
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = 0,
+                PageSize = 20,
+                Predicate = BuildSearchPredicate()
+            }; 
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+        Villages = result.Data;
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task OnPageSizeIndexChanged(int newPageIndex)
+    {
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = ActivePageIndex,
+                PageSize = newPageIndex,
+                Predicate = BuildSearchPredicate()
+            };
+        PageSize = newPageIndex;
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+        Villages = result.Data;
+        await InvokeAsync(StateHasChanged);
+    }
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = newPageIndex + 1,
+                PageSize = PageSize,
+                Predicate = BuildSearchPredicate()
+            };
+        ActivePageIndex = query.PageNumber == 0 ? 0 : query.PageNumber - 1;
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+        Villages = result.Data;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private int pageNumber = 1;
+    TestDataVillageService _testDataVillageServicezz { get; set; }
+    private int pageSize = 50;
     protected override async Task OnInitializedAsync()
     {
-        IsLoading = true;
-        Countrys = await Mediator.Send(new GetCountryQuery());
-        Provinces = await Mediator.Send(new GetProvinceQuery());
-        Districts = await Mediator.Send(new GetDistrictQuery());
-        Cities = await Mediator.Send(new GetCityQuery());
+        // var dataSource = new GridDevExtremeDataSource<Village>(Taa.GetVillages());
+
+        // dataSource.CustomizeLoadOptions = (loadOptions) =>
+        // {
+        //     If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+        //     This can make SQL execution plans more efficient.
+        //     loadOptions.PrimaryKey = new[] { "Id" };
+        //     loadOptions.PaginateViaPrimaryKey = true;
+        // };
+        // Data = dataSource;
+
+        // var aa = Data;
+
+        // Refer to https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.components.owningcomponentbase
+
+        // IsLoading = true;
+
+        // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
+        // {
+        //     e.KeyExpression = "Id";
+        //     e.QueryableSource = result;
+        // });
+
+        // IsLoading = false;
+        // return;
+
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = 1,
+                PageSize = 20
+
+            };
+
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20); 
+        Villages = result.Data;
+        // Countrys = await Mediator.Send(new GetCountryQuery());
+        // Provinces = await Mediator.Send(new GetProvinceQuery());
+        // Districts = await Mediator.Send(new GetDistrictQuery());
+        // Cities = await Mediator.Send(new GetCityQuery());
         await LoadData();
         IsLoading = false;
     }

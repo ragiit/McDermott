@@ -63,6 +63,12 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 try
                 {
+                    await GetUserInfo();
+                    StateHasChanged();
+
+                    await LoadData();
+                    StateHasChanged();
+
                     Allergies = await Mediator.Send(new GetAllergyQuery());
 
                     Allergies.ForEach(x =>
@@ -82,12 +88,6 @@ namespace McDermott.Web.Components.Pages.Patient
                     Departments = await Mediator.Send(new GetDepartmentQuery());
                     JobPositions = await Mediator.Send(new GetJobPositionQuery());
                     Families = await Mediator.Send(new GetFamilyQuery());
-                    StateHasChanged();
-
-                    await GetUserInfo();
-                    StateHasChanged();
-
-                    await LoadData();
                     StateHasChanged();
                 }
                 catch { }

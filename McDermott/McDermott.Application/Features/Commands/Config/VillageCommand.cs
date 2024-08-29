@@ -18,6 +18,17 @@ namespace McDermott.Application.Features.Commands.Config
             public bool RemoveCache { get; } = removeCache!;
         }
 
+        public class GetPagedDataQuery : IRequest<(List<VillageDto> Data, int TotalCount)>
+        {
+            public int PageNumber { get; set; }
+            public int PageSize { get; set; }
+            public Expression<Func<Village, bool>>? Predicate { get; set; }
+        }
+
+        public class GetVillageQuerylable : IRequest<IQueryable<Village>>
+        {
+        }
+
         public class GetDistrictsQuery : IRequest<PaginatedList<VillageDto>>
         {
             public int PageNumber { get; set; }
