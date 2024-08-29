@@ -255,6 +255,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string InpatientClass { get; set; }
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
+        public string? Markers { get; set; }
 
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
@@ -368,6 +369,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? ScheduleTime { get; set; }
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
+        public string? Markers { get; set; }
 
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]

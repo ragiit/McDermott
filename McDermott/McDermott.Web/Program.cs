@@ -83,7 +83,7 @@ builder.Services.AddWebOptimizer(pipeline =>
               "AdminLTE/plugins/summernote/summernote-bs4.min.js",
               "AdminLTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js",
               "AdminLTE/dist/js/adminlte.js",
-              "canvasScript.js",
+              //"canvasScript.js",
               "js/jspdf.umd.min.js",
               "js/quill.js",
               "js/my-js.js",

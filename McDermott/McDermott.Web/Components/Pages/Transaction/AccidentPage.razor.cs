@@ -5,6 +5,8 @@ using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
+using Newtonsoft.Json;
+
 namespace McDermott.Web.Components.Pages.Transaction
 {
     public partial class AccidentPage
@@ -91,9 +93,26 @@ namespace McDermott.Web.Components.Pages.Transaction
             isAccident = true;
         }
 
+        public class Marker
+        {
+            public int Number { get; set; }
+            public int X { get; set; }
+            public int Y { get; set; }
+        }
+
         private async Task OnPopupShown()
         {
-            await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
+            IsLoading = true;
+
+            try
+            {
+                var markers = JsonConvert.DeserializeObject<List<Marker>>(GeneralConsultanService.Markers) ?? new List<Marker>();
+                await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas", markers);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private async Task ResetMarkers()
@@ -105,34 +124,36 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SaveMarkers()
         {
+            IsLoading = true;
+
             try
             {
                 if (GeneralConsultanService.Id != 0)
                 {
-                    var canvasDataUrl = await JsRuntime.InvokeAsync<string>("getCompressedCanvasDataUrl", "MyCanvas");
-                    GeneralConsultanService.ImageToBase64 = canvasDataUrl;
+                    // Get the latest markers data from the JavaScript side
+                    var markersData = await JsRuntime.InvokeAsync<string>("getMarkersData", "MyCanvas");
+
+                    GeneralConsultanService.Markers = markersData;
                     GeneralConsultanService.Description = description;
-                    var a = GeneralConsultanService;
-                    var apptd = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(a));
+
+                    var updatedRecord = await Mediator.Send(new UpdateGeneralConsultanServiceRequest(GeneralConsultanService));
                     await EditItem_Click();
                 }
                 else
                 {
-                    ToastService.ShowInfo("Data Accident not null");
+                    ToastService.ShowInfo("Data Accident cannot be null");
                 }
             }
             catch (Exception ex)
             {
-                // Log the exception (you can use any logging framework or just Console for simplicity)
                 Console.WriteLine($"Error in SaveMarkers: {ex.Message}");
             }
+            finally
+            {
+                IsLoading = false;
+            }
         }
-
-        private async Task SaveImageToDatabase(string datas, string descript)
-        {
-
-
-        }
+    
 
         private List<IBrowserFile> BrowserFiles = [];
 
@@ -1363,6 +1384,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task EditItem_Click()
         {
             ShowForm = true;
+            isAccident = false;
             IsLoading = true;
 
             try
