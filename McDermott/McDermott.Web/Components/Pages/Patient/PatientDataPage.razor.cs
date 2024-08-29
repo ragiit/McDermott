@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
+﻿using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -88,6 +89,7 @@ namespace McDermott.Web.Components.Pages.Patient
                     Departments = await Mediator.Send(new GetDepartmentQuery());
                     JobPositions = await Mediator.Send(new GetJobPositionQuery());
                     Families = await Mediator.Send(new GetFamilyQuery());
+                    Occupationals = await Mediator.Send(new GetOccupationalQuery());
                     StateHasChanged();
                 }
                 catch { }
@@ -167,6 +169,8 @@ namespace McDermott.Web.Components.Pages.Patient
             "Separated",
             "Unmarried"
         };
+
+        private List<OccupationalDto> Occupationals = [];
 
         protected override async Task OnInitializedAsync()
         {

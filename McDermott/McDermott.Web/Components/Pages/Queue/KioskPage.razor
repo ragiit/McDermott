@@ -87,35 +87,53 @@
                                                             </DxComboBox>
                                                         </DxFormLayoutItem>
 
-                                                        <DxFormLayoutItem Caption="BPJS" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                            <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption=" BPJS Status" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                            @if (BPJS != null)
-                                                            {
-                                                                @if (statBPJS == "Active")
+                                                        @if (!IsTelemedicine)
+                                                        {
+                                                            <DxFormLayoutItem Caption="BPJS" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="@FormKios.BPJS" ReadOnly style="background-color:#949494" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem Caption=" BPJS Status" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                @if (BPJS != null)
                                                                 {
-                                                                    <h6 class="text-success">
-                                                                        <i class="fa-solid fa-circle" style="color: #05e401;"></i>
-                                                                        @statBPJS
-                                                                    </h6>
+                                                                    @if (statBPJS == "Active")
+                                                                    {
+                                                                        <h6 class="text-success">
+                                                                            <i class="fa-solid fa-circle" style="color: #05e401;"></i>
+                                                                            @statBPJS
+                                                                        </h6>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <h6 class="text-danger">
+                                                                            <i class="fa-solid fa-circle" style="color: #d20404;"></i>
+                                                                            @statBPJS
+                                                                        </h6>
+                                                                    }
                                                                 }
                                                                 else
                                                                 {
-                                                                    <h6 class="text-danger">
-                                                                        <i class="fa-solid fa-circle" style="color: #d20404;"></i>
+                                                                    <h6 class="text-dark">
+                                                                        <i class="fa-solid fa-circle" style="color: #000;"></i>
                                                                         @statBPJS
                                                                     </h6>
                                                                 }
-                                                            }
-                                                            else
-                                                            {
-                                                                <h6 class="text-dark">
-                                                                    <i class="fa-solid fa-circle" style="color: #000;"></i>
-                                                                    @statBPJS
-                                                                </h6>
-                                                            }
-                                                        </DxFormLayoutItem>
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                        else
+                                                        {
+                                                            @*   <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Phys"
+                                    @bind-Value="@FormKios.PhysicianId"
+                                    NullText="Select Physician"
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
+                                    TextFieldName="Name" />
+                                    </DxFormLayoutItem> *@
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Date">
+                                                                <DxDateEdit NullText="Select Date" @bind-Date="@FormKios.DateForTelemedicine" Mask="@DateTimeMask.ShortDate" />
+                                                            </DxFormLayoutItem>
+                                                        }
 
                                                         @if (showClass)
                                                         {
@@ -133,7 +151,8 @@
                                                             <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@serv"
                                                                             FilteringMode="@DataGridFilteringMode.Contains"
-                                                                            NullText="Select Service.."
+                                                                            NullText="Select Service"
+                                                                            SelectedItemChanged="@((ServiceDto? e) => SelectedItemServiceChanged(e))"
                                                                             @bind-Value="@ServiceId"
                                                                             TextFieldName="Name"
                                                                             ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
@@ -153,17 +172,14 @@
                                                         }
                                                         @if (showPhysician)
                                                         {
-                                                            @* <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                    <DxComboBox Data="@Phys"
-                                    @bind-Value="@FormKios.PhysicianId"
-                                    NullText="Select Physician.."
-                                    ValueFieldName="Id"
-                                    FilteringMode="DataGridFilteringMode.Contains"
-                                    SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
-                                    TextFieldName="Name"
-                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                    ShowValidationIcon="true" />
-                                    </DxFormLayoutItem> *@
+                                                            <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Phys"
+                                                                            @bind-Value="@FormKios.PhysicianId"
+                                                                            NullText="Select Physician.."
+                                                                            ValueFieldName="Id" 
+                                                                            SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
+                                                                            TextFieldName="Name" />
+                                                            </DxFormLayoutItem>
 
                                                             <DxFormLayoutItem Caption="Physician Schedule Slot" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <DxComboBox Data="@DoctorScheduleSlots"

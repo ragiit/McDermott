@@ -95,19 +95,19 @@ namespace McDermott.Application.Features.Queries.Config
                 if (result.Count > 0)
                 {
                     string type = null;
-                    if (result.Any(x => x.Legacy!.Equals(request.Number)))
+                    if (result.Any(x => !string.IsNullOrWhiteSpace(x.Legacy) && x.Legacy.Equals(request.Number)))
                     {
                         type = "Legacy";
                     }
-                    else if (result.Any(x => x.NIP!.Equals(request.Number)))
+                    else if (result.Any(x => !string.IsNullOrWhiteSpace(x.NIP) && x.NIP.Equals(request.Number)))
                     {
                         type = "NIP";
                     }
-                    else if (result.Any(x => x.Oracle!.Equals(request.Number)))
+                    else if (result.Any(x => !string.IsNullOrWhiteSpace(x.Oracle) && x.Oracle.Equals(request.Number)))
                     {
                         type = "Oracle";
                     }
-                    else if (result.Any(x => x.SAP!.Equals(request.Number)))
+                    else if (result.Any(x => !string.IsNullOrWhiteSpace(x.SAP) && x.SAP.Equals(request.Number)))
                     {
                         type = "SAP";
                     }

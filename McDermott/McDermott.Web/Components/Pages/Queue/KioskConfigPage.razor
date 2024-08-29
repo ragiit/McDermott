@@ -6,65 +6,63 @@
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Configuration Kiosk" />
+        @* <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Configuration Kiosk" /> *@
+
+        <BaseHeaderPage Title="Configuration Kiosk" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="card"> 
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <DxGrid @ref="Grid"
+                                    <MyGrid @ref="Grid"
                                             Data="kioskConfigs"
                                             PageSize="10"
                                             @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
                                             KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
                                             EditModelSaving="OnSave"
                                             DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            AllowSelectRowByClick="true"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
+                                            FocusedRowChanged="Grid_FocusedRowChanged">
+
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click(context.Grid)" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" id="upload" Text="Import" IconCssClass="fa-solid fa-file-import" />
-
-                                            </DxToolbar>
-
+                                            <MyDxToolbarBase TItem="KioskConfigDto"
+                                                             Items="@kioskConfigs"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="(() => NewItem_Click(context.Grid))"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@LoadData"
+                                                             IsImport="false"
+                                                             Grid="Grid"
+                                                             VisibleNew="UserAccessCRUID.Create"
+                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                             VisibleDelete="UserAccessCRUID.Delete" />
                                         </ToolbarTemplate>
+
+                                        @*  <ToolbarTemplate>
+                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click(context.Grid)" IconCssClass="fa-solid fa-plus" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
+                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                    <Items>
+                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                    </Items>
+                                    </DxToolbarItem>
+                                    <DxToolbarItem Visible="false" id="upload" Text="Import" IconCssClass="fa-solid fa-file-import" />
+
+                                    </DxToolbar>
+
+                                    </ToolbarTemplate> *@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
@@ -78,7 +76,7 @@
 
                                         </Columns>
 
-                                    </DxGrid>
+                                    </MyGrid>
                                 </DxLoadingPanel>
                                 <DxPopup @bind-Visible="@PopUpVisible"
                                          AllowResize="true"
@@ -92,27 +90,26 @@
                                     <EditForm Model="@FormKioskConfig" Context="EditFormContext">
                                         <DataAnnotationsValidator />
                                         <DxFormLayout CssClass="mt">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormKioskConfig.Name" NullText="Name Kiosk..." />
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@FormKioskConfig.Name" NullText="Kiosk Name" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Service Patient" ColSpanMd="12">
+                                        <DxFormLayoutItem Caption="Service Patient" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxTagBox Data="@Services" @bind-Values="@SelectedServices"
                                                           TextFieldName="Name"
                                                           NullText="Select Service"
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
+                                            <DxFormLayoutItem CssClass="mt-2" ColSpanMd="12">
                                                 <div class="row justify-content-end">
                                                     <div class="col-auto align-self-end">
-                                                        <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                        <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Contained" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
                                                         <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
                                                     </div>
                                                 </div>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditForm>
-                                </DxPopup>
-                            </div>
+                                </DxPopup> 
                         </div>
                     </div>
                 </div>
@@ -122,9 +119,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Kiosk Configuration" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <BaseHeaderPage Title="Configuration Kiosk" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 }
