@@ -2,9 +2,15 @@
 @using System.Drawing
 @using DinkToPdf
 @using DinkToPdf.Contracts
+@using Google.Apis.Auth.OAuth2
+@using Google.Apis.Calendar.v3
+@using Google.Apis.Calendar.v3.Data
+@using Google.Apis.Services
+@using Google.Apis.Util.Store
 @using LZStringCSharp
 @using McDermott.Application.Features.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Hosting
 @using static McDermott.Web.Components.Pages.Transaction.GeneralConsultanServicePage
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -22,23 +28,40 @@
             <h1><label>Home</label></h1>
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
-@* 
-            <DxButton Click="Clicktop" Text="Hayoo Tebakk"></DxButton>
-            <canvas id="pdfCanvas" style="display: none;"></canvas> *@
 
-          @*   <input type="text" @bind="filePath" placeholder="Enter file path" />
-            <button @onclick="DownloadFile">Download File</button>
+            <div class="form-group">
+                <label for="consultationType">Pilih Jenis Konsultasi:</label>
+                <select id="consultationType" class="form-control" @onchange="OnConsultationTypeChanged">
+                    <option value="offline">Konsul Offline</option>
+                    <option value="online">Konsul Online</option>
+                </select>
+            </div>
 
-            <DxGrid Data="@Data"
-                    TextWrapEnabled="false"
-                    ShowGroupPanel="true"
-                    AutoExpandAllGroupRows="true"
-                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                    VirtualScrollingEnabled="true">
-                <Columns>
-                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                </Columns>
-            </DxGrid> *@
+            @if (showConferenceLink)
+            {
+                <div class="form-group">
+                    <label for="conferenceLink">Link Conference:</label>
+                    <input type="text" id="conferenceLink" class="form-control" value="@linkMeet" readonly />
+                </div>
+            }
+
+            @*
+        <DxButton Click="Clicktop" Text="Hayoo Tebakk"></DxButton>
+        <canvas id="pdfCanvas" style="display: none;"></canvas> *@
+
+            @*   <input type="text" @bind="filePath" placeholder="Enter file path" />
+        <button @onclick="DownloadFile">Download File</button>
+
+        <DxGrid Data="@Data"
+        TextWrapEnabled="false"
+        ShowGroupPanel="true"
+        AutoExpandAllGroupRows="true"
+        ColumnResizeMode="GridColumnResizeMode.NextColumn"
+        VirtualScrollingEnabled="true">
+        <Columns>
+        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+        </Columns>
+        </DxGrid> *@
         </div>
     </div>
 }
@@ -51,6 +74,10 @@ else
     private string filePath { get; set; } = "Slip_Registration.pdf";
     object Data { get; set; }
 
+    private bool showConferenceLink = false;
+    private string consultationType = "offline";
+    private string linkMeet = string.Empty;
+    private string meetLink = string.Empty;
     private async Task DownloadFile()
     {
         if (string.IsNullOrWhiteSpace(filePath))
@@ -248,7 +275,7 @@ else
             //             <div class='border'>
             //                 <div class='title'>PT. McDERMOTT INDONESIA</div>
             //                 <div class='title'>BASE CLINIC</div>
-            //                 <p>Nama : {report.Name}</p> 
+            //                 <p>Nama : {report.Name}</p>
             //                 <p>Obat Luar</p>
             //             </div>
             //         </body>
@@ -283,6 +310,67 @@ else
         }
     }
 
+    private async Task OnConsultationTypeChanged(ChangeEventArgs e)
+    {
+        consultationType = e.Value.ToString();
+        if (consultationType == "online")
+        {
+            showConferenceLink = true;
+            linkMeet =  GenerateMeetLink();
+        }
+        else
+        {
+            showConferenceLink = false;
+            linkMeet = string.Empty;
+        }
+    }
+
+    private string GenerateMeetLink()
+    {
+        Random random = new Random();
+
+        // Generate 5 random characters for the meeting code
+        string meetingCode = "";
+        for (int i = 0; i < 5; i++)
+        {
+            meetingCode += (char)random.Next(97, 122); // Huruf kecil a-z
+        }
+
+        // Generate 3 random characters for the separator
+        string separator = "";
+        for (int i = 0; i < 3; i++)
+        {
+            separator += (char)random.Next(97, 122); // Huruf kecil a-z
+        }
+
+        // Generate 5 random characters for the last part of the code
+        string lastPart = "";
+        for (int i = 0; i < 5; i++)
+        {
+            lastPart += (char)random.Next(97, 122); // Huruf kecil a-z
+        }
+
+        return $"https://meet.google.com/{meetingCode}-{separator}-{lastPart}";
+    }
+
+    private async Task<UserCredential> GetCredentialAsync()
+    {
+        UserCredential credential;
+
+        using (var stream = new FileStream("wwwroot/Surat/secret_client.json", FileMode.Open, FileAccess.Read))
+        {
+            string credPath = "token.json";
+            credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                GoogleClientSecrets.FromStream(stream).Secrets,
+                new[] { CalendarService.Scope.Calendar },
+                "user",
+                CancellationToken.None,
+                new FileDataStore(credPath, true));
+        }
+
+        return credential;
+    }
+
     public class ClinicReport
     {
         public DateTime Date { get; set; }
@@ -295,7 +383,7 @@ else
 
     private async Task Clicktop()
     {
-        await  GeneratePdf();
+        await GeneratePdf();
         // NavigationManager.NavigateTo($"https://teams.microsoft.com/l/call/0/0?users={mail}");
     }
 
