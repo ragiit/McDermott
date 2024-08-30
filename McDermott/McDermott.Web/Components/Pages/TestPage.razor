@@ -1,6 +1,7 @@
 ﻿@page "/test"
 @using DevExpress.Data.Linq
 @using System.Linq.Expressions
+@using DevExtreme.AspNet.Data.ResponseModel
 @inject ITestDataVillageService Taa
 
 @* <style>
@@ -17,44 +18,131 @@
     }
 </style> *@
 
+<div class="wrapper">
+
+    <BaseHeaderPage Title="Village" ShowBackButton="false" />
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        @*  <DxLoadingPanel @bind-Visible="PanelVisible"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="true"
+                        Text="Fetching Data...">
+                        <MyGridPaginate @ref="Grid"
+                        Data="Villages"
+                        @bind-SelectedDataItems="@SelectedDataItems"
+                        @bind-PageIndex="@ActivePageIndex"
+                        SearchTextChanged="OnSearchBoxChanged"
+                        PageSize="@PageSize"
+                        PageSizeChanged="OnPageSizeIndexChanged">
+
+                        <ToolbarTemplate>
+                        <MyDxToolbarBase TItem="VillageDto"
+                        Items="@Villages"
+                        SelectedDataItems="@SelectedDataItems"
+                        NewItem_Click="@NewItem_Click"
+                        EditItem_Click="@EditItem_Click"
+                        DeleteItem_Click="@DeleteItem_Click"
+                        Refresh_Click="@Refresh_Click"
+                        IsImport="true"
+                        Grid="Grid"
+                        ImportFile="ImportFile"
+                        ExportToExcel="ExportToExcel"
+                        VisibleNew="true"
+                        VisibleEdit="true"
+                        VisibleDelete="true" />
+                        </ToolbarTemplate>
+
+                        <Columns>
+                        <DxGridSelectionColumn Width=" 15px" />
+                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                        <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
+                        <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
+                        <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
+                        <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
+                        </Columns>
+
+                        <TotalSummary>
+                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                        FieldName="Name"
+                        Visible="true" />
+                        </TotalSummary>
+                        </MyGridPaginate>
+
+                        <div class="row">
+                        <DxFormLayout>
+                        <div class="col-md-9">
+                        <DxFormLayoutItem>
+                        <DxPager PageCount="totalCount"
+                        ActivePageIndexChanged="OnPageIndexChanged"
+                        VisibleNumericButtonCount="10"
+                        SizeMode="SizeMode.Medium"
+                        NavigationMode="PagerNavigationMode.Auto">
+                        </DxPager>
+                        </DxFormLayoutItem>
+                        </div>
+                        <div class="col-md-3 d-flex justify-content-end">
+                        <DxFormLayoutItem Caption="Page Size:">
+                        <MyDxComboBox Data="@PageSizess"
+                        SizeMode="SizeMode.Medium"
+                        NullText="Ganjar..."
+                        SelectedItemChanged="((int e) => OnPageSizeIndexChanged(e))"
+                        @bind-Value="PageSize">
+                        </MyDxComboBox>
+                        </DxFormLayoutItem>
+                        </div>
+                        </DxFormLayout>
+                        </div>
+                        </DxLoadingPanel> *@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="wrapper">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    @*  <DxComboBox Data="@VillagesCB"
+                    NullText="Select Village..."
+                    @bind-Value="@CityId"
+                    AllowUserInput="true"
+                    TextFieldName="Name"
+                    TextChanged="@OnTextChanged"
+                    ValueFieldName="Id">
+                    </DxComboBox> *@
+
+                    <DxComboBox @bind-Value="selectedValue" DataAsync="LoadDataAsync" TextFieldName="Name" ValueFieldName="Id">
+                    </DxComboBox>
+                    <DxComboBox @bind-Value="selectedValue"
+                                DataAsync="LoadDataAsync"
+                                TextFieldName="Name"
+                                ValueFieldName="Id"
+                                AllowUserInput="true"
+                                FilteringMode="DataGridFilteringMode.Contains">
+                    </DxComboBox>
+                   @*  <Virtualize ItemsProvider="GetItems" ItemSize="50">
+
+                        <div>
+                            <span>@((context as TempClass).Name)</span>
+                        </div>
+
+                    </Virtualize> *@
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
 <div class="content layout-fixed">
-    <DxLoadingPanel @bind-Visible="PanelVisible"
-                    IsContentBlocked="true"
-                    ApplyBackgroundShading="true"
-                    IndicatorAreaVisible="true"
-                    Text="Fetching Data...">
-        <DxGrid @ref="Grid"
-                Data="Villages"
-                @bind-PageIndex="@ActivePageIndex"
-                PagerPosition="GridPagerPosition.TopAndBottom"
-                ShowSearchBox="true"   
-                SearchTextChanged="OnSearchBoxChanged" 
-                PagerVisible="true"
-                PageSize="@PageSize" 
-                PageSizeSelectorVisible="false"
-                PageSizeChanged="OnPageSizeIndexChanged"
-                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })" >
-            <Columns>
-                <DxGridSelectionColumn Width=" 15px" />
-                <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
-                <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
-                <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
-                <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
-            </Columns>
-          @*   <TotalSummary>
-                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                   FieldName="Name"
-                                   Visible="false" />
-            </TotalSummary> *@
-        </DxGrid>
-        <DxPager PageCount="totalCount" CssClass="mt-1"
-                     ActivePageIndexChanged="OnPageIndexChanged"
-                     ActivePageIndex="ActivePageIndex"
-                     VisibleNumericButtonCount="7"
-                     NavigationMode="PagerNavigationMode.NumericButtons">
-            </DxPager> 
-    </DxLoadingPanel>
 </div>
 
 @* <div class="grid-container">
@@ -86,10 +174,178 @@
 
 
 @code {
+
+    private async Task<IEnumerable<TempClass>> LoadDataAsync(CancellationToken cancellationToken)
+    {
+        // Fetch data based on current page and page size
+        var response = await Task.Run(() => GetData(currentPage, PageSize), cancellationToken);
+        return response;
+    }
+
+    // Optional: Method to load more data if needed
+    private async Task LoadMoreDataAsync()
+    {
+        currentPage++;
+        var newData = await LoadDataAsync(CancellationToken.None);
+        data.AddRange(newData);
+        StateHasChanged(); // Trigger UI update
+    }
+
+    public class TempClass
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    } 
+
+    public List<TempClass> GetData(int pageIndex, int pageSize)
+    {
+        ToastService.ShowInfo(pageIndex.ToString());
+        ToastService.ShowInfo(pageSize.ToString());
+        var data = new List<TempClass>();
+        var startId = pageIndex * pageSize;
+
+        for (int i = startId; i < startId + pageSize; i++)
+        {
+            data.Add(new TempClass
+            {
+                Id = i,
+                Name = $"Item {i} - Random Value: {random.Next(1, 1000)}"
+            });
+        }
+
+        return data;
+    }
+
+
+    private async ValueTask<ItemsProviderResult<TempClass>> GetItems(ItemsProviderRequest request)
+    {
+        // Calculate the current page and fetch data
+        var page = request.StartIndex / PageSize;
+        var data = await LoadDataAsync(page);
+
+        // Return data and total count
+        return new ItemsProviderResult<TempClass>(data, 1000); // Adjust total count as needed
+    }
+
+    private async Task<List<TempClass>> LoadDataAsync(int pageIndex)
+    {
+        return Enumerable.Range(pageIndex * PageSize, PageSize)
+                         .Select(i => new TempClass { Id = i, Name = $"Item {i}" })
+                         .ToList();
+    } 
+
+    private static Random random = new Random();
+
+    // public List<TempClass> GetData(int pageIndex, int pageSize)
+    // {
+    //     ToastService.ShowInfo(pageIndex.ToString());
+    //     ToastService.ShowInfo(pageSize.ToString());
+    //     var data = new List<TempClass>();
+    //     var startId = pageIndex * pageSize;
+
+    //     for (int i = startId; i < startId + pageSize; i++)
+    //     {
+    //         data.Add(new TempClass
+    //             {
+    //                 Id = i,
+    //                 Name = $"Item {i} - Random Value: {random.Next(1, 1000)}"
+    //             });
+    //     }
+
+    //     return data;
+    // }
+
+
+    private int selectedValue;
+    private int currentPage = 0;
+    private List<TempClass> data = new List<TempClass>();
+
+    // private async Task<IEnumerable<TempClass>> LoadDataAsync(CancellationToken cancellationToken)
+    // {
+    //     var response = await Task.Run(() => GetData(currentPage, PageSize), cancellationToken);
+    //     return response;
+    // }
+
+    // // Optional: Function to load more data if needed
+    // private async Task LoadMoreDataAsync()
+    // {
+    //     currentPage++;
+    //     var newData = await LoadDataAsync(CancellationToken.None);
+    //     data.AddRange(newData);
+    //     StateHasChanged(); // Trigger UI update
+    // }
+
+    private async Task OnTextChangedAA(VillageDto newText)
+    {
+        ToastService.ShowInfo(newText.Name)
+    ;
+    }
+    private async Task OnTextChanged(string newText)
+    {
+        if (string.IsNullOrEmpty(newText))
+        {
+            await hehe(); // Load initial data if search is cleared
+        }
+        else
+        {
+            await hehe2(newText);
+        }
+        ToastService.ShowInfo(newText);
+    }
+    private List<VillageDto> VillagesCB = [];
+    private async Task hehe()
+    {
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = 1,
+                PageSize = 20
+            };
+
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+        VillagesCB = result.Data;
+        PanelVisible = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task hehe2(string aa)
+    {
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = 1,
+                PageSize = 100,
+                Predicate = BuildSearchPredicate2(aa)
+            };
+
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / 100);
+        VillagesCB.Clear();
+        VillagesCB = result.Data;
+        PanelVisible = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task<LoadResult> LoadCitiesAsync(DevExtreme.AspNet.Data.DataSourceLoadOptionsBase loadOptions, CancellationToken cancellationToken)
+    {
+        // Example of how to handle paging and filtering based on loadOptions
+        var pageNumber = loadOptions.Skip / loadOptions.Take + 1;
+        var pageSize = loadOptions.Take;
+
+        ToastService.ShowInfo(pageNumber.ToString());
+        ToastService.ShowInfo(pageSize.ToString());
+
+        return new LoadResult
+            {
+                data = Cities,
+                totalCount = totalCount
+            };
+    }
+
+
     int PageCount { get; set; }
     int TotalRecords { get; set; }
     int PageSize { get; set; } = 20;
-    int ActivePageIndex { get; set; } = 20;
+    int ActivePageIndex { get; set; } = 0;
     string RowCountField { get; set; } = "Country";
 
     private bool IsLoading { get; set; } = false;
@@ -98,7 +354,6 @@
     private List<ProvinceDto> Provinces = [];
     private List<DistrictDto> Districts = [];
     private List<CountryDto> Countrys = [];
-    private List<CityDto> Cities = [];
     private int FocusedRowVisibleIndex { get; set; }
 
     private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
@@ -232,10 +487,10 @@
     {
         if (firstRender)
         {
-            await Grid.WaitForDataLoadAsync();
-            Grid.ExpandGroupRow(1);
-            await Grid.WaitForDataLoadAsync();
-            Grid.ExpandGroupRow(2);
+            // await Grid.WaitForDataLoadAsync();
+            // Grid.ExpandGroupRow(1);
+            // await Grid.WaitForDataLoadAsync();
+            // Grid.ExpandGroupRow(2);
         }
     }
     public void Dispose()
@@ -243,109 +498,186 @@
         InstantFeedbackSource?.Dispose();
     }
 
+    private int pageNumber = 1;
     private string searchTerm = string.Empty;
     private int totalCount;
+    TestDataVillageService _testDataVillageServicezz { get; set; }
 
-    private Expression<Func<Village, bool>> BuildSearchPredicate()
+    private IEnumerable<int> PageSizess = new[] { 10, 25, 50, 100 };
+
+    private async Task LoadData(int pageIndex, int pageSize)
     {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-            return village => true; // No filter if search term is empty
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = pageIndex + 1,
+                PageSize = pageSize,
+                Predicate = BuildSearchPredicate()
+            };
 
-        return village => village.Name.Contains(searchTerm);
+        var result = await Mediator.Send(query);
+        totalCount = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+        ActivePageIndex = pageIndex;
+        Villages = result.Data;
+        PanelVisible = false;
+        await InvokeAsync(StateHasChanged);
     }
-
-    ITestDataVillageService _testDataVillageService { get; set; }
 
     private async Task OnSearchBoxChanged(string x)
     {
         ToastService.ShowInfo(x);
         searchTerm = x;
-        var query = new GetPagedDataQuery
-            {
-                PageNumber = 0,
-                PageSize = 20,
-                Predicate = BuildSearchPredicate()
-            }; 
-        var result = await Mediator.Send(query);
-        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
-        Villages = result.Data;
-        await InvokeAsync(StateHasChanged);
+        await LoadData(0, 20);
     }
-    private async Task OnPageSizeIndexChanged(int newPageIndex)
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
     {
-        var query = new GetPagedDataQuery
-            {
-                PageNumber = ActivePageIndex,
-                PageSize = newPageIndex,
-                Predicate = BuildSearchPredicate()
-            };
-        PageSize = newPageIndex;
-        var result = await Mediator.Send(query);
-        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
-        Villages = result.Data;
-        await InvokeAsync(StateHasChanged);
+        PageSize = newPageSize;
+        await LoadData(ActivePageIndex, newPageSize);
     }
+
     private async Task OnPageIndexChanged(int newPageIndex)
     {
-        var query = new GetPagedDataQuery
-            {
-                PageNumber = newPageIndex + 1,
-                PageSize = PageSize,
-                Predicate = BuildSearchPredicate()
-            };
-        ActivePageIndex = query.PageNumber == 0 ? 0 : query.PageNumber - 1;
-        var result = await Mediator.Send(query);
-        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
-        Villages = result.Data;
-        await InvokeAsync(StateHasChanged);
+        PanelVisible = true;
+        await LoadData(newPageIndex, PageSize);
+    }
+    private Expression<Func<Village, bool>> BuildSearchPredicate2(string a)
+    {
+        return string.IsNullOrWhiteSpace(a)
+            ? village => true
+            : village => village.Name.Contains(a);
+    }
+    private Expression<Func<Village, bool>> BuildSearchPredicate()
+    {
+        return string.IsNullOrWhiteSpace(searchTerm)
+            ? village => true
+            : village => village.Name.Contains(searchTerm);
     }
 
-    private int pageNumber = 1;
-    TestDataVillageService _testDataVillageServicezz { get; set; }
-    private int pageSize = 50;
+    private long? CityId { get; set; }
+    private List<CityDto> Cities = [];
     protected override async Task OnInitializedAsync()
     {
-        // var dataSource = new GridDevExtremeDataSource<Village>(Taa.GetVillages());
+        PanelVisible = true;
 
-        // dataSource.CustomizeLoadOptions = (loadOptions) =>
-        // {
-        //     If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
-        //     This can make SQL execution plans more efficient.
-        //     loadOptions.PrimaryKey = new[] { "Id" };
-        //     loadOptions.PaginateViaPrimaryKey = true;
-        // };
-        // Data = dataSource;
+        // await LoadData(0, 20);
 
-        // var aa = Data;
+        // await hehe();
 
-        // Refer to https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.components.owningcomponentbase
-
-        // IsLoading = true;
-
-        // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
-        // {
-        //     e.KeyExpression = "Id";
-        //     e.QueryableSource = result;
-        // });
-
-        // IsLoading = false;
-        // return;
-
-        var query = new GetPagedDataQuery
-            {
-                PageNumber = 1,
-                PageSize = 20
-
-            };
-
-        var result = await Mediator.Send(query);
-        totalCount = (int)Math.Ceiling((double)result.TotalCount / 20); 
-        Villages = result.Data;
-        // Countrys = await Mediator.Send(new GetCountryQuery());
-        // Provinces = await Mediator.Send(new GetProvinceQuery());
-        // Districts = await Mediator.Send(new GetDistrictQuery());
         // Cities = await Mediator.Send(new GetCityQuery());
-        await LoadData();
-        IsLoading = false;
+        PanelVisible = false;
     }
+
+    private async Task awokAwokAwokk()
+    {
+        
+    }
+
+
+    // ITestDataVillageService _testDataVillageService { get; set; }
+
+    // private int pageNumber = 1;
+    // private int pageSize = 50;
+    // private async Task OnSearchBoxChanged(string x)
+    // {
+    //     ToastService.ShowInfo(x);
+    //     searchTerm = x;
+    //     var query = new GetPagedDataQuery
+    //         {
+    //             PageNumber = 1,
+    //             PageSize = 20,
+    //             Predicate = BuildSearchPredicate()
+    //         };
+    //     var result = await Mediator.Send(query);
+    //     totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+    //     Villages = result.Data;
+    //     ActivePageIndex = 0;
+    //     await InvokeAsync(StateHasChanged);
+    // }
+    // private async Task OnPageSizeIndexChanged(int newPageIndex)
+    // {
+    //     var query = new GetPagedDataQuery
+    //         {
+    //             PageNumber = ActivePageIndex,
+    //             PageSize = newPageIndex,
+    //             Predicate = BuildSearchPredicate()
+    //         };
+    //     PageSize = newPageIndex;
+    //     var result = await Mediator.Send(query);
+    //     totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+    //     Villages = result.Data;
+    //     await InvokeAsync(StateHasChanged);
+    // }
+    // private async Task OnPageIndexChanged(int newPageIndex)
+    // {
+    //     PanelVisible = true;
+    //     var query = new GetPagedDataQuery
+    //         {
+    //             PageNumber = newPageIndex + 1,
+    //             PageSize = PageSize,
+    //             Predicate = BuildSearchPredicate()
+    //         };
+    //     ActivePageIndex = query.PageNumber == 0 ? 0 : query.PageNumber - 1;
+    //     var result = await Mediator.Send(query);
+    //     totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+    //     Villages = result.Data;
+    //     PanelVisible = false;
+    //     await InvokeAsync(StateHasChanged);
+    // }
+    // private string searchTerm = string.Empty;
+    // private int totalCount;
+
+    // private Expression<Func<Village, bool>> BuildSearchPredicate()
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchTerm))
+    //         return village => true; // No filter if search term is empty
+
+    //     return village => village.Name.Contains(searchTerm);
+    // }
+    // TestDataVillageService _testDataVillageServicezz { get; set; }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var query = new GetPagedDataQuery
+    //         {
+    //             PageNumber = 1,
+    //             PageSize = 20
+
+    //         };
+
+    //     var result = await Mediator.Send(query);
+    //     totalCount = (int)Math.Ceiling((double)result.TotalCount / 20);
+    //     Villages = result.Data;
+    //     // var dataSource = new GridDevExtremeDataSource<Village>(Taa.GetVillages());
+
+    //     // dataSource.CustomizeLoadOptions = (loadOptions) =>
+    //     // {
+    //     //     If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
+    //     //     This can make SQL execution plans more efficient.
+    //     //     loadOptions.PrimaryKey = new[] { "Id" };
+    //     //     loadOptions.PaginateViaPrimaryKey = true;
+    //     // };
+    //     // Data = dataSource;
+
+    //     // var aa = Data;
+
+    //     // Refer to https://docs.microsoft.com/dotnet/api/microsoft.aspnetcore.components.owningcomponentbase
+
+    //     // IsLoading = true;
+
+    //     // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
+    //     // {
+    //     //     e.KeyExpression = "Id";
+    //     //     e.QueryableSource = result;
+    //     // });
+
+    //     // IsLoading = false;
+    //     // return;
+
+
+    //     // Countrys = await Mediator.Send(new GetCountryQuery());
+    //     // Provinces = await Mediator.Send(new GetProvinceQuery());
+    //     // Districts = await Mediator.Send(new GetDistrictQuery());
+    //     // Cities = await Mediator.Send(new GetCityQuery());
+    //     await LoadData();
+    //     IsLoading = false;
+    // }
 }

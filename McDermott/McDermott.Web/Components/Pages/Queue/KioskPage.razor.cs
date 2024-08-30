@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿using DocumentFormat.OpenXml.Office2010.Drawing.ChartDrawing;
+using McDermott.Application.Dtos.Queue;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
@@ -137,16 +138,36 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Async Data And Auth
 
-        private long ServiceId
+        //private long ServiceId
+        //{
+        //    get => _ServiceId;
+        //    set
+        //    {
+        //        _ServiceId = value;
+        //        LoadPhysicians(value);
+        //        FormKios.ServiceId = value;
+        //        showPhysician = true;
+        //    }
+        //}
+
+        private long ServiceId { get; set; }
+
+        private async Task SelectedItemServiceChanged(ServiceDto e)
         {
-            get => _ServiceId;
-            set
-            {
-                _ServiceId = value;
-                LoadPhysicians(value);
-                FormKios.ServiceId = value;
-                showPhysician = true;
-            }
+            if (e is null)
+                return;
+
+            ServiceId = e.Id;
+
+            FormKios.ServiceId = e.Id;
+
+            await LoadPhysicians(e.Id);
+
+            var telemedicineIds = Services.Where(x => x.IsTelemedicine && x.IsKiosk).Select(x => x.Id).ToList();
+
+            IsTelemedicine = telemedicineIds.Any(x => x == e.Id);
+
+            showPhysician = true;
         }
 
         private async Task UserSelected(UserDto user)
@@ -182,6 +203,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
             FormKios.PhysicianId = r.Id;
 
+            return;
             await SelectScheduleSlots();
         }
 
@@ -297,6 +319,8 @@ namespace McDermott.Web.Components.Pages.Queue
             var ad = Id;
             Id = Id;
         }
+
+        private bool IsTelemedicine = false;
 
         private async Task LoadData()
         {
@@ -499,6 +523,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
 
             showForm = true;
+
             NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
             FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
             //BPJS = InsurancePolices.FirstOrDefault(x => x.UserId == FormKios.PatientId);
@@ -561,6 +586,18 @@ namespace McDermott.Web.Components.Pages.Queue
                     showPhysician = true;
                 }
             }
+
+            if (FormKios.ServiceId is not null)
+            {
+                var telemedicineIds = Services.Where(x => x.IsTelemedicine && x.IsKiosk).Select(x => x.Id).ToList();
+                IsTelemedicine = telemedicineIds.Any(x => x == FormKios.ServiceId);
+                await LoadPhysicians(FormKios.ServiceId.Value);
+                showPhysician = true;
+            }
+
+            //var telemedicineIds = Services.Where(x => x.IsTelemedicine && x.IsKiosk).Select(x => x.Id).ToList();
+            //if (KioskConf.Any() && KioskConf.FirstOrDefault()?.ServiceIds is not null)
+            //    IsTelemedicine = telemedicineIds.Any(x => KioskConf.FirstOrDefault().ServiceIds.Contains(x));
 
             await SelectScheduleSlots();
         }
@@ -856,7 +893,6 @@ namespace McDermott.Web.Components.Pages.Queue
                             BPJSIntegration = new();
                             showQueue = false;
                             IsLoading = false;
-                            return;
                         }
                     }
 
@@ -872,6 +908,16 @@ namespace McDermott.Web.Components.Pages.Queue
                     {
                         FormGeneral.PratitionerId = FormKios.PhysicianId;
                     }
+
+                    if (IsTelemedicine)
+                    {
+                        FormGeneral.RegistrationDate = FormKios.DateForTelemedicine.GetValueOrDefault();
+                        FormGeneral.PratitionerId = FormKios.PhysicianId;
+                        FormGeneral.ServiceId = FormKios.ServiceId;
+                        FormGeneral.Status = EnumStatusGeneralConsultantService.Planned;
+                        FormGeneral.TypeRegistration = "Telemedicine";
+                    }
+
                     await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormGeneral));
                 }
                 else

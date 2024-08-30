@@ -773,7 +773,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadData()
         {
             PanelVisible = true;
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Service != null && x.Service.Name.Equals("Vaccination")));
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Service != null && x.Service.IsVaccination == true));
             PanelVisible = false;
         }
 

@@ -4775,6 +4775,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsPatient")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsTelemedicine")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsVaccination")
                         .HasColumnType("bit");
 

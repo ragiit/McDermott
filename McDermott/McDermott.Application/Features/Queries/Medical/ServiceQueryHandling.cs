@@ -58,6 +58,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ServiceDto>();
             }
@@ -76,6 +77,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<List<ServiceDto>>();
             }
@@ -98,6 +100,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ServiceDto>();
             }
@@ -116,6 +119,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<List<ServiceDto>>();
             }

@@ -239,6 +239,7 @@ namespace McDermott.Application.Features.Queries.Config
             var totalCount = await query.CountAsync(cancellationToken);
 
             var data = await query
+                .OrderBy(x => x.Id)
                 .Skip(skip)
                 .Take(request.PageSize)
                 .AsNoTracking()
