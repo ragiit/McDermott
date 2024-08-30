@@ -11,10 +11,12 @@
 @using McDermott.Application.Features.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Extensions.Hosting
+@using System.Net.Http.Headers
 @using static McDermott.Web.Components.Pages.Transaction.GeneralConsultanServicePage
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IHttpClientFactory ClientFactory
+@inject GoogleMeetService GoogleMeetService
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
@@ -22,27 +24,30 @@
 
 @if (IsAccess)
 {
-    <div class="content-header">
-        <div class="container-fluid">
+        <div class="content-header">
+            <div class="container-fluid">
 
-            <h1><label>Home</label></h1>
+                <h1><label>Home</label></h1>
 
-            <p>Welcome, @UserLogin.Name. @Greeting</p>
+                <p>Welcome, @UserLogin.Name. @Greeting</p>
 
-            <div class="form-group">
-                <label for="consultationType">Pilih Jenis Konsultasi:</label>
-                <select id="consultationType" class="form-control" @onchange="OnConsultationTypeChanged">
-                    <option value="offline">Konsul Offline</option>
-                    <option value="online">Konsul Online</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label for="consultationType">Pilih Jenis Konsultasi:</label>
+                    <select id="consultationType" class="form-control" @onchange="OnConsultationTypeChanged">
+                        <option value="offline">Konsul Offline</option>
+                        <option value="online">Konsul Online</option>
+                    </select>
+                </div>
+
+                <button @onclick="CreateMeetLink">Create Google Meet Link</button> 
+                <a href="@meetLink" target="_blank">Join Google Meet</a> 
 
             @if (showConferenceLink)
             {
-                <div class="form-group">
-                    <label for="conferenceLink">Link Conference:</label>
-                    <input type="text" id="conferenceLink" class="form-control" value="@linkMeet" readonly />
-                </div>
+                        <div class="form-group">
+                            <label for="conferenceLink">Link Conference:</label>
+                            <input type="text" id="conferenceLink" class="form-control" value="@linkMeet" readonly />
+                        </div>
             }
 
             @*
@@ -62,17 +67,24 @@
         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
         </Columns>
         </DxGrid> *@
+            </div>
         </div>
-    </div>
 }
 else
 {
-    <LoadingIndicatorLayout />
+        <LoadingIndicatorLayout />
 }
 
 
 
 @code {
+      private string meetLink;
+
+    private async Task CreateMeetLink()
+    {
+        meetLink = await GoogleMeetService.CreateMeetingAsync();
+    }
+
     private string aaaa = string.Empty;
     public async Task ClickAa()
     {
@@ -118,7 +130,7 @@ else
     {
         var clientId = "0lDTn2MlQaefltFQ8xHI8Q";
         var clientSecret = "sa3ztP83GXqfuGmoertxtYp485nDVVkC";
-        var tokenUrl = "https://zoom.us/oauth/token"; 
+        var tokenUrl = "https://zoom.us/oauth/token";
         var redirectUri = "https://helohelo.com/auth/callback";
 
         var client = new HttpClient();
@@ -157,8 +169,7 @@ else
 
     private bool showConferenceLink = false;
     private string consultationType = "offline";
-    private string linkMeet = string.Empty;
-    private string meetLink = string.Empty;
+    private string linkMeet = string.Empty; 
     private async Task DownloadFile()
     {
         if (string.IsNullOrWhiteSpace(filePath))
@@ -397,7 +408,7 @@ else
         if (consultationType == "online")
         {
             showConferenceLink = true;
-            linkMeet =  GenerateMeetLink();
+            linkMeet = GenerateMeetLink();
         }
         else
         {
@@ -928,4 +939,4 @@ else
     };
         }
     }
-    }
+}

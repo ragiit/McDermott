@@ -6,6 +6,7 @@ using static McDermott.Application.Features.Commands.Transaction.AccidentCommand
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 using Newtonsoft.Json;
+using Microsoft.JSInterop;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -106,7 +107,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                var markers = JsonConvert.DeserializeObject<List<Marker>>(GeneralConsultanService.Markers) ?? new List<Marker>();
+                var markers = JsonConvert.DeserializeObject<List<Marker>>(GeneralConsultanService.Markers ?? string.Empty) ?? new List<Marker>();
                 await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas", markers);
             }
             finally
@@ -131,7 +132,22 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (GeneralConsultanService.Id != 0)
                 {
                     // Get the latest markers data from the JavaScript side
-                    var markersData = await JsRuntime.InvokeAsync<string>("getMarkersData", "MyCanvas");
+                    //var markersData = await JsRuntime.InvokeAsync<string>("getMarkersData");
+                    //// Call JavaScript function to reset markers
+                    //await JsRuntime.InvokeVoidAsync("resetMarkers");
+                    //await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
+
+                    // Call JavaScript function to get marker data
+                    var markersData = await JsRuntime.InvokeAsync<string>("getMarkersData");
+
+                    // Use the markersData if needed
+                    Console.WriteLine(markersData);
+
+                    // Call JavaScript function to reset markers
+                    await JsRuntime.InvokeVoidAsync("resetMarkers");
+
+                    // Optionally, reinitialize the canvas to ensure it's fully functional
+                    await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
 
                     GeneralConsultanService.Markers = markersData;
                     GeneralConsultanService.Description = description;
@@ -153,7 +169,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 IsLoading = false;
             }
         }
-    
 
         private List<IBrowserFile> BrowserFiles = [];
 
@@ -310,7 +325,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task ClosePopUpAccident()
         {
             isAccident = false;
-
         }
 
         private List<string> ClassType = new List<string>
