@@ -39,7 +39,7 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         public string? Payment { get; set; } = "BPJS";
 
-        public string? TypeRegistration { get; set; } = "General Consultation";
+        public string? TypeRegistration { get; set; } = "Telemedic";
 
         public string? MedexType { get; set; }
         public string? HomeStatus { get; set; }
@@ -256,6 +256,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
         public string? Markers { get; set; }
+        public string? LinkMeet { get; set; }
 
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
@@ -450,6 +451,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? PPKRujukanCode { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         /// </BPJS Rujukan>
+        /// 
+        public string? LinkMeet { get; set; } //telemedic
 
         #region Clinical Assesment
 

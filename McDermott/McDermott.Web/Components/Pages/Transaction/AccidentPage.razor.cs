@@ -6,6 +6,7 @@ using static McDermott.Application.Features.Commands.Transaction.AccidentCommand
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 using Newtonsoft.Json;
+using McDermott.Persistence.Migrations;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -106,8 +107,15 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                var markers = JsonConvert.DeserializeObject<List<Marker>>(GeneralConsultanService.Markers) ?? new List<Marker>();
-                await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas", markers);
+                if (!string.IsNullOrEmpty(GeneralConsultanService.Markers))
+                {
+                    var markers = JsonConvert.DeserializeObject<List<Marker>>(GeneralConsultanService.Markers) ?? new List<Marker>();
+                    await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas", markers);
+                }
+                else
+                {
+                    await JsRuntime.InvokeVoidAsync("initializeCanvas", "MyCanvas");
+                }
             }
             finally
             {
@@ -153,7 +161,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 IsLoading = false;
             }
         }
-    
+
+
 
         private List<IBrowserFile> BrowserFiles = [];
 

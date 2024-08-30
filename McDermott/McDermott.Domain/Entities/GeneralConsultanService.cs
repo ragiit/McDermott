@@ -97,13 +97,15 @@
 
         #endregion Clinical Assesment
 
-
-
         #region Vaccination
 
         public long? LocationId { get; set; }
 
         #endregion Vaccination
+
+        #region Telemedic
+        public string? LinkMeet {  get; set; }
+        #endregion
 
         public long? ProjectId { get; set; }
 
