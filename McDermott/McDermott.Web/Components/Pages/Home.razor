@@ -43,9 +43,9 @@
 
             <button @onclick="CreateMeetLink">Create Google Meet Link</button>
             <a href="@meetLink" target="_blank">@meetLink</a>
-@* 
-            <button @onclick="CreateTeamsLink">Create Teams Meet Link</button>
-            <a href="@meetLink" target="_blank">Join Teams Meet</a> *@
+            @*
+        <button @onclick="CreateTeamsLink">Create Teams Meet Link</button>
+        <a href="@meetLink" target="_blank">Join Teams Meet</a> *@
 
             @if (showConferenceLink)
             {
@@ -104,26 +104,48 @@ else
     }
     async Task<string> CreateTeamsMeeting(string accessToken)
     {
-        var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-        var meetingRequest = new
+        try
         {
-            startDateTime = "2024-09-01T10:00:00Z",
-            endDateTime = "2024-09-01T11:00:00Z",
-            subject = "Meeting Subject"
-        };
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-        var response = await httpClient.PostAsJsonAsync("https://graph.microsoft.com/v1.0/me/onlineMeetings", meetingRequest);
-        response.EnsureSuccessStatusCode();
+            var meetingRequest = new
+            {
+                startDateTime = "2024-09-01T10:00:00Z",
+                endDateTime = "2024-09-01T11:00:00Z",
+                subject = "Meeting Subject"
+            };
 
-        var responseContent = await response.Content.ReadAsStringAsync();
-        dynamic meetingResponse = JsonConvert.DeserializeObject(responseContent);
-        return meetingResponse.joinUrl;
+            var response = await httpClient.PostAsJsonAsync("https://graph.microsoft.com/v1.0/me/onlineMeetings", meetingRequest);
+            response.EnsureSuccessStatusCode();
+
+            ToastService.ShowInfo("StatusCode " + response.StatusCode); 
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            dynamic meetingResponse = JsonConvert.DeserializeObject(responseContent);
+
+            ToastService.ShowInfo("joinUrl " + meetingResponse.joinUrl); 
+
+            return meetingResponse.joinUrl;
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowInfo(ex.Message);
+        }
+
+        return string.Empty;
+
     }
     private async Task CreateMeetLink()
     {
-        meetLink = await GoogleMeetService.CreateMeetingAsync();
+        try
+        {
+            meetLink = await GoogleMeetService.CreateMeetingAsync(ToastService);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowInfo(ex.Message);
+        }
     }
 
     private string aaaa = string.Empty;

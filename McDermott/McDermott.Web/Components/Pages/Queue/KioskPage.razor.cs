@@ -920,7 +920,7 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormGeneral.Status = EnumStatusGeneralConsultantService.Planned;
                         try
                         {
-                            FormGeneral.LinkMeet = await GoogleMeetService.CreateMeetingAsync();
+                            FormGeneral.LinkMeet = await GoogleMeetService.CreateMeetingAsync(null);
                         }
                         catch (Exception ex)
                         {

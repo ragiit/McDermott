@@ -11,7 +11,7 @@ namespace McDermott.Web.Extentions
         private readonly string[] Scopes = { CalendarService.Scope.Calendar };
         private readonly string ApplicationName = "Blazor Web App Client";
 
-        public async Task<string> CreateMeetingAsync()
+        public async Task<string> CreateMeetingAsync(IToastService? t)
         {
             UserCredential credential;
 
@@ -69,6 +69,11 @@ namespace McDermott.Web.Extentions
             request.ConferenceDataVersion = 1;
             Event createdEvent = await request.ExecuteAsync();
             var hehe = createdEvent.HangoutLink;
+
+            if (t is not null)
+            {
+                t.ShowInfo("LINK" + hehe);
+            }
 
             return hehe;
         }
