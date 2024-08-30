@@ -74,8 +74,6 @@
                                 <EditForm Model="GeneralConsultanService" Context="EditForm" OnValidSubmit="OnValidSubmitSave" OnInvalidSubmit="OnInvalidSubmitSave">
                                     <DataAnnotationsValidator />
 
-
-
                                     <div>
                                         @if (Accident.Id > 0)
                                         {
@@ -205,37 +203,7 @@
                                                                        NullText="Supervisor Name" />
                                                         </DxFormLayoutItem>
 
-                                                        @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoId)"
-                                                NullText="Identity Number"
-                                                ReadOnly />
-                                                </DxFormLayoutItem> *@
-
-                                                        @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
-                                                <Template>
-                                                <DxGridLayout>
-                                                <Rows>
-                                                <DxGridLayoutRow />
-                                                </Rows>
-                                                <Columns>
-                                                <DxGridLayoutColumn Width="90%" />
-                                                <DxGridLayoutColumn Width="30%" />
-                                                </Columns>
-                                                <Items>
-                                                <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
-                                                <Template>
-                                                <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
-                                                </Template>
-                                                </DxGridLayoutItem>
-                                                <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                <Template>
-                                                <h6 class="pl-1 pt-2 normal-caption">Year</h6>
-                                                </Template>
-                                                </DxGridLayoutItem>
-                                                </Items>
-                                                </DxGridLayout>
-                                                </Template>
-                                                </DxFormLayoutItem> *@
+                                                        
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reg Type" ColSpanMd="12">
                                                             <MyDxComboBox Data="@RegisType"

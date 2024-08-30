@@ -774,6 +774,7 @@ namespace McDermott.Web.Components.Pages.Inventory
 
 
                         }).ToList();
+                    
                     NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
                     if (SelectedDataItems[0].Adapt<ProductDto>().TraceAbility == true)
                     {
@@ -800,30 +801,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             showForm = false;
             PanelVisible = true;
 
-            getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
+            getMaintainanceDone = await Mediator.Send(new GetMaintainanceQuery(x=>x.EquipmentId == SelectedDataItems[0].Adapt<ProductDto>().Id && x.Status != EnumStatusMaintainance.Scrap));
             // Filter TransactionStocks based on getMaintainanceDone and excluding Scrap status
-            getMaintainanceDone = TransactionStocks
-    .Where(ts => ts.Validate == true &&
-                 getMaintainance.Any(gm => gm.EquipmentId == ts.ProductId && gm.Status != EnumStatusMaintainance.Scrap))
-    .GroupBy(ts => new { ts.ProductId, ts.Batch, ts.LocationId })
-    .Select(y =>
-    {
-        var relevantMaintainance = getMaintainance
-            .Where(gm => gm.EquipmentId == y.Key.ProductId && gm.Status != EnumStatusMaintainance.Scrap)
-            .FirstOrDefault();
-
-        return new MaintainanceDto
-        {
-            Title = relevantMaintainance?.Title ?? "-",
-            RequestName = relevantMaintainance?.RequestBy?.Name ?? "-",
-            ResponsibleName = relevantMaintainance?.ResponsibleBy?.Name ?? "-",
-            SerialNumber = relevantMaintainance?.SerialNumber ?? "-",
-            EquipmentName = relevantMaintainance?.Equipment?.Name ?? "-",
-            ScheduleDate = relevantMaintainance.ScheduleDate,
-            Status = relevantMaintainance?.Status
-        };
-    })
-    .ToList();
+           
 
 
             PanelVisible = false;
@@ -835,23 +815,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             showForm = false;
             PanelVisible = true;
 
-            getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
-            // Filter TransactionStocks based on getMaintainanceDone and excluding Scrap status
-            getMaintainanceScrap = TransactionStocks
-                .Where(ts => ts.Validate == true &&
-                             getMaintainance.Any(gm => gm.EquipmentId == ts.ProductId && gm.Status == EnumStatusMaintainance.Scrap))
-                .GroupBy(ts => new { ts.ProductId, ts.Batch, ts.LocationId })
-                .Select(y => new MaintainanceDto
-                {
-                    Title = getMaintainance.First().Title,
-                    RequestName = getMaintainance.First()?.RequestBy?.Name ?? "-",
-                    ResponsibleName = getMaintainance.First()?.ResponsibleBy?.Name ?? "-",
-                    SerialNumber = getMaintainance.First().SerialNumber ?? "-",
-                    EquipmentName = getMaintainance.First()?.Equipment?.Name ?? "-",
-                    ScheduleDate = getMaintainance.First().ScheduleDate,
-                    Status = getMaintainance.First().Status
-                })
-                .ToList();
+            getMaintainanceScrap = await Mediator.Send(new GetMaintainanceQuery(x => x.EquipmentId == SelectedDataItems[0].Adapt<ProductDto>().Id && x.Status == EnumStatusMaintainance.Scrap));
 
             PanelVisible = false;
         }
