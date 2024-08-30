@@ -224,7 +224,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                if (SelectedSchedules.IsNullOrEmpty() && EndDate.Date > StartDate.Date)
+                if (!SelectedSchedules.Any() && EndDate.Date > StartDate.Date)
                     return;
 
                 #region MyRegion
