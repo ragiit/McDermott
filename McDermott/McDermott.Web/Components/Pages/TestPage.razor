@@ -27,77 +27,77 @@
             <div class="row">
                 <div class="col">
                     <div class="card">
-                        @*  <DxLoadingPanel @bind-Visible="PanelVisible"
-                        IsContentBlocked="true"
-                        ApplyBackgroundShading="true"
-                        IndicatorAreaVisible="true"
-                        Text="Fetching Data...">
-                        <MyGridPaginate @ref="Grid"
-                        Data="Villages"
-                        @bind-SelectedDataItems="@SelectedDataItems"
-                        @bind-PageIndex="@ActivePageIndex"
-                        SearchTextChanged="OnSearchBoxChanged"
-                        PageSize="@PageSize"
-                        PageSizeChanged="OnPageSizeIndexChanged">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="true"
+                                        Text="Fetching Data...">
+                            <MyGridPaginate @ref="Grid"
+                                            Data="Villages"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            @bind-PageIndex="@ActivePageIndex"
+                                            SearchTextChanged="OnSearchBoxChanged"
+                                            PageSize="@PageSize"
+                                            PageSizeChanged="OnPageSizeIndexChanged">
 
-                        <ToolbarTemplate>
-                        <MyDxToolbarBase TItem="VillageDto"
-                        Items="@Villages"
-                        SelectedDataItems="@SelectedDataItems"
-                        NewItem_Click="@NewItem_Click"
-                        EditItem_Click="@EditItem_Click"
-                        DeleteItem_Click="@DeleteItem_Click"
-                        Refresh_Click="@Refresh_Click"
-                        IsImport="true"
-                        Grid="Grid"
-                        ImportFile="ImportFile"
-                        ExportToExcel="ExportToExcel"
-                        VisibleNew="true"
-                        VisibleEdit="true"
-                        VisibleDelete="true" />
-                        </ToolbarTemplate>
+                                <ToolbarTemplate>
+                                    <MyDxToolbarBase TItem="VillageDto"
+                                                     Items="@Villages"
+                                                     SelectedDataItems="@SelectedDataItems"
+                                                     NewItem_Click="@NewItem_Click"
+                                                     EditItem_Click="@EditItem_Click"
+                                                     DeleteItem_Click="@DeleteItem_Click"
+                                                     Refresh_Click="@Refresh_Click"
+                                                     IsImport="true"
+                                                     Grid="Grid"
+                                                     ImportFile="ImportFile"
+                                                     ExportToExcel="ExportToExcel"
+                                                     VisibleNew="true"
+                                                     VisibleEdit="true"
+                                                     VisibleDelete="true" />
+                                </ToolbarTemplate>
 
-                        <Columns>
-                        <DxGridSelectionColumn Width=" 15px" />
-                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                        <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
-                        <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
-                        <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
-                        <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
-                        </Columns>
+                                <Columns>
+                                    <DxGridSelectionColumn Width=" 15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
+                                </Columns>
 
-                        <TotalSummary>
-                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                        FieldName="Name"
-                        Visible="true" />
-                        </TotalSummary>
-                        </MyGridPaginate>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                       FieldName="Name"
+                                                       Visible="true" />
+                                </TotalSummary>
+                            </MyGridPaginate>
 
-                        <div class="row">
-                        <DxFormLayout>
-                        <div class="col-md-9">
-                        <DxFormLayoutItem>
-                        <DxPager PageCount="totalCount"
-                        ActivePageIndexChanged="OnPageIndexChanged"
-                        VisibleNumericButtonCount="10"
-                        SizeMode="SizeMode.Medium"
-                        NavigationMode="PagerNavigationMode.Auto">
-                        </DxPager>
-                        </DxFormLayoutItem>
-                        </div>
-                        <div class="col-md-3 d-flex justify-content-end">
-                        <DxFormLayoutItem Caption="Page Size:">
-                        <MyDxComboBox Data="@PageSizess"
-                        SizeMode="SizeMode.Medium"
-                        NullText="Ganjar..."
-                        SelectedItemChanged="((int e) => OnPageSizeIndexChanged(e))"
-                        @bind-Value="PageSize">
-                        </MyDxComboBox>
-                        </DxFormLayoutItem>
-                        </div>
-                        </DxFormLayout>
-                        </div>
-                        </DxLoadingPanel> *@
+                            <div class="row">
+                                <DxFormLayout>
+                                    <div class="col-md-9">
+                                        <DxFormLayoutItem>
+                                            <DxPager PageCount="totalCount"
+                                                     ActivePageIndexChanged="OnPageIndexChanged"
+                                                     VisibleNumericButtonCount="10"
+                                                     SizeMode="SizeMode.Medium"
+                                                     NavigationMode="PagerNavigationMode.Auto">
+                                            </DxPager>
+                                        </DxFormLayoutItem>
+                                    </div>
+                                    <div class="col-md-3 d-flex justify-content-end">
+                                        <DxFormLayoutItem Caption="Page Size:">
+                                            <MyDxComboBox Data="@PageSizess"
+                                                          SizeMode="SizeMode.Medium"
+                                                          NullText="Ganjar..."
+                                                          SelectedItemChanged="((int e) => OnPageSizeIndexChanged(e))"
+                                                          @bind-Value="PageSize">
+                                            </MyDxComboBox>
+                                        </DxFormLayoutItem>
+                                    </div>
+                                </DxFormLayout>
+                            </div>
+                        </DxLoadingPanel>
                     </div>
                 </div>
             </div>
@@ -128,11 +128,11 @@
                                 AllowUserInput="true"
                                 FilteringMode="DataGridFilteringMode.Contains">
                     </DxComboBox>
-                   @*  <Virtualize ItemsProvider="GetItems" ItemSize="50">
+                    @*  <Virtualize ItemsProvider="GetItems" ItemSize="50">
 
-                        <div>
-                            <span>@((context as TempClass).Name)</span>
-                        </div>
+                    <div>
+                    <span>@((context as TempClass).Name)</span>
+                    </div>
 
                     </Virtualize> *@
 
@@ -195,7 +195,7 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-    } 
+    }
 
     public List<TempClass> GetData(int pageIndex, int pageSize)
     {
@@ -207,10 +207,10 @@
         for (int i = startId; i < startId + pageSize; i++)
         {
             data.Add(new TempClass
-            {
-                Id = i,
-                Name = $"Item {i} - Random Value: {random.Next(1, 1000)}"
-            });
+                {
+                    Id = i,
+                    Name = $"Item {i} - Random Value: {random.Next(1, 1000)}"
+                });
         }
 
         return data;
@@ -232,7 +232,7 @@
         return Enumerable.Range(pageIndex * PageSize, PageSize)
                          .Select(i => new TempClass { Id = i, Name = $"Item {i}" })
                          .ToList();
-    } 
+    }
 
     private static Random random = new Random();
 
@@ -559,7 +559,7 @@
     {
         PanelVisible = true;
 
-        // await LoadData(0, 20);
+        await LoadData(0, 20);
 
         // await hehe();
 
@@ -569,7 +569,7 @@
 
     private async Task awokAwokAwokk()
     {
-        
+
     }
 
 

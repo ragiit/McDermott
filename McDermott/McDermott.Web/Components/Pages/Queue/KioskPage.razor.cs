@@ -807,6 +807,9 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool IsLoading { get; set; } = false;
         private BPJSIntegrationDto BPJSIntegration { get; set; }
 
+        [Inject]
+        public GoogleMeetService GoogleMeetService { get; set; }
+
         private async Task OnSave()
         {
             try
@@ -915,6 +918,14 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormGeneral.PratitionerId = FormKios.PhysicianId;
                         FormGeneral.ServiceId = FormKios.ServiceId;
                         FormGeneral.Status = EnumStatusGeneralConsultantService.Planned;
+                        try
+                        {
+                            FormGeneral.LinkMeet = await GoogleMeetService.CreateMeetingAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            ToastService.ShowError(ex.Message);
+                        }
                         FormGeneral.TypeRegistration = "Telemedicine";
                     }
 

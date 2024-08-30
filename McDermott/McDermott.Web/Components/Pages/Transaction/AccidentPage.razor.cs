@@ -319,7 +319,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task ClosePopUpAccident()
         {
             isAccident = false;
-
         }
 
         private List<string> ClassType = new List<string>
