@@ -67,33 +67,6 @@
                         else
                         {
 
-                            @*  @if (GeneralConsultanService.Id != 0)
-                    {
-                    <div class="row justify-content-end mb-3">
-                    <div class="col-auto align-self-end">
-                    <DxTabs>
-                    <DxTab Text="@EnumStatusGeneralConsultanService.ReturnToWork.GetDisplayName()" Enabled="@IsStatus(EnumStatusGeneralConsultanService.ReturnToWork)"></DxTab>
-                    <DxTab Text="@EnumStatusGeneralConsultanService.RestrictedWorkCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusGeneralConsultanService.RestrictedWorkCase)"></DxTab>
-                    <DxTab Text="@EnumStatusGeneralConsultanService.LostWorkDaysCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusGeneralConsultanService.LostWorkDaysCase)"></DxTab>
-                    <DxTab Text="@EnumStatusGeneralConsultanService.FatalityCase.GetDisplayName()" Enabled="@IsStatus(EnumStatusGeneralConsultanService.FatalityCase)"></DxTab>
-                    </DxTabs>
-                    </div>
-                    </div>
-
-                    @if (!IsStatus(EnumStatusGeneralConsultanService.FatalityCase))
-                    {
-                    <div class="card">
-                    <div class="card-body">
-                    <div class="w-100">
-                    <div class="col align-self-center">
-                    <DxButton IconCssClass="fa-solid fa-check" Enabled="!IsLoading" Text="@StagingText" Click="OnClickConfirm" RenderStyle="ButtonRenderStyle.Primary"></DxButton>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                    }
-                    } *@
-
                             <DxLoadingPanel @bind-Visible="IsLoading"
                                             IsContentBlocked="true"
                                             CssClass="w-100"
@@ -127,47 +100,6 @@
                                                 </div>
                                             </div>
                                         }
-
-                                        @*  @if (Accident.Status != EnumStatusAccident.Done && GeneralConsultanService.Id != 0)
-                                {
-                                <div class="card">
-                                <div class="card-body">
-                                <div class=" row w-100">
-                                <div class="col-auto pe-0">
-                                <DxButton IconCssClass="fa-solid fa-check"
-                                Text="@StagingText.GetDisplayName()"
-                                Click="OnClickConfirm"
-                                RenderStyle=" ButtonRenderStyle.Primary">
-                                </DxButton>
-
-                                <DxButton IconCssClass="fa-solid fa-print"
-                                Text="Print"
-                                Visible="GeneralConsultanService.Id > 0"
-                                Click="PrintAccident"
-                                RenderStyleMode="ButtonRenderStyleMode.Outline"
-                                RenderStyle=" ButtonRenderStyle.Success">
-                                </DxButton>
-                                </div>
-                                </div>
-                                </div>
-                                </div>
-                                }
-
-                                @if (!IsStatus(EnumStatusAccident.Done))
-                                {
-                                <div class="card ">
-                                <div class="card-body">
-                                <div class="w-100">
-                                <div class="row w-100">
-                                <div class="col-md-12 align-self-center">
-                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="@(async () => await LoadData())"></DxButton>
-                                </div>
-                                </div>
-                                </div>
-                                </div>
-                                </div>
-                                } *@
 
                                         @if (!IsStatus(EnumStatusAccident.Done))
                                         {

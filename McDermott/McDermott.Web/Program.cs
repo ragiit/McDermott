@@ -28,6 +28,7 @@ builder.Services.AddResponseCompression(options =>
         ["application/octet-stream"]); // Tambahkan tipe MIME tambahan jika perlu
 });
 
+builder.Services.AddScoped<GoogleMeetService>();
 // Konfigurasi tingkat kompresi (opsional)
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {

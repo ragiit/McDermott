@@ -51,5 +51,10 @@
         redrawMarkers();
     };
 
-    window.getMarkersData = () => JSON.stringify(markers);
+    window.getMarkersData = () => {
+        console.log("cekfaktadata"+markers);
+        JSON.stringify(markers);
+    };
+
+    
 };
