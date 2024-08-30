@@ -9,6 +9,7 @@
 @using Google.Apis.Util.Store
 @using LZStringCSharp
 @using McDermott.Application.Features.Services
+@using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Extensions.Hosting
 @using System.Net.Http.Headers
@@ -17,6 +18,7 @@
 @inject HttpClient Http
 @inject IHttpClientFactory ClientFactory
 @inject GoogleMeetService GoogleMeetService
+@inject IHttpContextAccessor _httpContextAccessor
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
@@ -24,30 +26,33 @@
 
 @if (IsAccess)
 {
-        <div class="content-header">
-            <div class="container-fluid">
+    <div class="content-header">
+        <div class="container-fluid">
 
-                <h1><label>Home</label></h1>
+            <h1><label>Home</label></h1>
 
-                <p>Welcome, @UserLogin.Name. @Greeting</p>
+            <p>Welcome, @UserLogin.Name. @Greeting</p>
 
-                <div class="form-group">
-                    <label for="consultationType">Pilih Jenis Konsultasi:</label>
-                    <select id="consultationType" class="form-control" @onchange="OnConsultationTypeChanged">
-                        <option value="offline">Konsul Offline</option>
-                        <option value="online">Konsul Online</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="consultationType">Pilih Jenis Konsultasi:</label>
+                <select id="consultationType" class="form-control" @onchange="OnConsultationTypeChanged">
+                    <option value="offline">Konsul Offline</option>
+                    <option value="online">Konsul Online</option>
+                </select>
+            </div>
 
-                <button @onclick="CreateMeetLink">Create Google Meet Link</button> 
-                <a href="@meetLink" target="_blank">Join Google Meet</a> 
+            <button @onclick="CreateMeetLink">Create Google Meet Link</button>
+            <a href="@meetLink" target="_blank">@meetLink</a>
+@* 
+            <button @onclick="CreateTeamsLink">Create Teams Meet Link</button>
+            <a href="@meetLink" target="_blank">Join Teams Meet</a> *@
 
             @if (showConferenceLink)
             {
-                        <div class="form-group">
-                            <label for="conferenceLink">Link Conference:</label>
-                            <input type="text" id="conferenceLink" class="form-control" value="@linkMeet" readonly />
-                        </div>
+                <div class="form-group">
+                    <label for="conferenceLink">Link Conference:</label>
+                    <input type="text" id="conferenceLink" class="form-control" value="@linkMeet" readonly />
+                </div>
             }
 
             @*
@@ -67,19 +72,55 @@
         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
         </Columns>
         </DxGrid> *@
-            </div>
         </div>
+    </div>
 }
 else
 {
-        <LoadingIndicatorLayout />
+    <LoadingIndicatorLayout />
 }
 
 
-
 @code {
-      private string meetLink;
+    private string meetLink { get; set; }
+    private string meetLink2;
 
+    private async Task CreateTeamsLink()
+    {
+        // var result = await TokenProvider.RequestAccessToken();
+        // if (result.TryGetToken(out var tokenResult))
+        // {
+        //    meetLink2 = await CreateTeamsMeeting(tokenResult.Value);
+
+        // }
+
+        meetLink2 = await CreateTeamsMeeting(await GetAccessTokenAsync2());
+        var a = "aodkawd";
+    }
+    public async Task<string> GetAccessTokenAsync2()
+    {
+        var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
+        return accessToken;
+    }
+    async Task<string> CreateTeamsMeeting(string accessToken)
+    {
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        var meetingRequest = new
+        {
+            startDateTime = "2024-09-01T10:00:00Z",
+            endDateTime = "2024-09-01T11:00:00Z",
+            subject = "Meeting Subject"
+        };
+
+        var response = await httpClient.PostAsJsonAsync("https://graph.microsoft.com/v1.0/me/onlineMeetings", meetingRequest);
+        response.EnsureSuccessStatusCode();
+
+        var responseContent = await response.Content.ReadAsStringAsync();
+        dynamic meetingResponse = JsonConvert.DeserializeObject(responseContent);
+        return meetingResponse.joinUrl;
+    }
     private async Task CreateMeetLink()
     {
         meetLink = await GoogleMeetService.CreateMeetingAsync();
@@ -169,7 +210,7 @@ else
 
     private bool showConferenceLink = false;
     private string consultationType = "offline";
-    private string linkMeet = string.Empty; 
+    private string linkMeet = string.Empty;
     private async Task DownloadFile()
     {
         if (string.IsNullOrWhiteSpace(filePath))

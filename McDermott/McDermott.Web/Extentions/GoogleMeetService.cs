@@ -34,7 +34,7 @@ namespace McDermott.Web.Extentions
             });
 
             // Define the parameters of the new event.
-            Event newEvent = new Event()
+            Event newEvent = new()
             {
                 Summary = "Google Meet Meeting",
                 Location = "Online",
