@@ -109,7 +109,7 @@
 
                                                                 <div class="info-box-content">
                                                                     <h3 class="info-box-number"> @TotalScrapQty <span>Unit</span> </h3>
-                                                                    <span class="info-box-text">On Hand</span>
+                                                                    <span class="info-box-text">Scrap</span>
                                                                 </div>
                                                                 <!-- /.info-box-content -->
                                                             </div>
@@ -177,29 +177,6 @@
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                 FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>
                                                                 </DxFormLayoutItem>
-
-                                                                @* <DxFormLayoutItem Caption="Drug Form" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                        <DxComboBox Data="@colors" Context="contexta" @bind-Value="@selectedColor" TextFieldName="Name" ValueFieldName="Color">
-                                                        <ItemTemplate>
-                                                        @{
-                                                        var item = contexta as ColorItem;
-                                                        }
-                                                        <div style="display: flex; align-items: center;">
-                                                        <div style="width: 15px; height: 15px; background-color: @(item?.Color); margin-right: 10px;"></div>
-                                                        <span>@item?.Name</span>
-                                                        </div>
-                                                        </ItemTemplate>
-                                                        <EditBoxTemplate>
-                                                        @{
-                                                        var selectedItem = colors.FirstOrDefault(c => c.Color == selectedColor);
-                                                        }
-                                                        <div style="display: flex; align-items: center;">
-                                                        <div style="width: 15px; height: 15px; background-color: @(selectedItem?.Color); margin-right: 10px;"></div>
-                                                        <span>@selectedItem?.Name</span>
-                                                        </div>
-                                                        </EditBoxTemplate>
-                                                        </DxComboBox>
-                                                        </DxFormLayoutItem> *@
 
                                                                 <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                     <DxComboBox Data="@DrugRoutes"

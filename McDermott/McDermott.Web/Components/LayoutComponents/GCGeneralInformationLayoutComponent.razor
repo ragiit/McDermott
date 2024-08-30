@@ -255,6 +255,9 @@
                                 </DxFormLayoutItem>
                             }
 
+                            <DxFormLayoutItem Visible="IsTelemedic" CaptionCssClass="normal-caption" Caption="Conference Link" ColSpanMd="12">
+                                <a href="@(GeneralConsultanService.LinkMeet)"></a>                                
+                            </DxFormLayoutItem>
                         </DxFormLayout>
                     </div>
                 </div>
@@ -293,6 +296,7 @@
 
     [Parameter] public bool ReadOnlyService { get; set; } = false;
     [Parameter] public bool IsVaccinationLocation { get; set; } = false;
+    [Parameter] public bool IsTelemedic { get; set; } = false;
 
 
     private IEnumerable<AllergyDto> _selectedPharmacologyAllergies;

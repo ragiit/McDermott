@@ -26,6 +26,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess { get; set; } = false;
+        private bool IsTelemedic { get; set; } = true;
 
         private async Task GetUserInfo()
         {
@@ -584,7 +585,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private List<string> RegisType = new List<string>
         {
-            "Telemedic",           
+            "Telemedicine",           
         };
 
         private List<string> ClinicVisitTypes = new List<string>
@@ -2255,7 +2256,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadComboBox()
         {
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            Services = await Mediator.Send(new GetServiceQuery(x=>x.Name=="Telemedic" || x.Name =="Telemedician"));
+            Services = await Mediator.Send(new GetServiceQuery(x=>x.IsTelemedicine== true));
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
@@ -2298,7 +2299,14 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private void OnCancelBack()
         {
-            NavigationManager.NavigateTo("clinic-service/general-consultation-service", true);
+            NavigationManager.NavigateTo("clinic-service/telemedicine", true);
+        }
+
+        private void CopyToClipboard()
+        {
+            var link = GeneralConsultanService.LinkMeet;
+            // Logika untuk menyalin link ke clipboard
+            JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", link);
         }
 
         private async Task LoadData()
@@ -2306,7 +2314,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             SelectedDataItems = [];
             ShowForm = false;
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "Telemedic" ));
+            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "Telemedicine" ));
             statusMcuData = GetStatusMcuCounts(GeneralConsultanServices);
            
             PanelVisible = false;

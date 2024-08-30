@@ -39,7 +39,7 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         public string? Payment { get; set; } = "BPJS";
 
-        public string? TypeRegistration { get; set; } = "Telemedic";
+        public string? TypeRegistration { get; set; } = "General Consultation";
 
         public string? MedexType { get; set; }
         public string? HomeStatus { get; set; }
