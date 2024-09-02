@@ -501,13 +501,9 @@
                                                                 }
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Conference Link" ColSpanMd="12">
-                                                                    <Template>
-                                                                        <div class="row">
-                                                                        <div class="col conten-align-center">
-                                                                            <a href="@GeneralConsultanService.LinkMeet" target="_blank">@GeneralConsultanService.LinkMeet</a>
-                                                                                <i class="fa-solid fa-copy" style="cursor: pointer; color: #63E6BE; padding-left:2px;" @onclick="CopyToClipboard" title="Copy"></i>
-                                                                        </div>
-                                                                        </div>
+                                                                    <Template>                                                                        
+                                                                      <a href="@GeneralConsultanService.LinkMeet" class="fw-bolder text-black" target="_blank">@GeneralConsultanService.LinkMeet</a>
+                                                                      <i class="fa-solid fa-copy" style="cursor: pointer; color: #63E6BE; padding-left:2px;" @onclick="CopyToClipboard" title="Copy"></i>                                                                        
                                                                     </Template>
                                                                 </DxFormLayoutItem>
 

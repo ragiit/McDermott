@@ -2307,6 +2307,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             var link = GeneralConsultanService.LinkMeet;
             // Logika untuk menyalin link ke clipboard
             JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", link);
+
+            ToastService.ShowSuccess("Copy link Success");
+            ToastService.ClearAll();
         }
 
         private async Task LoadData()
