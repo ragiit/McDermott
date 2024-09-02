@@ -2,7 +2,7 @@
 {
     public partial class AllergyBpjsIntegrationPage
     {
-        private string SelectedCodeAllergyType { get; set; } = "Makanan";
+        private string SelectedCodeAllergyType { get; set; } = "01";
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
@@ -131,38 +131,51 @@
         {
             PanelVisible = true;
 
-            _allergies = await Mediator.Send(new GetAllergyQuery(x => x.Type == SelectedCodeAllergyType));
+            //_allergies = await Mediator.Send(new GetAllergyQuery(x => x.Type == SelectedCodeAllergyType));
 
-            //var response = await PcareService.SendPCareService($"Allergy/AllergyType/{SelectedCodeAllergyType}/{parameter1}/{parameter2}", HttpMethod.Get);
+            SelectedCodeAllergyType = SelectedCodeAllergyType == "Makanan" ? "01" : SelectedCodeAllergyType?.ToString() ?? string.Empty;
 
-            //if (response.Item2 != 200)
-            //{
-            //    PanelVisible = false;
+            var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"alergi/jenis/{SelectedCodeAllergyType}", HttpMethod.Get);
 
-            //    if (response.Item2 == 404)
-            //    {
-            //        ToastService.ClearErrorToasts();
-            //        ToastService.ShowError(Convert.ToString(response.Item1));
-            //    }
+            if (response.Item2 != 200)
+            {
+                PanelVisible = false;
 
-            //    _allergies.Clear();
+                if (response.Item2 == 404)
+                {
+                    ToastService.ClearErrorToasts();
+                    ToastService.ShowError(Convert.ToString(response.Item1));
+                }
 
-            //    return;
-            //}
+                _allergies.Clear();
 
-            //dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Item1);
+                return;
+            }
 
-            //var dynamicList = (IEnumerable<dynamic>)data.list;
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Item1);
 
-            //var AllergyList = dynamicList.Select(item => new AllergyBPJSIntegrationTemp
-            //{
-            //    KdAllergy = item.kdAllergy,
-            //    NmAllergy = item.nmAllergy,
-            //    MaxTarif = item.maxTarif,
-            //    WithValue = item.withValue
-            //}).ToList();
+            var dynamicList = (IEnumerable<dynamic>)data.list;
 
-            //_allergies = AllergyList;
+            var AllergyList = dynamicList.Select(item => new AllergyDto
+            {
+                KdAllergy = item.kdAlergi,
+                NmAllergy = item.nmAlergi,
+                //MaxTarif = item.maxTarif,
+                //WithValue = item.withValue
+            }).ToList();
+
+            var a = await Mediator.Send(new GetAllergyQuery(x => x.Type == SelectedCodeAllergyType && AllergyList.Select(z => z.KdAllergy).Contains(x.KdAllergy)));
+
+            var existingKdAllergy = a.Select(x => x.KdAllergy).ToHashSet();
+
+            var newAllergies = AllergyList.Where(item => !existingKdAllergy.Contains(item.KdAllergy)).ToList();
+            newAllergies.ForEach(x => x.Type = SelectedCodeAllergyType);
+
+            await Mediator.Send(new CreateListAllergyRequest(newAllergies));
+
+            //var combinedAllergyList = a.Concat(newAllergies).ToList();
+
+            _allergies = AllergyList;
 
             PanelVisible = false;
         }

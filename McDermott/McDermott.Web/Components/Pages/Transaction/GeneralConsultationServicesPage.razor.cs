@@ -355,7 +355,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
 
-                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                     if (result.Item2 == 200)
                     {
@@ -399,7 +399,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
 
-                    var result = await PcareService.SendPCareService($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                     if (result.Item2 == 200)
                     {
@@ -446,7 +446,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (string.IsNullOrWhiteSpace(GeneralConsultanService.ReferVerticalSpesialisSaranaCode) || !Convert.ToBoolean(GeneralConsultanService.IsSarana))
                     GeneralConsultanService.ReferVerticalSpesialisSaranaCode = "0";
 
-                var result = await PcareService.SendPCareService($"spesialis/rujuk/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/sarana/{GeneralConsultanService.ReferVerticalSpesialisSaranaCode}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/sarana/{GeneralConsultanService.ReferVerticalSpesialisSaranaCode}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                 Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/sarana/{GeneralConsultanService.ReferVerticalSpesialisSaranaCode}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
                 if (result.Item2 == 200)
@@ -498,7 +498,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             try
             {
-                var result = await PcareService.SendPCareService($"spesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode}/subspesialis", HttpMethod.Get);
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode}/subspesialis", HttpMethod.Get);
                 if (result.Item2 == 200)
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
@@ -641,10 +641,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var count = GeneralConsultanServices.Where(x => x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
                 if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
                 {
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
                     if (parameter is not null)
                     {
-                        if (!Convert.ToBoolean(parameter.Value?.Equals(bpjs.KdProviderPstKdProvider)))
+                        if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
                         {
                             ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                         }
@@ -682,10 +683,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var count = GeneralConsultanServices.Where(x => x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
                 if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
                 {
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
                     if (parameter is not null)
                     {
-                        if (!Convert.ToBoolean(parameter.Value?.Equals(bpjs.KdProviderPstKdProvider)))
+                        if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
                         {
                             ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                         }
@@ -720,10 +722,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var count = GeneralConsultanServices.Where(x => x.PatientId == GeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
                 if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
                 {
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+
                     if (parameter is not null)
                     {
-                        if (!Convert.ToBoolean(parameter.Value?.Equals(bpjs.KdProviderPstKdProvider)))
+                        if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
                         {
                             ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                         }
@@ -1434,7 +1438,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 };
 
                 Console.WriteLine("Sending pendaftaran...");
-                var responseApi = await PcareService.SendPCareService($"pendaftaran", HttpMethod.Post, regis);
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"pendaftaran", HttpMethod.Post, regis);
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
 
@@ -1458,7 +1462,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task<bool> SendPcareRequestKunjungan()
         {
-            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
             {
                 var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
 
@@ -1490,12 +1494,16 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 var kunj = new KunjunganRequest
                 {
+                    Sistole = GeneralConsultanService.Systolic.ToInt32(),
+                    AlergiMakan = SelectedFoodAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                    AlergiObat = SelectedPharmacologyAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                    AlergiUdara = SelectedWeatherAllergies.FirstOrDefault()?.KdAllergy ?? null,
                     NoKunjungan = GeneralConsultanService.SerialNo ?? string.Empty,
                     NoKartu = SelectedBPJSIntegration.NoKartu ?? "",
                     TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
                     KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
                     KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultanService.AwarenessId)!.KdSadar,
-                    Diastole = GeneralConsultanService.Diastole.ToInt32(),
+                    Diastole = GeneralConsultanService.DiastolicBP.ToInt32(),
                     BeratBadan = GeneralConsultanService.Weight.ToInt32(),
                     TinggiBadan = GeneralConsultanService.Height.ToInt32(),
                     RespRate = GeneralConsultanService.RR.ToInt32(),
@@ -1510,7 +1518,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                     Suhu = GeneralConsultanService.Temp.ToString(),
                 };
 
-                var responseApi = await PcareService.SendPCareService($"kunjungan", HttpMethod.Post, kunj);
+                Console.WriteLine(JsonConvert.SerializeObject(kunj, Formatting.Indented));
+
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
 
                 if (responseApi.Item2 != 200)
                 {
@@ -1521,9 +1531,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                    if (!string.IsNullOrWhiteSpace(GeneralConsultanService.SerialNo)) // Check if the serial no is not getting from kiosk
-                        GeneralConsultanService.SerialNo = data.response.message;
+                    if (responseApi.Item1 is not null)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                        if (!string.IsNullOrWhiteSpace(GeneralConsultanService.SerialNo)) // Check if the serial no is not getting from kiosk
+                            GeneralConsultanService.SerialNo = data.response.message;
+                    }
                 }
             }
 
@@ -1546,7 +1559,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 };
 
                 Console.WriteLine("Sending antrean/panggil...");
-                var responseApi = await PcareService.SendPCareService($"antrean/panggil", HttpMethod.Post, antreanRequest);
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.AntreanFKTPBaseURL), $"antrean/panggil", HttpMethod.Post, antreanRequest);
 
                 if (responseApi.Item2 != 200)
                 {
@@ -1559,7 +1572,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 else
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                    Console.WriteLine(Convert.ToString(data));
+                    if (data is not null)
+                        Console.WriteLine(Convert.ToString(data));
                 }
 
                 return true;
@@ -1864,7 +1878,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string cacheKey = $"spesialis";
                 if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisPCare>? r))
                 {
-                    var result = await PcareService.SendPCareService($"spesialis", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis", HttpMethod.Get);
                     if (result.Item2 == 200)
                     {
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
@@ -1905,7 +1919,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string cacheKey = $"spesialis/sarana";
                 if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisSaranaPCare>? r))
                 {
-                    var result = await PcareService.SendPCareService($"spesialis/sarana", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/sarana", HttpMethod.Get);
                     if (result.Item2 == 200)
                     {
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
@@ -1946,7 +1960,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string cacheKey = $"spesialis/khusus";
                 if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisRefrensiKhususPCare>? r))
                 {
-                    var result = await PcareService.SendPCareService($"spesialis/khusus", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/khusus", HttpMethod.Get);
                     if (result.Item2 == 200)
                     {
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
@@ -2445,6 +2459,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 GeneralConsultanService = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
                 UserForm = GeneralConsultanService.Patient ?? new();
+
+                if (GeneralConsultanService.Method is not null && GeneralConsultanService.Method.Equals("BPJS"))
+                    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == true && x.Active == true));
+                else
+                    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && (x.Insurance.IsBPJSKesehatan == false || x.Insurance.IsBPJSTK == false) && x.Active == true));
+
                 //var targetUrl = NavigationManager.ToAbsoluteUri("/clinic-service/general-consultation-services");
                 //var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(targetUrl.ToString(), "id", GeneralConsultanService.Id.ToString());
                 //NavigationManager.NavigateTo(query);
@@ -2452,6 +2472,33 @@ namespace McDermott.Web.Components.Pages.Transaction
                 await GetPatientAllergy();
 
                 SelectedInsurancePolicy = (await Mediator.Send(new GetInsurancePolicyQuery(x => x.Id == GeneralConsultanService.InsurancePolicyId))).FirstOrDefault() ?? new();
+
+                var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == SelectedInsurancePolicy.Id))).FirstOrDefault();
+                if (bpjs is not null)
+                {
+                    var count = GeneralConsultanServices.Where(x => x.PatientId == GeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
+                    if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
+                    {
+                        //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                        var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+
+                        if (parameter is not null)
+                        {
+                            if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
+                            {
+                                ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+                            }
+                            else
+                            {
+                                SelectedBPJSIntegration = bpjs;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+                    }
+                }
 
                 switch (GeneralConsultanService.Status)
                 {

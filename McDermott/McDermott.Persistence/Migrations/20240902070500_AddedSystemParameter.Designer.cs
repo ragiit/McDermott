@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240902070500_AddedSystemParameter")]
+    partial class AddedSystemParameter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5069,6 +5072,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("AntreanFKTPBaseURL")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AntreanFKTPBaseURLValue")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConsId")
                         .HasColumnType("nvarchar(max)");
 
@@ -5081,7 +5087,14 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("KdAplikasi")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PCareBaseURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PCareBaseURLValue")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PCareCodeProvider")
@@ -5103,6 +5116,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

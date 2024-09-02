@@ -75,18 +75,7 @@
                                                           TextFieldName="Name"
                                                           ValueFieldName="Id"></MyDxComboBox>
                                             <ValidationMessage For="@(()=>a.ServicedId)" />
-                                        </DxFormLayoutItem>
-
-                                         <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
-                                            <MyDxComboBox Data="@ServicesK"
-                                                          @bind-Value="@a.ServicedId"
-                                                          NullText="select Service Counter.."
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"> 
-                                                      </MyDxComboBox>
-                                            <ValidationMessage For="@(()=>a.ServicedId)" />
-                                        </DxFormLayoutItem>
-
+                                        </DxFormLayoutItem> 
                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Counter" ColSpanMd="12">
                                             <DxCheckBox @bind-Checked="@a.IsKiosk" />
                                             <ValidationMessage For="@(()=>a.IsKiosk)" />

@@ -286,11 +286,11 @@ namespace McDermott.Application.Dtos.Transaction
               .NotEmpty().WithMessage("Service is required")
               .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
 
-            RuleFor(x => x.RegistrationDate)
-                 .NotEmpty().WithMessage("Registration Date is required")
-                 .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned))
-                 .GreaterThanOrEqualTo(DateTime.Now.Date).WithMessage("Registration Date cannot be in the past")
-                 .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
+            //RuleFor(x => x.RegistrationDate)
+            //     .NotEmpty().WithMessage("Registration Date is required")
+            //     .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned))
+            //     .GreaterThanOrEqualTo(DateTime.Now.Date).WithMessage("Registration Date cannot be in the past")
+            //     .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Planned));
 
             // Validation for Current Mobile field
             //RuleFor(x => x.CurrentMobile)
@@ -450,8 +450,9 @@ namespace McDermott.Application.Dtos.Transaction
         public string? PPKRujukanName { get; set; }
         public string? PPKRujukanCode { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
+
         /// </BPJS Rujukan>
-        /// 
+        ///
         public string? LinkMeet { get; set; } //telemedic
 
         #region Clinical Assesment

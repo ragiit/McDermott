@@ -1375,10 +1375,12 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var count = GeneralConsultanServices.Where(x => x.PatientId == GeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
                 if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
                 {
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+
                     if (parameter is not null)
                     {
-                        if (!Convert.ToBoolean(parameter.Value?.Equals(bpjs.KdProviderPstKdProvider)))
+                        if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
                         {
                             ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
                         }

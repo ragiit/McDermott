@@ -62,7 +62,7 @@
 
             Console.WriteLine("Getting API awarness");
 
-            var response = await PcareService.SendPCareService($"kesadaran", HttpMethod.Get);
+            var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kesadaran", HttpMethod.Get);
 
             if (response.Item2 != 200)
             {

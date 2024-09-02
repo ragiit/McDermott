@@ -7,114 +7,237 @@
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="System Parameter" />
-        <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+        <BaseHeaderPage Title="System Parameter" ShowBackButton="false" />
 
+        @*         <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+    *@
         <section class="content">
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col">
-                        <div class="card">
+                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                IsContentBlocked="true"
+                                ApplyBackgroundShading="true"
+                                IndicatorAreaVisible="true"
+                                Text="Fetching Data...">
+                    <EditForm Context="EditFormContext" Model="SystemParameter" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit">
+                        <AntiforgeryToken />
+                        <DataAnnotationsValidator />
+
+                        <div class="card sticky">
                             <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="true"
-                                                Text="Fetching Data...">
-
-                                    <DxGrid @ref="Grid"
-                                            Data="SystemParameters"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            PopupEditFormHeaderText="@(IsAddForm ? "Add System Parameter" : "Edit System Parameter")"
-                                            PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            PageSize="10"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
-                                            AllowSelectRowByClick="true"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="@GridExtention.Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
-                                                        <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
-                                                        <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" IconCssClass="fa-solid fa-file-import">
-                                                    <Items>
-                                                        <DxToolbarItem Text="Template" Click="ExportToExcel" />
-                                                        <DxToolbarItem Text="Import" Click="ImportFile" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Key" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Value" />
-
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (SystemParameterDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Key" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Key"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Key" />
-                                                    <ValidationMessage For="@(()=> a.Key)"   />
-                                                </DxFormLayoutItem>
-
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Value" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Value"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Value" />
-                                                    <ValidationMessage For="@(()=> a.Value)"   />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
+                                <div class=" row w-100">
+                                    <div class="col-auto pe-0 ">
+                                        <DxButton IconCssClass="fa-solid fa-check"
+                                                  Text="Save"
+                                                  SubmitFormOnClick="true"
+                                                  RenderStyle="ButtonRenderStyle.Primary">
+                                        </DxButton>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="card card-outline card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            Base URL
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="PCare Base URL" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.PCareBaseURL"
+                                                                   NullText="PCare Base URL" />
+                                                        <ValidationMessage For="@(() => SystemParameter.PCareBaseURL)"   />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Antrean FKTP" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.AntreanFKTPBaseURL"
+                                                                   NullText="Antrean FKTP Base URL" />
+                                                        <ValidationMessage For="@(() => SystemParameter.AntreanFKTPBaseURL)"   />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="card card-outline card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title">
+                                            Variables
+                                        </h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Cons Id" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.ConsId"
+                                                                   NullText="Cons Id" />
+                                                        <ValidationMessage For="@(() => SystemParameter.ConsId)"   />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Username" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.Username"
+                                                                   NullText="Username" />
+                                                        <ValidationMessage For="@(() => SystemParameter.Username)"   />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Password" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.Password"
+                                                                   NullText="Password" />
+                                                        <ValidationMessage For="@(() => SystemParameter.Password)"   />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="PCare Code Provider" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.PCareCodeProvider"
+                                                                   NullText="PCare Code Provider" />
+                                                        <ValidationMessage For="@(() => SystemParameter.PCareCodeProvider)"   />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <DxFormLayout>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Application Code" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.KdAplikasi"
+                                                                   NullText="Application Code" />
+                                                        <ValidationMessage For="@(() => SystemParameter.KdAplikasi)"   />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Secret Key" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.SecretKey"
+                                                                   NullText="Secret Key" />
+                                                        <ValidationMessage For="@(() => SystemParameter.SecretKey)"   />
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="User Key" ColSpanMd="12">
+                                                        <MyTextBox @bind-Text="@SystemParameter.UserKey"
+                                                                   NullText="User Key" />
+                                                        <ValidationMessage For="@(() => SystemParameter.UserKey)"   />
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </DxLoadingPanel>
             </div>
         </section>
+
+
+        @* <section class="content">
+    <div class="container-fluid">
+    <div class="row">
+    <div class="col">
+    <div class="card">
+    <div class="card-body">
+    <DxLoadingPanel @bind-Visible="PanelVisible"
+    IsContentBlocked="true"
+    ApplyBackgroundShading="true"
+    IndicatorAreaVisible="true"
+    Text="Fetching Data...">
+    <EditForm Model="SystemParameter" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit">
+    <AntiforgeryToken />
+    <DataAnnotationsValidator />
+
+    <DxGrid @ref="Grid"
+    Data="SystemParameters"
+    @bind-SelectedDataItems="@SelectedDataItems"
+    EditModelSaving="OnSave"
+    DataItemDeleting="OnDelete"
+    PopupEditFormHeaderText="@(IsAddForm ? "Add System Parameter" : "Edit System Parameter")"
+    PagerNavigationMode="PagerNavigationMode.InputBox"
+    EditorRenderMode="GridEditorRenderMode.Detached"
+    PageSize="10"
+    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+    KeyFieldName="Id"
+    CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
+    AllowSelectRowByClick="true"
+    PagerPosition="GridPagerPosition.Bottom"
+    PageSizeSelectorVisible="true"
+    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+    PageSizeSelectorAllRowsItemVisible="true"
+    PagerSwitchToInputBoxButtonCount="10"
+    FocusedRowEnabled="true"
+    PagerVisibleNumericButtonCount="10"
+    ShowGroupPanel="true"
+    AutoExpandAllGroupRows="true"
+    ShowFilterRow="true"
+    CustomizeElement="@GridExtention.Grid_CustomizeElement"
+    ShowSearchBox="true"
+    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+    KeyboardNavigationEnabled="true">
+    <ToolbarTemplate>
+    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
+    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
+    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+    <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+    <Items>
+    <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
+    <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
+    <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
+    </Items>
+    </DxToolbarItem>
+    <DxToolbarItem Visible="@UserAccessCRUID.Import" Text="Import" IconCssClass="fa-solid fa-file-import">
+    <Items>
+    <DxToolbarItem Text="Template" Click="ExportToExcel" />
+    <DxToolbarItem Text="Import" Click="ImportFile" />
+    </Items>
+    </DxToolbarItem>
+    </DxToolbar>
+    </ToolbarTemplate>
+
+    <Columns>
+    <DxGridSelectionColumn Width="15px" />
+    <DxGridDataColumn MinWidth="200" FieldName="Key" SortIndex="0" />
+    <DxGridDataColumn MinWidth="200" FieldName="Value" />
+
+
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+    @{
+    var a = (SystemParameterDto)EditFormContext.EditModel;
+    }
+    <DxFormLayout CssClass="w-100">
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionCssClass="required-caption normal-caption" Caption="Key" ColSpanMd="12">
+    <DxTextBox @bind-Text="@a.Key"
+    ShowValidationIcon="true"
+    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+    NullText="Key" />
+    <ValidationMessage For="@(()=> a.Key)"   />
+
+    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionCssClass="normal-caption" Caption="Value" ColSpanMd="12">
+    <DxTextBox @bind-Text="@a.Value"
+    ShowValidationIcon="true"
+    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+    NullText="Value" />
+    <ValidationMessage For="@(()=> a.Value)"   />
+    </DxFormLayoutItem>
+    </DxFormLayout>
+    </EditFormTemplate>
+    </DxGrid>
+    </DxLoadingPanel>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </section> *@
     </div>
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Regimen of Use" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }
