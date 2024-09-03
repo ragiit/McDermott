@@ -15,10 +15,14 @@ using Serilog;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Antiforgery;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddAntiforgery();
+
 // Tambahkan layanan kompresi respons
 builder.Services.AddResponseCompression(options =>
 {
@@ -119,7 +123,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
 builder.Services.AddRazorPages();
-builder.Services.AddAntiforgery();
+//builder.Services.AddAntiforgery();
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.Secure = CookieSecurePolicy.Always;
@@ -206,6 +210,7 @@ app.UseStaticFiles(new StaticFileOptions
         ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddYears(1).ToString("R"));
     }
 });
+//app.UseMiddleware<CsrfTokenCOokieMiddleware>();
 app.UseResponseCompression();
 app.UseWebOptimizer();
 app.UseAntiforgery();
@@ -322,5 +327,21 @@ public static class RequestTimeoutMiddlewareExtensions
     public static IApplicationBuilder UseRequestTimeout(this IApplicationBuilder builder, TimeSpan timeout)
     {
         return builder.UseMiddleware<RequestTimeoutMiddleware>(timeout);
+    }
+}
+
+internal class CsrfTokenCOokieMiddleware(IAntiforgery antiforgery, RequestDelegate next)
+{
+    private readonly IAntiforgery _antiforgery = antiforgery;
+    private readonly RequestDelegate _next = next;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (context.Request.Cookies["CSRF-TOKEN"] == null)
+        {
+            var token = _antiforgery.GetAndStoreTokens(context);
+            context.Response.Cookies.Append("CSRF-TOKEN", token.RequestToken, new Microsoft.AspNetCore.Http.CookieOptions { HttpOnly = false });
+        }
+        await _next(context);
     }
 }

@@ -158,8 +158,10 @@ namespace McDermott.Persistence.Context
         #region OnModelCreating
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+        { // Definisikan indeks untuk kolom Name
+            modelBuilder.Entity<Village>()
+                .HasIndex(v => v.Name)
+                .HasDatabaseName("IX_Villages_Name");
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
@@ -573,6 +575,8 @@ namespace McDermott.Persistence.Context
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             // seed data
             //SeedIdentity(modelBuilder);
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

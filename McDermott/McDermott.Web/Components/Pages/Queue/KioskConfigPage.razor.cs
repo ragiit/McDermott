@@ -109,7 +109,7 @@ namespace McDermott.Web.Components.Pages.Queue
             var a = await Mediator.Send(new GetKioskConfigQuery());
             var service = await Mediator.Send(new GetServiceQuery());
             Services = [.. service.Where(x => x.IsPatient == true)];
-            a.ForEach(x => x.ServiceName = string.Join(",", Services.Where(z => x.ServiceIds != null && x.ServiceIds.Contains(z.Id)).Select(x => x.Name).ToList()));
+            a.ForEach(x => x.ServiceName = string.Join(", ", Services.Where(z => x.ServiceIds != null && x.ServiceIds.Contains(z.Id)).Select(x => x.Name).ToList()));
             kioskConfigs = a;
             PanelVisible = false;
         }
@@ -147,6 +147,9 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task NewItem_Click(IGrid context)
         {
+            await Grid.StartEditNewRowAsync();
+
+            return;
             FormKioskConfig = new();
             PopUpVisible = true;
             TextPopUp = "Add Config Kiosk";
@@ -154,9 +157,13 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task EditItem_Click()
         {
+            var a = SelectedDataItems[0].Adapt<KioskConfigDto>();
+            SelectedServices = Services.Where(x => a.ServiceIds != null && a.ServiceIds.Contains(x.Id)).ToList();
+
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            return;
             TextPopUp = "Edit Config Kiosk";
             FormKioskConfig = SelectedDataItems[0].Adapt<KioskConfigDto>();
-            SelectedServices = Services.Where(x => FormKioskConfig.ServiceIds.Contains(x.Id)).ToList();
             PopUpVisible = true;
         }
 
@@ -226,13 +233,11 @@ namespace McDermott.Web.Components.Pages.Queue
             catch { }
         }
 
-        private async Task OnSave()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(FormKioskConfig.Name))
-                    return;
-
+                FormKioskConfig = (KioskConfigDto)e.EditModel;
                 if (FormKioskConfig.Id == 0)
                 {
                     var a = SelectedServices.Select(x => x.Id).ToList();

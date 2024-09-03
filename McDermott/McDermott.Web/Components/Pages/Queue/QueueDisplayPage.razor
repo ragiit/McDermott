@@ -6,106 +6,121 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Queue Display" />
+        <BaseHeaderPage Title="Queue Display" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="QueueDisplay"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            AllowSelectRowByClick="true"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && QueueDisplay.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && QueueDisplay.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                @* <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" /> *@
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" Caption="Queue Display" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="NameCounter" Caption="Counter" />
-                                            <DxGridDataColumn Caption=" Action Display">
-                                                <CellDisplayTemplate>
-                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" CssClass="text-center" IconCssClass="fa-solid fa-play mr-1" Text="Start" @onclick="() => OnRenderTo((QueueDisplayDto)context.DataItem)"></DxButton>
-                                                </CellDisplayTemplate>
-                                            </DxGridDataColumn>
-                                        </Columns>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                                <DxPopup @bind-Visible="@showPopUp" HeaderText="Set Display">
-                                    <EditForm Model="@FormDisplays" Context="EditFormContext">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGrid @ref="Grid"
+                                        Data="QueueDisplay"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        KeyFieldName="Id"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged">
+
+                                    @* <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && QueueDisplay.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && QueueDisplay.Count > 0" />
+                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                <Items>
+                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                </Items>
+                                </DxToolbarItem>
+                                <DxToolbarItem Visible="@UserAccessCRUID.Import" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
+                                </DxToolbar>
+                                </ToolbarTemplate> *@
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="QueueDisplayDto"
+                                                         Items="@QueueDisplay"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         Grid="Grid"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" Caption="Queue Display" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="NameCounter" Caption="Counter" />
+                                        <DxGridDataColumn Caption=" Action Display">
+                                            <CellDisplayTemplate>
+                                                <DxButton RenderStyle="@ButtonRenderStyle.Success" CssClass="text-center" IconCssClass="fa-solid fa-play mr-1" Text="Start" @onclick="() => OnRenderTo((QueueDisplayDto)context.DataItem)"></DxButton>
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
+                                    </Columns>
+
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (QueueDisplayDto)EditFormContext.EditModel;
+                                        }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                                 <div class="pop-warning">
-                                                    <DxTextBox @bind-Text="@FormDisplays.Name" NullText="Name Display.."></DxTextBox>
+                                                    <DxTextBox @bind-Text="@a.Name" NullText="Name Display.."></DxTextBox>
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12" Caption="Counter">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Counter">
                                                 <DxTagBox Data="@counteres" FilteringMode="@DataGridFilteringMode.Contains"
                                                           @bind-Values="@selectedCounter"
                                                           NullText="Select Counter.."
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                          TextFieldName="Name"
-                                                           />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12">
-                                                <div class="row justify-content-end">
-                                                    <div class="col-5 align-self-end">
-                                                        <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                        <DxButton Text="Discard" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            </DxFormLayoutItem>
+                                                          TextFieldName="Name" />
+                                            </DxFormLayoutItem> 
                                         </DxFormLayout>
-                                    </EditForm>
-                                </DxPopup>
-                            </div>
+                                    </EditFormTemplate>
+                                </MyGrid>
+                            </DxLoadingPanel>
+                           @*  <DxPopup @bind-Visible="@showPopUp" HeaderText="Set Display">
+                                <EditForm Model="@FormDisplays" Context="EditFormContext">
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                                            <div class="pop-warning">
+                                                <DxTextBox @bind-Text="@FormDisplays.Name" NullText="Name Display.."></DxTextBox>
+                                            </div>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem ColSpanMd="12" Caption="Counter">
+                                            <DxTagBox Data="@counteres" FilteringMode="@DataGridFilteringMode.Contains"
+                                                      @bind-Values="@selectedCounter"
+                                                      NullText="Select Counter.."
+                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                      TextFieldName="Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem ColSpanMd="12">
+                                            <div class="row justify-content-end">
+                                                <div class="col-5 align-self-end">
+                                                    <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                    <DxButton Text="Discard" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditForm>
+                            </DxPopup> *@
                         </div>
                     </div>
                 </div>
@@ -115,9 +130,5 @@
 }
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Queue Display" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }
