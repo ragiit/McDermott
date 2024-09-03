@@ -13,6 +13,7 @@ using Mapster;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 using FluentValidation.Results;
 using FluentValidation;
+using Path = System.IO.Path;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {

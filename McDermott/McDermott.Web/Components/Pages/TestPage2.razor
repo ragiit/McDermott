@@ -1,0 +1,79 @@
+﻿@page "/test2"
+@inject IHttpClientFactory HttpClientFactory
+
+
+@if (!isLoading)
+{
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="panelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+                                <MyGrid @ref="grid"
+                                        Data="Es"
+                                        KeyFieldName="id">
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="id" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="name" SortIndex="0" />
+
+                                    </Columns>
+                                </MyGrid>
+
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+@code
+{
+    public class VillageE
+    {
+        public long id { get; set; }
+        public string name { get; set; }
+    }
+
+    public class GraphQLResponse
+    {
+        public Data data { get; set; }
+    }
+
+    public class Data
+    {
+        public List<VillageE> villages { get; set; }
+    }
+
+    public List<VillageE> Es { get; set; }
+    private bool isLoading { get; set; }
+    private bool panelVisible { get; set; }
+    private IGrid grid { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+
+        var client2 = HttpClientFactory.CreateClient("GraphQLClient");
+        var query2 = @"{ villages { id name } }";
+        var response2 = await client2.PostAsJsonAsync("", new { query = query2 });
+
+        var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+
+        Es = responseData23.data.villages;
+
+        isLoading = false;
+    }
+}

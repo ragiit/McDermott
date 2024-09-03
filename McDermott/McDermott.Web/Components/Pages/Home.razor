@@ -18,7 +18,7 @@
 @inject HttpClient Http
 @inject IHttpClientFactory ClientFactory
 @inject GoogleMeetService GoogleMeetService
-@inject IHttpContextAccessor _httpContextAccessor
+@inject IHttpContextAccessor _httpContextAccessor 
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
@@ -246,7 +246,7 @@ else
 
         if (response.IsSuccessStatusCode)
         {
-            var fileName = response.Content.Headers.ContentDisposition?.FileNameStar ?? Path.GetFileName(filePath);
+            var fileName = response.Content.Headers.ContentDisposition?.FileNameStar ?? System.IO.Path.GetFileName(filePath);
             var fileBytes = await response.Content.ReadAsByteArrayAsync();
             var base64File = Convert.ToBase64String(fileBytes);
 

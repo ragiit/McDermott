@@ -2,7 +2,10 @@
 @using DevExpress.Data.Linq
 @using System.Linq.Expressions
 @using DevExtreme.AspNet.Data.ResponseModel
+@using System.Text.Json
 @inject ITestDataVillageService Taa
+@inject IHttpClientFactory HttpClientFactory
+@inject HttpClient Http
 
 @* <style>
     .grid-container {
@@ -97,6 +100,36 @@
                                     </div>
                                 </DxFormLayout>
                             </div>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="true"
+                                        Text="Fetching Data...">
+                            <MyGrid @ref="Grid"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    Data="Es" 
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    KeyFieldName="id"> 
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="id" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="name" SortIndex="0" /> 
+
+                                </Columns> 
+                            </MyGrid>
+                             
                         </DxLoadingPanel>
                     </div>
                 </div>
@@ -454,7 +487,7 @@
         await LoadData();
     }
 
-    private object Data { get; set; }
+    // private object Data { get; set; }
     private EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
 
     private async Task LoadData()
@@ -555,6 +588,33 @@
 
     private long? CityId { get; set; }
     private List<CityDto> Cities = [];
+    private List<Country> countries;
+
+
+    public class AA
+    {
+        public long id { get; set; }
+        public long name { get; set; }
+    }
+
+    public class VillageE
+    {
+        public long id { get; set; }
+        public string name { get; set; }
+    }
+
+    public class GraphQLResponse
+    {
+        public Data data { get; set; }
+    }
+
+    public class Data
+    {
+        public List<VillageE> villages { get; set; }
+    }
+
+    public List<VillageE> Es { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         PanelVisible = true;
@@ -563,7 +623,46 @@
 
         // await hehe();
 
-        // Cities = await Mediator.Send(new GetCityQuery());
+        Cities = await Mediator.Send(new GetCityQuery());
+
+        var client = HttpClientFactory.CreateClient("GraphQLClient");
+        var query = @"{ countries { id name } }";
+        var response = await client.PostAsJsonAsync("", new { query });
+        var responseData = await response.Content.ReadFromJsonAsync<dynamic>();
+
+        Console.WriteLine("========================");
+
+        if (responseData is not null)
+        {
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(responseData, new JsonSerializerOptions { WriteIndented = true }));
+        }
+
+        Console.WriteLine("========================");
+
+
+        var client2 = HttpClientFactory.CreateClient("GraphQLClient");
+        var query2 = @"{ villages { id name } }";
+        var response2 = await client2.PostAsJsonAsync("", new { query = query2 });
+
+        var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+
+        Es = responseData23.data.villages;
+
+        // var responseData2 = await response2.Content.ReadFromJsonAsync<dynamic>();
+
+
+        // dynamic data = JsonConvert.DeserializeObject<dynamic>(responseData2);
+
+        // var dynamicList = (IEnumerable<dynamic>)data.data.villages;
+         
+        // if (responseData2 is not null)
+        // {
+        //     Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(responseData2, new JsonSerializerOptions { WriteIndented = true }));
+        // }
+
+
+        // users = responseData.Data.Users;
+
         PanelVisible = false;
     }
 

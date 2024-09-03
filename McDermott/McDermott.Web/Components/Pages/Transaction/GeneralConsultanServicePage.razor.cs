@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
+using Path = System.IO.Path;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {

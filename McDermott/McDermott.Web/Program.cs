@@ -16,11 +16,18 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Antiforgery;
+using McDermott.Web;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddFiltering()
+    .AddSorting()
+    .AddProjections()
+    .AddAuthorization();
 builder.Services.AddAntiforgery();
 
 // Tambahkan layanan kompresi respons
@@ -52,6 +59,11 @@ builder.Services.AddOptions();
 //builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 // Add rate limiting processing strategy
 //builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+builder.Services.AddHttpClient("GraphQLClient", client =>
+{
+    var a = new Uri(builder.Configuration["GraphQLServer"]);
+    client.BaseAddress = a;
+});
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
@@ -195,6 +207,11 @@ else
 
 app.UseSerilogRequestLogging();
 app.UseRouting();
+app.UseAntiforgery();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGraphQL();
+});
 //app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
 //app.UseAuthorization();  // Gunakan otorisasi
@@ -213,7 +230,6 @@ app.UseStaticFiles(new StaticFileOptions
 //app.UseMiddleware<CsrfTokenCOokieMiddleware>();
 app.UseResponseCompression();
 app.UseWebOptimizer();
-app.UseAntiforgery();
 // Tambahkan middleware logging untuk rate limiting
 //app.UseMiddleware<RateLimitLoggingMiddleware>();
 app.MapHub<RealTimeHub>("/realTimeHub");
