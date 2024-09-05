@@ -22,6 +22,7 @@
                 PageSizeSelectorVisible = false;
                 FocusedRowEnabled = true;
                 TextWrapEnabled = false;
+                VirtualScrollingEnabled = true;
                 ValidationEnabled = true;
                 ColumnResizeMode = GridColumnResizeMode.NextColumn;
                 PagerVisibleNumericButtonCount = 10;

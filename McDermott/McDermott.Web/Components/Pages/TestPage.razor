@@ -81,7 +81,7 @@
                                     <div class="col-md-9">
                                         <DxFormLayoutItem>
                                             <DxPager PageCount="totalCount"
-                                                     ActivePageIndexChanged="OnPageIndexChanged"
+                                                     ActivePageIndexChanged="OnPageIndexChanged" 
                                                      VisibleNumericButtonCount="10"
                                                      SizeMode="SizeMode.Medium"
                                                      NavigationMode="PagerNavigationMode.Auto">
@@ -549,10 +549,13 @@
 
         var result = await Mediator.Send(query);
         totalCount = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+        ToastService.ShowInfo(totalCount.ToString());
         ActivePageIndex = pageIndex;
+        ToastService.ShowInfo("Active Page Index" + ActivePageIndex.ToString());
+        ToastService.ShowInfo("Page Index" + pageIndex.ToString());
         Villages = result.Data;
         PanelVisible = false;
-        await InvokeAsync(StateHasChanged);
+        // await InvokeAsync(StateHasChanged);
     }
 
     private async Task OnSearchBoxChanged(string x)
@@ -640,13 +643,13 @@
         Console.WriteLine("========================");
 
 
-        var client2 = HttpClientFactory.CreateClient("GraphQLClient");
-        var query2 = @"{ villages { id name } }";
-        var response2 = await client2.PostAsJsonAsync("", new { query = query2 });
+        // var client2 = HttpClientFactory.CreateClient("GraphQLClient");
+        // var query2 = @"{ villages { id name } }";
+        // var response2 = await client2.PostAsJsonAsync("", new { query = query2 });
 
-        var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+        // var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
 
-        Es = responseData23.data.villages;
+        // Es = responseData23.data.villages;
 
         // var responseData2 = await response2.Content.ReadFromJsonAsync<dynamic>();
 

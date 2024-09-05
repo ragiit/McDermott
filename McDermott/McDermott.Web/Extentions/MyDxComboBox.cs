@@ -4,7 +4,8 @@ namespace McDermott.Web.Extentions
 {
     public class MyDxComboBox<TData, TValue> : DxComboBox<TData, TValue>
     {
-        bool _initialParametersSet;
+        private bool _initialParametersSet;
+
         protected override Task SetParametersAsyncCore(ParameterView parameters)
         {
             if (!_initialParametersSet)
@@ -14,6 +15,8 @@ namespace McDermott.Web.Extentions
                 ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Auto;
                 FilteringMode = DataGridFilteringMode.Contains;
                 ListRenderMode = ListRenderMode.Virtual;
+                AllowUserInput = true;
+                ShowValidationIcon = true;
                 _initialParametersSet = true;
             }
             return base.SetParametersAsyncCore(parameters);

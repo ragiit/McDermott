@@ -21,13 +21,17 @@ using McDermott.Web;
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddFiltering()
     .AddSorting()
     .AddProjections()
-    .AddAuthorization();
+    .AddAuthorization()
+    .AddQueryableCursorPagingProvider()
+    .AddQueryableOffsetPagingProvider();
+
 builder.Services.AddAntiforgery();
 
 // Tambahkan layanan kompresi respons

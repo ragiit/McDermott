@@ -799,6 +799,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Cities_Name");
+
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Cities");
@@ -1392,6 +1395,9 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Districts_Name");
 
                     b.HasIndex("ProvinceId");
 
@@ -4460,6 +4466,9 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Provinces_Name");
 
                     b.ToTable("Provinces");
                 });

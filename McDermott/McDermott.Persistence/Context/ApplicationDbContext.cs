@@ -158,10 +158,20 @@ namespace McDermott.Persistence.Context
         #region OnModelCreating
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { // Definisikan indeks untuk kolom Name
+        {
+            // Definisikan indeks untuk kolom Name
             modelBuilder.Entity<Village>()
                 .HasIndex(v => v.Name)
                 .HasDatabaseName("IX_Villages_Name");
+            modelBuilder.Entity<City>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Cities_Name");
+            modelBuilder.Entity<Province>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Provinces_Name");
+            modelBuilder.Entity<District>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Districts_Name");
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

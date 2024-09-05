@@ -66,14 +66,79 @@ else
     {
         isLoading = true;
 
+
+        await A();
+
+        isLoading = false;
+
+        return;
+
+
         var client2 = HttpClientFactory.CreateClient("GraphQLClient");
-        var query2 = @"{ villages { id name } }";
+        var query2 = @"{ villages { id name  city { name } } }";
         var response2 = await client2.PostAsJsonAsync("", new { query = query2 });
 
-        var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+        // var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+        var responseData234 = await response2.Content.ReadFromJsonAsync<dynamic>();
 
-        Es = responseData23.data.villages;
+        // Es = responseData23.data.villages;
 
         isLoading = false;
     }
+
+    private async Task A()
+    {
+
+        var client2 = HttpClientFactory.CreateClient("GraphQLClient");
+        var query2 = @"{  villages(pageIndex: 1, pageSize: 100) {
+    id
+    name
+  } }";
+        var response2 = await client2.PostAsJsonAsync("", new { query = query2 });
+
+        // var responseData23 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+        var responseData234 = await response2.Content.ReadFromJsonAsync<GraphQLResponse>();
+
+        var aa = responseData234.data.villages;
+
+        // var client = HttpClientFactory.CreateClient("GraphQLClient");
+
+        // Query GraphQL dengan parameter
+        // var query = @"
+        //         query Villages($pageIndex: Int!, $pageSize: Int!) {
+        //           villages(pageIndex: $pageIndex, pageSize: $pageSize) {
+        //             id
+        //             name
+        //             city {
+        //               name
+        //             }
+        //           }
+        //         }";
+
+        // Variabel untuk query
+        // var variables = new                                                                                                                                                                         
+        // {
+        //     pageIndex = 0,   Halaman pertama
+        //     pageSize = 20    Ukuran halaman
+        // };
+
+        // Membuat payload untuk POST
+        // var requestPayload = new
+        // {
+        //     query = query,
+        //     variables = variables
+        // };
+
+        // Mengirimkan permintaan GraphQL
+        // var response = await client.PostAsJsonAsync("", requestPayload);
+
+        // Membaca respons
+        // var responseData = await response.Content.ReadFromJsonAsync<dynamic>();
+
+        // Mengakses data dari respons
+        // var villages = responseData?.data?.villages;
+
+        // Proses data sesuai kebutuhan
+    }
+
 }
