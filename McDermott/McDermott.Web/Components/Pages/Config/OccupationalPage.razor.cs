@@ -135,16 +135,40 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            Occupationals = await Mediator.Send(new GetOccupationalQuery());
-            Occupationals.ForEach(x =>
-            {
-                if (string.IsNullOrWhiteSpace(x.Description))
-                    x.Description = "-";
-            });
+            var result = await MyQuery.GetOccupationals(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            Occupationals = result.Item1;
+            totalCount = result.Item2;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 

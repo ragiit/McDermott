@@ -27,6 +27,7 @@
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         EditModelSaving="OnSave"
                                         DataItemDeleting="OnDelete"
+                                        SearchTextChanged="OnSearchBoxChanged"
                                         KeyFieldName="Id">
 
                                     <ToolbarTemplate>
@@ -66,18 +67,75 @@
                                                 <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Code" />
                                                 <ValidationMessage For="@(()=> a.Code)"   />
                                             </DxFormLayoutItem>
+
+
+                                            @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
+                                        <MyDxComboBox Data="@Countries"
+                                        NullText="Select Country..."
+                                        @bind-Value="@a.CountryId"
+                                        TextFieldName="Name"
+                                        ValueFieldName="Id">
+                                        </MyDxComboBox>
+                                        <ValidationMessage For="@(()=>a.CountryId)" />
+                                        </DxFormLayoutItem> *@
+
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Countries"
                                                               NullText="Select Country..."
+                                                              @ref="refCountryComboBox"
                                                               @bind-Value="@a.CountryId"
                                                               TextFieldName="Name"
-                                                              ValueFieldName="Id">
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputCountryChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchCountryndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchCountry"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchCountryIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CountryId)" />
                                             </DxFormLayoutItem>
+
                                         </DxFormLayout>
                                     </EditFormTemplate>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
                                 </MyGrid>
+
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
                             </DxLoadingPanel>
                         </div>
                     </div>

@@ -2,6 +2,184 @@
 {
     public partial class VillagePage
     {
+        #region ComboboxCity
+
+        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
+        private int CityComboBoxIndex { get; set; } = 0;
+        private int totalCountCity = 0;
+
+        private async Task OnSearchCity()
+        {
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task OnSearchCityIndexIncrement()
+        {
+            if (CityComboBoxIndex < (totalCountCity - 1))
+            {
+                CityComboBoxIndex++;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCityndexDecrement()
+        {
+            if (CityComboBoxIndex > 0)
+            {
+                CityComboBoxIndex--;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCityChanged(string e)
+        {
+            CityComboBoxIndex = 0;
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, refCityComboBox?.Text ?? "");
+            Cities = result.Item1;
+            totalCountCity = result.Item2;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCity
+
+        #region ComboboxDistrict
+
+        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
+        private int DistrictComboBoxIndex { get; set; } = 0;
+        private int totalCountDistrict = 0;
+
+        private async Task OnSearchDistrict()
+        {
+            await LoadDataDistrict(0, 10);
+        }
+
+        private async Task OnSearchDistrictIndexIncrement()
+        {
+            if (DistrictComboBoxIndex < (totalCountDistrict - 1))
+            {
+                DistrictComboBoxIndex++;
+                await LoadDataDistrict(DistrictComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDistrictndexDecrement()
+        {
+            if (DistrictComboBoxIndex > 0)
+            {
+                DistrictComboBoxIndex--;
+                await LoadDataDistrict(DistrictComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDistrictChanged(string e)
+        {
+            DistrictComboBoxIndex = 0;
+            await LoadDataDistrict(0, 10);
+        }
+
+        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetDistricts(HttpClientFactory, pageIndex, pageSize, refDistrictComboBox?.Text ?? "");
+            Districts = result.Item1;
+            totalCountDistrict = result.Item2;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxDistrict
+
+        #region ComboboxProvince
+
+        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+        private int ProvinceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvince = 0;
+
+        private async Task OnSearchProvince()
+        {
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task OnSearchProvinceIndexIncrement()
+        {
+            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            {
+                ProvinceComboBoxIndex++;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvincendexDecrement()
+        {
+            if (ProvinceComboBoxIndex > 0)
+            {
+                ProvinceComboBoxIndex--;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceChanged(string e)
+        {
+            ProvinceComboBoxIndex = 0;
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+            Provinces = result.Item1;
+            totalCountProvince = result.Item2;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxProvince
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetVillages(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            Villages = result.Item1;
+            totalCount = result.Item2;
+            activePageIndex = pageIndex;
+            PanelVisible = false;
+        }
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -15,37 +193,37 @@
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                    StateHasChanged();
-                }
-                catch { }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //        StateHasChanged();
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
+            //    await LoadData();
+            //    StateHasChanged();
 
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                        StateHasChanged();
-                    }
-                }
-                catch { }
+            //    try
+            //    {
+            //        if (Grid is not null)
+            //        {
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(1);
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(2);
+            //            StateHasChanged();
+            //        }
+            //    }
+            //    catch { }
 
-                Countrys = await Mediator.Send(new GetCountryQuery());
-                Provinces = await Mediator.Send(new GetProvinceQuery());
-                Districts = await Mediator.Send(new GetDistrictQuery());
-                Cities = await Mediator.Send(new GetCityQuery());
-                StateHasChanged();
-            }
+            //    Countrys = await Mediator.Send(new GetCountryQuery());
+            //    Provinces = await Mediator.Send(new GetProvinceQuery());
+            //    Districts = await Mediator.Send(new GetDistrictQuery());
+            //    Cities = await Mediator.Send(new GetCityQuery());
+            //    StateHasChanged();
+            //}
         }
 
         private async Task GetUserInfo()
@@ -79,13 +257,11 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-        }
-
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            Data = await Mediator.Send(new GetVillageQuery());
-            SelectedDataItems = [];
+            await GetUserInfo();
+            await LoadData();
+            await LoadDataCity();
+            await LoadDataDistrict();
+            await LoadDataProvince();
             PanelVisible = false;
         }
 

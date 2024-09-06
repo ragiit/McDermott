@@ -382,10 +382,17 @@ else
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        await LoadData(0, pageSize);
-        await LoadDataProvinces(0, 10);
-        await LoadDataCitys(0, 10);
-        await LoadDataDistricts(0, 10);
+        try
+        {
+            await LoadData(0, pageSize);
+            await LoadDataProvinces(0, 10);
+            await LoadDataCitys(0, 10);
+            await LoadDataDistricts(0, 10);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowInfo(ex.Message);
+        }
         isLoading = false;
     }
 

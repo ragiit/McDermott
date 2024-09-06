@@ -51,7 +51,7 @@ namespace McDermott.Persistence.Extensions
                         errorNumbersToAdd: null  // Nomor error SQL yang akan ditambahkan ke daftar retry
                     );
 
-                    sqlOptions.CommandTimeout(60);  // Timeout untuk eksekusi perintah
+                    sqlOptions.CommandTimeout(300);  // Timeout untuk eksekusi perintah
                     sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                     sqlOptions.MaxBatchSize(100);  // Batas maksimal batch dalam satu transaksi
                 });

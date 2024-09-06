@@ -23,12 +23,6 @@
                     StateHasChanged();
                 }
                 catch { }
-
-                await LoadData();
-                StateHasChanged();
-
-                Countries = await Mediator.Send(new GetCountryQuery());
-                StateHasChanged();
             }
         }
 
@@ -46,10 +40,94 @@
 
         #endregion UserLoginAndAccessRole
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            Provinces = result.Item1;
+            totalCount = result.Item2;
+            activePageIndex = pageIndex;
+            PanelVisible = false;
+        }
+
+        #region ComboboxCountry
+
+        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
+        private int CountryComboBoxIndex { get; set; } = 0;
+        private int totalCountCountry = 0;
+
+        private async Task OnSearchCountry()
+        {
+            await LoadDataCountries(0, 10);
+        }
+
+        private async Task OnSearchCountryIndexIncrement()
+        {
+            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            {
+                CountryComboBoxIndex++;
+                await LoadDataCountries(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCountryndexDecrement()
+        {
+            if (CountryComboBoxIndex > 0)
+            {
+                CountryComboBoxIndex--;
+                await LoadDataCountries(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCountryChanged(string e)
+        {
+            CountryComboBoxIndex = 0;
+            await LoadDataCountries(0, 10);
+        }
+
+        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetCountries(HttpClientFactory, pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+            Countries = result.Item1;
+            totalCountCountry = result.Item2;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCountry
+
         public IGrid Grid { get; set; }
 
-        private List<CountryDto> Countries = new();
-        private List<ProvinceDto> Provinces = new();
+        private List<CountryDto> Countries { get; set; } = [];
+        private List<ProvinceDto> Provinces { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int Value { get; set; } = 0;
         private int FocusedRowVisibleIndex { get; set; }
@@ -81,6 +159,9 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await LoadData();
+            await LoadDataCountries();
+            PanelVisible = false;
         }
 
         private async Task ImportFile()
@@ -174,13 +255,13 @@
             PanelVisible = false;
         }
 
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            PanelVisible = false;
-        }
+        //private async Task LoadData()
+        //{
+        //    PanelVisible = true;
+        //    SelectedDataItems = [];
+        //    Provinces = await Mediator.Send(new GetProvinceQuery());
+        //    PanelVisible = false;
+        //}
 
         private async Task NewItem_Click()
         {

@@ -621,11 +621,11 @@ namespace McDermott.Persistence.Context
             {
                 Log.Error(
                  "\n\n" +
-                 "==================== START SAVE ASYNC ERROR ====================" + "\n" +
+                 "==================== SAVE ASYNC ERROR ====================" + "\n" +
                  "Message =====> An error occurred while saving data: " + ex.Message + "\n" +
                  "Inner Message =====> An error occurred while saving data: " + ex.InnerException?.Message + "\n" +
                  "Stack Trace =====> " + ex.StackTrace?.Trim() + "\n" +
-                 "==================== END SAVE ASYNC ERROR ====================" + "\n"
+                 "==================== SAVE ASYNC ERROR ====================" + "\n"
                  );
                 throw;
             }
