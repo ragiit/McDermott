@@ -1787,6 +1787,13 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsAppoimentPendingAlert = true;
         }
 
+        private async Task OnPrintDocumentMedical()
+        {
+
+            var IdEncrypt = SecureHelper.EncryptIdToBase64(GeneralConsultanService.Id);
+            NavigationManager.NavigateTo($"/transaction/print-document-medical/{IdEncrypt}");
+        }
+
         private bool IsHistoricalRecordPatientDetailGC { get; set; } = false;
         private bool IsHistoricalRecordPatientDetailAccident { get; set; } = false;
         private GeneralConsultanServiceDto SelectedDetailHistorical { get; set; } = new();

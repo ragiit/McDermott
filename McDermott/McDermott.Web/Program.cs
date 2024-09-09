@@ -15,6 +15,7 @@ using Serilog;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.CookiePolicy;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -97,7 +98,7 @@ builder.Services.AddResponseCompression(options =>
         new[] { "application/javascript", "text/css", "application/json" });
 });
 
-builder.Services.AddServerSideBlazor();
+//builder.Services.AddServerSideBlazor();
 builder.Services.AddControllers(); // Menambahkan layanan Controllers
 builder.Services.AddControllersWithViews();
 // Configure HttpClient with BaseAddress
@@ -122,6 +123,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery();
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
+    options.HttpOnly = HttpOnlyPolicy.Always;
     options.Secure = CookieSecurePolicy.Always;
 });
 

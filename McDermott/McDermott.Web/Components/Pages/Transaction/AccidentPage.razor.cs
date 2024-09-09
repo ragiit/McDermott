@@ -5,8 +5,11 @@ using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
-using Newtonsoft.Json;
+using System.Text.Json;
 using McDermott.Persistence.Migrations;
+using Microsoft.AspNetCore.Components.Web;
+using Blazor.Extensions.Canvas.Canvas2D;
+using Blazor.Extensions;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -93,14 +96,112 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             isAccident = true;
         }
+        #region Test
 
-        public class Marker
+        private BECanvasComponent canvasReference;
+        private Canvas2DContext ctx;
+        private List<Point> operationPoints = new List<Point>();
+        private int pointCounter = 1; // Untuk memberi nomor urut pada titik
+        private Point? selectedPoint = null;
+
+        public class Point
         {
             public int Number { get; set; }
-            public int X { get; set; }
-            public int Y { get; set; }
+            public double X { get; set; }
+            public double Y { get; set; }
+        }
+        private async Task OnPopupShown2()
+        {
+            await LoadImageAsync("image/aciddent.png");
+            await LoadPoints(); // Memuat titik-titik yang sudah tersimpan
+            await DrawPointsAsync();
         }
 
+        private async Task LoadImageAsync(string ImagePath)
+        {
+            await JsRuntime.InvokeVoidAsync("loadImageToCanvas", canvasReference, ImagePath);
+        }
+
+        private async Task HandleClick(MouseEventArgs e)
+        {
+            if (selectedPoint != null)
+            {
+                selectedPoint.X = e.ClientX;
+                selectedPoint.Y = e.ClientY;
+                selectedPoint = null;
+            }
+            else
+            {
+                var point = new Point
+                {
+                    X = e.ClientX,
+                    Y = e.ClientY,
+                    Number = pointCounter++
+                };
+
+                operationPoints.Add(point);
+            }
+
+            await DrawPointsAsync();
+        }
+
+        private async Task DrawPointsAsync()
+        {
+            await ctx.ClearRectAsync(0, 0, 500, 700); // Bersihkan canvas sebelum menggambar
+            await LoadImageAsync("images/aciddent.png"); // Load ulang gambar
+
+            foreach (var point in operationPoints)
+            {
+                await ctx.BeginPathAsync();
+                await ctx.ArcAsync(point.X, point.Y, 5, 0, 2 * Math.PI);
+                await ctx.FillAsync();
+                await ctx.FillTextAsync(point.Number.ToString(), point.X + 10, point.Y);
+            }
+        }
+
+        private async Task SavePoints()
+        {
+            var pointData = operationPoints.Select(p => new { p.X, p.Y, p.Number }).ToList();
+            var jsonMarker = System.Text.Json.JsonSerializer.Serialize(pointData);
+
+            // Simpan data JSON marker ke dalam GeneralConsultanService
+            GeneralConsultanService.Markers = jsonMarker;
+
+            // Kirim request menggunakan Mediator untuk memperbarui GeneralConsultanService
+            var updateRequest = new UpdateGeneralConsultanServiceRequest(GeneralConsultanService);
+            await Mediator.Send(updateRequest);
+        }
+
+        private async Task LoadPoints()
+        {
+            var dto = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x=>x.Id == GeneralConsultanService.Id))).FirstOrDefault(); // Gantilah ID sesuai kebutuhan
+
+            if (dto != null)
+            {
+                operationPoints = System.Text.Json.JsonSerializer.Deserialize<List<Point>>(dto.Markers);
+            }
+            await DrawPointsAsync();
+        }
+
+        private void EditPoint(Point point)
+        {
+            selectedPoint = point;
+        }
+
+        private void DeletePoint(Point point)
+        {
+            operationPoints.Remove(point);
+            StateHasChanged(); // Render ulang UI
+        }
+
+        private async Task ResetPoints()
+        {
+            operationPoints.Clear();
+            pointCounter = 1;
+            await DrawPointsAsync();
+        }
+
+        #endregion
         private async Task OnPopupShown()
         {
             IsLoading = true;

@@ -44,32 +44,32 @@
                 @text
                 </div> *@
 
-                @*   <form>
-                <div class="input-group mb-3">
-                <input @bind="User.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
-                <div class="input-group-append">
-                <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
-                </div>
-                </div>
+                <form method="POST" action="/login">
+                    <div class="input-group mb-3">
+                        <input @bind="LoginForm.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
 
-                </div>
-                <div class="input-group mb-3">
-                <input @bind="User.Password" type="password" class="form-control" placeholder="Password">
-                <div class="input-group-append">
-                <div class="input-group-text">
-                <span class="fas fa-lock"></span>
-                </div>
-                </div>
-                </div>
-                <button type="button" @onclick="OnLogin" class="btn btn-block btn-primary">
-                Sign in
-                </button>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input @bind="LoginForm.Password" type="password" class="form-control" placeholder="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-primary">
+                        Sign in
+                    </button>
 
-                </form> *@
+                </form>
 
-                <EditForm Model="@LoginForm"  Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
-                          OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser"  >
+                <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
+                          OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">
                     <DataAnnotationsValidator />
                     <AntiforgeryToken />
                     <DxFormLayout CssClass="col-md">
