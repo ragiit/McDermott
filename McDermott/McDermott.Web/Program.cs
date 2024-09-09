@@ -17,6 +17,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Antiforgery;
 using McDermott.Web;
+using Microsoft.AspNetCore.CookiePolicy;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
