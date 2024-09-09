@@ -30,12 +30,12 @@
 
                 PagerNavigationMode = PagerNavigationMode.InputBox;
                 EditorRenderMode = GridEditorRenderMode.Detached;
-                PageSize = 100;
+                PageSize = 10;
                 FilterMenuButtonDisplayMode = GridFilterMenuButtonDisplayMode.Always;
                 CustomizeDataRowEditor = @GridExtention.Grid_CustomizeDataRowEditor;
                 AllowSelectRowByClick = true;
                 PagerPosition = GridPagerPosition.Bottom;
-                PageSizeSelectorVisible = false;
+                PageSizeSelectorVisible = true;
                 PageSizeSelectorItems = ([10, 20, 50, 100]);
                 //PageSizeSelectorAllRowsItemVisible = true;
                 PagerSwitchToInputBoxButtonCount = 10;

@@ -152,6 +152,75 @@ namespace McDermott.Web
 
             return GetPagedData(pagedResult, pageIndex, pageSize);
         }
+
+        public Task<ItemConnection<Menu>> Menus(
+            [Service] ApplicationDbContext context,
+            int pageIndex = 1,
+            int pageSize = 10,
+            string searchTerm = "",
+            long? parentId = null)
+        {
+            var query = context.Menus
+                .AsNoTracking()
+                .Where(v =>
+                    (parentId == null || v.ParentId == parentId) &&  // Fix for parentId comparison
+                    (string.IsNullOrEmpty(searchTerm) ||
+                    EF.Functions.Like(v.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Parent.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Url, $"%{searchTerm}%")));
+
+            var pagedResult = query
+                .OrderBy(x => x.Name)
+                .Include(x => x.Parent);
+
+            return GetPagedData(pagedResult, pageIndex, pageSize);
+        }
+
+        public Task<ItemConnection<Group>> Groups(
+            [Service] ApplicationDbContext context,
+            int pageIndex = 1,
+            int pageSize = 10,
+            string searchTerm = "")
+        {
+            var query = context.Groups
+                        .AsNoTracking()
+                        .Where(v => string.IsNullOrEmpty(searchTerm) ||
+                                    EF.Functions.Like(v.Name, $"%{searchTerm}%") ||
+                                    EF.Functions.Like(v.Id.ToString(), $"%{searchTerm}%"));
+
+            var pagedResult = query
+                .OrderBy(x => x.Name);
+
+            return GetPagedData(pagedResult, pageIndex, pageSize);
+        }
+
+        public Task<ItemConnection<GroupMenu>> GroupMenus(
+           [Service] ApplicationDbContext context,
+           int pageIndex = 1,
+           int pageSize = 10,
+           string searchTerm = "",
+           long? id = null,
+           long? groupId = null,
+           long? menuId = null)
+        {
+            var query = context.GroupMenus
+                        .AsNoTracking()
+                        .Where(v =>
+                            (string.IsNullOrEmpty(searchTerm) ||
+                             EF.Functions.Like(v.Menu.Name, $"%{searchTerm}%") ||
+                             EF.Functions.Like(v.Id.ToString(), $"%{searchTerm}%")) &&
+                            (!id.HasValue || v.Id == id.Value) &&
+                            (!groupId.HasValue || v.GroupId == groupId.Value) &&
+                            (!menuId.HasValue || v.MenuId == menuId.Value));
+
+            var pagedResult = query
+                .OrderBy(x => x.Menu.Name)
+                .Include(x => x.Menu)
+                .Include(x => x.Group)
+                .Include(x => x.Menu.Parent);
+
+            return GetPagedData(pagedResult, pageIndex, pageSize);
+        }
     }
 
     public class GraphQLResponse<T>
@@ -177,13 +246,13 @@ namespace McDermott.Web
 
     public static class MyQuery
     {
-        public static async Task<(dynamic, int)> LoadData(this System.Net.Http.IHttpClientFactory HttpClientFactory, string query, int pageIndex, int pageSize, string searchTerm)
+        public static async Task<(dynamic, int)> LoadData(this System.Net.Http.IHttpClientFactory HttpClientFactory, string query, int pageIndex, int pageSize, string searchTerm, object? requestPayload = null)
         {
             try
             {
                 var client = HttpClientFactory.CreateClient("GraphQLClient");
 
-                var requestPayload = new
+                requestPayload = requestPayload ?? new
                 {
                     query,
                     variables = new
@@ -362,6 +431,126 @@ namespace McDermott.Web
 
             return (JsonConvert.DeserializeObject<List<VillageDto>>(JsonConvert.SerializeObject(result.Item1.data.villages.items)),
                     JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result.Item1)).data.villages.activePageIndexCount);
+        }
+
+        public static async Task<(List<MenuDto>, int)> GetMenus(this System.Net.Http.IHttpClientFactory HttpClientFactory, int pageIndex, int pageSize, string? search = "")
+        {
+            var query = @"
+                query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!) {
+                    menus(pageIndex: $pageIndex, pageSize: $pageSize, searchTerm: $searchTerm) {
+                        activePageIndexCount
+                       items {
+                          id
+                          name
+                          sequence
+                          url
+                          icon
+                          parentId
+                          parent {
+                            id
+                            name
+                          }
+                        }
+                    }
+                }";
+
+            var result = await LoadData(HttpClientFactory, query, pageIndex, pageSize, search ?? "");
+
+            return (JsonConvert.DeserializeObject<List<MenuDto>>(JsonConvert.SerializeObject(result.Item1.data.menus.items)),
+                    JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result.Item1)).data.menus.activePageIndexCount);
+        }
+
+        public static async Task<(List<GroupDto>, int)> GetGroups(this System.Net.Http.IHttpClientFactory HttpClientFactory, int pageIndex, int pageSize, string? search = "")
+        {
+            var query = @"
+                query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!) {
+                    groups(pageIndex: $pageIndex, pageSize: $pageSize, searchTerm: $searchTerm) {
+                        activePageIndexCount
+                       items {
+                          id
+                          name
+                          isDefaultData
+                        }
+                    }
+                }";
+
+            var result = await LoadData(HttpClientFactory, query, pageIndex, pageSize, search ?? "");
+
+            return (JsonConvert.DeserializeObject<List<GroupDto>>(JsonConvert.SerializeObject(result.Item1.data.groups.items)),
+                    JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result.Item1)).data.groups.activePageIndexCount);
+        }
+
+        public static async Task<(List<GroupMenuDto>, int)> GetGroupMenus(this System.Net.Http.IHttpClientFactory HttpClientFactory,
+             int pageIndex,
+             int pageSize,
+             string? search = "",
+             long? id = null,
+             long? menuId = null,
+             long? groupId = null)
+        {
+            var query = @"
+        query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!, $id: Long, $menuId: Long, $groupId: Long) {
+            groupMenus(
+                pageIndex: $pageIndex,
+                pageSize: $pageSize,
+                searchTerm: $searchTerm,
+                id: $id,
+                groupId: $groupId,
+                menuId: $menuId
+            ) {
+                activePageIndexCount
+                items {
+                    id
+                    isCreate
+                    isDefaultData
+                    isDelete
+                    isImport
+                    isRead
+                    isUpdate
+                    groupId
+                    group {
+                        id
+                        isDefaultData
+                        name
+                    }
+                    menuId
+                    menu {
+                        id
+                        name
+                        isDefaultData
+                        parentId
+                        parent{
+                            id
+                            name
+                        }
+                        sequence
+                        icon
+                        url
+                    }
+                }
+            }
+        }";
+
+            var client = HttpClientFactory.CreateClient("GraphQLClient");
+
+            var requestPayload = new
+            {
+                query,
+                variables = new
+                {
+                    pageIndex = pageIndex + 1,
+                    pageSize,
+                    searchTerm = search,
+                    id,
+                    menuId,
+                    groupId
+                }
+            };
+
+            var result = await LoadData(HttpClientFactory, query, pageIndex, pageSize, search ?? "", requestPayload);
+
+            return (JsonConvert.DeserializeObject<List<GroupMenuDto>>(JsonConvert.SerializeObject(result.Item1.data.groupMenus.items)),
+                    JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result.Item1)).data.groupMenus.activePageIndexCount);
         }
     }
 }

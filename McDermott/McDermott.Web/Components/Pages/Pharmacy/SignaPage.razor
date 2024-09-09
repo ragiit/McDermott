@@ -65,9 +65,9 @@
                                             KeyboardNavigationEnabled="true">
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Signas.Count > 0" />
                                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
 
                                             </DxToolbar>

@@ -173,6 +173,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
+            var a = await Mediator.Send(new GetVillageQuery());
             var result = await MyQuery.GetVillages(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
             Villages = result.Item1;
             totalCount = result.Item2;

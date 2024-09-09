@@ -64,10 +64,10 @@
                                                     <Items>
                                                         <DxToolbarItem IconCssClass="fa-solid fa-ellipsis-vertical fa-lg" CssClass="position-absolute top-50 start-100 translate-middle">
                                                             <Items>
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="@(() => EditItem_Click(i.Id))" IconCssClass="fa-solid fa-pen-to-square" />
+                                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="@(() => EditItem_Click(i.Id))" IconCssClass="fa-solid fa-pen-to-square" />
                                                                 @if (i.Status == "open")
                                                                 {
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="@(() => OnDelete(i.Id))" IconCssClass="fa-solid fa-trash" />
                                                                 }
                                                                 else
                                                                 {

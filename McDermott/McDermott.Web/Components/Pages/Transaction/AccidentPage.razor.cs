@@ -6,7 +6,6 @@ using static McDermott.Application.Features.Commands.Transaction.AccidentCommand
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 using Newtonsoft.Json;
-using McDermott.Persistence.Migrations;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -161,8 +160,6 @@ namespace McDermott.Web.Components.Pages.Transaction
                 IsLoading = false;
             }
         }
-
-
 
         private List<IBrowserFile> BrowserFiles = [];
 

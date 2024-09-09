@@ -93,9 +93,9 @@
                                             KeyboardNavigationEnabled="true">
                                         <ToolbarTemplate>
                                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
+                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
                                             </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
@@ -216,9 +216,9 @@
                                 KeyboardNavigationEnabled="true">
                             <ToolbarTemplate>
                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
+                                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
 
                                 </DxToolbar>
                             </ToolbarTemplate>

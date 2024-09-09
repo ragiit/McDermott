@@ -65,9 +65,9 @@
 
                                                             <ToolbarTemplate>
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                    @* <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!ShowForm" /> *@
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Detail" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !showForm" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && IsDeletedPharmacy" />
+                                                    @* <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="!ShowForm" /> *@
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Detail" Click="()=>EditItemPharmacy_Click(null)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && !showForm" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Pharmacies.Count > 0 && IsDeletedPharmacy" />
                                                                     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" Enabled="!showForm" />
                                                                     <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" Enabled="!showForm" />
                                                                     <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export" Enabled="!showForm">
@@ -375,9 +375,9 @@
                                                                                     KeyboardNavigationEnabled="true">
                                                                                 <ToolbarTemplate>
                                                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemPrescriptionLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
-                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="() => EditItemPrescriptionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
-                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 &&  (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemPrescriptionLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="() => EditItemPrescriptionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemPrescriptionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsPrescriptionLines.Count > 0 && Prescriptions.Count > 0 &&  (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
                                                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                                         <DxToolbarItem Visible="@(NameUser.IsPharmacy == true &&(Pharmacy.Id != 0 || Pharmacy.Status == EnumStatusPharmacy.Received ||Pharmacy.Status == EnumStatusPharmacy.Processed||Pharmacy.Status == EnumStatusPharmacy.Done))" BeginGroup="true" Text="Print"  IconCssClass="fa-solid fa-print" >
                                                                                         <Items>
@@ -571,9 +571,9 @@
                                                                                     KeyboardNavigationEnabled="true">
                                                                                 <ToolbarTemplate>
                                                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click=" NewItemConcoction_Click" IconCssClass="fa-solid fa-plus" Enabled="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
-                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemPrescriptionConcoction_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0" />
-                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0  && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click=" NewItemConcoction_Click" IconCssClass="fa-solid fa-plus" Enabled="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="()=>EditItemPrescriptionConcoction_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0" />
+                                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemPrescriptionConcoction_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoction.Count > 0 && Concoctions.Count > 0  && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
                                                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshPrescriptionConcoction_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                                         <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButtonConcoction_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                                     </DxToolbar>
@@ -862,9 +862,9 @@ else
                             KeyboardNavigationEnabled="true">
                         <ToolbarTemplate>
                             <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemConcoctionLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemConcoctionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0 && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemConcoctionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0  && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemConcoctionLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="()=>EditItemConcoctionLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0 && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemConcoctionLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsConcoctionLines.Count > 0 && ConcoctionLines.Count > 0  && (Pharmacy.Id == 0 || Pharmacy.Status == EnumStatusPharmacy.Draft)" />
                                 <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshConcoctionLines_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                 <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButtonConcoctionLine_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                             </DxToolbar>
@@ -1040,9 +1040,9 @@ else
                 KeyboardNavigationEnabled="true">
             <ToolbarTemplate>
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && showForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemStockOut_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="()=>EditItemStockOut_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemStockOut_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutPrescriptions.Count > 0 && showForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>                
@@ -1164,9 +1164,9 @@ else
                 KeyboardNavigationEnabled="true">
             <ToolbarTemplate>
                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemStockOutLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="()=>EditItemStockOutLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
-                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && showForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemStockOutLines_Click" IconCssClass="fa-solid fa-plus" Enabled="@(NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received)" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="()=>EditItemStockOutLines_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
+                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemStockOutLines_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsStockOut.Count > 0 && StockOutLines.Count > 0 && showForm && NameUser.IsPharmacy == true && Pharmacy.Status == EnumStatusPharmacy.Received" />
                 </DxToolbar>
             </ToolbarTemplate>
             <Columns>

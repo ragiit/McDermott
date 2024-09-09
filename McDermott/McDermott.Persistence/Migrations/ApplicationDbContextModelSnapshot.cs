@@ -2649,6 +2649,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -2674,32 +2677,35 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<bool?>("Create")
-                        .HasColumnType("bit");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool?>("Delete")
-                        .HasColumnType("bit");
-
                     b.Property<long>("GroupId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool?>("Import")
+                    b.Property<bool?>("IsCreate")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDelete")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsImport")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsUpdate")
                         .HasColumnType("bit");
 
                     b.Property<long>("MenuId")
                         .HasColumnType("bigint");
-
-                    b.Property<bool?>("Read")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Update")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -3822,19 +3828,19 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Html")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Icon")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("ParentMenu")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("ParentId")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("Sequence")
                         .HasColumnType("bigint");
@@ -3849,6 +3855,11 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Menus_Name");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Menus");
                 });
@@ -5545,6 +5556,12 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("IdCardZip")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDefaultData")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDoctor")
                         .HasColumnType("bit");
 
@@ -6819,6 +6836,16 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Signa");
 
                     b.Navigation("UnitOfDosage");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.Menu", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.Menu", "Parent")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>

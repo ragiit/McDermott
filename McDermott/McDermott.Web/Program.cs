@@ -17,6 +17,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Antiforgery;
 using McDermott.Web;
+using Microsoft.AspNetCore.Identity;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -250,6 +251,11 @@ using (var scope = app.Services.CreateScope())
         Log.Information("=== Starting Migrate the database. ===");
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
+        Console.WriteLine("=== Success Migrated ===");
+
+        Console.WriteLine("=== Starting Seeding the data. ===");
+        await new SeedData().Initialize(services);
+        Console.WriteLine("=== Success Seeding ===");
     }
     catch (Exception ex)
     {
@@ -363,5 +369,145 @@ internal class CsrfTokenCOokieMiddleware(IAntiforgery antiforgery, RequestDelega
             context.Response.Cookies.Append("CSRF-TOKEN", token.RequestToken, new Microsoft.AspNetCore.Http.CookieOptions { HttpOnly = false });
         }
         await _next(context);
+    }
+}
+
+public class SeedData
+{
+    public async Task Initialize(IServiceProvider serviceProvider)
+    {
+        using var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), null);
+        // Periksa apakah ada pengguna admin
+        if (!context.Users.Any())
+        {
+            if (!await context.Groups.AnyAsync(x => x.Name == "Admin"))
+            {
+                await context.Groups.AddAsync(new Group
+                {
+                    Name = "Admin",
+                    IsDefaultData = true
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            long groupId = 0;
+            long userMenuId = 0;
+            long groupGroupId = 0;
+            long groupMenuId = 0;
+
+            if (!await context.Menus.AnyAsync(x => x.Name == "Configuration"))
+            {
+                var config = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Configuration",
+                    Sequence = 10,
+                    Icon = "fa-solid fa-gear",
+                    IsDefaultData = true
+                });
+
+                await context.SaveChangesAsync();
+
+                groupId = (await context.Groups.FirstOrDefaultAsync(x => x.Name == "Admin")!)!.Id;
+
+                var user = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Users",
+                    ParentId = config.Entity.Id,
+                    Sequence = 1,
+                    Url = "configuration/users",
+                    IsDefaultData = true
+                });
+
+                var group = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Groups",
+                    ParentId = config.Entity.Id,
+                    Sequence = 2,
+                    Url = "configuration/groups",
+                    IsDefaultData = true
+                });
+
+                var menu = await context.Menus.AddAsync(new Menu
+                {
+                    Name = "Menus",
+                    ParentId = config.Entity.Id,
+                    Sequence = 3,
+                    Url = "configuration/menus",
+                    IsDefaultData = true
+                });
+
+                await context.SaveChangesAsync();
+
+                userMenuId = user.Entity.Id;
+                groupGroupId = group.Entity.Id;
+                groupMenuId = menu.Entity.Id;
+            }
+
+            if (userMenuId != 0 && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == userMenuId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = userMenuId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            if (groupGroupId != 0 && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupGroupId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = groupGroupId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            if (groupMenuId != 0 && !await context.GroupMenus.AnyAsync(x => x.GroupId == groupId && x.MenuId == groupMenuId))
+            {
+                await context.GroupMenus.AddAsync(new GroupMenu
+                {
+                    GroupId = groupId,
+                    MenuId = groupMenuId,
+                    IsRead = true,
+                    IsCreate = true,
+                    IsUpdate = true,
+                    IsDelete = true,
+                    IsImport = true,
+                    IsDefaultData = true
+                });
+            }
+
+            await context.SaveChangesAsync();
+
+            if (groupId == 0)
+                groupId = (await context.Groups.FirstOrDefaultAsync(x => x.Name == "Admin")!)!.Id;
+
+            var adminUser = new User
+            {
+                Name = "Administrator",
+                NoId = "3671052024",
+                UserName = "admin@example.com",
+                GroupId = groupId,
+                Email = "admin@example.com",
+                Password = Helper.HashMD5("admin1123"),
+                IsAdmin = true,
+                IsDefaultData = true,
+            };
+
+            await context.Users.AddAsync(adminUser);
+            await context.SaveChangesAsync();
+        }
     }
 }

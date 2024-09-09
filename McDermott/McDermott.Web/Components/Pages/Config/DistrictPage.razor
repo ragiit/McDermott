@@ -1,4 +1,4 @@
-﻿@page "/config/district"
+﻿@page "/configuration/districts"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Master Data District</PageTitle>
@@ -22,7 +22,7 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <MyGrid @ref="Grid"
+                                <MyGridPaginate @ref="Grid"
                                         Data="Districts"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         EditModelSaving="OnSave"
@@ -42,9 +42,9 @@
                                                          IsImport="true"
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.Create"
-                                                         VisibleEdit="UserAccessCRUID.Update"
-                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
 
                                     <Columns>
@@ -116,7 +116,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
-                                </MyGrid>
+                                </MyGridPaginate>
 
 
                                 <div class="row">

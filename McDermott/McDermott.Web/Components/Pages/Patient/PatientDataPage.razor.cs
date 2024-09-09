@@ -83,7 +83,7 @@ namespace McDermott.Web.Components.Pages.Patient
                     Provinces = await Mediator.Send(new GetProvinceQuery());
                     Cities = await Mediator.Send(new GetCityQuery());
                     Districts = await Mediator.Send(new GetDistrictQuery());
-                    Villages = await Mediator.Send(new GetVillageQuery());
+                    //Villages = await Mediator.Send(new GetVillageQuery());
                     Religions = await Mediator.Send(new GetReligionQuery());
                     Genders = await Mediator.Send(new GetGenderQuery());
                     Departments = await Mediator.Send(new GetDepartmentQuery());

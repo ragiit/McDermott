@@ -47,9 +47,9 @@
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
                                                              EnableDelete="isActiveButton"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
 
                                         <Columns>
@@ -240,9 +240,9 @@
                                                                 KeyboardNavigationEnabled="true">
                                                             <ToolbarTemplate>
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft || FormInternalTransfer.Status == EnumStatusInternalTransfer.Request" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft || FormInternalTransfer.Status == EnumStatusInternalTransfer.Request" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && TempTransferStocks.Count > 0 && FormInternalTransfer.Id == 0||FormInternalTransfer.Status == EnumStatusInternalTransfer.Draft" />
 
                                                                 </DxToolbar>
                                                             </ToolbarTemplate>

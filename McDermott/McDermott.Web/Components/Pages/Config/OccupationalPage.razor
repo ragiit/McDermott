@@ -1,4 +1,4 @@
-@page "/config/occupational";
+@page "/configuration/occupationals";
 
 @rendermode InteractiveServer
 
@@ -23,7 +23,7 @@
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
 
-                                <MyGrid @ref="Grid"
+                                <MyGridPaginate @ref="Grid"
                                         Data="Occupationals"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         EditModelSaving="OnSave"
@@ -44,9 +44,9 @@
                                                          Grid="Grid"
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.Create"
-                                                         VisibleEdit="UserAccessCRUID.Update"
-                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
 
                                     <Columns>
@@ -74,7 +74,7 @@
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
-                                </MyGrid>
+                                </MyGridPaginate>
 
                                 <div class="row">
                                     <DxFormLayout>

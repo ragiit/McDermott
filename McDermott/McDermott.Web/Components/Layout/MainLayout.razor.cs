@@ -62,6 +62,16 @@ namespace McDermott.Web.Components.Layout
             catch { }
         }
 
+        private List<ParentMenuTemp> ParentMenus { get; set; } = [];
+
+        private class ParentMenuTemp
+        {
+            public long? ParentId { get; set; }
+            public string? ParentName { get; set; }
+            public string? Icon { get; set; }
+            public long? Sequence { get; set; }
+        }
+
         private async Task LoadUser()
         {
             try
@@ -84,10 +94,25 @@ namespace McDermott.Web.Components.Layout
                 var menus = await Mediator.Send(new GetMenuQuery());
                 var groups = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!)!);
 
+                var m = groups.Select(x => x.Menu.ParentId).ToList().Distinct().Where(x => x != null);
                 var ids = groups.Select(x => x.MenuId).ToList();
+                var parentIds = groups.Where(x => menus.Select(z => z.ParentId).Contains(x.MenuId)).Select(x => x.Id).ToList().Distinct();
 
-                HeaderMenuDtos = [.. menus.Where(x => x.ParentMenu == null && ids.Contains(x.Id) && !x.Name.Equals("Template Page")).OrderBy(x => x.Sequence.ToInt32())];
-                DetailMenuDtos = [.. menus.Where(x => x.ParentMenu != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
+                ParentMenus.Clear();
+                ParentMenus = [.. menus
+                    .Where(x => x.ParentId == null && m.Contains(x.Id))
+                    .Select(x => new ParentMenuTemp
+                    {
+                        ParentId = x.Id,
+                        ParentName = x.Name,
+                        Sequence = x.Sequence,
+                        Icon = x.Icon
+                    })
+                    .DistinctBy(p => new { p.ParentId, p.ParentName, p.Sequence })
+                    .OrderBy(x => x.Sequence)];
+
+                HeaderMenuDtos = [.. menus.Where(x => x.Parent == null && ids.Contains(x.Id) && !x.Name.Equals("Template Page")).OrderBy(x => x.Sequence.ToInt32())];
+                DetailMenuDtos = [.. menus.Where(x => x.Parent != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
             }
             catch { }
         }

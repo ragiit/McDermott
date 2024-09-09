@@ -1,4 +1,4 @@
-﻿@page "/config/gender"
+﻿@page "/configuration/genders"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Gender</PageTitle>
@@ -22,7 +22,7 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                 </DxLoadingPanel>
-                                <MyGrid @ref="Grid"
+                                <MyGridPaginate @ref="Grid"
                                         Data="Genders"
                                         KeyFieldName="Id"
                                         EditModelSaving="OnSave"
@@ -39,7 +39,7 @@
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
-                                </MyGrid>
+                                </MyGridPaginate>
                             </div>
                         </div>
                     </div>

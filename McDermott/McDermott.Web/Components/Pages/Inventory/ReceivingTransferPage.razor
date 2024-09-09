@@ -46,9 +46,9 @@
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
                                                              EnableDelete="isActiveButton"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
@@ -183,9 +183,9 @@
                                                                 KeyboardNavigationEnabled="true">
                                                             <ToolbarTemplate>
                                                                 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormReceivingStocks.Id == 0 || FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async ()  => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && (TempReceivingStockDetails.Count > 0 && FormReceivingStocks.Id >0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft) || FormReceivingStocks.Id == 0" />
-                                                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && (TempReceivingStockDetails.Count > 0 && FormReceivingStocks.Id >0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft) || FormReceivingStocks.Id == 0" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" Enabled="FormReceivingStocks.Id == 0 || FormReceivingStocks.Status == EnumStatusReceiving.Draft" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="async ()  => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItemsDetail.Count > 0 && (TempReceivingStockDetails.Count > 0 && FormReceivingStocks.Id >0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft) || FormReceivingStocks.Id == 0" />
+                                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItemsDetail.Count > 0 && (TempReceivingStockDetails.Count > 0 && FormReceivingStocks.Id >0 && FormReceivingStocks.Status == EnumStatusReceiving.Draft) || FormReceivingStocks.Id == 0" />
 
                                                                 </DxToolbar>
                                                             </ToolbarTemplate>

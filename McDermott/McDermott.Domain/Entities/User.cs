@@ -71,6 +71,8 @@
         public string? EmployeeCode { get; set; }
         public long? DegreeId { get; set; }
         public bool IsEmployee { get; set; } = false;
+        public bool IsAdmin { get; set; } = false;
+        public bool IsDefaultData { get; set; } = false;
         public bool IsPatient { get; set; } = false;
         public bool IsUser { get; set; } = false;
         public bool IsDoctor { get; set; } = false;

@@ -20,9 +20,11 @@ namespace McDermott.Application.Features.Queries.Config
                 string cacheKey = $"GetMenuQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
                 if (!_cache.TryGetValue(cacheKey, out List<Menu>? result))
                 {
-                    result = await _unitOfWork.Repository<Menu>().GetAsync(
-                        request.Predicate,
-                        cancellationToken: cancellationToken);
+                    result = await _unitOfWork.Repository<Menu>().Entities
+                        .AsNoTracking()
+                        .OrderBy(x => x.Name)
+                        .Include(x => x.Parent)
+                        .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }

@@ -172,6 +172,9 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<District>()
                .HasIndex(v => v.Name)
                .HasDatabaseName("IX_Districts_Name");
+            modelBuilder.Entity<Menu>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Menus_Name");
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

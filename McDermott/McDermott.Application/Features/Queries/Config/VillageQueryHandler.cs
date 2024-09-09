@@ -1,11 +1,16 @@
-﻿using MapsterMapper;
+﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using MailKit.Search;
+using MapsterMapper;
 using McDermott.Application.Dtos;
+using System.Linq;
 using static McDermott.Application.Features.Commands.Config.VillageCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
     public class VillageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetVillageQuery, List<VillageDto>>,
+        IRequestHandler<GetVillageQuery, (List<VillageDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetVillageQuery2, IQueryable<VillageDto>>,
         IRequestHandler<GetVillageQuerylable, IQueryable<Village>>,
         IRequestHandler<GetPagedDataQuery, (List<VillageDto> Data, int TotalCount)>,
@@ -18,56 +23,9 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
-        public async Task<List<VillageDto>> Handle(GetVillageQuery request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                string cacheKey = $"GetVillageQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
-
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Village>? result))
-                {
-                    //return await _unitOfWork.Repository<DetailQueueDisplay>().Entities
-                    //    .Include(x => x.QueueDisplay)
-                    //    .Include(x => x.Counter)
-                    //    .Select(DetailQueueDisplay => DetailQueueDisplay.Adapt<DetailQueueDisplayDto>())
-                    //    .AsNoTracking()
-                    //    .ToListAsync(cancellationToken);
-
-                    result = await _unitOfWork.Repository<Village>().Entities
-                        .OrderBy(x => x.Name)
-                        .Include(x => x.Province)
-                        .Include(x => x.City)
-                        .Include(x => x.District)
-                        .AsNoTracking()
-                        //.Take(100)
-                        .ToListAsync(cancellationToken);
-
-                    //result = await _unitOfWork.Repository<Village>().Entities
-                    //    .Include(x => x.Province)
-                    //    .Include(x => x.City)
-                    //    .Include(x => x.District)
-                    //    .OrderBy(x => x.Name)
-                    //    .Take(5)
-                    //    .AsNoTracking()
-                    //    .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
-                }
-
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
-
-                return result.ToList().Adapt<List<VillageDto>>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //public async Task<List<VillageDto>> Handle(GetVillageQuery request, CancellationToken cancellationToken)
+        //{
+        //}
 
         public async Task<IQueryable<VillageDto>> Handle(GetVillageQuery2 request, CancellationToken cancellationToken)
         {
@@ -253,6 +211,47 @@ namespace McDermott.Application.Features.Queries.Config
         public async Task<IQueryable<Village>> Handle(GetVillageQuerylable request, CancellationToken cancellationToken)
         {
             return await Task.FromResult(_unitOfWork.Repository<Village>().GetAllQuerylable());
+        }
+
+        public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Village>().Entities
+                    .AsNoTracking()
+                    .Include(v => v.City)
+                    .Include(v => v.Province)
+                    .Include(v => v.District)
+                    .AsQueryable();
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
+                }
+
+                var pagedResult = query
+                .OrderBy(x => x.Name);
+
+                var skip = (request.PageIndex - 1) * request.PageSize;
+
+                var totalCount = await query.CountAsync();
+
+                var paged = query
+                            .Skip(skip).Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                var result = await pagedResult.ToListAsync(cancellationToken);
+
+                return (result.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

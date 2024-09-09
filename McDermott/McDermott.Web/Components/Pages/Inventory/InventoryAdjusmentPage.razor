@@ -41,9 +41,9 @@
                                                              IsImport="false"
                                                              Grid="Grid"
                                                              EnableDelete="IsDeletedAdjusment"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
 
                                         <Columns>
@@ -219,9 +219,9 @@
 
                                                                 <ToolbarTemplate>
                                                                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjustment.InProgress)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress)" />
-                                                                        <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress) " />
+                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Enabled="@IsStatus(EnumStatusInventoryAdjustment.InProgress)" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
+                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="async () => await EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress)" />
+                                                                        <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress) " />
                                                                         <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshDetails_Click" IconCssClass="fa-solid fa-arrows-rotate" />
                                                                         <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(GridDetail))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
                                                                         <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">

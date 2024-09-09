@@ -1,0 +1,35 @@
+id,CountryId,Name
+11,1,Aceh
+12,1,Sumatera Utara
+13,1,Sumatera Barat
+14,1,Riau
+15,1,Jambi
+16,1,Sumatera Selatan
+17,1,Bengkulu
+18,1,Lampung
+19,1,Kepulauan Bangka Belitung
+21,1,Kepulauan Riau
+31,1,Dki Jakarta
+32,1,Jawa Barat
+33,1,Jawa Tengah
+34,1,Di Yogyakarta
+35,1,Jawa Timur
+36,1,Banten
+51,1,Bali
+52,1,Nusa Tenggara Barat
+53,1,Nusa Tenggara Timur
+61,1,Kalimantan Barat
+62,1,Kalimantan Tengah
+63,1,Kalimantan Selatan
+64,1,Kalimantan Timur
+65,1,Kalimantan Utara
+71,1,Sulawesi Utara
+72,1,Sulawesi Tengah
+73,1,Sulawesi Selatan
+74,1,Sulawesi Tenggara
+75,1,Gorontalo
+76,1,Sulawesi Barat
+81,1,Maluku
+82,1,Maluku Utara
+91,1,Papua Barat
+94,1,Papua

@@ -1,4 +1,4 @@
-﻿@page "/config/user"
+﻿@page "/configuration/users"
 @using System.Security.Claims
 @rendermode InteractiveServer
 
@@ -43,9 +43,9 @@
                                                              EnableDelete="!IsDeleted"
                                                              IsImport="false"
                                                              Grid="Grid"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
 
                                         <Columns>

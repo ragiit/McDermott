@@ -67,8 +67,8 @@
                             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                         </li>
                         @* <li class="nav-item d-none d-sm-inline-block">
-                            <a href="" class="nav-link">Home</a>
-                        </li> *@
+                <a href="" class="nav-link">Home</a>
+                </li> *@
 
                         @if (currentUrl.Contains("clinic-service/reporting-&-analytic"))
                         {
@@ -122,12 +122,65 @@
                                     </NavLink>
                                 </li>
 
+                                @foreach (var parentMenu in ParentMenus)
+                                {
+                                    <li class="nav-item">  
+                                        <NavLink class="nav-link" Match="NavLinkMatch.Prefix">
+                                            @if (parentMenu.Icon != null)
+                                            {
+                                                @* @((MarkupString)parentMenu.Icon) *@
+                                                <i class="nav-icon @parentMenu.Icon"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="nav-icon fas fa-book"></i>
+                                            }
+                                            <p>@parentMenu.ParentName <i class="fas fa-angle-left right"></i></p>
+                                        </NavLink>
+
+                                        <ul class="nav nav-treeview">
+                                            @foreach (var menu in DetailMenuDtos.Where(x => x.ParentId == parentMenu.ParentId))
+                                            {
+                                                if (!menu.Name.ToLower().Equals("kiosk"))
+                                                {
+                                                    var url = string.IsNullOrEmpty(menu.Url) ? "test" : menu.Url;
+                                                    <li class="nav-item">
+                                                        <NavLink href="@url" class="nav-link sidebar-light-info sidebar-light-bg-info" Match="NavLinkMatch.All">
+                                                            <i class="far fa-circle nav-icon"></i>
+                                                            <p class="ml-3">@menu.Name</p>
+                                                        </NavLink>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+
+                              @*   @foreach (var parentMenu in ParentMenus)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link">
+                                            <p>@parentMenu.ParentName <i class="@parentMenu.Icon"></i></p>
+                                        </a>
+
+                                        <ul class="nav nav-treeview  ">
+                                            @foreach (var menu in DetailMenuDtos.Where(x => x.ParentId == parentMenu.ParentId))
+                                            {
+                                                <li class="nav-item"><NavLink class="nav-link sidebar-light-info sidebar-light-bg-info" href="@menu.Url">@menu.Name</NavLink></li>
+
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+
+
+
                                 @foreach (var h in HeaderMenuDtos.Where(x => x.Name.ToLower().Trim().Contains(searchQuery.Trim().ToLower()) ||
-                               DetailMenuDtos.Where(z => z.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())).Select(a => a.ParentMenu).ToList().Contains(x.Name)))
+                               DetailMenuDtos.Where(z => z.Parent != null && z.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower())).Select(a => a.Parent.Name).ToList().Contains(x.Name)))
                                 {
                                     <li class="nav-item">
                                         @{
-                                            var details = DetailMenuDtos.Where(x => x.ParentMenu == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower()));
+                                            var details = DetailMenuDtos.Where(x => x.Parent != null && x.Parent.Name == h.Name && x.Name.Trim().ToLower().Contains(searchQuery.Trim().ToLower()));
                                             var parent = details.FirstOrDefault()?.Url?.Split("/")[0] ?? "";
                                         }
 
@@ -162,7 +215,7 @@
                                             </ul>
                                         }
                                     </li>
-                                }
+                                } *@
                             </ul>
                         </nav>
                     </div>

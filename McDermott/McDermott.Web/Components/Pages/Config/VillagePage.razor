@@ -1,4 +1,4 @@
-﻿@page "/config/village"
+﻿@page "/configuration/sub-districts"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Master Data Village</PageTitle>
@@ -22,7 +22,7 @@
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
 
-                                <MyGrid @ref="Grid"
+                                <MyGridPaginate @ref="Grid"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         Data="Villages"
                                         EditModelSaving="OnSave"
@@ -43,9 +43,9 @@
                                                          Grid="Grid"
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.Create"
-                                                         VisibleEdit="UserAccessCRUID.Update"
-                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
 
                                     <Columns>
@@ -144,7 +144,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
-                                </MyGrid>
+                                </MyGridPaginate>
 
                                 <div class="row">
                                     <DxFormLayout>

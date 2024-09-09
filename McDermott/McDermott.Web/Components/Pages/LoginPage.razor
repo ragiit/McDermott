@@ -46,7 +46,7 @@
                 @text
                 </div> *@
 
-                @*   <form>
+                @*  <form>
                 <div class="input-group mb-3">
                 <input @bind="User.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
                 <div class="input-group-append">
@@ -70,27 +70,27 @@
 
                 </form> *@
 
-                @*    <EditForm Model="@LoginForm" Context="EditFormContextt" method="POST" action="/login">
-                <input type="text" name="data" value="test">
-                <input type="submit" value="Submit">
+                <EditForm Model="@LoginForm" Context="EditFormContextt" method="POST" action="/login">
+                    <input type="text" name="data" value="test">
+                    <input type="submit" value="Submit">
                 </EditForm>
 
                 <form method="POST" action="/login">
-                <input type="text" name="data" value="test">
-                <input type="submit" value="Submit">
-                </form> *@
+                    <input type="text" name="data" value="test">
+                    <input type="submit" value="Submit">
+                </form>
 
                 <DxComboBox @bind-Value="SelectedValue"
                             @bind-Text="Hehehe"
                             Data="@Villages"
                             ValueFieldName="Id"
                             FilteringMode="DataGridFilteringMode.Contains"
-                            TextFieldName="Name" 
-                            AllowUserInput="true" 
+                            TextFieldName="Name"
+                            AllowUserInput="true"
                             ShowValidationIcon="true"
                             ListRenderMode="ListRenderMode.Virtual">
                     <Buttons>
-                        <DxEditorButton Click="OnSearch" IconCssClass="fa-solid fa-magnifying-glass" /> 
+                        <DxEditorButton Click="OnSearch" IconCssClass="fa-solid fa-magnifying-glass" />
                     </Buttons>
                 </DxComboBox>
 
@@ -154,7 +154,7 @@
         border-radius: 13px; /* Sesuaikan dengan radius yang Anda inginkan */
     }
 </style>
- 
+
 
 @code {
     private async Task PerformSearch()
@@ -178,8 +178,8 @@
         public string? Password { get; set; }
     }
 
-    private long? SelectedValue { get; set; } 
-    private string? Hehehe { get; set; } 
+    private long? SelectedValue { get; set; }
+    private string? Hehehe { get; set; }
 
     private void HandleInput(ChangeEventArgs e)
     {

@@ -1,4 +1,4 @@
-﻿@page "/config/group"
+﻿@page "/configuration/groups"
 @using McDermott.Web.Components.Layout
 @rendermode InteractiveServer
 
@@ -6,6 +6,8 @@
 
 @if (IsAccess)
 {
+    <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+    <InputFile id="fileInput2" style="display:none" OnChange="@ImportExcelFile2" accept=".xlsx" multiple="false"></InputFile>
 
     <div class="wrapper">
 
@@ -24,13 +26,13 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <MyGrid @ref="Grid"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            Data="Groups"
-                                            KeyFieldName="Id"
-                                            DataItemDeleting="OnDelete"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            RowDoubleClick="EditItem_Click">
+                                    <MyGridPaginate @ref="Grid"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    Data="Groups"
+                                                    KeyFieldName="Id"
+                                                    DataItemDeleting="OnDelete"
+                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    RowDoubleClick="EditItem_Click">
 
                                         <ToolbarTemplate>
                                             <MyDxToolbarBase TItem="GroupDto"
@@ -41,20 +43,51 @@
                                                              EditItem_Click="@EditItem_Click"
                                                              DeleteItem_Click="@DeleteItem_Click"
                                                              Refresh_Click="@Refresh_Click"
-                                                             IsImport="false"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
+                                                             IsImport="UserAccessCRUID.IsImport"
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
-                                        </Columns>
+                                        </Columns>  <TotalSummary>
+                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                               FieldName="Name"
+                                                               Visible="true" />
+                                        </TotalSummary>
                                         <DetailRowTemplate>
                                             <Grid_GroupPage_NestedGrid_DetailContent Group="(GroupDto)context.DataItem"></Grid_GroupPage_NestedGrid_DetailContent>
                                         </DetailRowTemplate>
-                                    </MyGrid>
+                                    </MyGridPaginate>
+                                    <div class="row">
+                                        <DxFormLayout>
+                                            <div class="col-md-9">
+                                                <DxFormLayoutItem>
+                                                    <DxPager PageCount="totalCount"
+                                                             ActivePageIndexChanged="OnPageIndexChanged"
+                                                             ActivePageIndex="activePageIndex"
+                                                             VisibleNumericButtonCount="10"
+                                                             SizeMode="SizeMode.Medium"
+                                                             NavigationMode="PagerNavigationMode.Auto">
+                                                    </DxPager>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                            <div class="col-md-3 d-flex justify-content-end">
+                                                <DxFormLayoutItem Caption="Page Size:">
+                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                  NullText="Select Page Size"
+                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                  @bind-Value="pageSize">
+                                                    </MyDxComboBox>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                        </DxFormLayout>
+                                    </div>
                                 </DxLoadingPanel>
                             }
                             else
@@ -66,8 +99,9 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <EditForm Model="@Group" @onkeypress="@KeyPressHandler" Context="EditFormContext22" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                        <EditForm Model="@Group" @onkeypress="@KeyPressHandler" Context="EditFormContext22" Enhance OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
                                             <DataAnnotationsValidator />
+                                            <AntiforgeryToken />
                                             <DxFormLayout CssClass="w-100">
                                                 <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" Caption="Group" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
                                                     <DxTextBox @bind-Text="@Group.Name"
@@ -95,73 +129,79 @@
                                                                                  EditItem_Click="() => EditItemGroup_Click(GridGropMenu)"
                                                                                  DeleteItem_Click="@DeleteItem_Click"
                                                                                  Refresh_Click="@Refresh_Click"
-                                                                                 IsImport="false"
+                                                                                 ImportFile="ImportFile2"
+                                                                                 ExportToExcel="ExportToExcel2"
+                                                                                 IsImport="UserAccessCRUID.IsImport"
                                                                                  Grid="GridGropMenu"
-                                                                                 VisibleNew="UserAccessCRUID.Create"
-                                                                                 VisibleEdit="UserAccessCRUID.Update"
-                                                                                 VisibleDelete="UserAccessCRUID.Delete" />
+                                                                                 VisibleNew="UserAccessCRUID.IsCreate"
+                                                                                 VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                                 VisibleDelete="UserAccessCRUID.IsDelete" />
                                                             </ToolbarTemplate>
 
                                                             <Columns>
                                                                 <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
                                                                 <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
-                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Create" />
-                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Read" />
-                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Update" />
-                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Delete" />
-                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="Import" />
+                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="IsCreate" Caption="Create" />
+                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="IsRead" Caption="Read" />
+                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="IsUpdate" Caption="Update" />
+                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="IsDelete" Caption="Delete" />
+                                                                <DxGridDataColumn MinWidth="50" Context="ToolbarContext" FieldName="IsImport" Caption="Import" />
                                                             </Columns>
                                                             <EditFormTemplate Context="EditFormContext">
                                                                 <DxFormLayout CssClass="w-100">
-                                                                    @*  <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
-                                                            <DxComboBox Data="@(Menus.Where(x => !string.IsNullOrWhiteSpace(x.ParentMenu) || (string.IsNullOrEmpty(x.ParentMenu) && x.Name.Equals("All"))))"
-                                                            NullText="Select Menu..."
-                                                            ShowValidationIcon="true"
-                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                            @bind-Value="@GroupMenu.MenuId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                            </DxComboBox>
-                                                            <ValidationMessage For="@(() => GroupMenu.MenuId)"   />
-                                                            </DxFormLayoutItem> *@
                                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Menu:" ColSpanMd="12">
-                                                                        <MyDxComboBox Data="@(Menus.Where(x => !string.IsNullOrWhiteSpace(x.ParentMenu) || (string.IsNullOrEmpty(x.ParentMenu) && x.Name.Equals("All"))))"
+                                                                        <MyDxComboBox Data="@Menus"
                                                                                       @bind-Value="@GroupMenu.MenuId"
+                                                                                      @ref="refMenuComboBox"
                                                                                       ValueFieldName="Id"
+                                                                                      TextChanged="((string e) => OnInputMenuChanged(e))"
                                                                                       EditFormat="{0}">
                                                                             <Columns>
                                                                                 <DxListEditorColumn Visible="false" FieldName="@nameof(MenuDto.Id)"
                                                                                                     Caption="Id" />
                                                                                 <DxListEditorColumn FieldName="@nameof(MenuDto.Name)"
                                                                                                     Caption="Name" />
-                                                                                <DxListEditorColumn FieldName="@nameof(MenuDto.ParentMenu)"
+                                                                                <DxListEditorColumn FieldName="Parent.Name"
                                                                                                     Caption="Parent Menu" />
                                                                                 <DxListEditorColumn FieldName="@nameof(MenuDto.Sequence)"
                                                                                                     Caption="Sequence" />
                                                                                 <DxListEditorColumn FieldName="@nameof(MenuDto.Url)"
                                                                                                     Caption="Url" />
                                                                             </Columns>
+                                                                            <Buttons>
+                                                                                <DxEditorButton Click="OnSearchMenundexDecrement"
+                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                Tooltip="Previous Index" />
+                                                                                <DxEditorButton Click="OnSearchMenu"
+                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                Tooltip="Search" />
+                                                                                <DxEditorButton Click="OnSearchMenuIndexIncrement"
+                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                Tooltip="Next Index" />
+                                                                            </Buttons>
+
                                                                         </MyDxComboBox>
+                                                                        <ValidationMessage For="@(()=> @GroupMenu.GroupId)"   />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Create">
-                                                                        <DxCheckBox @bind-Checked="@GroupMenu.Create" />
-                                                                        <ValidationMessage For="@(()=> @GroupMenu.Create)"   />
+                                                                        <DxCheckBox @bind-Checked="@GroupMenu.IsCreate" />
+                                                                        <ValidationMessage For="@(()=> @GroupMenu.IsCreate)"   />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Read">
-                                                                        <DxCheckBox @bind-Checked="@GroupMenu.Read" />
-                                                                        <ValidationMessage For="@(()=> @GroupMenu.Read)"   />
+                                                                        <DxCheckBox @bind-Checked="@GroupMenu.IsRead" />
+                                                                        <ValidationMessage For="@(()=> @GroupMenu.IsRead)"   />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Update">
-                                                                        <DxCheckBox @bind-Checked="@GroupMenu.Update" />
-                                                                        <ValidationMessage For="@(()=> @GroupMenu.Update)"   />
+                                                                        <DxCheckBox @bind-Checked="@GroupMenu.IsUpdate" />
+                                                                        <ValidationMessage For="@(()=> @GroupMenu.IsUpdate)"   />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Delete">
-                                                                        <DxCheckBox @bind-Checked="@GroupMenu.Delete" />
-                                                                        <ValidationMessage For="@(()=> @GroupMenu.Delete)"   />
+                                                                        <DxCheckBox @bind-Checked="@GroupMenu.IsDelete" />
+                                                                        <ValidationMessage For="@(()=> @GroupMenu.IsDelete)"   />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Import">
-                                                                        <DxCheckBox @bind-Checked="@GroupMenu.Import" />
-                                                                        <ValidationMessage For="@(()=> @GroupMenu.Import)"   />
+                                                                        <DxCheckBox @bind-Checked="@GroupMenu.IsImport" />
+                                                                        <ValidationMessage For="@(()=> @GroupMenu.IsImport)"   />
                                                                     </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </EditFormTemplate>

@@ -1,33 +1,55 @@
 ﻿@using static McDermott.Application.Features.Commands.Config.GroupMenuCommand
-<DxGrid Data="GroupMenus"
-        @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-        PageSize="10"
-        ShowSearchBox="true"
-        ShowGroupPanel="true"
-        CustomizeElement="Grid_CustomizeElement"
-        TextWrapEnabled="false"
-        AutoExpandAllGroupRows="true" KeyboardNavigationEnabled="true">
-    <ToolbarTemplate>
-        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-            <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-            <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                <Items>
-                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                </Items>
-            </DxToolbarItem>
-        </DxToolbar>
-    </ToolbarTemplate>
-    <Columns>
-        <DxGridDataColumn MinWidth="200" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
-        <DxGridDataColumn MinWidth="50" FieldName="Create" />
-        <DxGridDataColumn MinWidth="50" FieldName="Read" />
-        <DxGridDataColumn MinWidth="50" FieldName="Update" />
-        <DxGridDataColumn MinWidth="50" FieldName="Delete" />
-        @* <DxGridDataColumn FieldName="Import" /> *@
-    </Columns>
-</DxGrid>
+
+<DxLoadingPanel @bind-Visible="PanelVisible"
+                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+    <MyGridPaginate Data="GroupMenus"
+                    @ref="Grid"
+                    PageSize="10">
+        <Columns>
+            <DxGridDataColumn MinWidth="200" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
+            <DxGridDataColumn MinWidth="200" FieldName="Menu.Parent.Name" Caption="Parent" SortIndex="0" />
+            <DxGridDataColumn MinWidth="50" FieldName="IsCreate" Caption="Create" />
+            <DxGridDataColumn MinWidth="50" FieldName="IsRead" Caption="Read" />
+            <DxGridDataColumn MinWidth="50" FieldName="IsUpdate" Caption="Update" />
+            <DxGridDataColumn MinWidth="50" FieldName="IsDelete" Caption="Delete" />
+            @* <DxGridDataColumn FieldName="Import" /> *@
+        </Columns>
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                               FieldName="Name"
+                               Visible="true" />
+        </TotalSummary>
+    </MyGridPaginate>
+    <div class="row">
+        <DxFormLayout>
+            <div class="col-md-9">
+                <DxFormLayoutItem>
+                    <DxPager PageCount="totalCount"
+                             ActivePageIndexChanged="OnPageIndexChanged"
+                             ActivePageIndex="activePageIndex"
+                             VisibleNumericButtonCount="10"
+                             SizeMode="SizeMode.Medium"
+                             NavigationMode="PagerNavigationMode.Auto">
+                    </DxPager>
+                </DxFormLayoutItem>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end">
+                <DxFormLayoutItem Caption="Page Size:">
+                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                  NullText="Select Page Size"
+                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                  @bind-Value="pageSize">
+                    </MyDxComboBox>
+                </DxFormLayoutItem>
+            </div>
+        </DxFormLayout>
+    </div>
+</DxLoadingPanel>
 
 @code {
     [Parameter]
@@ -37,11 +59,44 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadData(0, 10);
+    }
+    #region Searching
 
-        if (Group != null)
-        {
-            GroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
-        }
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+    #endregion Searching
+
+    private bool PanelVisible = false;
+
+    private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+    {
+        PanelVisible = true;
+        var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id);
+        GroupMenus = result.Item1;
+        totalCount = result.Item2;
+        activePageIndex = pageIndex;
+        PanelVisible = false;
     }
 
     private void ColumnChooserButton_Click()
