@@ -104,32 +104,33 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetCountries(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
-            Countries = result.Item1;
-            totalCount = result.Item2;
+            //var result = await MyQuery.GetCountries(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            var countries = await Mediator.Send(new GetCountryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Countries = countries.Item1;
+            totalCount = countries.Item4;
             activePageIndex = pageIndex;
             PanelVisible = false;
 
             return;
-            // Menggunakan InvokeAsync untuk memastikan manipulasi UI dilakukan di thread utama
-            await InvokeAsync(() =>
-                PanelVisible = true // Jika diperlukan, panel diperlihatkan di sini
-            );
+            //// Menggunakan InvokeAsync untuk memastikan manipulasi UI dilakukan di thread utama
+            //await InvokeAsync(() =>
+            //    PanelVisible = true // Jika diperlukan, panel diperlihatkan di sini
+            //);
 
-            // Memuat data
-            try
-            {
-                Countries = await Mediator.Send(new GetCountryQuery());
-                Grid.SelectRow(0);
-            }
-            catch { }
+            //// Memuat data
+            //try
+            //{
+            //    var countries = await Mediator.Send(new GetCountryQuery());
+            //    Countries = countries.Item1; Grid.SelectRow(0);
+            //}
+            //catch { }
 
-            // Refresh UI setelah memuat data selesai
-            await InvokeAsync(() =>
-            {
-                PanelVisible = false; // Jika diperlukan, panel disembunyikan di sini
-                StateHasChanged(); // Memastikan bahwa perubahan UI diterapkan
-            });
+            //// Refresh UI setelah memuat data selesai
+            //await InvokeAsync(() =>
+            //{
+            //    PanelVisible = false; // Jika diperlukan, panel disembunyikan di sini
+            //    StateHasChanged(); // Memastikan bahwa perubahan UI diterapkan
+            //});
         }
 
         public void Dispose()
@@ -423,6 +424,15 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 var editModel = (CountryDto)e.EditModel;
+
+                bool validate = await Mediator.Send(new ValidateCountryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"Country with name '{editModel.Name}' and code '{editModel.Code}' is already exist");
+                    e.Cancel = true;
+                    return;
+                }
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateCountryRequest(editModel));

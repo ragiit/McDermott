@@ -169,7 +169,8 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            Countries = await Mediator.Send(new GetCountryQuery());
+            var countries = await Mediator.Send(new GetCountryQuery());
+            Countries = countries.Item1;
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
 

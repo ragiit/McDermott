@@ -33,7 +33,7 @@
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
 
-            <div class="form-group">
+           @*  <div class="form-group">
                 <label for="consultationType">Pilih Jenis Konsultasi:</label>
                 <select id="consultationType" class="form-control" @onchange="OnConsultationTypeChanged">
                     <option value="offline">Konsul Offline</option>
@@ -42,18 +42,18 @@
             </div>
 
             <button @onclick="CreateMeetLink">Create Google Meet Link</button>
-            <a href="@meetLink" target="_blank">@meetLink</a>
+            <a href="@meetLink" target="_blank">@meetLink</a> *@
             @*
         <button @onclick="CreateTeamsLink">Create Teams Meet Link</button>
         <a href="@meetLink" target="_blank">Join Teams Meet</a> *@
 
-            @if (showConferenceLink)
+           @*  @if (showConferenceLink)
             {
                 <div class="form-group">
                     <label for="conferenceLink">Link Conference:</label>
                     <input type="text" id="conferenceLink" class="form-control" value="@linkMeet" readonly />
                 </div>
-            }
+            } *@
 
             @*
         <DxButton Click="Clicktop" Text="Hayoo Tebakk"></DxButton>
@@ -879,7 +879,7 @@ else
         try
         {
             var aa = await Mediator.Send(new GetCountryQuery());
-            var z = aa[1000];
+            // var z = aa[1000];
         }
         catch (Exception e)
         {
@@ -893,7 +893,7 @@ else
         try
         {
             var aa = await Mediator.Send(new GetCountryQuery());
-            var z = aa[1000];
+            // var z = aa[1000];
         }
         catch (Exception e)
         {

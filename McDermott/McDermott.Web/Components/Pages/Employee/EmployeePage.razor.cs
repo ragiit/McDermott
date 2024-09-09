@@ -104,7 +104,8 @@ namespace McDermott.Web.Components.Pages.Employee
             }
             catch { }
 
-            Countries = await Mediator.Send(new GetCountryQuery());
+            var countries = await Mediator.Send(new GetCountryQuery());
+            Countries = countries.Item1;
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
             Districts = await Mediator.Send(new GetDistrictQuery());

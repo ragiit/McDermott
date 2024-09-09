@@ -1,4 +1,5 @@
 ﻿@page "/clinic-service/accident"
+@using Blazor.Extensions.Canvas
 @rendermode InteractiveServer
 
 <PageTitle>@Helper.APP_NAME - Accident</PageTitle>
@@ -203,7 +204,7 @@
                                                                        NullText="Supervisor Name" />
                                                         </DxFormLayoutItem>
 
-                                                        
+
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reg Type" ColSpanMd="12">
                                                             <MyDxComboBox Data="@RegisType"
@@ -1691,8 +1692,8 @@ else
         </div>
     </div>
 </DxPopup>
- 
-<DxPopup Visible="isPrint" Width="874px" CloseOnOutsideClick="false" ShowCloseButton = "true" Closed="ClosePopUp">
+
+<DxPopup Visible="isPrint" Width="874px" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="ClosePopUp">
     <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
         <MailMergeSettings>
             <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
@@ -1700,7 +1701,7 @@ else
     </DxRichEdit>
 </DxPopup>
 
-<DxPopup Visible="isAccident" Width="800px" Shown="OnPopupShown" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="ClosePopUpAccident">
+@* <DxPopup Visible="isAccident" Width="800px" Shown="OnPopupShown" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="ClosePopUpAccident">
     <div class="card">
         <div class="card-body">
             <DxFormLayout CssClass="w-100 justify-content-center">
@@ -1718,6 +1719,30 @@ else
                 </DxFormLayoutItem>
             </DxFormLayout>
         </div>
+    </div>
+</DxPopup> *@
+
+
+
+<DxPopup Visible="isAccident" Width="800px" Shown="OnPopupShown2" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="ClosePopUpAccident">
+    <BECanvas Width="500" Height="700" @ref="canvasReference" @onclick="HandleClick" style="border:1px solid #000;"></BECanvas>
+
+    <button @onclick="SavePoints">Save Points</button>
+    <button @onclick="LoadPoints">Load Points</button>
+    <button @onclick="ResetPoints">Reset Points</button>
+
+    <div>
+        <h3>Edit or Delete Points</h3>
+        <ul>
+            @foreach (var point in operationPoints)
+            {
+                <li>
+                    Point @point.Number: (@point.X, @point.Y)
+                    <button @onclick="() => EditPoint(point)">Edit</button>
+                    <button @onclick="() => DeletePoint(point)">Delete</button>
+                </li>
+            }
+        </ul>
     </div>
 </DxPopup>
 
