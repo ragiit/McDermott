@@ -6,6 +6,32 @@ namespace McDermott.Web.Components.Pages.Config
     {
         private List<CountryDto> Countries = [];
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -19,14 +45,14 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-            }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //    }
+            //    catch { }
+            //}
         }
 
         private async Task GetUserInfo()
@@ -47,11 +73,21 @@ namespace McDermott.Web.Components.Pages.Config
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
+        //[Inject]
+        //private IHttpClientFactory HttpClientFactory2 { get; set; }
+
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
+            await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
             try
             {
                 _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
@@ -64,8 +100,17 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetCountries(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            Countries = result.Item1;
+            totalCount = result.Item2;
+            activePageIndex = pageIndex;
+            PanelVisible = false;
+
+            return;
             // Menggunakan InvokeAsync untuk memastikan manipulasi UI dilakukan di thread utama
             await InvokeAsync(() =>
                 PanelVisible = true // Jika diperlukan, panel diperlihatkan di sini
@@ -378,9 +423,6 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 var editModel = (CountryDto)e.EditModel;
-
-                if (string.IsNullOrWhiteSpace(editModel.Name))
-                    return;
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateCountryRequest(editModel));

@@ -799,6 +799,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Cities_Name");
+
                     b.HasIndex("ProvinceId");
 
                     b.ToTable("Cities");
@@ -1392,6 +1395,9 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Districts_Name");
 
                     b.HasIndex("ProvinceId");
 
@@ -4461,6 +4467,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("CountryId");
 
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Provinces_Name");
+
                     b.ToTable("Provinces");
                 });
 
@@ -5066,14 +5075,31 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("AntreanFKTPBaseURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConsId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Key")
-                        .IsRequired()
+                    b.Property<string>("KdAplikasi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PCareBaseURL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PCareCodeProvider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecretKey")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
@@ -5082,7 +5108,10 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Value")
+                    b.Property<string>("UserKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -5853,6 +5882,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("Id")
                         .IsUnique();
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Villages_Name");
 
                     b.HasIndex("ProvinceId");
 

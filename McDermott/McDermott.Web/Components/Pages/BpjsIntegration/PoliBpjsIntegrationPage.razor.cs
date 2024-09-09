@@ -65,7 +65,7 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
         {
             PanelVisible = true;
 
-            var response = await PcareService.SendPCareService($"poli/fktp/{parameter1}/{parameter2}", HttpMethod.Get);
+            var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"poli/fktp/{parameter1}/{parameter2}", HttpMethod.Get);
 
             if (response.Item2 != 200)
             {

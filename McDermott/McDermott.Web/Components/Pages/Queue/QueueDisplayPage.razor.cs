@@ -91,7 +91,7 @@ namespace McDermott.Web.Components.Pages.Queue
             QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
             Counters = await Mediator.Send(new GetCounterQuery());
             counteres = [.. Counters.Where(x => x.Status == "on process")];
-            QueueDisplay.ForEach(x => x.NameCounter = string.Join(",", counteres.Where(z => x.CounterIds != null && x.CounterIds.Contains(z.Id)).Select(z => z.Name).ToList()));
+            QueueDisplay.ForEach(x => x.NameCounter = string.Join(", ", counteres.Where(z => x.CounterIds != null && x.CounterIds.Contains(z.Id)).Select(z => z.Name).ToList()));
             PanelVisible = false;
         }
 
@@ -183,15 +183,16 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task NewItem_Click()
         {
-            showPopUp = true;
+            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
             FormDisplays = SelectedDataItems[0].Adapt<QueueDisplayDto>();
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
             selectedCounter = counteres.Where(x => FormDisplays.CounterIds.Contains(x.Id)).ToList();
 
-            showPopUp = true;
+            //showPopUp = true;
         }
 
         private void DeleteItem_Click()
@@ -277,13 +278,11 @@ namespace McDermott.Web.Components.Pages.Queue
 
         #region Method save
 
-        private async Task OnSave()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(FormDisplays.Name))
-                    return;
-
+                FormDisplays = (QueueDisplayDto)e.EditModel;
                 if (FormDisplays.Id == 0)
                 {
                     Displays.Name = FormDisplays.Name;

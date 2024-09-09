@@ -24,9 +24,10 @@
 
                                 <MyGrid @ref="Grid"
                                         @bind-SelectedDataItems="@SelectedDataItems"
-                                        Data="Data"
+                                        Data="Villages"
                                         EditModelSaving="OnSave"
                                         DataItemDeleting="OnDelete"
+                                        SearchTextChanged="OnSearchBoxChanged"
                                         FocusedRowChanged="Grid_FocusedRowChanged"
                                         KeyFieldName="Id">
 
@@ -54,8 +55,8 @@
                                         <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
                                         <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
                                         <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
-
                                     </Columns>
+
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
                                             var a = (VillageDto)EditFormContext.EditModel;
@@ -65,40 +66,111 @@
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.PostalCode" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
                                                 <ValidationMessage For="@(()=> a.PostalCode)"   />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-                                                <DxComboBox Data="@Provinces"
-                                                            NullText="Select Province..."
-                                                            @bind-Value="@a.ProvinceId"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id">
-                                                </DxComboBox>
+                                                <MyDxComboBox Data="@Provinces"
+                                                              NullText="Select Province..."
+                                                              @ref="refProvinceComboBox"
+                                                              @bind-Value="@a.ProvinceId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputProvinceChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchProvincendexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchProvince"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchProvinceIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Cities"
                                                               NullText="Select City..."
+                                                              @ref="refCityComboBox"
                                                               @bind-Value="@a.CityId"
                                                               TextFieldName="Name"
-                                                              ValueFieldName="Id">
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputCityChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchCityndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchCity"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchCityIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CityId)" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Districts"
                                                               NullText="Select District..."
+                                                              @ref="refDistrictComboBox"
                                                               @bind-Value="@a.DistrictId"
                                                               TextFieldName="Name"
-                                                              ValueFieldName="Id">
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputDistrictChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchDistrictndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchDistrict"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchDistrictIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.DistrictId)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
                                 </MyGrid>
+
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
                             </DxLoadingPanel>
                         </div>
                     </div>

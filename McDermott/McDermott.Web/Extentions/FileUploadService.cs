@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Extentions
+﻿using Path = System.IO.Path;
+
+namespace McDermott.Web.Extentions
 {
     public class FileUploadService : IFileUploadService
     {
@@ -53,8 +55,6 @@
                 return null;
             }
         }
-
-
 
         public async Task<(int, string)> UploadFileAsync(IBrowserFile file, int? maxFileSize = 0, string[] allowedExtensions = null)
         {

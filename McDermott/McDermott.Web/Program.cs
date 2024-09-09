@@ -15,11 +15,25 @@ using Serilog;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Antiforgery;
+using McDermott.Web;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddFiltering()
+    .AddSorting()
+    .AddProjections()
+    .AddAuthorization()
+    .AddQueryableCursorPagingProvider()
+    .AddQueryableOffsetPagingProvider();
+
+builder.Services.AddAntiforgery();
+
 // Tambahkan layanan kompresi respons
 builder.Services.AddResponseCompression(options =>
 {
@@ -49,6 +63,11 @@ builder.Services.AddOptions();
 //builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 // Add rate limiting processing strategy
 //builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+builder.Services.AddHttpClient("GraphQLClient", client =>
+{
+    var a = new Uri(builder.Configuration["GraphQLServer"]);
+    client.BaseAddress = a;
+});
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
@@ -120,7 +139,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddApplicationLayer();
 builder.Services.AddRazorPages();
-builder.Services.AddAntiforgery();
+//builder.Services.AddAntiforgery();
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.HttpOnly = HttpOnlyPolicy.Always;
@@ -193,6 +212,11 @@ else
 
 app.UseSerilogRequestLogging();
 app.UseRouting();
+app.UseAntiforgery();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGraphQL();
+});
 //app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
 //app.UseAuthorization();  // Gunakan otorisasi
@@ -208,9 +232,9 @@ app.UseStaticFiles(new StaticFileOptions
         ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddYears(1).ToString("R"));
     }
 });
+//app.UseMiddleware<CsrfTokenCOokieMiddleware>();
 app.UseResponseCompression();
 app.UseWebOptimizer();
-app.UseAntiforgery();
 // Tambahkan middleware logging untuk rate limiting
 //app.UseMiddleware<RateLimitLoggingMiddleware>();
 app.MapHub<RealTimeHub>("/realTimeHub");
@@ -324,5 +348,21 @@ public static class RequestTimeoutMiddlewareExtensions
     public static IApplicationBuilder UseRequestTimeout(this IApplicationBuilder builder, TimeSpan timeout)
     {
         return builder.UseMiddleware<RequestTimeoutMiddleware>(timeout);
+    }
+}
+
+internal class CsrfTokenCOokieMiddleware(IAntiforgery antiforgery, RequestDelegate next)
+{
+    private readonly IAntiforgery _antiforgery = antiforgery;
+    private readonly RequestDelegate _next = next;
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        if (context.Request.Cookies["CSRF-TOKEN"] == null)
+        {
+            var token = _antiforgery.GetAndStoreTokens(context);
+            context.Response.Cookies.Append("CSRF-TOKEN", token.RequestToken, new Microsoft.AspNetCore.Http.CookieOptions { HttpOnly = false });
+        }
+        await _next(context);
     }
 }

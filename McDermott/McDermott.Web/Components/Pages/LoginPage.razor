@@ -9,6 +9,8 @@
 @using Newtonsoft.Json
 @using System.Security.Claims
 @using System.ComponentModel.DataAnnotations
+@using System.Linq.Expressions
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 
 @inject CustomAuthenticationStateProvider CustomAuth
 
@@ -68,15 +70,43 @@
 
                 </form>
 
+                @*    <EditForm Model="@LoginForm" Context="EditFormContextt" method="POST" action="/login">
+                <input type="text" name="data" value="test">
+                <input type="submit" value="Submit">
+                </EditForm>
+
+                <form method="POST" action="/login">
+                <input type="text" name="data" value="test">
+                <input type="submit" value="Submit">
+                </form> *@
+
+                <DxComboBox @bind-Value="SelectedValue"
+                            @bind-Text="Hehehe"
+                            Data="@Villages"
+                            ValueFieldName="Id"
+                            FilteringMode="DataGridFilteringMode.Contains"
+                            TextFieldName="Name" 
+                            AllowUserInput="true" 
+                            ShowValidationIcon="true"
+                            ListRenderMode="ListRenderMode.Virtual">
+                    <Buttons>
+                        <DxEditorButton Click="OnSearch" IconCssClass="fa-solid fa-magnifying-glass" /> 
+                    </Buttons>
+                </DxComboBox>
+
+
                 <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                           OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">
                     <DataAnnotationsValidator />
                     <AntiforgeryToken />
                     <DxFormLayout CssClass="col-md">
                         <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
-                            <DxMaskedInput @bind-Value="LoginForm.Email"
-                                           Mask="@EmailMask"
+                            <DxMaskedInput Mask="@EmailMask"
                                            NullText="mail@domain.com"
+                                           ValueExpression="@(() => LoginForm.Email)"
+                                           Value="LoginForm.Email"
+                                           TextChanged="PerformSearch"
+                                           ValueChanged="@((string s) => OnEmailChanged(s))"
                                            ShowValidationIcon="true"
                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                            InputId="EmailId"
@@ -124,9 +154,20 @@
         border-radius: 13px; /* Sesuaikan dengan radius yang Anda inginkan */
     }
 </style>
+ 
 
 @code {
-    [SupplyParameterFromForm]
+    private async Task PerformSearch()
+    {
+        ToastService.ShowInfo("dawd");
+    }
+    private async Task OnEmailChanged(string newValue)
+    {
+        // Handle the value change, e.g., perform a search or show a toast message
+        LoginForm.Email = newValue;
+        ToastService.ShowInfo("Email changed: " + newValue);
+    }
+    [SupplyParameterFromForm(FormName = "dawda")]
     public LoginTemp LoginForm { get; set; } = new();
     public class LoginTemp
     {
@@ -137,18 +178,27 @@
         public string? Password { get; set; }
     }
 
+    private long? SelectedValue { get; set; } 
+    private string? Hehehe { get; set; } 
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        ToastService.ShowInfo(e.Value?.ToString() ?? "Empty");
+    }
+
     #region MaskedInput
     string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
     string EmailLink { get; set; } = "mailto:test@example.com";
-    void OnEmailChanged(string email)
-    {
-        User.Email = email;
-        EmailLink = $"mailto:{email}";
-    }
+    // void OnEmailChanged(string email)
+    // {
+    //     User.Email = email;
+    //     EmailLink = $"mailto:{email}";
+    // }
     #endregion
     private GroupMenuDto UserAccessCRUID = new();
     private bool IsAccess = false;
 
+    [Microsoft.AspNetCore.Mvc.ValidateAntiForgeryToken]
     private async Task HandleValidSubmit()
     {
         FormValidationState = true;
@@ -168,8 +218,47 @@
         }
     }
 
+    private bool PanelVisible { get; set; } = false;
+    private List<VillageDto> Villages = [];
+    private string searchTerm = string.Empty;
+    private string FilterText { get; set; }
+
+    private async Task OnSearch()
+    {
+        ToastService.ShowInfo(Hehehe);
+        await LoadData(1, 100);
+    }
+    private async Task OnTextChanged(string text)
+    {
+        FilterText = text;
+        // Optionally update the list based on filter text
+        // Villages = await HttpClient.GetFromJsonAsync<IEnumerable<Village>>($"api/villages?search={FilterText}");
+    }
+    private async Task LoadData(int pageIndex, int pageSize)
+    {
+        var query = new GetPagedDataQuery
+            {
+                PageNumber = pageIndex + 1,
+                PageSize = pageSize,
+                Predicate = BuildSearchPredicate()
+            };
+
+        var result = await Mediator.Send(query);
+        Villages = result.Data;
+        PanelVisible = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private Expression<Func<Village, bool>> BuildSearchPredicate()
+    {
+        return string.IsNullOrWhiteSpace(Hehehe)
+            ? village => true
+            : village => village.Name.Contains(Hehehe);
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        await LoadData(1, 20);
         //Helper.DeleteFile("Hasil-Ronsen.jpg");
         // try
         // {
@@ -242,6 +331,8 @@
     [SupplyParameterFromForm]
     private User User { get; set; } = new();
 
+
+
     private async Task OnLogin()
     {
         // toastService.ShowSuccess("Success");
@@ -251,6 +342,29 @@
 
         try
         {
+            var currentUrl = NavigationManager.Uri;
+            var request = new HttpRequestMessage(HttpMethod.Post, currentUrl);
+
+            // Get the anti-forgery token
+            // var tokens = await HttpContextAccessor.HttpContext.GetTokenAsync("RequestVerificationToken");
+            // request.Headers.Add("X-CSRF-TOKEN", tokens.RequestToken);
+
+            // Optionally add content to your request
+
+            var jsonContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(LoginForm), Encoding.UTF8, "application/json");
+
+            // request.Content = new StringContent(jsonContent);
+            request.Content = jsonContent;
+
+            // Send the request
+            var response = await HttpClient.SendAsync(request);
+
+            // Handle response
+            if (response.IsSuccessStatusCode)
+            {
+                // Success logic
+            }
+
             ToastService.ClearErrorToasts();
 
             // var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));

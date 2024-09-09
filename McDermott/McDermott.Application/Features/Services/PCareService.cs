@@ -21,8 +21,9 @@ namespace McDermott.Application.Features.Services
 
         private async Task<string> Signature(string timestamp)
         {
-            var data = $"{await GetPCareCredential("cons-id")!}&{timestamp}";
-            string secretKey = await GetPCareCredential("secret-key");
+            var cred = await GetPCareCredential();
+            var data = $"{cred.ConsId!}&{timestamp}";
+            string secretKey = cred.SecretKey;
 
             // Initialize the keyed hash object using the secret key as the key
             HMACSHA256 hashObject = new(Encoding.UTF8.GetBytes(secretKey));
@@ -37,7 +38,6 @@ namespace McDermott.Application.Features.Services
             // encodedSignature = System.Web.HttpUtility.UrlEncode(encodedSignature);
 
             return encodedSignature;
-
         }
 
         public string PCareWebServiceDecrypt(string key, string data)
@@ -106,33 +106,42 @@ namespace McDermott.Application.Features.Services
             return plaintext;
         }
 
-        private async Task<string> GetPCareCredential(string key)
+        private async Task<SystemParameterDto> GetPCareCredential()
         {
-            return (await _mediator.Send(new GetSystemParameterQuery(x => x.Key.Equals(key)))).FirstOrDefault()?.Value ?? string.Empty;
+            //return (await _mediator.Send(new GetSystemParameterQuery(x => x.Key.Equals(key)))).FirstOrDefault()?.Value ?? string.Empty;
+
+            return (await _mediator.Send(new GetSystemParameterQuery()))?.FirstOrDefault() ?? new();
         }
 
-        public async Task<(dynamic, int)> SendPCareService(string requestURL, HttpMethod method, object? requestBody = null)
+        public async Task<(dynamic, int)> SendPCareService(string baseURL, string requestURL, HttpMethod method, object? requestBody = null)
         {
             try
             {
                 DateTime epochStart = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                 TimeSpan timeSpan = DateTime.UtcNow - epochStart;
 
+                SystemParameterDto cred = await GetPCareCredential() ?? new();
 
-                string baseUrl = await GetPCareCredential("baseURL");
-                string serviceName = await GetPCareCredential("serviceName");
-                string username = await GetPCareCredential("username");
-                string password = await GetPCareCredential("password");
-                string kpAplikasi = await GetPCareCredential("kdAplikasi");
-                string userKey = await GetPCareCredential("user-key");
-                string secretKey = await GetPCareCredential("secret-key");
-                string cons = await GetPCareCredential("cons-id");
+                var urls = string.Empty;
+
+                if (nameof(SystemParameter.AntreanFKTPBaseURL) == baseURL)
+                    urls = cred.AntreanFKTPBaseURL;
+                else if (nameof(SystemParameter.PCareBaseURL) == baseURL)
+                    urls = cred.PCareBaseURL;
+
+                string baseUrl = urls;
+                string username = cred.Username;
+                string password = cred.Password;
+                string kpAplikasi = cred.KdAplikasi;
+                string userKey = cred.UserKey;
+                string secretKey = cred.SecretKey;
+                string cons = cred.ConsId;
 
                 string t = Convert.ToInt64(timeSpan.TotalSeconds).ToString();
                 string sign = await Signature(t);
                 string auth = EncodeToBase64($"{username}:{password}:{kpAplikasi}");
 
-                var url = $"{baseUrl}/{serviceName}/{requestURL}";
+                var url = $"{baseUrl}/{requestURL}";
                 var request = new HttpRequestMessage(method, url);
                 request.Headers.Add("X-cons-id", cons);
                 request.Headers.Add("X-timestamp", t);
@@ -161,6 +170,10 @@ namespace McDermott.Application.Features.Services
                     dynamic metaData = responseJson.metaData;
 
                     string LZDecrypted = PCareWebServiceDecrypt(a, r);
+
+                    if (LZDecrypted is null)
+                        return (r, Convert.ToInt32(response.StatusCode));
+
                     try
                     {
                         string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
@@ -170,7 +183,6 @@ namespace McDermott.Application.Features.Services
                     {
                         return (r, Convert.ToInt32(response.StatusCode));
                     }
-
                 }
                 else
                 {
@@ -222,14 +234,10 @@ namespace McDermott.Application.Features.Services
                     }
                     else
                     {
-
                         Console.WriteLine($"Response: {data}");
 
                         return (data, Convert.ToInt32(response.StatusCode));
                     }
-
-
-
                 }
             }
             catch (Exception ex)

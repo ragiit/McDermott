@@ -42,7 +42,7 @@ namespace McDermott.Application.Features.Queries.Config
                         .Include(x => x.City)
                         .Include(x => x.District)
                         .AsNoTracking()
-                        .Take(100)
+                        //.Take(100)
                         .ToListAsync(cancellationToken);
 
                     //result = await _unitOfWork.Repository<Village>().Entities

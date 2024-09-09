@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Text.Json;
+using Path = System.IO.Path;
 
 namespace McDermott.Web.Controllers
 {
@@ -15,7 +16,6 @@ namespace McDermott.Web.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-
         private readonly IMediator _mediator;
         private readonly ApplicationDbContext _context;
 
@@ -29,6 +29,7 @@ namespace McDermott.Web.Controllers
         public class DataSourceLoadOptions : DataSourceLoadOptionsBase
         {
         }
+
         public class DataSourceLoadOptionsBinder : IModelBinder
         {
             public Task BindModelAsync(ModelBindingContext bindingContext)

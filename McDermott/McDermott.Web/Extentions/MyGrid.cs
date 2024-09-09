@@ -35,12 +35,13 @@
                 CustomizeDataRowEditor = @GridExtention.Grid_CustomizeDataRowEditor;
                 AllowSelectRowByClick = true;
                 PagerPosition = GridPagerPosition.Bottom;
-                PageSizeSelectorVisible = true;
-                PageSizeSelectorItems = (new int[] { 10, 20, 50, 100 });
+                PageSizeSelectorVisible = false;
+                PageSizeSelectorItems = ([10, 20, 50, 100]);
                 //PageSizeSelectorAllRowsItemVisible = true;
                 PagerSwitchToInputBoxButtonCount = 10;
                 FocusedRowEnabled = true;
                 TextWrapEnabled = false;
+                VirtualScrollingEnabled = false;
                 ValidationEnabled = true;
                 ColumnResizeMode = GridColumnResizeMode.NextColumn;
                 PagerVisibleNumericButtonCount = 10;

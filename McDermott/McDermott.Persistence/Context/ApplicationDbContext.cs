@@ -159,7 +159,19 @@ namespace McDermott.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            // Definisikan indeks untuk kolom Name
+            modelBuilder.Entity<Village>()
+                .HasIndex(v => v.Name)
+                .HasDatabaseName("IX_Villages_Name");
+            modelBuilder.Entity<City>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Cities_Name");
+            modelBuilder.Entity<Province>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Provinces_Name");
+            modelBuilder.Entity<District>()
+               .HasIndex(v => v.Name)
+               .HasDatabaseName("IX_Districts_Name");
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {
@@ -573,6 +585,8 @@ namespace McDermott.Persistence.Context
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             // seed data
             //SeedIdentity(modelBuilder);
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -607,11 +621,11 @@ namespace McDermott.Persistence.Context
             {
                 Log.Error(
                  "\n\n" +
-                 "==================== START SAVE ASYNC ERROR ====================" + "\n" +
+                 "==================== SAVE ASYNC ERROR ====================" + "\n" +
                  "Message =====> An error occurred while saving data: " + ex.Message + "\n" +
                  "Inner Message =====> An error occurred while saving data: " + ex.InnerException?.Message + "\n" +
                  "Stack Trace =====> " + ex.StackTrace?.Trim() + "\n" +
-                 "==================== END SAVE ASYNC ERROR ====================" + "\n"
+                 "==================== SAVE ASYNC ERROR ====================" + "\n"
                  );
                 throw;
             }

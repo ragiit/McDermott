@@ -14,102 +14,119 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        <div class="card"> 
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <MyGrid @ref="Grid"
-                                            Data="kioskConfigs"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            KeyFieldName="Id"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            FocusedRowChanged="Grid_FocusedRowChanged">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGrid @ref="Grid"
+                                        Data="kioskConfigs"
+                                        PageSize="10"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        KeyFieldName="Id"
+                                        EditModelSaving="OnSave"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged">
 
-                                        <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="KioskConfigDto"
-                                                             Items="@kioskConfigs"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="(() => NewItem_Click(context.Grid))"
-                                                             EditItem_Click="@EditItem_Click"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@LoadData"
-                                                             IsImport="false"
-                                                             Grid="Grid"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
-                                        </ToolbarTemplate>
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="KioskConfigDto"
+                                                         Items="@kioskConfigs"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="(() => NewItem_Click(context.Grid))"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@LoadData"
+                                                         IsImport="false"
+                                                         Grid="Grid"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
 
-                                        @*  <ToolbarTemplate>
-                                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click(context.Grid)" IconCssClass="fa-solid fa-plus" />
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
-                                    <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
-                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                    <Items>
-                                    <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                    <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                    <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                    </Items>
-                                    </DxToolbarItem>
-                                    <DxToolbarItem Visible="false" id="upload" Text="Import" IconCssClass="fa-solid fa-file-import" />
+                                    @*  <ToolbarTemplate>
+                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                <DxToolbarItem Visible="@UserAccessCRUID.Create" Text="New" Click="() => NewItem_Click(context.Grid)" IconCssClass="fa-solid fa-plus" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Update" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
+                                <DxToolbarItem Visible="@UserAccessCRUID.Delete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && kioskConfigs.Count > 0" />
+                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                <Items>
+                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                </Items>
+                                </DxToolbarItem>
+                                <DxToolbarItem Visible="false" id="upload" Text="Import" IconCssClass="fa-solid fa-file-import" />
 
-                                    </DxToolbar>
+                                </DxToolbar>
 
-                                    </ToolbarTemplate> *@
+                                </ToolbarTemplate> *@
 
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="ServiceName" Caption="Sercive " />
-                                            <DxGridDataColumn Caption="Action ">
-                                                <CellDisplayTemplate>
-                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Start" @onclick="() => OnRenderTo((KioskConfigDto)context.DataItem)"></DxButton>
-                                                </CellDisplayTemplate>
-                                            </DxGridDataColumn>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="ServiceName" Caption="Sercive " />
+                                        <DxGridDataColumn Caption="Action ">
+                                            <CellDisplayTemplate>
+                                                <DxButton RenderStyle="@ButtonRenderStyle.Success" IconCssClass="fa-solid fa-play mr-1" Text="Start" @onclick="() => OnRenderTo((KioskConfigDto)context.DataItem)"></DxButton>
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
 
-                                        </Columns>
+                                    </Columns>
 
-                                    </MyGrid>
-                                </DxLoadingPanel>
-                                <DxPopup @bind-Visible="@PopUpVisible"
-                                         AllowResize="true"
-                                         HeaderText="@TextPopUp"
-                                         MinWidth="300"
-                                         MinHeight="200"
-                                         MaxWidth="800"
-                                         MaxHeight="500"
-                                         Width="@width"
-                                         Height="@height">
-                                    <EditForm Model="@FormKioskConfig" Context="EditFormContext">
-                                        <DataAnnotationsValidator />
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (KioskConfigDto)EditFormContext.EditModel;
+                                        }
                                         <DxFormLayout CssClass="mt">
                                             <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@FormKioskConfig.Name" NullText="Kiosk Name" />
+                                                <DxTextBox @bind-Text="@a.Name" NullText="Kiosk Name" />
                                             </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Service Patient" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="Service Patient" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxTagBox Data="@Services" @bind-Values="@SelectedServices"
                                                           TextFieldName="Name"
                                                           NullText="Select Service"
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CssClass="mt-2" ColSpanMd="12">
-                                                <div class="row justify-content-end">
-                                                    <div class="col-auto align-self-end">
-                                                        <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Contained" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                        <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
-                                                    </div>
-                                                </div>
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem> 
                                         </DxFormLayout>
-                                    </EditForm>
-                                </DxPopup> 
+                                    </EditFormTemplate>
+
+                                </MyGrid>
+                            </DxLoadingPanel>
+                          @*   <DxPopup @bind-Visible="@PopUpVisible"
+                                     AllowResize="true"
+                                     HeaderText="@TextPopUp"
+                                     MinWidth="300"
+                                     MinHeight="200"
+                                     MaxWidth="800"
+                                     MaxHeight="500"
+                                     Width="@width"
+                                     Height="@height">
+                                <EditForm Model="@FormKioskConfig" Context="EditFormContext">
+                                    <DataAnnotationsValidator />
+                                    <DxFormLayout CssClass="mt">
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@FormKioskConfig.Name" NullText="Kiosk Name" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Service Patient" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxTagBox Data="@Services" @bind-Values="@SelectedServices"
+                                                      TextFieldName="Name"
+                                                      NullText="Select Service"
+                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CssClass="mt-2" ColSpanMd="12">
+                                            <div class="row justify-content-end">
+                                                <div class="col-auto align-self-end">
+                                                    <DxButton Text="Save" RenderStyleMode="@ButtonRenderStyleMode.Contained" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                                                    <DxButton Text="Discard" RenderStyleMode="@ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" Click="OnCancel"></DxButton>
+                                                </div>
+                                            </div>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditForm>
+                            </DxPopup> *@
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Bpjs
+﻿using DevExpress.XtraReports.Parameters;
+
+namespace McDermott.Web.Components.Pages.Bpjs
 {
     public partial class SystemParameterPage
     {
@@ -60,6 +62,7 @@
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         private List<SystemParameterDto> SystemParameters = [];
+        private SystemParameterDto SystemParameter { get; set; } = new();
 
         #endregion Static
 
@@ -77,7 +80,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            SystemParameters = await Mediator.Send(new GetSystemParameterQuery());
+            SystemParameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault() ?? new();
             PanelVisible = false;
         }
 
@@ -144,17 +147,17 @@
 
                     var list = new List<SystemParameterDto>();
 
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        var c = new SystemParameterDto
-                        {
-                            Key = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Value = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                        };
+                    //for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    //{
+                    //    var c = new SystemParameterDto
+                    //    {
+                    //        Key = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                    //        Value = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                    //    };
 
-                        if (!SystemParameters.Any(x => x.Key.Trim().ToLower() == c?.Key?.Trim().ToLower() && x.Value != null && x.Value.Trim().ToLower() == c?.Value?.Trim().ToLower()))
-                            list.Add(c);
-                    }
+                    //    if (!SystemParameters.Any(x => x.Key.Trim().ToLower() == c?.Key?.Trim().ToLower() && x.Value != null && x.Value.Trim().ToLower() == c?.Value?.Trim().ToLower()))
+                    //        list.Add(c);
+                    //}
 
                     await Mediator.Send(new CreateListSystemParameterRequest(list));
 
@@ -225,5 +228,32 @@
         }
 
         #endregion Grid
+
+        private async Task OnValidSubmit()
+        {
+            PanelVisible = true;
+            try
+            {
+                if (SystemParameter.Id == 0)
+                    SystemParameter = await Mediator.Send(new CreateSystemParameterRequest(SystemParameter));
+                else
+                    SystemParameter = await Mediator.Send(new UpdateSystemParameterRequest(SystemParameter));
+
+                ToastService.ShowSuccess("Successfully saved.");
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
+        }
+
+        private async Task OnInvalidSubmit()
+        {
+            ToastService.ShowInfoSubmittingForm();
+        }
     }
 }

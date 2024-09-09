@@ -2,6 +2,7 @@
 using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
 using Serilog;
+using Path = System.IO.Path;
 
 namespace McDermott.Web.Extentions
 {

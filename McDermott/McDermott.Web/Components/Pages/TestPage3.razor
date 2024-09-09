@@ -1,0 +1,484 @@
+﻿@page "/test3"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject IHttpClientFactory HttpClientFactory
+
+@if (!isLoading)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Village" ShowBackButton="false" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="panelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+
+                                <MyGridPaginate @ref="grid"
+                                                Data="Datas"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                @bind-PageIndex="@activePageIndex"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                EditModelSaving="OnSave"
+                                                PageSize="@pageSize"
+                                                PageSizeChanged="OnPageSizeIndexChanged">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="VillageDto"
+                                                         Items="@Datas.ToList()"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         IsImport="true"
+                                                         Grid="grid" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="PostalCode" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Province.Name" Caption="Province" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="City.Name" Caption="City" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="District.Name" Caption="District" />
+                                    </Columns>
+
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (Application.Dtos.Config.VillageDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.PostalCode" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
+                                                <ValidationMessage For="@(()=> a.PostalCode)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Provinces"
+                                                              NullText="Select Province..."
+                                                              @ref="refProvinceComboBox"
+                                                              @bind-Value="@a.ProvinceId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputProvinceChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchProvincendexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchProvince"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchProvinceIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.ProvinceId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Cities"
+                                                              NullText="Select City..."
+                                                              @ref="refCityComboBox"
+                                                              @bind-Value="@a.CityId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputCityChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchCityndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchCity"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchCityIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.CityId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Districts"
+                                                              NullText="Select District..."
+                                                              @ref="refDistrictComboBox"
+                                                              @bind-Value="@a.DistrictId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputDistrictChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchDistrictndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchDistrict"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchDistrictIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.DistrictId)" />
+                                            </DxFormLayoutItem>
+
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+@code {
+    private bool isLoading { get; set; }
+    private bool panelVisible { get; set; }
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    private IGrid grid { get; set; }
+
+
+    #region Binding Form
+    private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+    private int provinceComboBoxIndex { get; set; } = 0;
+    private int totalCountProvince = 0;
+
+    private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
+    private int cityComboBoxIndex { get; set; } = 0;
+    private int totalCountCity = 0;
+
+    private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
+    private int districtComboBoxIndex { get; set; } = 0;
+    private int totalCountDistrict = 0;
+    #endregion
+
+    #region Binding ComboBox
+
+    #region Province
+    private async Task OnSearchProvince()
+    {
+        await LoadDataProvinces(0, 10, refProvinceComboBox.Text);
+    }
+
+    private async Task OnSearchProvinceIndexIncrement()
+    {
+        if (provinceComboBoxIndex < (totalCountProvince - 1))
+        {
+            provinceComboBoxIndex++;
+            await LoadDataProvinces(provinceComboBoxIndex, 10, refProvinceComboBox.Text);
+        }
+    }
+
+    private async Task OnSearchProvincendexDecrement()
+    {
+        if (provinceComboBoxIndex > 0)
+        {
+            provinceComboBoxIndex--;
+            await LoadDataProvinces(provinceComboBoxIndex, 10, refProvinceComboBox.Text);
+        }
+    }
+
+    private async Task OnInputProvinceChanged(string e)
+    {
+        provinceComboBoxIndex = 0;
+        await LoadDataProvinces(0, 10, e);
+    }
+
+    private async Task LoadDataProvinces(int pageIndex, int pageSize, string searchTerm = "")
+    {
+        var query = @"
+        query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!) {
+            provinces(pageIndex: $pageIndex, pageSize: $pageSize, searchTerm: $searchTerm) {
+                activePageIndexCount
+                items {
+                    id
+                    name
+                }
+            }
+        }";
+
+        await LoadData<ProvinceDto>(query, pageIndex, pageSize, searchTerm ?? "", result =>
+        {
+            Provinces = JsonConvert.DeserializeObject<List<ProvinceDto>>(JsonConvert.SerializeObject(result.data.provinces.items));
+            totalCountProvince = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result)).data.provinces.activePageIndexCount;
+        });
+    }
+    #endregion
+
+    #region City
+    private async Task OnSearchCity()
+    {
+        await LoadDataCitys(0, 10, refCityComboBox.Text);
+    }
+
+    private async Task OnSearchCityIndexIncrement()
+    {
+        if (cityComboBoxIndex < (totalCountCity - 1))
+        {
+            cityComboBoxIndex++;
+            await LoadDataCitys(cityComboBoxIndex, 10, refCityComboBox.Text);
+        }
+    }
+
+    private async Task OnSearchCityndexDecrement()
+    {
+        if (cityComboBoxIndex > 0)
+        {
+            cityComboBoxIndex--;
+            await LoadDataCitys(cityComboBoxIndex, 10, refCityComboBox.Text);
+        }
+    }
+
+    private async Task OnInputCityChanged(string e)
+    {
+        cityComboBoxIndex = 0;
+        await LoadDataCitys(0, 10, e);
+    }
+
+    private async Task LoadDataCitys(int pageIndex, int pageSize, string searchTerm = "")
+    {
+        var query = @"
+        query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!) {
+            cities(pageIndex: $pageIndex, pageSize: $pageSize, searchTerm: $searchTerm) {
+                activePageIndexCount
+                items {
+                    id
+                    name
+                }
+            }
+        }";
+
+        await LoadData<CityDto>(query, pageIndex, pageSize, searchTerm ?? "", result =>
+        {
+            Cities = JsonConvert.DeserializeObject<List<CityDto>>(JsonConvert.SerializeObject(result.data.cities.items));
+            totalCountCity = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result)).data.cities.activePageIndexCount;
+        });
+    }
+    #endregion
+
+    #region District
+    private async Task OnSearchDistrict()
+    {
+        await LoadDataDistricts(0, 10, refDistrictComboBox.Text);
+    }
+
+    private async Task OnSearchDistrictIndexIncrement()
+    {
+        if (districtComboBoxIndex < (totalCountDistrict - 1))
+        {
+            districtComboBoxIndex++;
+            await LoadDataDistricts(districtComboBoxIndex, 10, refDistrictComboBox.Text);
+        }
+    }
+
+    private async Task OnSearchDistrictndexDecrement()
+    {
+        if (districtComboBoxIndex > 0)
+        {
+            districtComboBoxIndex--;
+            await LoadDataDistricts(districtComboBoxIndex, 10, refDistrictComboBox.Text);
+        }
+    }
+
+    private async Task OnInputDistrictChanged(string e)
+    {
+        districtComboBoxIndex = 0;
+        await LoadDataDistricts(0, 10, e);
+    }
+
+    private async Task LoadDataDistricts(int pageIndex, int pageSize, string searchTerm = "")
+    {
+        var query = @"
+        query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!) {
+            districts(pageIndex: $pageIndex, pageSize: $pageSize, searchTerm: $searchTerm) {
+                activePageIndexCount
+                items {
+                    id
+                    name
+                }
+            }
+        }";
+
+        await LoadData<DistrictDto>(query, pageIndex, pageSize, searchTerm ?? "", result =>
+        {
+            Districts = JsonConvert.DeserializeObject<List<DistrictDto>>(JsonConvert.SerializeObject(result.data.districts.items));
+            totalCountDistrict = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result)).data.districts.activePageIndexCount;
+        });
+    }
+    #endregion
+
+    #endregion
+
+    public List<VillageDto> Datas { get; set; } = [];
+    public List<ProvinceDto> Provinces { get; set; } = [];
+    public List<CityDto> Cities { get; set; } = [];
+    public List<DistrictDto> Districts { get; set; } = [];
+
+    private async Task OnSave(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (VillageDto)e.EditModel;
+
+        if (editModel.Id == 0)
+            await Mediator.Send(new CreateVillageRequest(editModel));
+        else
+            await Mediator.Send(new UpdateVillageRequest(editModel));
+
+        await LoadData(activePageIndex, pageSize);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        try
+        {
+            await LoadData(0, pageSize);
+            await LoadDataProvinces(0, 10);
+            await LoadDataCitys(0, 10);
+            await LoadDataDistricts(0, 10);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowInfo(ex.Message);
+        }
+        isLoading = false;
+    }
+
+    private async Task NewItem_Click()
+    {
+        await grid.StartEditNewRowAsync();
+    }
+
+    private async Task LoadData<T>(string query, int pageIndex, int pageSize, string searchTerm, Action<dynamic> updateDataAction)
+    {
+        try
+        {
+            panelVisible = true;
+            var client = HttpClientFactory.CreateClient("GraphQLClient");
+
+            var requestPayload = new
+            {
+                query,
+                variables = new
+                {
+                    pageIndex = pageIndex + 1,
+                    pageSize,
+                    searchTerm
+                }
+            };
+
+            var response = await client.PostAsJsonAsync("", requestPayload);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var jsonReturn = JsonConvert.DeserializeObject<dynamic>(responseContent);
+            updateDataAction(jsonReturn);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError(ex.Message);
+        }
+        finally
+        {
+            panelVisible = false;
+        }
+    }
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+
+
+
+    private async Task LoadData(int pageIndex, int pageSize)
+    {
+        var query = @"
+        query Query($pageIndex: Int!, $pageSize: Int!, $searchTerm: String!) {
+            villages(pageIndex: $pageIndex, pageSize: $pageSize, searchTerm: $searchTerm) {
+                activePageIndexCount
+                items {
+                    id
+                    name
+                    postalCode
+                    province { id, name }
+                    city { id, name }
+                    district { id, name }
+                }
+            }
+        }";
+
+        await LoadData<VillageDto>(query, pageIndex, pageSize, searchTerm ?? "", result =>
+        {
+            activePageIndex = pageIndex;
+            Datas = JsonConvert.DeserializeObject<List<VillageDto>>(JsonConvert.SerializeObject(result.data.villages.items));
+            totalCount = JsonConvert.DeserializeObject<dynamic>(JsonConvert.SerializeObject(result)).data.villages.activePageIndexCount;
+
+        });
+    }
+
+
+}

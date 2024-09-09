@@ -489,7 +489,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     return false;
                 }
 
-                var result = await PcareService.SendPCareService($"peserta/{number}", HttpMethod.Get);
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"peserta/{number}", HttpMethod.Get);
                 if (result.Item2 != 200 || result.Item1 == null)
                 {
                     return false;
@@ -976,7 +976,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 };
 
                 Console.WriteLine("Sending antrean/batal...");
-                var responseApi = await PcareService.SendPCareService($"antrean/batal", HttpMethod.Post, antreanRequest);
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"antrean/batal", HttpMethod.Post, antreanRequest);
 
                 if (responseApi.Item2 != 200)
                 {
@@ -1026,10 +1026,10 @@ namespace McDermott.Web.Components.Pages.Queue
                     Nik = bpjs.NoKTP ?? string.Empty,
                     Nohp = bpjs.NoHP ?? string.Empty,
                     Kodepoli = service?.Code ?? string.Empty,
-                    Namapoli = service.Name ?? string.Empty,
+                    Namapoli = service?.Name ?? string.Empty,
                     Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
-                    Kodedokter = physician.PhysicanCode ?? null,
+                    Kodedokter = physician?.PhysicanCode ?? null,
                     Namadokter = physician.Name ?? null,
                     Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
                     Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
@@ -1038,7 +1038,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 };
 
                 Console.WriteLine("Sending antrean/add...");
-                var responseApi = await PcareService.SendPCareService($"antrean/add", HttpMethod.Post, antreanRequest);
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.AntreanFKTPBaseURL), $"antrean/add", HttpMethod.Post, antreanRequest);
 
                 if (responseApi.Item2 != 200)
                 {
@@ -1050,8 +1050,11 @@ namespace McDermott.Web.Components.Pages.Queue
                 }
                 else
                 {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                    Console.WriteLine(Convert.ToString(data));
+                    if (responseApi.Item1 is not null)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                        Console.WriteLine(Convert.ToString(data));
+                    }
                 }
 
                 return true;

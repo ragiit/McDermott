@@ -427,7 +427,7 @@
 
                 IsLoadingGetBPJS = true;
 
-                var result = await PcareService.SendPCareService($"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"peserta/{InsurancePoliciyForm.PolicyNumber}", HttpMethod.Get);
                 if (result.Item2 == 200)
                 {
                     if (result.Item1 == null)

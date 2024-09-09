@@ -2,6 +2,53 @@
 {
     public partial class CityPage
     {
+        #region ComboboxProvince
+
+        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+        private int ProvinceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvince = 0;
+
+        private async Task OnSearchProvince()
+        {
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task OnSearchProvinceIndexIncrement()
+        {
+            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            {
+                ProvinceComboBoxIndex++;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvincendexDecrement()
+        {
+            if (ProvinceComboBoxIndex > 0)
+            {
+                ProvinceComboBoxIndex--;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceChanged(string e)
+        {
+            ProvinceComboBoxIndex = 0;
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+            Provinces = result.Item1;
+            totalCountProvince = result.Item2;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxProvince
+
         private DxUpload MyUpload { get; set; }
 
         private List<CityDto> Cities = [];
@@ -60,17 +107,46 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-
-            Provinces = await Mediator.Send(new GetProvinceQuery());
             await GetUserInfo();
             await LoadData();
+            await LoadDataProvince();
+            PanelVisible = false;
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Cities = await Mediator.Send(new GetCityQuery());
+            SelectedDataItems = [];
+            var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            Cities = result.Item1;
+            totalCount = result.Item2;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
