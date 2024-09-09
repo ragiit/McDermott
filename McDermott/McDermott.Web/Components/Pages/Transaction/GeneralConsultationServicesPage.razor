@@ -147,7 +147,7 @@
 
                                 <EditForm Model="@GeneralConsultanService" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                                           OnInvalidSubmit="@HandleInvalidSubmit">
-                                    <Blazored.FluentValidation.FluentValidationValidator />
+                                    @* <Blazored.FluentValidation.FluentValidationValidator /> *@
                                     <DataAnnotationsValidator />
                                     <ValidationSummary />
 
@@ -267,10 +267,10 @@
                                                                            Text="Procedure Room" />
                                                         }
 
-                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                       @*  <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
                                                                        IconCssClass="fa-solid fa-file-circle-check"
                                                                        Click="OnPrintDocumentMedicalF"
-                                                                       Text="Print Out Document Medical" />
+                                                                       Text="Print Out Document Medical" /> *@
                                                     </Items>
                                                 </DxToolbar>
                                             </div>

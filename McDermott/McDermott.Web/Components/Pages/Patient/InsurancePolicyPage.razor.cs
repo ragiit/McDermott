@@ -103,8 +103,8 @@
             ShowForm = false;
             SelectedDataItems = [];
 
-            Countries = await Mediator.Send(new GetCountryQuery());
-
+            var countries = await Mediator.Send(new GetCountryQuery());
+            Countries = countries.Item1;
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
 
             if (User != null && User.Id != 0)

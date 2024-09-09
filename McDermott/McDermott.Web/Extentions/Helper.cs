@@ -38,6 +38,7 @@ namespace McDermott.Web.Extentions
         ];
 
         public static string DefaultFormatDate => "dd MMMM yyyy";
+
         public static string DefaultFormatDateTime => "dd MMMM yyyy HH:mm:ss";
 
         public class AllergyType
