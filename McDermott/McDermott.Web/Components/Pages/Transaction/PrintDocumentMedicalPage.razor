@@ -6,22 +6,45 @@
 
 <div class="wrapper">
     <BaseHeaderPage Title="Print Document Medical" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
-        <div class="wrapper">
-            <div class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col">
-                            <div class="card">
-                                <div class="card-header"><h1>@Ids</h1></div>
-                                <div class=" card-body">
-                                    <EditForm Model="@postGenerateMedicalcertificates" Context="EditFormConter">
-
-                                    </EditForm> 
-                                </div>
+    <div class="wrapper">
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        
+                        <div class="card">
+                            <div class="card-header"><h1>@Ids</h1></div>
+                            <div class=" card-body">
+                                <EditForm Model="@postGenerateMedicalcertificates" Context="EditFormConter" >
+                                    <AntiforgeryToken/>
+                                    
+                                    <DxFormLayout class="w-100 mt-1">
+                                        <DxFormLayoutItem CaptionCssClass="caption-normal" Caption="Certified Medical Category" ColSpanMd="12">
+                                            <MyDxComboBox Data="@CertifiedMedicalCategroy"
+                                                          @bind-Value="@postGenerateMedicalcertificates.JenisSurat"></MyDxComboBox>
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="justify-content-end" ColSpanMd="12">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" text="Check" Click="SelectCategory"></DxButton>
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </EditForm>
                             </div>
                         </div>
+                        @if (ViewVisible)
+                        {
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
+                                    <MailMergeSettings>
+                                        <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
+                                    </MailMergeSettings>
+                                </DxRichEdit>
+                            </div>
+                        </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </div>
