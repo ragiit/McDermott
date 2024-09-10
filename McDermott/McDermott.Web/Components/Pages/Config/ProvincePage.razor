@@ -50,7 +50,7 @@
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
+                                         @* <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" /> *@
                                         <DxGridDataColumn MinWidth="200" FieldName="Country.Name" Caption="Country" />
                                     </Columns>
 
@@ -63,10 +63,10 @@
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                          @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Code" />
                                                 <ValidationMessage For="@(()=> a.Code)"   />
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem> *@
 
 
                                             @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">

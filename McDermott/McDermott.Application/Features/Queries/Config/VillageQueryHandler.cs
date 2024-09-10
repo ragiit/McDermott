@@ -23,45 +23,45 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
-        public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQuery request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var query = _unitOfWork.Repository<Village>().Entities
-                    .AsNoTracking()
-                    .Include(v => v.City)
-                    .Include(v => v.Province)
-                    .Include(v => v.District)
-                    .AsQueryable();
+        //public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQuery request, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var query = _unitOfWork.Repository<Village>().Entities
+        //            .AsNoTracking()
+        //            .Include(v => v.City)
+        //            .Include(v => v.Province)
+        //            .Include(v => v.District)
+        //            .AsQueryable();
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
-                {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
-                }
+        //        if (!string.IsNullOrEmpty(request.SearchTerm))
+        //        {
+        //            query = query.Where(v =>
+        //                EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+        //                EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
+        //                EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
+        //        }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+        //        var pagedResult = query
+        //                    .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
+        //        var skip = (request.PageIndex) * request.PageSize;
 
-                var totalCount = await query.CountAsync(cancellationToken);
+        //        var totalCount = await query.CountAsync(cancellationToken);
 
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
+        //        var paged = pagedResult
+        //                    .Skip(skip)
+        //                    .Take(request.PageSize);
 
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+        //        var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
-                return (paged.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //        return (paged.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         public async Task<IQueryable<VillageDto>> Handle(GetVillageQuery2 request, CancellationToken cancellationToken)
         {

@@ -23,12 +23,12 @@
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
                                 <MyGridPaginate @ref="Grid"
-                                        Data="Districts"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        EditModelSaving="OnSave"
-                                        SearchTextChanged="OnSearchBoxChanged"
-                                        DataItemDeleting="OnDelete"
-                                        KeyFieldName="Id">
+                                                Data="Districts"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                DataItemDeleting="OnDelete"
+                                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="DistrictDto"
@@ -156,4 +156,5 @@
 else
 {
     <LoadingIndicatorLayout />
-} 
+}
+

@@ -183,11 +183,11 @@
                     Column = "Name",
                     Notes = "Mandatory"
                 },
-                new()
-                {
-                    Column = "Code",
-                    Notes = "Max Lenght 5 char",
-                },
+                //new()
+                //{
+                //    Column = "Code",
+                //    Notes = "Max Lenght 5 char",
+                //},
             ]);
         }
 
@@ -206,7 +206,7 @@
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Country", "Name", "Code" };
+                    var headerNames = new List<string>() { "Country", "Name" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -233,7 +233,7 @@
                         {
                             CountryId = a.Id,
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                            Code = ws.Cells[row, 3].Value?.ToString()?.Trim(),
+                            //Code = ws.Cells[row, 3].Value?.ToString()?.Trim(),
                         };
 
                         if (!Provinces.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.CountryId == c.CountryId))

@@ -280,4 +280,17 @@
     //     document.querySelector('[data-widget="pushmenu"]').click();
     //     console.log('Push menu initialized');
     // };
+
+     
+        function downloadFileFromStream(fileName, contentType, streamReference) {
+            const blob = new Blob([streamReference], {type: contentType });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.download = fileName;
+        anchor.href = url;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(url);
+        } 
 </script>
