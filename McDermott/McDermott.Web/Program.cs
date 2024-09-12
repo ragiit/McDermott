@@ -162,7 +162,7 @@ builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = B
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 builder.Services.AddHttpClient();
-builder.Services.AddSignalR();
+
 builder.Services.AddScoped<ITestDataVillageService, TestDataVillageService>();
 builder.Services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
 

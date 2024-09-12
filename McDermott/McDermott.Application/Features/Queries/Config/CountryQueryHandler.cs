@@ -4,9 +4,10 @@ using static McDermott.Application.Features.Commands.Config.VillageCommand;
 namespace McDermott.Application.Features.Queries.Config
 {
     public class CountryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateCountryQuery, bool>,
         IRequestHandler<CreateCountryRequest, CountryDto>,
+        IRequestHandler<CreateListCountryRequest, List<CountryDto>>,
         IRequestHandler<UpdateCountryRequest, CountryDto>,
         IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
         IRequestHandler<DeleteCountryRequest, bool>
@@ -126,6 +127,9 @@ IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize,
                 var query = _unitOfWork.Repository<Country>().Entities
                     .AsNoTracking()
                     .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {

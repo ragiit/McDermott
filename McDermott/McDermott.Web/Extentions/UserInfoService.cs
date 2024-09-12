@@ -6,7 +6,7 @@ namespace McDermott.Web.Extentions
     {
         private readonly NavigationManager _navigationManager = navigationManager;
         private readonly IJSRuntime _oLocal = oLocal; // Ganti YourLocalService dengan service yang sesuai
-        private readonly IMediator _mediator = mediator; // Ganti IMediator dengan interface Mediator yang sesuai 
+        private readonly IMediator _mediator = mediator; // Ganti IMediator dengan interface Mediator yang sesuai
 
         public async Task<(bool, GroupMenuDto, User)> GetUserInfo(IToastService? toastService = null)
         {
@@ -24,8 +24,11 @@ namespace McDermott.Web.Extentions
                     return (false, null!, null!);
                 }
 
-
-                var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
+                //var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
+                var tempUser = await _mediator.Send(new GetUserQuery2(x => x.Id == user.Id, 0, 1));
+                user = tempUser.Item1.FirstOrDefault().Adapt<User>();
+                var result2 = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!, pageIndex: 0, pageSize: short.MaxValue));
+                var groups = result2.Item1;
 
                 var asdf = "queue/kiosk/1".Contains("queue/kiosk");
 

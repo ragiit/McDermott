@@ -15,6 +15,16 @@ namespace McDermott.Application.Features.Commands.Config
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class ValidateVillageQuery(Expression<Func<Village, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Village, bool>> Predicate { get; } = predicate!;
+        }
+
+        public class BulkValidateVillageQuery(List<VillageDto> villagesToValidate) : IRequest<List<VillageDto>>
+        {
+            public List<VillageDto> VillagesToValidate { get; } = villagesToValidate;
+        }
+
         public class GetVillageQuery2(Expression<Func<Village, bool>>? predicate = null, bool removeCache = false) : IRequest<IQueryable<VillageDto>>
         {
             public Expression<Func<Village, bool>> Predicate { get; } = predicate!;

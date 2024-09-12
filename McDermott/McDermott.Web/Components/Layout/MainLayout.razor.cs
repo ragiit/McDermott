@@ -92,8 +92,12 @@ namespace McDermott.Web.Components.Layout
                     return;
                 }
 
-                var menus = await Mediator.Send(new GetMenuQuery());
-                var groups = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!)!);
+                var result = await Mediator.Send(new GetMenuQuery(pageIndex: 0, pageSize: short.MaxValue));
+                var menus = result.Item1;
+
+                var result2 = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!, pageIndex: 0, pageSize: short.MaxValue));
+                var groups = result2.Item1;
+                //var groups = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!)!);
 
                 var m = groups.Select(x => x.Menu.ParentId).ToList().Distinct().Where(x => x != null);
                 var ids = groups.Select(x => x.MenuId).ToList();

@@ -171,8 +171,10 @@
             PanelVisible = true;
             var countries = await Mediator.Send(new GetCountryQuery());
             Countries = countries.Item1;
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
+            var result = await Mediator.Send(new GetProvinceQuery());
+            Provinces = result.Item1;
+            var resultsCity = await Mediator.Send(new GetCityQuery());
+            Cities = resultsCity.Item1;
 
             await GetUserInfo();
             await LoadData();

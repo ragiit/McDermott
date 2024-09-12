@@ -143,7 +143,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             LabUoms = await Mediator.Send(new GetLabUomQuery());
             LabTests = await Mediator.Send(new GetLabTestQuery());
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
-            groups = await Mediator.Send(new GetGroupQuery());
+            var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
+            groups = result2.Item1;
             NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             user_group = await Mediator.Send(new GetUserQuery());
             NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();

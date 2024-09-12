@@ -1,13 +1,88 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using McDermott.Web.Components.Layout;
+using System.Security.Policy;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class MenuPage
     {
-        #region Searching
+        #region Fields and Properties
 
         private int pageSize { get; set; } = 10;
         private int totalCount = 0;
         private int activePageIndex { get; set; } = 0;
         private string searchTerm { get; set; } = string.Empty;
+
+        private DxComboBox<MenuDto, long?> refParentMenuComboBox { get; set; }
+        private int ParentMenuComboBoxIndex { get; set; } = 0;
+        private int totalCountParentMenu = 0;
+
+        [Inject] public UserInfoService UserInfoService { get; set; }
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        public IGrid Grid { get; set; }
+        private List<MenuDto> Menus = new();
+        private List<MenuDto> ParentMenuDto = new();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private int FocusedRowVisibleIndex { get; set; }
+        private bool EditItemsEnabled { get; set; }
+        private bool PanelVisible { get; set; }
+
+        private List<ExportFileData> ExportFiles = new()
+    {
+        new() { Column = "Name", Notes = "Mandatory" },
+        new() { Column = "Parent" },
+        new() { Column = "Parent Icon" },
+        new() { Column = "Sequence", Notes = "Mandatory" },
+        new() { Column = "URL" }
+    };
+
+        #endregion Fields and Properties
+
+        #region Lifecycle Methods
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+            await GetUserInfo();
+            await LoadData();
+            await LoadDataParentMenu();
+            PanelVisible = false;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            //if (firstRender)
+            //{
+            //    await GetUserInfo();
+            //    await LoadData();
+            //}
+            //await base.OnAfterRenderAsync(firstRender);
+        }
+
+        #endregion Lifecycle Methods
+
+        #region User and Access Management
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo(ToastService);
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch
+            {
+                // Handle user information retrieval failure.
+            }
+        }
+
+        #endregion User and Access Management
+
+        #region Data Loading and Searching
 
         private async Task OnSearchBoxChanged(string searchText)
         {
@@ -28,22 +103,26 @@
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
-            Menus = result.Item1;
-            totalCount = result.Item2;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+                Menus = result.Item1;
+                totalCount = result.Item2;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                PanelVisible = false;
+                ex.HandleException(ToastService);
+            }
         }
 
-        #endregion Searching
+        #endregion Data Loading and Searching
 
-        #region ComboboxParentMenu
-
-        private DxComboBox<MenuDto, long?> refParentMenuComboBox { get; set; }
-        private int ParentMenuComboBoxIndex { get; set; } = 0;
-        private int totalCountParentMenu = 0;
+        #region Parent Menu Combobox
 
         private async Task OnSearchParentMenu()
         {
@@ -78,83 +157,66 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refParentMenuComboBox?.Text ?? "");
-            ParentMenuDto = result.Item1.Where(x => x.Parent != null).OrderBy(x => x.Sequence).ToList();
-            totalCountParentMenu = result.Item2;
+            var result = await Mediator.Send(new GetMenuQuery(x => x.Parent != null, searchTerm: refParentMenuComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
+            ParentMenuDto = [.. result.Item1.OrderBy(x => x.Name).ThenBy(x => x.Sequence)];
+            totalCountParentMenu = result.pageCount;
             PanelVisible = false;
         }
 
-        #endregion ComboboxParentMenu
+        #endregion Parent Menu Combobox
 
-        #region UserLoginAndAccessRole
-
-        [Inject]
-        public UserInfoService UserInfoService { get; set; }
-
-        private GroupMenuDto UserAccessCRUID = new();
-        private User UserLogin { get; set; } = new();
-        private bool IsAccess = false;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            //if (firstRender)
-            //{
-            //    try
-            //    {
-            //        await GetUserInfo();
-            //        StateHasChanged();
-            //    }
-            //    catch { }
-
-            //    await LoadData();
-            //    StateHasChanged();
-
-            //    ParentMenuDto = (await Mediator.Send(new GetMenuQuery())).Where(x => x.ParentMenu == null || x.ParentMenu == string.Empty).OrderBy(x => x.Sequence).ToList();
-            //    StateHasChanged();
-            //}
-        }
-
-        private async Task GetUserInfo()
-        {
-            try
-            {
-                var user = await UserInfoService.GetUserInfo(ToastService);
-                IsAccess = user.Item1;
-                UserAccessCRUID = user.Item2;
-                UserLogin = user.Item3;
-            }
-            catch { }
-        }
-
-        #endregion UserLoginAndAccessRole
-
-        public IGrid Grid { get; set; }
-        private List<MenuDto> Menus = new();
-        private List<MenuDto> ParentMenuDto = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
-        private int FocusedRowVisibleIndex { get; set; }
-        private bool EditItemsEnabled { get; set; }
-        private bool PanelVisible { get; set; }
+        #region CRUD Operations
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            await Mediator.Send(new DeleteMenuRequest(((MenuDto)e.DataItem).Id));
-
-            NavigationManager.NavigateTo("config/menu", true);
-
-            await LoadData();
+            try
+            {
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteMenuRequest(((MenuDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var selectedMenus = SelectedDataItems.Adapt<List<MenuDto>>();
+                    await Mediator.Send(new DeleteMenuRequest(ids: selectedMenus.Select(x => x.Id).ToList()));
+                }
+                await LoadData(0, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        protected override async Task OnInitializedAsync()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            PanelVisible = true;
-            await GetUserInfo();
+            var editModel = (MenuDto)e.EditModel;
+
+            bool exists = await Mediator.Send(new ValidateMenuQuery(x =>
+                x.Name == editModel.Name &&
+                x.Id != editModel.Id &&
+                x.ParentId == editModel.ParentId &&
+                x.Sequence == editModel.Sequence &&
+                x.Url == editModel.Url));
+
+            if (exists)
+            {
+                ToastService.ShowErrorConflictValidation(nameof(Menu));
+                e.Cancel = true;
+                return;
+            }
+
+            if (editModel.Id == 0)
+                await Mediator.Send(new CreateMenuRequest(editModel));
+            else
+                await Mediator.Send(new UpdateMenuRequest(editModel));
+
             await LoadData();
-            await LoadDataParentMenu();
-            PanelVisible = false;
         }
+
+        #endregion CRUD Operations
+
+        #region Grid Event Handlers
 
         private void UpdateEditItemsEnabled(bool enabled)
         {
@@ -172,14 +234,14 @@
             await Grid.StartEditNewRowAsync();
         }
 
-        private async Task Refresh_Click()
-        {
-            await LoadData();
-        }
-
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadData();
         }
 
         private void DeleteItem_Click()
@@ -187,62 +249,13 @@
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task OnSave(GridEditModelSavingEventArgs e)
+        #endregion Grid Event Handlers
+
+        #region Import and Export
+
+        private async Task ExportToExcel()
         {
-            var editModel = (MenuDto)e.EditModel;
-
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
-
-            //if (!string.IsNullOrWhiteSpace(editModel.ParentMenu))
-            //{
-            //    var splits = editModel.Name.ToLower().Split(" ");
-            //    editModel.Url = $"{string.Join("-", editModel.ParentMenu.ToLower().Trim().Split())}/{editModel.Url}";
-
-            //    if (editModel.ParentMenu.Contains("Configuration"))
-            //    {
-            //        editModel.Url = $"config/{string.Join("-", splits)}";
-            //    }
-            //}
-
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateMenuRequest(editModel));
-            else
-            {
-                await Mediator.Send(new UpdateMenuRequest(editModel));
-
-                if (editModel.Parent != null && string.IsNullOrWhiteSpace(editModel.Parent.Name))
-                {
-                    //var relatedMenus = await Mediator.Send(new GetMenuQuery(x => x.ParentMenu == SelectedDataItems[0].Adapt<MenuDto>().Name));
-
-                    //var splits = editModel.Name.ToLower().Split(" ");
-
-                    //if (editModel.Name.Contains("Configuration"))
-                    //{
-                    //    editModel.Url = $"config/{string.Join("-", splits)}";
-                    //}
-                    //else
-                    //{
-                    //    editModel.Url = $"{string.Join("-", splits)}/";
-                    //}
-
-                    //relatedMenus.ForEach(x =>
-                    //{
-                    //    x.ParentMenu = editModel.Name;
-                    //    x.Url = editModel.Url + string.Join("-", x.Name.ToLower().Split(" "));
-                    //});
-
-                    //await Mediator.Send(new UpdateMenuRequest(editModel));
-
-                    //await Mediator.Send(new UpdateListMenuRequest(relatedMenus));
-                }
-            }
-
-            //await Mediator.Send(new GetGroupMenuQuery(removeCache: true));
-
-            NavigationManager.NavigateTo("config/menu", true);
-
-            await LoadData();
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "menu_template.xlsx", ExportFiles);
         }
 
         private async Task ImportFile()
@@ -253,101 +266,123 @@
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
             PanelVisible = true;
+
             foreach (var file in e.GetMultipleFiles(1))
             {
                 try
                 {
-                    using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
-                    ms.Position = 0;
+                    using MemoryStream memoryStream = new();
+                    await file.OpenReadStream().CopyToAsync(memoryStream);
+                    memoryStream.Position = 0;
 
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                    using ExcelPackage package = new(ms);
-                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+                    using ExcelPackage excelPackage = new(memoryStream);
+                    ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Parent", "Parent Icon", "Sequence", "Url" };
+                    var expectedHeaders = ExportFiles.Select(x => x.Column);
 
-                    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    // Validasi header
+                    if (!expectedHeaders.Select((header, index) => header.Trim().ToLower() == worksheet.Cells[1, index + 1].Value?.ToString()?.Trim().ToLower()).All(valid => valid))
                     {
                         ToastService.ShowInfo("The header must match with the template.");
                         return;
                     }
 
-                    var list = new List<MenuDto>();
+                    var importedMenus = new List<MenuDto>();
+                    var parentCache = new List<MenuDto>();
 
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
-                        bool IsValid = true;
-                        var a = this.Menus.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim())?.Id ?? 0;
+                        string name = worksheet.Cells[row, 1].Value?.ToString()?.Trim();
+                        string parentName = worksheet.Cells[row, 2].Value?.ToString()?.Trim();
+                        string icon = worksheet.Cells[row, 3].Value?.ToString()?.Trim();
+                        int? sequence = worksheet.Cells[row, 4].Value?.ToInt32();
+                        string url = worksheet.Cells[row, 5].Value?.ToString()?.Trim();
+                        bool isValid = true;
 
-                        if (ws.Cells[row, 2].Value?.ToString()?.Trim() is not null)
+                        // Validasi URL
+                        if (!Helper.URLS.Contains(url) && !string.IsNullOrEmpty(parentName))
                         {
-                            if (a == 0)
+                            isValid = false;
+                            ToastService.ShowErrorImport(row, 5, url ?? string.Empty);
+                        }
+
+                        // Validasi Name
+                        if (string.IsNullOrEmpty(name))
+                        {
+                            isValid = false;
+                            ToastService.ShowErrorImport(row, 1, name ?? string.Empty);
+                        }
+
+                        long? parentId = null;
+                        if (!string.IsNullOrEmpty(parentName))
+                        {
+                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
+                            if (cachedParent is null)
                             {
-                                ToastService.ShowErrorImport(row, 1, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
-                                IsValid = false;
+                                var parentMenu = (await Mediator.Send(new GetMenuQuery(
+                                    x => x.Parent == null && x.Name == parentName,
+                                    searchTerm: parentName, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentMenu is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 2, parentName ?? string.Empty);
+                                }
+                                else
+                                {
+                                    parentId = parentMenu.Id;
+                                    parentCache.Add(parentMenu);
+                                }
+                            }
+                            else
+                            {
+                                parentId = cachedParent.Id;
                             }
                         }
 
-                        if (!IsValid)
+                        // Lewati baris jika tidak valid
+                        if (!isValid)
                             continue;
 
-                        var c = new MenuDto
+                        // Validasi dan tambahkan menu baru
+                        var newMenu = new MenuDto
                         {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            ParentId = a == 0 ? null : a,
-                            Icon = ws.Cells[row, 3].Value?.ToString()?.Trim(),
-                            Sequence = ws.Cells[row, 4].Value?.ToInt32(),
-                            Url = ws.Cells[row, 5].Value?.ToString().Trim()
+                            Name = name,
+                            ParentId = parentId,
+                            Icon = icon,
+                            Sequence = sequence,
+                            Url = url
                         };
 
-                        if (!Menus.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.ParentId == c?.ParentId && x.Sequence == c?.Sequence && x.Url?.Trim().ToLower() == c?.Url?.Trim().ToLower()))
-                            list.Add(c);
+                        bool exists = await Mediator.Send(new ValidateMenuQuery(x =>
+                            x.Name == newMenu.Name &&
+                            x.ParentId == newMenu.ParentId &&
+                            x.Sequence == newMenu.Sequence &&
+                            x.Url == newMenu.Url));
+
+                        if (!exists)
+                            importedMenus.Add(newMenu);
                     }
 
-                    await Mediator.Send(new CreateListMenuRequest(list));
+                    if (importedMenus.Count != 0)
+                    {
+                        await Mediator.Send(new CreateListMenuRequest(importedMenus));
+                        await LoadData();
+                        SelectedDataItems = [];
+                    }
 
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
+                    ToastService.ShowSuccessCountImported(importedMenus.Count);
                 }
                 catch (Exception ex)
                 {
                     ToastService.ShowError(ex.Message);
                 }
             }
+
             PanelVisible = false;
         }
 
-        private async Task ExportToExcel()
-        {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "menu_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Parent"
-                },
-                new()
-                {
-                    Column = "Parent Icon"
-                },
-                new()
-                {
-                    Column = "Sequence",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "URL"
-                }
-            ]);
-        }
+        #endregion Import and Export
     }
 }

@@ -83,6 +83,11 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
+                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
@@ -105,6 +110,10 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CityId)" />
                                             </DxFormLayoutItem>

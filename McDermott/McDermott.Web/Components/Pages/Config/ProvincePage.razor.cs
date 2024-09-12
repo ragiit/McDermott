@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Web.Components.Layout;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class ProvincePage
     {
@@ -9,7 +12,7 @@
 
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
-        private bool IsAccess = false;
+        private bool IsAccess { get; set; } = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -22,7 +25,10 @@
                     await GetUserInfo();
                     StateHasChanged();
                 }
-                catch { }
+                catch (Exception)
+                {
+                    // Handle exception if necessary
+                }
             }
         }
 
@@ -35,7 +41,10 @@
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;
             }
-            catch { }
+            catch (Exception)
+            {
+                // Handle exception if necessary
+            }
         }
 
         #endregion UserLoginAndAccessRole
@@ -69,11 +78,13 @@
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            SelectedDataItems = Array.Empty<object>();
+
+            var result = await Mediator.Send(new GetProvinceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Provinces = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
+
             PanelVisible = false;
         }
 
@@ -97,7 +108,7 @@
             }
         }
 
-        private async Task OnSearchCountryndexDecrement()
+        private async Task OnSearchCountryIndexDecrement()
         {
             if (CountryComboBoxIndex > 0)
             {
@@ -116,9 +127,11 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetCountries(HttpClientFactory, pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+
+            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
             Countries = result.Item1;
-            totalCountCountry = result.Item2;
+            totalCountCountry = result.pageCount;
+
             PanelVisible = false;
         }
 
@@ -126,10 +139,9 @@
 
         public IGrid Grid { get; set; }
 
-        private List<CountryDto> Countries { get; set; } = [];
-        private List<ProvinceDto> Provinces { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private int Value { get; set; } = 0;
+        private List<CountryDto> Countries { get; set; } = new();
+        private List<ProvinceDto> Provinces { get; set; } = new();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = Array.Empty<object>();
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private bool PanelVisible { get; set; } = false;
@@ -138,21 +150,21 @@
         {
             try
             {
-                var aq = SelectedDataItems.Count;
-                if (SelectedDataItems is null)
+                if (SelectedDataItems.Count == 0)
                 {
                     await Mediator.Send(new DeleteProvinceRequest(((ProvinceDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<ProvinceDto>>();
-                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+                    var selectedProvinces = SelectedDataItems.Adapt<List<ProvinceDto>>();
+                    await Mediator.Send(new DeleteProvinceRequest(ids: selectedProvinces.Select(x => x.Id).ToList()));
                 }
+
                 await LoadData();
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                ee.HandleException(ToastService);
+                ex.HandleException(ToastService);
             }
         }
 
@@ -163,105 +175,6 @@
             await LoadDataCountries();
             PanelVisible = false;
         }
-
-        private async Task ImportFile()
-        {
-            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
-        }
-
-        private async Task ExportToExcel()
-        {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "province_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Country",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-                //new()
-                //{
-                //    Column = "Code",
-                //    Notes = "Max Lenght 5 char",
-                //},
-            ]);
-        }
-
-        public async Task ImportExcelFile(InputFileChangeEventArgs e)
-        {
-            PanelVisible = true;
-            foreach (var file in e.GetMultipleFiles(1))
-            {
-                try
-                {
-                    using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
-                    ms.Position = 0;
-
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                    using ExcelPackage package = new(ms);
-                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-
-                    var headerNames = new List<string>() { "Country", "Name" };
-
-                    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
-                    {
-                        PanelVisible = false;
-                        ToastService.ShowInfo("The header must match with the template.");
-                        return;
-                    }
-
-                    var list = new List<ProvinceDto>();
-
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        var a = Countries.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
-
-                        if (a is null)
-                        {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"Country with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
-                            return;
-                        }
-
-                        var c = new ProvinceDto
-                        {
-                            CountryId = a.Id,
-                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                            //Code = ws.Cells[row, 3].Value?.ToString()?.Trim(),
-                        };
-
-                        if (!Provinces.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.CountryId == c.CountryId))
-                            list.Add(c);
-                    }
-
-                    await Mediator.Send(new CreateListProvinceRequest(list));
-
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
-                }
-                catch (Exception ex)
-                {
-                    ToastService.ShowError(ex.Message);
-                }
-            }
-            PanelVisible = false;
-        }
-
-        //private async Task LoadData()
-        //{
-        //    PanelVisible = true;
-        //    SelectedDataItems = [];
-        //    Provinces = await Mediator.Send(new GetProvinceQuery());
-        //    PanelVisible = false;
-        //}
 
         private async Task NewItem_Click()
         {
@@ -294,30 +207,127 @@
             UpdateEditItemsEnabled(true);
         }
 
-        //protected async Task SelectedFilesChangedAsync(IEnumerable<UploadFileInfo> files)
-        //{
-        //    UploadVisible = files.ToList().Count == 0;
-        //    try
-        //    {
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Error reading Excel file: {ex.Message}");
-        //    }
-        //}
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (ProvinceDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
+            bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.CountryId == editModel.CountryId));
+            if (exists)
+            {
+                ToastService.ShowInfo($"Province with name '{editModel.Name}' and country '{refCountryComboBox.Text}' already exists.");
+                e.Cancel = true;
                 return;
+            }
 
             if (editModel.Id == 0)
+            {
                 await Mediator.Send(new CreateProvinceRequest(editModel));
+            }
             else
+            {
                 await Mediator.Send(new UpdateProvinceRequest(editModel));
+            }
 
             await LoadData();
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "province_template.xlsx",
+            [
+                new() { Column = "Country", Notes = "Mandatory" },
+                new() { Column = "Name", Notes = "Mandatory" }
+            ]);
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Country", "Name" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<ProvinceDto>();
+                    var parentCache = new List<CountryDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var countryName = ws.Cells[row, 1].Value?.ToString()?.Trim();
+
+                        long? parentId = null;
+                        if (!string.IsNullOrEmpty(countryName))
+                        {
+                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == countryName);
+                            if (cachedParent is null)
+                            {
+                                var parentMenu = (await Mediator.Send(new GetCountryQuery(x => x.Name == countryName, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+                                if (parentMenu is null)
+                                {
+                                    ToastService.ShowErrorImport(row, 1, countryName ?? string.Empty);
+                                    continue;
+                                }
+                                else
+                                {
+                                    parentId = parentMenu.Id;
+                                    parentCache.Add(parentMenu);
+                                }
+                            }
+                            else
+                            {
+                                parentId = cachedParent.Id;
+                            }
+                        }
+
+                        var newMenu = new ProvinceDto
+                        {
+                            CountryId = parentId,
+                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Name == newMenu.Name && x.CountryId == newMenu.CountryId));
+
+                        if (!exists)
+                            list.Add(newMenu);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        await Mediator.Send(new CreateListProvinceRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
         }
     }
 }

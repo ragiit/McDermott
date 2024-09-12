@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Web.Components.Layout;
 using Microsoft.AspNetCore.HttpLogging;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -44,9 +45,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, refCityComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetCityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Cities = result.Item1;
-            totalCountCity = result.Item2;
+            totalCountCity = result.pageCount;
             PanelVisible = false;
         }
 
@@ -91,9 +92,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetDistricts(HttpClientFactory, pageIndex, pageSize, refDistrictComboBox?.Text ?? "");
-            Districts = result.Item1;
-            totalCountDistrict = result.Item2;
+            var resultDistrict = await Mediator.Send(new GetDistrictQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
+            Districts = resultDistrict.Item1;
+            totalCountDistrict = resultDistrict.pageCount;
             PanelVisible = false;
         }
 
@@ -138,9 +139,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
             Provinces = result.Item1;
-            totalCountProvince = result.Item2;
+            totalCountProvince = result.pageCount;
             PanelVisible = false;
         }
 
@@ -321,13 +322,12 @@ namespace McDermott.Web.Components.Pages.Config
         {
             var editModel = (VillageDto)e.EditModel;
 
-            var c = await Mediator.Send(new GetCountryQuery(searchTerm: editModel.Name, pageSize: 0, pageIndex: 1));
+            bool validate = await Mediator.Send(new ValidateVillageQuery(x => x.Id != editModel.Id && x.DistrictId == editModel.DistrictId && x.PostalCode == editModel.PostalCode && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId && x.CityId == editModel.CityId));
 
-            if (c.Item1.Count > 0)
+            if (validate)
             {
-                ToastService.ShowInfo($"Country with name '{editModel.Name}' is already exist");
+                ToastService.ShowInfo($"Village with name '{editModel.Name}', postal code '{editModel.PostalCode}', province '{refProvinceComboBox.Text}', city '{refCityComboBox.Text}' and district '{refDistrictComboBox.Text}' is already exists");
                 e.Cancel = true;
-
                 return;
             }
 
@@ -342,19 +342,21 @@ namespace McDermott.Web.Components.Pages.Config
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
             PanelVisible = true;
+
+            long maxAllowedSize = 3 * 1024 * 1024; // 2MB
             foreach (var file in e.GetMultipleFiles(1))
             {
                 try
                 {
                     using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
+                    await file.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
                     ms.Position = 0;
 
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Province", "City", "District", "Name", "Postal Code" };
+                    var headerNames = new List<string>() { "Name", "Postal Code", "Province", "City", "District" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -363,69 +365,196 @@ namespace McDermott.Web.Components.Pages.Config
                         return;
                     }
 
+                    var provinceNames = new HashSet<string>();
+                    var cityNames = new HashSet<string>();
+                    var districtNames = new HashSet<string>();
+
                     var list = new List<VillageDto>();
+                    var list1 = new List<ProvinceDto>();
+                    var list2 = new List<CityDto>();
+                    var list3 = new List<DistrictDto>();
+
+                    // First loop: Collect unique province, city, and district names
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var prov = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var city = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        var district = ws.Cells[row, 5].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(prov))
+                            provinceNames.Add(prov.ToLower());
+
+                        if (!string.IsNullOrEmpty(city))
+                            cityNames.Add(city.ToLower());
+
+                        if (!string.IsNullOrEmpty(district))
+                            districtNames.Add(district.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name), 0, int.MaxValue))).Item1;
+                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name), 0, int.MaxValue))).Item1;
+                    list3 = (await Mediator.Send(new GetDistrictQuery(x => districtNames.Contains(x.Name), 0, int.MaxValue))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var a = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
+                        var name = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var code = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var prov = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var city = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        var district = ws.Cells[row, 5].Value?.ToString()?.Trim();
 
-                        if (a is null)
+                        long? provinceId = null;
+                        long? cityId = null;
+                        long? districtId = null;
+                        bool isValid = true;
+
+                        if (!string.IsNullOrEmpty(prov))
                         {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"Province with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
-                            return;
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.ToLower() == prov.ToLower());
+                            if (cachedParent is null)
+                            {
+                                var parentProvince = (await Mediator.Send(new GetProvinceQuery(x => x.Name == prov, searchTerm: prov, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentProvince is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 3, prov ?? string.Empty);
+                                }
+                                else
+                                {
+                                    provinceId = parentProvince.Id;
+                                    list1.Add(parentProvince);
+                                }
+                            }
+                            else
+                            {
+                                provinceId = cachedParent.Id;
+                            }
                         }
 
-                        var b = Cities.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim());
-
-                        if (b is null)
+                        if (!string.IsNullOrEmpty(city))
                         {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"City with name \"{ws.Cells[row, 2].Value?.ToString()?.Trim()}\" is not found");
-                            return;
+                            var cachedParent = list2.FirstOrDefault(x => x.Name.ToLower() == city.ToLower());
+                            if (cachedParent is null)
+                            {
+                                var parentCityince = (await Mediator.Send(new GetCityQuery(x => x.Name == city, searchTerm: city, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentCityince is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 4, city ?? string.Empty);
+                                }
+                                else
+                                {
+                                    cityId = parentCityince.Id;
+                                    list2.Add(parentCityince);
+                                }
+                            }
+                            else
+                            {
+                                cityId = cachedParent.Id;
+                            }
                         }
 
-                        var c = Districts.FirstOrDefault(x => x.Name == ws.Cells[row, 3].Value?.ToString()?.Trim());
-
-                        if (c is null)
+                        if (!string.IsNullOrEmpty(district))
                         {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"District with name \"{ws.Cells[row, 3].Value?.ToString()?.Trim()}\" is not found");
-                            return;
+                            var cachedParent = list3.FirstOrDefault(x => x.Name.ToLower() == district.ToLower());
+                            if (cachedParent is null)
+                            {
+                                var parentDistrictince = (await Mediator.Send(new GetDistrictQuery(x => x.Name == district, searchTerm: district, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentDistrictince is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 5, district ?? string.Empty);
+                                }
+                                else
+                                {
+                                    districtId = parentDistrictince.Id;
+                                    list3.Add(parentDistrictince);
+                                }
+                            }
+                            else
+                            {
+                                districtId = cachedParent.Id;
+                            }
                         }
 
-                        var ee = new VillageDto
+                        if (!isValid)
+                            continue;
+
+                        var newMenu = new VillageDto
                         {
-                            ProvinceId = a.Id,
-                            CityId = b.Id,
-                            DistrictId = c.Id,
-                            Name = ws.Cells[row, 4].Value?.ToString()?.Trim(),
-                            PostalCode = ws.Cells[row, 5].Value?.ToString()?.Trim(),
+                            ProvinceId = provinceId,
+                            CityId = cityId,
+                            DistrictId = districtId,
+                            Name = name,
+                            PostalCode = code,
                         };
 
-                        if (!Villages.Any(x => x.CityId == ee.CityId && x.ProvinceId == ee.ProvinceId && x.DistrictId == ee.DistrictId && x.Name.Trim().ToLower() == ee?.Name?.Trim().ToLower() && x.PostalCode.Trim().ToLower() == ee?.PostalCode?.Trim().ToLower()))
-                            list.Add(ee);
+                        //bool exists = await Mediator.Send(new ValidateVillageQuery(x =>
+                        //    x.Name == newMenu.Name &&
+                        //    x.PostalCode == newMenu.PostalCode &&
+                        //    x.ProvinceId == newMenu.ProvinceId &&
+                        //    x.CityId == newMenu.CityId &&
+                        //    x.DistrictId == newMenu.DistrictId
+                        //));
+
+                        //if (!exists)
+                        list.Add(newMenu);
                     }
 
-                    await Mediator.Send(new CreateListVillageRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.ProvinceId, x.Name, x.CityId, x.DistrictId, x.PostalCode }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateVillageQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.PostalCode == village.PostalCode &&
+                                ev.ProvinceId == village.ProvinceId &&
+                                ev.CityId == village.CityId &&
+                                ev.DistrictId == village.DistrictId
+                            )
+                        ).ToList();
+
+                        // At this point, `duplicates` contains all the duplicate VillageDto entries based on the specified properties.
+
+                        await Mediator.Send(new CreateListVillageRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
                     ToastService.ShowError(ex.Message);
                 }
+                finally
+                {
+                    PanelVisible = false;
+                }
             }
-            PanelVisible = false;
         }
 
         private async Task ExportToExcel()
         {
             await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "village_template.xlsx",
             [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Postal Code"
+                },
                 new()
                 {
                     Column = "Province",
@@ -440,15 +569,6 @@ namespace McDermott.Web.Components.Pages.Config
                 {
                     Column = "District",
                     Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Postal Code"
                 },
             ]);
         }

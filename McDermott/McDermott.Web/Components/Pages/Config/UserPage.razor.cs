@@ -187,11 +187,16 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadComboBox()
         {
             var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1; Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
-            Districts = await Mediator.Send(new GetDistrictQuery());
+            Countries = countries.Item1;
+            var result = await Mediator.Send(new GetProvinceQuery());
+            Provinces = result.Item1;
+            var results = await Mediator.Send(new GetCityQuery());
+            Cities = results.Item1;
+            var resultDistrict = await Mediator.Send(new GetDistrictQuery());
+            Districts = resultDistrict.Item1;
             //Villages = await Mediator.Send(new GetVillageQuery());
-            Groups = await Mediator.Send(new GetGroupQuery());
+            var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
+            Groups = result2.Item1;
             Religions = await Mediator.Send(new GetReligionQuery());
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());

@@ -188,3 +188,68 @@
 
 </body>
 </html>
+
+
+
+@* Kodingan Export
+
+ var districtsd = await Mediator.Send(new GetDistrictQuery());
+   var excelData = ExportDistrictsToExcel(districtsd.ToList());
+
+   await JsRuntime.InvokeVoidAsync("saveAsFile", $"test_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx", Convert.ToBase64String(excelData));
+
+ public byte[] ExportDistrictsToExcel(List<DistrictDto> districts)
+ {
+     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+     using var package = new ExcelPackage();
+     // Buat worksheet baru
+     var worksheet = package.Workbook.Worksheets.Add("Districts");
+
+     // Header kolom
+     worksheet.Cells[1, 1].Value = "Province";
+     worksheet.Cells[1, 2].Value = "City";
+     worksheet.Cells[1, 3].Value = "Name";
+
+     // Format header
+     using (var range = worksheet.Cells[1, 1, 1, 3])
+     {
+         range.Style.Font.Bold = true;
+         range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+         range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+     }
+
+     // Isi data dari DistrictDto
+     for (int i = 0; i < districts.Count; i++)
+     {
+         var district = districts[i];
+         worksheet.Cells[i + 2, 1].Value = district.Province?.Name;
+         worksheet.Cells[i + 2, 2].Value = district.City?.Name;
+         worksheet.Cells[i + 2, 3].Value = district.Name;
+     }
+
+     // Mengatur auto-fit kolom
+     worksheet.Cells.AutoFitColumns();
+
+     return package.GetAsByteArray();
+
+     // Menghasilkan file dalam format byte[]
+     // Simpan hasil ke MemoryStream
+     using (var stream = new MemoryStream())
+     {
+         package.SaveAs(stream);
+         stream.Flush(); // Pastikan semua data ditulis ke stream
+         return stream.ToArray();
+     }
+ }
+
+<script>
+    function saveAsFile(filename, bytesBase64) {
+        var link = document.createElement('a');
+        link.download = filename;
+        link.href = "data:application/octet-stream;base64," + bytesBase64;
+        document.body.appendChild(link); // Needed for Firefox
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+ *@

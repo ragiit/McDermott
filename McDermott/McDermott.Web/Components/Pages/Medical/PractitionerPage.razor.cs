@@ -106,9 +106,12 @@
             Specialities = await Mediator.Send(new GetSpecialityQuery());
             Services = await Mediator.Send(new GetServiceQuery());
             var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1; Provinces = await Mediator.Send(new GetProvinceQuery());
+            Countries = countries.Item1;
+            var result = await Mediator.Send(new GetProvinceQuery());
+            Provinces = result.Item1;
             //Cities = await Mediator.Send(new GetCityQuery());
-            Districts = await Mediator.Send(new GetDistrictQuery());
+            var resultDistrict = await Mediator.Send(new GetDistrictQuery());
+            Districts = resultDistrict.Item1;
             //Villages = await Mediator.Send(new GetVillageQuery());
             Religions = await Mediator.Send(new GetReligionQuery());
             Genders = await Mediator.Send(new GetGenderQuery());

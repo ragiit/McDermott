@@ -11,6 +11,8 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class VillageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetVillageQuery, (List<VillageDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateVillageQuery, bool>,
+        IRequestHandler<BulkValidateVillageQuery, List<VillageDto>>,
         IRequestHandler<GetVillageQuery2, IQueryable<VillageDto>>,
         IRequestHandler<GetVillageQuerylable, IQueryable<Village>>,
         IRequestHandler<GetPagedDataQuery, (List<VillageDto> Data, int TotalCount)>,
@@ -62,6 +64,58 @@ namespace McDermott.Application.Features.Queries.Config
         //        throw;
         //    }
         //}
+        public async Task<bool> Handle(ValidateVillageQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Village>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Village>().Entities
+                    .AsNoTracking()
+                    .Include(v => v.Province)
+                    .Include(v => v.City)
+                    .Include(v => v.District)
+                    .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.District.Name, $"%{request.SearchTerm}%"));
+                }
+
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
+
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<IQueryable<VillageDto>> Handle(GetVillageQuery2 request, CancellationToken cancellationToken)
         {
@@ -249,45 +303,28 @@ namespace McDermott.Application.Features.Queries.Config
             return await Task.FromResult(_unitOfWork.Repository<Village>().GetAllQuerylable());
         }
 
-        public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQuery request, CancellationToken cancellationToken)
+        public async Task<List<VillageDto>> Handle(BulkValidateVillageQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var query = _unitOfWork.Repository<Village>().Entities
-                    .AsNoTracking()
-                    .Include(v => v.City)
-                    .Include(v => v.Province)
-                    .Include(v => v.District)
-                    .AsQueryable();
+            var villageDtos = request.VillagesToValidate;
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
-                {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
-                }
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var villageNames = villageDtos.Select(x => x.Name).Distinct().ToList();
+            var postalCodes = villageDtos.Select(x => x.PostalCode).Distinct().ToList();
+            var provinceIds = villageDtos.Select(x => x.ProvinceId).Distinct().ToList();
+            var cityIds = villageDtos.Select(x => x.CityId).Distinct().ToList();
+            var districtIds = villageDtos.Select(x => x.DistrictId).Distinct().ToList();
 
-                var pagedResult = query
-                .OrderBy(x => x.Name);
+            var existingVillages = await _unitOfWork.Repository<Village>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => villageNames.Contains(v.Name)
+                            && postalCodes.Contains(v.PostalCode)
+                            && provinceIds.Contains(v.ProvinceId)
+                            && cityIds.Contains(v.CityId)
+                            && districtIds.Contains(v.DistrictId))
+                .ToListAsync(cancellationToken);
 
-                var skip = (request.PageIndex - 1) * request.PageSize;
-
-                var totalCount = await query.CountAsync();
-
-                var paged = query
-                            .Skip(skip).Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                var result = await pagedResult.ToListAsync(cancellationToken);
-
-                return (result.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return existingVillages.Adapt<List<VillageDto>>();
         }
     }
 }
