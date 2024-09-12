@@ -63,8 +63,10 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnInitializedAsync()
         {
-            HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
-            Locations = await Mediator.Send(new GetLocationQuery());
+            var HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
+            this.HealthCenters = HealthCenters.Item1;
+            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            this.Locations = Locations.Item1;
 
             await GetUserInfo();
             await LoadData();
@@ -83,7 +85,8 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            Buildings = await Mediator.Send(new GetBuildingQuery());
+            var Buildings = await Mediator.Send(new GetBuildingQuery());
+            this.Buildings = Buildings.Item1;
             ShowForm = false;
             PanelVisible = false;
         }
@@ -232,8 +235,9 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 if (Building != null)
                 {
-                    DeletedBuildingLocations = await Mediator.Send(new GetBuildingLocationQuery(x => x.BuildingId == Building.Id));
-                    BuildingLocations = [.. DeletedBuildingLocations];
+                    var DeletedBuildingLocations = await Mediator.Send(new GetBuildingLocationQuery(x => x.BuildingId == Building.Id));
+                    this.DeletedBuildingLocations = DeletedBuildingLocations.Item1;
+                    BuildingLocations = [.. this.DeletedBuildingLocations];
                 }
             }
             catch { }

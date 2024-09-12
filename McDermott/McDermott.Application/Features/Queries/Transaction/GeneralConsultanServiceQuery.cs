@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanServiceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetGeneralConsultanServiceQuery, List<GeneralConsultanServiceDto>>,
+       IRequestHandler<GetGeneralConsultanServiceQuery, (List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
         IRequestHandler<CreateListGeneralConsultanServiceRequest, List<GeneralConsultanServiceDto>>,
         IRequestHandler<UpdateGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
@@ -29,38 +29,43 @@ namespace McDermott.Application.Features.Queries.Transaction
                 .CountAsync(cancellationToken: cancellationToken);
         }
 
-        public async Task<List<GeneralConsultanServiceDto>> Handle(GetGeneralConsultanServiceQuery request, CancellationToken cancellationToken)
+        public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServiceQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetGeneralConsultanServiceQuery_";
+                var query = _unitOfWork.Repository<GeneralConsultanService>().Entities
+                    .AsNoTracking()
+                    .Include(z => z.Service)
+                    .Include(z => z.Pratitioner)
+                    .Include(z => z.ClassType)
+                    .Include(z => z.InsurancePolicy)
+                    .Include(z => z.Patient)
+                    .Include(z => z.Patient!.Gender)
+                    .Include(z => z.Patient.Department)
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultanService>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<GeneralConsultanService>().Entities
-                        .Include(z => z.Service)
-                        .Include(z => z.Pratitioner)
-                        .Include(z => z.ClassType)
-                        .Include(z => z.InsurancePolicy)
-                        .Include(z => z.Patient)
-                        .Include(z => z.Patient!.Gender)
-                        .Include(z => z.Patient.Department)
-                        .Include(z => z.Patient.IdCardCountry)
-                        //.ThenInclude(z => z.Gender)
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    //query = query.Where(v =>);
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                //var pagedResult = query
+                //            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<GeneralConsultanServiceDto>>();
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = query
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<GeneralConsultanServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

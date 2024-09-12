@@ -58,7 +58,8 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
         {
             IsLoading = true;
             await LoadData();
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+            this.Diagnoses = Diagnoses.Item1;
             IsLoading = false;
         }
 

@@ -2274,8 +2274,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                     x.TypeString = a.Name;
             });
 
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
-            NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+            this.Diagnoses = Diagnoses.Item1;
+            var NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            this.NursingDiagnoses = NursingDiagnoses.Item1;
         }
 
         private bool IsDashboard { get; set; } = false;

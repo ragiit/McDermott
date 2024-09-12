@@ -56,8 +56,9 @@ namespace McDermott.Web.Components.Pages.Medical
         protected override async Task OnInitializedAsync()
         {
             var a = await Mediator.Send(new GetDiseaseCategoryQuery());
-            Diseases = [.. a.Where(x => x.ParentCategory != null || x.ParentCategory != "")];
-            Cronises = await Mediator.Send(new GetCronisCategoryQuery());
+            Diseases = [.. a.Item1.Where(x => x.ParentCategory != null || x.ParentCategory != "")];
+            var Chronises = await Mediator.Send(new GetCronisCategoryQuery());
+            this.Cronises = Chronises.Item1;
 
             await GetUserInfo();
             await LoadData();
@@ -67,7 +68,8 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+            this.Diagnoses = Diagnoses.Item1;
             PanelVisible = false;
         }
 

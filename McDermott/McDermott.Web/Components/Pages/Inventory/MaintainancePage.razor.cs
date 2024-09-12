@@ -17,6 +17,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private TransactionStockDto postTransactionStock = new();
 
         #region Variable
+
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool isActiveButton { get; set; } = false;
@@ -33,8 +34,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 postMaintainance.isExternal = false;
             else
                 postMaintainance.isInternal = false;
-
         }
+
         private void unCheckEX(bool newValue)
         {
             postMaintainance.isExternal = true;
@@ -42,8 +43,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 postMaintainance.isInternal = false;
             else
                 postMaintainance.isExternal = false;
-
         }
+
         private void unCheckCR(bool newValue)
         {
             postMaintainance.isCorrective = true;
@@ -52,6 +53,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             else
                 postMaintainance.isCorrective = false;
         }
+
         private void unCheckPR(bool newValue)
         {
             postMaintainance.isPreventive = true;
@@ -60,21 +62,23 @@ namespace McDermott.Web.Components.Pages.Inventory
             else
                 postMaintainance.isPreventive = false;
         }
+
         private void unCheckRE(bool newValue)
         {
             postMaintainance.Recurrent = true;
-
         }
+
         private List<string> Batch = [];
+
         private async Task selectByProduct(ProductDto value)
         {
             var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id && s.LocationId == postMaintainance.LocationId));
             Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
             Batch = Batch.Distinct().ToList();
-        } 
+        }
+
         private async Task selectByLocation(LocationDto value)
         {
-
             postMaintainance.LocationId = value.Id;
             postMaintainance.EquipmentId = null;
             postMaintainance.SerialNumber = null;
@@ -87,7 +91,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             "Months",
             "Years"
         };
-        #endregion
+
+        #endregion Variable
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -146,6 +152,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #endregion UserLoginAndAccessRole
 
         #region Load
+
         private async Task LoadData()
         {
             try
@@ -155,7 +162,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
                 getEquipment = await Mediator.Send(new GetProductQuery(x => x.HospitalType == "Medical Equipment"));
                 getRequestBy = await Mediator.Send(new GetUserQuery());
-                getLocation = await Mediator.Send(new GetLocationQuery());
+                var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+                this.getLocation = Locations.Item1;
                 getResponsibleBy = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
             }
             catch (Exception ex)
@@ -194,16 +202,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                     priorityClass = "warning";
                     title = "Scrap";
                     break;
+
                 case EnumStatusMaintainance.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
+
                 case EnumStatusMaintainance.Canceled:
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
-
-
 
                 default:
                     return new MarkupString("");
@@ -214,8 +222,11 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             return new MarkupString(html);
         }
-        #endregion
+
+        #endregion Load
+
         #region Grid
+
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {
             if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
@@ -250,11 +261,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
             await EditItem_Click();
         }
-        #endregion
+
+        #endregion Grid
 
         #region button
 
@@ -297,9 +310,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                     ToastService.ShowWarning("No item selected for editing.");
                     return;
                 }
-
-
-
             }
             catch (Exception ex)
             {
@@ -311,7 +321,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
         }
 
-        private async Task Cancel_Click() { }
+        private async Task Cancel_Click()
+        { }
+
         private async Task InProgress_Click()
         {
             try
@@ -327,6 +339,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task Repaired_Click()
         {
             try
@@ -342,6 +355,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task Scrap_Click()
         {
             try
@@ -359,16 +373,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 string referenceNumber = $"MNT#{NextReferenceNumber:D3}";
 
-                foreach(var items in getMaintainance)
+                foreach (var items in getMaintainance)
                 {
-                    var cekUom = getEquipment.Where(x=>x.Id == postMaintainance.EquipmentId).Select(x=>x.UomId).FirstOrDefault();
+                    var cekUom = getEquipment.Where(x => x.Id == postMaintainance.EquipmentId).Select(x => x.UomId).FirstOrDefault();
 
                     postTransactionStock.SourceTable = nameof(Maintainance);
                     postTransactionStock.SourcTableId = postMaintainance.Id;
                     postTransactionStock.ProductId = items.EquipmentId;
                     postTransactionStock.LocationId = items.LocationId;
                     postTransactionStock.Batch = items.SerialNumber;
-                    postTransactionStock.ExpiredDate =  null;
+                    postTransactionStock.ExpiredDate = null;
                     postTransactionStock.Reference = referenceNumber;
                     postTransactionStock.Quantity = -1;
                     postTransactionStock.UomId = cekUom;
@@ -398,13 +412,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;
                 await EditItem_Click(getMaintainanceById);
-
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task onDiscard()
         {
             await LoadData();
@@ -415,13 +429,16 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await LoadData();
         }
+
         private void DeleteItem_Click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        #endregion
+
+        #endregion button
 
         #region Delete
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -448,10 +465,13 @@ namespace McDermott.Web.Components.Pages.Inventory
                 StateHasChanged();
             }
         }
-        #endregion
+
+        #endregion Delete
 
         #region save
-        MaintainanceDto getMaintainanceById = new();
+
+        private MaintainanceDto getMaintainanceById = new();
+
         private async Task OnSave()
         {
             try
@@ -494,9 +514,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 ex.HandleException(ToastService);
             }
-
         }
-        #endregion
 
+        #endregion save
     }
 }

@@ -743,7 +743,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task LoadComboBox()
         {
-            Locations = await Mediator.Send(new GetLocationQuery());
+            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            this.Locations = Locations.Item1;
             Products = await Mediator.Send(new GetProductQuery(x => x.HospitalType != null && x.HospitalType.Equals("Vactination")));
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
             //Services = await Mediator.Send(new GetServiceQuery(x => x.Name.Equals("Vaccination")));
@@ -758,8 +759,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                     x.TypeString = a.Name;
             });
 
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
-            NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+            this.Diagnoses = Diagnoses.Item1;
+            var NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            this.NursingDiagnoses = NursingDiagnoses.Item1;
         }
 
         private async Task OnCancelBack()

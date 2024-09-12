@@ -8,14 +8,13 @@ namespace McDermott.Web.Components.Pages.Inventory
 {
     public partial class ProductPage
     {
-
         private List<ColorItem> colors =
             [ new ColorItem { Name = "Red", Color = "red" },
             new ColorItem { Name = "Green", Color = "green" },
             new ColorItem { Name = "Blue", Color = "blue" }
             ];
-        private string selectedColor;
 
+        private string selectedColor;
 
         public class ColorItem
         {
@@ -169,16 +168,16 @@ namespace McDermott.Web.Components.Pages.Inventory
                     priorityClass = "warning";
                     title = "Scrap";
                     break;
+
                 case EnumStatusMaintainance.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
+
                 case EnumStatusMaintainance.Canceled:
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
-
-
 
                 default:
                     return new MarkupString("");
@@ -278,7 +277,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                 Frequencys = await Mediator.Send(new GetDrugDosageQuery());
                 ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
-                Locations = await Mediator.Send(new GetLocationQuery());
+                var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+                this.Locations = Locations.Item1;
+
                 getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
 
                 // Mengambil data stok produk dan menghitung jumlahnya
@@ -684,14 +685,17 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await NewTableStock_Item();
         }
+
         private async Task RefreshMaintainance_Click()
         {
             await NewTableEquipment_Item();
         }
+
         private async Task RefreshScrap_Click()
         {
             await NewTableEquipment_Scrap();
         }
+
         private async Task RefreshEquiptment_Click()
         {
             await NewTableEquipment_Item();
@@ -729,8 +733,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                             Expired = y.First().ExpiredDate,
                             ProductName = y.First()?.Product?.Name ?? "-",
                             Qty = y.Sum(item => item.Quantity)
-
-
                         }).ToList();
 
                         FieldHideStock = true;
@@ -748,8 +750,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                             UomName = y.First()?.Uom?.Name ?? "-",
                             ProductName = y.First()?.Product?.Name ?? "-",
                             Qty = y.Sum(item => item.Quantity)
-
-
                         }).ToList();
                         FieldHideStock = false;
                     }
@@ -771,10 +771,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                             Expired = y.First().ExpiredDate,
                             ProductName = y.First()?.Product?.Name ?? "-",
                             Qty = y.Sum(item => item.Quantity)
-
-
                         }).ToList();
-                    
+
                     NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
                     if (SelectedDataItems[0].Adapt<ProductDto>().TraceAbility == true)
                     {
@@ -801,10 +799,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             showForm = false;
             PanelVisible = true;
 
-            getMaintainanceDone = await Mediator.Send(new GetMaintainanceQuery(x=>x.EquipmentId == SelectedDataItems[0].Adapt<ProductDto>().Id && x.Status != EnumStatusMaintainance.Scrap));
+            getMaintainanceDone = await Mediator.Send(new GetMaintainanceQuery(x => x.EquipmentId == SelectedDataItems[0].Adapt<ProductDto>().Id && x.Status != EnumStatusMaintainance.Scrap));
             // Filter TransactionStocks based on getMaintainanceDone and excluding Scrap status
-           
-
 
             PanelVisible = false;
         }

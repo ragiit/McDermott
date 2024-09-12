@@ -9,15 +9,15 @@ namespace McDermott.Web.Components.Pages.Patient
         private List<DiagnosisDto> getDiagnosis = [];
         private List<DiseaseDto> getDisease = [];
 
-
         #region variable
+
         private bool PanelVisible { get; set; } = false;
         private bool IsPopUpForm { get; set; } = false;
         private bool ShowForm { get; set; } = false;
         private bool IsActive { get; set; } = false;
-        private IGrid Grid {  get; set; }
+        private IGrid Grid { get; set; }
 
-        #endregion
+        #endregion variable
 
         #region UserLoginAndAccessRole
 
@@ -27,7 +27,7 @@ namespace McDermott.Web.Components.Pages.Patient
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-       
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -53,13 +53,11 @@ namespace McDermott.Web.Components.Pages.Patient
                         await Grid.WaitForDataLoadAsync();
                         Grid.ExpandGroupRow(2);
                         StateHasChanged();
-
                     }
                 }
                 catch { }
 
                 StateHasChanged();
-
             }
         }
 
@@ -80,7 +78,6 @@ namespace McDermott.Web.Components.Pages.Patient
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-
         }
 
         private async Task LoadData()
@@ -88,9 +85,9 @@ namespace McDermott.Web.Components.Pages.Patient
             PanelVisible = true;
 
             // Load data asynchronously
-            getGeneralConsultan = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            getGeneralConsultan = (await Mediator.Send(new GetGeneralConsultanServiceQuery())).Item1;
             getGeneralConsultanCPPT = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
-            getDiagnosis = await Mediator.Send(new GetDiagnosisQuery());
+            getDiagnosis = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
 
             // Clear the getDisease list before populating it
             getDisease.Clear();
@@ -132,7 +129,5 @@ namespace McDermott.Web.Components.Pages.Patient
             // Hide the panel
             PanelVisible = false;
         }
-
-
     }
 }

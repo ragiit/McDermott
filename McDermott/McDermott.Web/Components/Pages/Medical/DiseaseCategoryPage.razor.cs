@@ -51,10 +51,10 @@
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            DiseaseCategorys = await Mediator.Send(new GetDiseaseCategoryQuery());
-            DiseaseCategorys = [.. DiseaseCategorys.OrderBy(x => x.ParentCategory == null)];
+            var DiseaseCategorys = await Mediator.Send(new GetDiseaseCategoryQuery());
+            this.DiseaseCategorys = [.. DiseaseCategorys.Item1.OrderBy(x => x.ParentCategory == null)];
             var q = await Mediator.Send(new GetDiseaseCategoryQuery());
-            ParentCategoryDto = [.. q.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
+            ParentCategoryDto = [.. q.Item1.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
             PanelVisible = false;
         }
 

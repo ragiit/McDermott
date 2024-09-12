@@ -448,8 +448,8 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (FormRegis.Id == 0)
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.Status!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
-
+                    var apatient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.ServiceId == FormRegis.ServiceId && x.PatientId == FormRegis.PatientId && x.Status!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                    var patient = apatient.Item1;
                     if (patient.Count > 0)
                     {
                         ToastService.ShowInfo($"Patient in the name of \"{patient[0].Patient?.Name}\" there is still a pending transaction");
@@ -938,7 +938,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //LabResultDetails.Clear();
 
             var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
-            foreach (var item in details)
+            foreach (var item in details.Item1)
             {
                 LabResultDetails.Add(new LabResultDetailDto
                 {
@@ -1704,8 +1704,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             PatientAllergy = new();
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            GeneralConsultanServices = result.item1;
+            var result = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            GeneralConsultanServices = result.Item1;
             totalCount = result.pageCount;
             IsReferTo = false;
             PopUpVisible = false;
@@ -1726,7 +1726,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             });
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
-            NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;
             //LabTests = await Mediator.Send(new GetLabTestQuery());
 
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
@@ -1736,7 +1736,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }).ToList();
             NursingDiagnosesTemps.AddRange(nursingDiagnosesTemps);
 
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
             var diagnosesTemps = Diagnoses.Select(x => new DiagnosesTemp
             {
                 Id = x.Id,
@@ -1744,7 +1744,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }).ToList();
             DiagnosesTemps.AddRange(diagnosesTemps);
 
-            AllDiseaseCategories = await Mediator.Send(new GetDiseaseCategoryQuery());
+            AllDiseaseCategories = (await Mediator.Send(new GetDiseaseCategoryQuery())).Item1;
 
             PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
             user_group = await Mediator.Send(new GetUserQuery());
@@ -1988,7 +1988,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (FormRegis.Id == 0)
                 return;
 
-            var services = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId));
+            var services = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId))).Item1;
 
             if (services.Count <= 0 || services.Count == 1)
                 return;
@@ -2026,7 +2026,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 await Mediator.Send(new UpdateGeneralConsultanServiceRequest(FormRegis));
 
                 var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
-                FormRegis = result[0];
+                FormRegis = result.Item1[0];
 
                 ToastService.ShowSuccess("Cancelled..");
             }
@@ -2102,7 +2102,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             AllDoctors = [.. user.Where(x => x.IsDoctor == true).ToList()];
 
             //Insurance
-            AllInsurances = await Mediator.Send(new GetInsuranceQuery());
+            AllInsurances = (await Mediator.Send(new GetInsuranceQuery())).Item1;
 
             //Medical Type
             //Services = await Mediator.Send(new GetServiceQuery());
@@ -2835,7 +2835,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PopUpVisible = false;
             if (!IsSelectedFaskes)
             {
-                var value = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+                var value = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id))).Item1;
                 if (value.Count > 0)
                     FormRegis = value[0];
             }
@@ -2844,7 +2844,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task CloseAppoimentPopUp()
         {
             PopUpAppoiment = false;
-            var value = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id));
+            var value = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == FormRegis.Id))).Item1;
             if (value.Count > 0)
                 FormRegis = value[0];
         }
@@ -2880,8 +2880,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task OnClickPopUpPopUpProcedureRoom()
         {
-            LabUoms = await Mediator.Send(new GetLabUomQuery());
-            LabTests = await Mediator.Send(new GetLabTestQuery());
+            var LabUoms = await Mediator.Send(new GetLabUomQuery());
+            this.LabUoms = LabUoms.Item1;
+            var LabTests = await Mediator.Send(new GetLabTestQuery());
+            this.LabTests = LabTests.Item1;
 
             LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
 

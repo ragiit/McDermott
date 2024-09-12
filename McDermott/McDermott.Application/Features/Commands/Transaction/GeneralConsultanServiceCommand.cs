@@ -4,10 +4,18 @@
     {
         #region GET
 
-        public class GetGeneralConsultanServiceQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GeneralConsultanServiceDto>>
+        public class GetGeneralConsultanServiceQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<GeneralConsultanService, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class ValidateGeneralConsultanServiceQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<GeneralConsultanService, bool>> Predicate { get; } = predicate!;
         }
 
         public class GetGeneralConsultanServiceCountQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null) : IRequest<int>

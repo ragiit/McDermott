@@ -1,5 +1,4 @@
-﻿
-using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
+﻿using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -61,15 +60,6 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 throw;
             }
-        }
-
-        public async Task<bool> Handle(ValidateProvinceQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<Province>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

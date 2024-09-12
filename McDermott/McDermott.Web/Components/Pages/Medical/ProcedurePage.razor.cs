@@ -185,8 +185,8 @@ namespace McDermott.Web.Components.Pages.Medical
                             Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Procedures.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                            list.Add(c);
+                        //if (!Procedures.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
+                        //    list.Add(c);
                     }
 
                     await Mediator.Send(new CreateListProcedureRequest(list));
@@ -222,6 +222,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 },
             ]);
         }
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();

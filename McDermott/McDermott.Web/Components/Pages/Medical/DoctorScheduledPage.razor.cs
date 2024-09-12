@@ -190,7 +190,8 @@ namespace McDermott.Web.Components.Pages.Medical
             Schedules = doctorSchedules;
 
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Buildings = await Mediator.Send(new GetBuildingQuery());
+            var Buildings = await Mediator.Send(new GetBuildingQuery());
+            this.Buildings = Buildings.Item1;
 
             PanelVisible = false;
         }

@@ -79,8 +79,10 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             PanelVisible = true;
 
-            Locations = await Mediator.Send(new GetLocationQuery());
-            Companies = await Mediator.Send(new GetCompanyQuery());
+            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            this.Locations = Locations.Item1;
+            var Companies = (await Mediator.Send(new GetCompanyQuery())).Item1;
+            this.Companies = Companies.Item1;
             Uoms = await Mediator.Send(new GetUomQuery());
             Products = await Mediator.Send(new GetProductQuery());
             AllProducts = Products.Select(x => x).ToList();
@@ -260,7 +262,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task HandleValidSubmit()
         {
-
             if (FormValidationState)
                 await SaveInventoryAdjusment();
             else
@@ -422,7 +423,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                         }
                         else
                         {
-
                             await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(inventoryAdjusmentDetail));
 
                             var updtStock = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusment) && x.SourcTableId == inventoryAdjusmentDetail.Id))).FirstOrDefault() ?? new();
@@ -444,13 +444,10 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                         //    await Mediator.Send(new CreateTransactionStockRequest(transactionStockDto));
                         //}
-
                     }
 
                     await LoadInventoryAdjustmentDetails();
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -500,7 +497,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                             var idd = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
                             await Mediator.Send(new DeleteTransactionStockRequest(idd.Id));
                         }
-
 
                         await Mediator.Send(new DeleteInventoryAdjusmentDetailRequest(ids: a.Select(x => x.Id).ToList()));
                     }
@@ -574,7 +570,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ToastService.ShowInfo("Please select the Location first.");
                 return;
             }
-
 
             Products = await Mediator.Send(new GetProductQuery());
             AllProducts = Products.Select(x => x).ToList();
@@ -832,7 +827,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 //}
 
                                 //foreach (var detail in adjustmentDetailsToUpdate)
-                                //{ 
+                                //{
                                 //    await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(detail));
                                 //}
 
@@ -857,9 +852,9 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 }
 
                                 await Mediator.Send(new UpdateListTransactionStockRequest(update));
-
                             }
                             break;
+
                         default:
                             return;
                     }

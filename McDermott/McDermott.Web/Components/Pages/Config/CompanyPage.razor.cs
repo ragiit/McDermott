@@ -1,3 +1,5 @@
+using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
+
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
@@ -75,7 +77,8 @@ namespace McDermott.Web.Components.Pages.Config
             showForm = false;
             PanelVisible = true;
             SelectedDataItems = [];
-            Companys = await Mediator.Send(new GetCompanyQuery());
+            var Companys = (await Mediator.Send(new GetCompanyQuery())).Item1;
+            this.Companys = Companys.Item1;
             //DetailCompanies = [.. Companys.ToList()];
             PanelVisible = false;
         }

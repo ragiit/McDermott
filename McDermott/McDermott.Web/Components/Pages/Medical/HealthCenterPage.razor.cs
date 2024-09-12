@@ -87,6 +87,7 @@ namespace McDermott.Web.Components.Pages.Medical
         #endregion Searching
 
         #region Load Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -117,10 +118,13 @@ namespace McDermott.Web.Components.Pages.Medical
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Load Data
 
         #region ComboBox
+
         #region ComboBox Sampel TypeCountry
+
         private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
         private int CountryComboBoxIndex { get; set; } = 0;
         private int totalCountCountry = 0;
@@ -163,9 +167,11 @@ namespace McDermott.Web.Components.Pages.Medical
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion ComboBox Sampel TypeCountry
 
         #region ComboBox Sampel Province
+
         private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
         private int ProvinceComboBoxIndex { get; set; } = 0;
         private int totalCountProvince = 0;
@@ -208,9 +214,11 @@ namespace McDermott.Web.Components.Pages.Medical
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion ComboBox Sampel Province
 
         #region ComboBox City
+
         private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
         private int CityComboBoxIndex { get; set; } = 0;
         private int totalCountCity = 0;
@@ -253,10 +261,10 @@ namespace McDermott.Web.Components.Pages.Medical
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
 
+        #endregion ComboBox City
 
-        #endregion
+        #endregion ComboBox
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -299,7 +307,7 @@ namespace McDermott.Web.Components.Pages.Medical
             FocusedRowVisibleIndex = args.VisibleIndex;
             EditItemsEnabled = true;
         }
-                
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -315,14 +323,10 @@ namespace McDermott.Web.Components.Pages.Medical
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
-       
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        
-        
-
 
         private async Task ImportFile()
         {
@@ -367,28 +371,12 @@ namespace McDermott.Web.Components.Pages.Medical
                         if (!HealthCenters.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Type.Trim().ToLower() == c?.Type?.Trim().ToLower()))
                             list.Add(c);
                     }
-
-        protected override async Task OnInitializedAsync()
-        {
-            PanelVisible = true;
-            var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1;
-            var result = await Mediator.Send(new GetProvinceQuery());
-            Provinces = result.Item1;
-            var resultsCity = await Mediator.Send(new GetCityQuery());
-            Cities = resultsCity.Item1;
-
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
                 }
-                catch (Exception ex)
+                catch (Exception ee)
                 {
-                    ToastService.ShowError(ex.Message);
+                    ee.HandleException(ToastService);
                 }
             }
-            PanelVisible = false;
         }
 
         private async Task ExportToExcel()

@@ -60,7 +60,9 @@
             PanelVisible = true;
 
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Companies = await Mediator.Send(new GetCompanyQuery());
+
+            var Companys = (await Mediator.Send(new GetCompanyQuery())).Item1;
+            this.Companies = Companys.Item1;
 
             await GetUserInfo();
             await LoadData();

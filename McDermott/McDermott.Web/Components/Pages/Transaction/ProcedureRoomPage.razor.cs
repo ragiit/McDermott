@@ -140,8 +140,10 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadDataAsync()
         {
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
-            LabUoms = await Mediator.Send(new GetLabUomQuery());
-            LabTests = await Mediator.Send(new GetLabTestQuery());
+            var LabUoms = await Mediator.Send(new GetLabUomQuery());
+            this.LabUoms = LabUoms.Item1;
+            var LabTests = await Mediator.Send(new GetLabTestQuery());
+            this.LabTests = LabTests.Item1;
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
             groups = result2.Item1;
@@ -235,7 +237,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //}
 
             var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
-            foreach (var item in details)
+            foreach (var item in details.Item1)
             {
                 LabResultDetails.Add(new LabResultDetailDto
                 {

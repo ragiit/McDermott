@@ -63,8 +63,9 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadData()
         {
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Chronises = await Mediator.Send(new GetCronisCategoryQuery());
+            SelectedDataItems = [];
+            var Chronises = await Mediator.Send(new GetCronisCategoryQuery());
+            this.Chronises = Chronises.Item1;
             PanelVisible = false;
         }
 

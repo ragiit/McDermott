@@ -36,6 +36,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         #endregion Relation Data
 
         #region Variable Static
+
         private IGrid? Grid { get; set; }
         private IGrid? GridProduct { get; set; }
         private bool PanelVisible { get; set; } = false;
@@ -89,7 +90,6 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
                 catch { }
 
-
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
                 StateHasChanged();
@@ -130,10 +130,10 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadAsyncData()
         {
-
             ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            Locations = await Mediator.Send(new GetLocationQuery());
+            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            this.Locations = Locations.Item1;
             Products = await Mediator.Send(new GetProductQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
             receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
@@ -174,6 +174,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private void ResetFormProductDetail()
         {
             TempFormReceivingStockDetail.PurchaseName = null;
@@ -220,6 +221,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             showForm = true;
             FormValidationState = false;
         }
+
         public class StatusComparer : IComparer<EnumStatusReceiving>
         {
             private static readonly List<EnumStatusReceiving> StatusOrder = new List<EnumStatusReceiving> { EnumStatusReceiving.Draft, EnumStatusReceiving.Process, EnumStatusReceiving.Done, EnumStatusReceiving.Cancel };
@@ -245,6 +247,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                     priorityClass = "info";
                     title = "Draft";
                     break;
+
                 case EnumStatusReceiving.Process:
                     priorityClass = "warning";
                     title = "Process";
@@ -312,8 +315,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-
-
         }
 
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
@@ -343,7 +344,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             try
             {
-
                 showForm = true;
                 PanelVisible = true;
                 header = "Edit Data";
@@ -446,7 +446,8 @@ namespace McDermott.Web.Components.Pages.Inventory
         {
             await GridProduct.StartEditRowAsync(FocusedRowVisibleIndex);
             var traceavibility = context.SelectedDataItem.Adapt<ReceivingStockProductDto>();
-            if(traceavibility?.Product?.TraceAbility == true){
+            if (traceavibility?.Product?.TraceAbility == true)
+            {
                 TempFormReceivingStockDetail.TraceAbility = true;
             }
             StateHasChanged();
@@ -463,6 +464,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #endregion Click Button
+
         private string GetSourceTableName()
         {
             var tableName = typeof(ReceivingStockDto)
@@ -472,6 +474,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #region Process
+
         private async Task onProcess()
         {
             PanelVisible = true;
@@ -531,9 +534,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 StateHasChanged();
             }
         }
-        #endregion
+
+        #endregion Process
 
         #region Validation
+
         private async Task onValidation()
         {
             PanelVisible = true;
@@ -544,7 +549,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             foreach (var item in data_TransactionStock)
             {
-
                 item.Validate = true;
                 var aa = await Mediator.Send(new UpdateTransactionStockRequest(item));
             }
@@ -567,6 +571,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             StateHasChanged();
             PanelVisible = false;
         }
+
         private async Task onCancel()
         {
             var receivedStock = await Mediator.Send(new GetReceivingStockQuery());
@@ -581,7 +586,6 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             //Update Receiving Stock
 
-
             //Save Log
             FormReceivingLog.SourceId = GetReceivingStock.DestinationId;
             FormReceivingLog.UserById = NameUser.Id;
@@ -590,9 +594,11 @@ namespace McDermott.Web.Components.Pages.Inventory
 
             await Mediator.Send(new CreateReceivingLogRequest(FormReceivingLog));
         }
+
         #endregion Validation
 
         #region Function Delete
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -656,6 +662,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task OnDelete_Detail(GridDataItemDeletingEventArgs e)
         {
             try
@@ -683,9 +690,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         #endregion Function Delete
 
         #region Function Save
+
         private async Task OnSave()
         {
             try
@@ -749,11 +758,11 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task OnSave_Detail(GridEditModelSavingEventArgs e)
         {
             if (e is null)
                 return;
-
 
             var r = (ReceivingStockProductDto)e.EditModel;
 
@@ -763,12 +772,10 @@ namespace McDermott.Web.Components.Pages.Inventory
                 {
                     if (r.TraceAbility == true)
                     {
-                        
-                            if (r.Batch == null || r.ExpiredDate == null)
-                            {
-                                ToastService.ShowInfo("Batch And Expired Date not null");
-                            }
-                       
+                        if (r.Batch == null || r.ExpiredDate == null)
+                        {
+                            ToastService.ShowInfo("Batch And Expired Date not null");
+                        }
                     }
 
                     ReceivingStockProductDto updates = new();
@@ -806,6 +813,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 StateHasChanged();
             }
         }
+
         #endregion Function Save
     }
 }

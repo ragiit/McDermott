@@ -46,7 +46,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task LoadData()
         {
-            generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            generalConsultans = (await Mediator.Send(new GetGeneralConsultanServiceQuery())).Item1;
         }
 
         private async Task Download()

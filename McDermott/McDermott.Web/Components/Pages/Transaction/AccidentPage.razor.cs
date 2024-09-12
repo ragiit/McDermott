@@ -111,6 +111,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             public double X { get; set; }
             public double Y { get; set; }
         }
+
         private async Task OnPopupShown2()
         {
             await LoadImageAsync("image/aciddent.png");
@@ -175,7 +176,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task LoadPoints()
         {
-            var dto = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x=>x.Id == GeneralConsultanService.Id))).FirstOrDefault(); // Gantilah ID sesuai kebutuhan
+            var dto = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).FirstOrDefault(); // Gantilah ID sesuai kebutuhan
 
             if (dto != null)
             {
@@ -202,7 +203,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             await DrawPointsAsync();
         }
 
-        #endregion
+        #endregion Test
 
         private async Task OnPopupShown()
         {
@@ -1241,10 +1242,10 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+            Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
             Awareness = await Mediator.Send(new GetAwarenessQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
-            Projects = await Mediator.Send(new GetProjectQuery());
+            Projects = (await Mediator.Send(new GetProjectQuery())).Item1;
         }
 
         private async Task OnValidSubmitSave()

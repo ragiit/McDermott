@@ -72,8 +72,8 @@
         {
             IsAccess = false;
 
-            Locations = await Mediator.Send(new GetLocationQuery());
-            Companies = await Mediator.Send(new GetCompanyQuery());
+            Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            Companies = (await Mediator.Send(new GetCompanyQuery())).Item1;
 
             await GetUserInfo();
             await LoadData();

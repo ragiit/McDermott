@@ -331,7 +331,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (GeneralConsultanService.Height == 0 && GeneralConsultanService.Weight == 0)
                 {
                     var prev = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x
-                        => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished)))
+                        => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished))).Item1
                         .OrderByDescending(x => x.CreatedDate)
                         .FirstOrDefault() ?? new();
 
@@ -1804,7 +1804,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task OnPrintDocumentMedical()
         {
-
             var IdEncrypt = SecureHelper.EncryptIdToBase64(GeneralConsultanService.Id);
             NavigationManager.NavigateTo($"/transaction/print-document-medical/{IdEncrypt}");
         }
@@ -1851,7 +1850,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 IsHistoricalRecordPatient = true;
                 IsLoadingHistoricalRecordPatient = true;
-                GeneralConsultanServicesHistoricalMR = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == GeneralConsultanService.PatientId))).OrderBy(x => x.RegistrationDate).ToList();
+                GeneralConsultanServicesHistoricalMR = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == GeneralConsultanService.PatientId))).Item1.OrderBy(x => x.RegistrationDate).ToList();
                 IsLoadingHistoricalRecordPatient = false;
             }
             IsLoadingHistoricalRecordPatient = false;
@@ -2013,7 +2012,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != ReferToGeneralConsultanService.Id && x.ServiceId == ReferToGeneralConsultanService.ServiceId && x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != ReferToGeneralConsultanService.Id && x.ServiceId == ReferToGeneralConsultanService.ServiceId && x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1;
 
                 if (patient.Count > 0)
                 {
@@ -2135,7 +2134,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     case EnumStatusGeneralConsultantService.Planned:
 
-                        var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                        var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1;
 
                         if (patient.Count > 0)
                         {
@@ -2291,8 +2290,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                     x.TypeString = a.Name;
             });
 
-            Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
-            NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+            this.Diagnoses = Diagnoses;
+            var NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            this.NursingDiagnoses = NursingDiagnoses.Item1;
         }
 
         private bool IsDashboard { get; set; } = false;
@@ -2330,7 +2331,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             SelectedDataItems = [];
             ShowForm = false;
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "General Consultation" || x.TypeRegistration == "Emergency"));
+            GeneralConsultanServices = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "General Consultation" || x.TypeRegistration == "Emergency"))).Item1;
             statusMcuData = GetStatusMcuCounts(GeneralConsultanServices);
             //if (GeneralConsultanServices.FirstOrDefault() != null)
             //    SelectedDataItems = new List<object> { GeneralConsultanServices.FirstOrDefault() };

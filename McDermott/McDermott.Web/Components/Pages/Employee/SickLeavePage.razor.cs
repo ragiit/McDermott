@@ -9,6 +9,7 @@ using Aspose.Words.Saving;
 using DocumentFormat.OpenXml.Packaging;
 using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
 using Microsoft.IdentityModel.Tokens;
+using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -103,13 +104,14 @@ namespace McDermott.Web.Components.Pages.Employee
                 SickLeaves = await Mediator.Send(new GetSickLeaveQuery());
                 Users = await Mediator.Send(new GetUserQuery());
                 CPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
-                Diagnoses = await Mediator.Send(new GetDiagnosisQuery());
+                var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+                this.Diagnoses = diagnoses.Item1;
 
                 foreach (var item in SickLeaves)
                 {
                     var diagnosis = "";
                     TypeLeaves = item.TypeLeave;
-                    var generalConsultans = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+                    var generalConsultans = (await Mediator.Send(new GetGeneralConsultanServiceQuery())).Item1;
                     var BodyCPPT = CPPTs.Where(x => x.GeneralConsultanServiceId == item.GeneralConsultans.Id && x.Title == "Diagnosis").Select(x => x.Body).FirstOrDefault();
 
                     if (BodyCPPT != null)
@@ -166,6 +168,7 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             isShow = true;
         }
+
         private void Cancel()
         {
             isShow = false;
@@ -232,8 +235,6 @@ namespace McDermott.Web.Components.Pages.Employee
                 ex.HandleException(ToastService);
             }
         }
-
-
 
         private async Task SendToEmail()
         {
@@ -347,7 +348,6 @@ namespace McDermott.Web.Components.Pages.Employee
                     // Add Cc recipients
                     if (cekEmailTemplate.Cc is not null)
                     {
-
                         foreach (var cc in cekEmailTemplate.Cc)
                         {
                             message.Cc.Add(MailboxAddress.Parse(cc.Trim()));

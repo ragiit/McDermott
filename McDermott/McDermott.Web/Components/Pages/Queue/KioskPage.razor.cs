@@ -455,7 +455,7 @@ namespace McDermott.Web.Components.Pages.Queue
                         }
                     }
 
-                    var cekId = await Mediator.Send(new GetGeneralConsultanServiceQuery()); //get Data General Consultation
+                    var cekId = (await Mediator.Send(new GetGeneralConsultanServiceQuery())).Item1; //get Data General Consultation
                     var GId = cekId.Where(x => x.KioskQueueId == id).Select(x => x.Id).FirstOrDefault(); //Get Id in General Consultation where KioskQueueId = id
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(GId)); //Delete Data in General Consultation where id
 
