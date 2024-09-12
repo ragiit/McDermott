@@ -1072,7 +1072,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         StagingText = EnumStatusGeneralConsultantService.NurseStation;
 
                         Id = GeneralConsultanService.Id;
-                        NavigationManager.NavigateTo($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{GeneralConsultanService.Id}");
+                        NavigationManager.NavigateTo($"{Url}/{EnumPageMode.Update.GetDisplayName()}/{GeneralConsultanService.Id}", true);
 
                         break;
 

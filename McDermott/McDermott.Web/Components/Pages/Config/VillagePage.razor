@@ -22,7 +22,7 @@
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
 
-                                <MyGrid @ref="Grid"
+                                <MyGridPaginate @ref="Grid"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         Data="Villages"
                                         EditModelSaving="OnSave"
@@ -144,7 +144,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
-                                </MyGrid>
+                                </MyGridPaginate>
 
                                 <div class="row">
                                     <DxFormLayout>
