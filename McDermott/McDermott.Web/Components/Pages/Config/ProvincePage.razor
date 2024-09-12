@@ -68,17 +68,6 @@
                                                 <ValidationMessage For="@(()=> a.Code)"   />
                                             </DxFormLayoutItem>
 
-
-                                            @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
-                                        <MyDxComboBox Data="@Countries"
-                                        NullText="Select Country..."
-                                        @bind-Value="@a.CountryId"
-                                        TextFieldName="Name"
-                                        ValueFieldName="Id">
-                                        </MyDxComboBox>
-                                        <ValidationMessage For="@(()=>a.CountryId)" />
-                                        </DxFormLayoutItem> *@
-
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Countries"
                                                               NullText="Select Country..."

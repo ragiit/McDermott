@@ -107,8 +107,8 @@ namespace McDermott.Web.Components.Pages
         {
             PanelVisible = true;
 
-            Countries = await Mediator.Send(new GetCountryQuery());
-
+            var countries = await Mediator.Send(new GetCountryQuery());
+            Countries = countries.Item1;
             await GetUserInfo();
             await LoadData();
         }

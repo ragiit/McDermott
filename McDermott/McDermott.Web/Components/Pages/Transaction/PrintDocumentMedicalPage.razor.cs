@@ -108,8 +108,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        
-
         private async Task SelectCategory()
         {
             switch (postGenerateMedicalcertificates.JenisSurat)

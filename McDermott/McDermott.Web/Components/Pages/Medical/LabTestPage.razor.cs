@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using MailKit.Search;
+using McDermott.Application.Dtos.Medical;
+using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -67,6 +71,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region Static
 
+        private Timer _timer;
         private bool ShowForm { get; set; } = false;
         private bool FormValidationState { get; set; } = true;
         private bool PanelVisible { get; set; } = true;
@@ -78,6 +83,32 @@ namespace McDermott.Web.Components.Pages.Medical
         private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
 
         #endregion Static
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
 
         #region SaveDelete
 
@@ -148,10 +179,11 @@ namespace McDermott.Web.Components.Pages.Medical
             }
         }
 
-        private async Task LoadLabTestDetails()
+        private async Task LoadLabTestDetails(int pageIndex = 0, int pageSize = 10)
         {
             SelectedDetailDataItems = [];
-            LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+            var result = await Mediator.Send(new GetLabTestDetailQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            LabTestDetailForms = result.Item1.Where(x => x.LabTestId == LabTest.Id).ToList();
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -218,39 +250,131 @@ namespace McDermott.Web.Components.Pages.Medical
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-
-            LabUoms = await Mediator.Send(new GetLabUomQuery());
-            SampleTypes = await Mediator.Send(new GetSampleTypeQuery());
-
-            await GetUserInfo();
             await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+                await GetUserInfo();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
             ShowForm = false;
             SelectedDataItems = [];
-            LabTests = await Mediator.Send(new GetLabTestQuery());
+            var result = await Mediator.Send(new GetLabTestQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            LabTests = result.Item1;
+            totalCount = result.pageCount;
             PanelVisible = false;
         }
 
         #endregion LoadData
 
-        #region Grid Function
+        #region Load ComboBox
+        #region ComboBox Sampel Type
+        private DxComboBox<SampleTypeDto, long?> refSampleTypesComboBox { get; set; }
+        private int SampleTypesComboBoxIndex { get; set; } = 0;
+        private int totalCountSampleTypes = 0;
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        private async Task OnSearchSampleTypes()
         {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            await LoadDataSampleTypes(0, 10);
+        }
+
+        private async Task OnSearchSampleTypesIndexIncrement()
+        {
+            if (SampleTypesComboBoxIndex < (totalCountSampleTypes - 1))
             {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
+                SampleTypesComboBoxIndex++;
+                await LoadDataSampleTypes(SampleTypesComboBoxIndex, 10);
             }
         }
+
+        private async Task OnSearchSampleTypesIndexDecrement()
+        {
+            if (SampleTypesComboBoxIndex > 0)
+            {
+                SampleTypesComboBoxIndex--;
+                await LoadDataSampleTypes(SampleTypesComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputSampleTypesChanged(string e)
+        {
+            SampleTypesComboBoxIndex = 0;
+            await LoadDataSampleTypes(0, 10);
+        }
+
+        private async Task LoadDataSampleTypes(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetSampleTypeQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            SampleTypes = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+        #region Combo Box Lab Uoms
+        private DxComboBox<LabUomDto, long?> refLabUomComboBox { get; set; }
+        private int LabUomComboBoxIndex { get; set; } = 0;
+        private int totalCountLabUom = 0;
+
+        private async Task OnSearchLabUom()
+        {
+            await LoadDataLabUom(0, 10);
+        }
+
+        private async Task OnSearchLabUomIndexIncrement()
+        {
+            if (LabUomComboBoxIndex < (totalCountLabUom - 1))
+            {
+                LabUomComboBoxIndex++;
+                await LoadDataLabUom(LabUomComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchLabUomIndexDecrement()
+        {
+            if (LabUomComboBoxIndex > 0)
+            {
+                LabUomComboBoxIndex--;
+                await LoadDataLabUom(LabUomComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputLabUomChanged(string e)
+        {
+            LabUomComboBoxIndex = 0;
+            await LoadDataLabUom(0, 10);
+        }
+
+        private async Task LoadDataLabUom(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetLabUomQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            LabUoms = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+        #endregion
+
+        #region Grid Function
+
+
 
         private void GridDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -269,54 +393,14 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region ToolBar Button
 
-        public async Task ImportExcelFile(InputFileChangeEventArgs e)
-        {
-            foreach (var file in e.GetMultipleFiles(1))
-            {
-                //try
-                //{
-                //    using MemoryStream ms = new();
-                //    await file.OpenReadStream().CopyToAsync(ms);
-                //    ms.Position = 0;
-
-                //    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                //    using ExcelPackage package = new(ms);
-                //    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-
-                //    var headerNames = new List<string>() { "Name", "Code" };
-
-                //    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                //        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
-                //    {
-                //        ToastService.ShowInfo("The header must match the grid.");
-                //        return;
-                //    }
-
-                //    var countries = new List<CountryDto>();
-
-                //    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                //    {
-                //        var country = new CountryDto
-                //        {
-                //            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                //            Code = ws.Cells[row, 2].Value?.ToString()?.Trim()
-                //        };
-
-                //        if (!Countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country.Name.Trim().ToLower()))
-                //            countries.Add(country);
-                //    }
-
-                //    await Mediator.Send(new CreateListCountryRequest(countries));
-
-                //    await LoadData();
-                //}
-                //catch { }
-            }
-        }
 
         private async Task Refresh_Click()
         {
             await LoadData();
+        }
+        private async Task RefreshDetail_Click()
+        {
+            await LoadLabTestDetails();
         }
 
         private async Task NewItemDetail_Click()
@@ -329,14 +413,14 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task EditItem_Click()
         {
             ShowForm = true;
-            var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
+            //var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
 
-            if (labTest.Count > 0)
-            {
-                LabTest = labTest[0];
-                EditedResultType = LabTest.ResultType;
-                LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
-            }
+            //if (labTest.Count > 0)
+            //{
+            //    LabTest = labTest[0];
+            //    EditedResultType = LabTest.ResultType;
+            //    LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+            //}
         }
 
         private void DeleteItem_Click()
@@ -344,11 +428,12 @@ namespace McDermott.Web.Components.Pages.Medical
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void NewItem_Click()
+        private async Task NewItem_Click()
         {
             ShowForm = true;
             LabTest = new();
             LabTestDetailForms = [];
+            await LoadLabTestDetails();
         }
 
         private async Task EditItemDetail_Click(IGrid context)
@@ -371,38 +456,79 @@ namespace McDermott.Web.Components.Pages.Medical
             GridDetail.ShowRowDeleteConfirmation(FocusedRowDetailVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         private async Task ImportFile()
         {
-            await JsRuntime.InvokeVoidAsync("clickInputFile");
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<LabTestDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var c = new LabTestDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!LabTests.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
+                            list.Add(c);
+                    }
+
+                    await Mediator.Send(new CreateListLabTestRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Code"
+                },
+            ]);
         }
 
         #endregion ToolBar Button

@@ -1,9 +1,11 @@
-﻿using static McDermott.Application.Features.Commands.Medical.DoctorScheduleSlotCommand;
+﻿using Microsoft.EntityFrameworkCore;
+
+using static McDermott.Application.Features.Commands.Medical.DoctorScheduleSlotCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class DoctorScheduleSlotQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>,
+        IRequestHandler<GetDoctorScheduleSlotQuery, (List<DoctorScheduleSlotDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateDoctorScheduleSlotRequest, DoctorScheduleSlotDto>,
         IRequestHandler<CreateListDoctorScheduleSlotRequest, List<DoctorScheduleSlotDto>>,
         IRequestHandler<UpdateDoctorScheduleSlotRequest, DoctorScheduleSlotDto>,
@@ -12,37 +14,52 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<List<DoctorScheduleSlotDto>> Handle(GetDoctorScheduleSlotQuery request, CancellationToken cancellationToken)
+        public async Task<(List<DoctorScheduleSlotDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDoctorScheduleSlotQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetDoctorScheduleSlotQuery_";
+                var query = _unitOfWork.Repository<DoctorScheduleSlot>().Entities
+                    .Include(x=>x.Physician)
+                    .Include(x=>x.DoctorSchedule)
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<DoctorScheduleSlot>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<DoctorScheduleSlot>().Entities
-                       .Include(x => x.DoctorSchedule)
-                       .Include(x => x.Physician)
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.StartDate.ToString(), $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.WorkFrom.ToString(), $"%{request.SearchTerm}%")||
+                        EF.Functions.Like(v.WorkTo.ToString(), $"%{request.SearchTerm}%"));
                 }
 
-                result ??= [];
+                var pagedResult = query
+                            .OrderBy(x => x.StartDate);
 
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var skip = (request.PageIndex) * request.PageSize;
 
-                return result.ToList().Adapt<List<DoctorScheduleSlotDto>>();
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<DoctorScheduleSlotDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateDoctorScheduleSlotQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<DoctorScheduleSlot>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

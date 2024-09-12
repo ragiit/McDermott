@@ -1,7 +1,9 @@
-﻿namespace McDermott.Application.Features.Queries.Medical
+﻿using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
+
+namespace McDermott.Application.Features.Queries.Medical
 {
     public class BuildingLocationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetBuildingLocationQuery, List<BuildingLocationDto>>,
+        IRequestHandler<GetBuildingLocationQuery, (List<BuildingLocationDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateBuildingLocationRequest, BuildingLocationDto>,
         IRequestHandler<CreateListBuildingLocationRequest, List<BuildingLocationDto>>,
         IRequestHandler<UpdateBuildingLocationRequest, BuildingLocationDto>,
@@ -10,38 +12,51 @@
     {
         #region GET
 
-        public async Task<List<BuildingLocationDto>> Handle(GetBuildingLocationQuery request, CancellationToken cancellationToken)
+        public async Task<(List<BuildingLocationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBuildingLocationQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetBuildingLocationQuery_";
+                var query = _unitOfWork.Repository<BuildingLocation>().Entities
+                    .Include(x=>x.Building)
+                    .Include(x=>x.Location)
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<BuildingLocation>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<BuildingLocation>().Entities
-                       .Include(x => x.Building)
-                       .Include(x => x.Location)
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.BuildingId.ToString(), $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.LocationId.ToString(), $"%{request.SearchTerm}%"));
                 }
 
-                result ??= [];
+                var pagedResult = query
+                            .OrderBy(x => x.BuildingId);
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var skip = (request.PageIndex) * request.PageSize;
 
-                return result.ToList().Adapt<List<BuildingLocationDto>>();
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<BuildingLocationDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateBuildingLocationQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<BuildingLocation>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

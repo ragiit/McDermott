@@ -3,7 +3,7 @@ using static McDermott.Application.Features.Commands.Config.CompanyCommand;
 namespace McDermott.Application.Features.Queries.Employee
 {
     public class CompanyQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetCompanyQuery, List<CompanyDto>>,
+        IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateCompanyRequest, CompanyDto>,
         IRequestHandler<CreateListCompanyRequest, List<CompanyDto>>,
         IRequestHandler<UpdateCompanyRequest, CompanyDto>,
@@ -12,32 +12,41 @@ namespace McDermott.Application.Features.Queries.Employee
     {
         #region GET
 
-        public async Task<List<CompanyDto>> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
+        public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetCompanyQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<Company>().Entities
+                    .Include(x => x.City)
+                    .Include(x => x.Province)
+                    .Include(x => x.Country)
+                    .AsNoTracking()
+                    .AsQueryable();
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Company>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<Company>().Entities
-                        .Include(z => z.Country)
-                        .Include(z => z.City)
-                        .Include(z => z.Province)
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Email, $"{request.SearchTerm}") ||
+                        EF.Functions.Like(v.Phone, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<CompanyDto>>();
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<CompanyDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -45,6 +54,14 @@ namespace McDermott.Application.Features.Queries.Employee
             }
         }
 
+        public async Task<bool> Handle(ValidateCompanyQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Company>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
         #endregion GET
 
         #region CREATE

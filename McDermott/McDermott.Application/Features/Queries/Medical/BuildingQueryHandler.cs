@@ -1,7 +1,9 @@
-﻿namespace McDermott.Application.Features.Queries.Medical
+﻿using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
+
+namespace McDermott.Application.Features.Queries.Medical
 {
     public class BuildingQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetBuildingQuery, List<BuildingDto>>,
+        IRequestHandler<GetBuildingQuery, (List<BuildingDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateBuildingRequest, BuildingDto>,
         IRequestHandler<CreateListBuildingRequest, List<BuildingDto>>,
         IRequestHandler<UpdateBuildingRequest, BuildingDto>,
@@ -10,32 +12,36 @@
     {
         #region GET
 
-        public async Task<List<BuildingDto>> Handle(GetBuildingQuery request, CancellationToken cancellationToken)
+        public async Task<(List<BuildingDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBuildingQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetBuildingQuery_";
+                var query = _unitOfWork.Repository<Building>().Entities
+                    .Include(x=>x.HealthCenter)
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Building>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<Building>().Entities
-                       .Include(x => x.HealthCenter)
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
-                result ??= [];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var skip = (request.PageIndex) * request.PageSize;
 
-                return result.ToList().Adapt<List<BuildingDto>>();
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<BuildingDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -43,6 +49,14 @@
             }
         }
 
+        public async Task<bool> Handle(ValidateBuildingQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Building>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
         #endregion GET
 
         #region CREATE

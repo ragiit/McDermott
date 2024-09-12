@@ -1,9 +1,10 @@
 ﻿
+using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class HealthCenterQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetHealthCenterQuery, List<HealthCenterDto>>,
+        IRequestHandler<GetHealthCenterQuery, (List<HealthCenterDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateHealthCenterRequest, HealthCenterDto>,
         IRequestHandler<CreateListHealthCenterRequest, List<HealthCenterDto>>,
         IRequestHandler<UpdateHealthCenterRequest, HealthCenterDto>,
@@ -12,36 +13,52 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<List<HealthCenterDto>> Handle(GetHealthCenterQuery request, CancellationToken cancellationToken)
+        public async Task<(List<HealthCenterDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetHealthCenterQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetHealthCenterQuery_";
+                var query = _unitOfWork.Repository<HealthCenter>().Entities
+                    .Include(x=>x.Province)
+                    .Include(x=>x.City)
+                    .Include (x=>x.Country)
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<HealthCenter>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<HealthCenter>().Entities
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%"));
                 }
 
-                result ??= [];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var skip = (request.PageIndex) * request.PageSize;
 
-                return result.ToList().Adapt<List<HealthCenterDto>>();
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<HealthCenterDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateHealthCenterQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<HealthCenter>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

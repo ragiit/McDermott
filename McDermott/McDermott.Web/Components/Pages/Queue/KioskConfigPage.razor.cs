@@ -108,7 +108,7 @@ namespace McDermott.Web.Components.Pages.Queue
             SelectedDataItems = new ObservableRangeCollection<object>();
             var a = await Mediator.Send(new GetKioskConfigQuery());
             var service = await Mediator.Send(new GetServiceQuery());
-            Services = [.. service.Where(x => x.IsPatient == true)];
+            //Services = [.. service.Where(x => x.IsPatient == true)];
             a.ForEach(x => x.ServiceName = string.Join(", ", Services.Where(z => x.ServiceIds != null && x.ServiceIds.Contains(z.Id)).Select(x => x.Name).ToList()));
             kioskConfigs = a;
             PanelVisible = false;

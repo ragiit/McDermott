@@ -15,6 +15,6 @@
         public virtual DiseaseCategory? DiseaseCategory { get; set; }
 
         [SetToNull]
-        public virtual CronisCategory? CronisKategory { get; set; }
+        public virtual CronisCategory? CronisCategory { get; set; }
     }
 }

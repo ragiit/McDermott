@@ -1,4 +1,8 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using GreenDonut;
+using McDermott.Application.Features.Services;
+using McDermott.Domain.Entities;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class SpecialityPage
     {
@@ -7,6 +11,7 @@
         private IEnumerable<GridEditMode> GridEditModes { get; } = Enum.GetValues<GridEditMode>();
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private dynamic dd;
+        private Timer _timer;
         private long Value { get; set; } = 0;
         private bool PanelVisible { get; set; } = true;
         private string textPopUp = "";
@@ -52,15 +57,90 @@
 
         #endregion UserLoginAndAccessRole
 
-        protected override async Task OnInitializedAsync()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            await GetUserInfo();
-            await LoadData();
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        private async Task OnPageSizeIndexChanged(int newPageSize)
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+            await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+                await GetUserInfo();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            var result = await Mediator.Send(new GetSpecialityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Specialitys = result.Item1;
+            totalCount = result.pageCount;
+            activePageIndex = pageIndex;
+            PanelVisible = false;
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Speciality_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Code"
+                },
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+            ]);
+        }
+
+        public async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jSRuntime, IFileExportService file, string fileName, DotNetStreamReference streamReference, List<ExportFileData> data, string? name = "downloadFileFromStream")
+        {
+            var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
+
+            using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
+            await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -111,24 +191,7 @@
             });
         }
 
-        // private void ImportItem_Click()
-        // {
-        //     /// .....
-        // }
-
-        // private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        // {
-        //     if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-        //     {
-        //         e.CssClass = "alt-item";
-        //     }
-        //     if (e.ElementType == GridElementType.HeaderCell)
-        //     {
-        //         e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-        //         e.CssClass = "header-bold";
-        //     }
-        // }
-
+        
         private async Task ExportCsvItem_Click()
         {
             await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
@@ -173,13 +236,7 @@
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Specialitys = await Mediator.Send(new GetSpecialityQuery());
-            PanelVisible = false;
-        }
+        
 
         private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
         {

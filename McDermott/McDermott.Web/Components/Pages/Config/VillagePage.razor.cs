@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.HttpLogging;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class VillagePage
     {
@@ -173,9 +176,10 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetVillages(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            //var result = await MyQuery.GetVillages(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            var result = await Mediator.Send(new GetVillageQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Villages = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -257,6 +261,7 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            //var haleh = await Mediator.Send(new GetVillageQuery());
             await GetUserInfo();
             await LoadData();
             await LoadDataCity();
@@ -316,8 +321,15 @@
         {
             var editModel = (VillageDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
+            var c = await Mediator.Send(new GetCountryQuery(searchTerm: editModel.Name, pageSize: 0, pageIndex: 1));
+
+            if (c.Item1.Count > 0)
+            {
+                ToastService.ShowInfo($"Country with name '{editModel.Name}' is already exist");
+                e.Cancel = true;
+
                 return;
+            }
 
             if (editModel.Id == 0)
                 await Mediator.Send(new CreateVillageRequest(editModel));

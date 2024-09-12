@@ -95,7 +95,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 ShowPresent = false;
                 PanelVisible = true;
                 var general = await Mediator.Send(new GetCounterByIdQuery(CounterId));
-                Services = await Mediator.Send(new GetServiceQuery());
+                //Services = await Mediator.Send(new GetServiceQuery());
                 var physician = await Mediator.Send(new GetUserQuery());
                 DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());
                 ServiceK = Services.Where(x => x.IsKiosk == true).ToList();

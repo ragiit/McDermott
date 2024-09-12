@@ -83,7 +83,8 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             SelectedDataItems = new ObservableRangeCollection<object>();
-            Countries = await Mediator.Send(new GetCountryQuery());
+            var countries = await Mediator.Send(new GetCountryQuery());
+            Countries = countries.Item1;
             Provinces = await Mediator.Send(new GetProvinceQuery());
             Cities = await Mediator.Send(new GetCityQuery());
 

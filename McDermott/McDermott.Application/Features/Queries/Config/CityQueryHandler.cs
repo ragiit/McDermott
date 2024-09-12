@@ -3,7 +3,7 @@
 namespace McDermott.Application.Features.Queries.Config
 {
     public class CityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetCityQuery, List<CityDto>>,
+        IRequestHandler<GetCityQuery, (List<CityDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateCityRequest, CityDto>,
         IRequestHandler<CreateListCityRequest, List<CityDto>>,
         IRequestHandler<UpdateCityRequest, CityDto>,
@@ -12,35 +12,50 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
-        public async Task<List<CityDto>> Handle(GetCityQuery request, CancellationToken cancellationToken)
+        public async Task<(List<CityDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCityQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetCityQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<City>().Entities
+                    .Include(x=>x.Province)
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<City>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<City>().Entities
-                        .Include(x => x.Province)
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.ProvinceId.ToString(), $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<CityDto>>();
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<CityDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateCityQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<City>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

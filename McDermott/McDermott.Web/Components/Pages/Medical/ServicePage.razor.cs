@@ -11,6 +11,7 @@
         private bool PanelVisible { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
         private string TextPopUp { get; set; } = string.Empty;
+        private Timer _timer;
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -55,9 +56,109 @@
 
         private string KioskName { get; set; } = String.Empty;
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+            await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+                await GetUserInfo();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            PopUpVisible = false;
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            var result = await Mediator.Send(new GetServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Services = result.Item1;
+            totalCount = result.pageCount;
+            ServicesK = [.. Services.Where(x => x.IsKiosk == true).ToList()];
+
+            foreach (var i in Services)
+            {
+                if (i.IsKiosk == true && i.IsPatient == false)
+                {
+                    i.Flag = "Counter";
+                    if (i.ServicedId != null && i.ServicedId != 0)
+                    {
+                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
+                    }
+                    else
+                    {
+                        i.KioskName = "-";
+                    }
+                }
+                else if (i.IsKiosk == false && i.IsPatient == true)
+                {
+                    i.Flag = "Patient";
+                    if (i.ServicedId != null && i.ServicedId != 0)
+                    {
+                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
+                    }
+                    else
+                    {
+                        i.KioskName = "-";
+                    }
+                }
+                else if (i.IsKiosk == true && i.IsPatient == true)
+                {
+                    i.Flag = " Patient, Counter";
+                    if (i.ServicedId != null && i.ServicedId != 0)
+                    {
+                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
+                    }
+                    else
+                    {
+                        i.KioskName = "-";
+                    }
+                }
+                else
+                {
+                    i.Flag = "-";
+                    i.KioskName = "-";
+                }
+            }
+
+            PanelVisible = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -83,18 +184,7 @@
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            //if (string.IsNullOrWhiteSpace(FormService.Name))
-            //    return;
-
-            //if (FormService.Id == 0)
-            //{
-            //    await Mediator.Send(new CreateServiceRequest(FormService));
-            //}
-            //else
-            //{
-            //    await Mediator.Send(new UpdateServiceRequest(FormService));
-            //}
-            //await LoadData();
+            
             try
             {
                 var editModel = (ServiceDto)e.EditModel;
@@ -175,95 +265,8 @@
             Grid.ShowColumnChooser();
         }
 
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            PanelVisible = true;
-
-            SelectedDataItems = new ObservableRangeCollection<object>();
-
-            await GetUserInfo();
-            await LoadData();
-        }
-
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            PopUpVisible = false;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Services = await Mediator.Send(new GetServiceQuery());
-            ServicesK = [.. Services.Where(x => x.IsKiosk == true).ToList()];
-
-            foreach (var i in Services)
-            {
-                if (i.IsKiosk == true && i.IsPatient == false)
-                {
-                    i.Flag = "Counter";
-                    if (i.ServicedId != null && i.ServicedId != 0)
-                    {
-                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
-                    }
-                    else
-                    {
-                        i.KioskName = "-";
-                    }
-                }
-                else if (i.IsKiosk == false && i.IsPatient == true)
-                {
-                    i.Flag = "Patient";
-                    if (i.ServicedId != null && i.ServicedId != 0)
-                    {
-                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
-                    }
-                    else
-                    {
-                        i.KioskName = "-";
-                    }
-                }
-                else if (i.IsKiosk == true && i.IsPatient == true)
-                {
-                    i.Flag = " Patient, Counter";
-                    if (i.ServicedId != null && i.ServicedId != 0)
-                    {
-                        i.KioskName = Services.Where(x => x.Id == i.ServicedId).Select(z => z.Name).FirstOrDefault();
-                    }
-                    else
-                    {
-                        i.KioskName = "-";
-                    }
-                }
-                else
-                {
-                    i.Flag = "-";
-                    i.KioskName = "-";
-                }
-            }
-
-            PanelVisible = false;
-        }
+        
+        
 
         #endregion Default Grid
     }
