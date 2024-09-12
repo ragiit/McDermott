@@ -10,6 +10,7 @@
         "dependencies": {
           "AspNetCoreRateLimit": "5.0.0",
           "Aspose.Words": "24.7.0",
+          "Blazor.Extensions.Canvas": "1.1.1",
           "Blazor.SignaturePad": "8.1.3",
           "Blazored.FluentValidation": "2.2.0",
           "Blazored.LocalStorage": "4.5.0",
@@ -127,6 +128,21 @@
           "lib/net8.0/BananaCakePop.Middleware.dll": {
             "assemblyVersion": "16.0.0.0",
             "fileVersion": "16.0.3.0"
+          }
+        }
+      },
+      "Blazor.Extensions.Canvas/1.1.1": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.Web": "8.0.7"
+        },
+        "runtime": {
+          "lib/netstandard2.1/Blazor.Extensions.Canvas.JS.dll": {
+            "assemblyVersion": "0.1.0.0",
+            "fileVersion": "0.1.0.0"
+          },
+          "lib/netstandard2.1/Blazor.Extensions.Canvas.dll": {
+            "assemblyVersion": "0.1.0.0",
+            "fileVersion": "0.1.0.0"
           }
         }
       },
@@ -4171,6 +4187,13 @@
       "sha512": "sha512-gwWk5ykS1uum2/++x3UnGhmjs+4itxce1lW5YnKdb8JeG4QxAMzSWVGh3B1ehiKJNAuvNtbfBwp2BAQvOsq02g==",
       "path": "bananacakepop.middleware/16.0.3",
       "hashPath": "bananacakepop.middleware.16.0.3.nupkg.sha512"
+    },
+    "Blazor.Extensions.Canvas/1.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-G+ElSm24MPj3iU2adehrRbVEFQtIR8NPH5M9oBq+RhJ1/Bvit8z6CTaUTVkfiuhgmFVZKJ56D1OdnbZ0u1/lQQ==",
+      "path": "blazor.extensions.canvas/1.1.1",
+      "hashPath": "blazor.extensions.canvas.1.1.1.nupkg.sha512"
     },
     "Blazor.SignaturePad/8.1.3": {
       "type": "package",

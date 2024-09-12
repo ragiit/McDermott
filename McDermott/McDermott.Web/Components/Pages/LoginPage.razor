@@ -46,7 +46,7 @@
                 @text
                 </div> *@
 
-                <form method="POST" action="/login">
+                @* <form method="POST" action="/login">
                     <div class="input-group mb-3">
                         <input @bind="LoginForm.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
@@ -68,7 +68,7 @@
                         Sign in
                     </button>
 
-                </form>
+                </form> *@
 
                 @*    <EditForm Model="@LoginForm" Context="EditFormContextt" method="POST" action="/login">
                 <input type="text" name="data" value="test">
@@ -79,7 +79,7 @@
                 <input type="text" name="data" value="test">
                 <input type="submit" value="Submit">
                 </form> *@
-
+@* 
                 <DxComboBox @bind-Value="SelectedValue"
                             @bind-Text="Hehehe"
                             Data="@Villages"
@@ -93,7 +93,7 @@
                         <DxEditorButton Click="OnSearch" IconCssClass="fa-solid fa-magnifying-glass" /> 
                     </Buttons>
                 </DxComboBox>
-
+ *@
 
                 <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                           OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">
@@ -165,7 +165,7 @@
     {
         // Handle the value change, e.g., perform a search or show a toast message
         LoginForm.Email = newValue;
-        ToastService.ShowInfo("Email changed: " + newValue);
+        // ToastService.ShowInfo("Email changed: " + newValue);
     }
     [SupplyParameterFromForm(FormName = "dawda")]
     public LoginTemp LoginForm { get; set; } = new();

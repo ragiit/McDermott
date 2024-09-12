@@ -22,7 +22,7 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <MyGrid @ref="Grid"
+                                <MyGridPaginate @ref="Grid"
                                         Data="Districts"
                                         @bind-SelectedDataItems="@SelectedDataItems"
                                         EditModelSaving="OnSave"
@@ -116,7 +116,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
-                                </MyGrid>
+                                </MyGridPaginate>
 
 
                                 <div class="row">
