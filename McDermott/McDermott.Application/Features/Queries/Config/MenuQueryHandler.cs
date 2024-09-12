@@ -4,8 +4,9 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class MenuQueryHandler
         (IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetMenuQuery, List<MenuDto>>,
+        IRequestHandler<GetMenuQuery, (List<MenuDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateMenuRequest, MenuDto>,
+        IRequestHandler<ValidateMenuQuery, bool>,
         IRequestHandler<CreateListMenuRequest, List<MenuDto>>,
         IRequestHandler<UpdateMenuRequest, MenuDto>,
         IRequestHandler<UpdateListMenuRequest, List<MenuDto>>,
@@ -13,27 +14,47 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
-        public async Task<List<MenuDto>> Handle(GetMenuQuery request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ValidateMenuQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Menu>()
+                .Entities
+                .AsNoTracking()
+                .AnyAsync(request.Predicate, cancellationToken);// Check if any record matches the condition
+        }
+
+        public async Task<(List<MenuDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMenuQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetMenuQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
-                if (!_cache.TryGetValue(cacheKey, out List<Menu>? result))
-                {
-                    result = await _unitOfWork.Repository<Menu>().Entities
-                        .AsNoTracking()
-                        .OrderBy(x => x.Name)
-                        .Include(x => x.Parent)
-                        .ToListAsync(cancellationToken);
+                var query = _unitOfWork.Repository<Menu>().Entities
+                    .AsNoTracking()
+                    .Include(x => x.Parent)
+                    .AsQueryable();
 
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<MenuDto>>();
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<MenuDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

@@ -66,7 +66,7 @@ namespace McDermott.Web.Components.Pages.Config
         private bool isDetail { get; set; } = false;
         private string textPopUp = "";
         public IGrid Grid { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private bool PanelVisible { get; set; } = true;
 
@@ -74,7 +74,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             showForm = false;
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             Companys = await Mediator.Send(new GetCompanyQuery());
             //DetailCompanies = [.. Companys.ToList()];
             PanelVisible = false;
@@ -82,11 +82,13 @@ namespace McDermott.Web.Components.Pages.Config
 
         protected override async Task OnInitializedAsync()
         {
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             var countries = await Mediator.Send(new GetCountryQuery());
             Countries = countries.Item1;
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
+            var result = await Mediator.Send(new GetProvinceQuery());
+            Provinces = result.Item1;
+            var results = await Mediator.Send(new GetCityQuery());
+            Cities = results.Item1;
 
             await GetUserInfo();
             await LoadData();

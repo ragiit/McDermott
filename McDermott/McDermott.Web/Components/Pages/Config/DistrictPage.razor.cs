@@ -1,4 +1,5 @@
 ﻿using Google.Apis.Http;
+using McDermott.Web.Components.Layout;
 using OfficeOpenXml.Style;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -127,44 +128,98 @@ namespace McDermott.Web.Components.Pages.Config
                     }
 
                     var list = new List<DistrictDto>();
-
+                    var parentCache = new List<CityDto>();
+                    var parentProvinceCache = new List<ProvinceDto>();
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var provName = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
+                        bool isValid = true;
 
-                        if (provName is null)
+                        long? provinceId = null;
+                        var province = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        // Cari parent di cache atau database
+                        if (!string.IsNullOrEmpty(province))
                         {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"Province with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
-                            return;
+                            var cachedParent = parentProvinceCache.FirstOrDefault(x => x.Name == province);
+                            if (cachedParent is null)
+                            {
+                                var parentMenu = (await Mediator.Send(new GetProvinceQuery(x =>
+                                      x.Name == province,
+                                    searchTerm: province, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentMenu is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 1, province ?? string.Empty);
+                                }
+                                else
+                                {
+                                    provinceId = parentMenu.Id;
+                                    parentProvinceCache.Add(parentMenu);
+                                }
+                            }
+                            else
+                            {
+                                provinceId = cachedParent.Id;
+                            }
                         }
 
-                        var cityName = Cities.FirstOrDefault(x => x.Name == ws.Cells[row, 2].Value?.ToString()?.Trim());
-
-                        if (cityName is null)
+                        long? cityId = null;
+                        var city = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        if (!string.IsNullOrEmpty(city))
                         {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"City with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
-                            return;
+                            var cachedParent = parentProvinceCache.FirstOrDefault(x => x.Name == city);
+                            if (cachedParent is null)
+                            {
+                                var parentMenu = (await Mediator.Send(new GetCityQuery(x =>
+                                      x.Name == city,
+                                    searchTerm: city, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentMenu is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 2, city ?? string.Empty);
+                                }
+                                else
+                                {
+                                    cityId = parentMenu.Id;
+                                    parentCache.Add(parentMenu);
+                                }
+                            }
+                            else
+                            {
+                                cityId = cachedParent.Id;
+                            }
                         }
 
-                        var c = new DistrictDto
+                        // Lewati baris jika tidak valid
+                        if (!isValid)
+                            continue;
+
+                        var newMenu = new DistrictDto
                         {
-                            ProvinceId = provName.Id,
-                            CityId = cityName.Id,
+                            ProvinceId = provinceId,
+                            CityId = cityId,
                             Name = ws.Cells[row, 3].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Districts.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.ProvinceId == c.ProvinceId && x.CityId == c.CityId))
-                            list.Add(c);
+                        bool exists = await Mediator.Send(new ValidateDistrictQuery(x =>
+                            x.Name == newMenu.Name &&
+                            x.ProvinceId == newMenu.ProvinceId &&
+                            x.CityId == newMenu.CityId));
+
+                        if (!exists)
+                            list.Add(newMenu);
                     }
 
-                    await Mediator.Send(new CreateListDistrictRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.ProvinceId, x.Name, x.CityId }).ToList();
+                        await Mediator.Send(new CreateListDistrictRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
 
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
@@ -204,9 +259,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetDistricts(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            var result = await Mediator.Send(new GetDistrictQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Districts = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -250,9 +305,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
             Provinces = result.Item1;
-            totalCountProvince = result.Item2;
+            totalCountProvince = result.pageCount;
             PanelVisible = false;
         }
 
@@ -297,9 +352,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, refCityComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
             Cities = result.Item1;
-            totalCountCity = result.Item2;
+            totalCountCity = result.pageCount;
             PanelVisible = false;
         }
 
@@ -409,8 +464,14 @@ namespace McDermott.Web.Components.Pages.Config
         {
             var editModel = (DistrictDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
+            bool validate = await Mediator.Send(new ValidateDistrictQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId && x.CityId == editModel.CityId));
+
+            if (validate)
+            {
+                ToastService.ShowInfo($"District with name '{editModel.Name}', province '{refProvinceComboBox.Text}' and city '{refCityComboBox.Text}' is already exists");
+                e.Cancel = true;
                 return;
+            }
 
             if (editModel.Id == 0)
                 await Mediator.Send(new CreateDistrictRequest(editModel));

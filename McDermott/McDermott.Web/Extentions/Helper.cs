@@ -1,6 +1,7 @@
 ﻿using DevExpress.Utils.Filtering.Internal;
 using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
+using McDermott.Domain.Entities;
 using Serilog;
 using Path = System.IO.Path;
 
@@ -10,12 +11,23 @@ namespace McDermott.Web.Extentions
     {
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {
-            ToastService.ShowInfo($"Data \"{val}\" in row {row} and column {col} is invalid");
+            ToastService.ShowInfo($"Data with name \"{val}\" in row {row} and column {col} is invalid");
+        }
+
+        public static void ShowErrorConflictValidation(this IToastService ToastService, string entityName)
+        {
+            ToastService.ShowInfo($"{entityName} already exists. Please check the details and try again.");
+        }
+
+        public static void ShowSuccessCountImported(this IToastService ToastService, int count)
+        {
+            ToastService.ShowSuccess($"{count} items were successfully imported.");
         }
 
         public static List<string> URLS =
         [
             // Clinic Services
+            "clinic-service/general-consultation-services",
             "clinic-service/general-consultation-services",
             "clinic-service/medical-checkups",
             "clinic-service/procedure-rooms",
@@ -179,7 +191,7 @@ namespace McDermott.Web.Extentions
             var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
 
             using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
-            await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+            await jSRuntime.InvokeVoidAsync("saveFileExcellExporrt", fileName, streamRef);
         }
 
         public static readonly string VERSION = "2.0.0";

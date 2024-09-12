@@ -1,9 +1,11 @@
-﻿using static McDermott.Application.Features.Commands.Config.DistrictCommand;
+﻿using Microsoft.EntityFrameworkCore.Internal;
+using static McDermott.Application.Features.Commands.Config.DistrictCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
     public class DistrictQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetDistrictQuery, List<DistrictDto>>,
+        IRequestHandler<GetDistrictQuery, (List<DistrictDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateDistrictQuery, bool>,
         IRequestHandler<CreateDistrictRequest, DistrictDto>,
         IRequestHandler<CreateListDistrictRequest, List<DistrictDto>>,
         IRequestHandler<UpdateDistrictRequest, DistrictDto>,
@@ -12,38 +14,55 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
-        public async Task<List<DistrictDto>> Handle(GetDistrictQuery request, CancellationToken cancellationToken)
+        public async Task<(List<DistrictDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDistrictQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetDistrictQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<District>().Entities
+                    .AsNoTracking()
+                    .Include(v => v.City)
+                    .Include(v => v.Province)
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<District>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<District>().Entities
-                        .OrderBy(x => x.Name)
-                        .Include(x => x.Province)
-                        .Include(x => x.City)
-                        .AsNoTracking()
-                        .Take(100)
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<DistrictDto>>();
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<DistrictDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateDistrictQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<District>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

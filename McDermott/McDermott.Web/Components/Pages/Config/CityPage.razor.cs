@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Config
+﻿using McDermott.Domain.Entities;
+
+namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
@@ -41,9 +43,9 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetProvinces(HttpClientFactory, pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
             Provinces = result.Item1;
-            totalCountProvince = result.Item2;
+            totalCountProvince = result.pageCount;
             PanelVisible = false;
         }
 
@@ -143,9 +145,10 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            //var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            var result = await Mediator.Send(new GetCityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Cities = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -191,41 +194,65 @@
                     }
 
                     var list = new List<CityDto>();
+                    var parentCache = new List<ProvinceDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var provName = Provinces.FirstOrDefault(x => x.Name == ws.Cells[row, 1].Value?.ToString()?.Trim());
+                        long? parentId = null;
+                        var provinsiName = ws.Cells[row, 1].Value?.ToString()?.Trim();
 
-                        if (provName is null)
+                        if (!string.IsNullOrEmpty(provinsiName))
                         {
-                            PanelVisible = false;
-                            ToastService.ShowInfo($"Province with name \"{ws.Cells[row, 1].Value?.ToString()?.Trim()}\" is not found");
-                            return;
+                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == provinsiName);
+                            if (cachedParent is null)
+                            {
+                                var parentMenu = (await Mediator.Send(new GetProvinceQuery(x => x.Name == provinsiName, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+                                if (parentMenu is null)
+                                {
+                                    ToastService.ShowErrorImport(row, 1, provinsiName ?? string.Empty);
+                                    continue;
+                                }
+                                else
+                                {
+                                    parentId = parentMenu.Id;
+                                    parentCache.Add(parentMenu);
+                                }
+                            }
+                            else
+                            {
+                                parentId = cachedParent.Id;
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowErrorImport(row, 1, provinsiName ?? string.Empty);
+                            continue;
                         }
 
                         var c = new CityDto
                         {
-                            ProvinceId = provName.Id,
+                            ProvinceId = parentId,
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Cities.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.ProvinceId == c.ProvinceId))
+                        bool exists = await Mediator.Send(new ValidateCityQuery(x => x.Name == c.Name && x.ProvinceId == c.ProvinceId));
+                        if (!exists)
                             list.Add(c);
                     }
 
-                    await Mediator.Send(new CreateListCityRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.ProvinceId, x.Name }).ToList();
+                        await Mediator.Send(new CreateListCityRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
 
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
-                catch (Exception ex)
-                {
-                    ToastService.ShowError(ex.Message);
-                }
+                catch (Exception ex) { ex.HandleException(ToastService); }
+                finally { PanelVisible = false; }
             }
-            PanelVisible = false;
         }
 
         private async Task ExportToExcel()
@@ -264,6 +291,7 @@
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteCityRequest(((CityDto)e.DataItem).Id));
@@ -275,17 +303,25 @@
                 }
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex) { ex.HandleException(ToastService); }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
                 var editModel = (CityDto)e.EditModel;
 
-                if (string.IsNullOrWhiteSpace(editModel.Name))
+                bool validate = await Mediator.Send(new ValidateCityQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"City with name '{editModel.Name}' and province '{refProvinceComboBox.Text}' is already exists");
+                    e.Cancel = true;
                     return;
+                }
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateCityRequest(editModel));
@@ -294,7 +330,14 @@
 
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         #endregion Default Grid Components

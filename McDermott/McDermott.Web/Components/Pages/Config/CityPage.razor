@@ -3,7 +3,7 @@
 
 <PageTitle>McHealthCare - City</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
@@ -24,13 +24,13 @@
                                             Text="Fetching Data...">
 
                                 <MyGridPaginate @ref="Grid"
-                                        Data="Cities"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        SearchTextChanged="OnSearchBoxChanged"
-                                        KeyFieldName="Id">
+                                                Data="Cities"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="CityDto"
@@ -40,10 +40,10 @@
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
                                                          Grid="Grid"
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -82,6 +82,11 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
+                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
@@ -126,6 +131,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

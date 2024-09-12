@@ -368,7 +368,15 @@ namespace McDermott.Web.Components.Pages.Medical
                             list.Add(c);
                     }
 
-                    await Mediator.Send(new CreateListHealthCenterRequest(list));
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+            var countries = await Mediator.Send(new GetCountryQuery());
+            Countries = countries.Item1;
+            var result = await Mediator.Send(new GetProvinceQuery());
+            Provinces = result.Item1;
+            var resultsCity = await Mediator.Send(new GetCityQuery());
+            Cities = resultsCity.Item1;
 
                     await LoadData();
                     SelectedDataItems = [];

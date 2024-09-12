@@ -1,20 +1,20 @@
 ﻿@page "/configuration/sub-districts"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Village</PageTitle>
+<PageTitle>McHealthCare - Village</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="District" ShowBackButton="false" />
+        <BaseHeaderPage Title="Village" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                            <InputFile id="fileInput" style="display:none"  OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IsContentBlocked="true"
@@ -89,6 +89,11 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
+                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
@@ -111,6 +116,10 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Province.Name" Caption="Province" /> 
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CityId)" />
                                             </DxFormLayoutItem>
@@ -133,6 +142,12 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(VillageDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                        <DxListEditorColumn FieldName="City.Name" Caption="City" />
+                                                        <DxListEditorColumn FieldName="District.Name" Caption="District" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.DistrictId)" />
                                             </DxFormLayoutItem>

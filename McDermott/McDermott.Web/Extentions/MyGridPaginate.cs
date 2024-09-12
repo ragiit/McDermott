@@ -28,10 +28,11 @@
                 PagerVisibleNumericButtonCount = 10;
                 ShowGroupPanel = true;
                 AutoExpandAllGroupRows = true;
-                ShowFilterRow = false;
+
+                ShowFilterRow = true;
                 CustomizeElement = @GridExtention.Grid_CustomizeElement;
                 ShowSearchBox = true;
-                SelectAllCheckboxMode = GridSelectAllCheckboxMode.Mixed;
+                SelectAllCheckboxMode = GridSelectAllCheckboxMode.Page;
             }
 
             return base.SetParametersAsyncCore(parameters);

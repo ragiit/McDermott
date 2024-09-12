@@ -338,7 +338,8 @@ namespace McDermott.Web.Components.Pages.Queue
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
             KioskConf = kconfig.Where(x => x.Id == Id).ToList();
             classTypes = await Mediator.Send(new GetClassTypeQuery());
-            groups = await Mediator.Send(new GetGroupQuery());
+            var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
+            groups = result2.Item1;
 
             PanelVisible = false;
         }
@@ -511,7 +512,8 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task OnSearch()
         {
-            var group = await Mediator.Send(new GetGroupQuery());
+            var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
+            var group = result2.Item1;
             var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             var InputSearch = FormKios.NumberType ?? string.Empty;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));

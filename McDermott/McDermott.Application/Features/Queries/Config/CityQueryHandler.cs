@@ -4,6 +4,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class CityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetCityQuery, (List<CityDto>, int pageIndex, int pageSize, int pageCount)>,
+  IRequestHandler<ValidateCityQuery, bool>,
         IRequestHandler<CreateCityRequest, CityDto>,
         IRequestHandler<CreateListCityRequest, List<CityDto>>,
         IRequestHandler<UpdateCityRequest, CityDto>,
@@ -17,15 +18,18 @@ namespace McDermott.Application.Features.Queries.Config
             try
             {
                 var query = _unitOfWork.Repository<City>().Entities
-                    .Include(x=>x.Province)
                     .AsNoTracking()
+                    .Include(v => v.Province)
                     .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ProvinceId.ToString(), $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
                 }
 
                 var pagedResult = query

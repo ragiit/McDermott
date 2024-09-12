@@ -3,7 +3,7 @@
 
 <PageTitle>McHealthCare - Country</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
         <BaseHeaderPage Title="Country" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
@@ -22,13 +22,13 @@
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
                                 <MyGridPaginate @ref="Grid"
-                                        Data="Countries"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        SearchTextChanged="OnSearchBoxChanged"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        KeyFieldName="Id">
+                                                Data="Countries"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="CountryDto"
@@ -38,10 +38,10 @@
                                                          NewItem_Click="@NewItem_Click"
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
+                                                         Refresh_Click="@(async () => await LoadData())"
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -107,6 +107,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

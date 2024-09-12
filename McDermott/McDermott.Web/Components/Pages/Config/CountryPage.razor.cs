@@ -1,10 +1,12 @@
 ﻿using McDermott.Application.Features.Services;
+using McDermott.Web.Components.Layout;
 
 namespace McDermott.Web.Components.Pages.Config
 {
-    public partial class CountryPage
+    public partial class CountryPage : IDisposable
     {
-        private List<CountryDto> Countries = [];
+        private List<CountryDto> Countries = new();
+        private Timer _timer;
 
         #region Searching
 
@@ -44,15 +46,10 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-
-            //if (firstRender)
-            //{
-            //    try
-            //    {
-            //        await GetUserInfo();
-            //    }
-            //    catch { }
-            //}
+            if (firstRender)
+            {
+                await GetUserInfo();
+            }
         }
 
         private async Task GetUserInfo()
@@ -69,15 +66,12 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion UserLoginAndAccessRole
 
-        private Timer _timer;
-        private bool PanelVisible { get; set; } = true;
-        private int FocusedRowVisibleIndex { get; set; }
-
-        //[Inject]
-        //private IHttpClientFactory HttpClientFactory2 { get; set; }
+        #region Grid
 
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private bool PanelVisible { get; set; } = true;
+        private int FocusedRowVisibleIndex { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -85,60 +79,49 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadData();
             await GetUserInfo();
             PanelVisible = false;
-
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //var result = await MyQuery.GetCountries(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
             var countries = await Mediator.Send(new GetCountryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Countries = countries.Item1;
             totalCount = countries.Item4;
             activePageIndex = pageIndex;
             PanelVisible = false;
-
-            return;
-            //// Menggunakan InvokeAsync untuk memastikan manipulasi UI dilakukan di thread utama
-            //await InvokeAsync(() =>
-            //    PanelVisible = true // Jika diperlukan, panel diperlihatkan di sini
-            //);
-
-            //// Memuat data
-            //try
-            //{
-            //    var countries = await Mediator.Send(new GetCountryQuery());
-            //    Countries = countries.Item1; Grid.SelectRow(0);
-            //}
-            //catch { }
-
-            //// Refresh UI setelah memuat data selesai
-            //await InvokeAsync(() =>
-            //{
-            //    PanelVisible = false; // Jika diperlukan, panel disembunyikan di sini
-            //    StateHasChanged(); // Memastikan bahwa perubahan UI diterapkan
-            //});
         }
 
         public void Dispose()
         {
-            _timer.Dispose();
+            _timer?.Dispose();
         }
 
-        #region Grid
+        #endregion Grid
+
+        #region ImportExport
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx", new List<ExportFileData>
+        {
+            new ExportFileData { Column = "Code", Notes = "Mandatory" },
+            new ExportFileData { Column = "Name", Notes = "Mandatory" }
+        });
+        }
+
+        public async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jsRuntime, IFileExportService file, string fileName, DotNetStreamReference streamReference, List<ExportFileData> data, string name = "downloadFileFromStream")
+        {
+            var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
+
+            using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
+            await jsRuntime.InvokeVoidAsync("saveFileExcellExporrt", fileName, streamRef);
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
 
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
@@ -174,16 +157,21 @@ namespace McDermott.Web.Components.Pages.Config
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Countries.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower()))
+                        bool exists = await Mediator.Send(new ValidateCountryQuery(x => x.Name == country.Name && x.Code == country.Code));
+
+                        if (!exists)
                             countries.Add(country);
                     }
 
-                    await Mediator.Send(new CreateListCountryRequest(countries));
+                    if (countries.Count > 0)
+                    {
+                        countries = countries.DistinctBy(x => new { x.Code, x.Name }).ToList();
+                        await Mediator.Send(new CreateListCountryRequest(countries));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
 
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
+                    ToastService.ShowSuccessCountImported(countries.Count);
                 }
                 catch (Exception ex)
                 {
@@ -193,184 +181,9 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = false;
         }
 
-        private async Task Refresh_Click()
-        {
-            await LoadData();
-        }
+        #endregion ImportExport
 
-        //public async Task ImportExcelFile(InputFileChangeEventArgs e)
-        //{
-        //    foreach (var file in e.GetMultipleFiles(1))
-        //    {
-        //        try
-        //        {
-        //            using MemoryStream ms = new MemoryStream();
-        //            // copy data from file to memory stream
-        //            await file.OpenReadStream().CopyToAsync(ms);
-        //            // positions the cursor at the beginning of the memory stream
-        //            ms.Position = 0;
-
-        //            // create ExcelPackage from memory stream
-        //            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-        //            using ExcelPackage package = new ExcelPackage(ms);
-
-        //            ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-
-        //            long colCount = ws.Dimension.End.Column;
-        //            long rowCount = ws.Dimension.End.Row;
-        //            var headerNames = new List<string>()
-        //            {
-        //                "Name",
-        //                "Code"
-        //            };
-
-        //            for (long i = 1; i <= colCount; i++)
-        //            {
-        //                var a = headerNames[i - 1].Trim().ToLower();
-        //                var b = ws.Cells[1, i].Value?.ToString().Trim().ToLower();
-        //                if (a != b)
-        //                {
-        //                    ToastService.ShowInfo("The header must match the grid.");
-        //                    return;
-        //                }
-        //            }
-
-        //            var countries = new List<CountryDto>();
-
-        //            // Start iterating from row 2
-        //            for (long row = 1; row <= rowCount; row++)
-        //            {
-        //                var country = new CountryDto();
-
-        //                // Access data from row 2 onwards
-        //                country.Name = ws.Cells[row, 1].Value?.ToString(); // Assuming name is in the first column
-
-        //                if (countries.Any(x => x.Name.ToLower().Trim().Equals(country.Name.ToLower().Trim())))
-        //                    continue;
-
-        //                country.Code = ws.Cells[row, 2].Value?.ToString(); // Assuming code is in the second column
-
-        //                countries.Add(country);
-        //            }
-
-        //            // Now you have a list of CountryDto objects extracted from Excel
-        //            // You can do further processing with this list, such as saving to database or any other operations
-        //        }
-        //        catch { }
-        //    }
-        //}
-
-        //private async Task ImportExcelFile(InputFileChangeEventArgs e)
-        //{
-        //    foreach (var file in e.GetMultipleFiles(1))
-        //    {
-        //        try
-        //        {
-        //            using (MemoryStream ms = new MemoryStream())
-        //            {
-        //                // copy data from file to memory stream
-        //                await file.OpenReadStream().CopyToAsync(ms);
-        //                // positions the cursor at the beginning of the memory stream
-        //                ms.Position = 0;
-
-        //                // create ExcelPackage from memory stream
-        //                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-        //                using (ExcelPackage package = new ExcelPackage(ms))
-        //                {
-        //                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-        //                    long colCount = ws.Dimension.End.Column;
-        //                    long rowCount = ws.Dimension.End.Row;
-        //                    var s = ws.Cells[2, 2].Value;
-        //                    // rest of the code here...
-        //                }
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            throw;
-        //        }
-        //    }
-        //}
-        //public class FileExportService
-        //{
-        //    public async Task<byte[]> GenerateExcelFileAsync(IEnumerable<MyData> data)
-        //    {
-        //        using var package = new ExcelPackage();
-        //        var worksheet = package.Workbook.Worksheets.Add("Sheet1");
-        //        Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#82b8d7");
-
-        //        worksheet.Cells[1, 1].Value = "Code";
-        //        worksheet.Cells[1, 2].Value = "Name";
-        //        worksheet.Cells[1, 1].Style.Font.Bold = true;
-        //        worksheet.Cells[1, 2].Style.Font.Bold = true;
-
-        //        worksheet.Cells[1, 1].AddComment("Mandatory Coy");
-        //        worksheet.Cells[1, 2].AddComment("Mandatory Iya nih");
-
-        //        worksheet.Cells[1, 1].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-        //        worksheet.Cells[1, 2].Style.Border.Top.Style = OfficeOpenXml.Style.ExcelBorderStyle.Hair;
-
-        //        int row = 2;
-        //        foreach (var item in data)
-        //        {
-        //            worksheet.Cells[row, 1].Value = item.Column1;
-        //            worksheet.Cells[row, 2].Value = item.Column2;
-        //            row++;
-        //        }
-
-        //        worksheet.Column(1).AutoFit();
-        //        worksheet.Column(2).AutoFit();
-
-        //        // Create the table
-        //        var tableRange = worksheet.Cells[1, 1, 1, 2];
-
-        //        var excelTable = worksheet.Tables.Add(tableRange, "Table");
-        //        excelTable.TableStyle = OfficeOpenXml.Table.TableStyles.Light1;
-
-        //        // Add borders to the table range
-        //        tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-        //        tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-        //        tableRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-        //        tableRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-
-        //        // Add thick border to the header row
-        //        tableRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-        //        tableRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-
-        //        return await Task.FromResult(package.GetAsByteArray());
-        //    }
-        //}
-
-        //public class MyData
-        //{
-        //    public string Column1 { get; set; }
-        //    public string Column2 { get; set; }
-        //}
-
-        private async Task ExportToExcel()
-        {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Code",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-            ]);
-        }
-
-        public async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jSRuntime, IFileExportService file, string fileName, DotNetStreamReference streamReference, List<ExportFileData> data, string? name = "downloadFileFromStream")
-        {
-            var fileContent = await file.GenerateColumnImportTemplateExcelFileAsync(data);
-
-            using var streamRef = new DotNetStreamReference(new MemoryStream(fileContent));
-            await jSRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-        }
+        #region Grid Events
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -392,26 +205,22 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task ImportFile()
-        {
-            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
-                if (SelectedDataItems is null)
+                if (SelectedDataItems == null || !SelectedDataItems.Any())
                 {
                     await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<CountryDto>>();
-                    await Mediator.Send(new DeleteCountryRequest(ids: a.Select(x => x.Id).ToList()));
+                    var countriesToDelete = SelectedDataItems.Adapt<List<CountryDto>>();
+                    await Mediator.Send(new DeleteCountryRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
                 }
+
                 SelectedDataItems = [];
-                await LoadData();
+                await LoadData(0, pageSize);
             }
             catch (Exception ex)
             {
@@ -429,7 +238,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 if (validate)
                 {
-                    ToastService.ShowInfo($"Country with name '{editModel.Name}' and code '{editModel.Code}' is already exist");
+                    ToastService.ShowInfo($"Country with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
                     e.Cancel = true;
                     return;
                 }
@@ -439,7 +248,6 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                     await Mediator.Send(new UpdateCountryRequest(editModel));
 
-                //await hubConnection.SendAsync("SendCountry", editModel);
                 SelectedDataItems = [];
                 await LoadData();
             }
@@ -449,6 +257,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        #endregion Grid
+        #endregion Grid Events
     }
 }

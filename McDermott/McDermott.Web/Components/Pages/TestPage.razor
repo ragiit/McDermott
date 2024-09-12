@@ -626,7 +626,8 @@
 
         // await hehe();
 
-        Cities = await Mediator.Send(new GetCityQuery());
+        var resultsCity = await Mediator.Send(new GetCityQuery());
+        Cities = resultsCity.Item1;
 
         var client = HttpClientFactory.CreateClient("GraphQLClient");
         var query = @"{ countries { id name } }";

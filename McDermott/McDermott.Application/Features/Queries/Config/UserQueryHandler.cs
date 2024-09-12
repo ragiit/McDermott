@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using static McDermott.Application.Features.Commands.Config.UserCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
     public class UserQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetUserQuery, List<UserDto>>,
+        IRequestHandler<GetUserQuery2, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateUserQuery, bool>,
         IRequestHandler<GetUserInfoGroupQuery, List<UserDto>>,
         IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
         IRequestHandler<CreateUserRequest, UserDto>,
@@ -11,6 +14,59 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteUserRequest, bool>
     {
         #region Get
+
+        public async Task<(List<UserDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUserQuery2 request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<User>().Entities
+                    .AsNoTracking()
+                        .Include(x => x.Group)
+                        .Include(x => x.Supervisor)
+                        .Include(x => x.Department)
+                    .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Department.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Supervisor.Name, $"%{request.SearchTerm}%"));
+                }
+
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
+
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<UserDto>>(), request.PageIndex, request.PageSize, totalPages);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> Handle(ValidateUserQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<User>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
 
         public async Task<List<UserDto>> Handle(GetUserInfoGroupQuery request, CancellationToken cancellationToken)
         {

@@ -4,7 +4,7 @@
 
 <PageTitle>McHealthCare - Group</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess &&  UserAccessCRUID is not null &&  UserAccessCRUID.IsRead)
 {
     <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
     <InputFile id="fileInput2" style="display:none" OnChange="@ImportExcelFile2" accept=".xlsx" multiple="false"></InputFile>
@@ -226,6 +226,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

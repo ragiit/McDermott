@@ -5,6 +5,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class ProvinceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetProvinceQuery, (List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateProvinceQuery, bool>,
         IRequestHandler<CreateProvinceRequest, ProvinceDto>,
         IRequestHandler<CreateListProvinceRequest, List<ProvinceDto>>,
         IRequestHandler<UpdateProvinceRequest, ProvinceDto>,
@@ -13,20 +14,32 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
+        public async Task<bool> Handle(ValidateProvinceQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Province>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
         public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProvinceQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var query = _unitOfWork.Repository<Province>().Entities
-                    .Include(x=>x.Country)
                     .AsNoTracking()
+                    .Include(v => v.Country)
                     .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%"));
                 }
 
                 var pagedResult = query

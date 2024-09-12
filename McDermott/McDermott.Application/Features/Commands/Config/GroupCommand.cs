@@ -1,13 +1,23 @@
-﻿namespace McDermott.Application.Features.Commands.Config
+﻿using McDermott.Application.Interfaces.Repositories;
+
+namespace McDermott.Application.Features.Commands.Config
 {
     public class GroupCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetGroupQuery(Expression<Func<Group, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GroupDto>>
+        public class GetGroupQuery(Expression<Func<Group, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<GroupDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Group, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class ValidateGroupQuery(Expression<Func<Group, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Group, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)

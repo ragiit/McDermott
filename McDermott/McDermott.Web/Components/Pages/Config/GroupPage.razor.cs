@@ -1,5 +1,7 @@
 ﻿using DevExpress.Blazor.Internal;
+using GreenDonut;
 using McDermott.Application.Features.Services;
+using McDermott.Web.Components.Layout;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
@@ -81,7 +83,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var a = SelectedDataItems.Adapt<List<GroupDto>>();
                     await Mediator.Send(new DeleteGroupRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData();
+                await LoadData(0, pageSize);
             }
             catch (Exception ee)
             {
@@ -137,7 +139,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
+            //var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetMenuQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refMenuComboBox?.Text ?? ""));
             Menus = result.Item1;
             Menus.Insert(0, new MenuDto
             {
@@ -145,7 +148,7 @@ namespace McDermott.Web.Components.Pages.Config
                 Name = "All",
             });
             Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.Item2;
+            totalCountMenu = result.pageCount;
             PanelVisible = false;
         }
 
@@ -179,7 +182,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 if (Group != null)
                 {
-                    await LoadGroupMenus();
+                    //await LoadGroupMenus();
                 }
             }
             catch (Exception e)
@@ -190,11 +193,31 @@ namespace McDermott.Web.Components.Pages.Config
             IsLoading = false;
         }
 
-        private async Task LoadGroupMenus()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            DeletedGroupMenus = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id));
-            GroupMenus = DeletedGroupMenus.Select(x => x).ToList();
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
         }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
 
         private void DeleteItem_Click()
         {
@@ -254,32 +277,6 @@ namespace McDermott.Web.Components.Pages.Config
             UpdateEditItemsEnabled(state);
         }
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -289,9 +286,9 @@ namespace McDermott.Web.Components.Pages.Config
             Group = new();
             ShowForm = false;
             GroupMenus = [];
-            var result = await MyQuery.GetGroups(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            var result = await Mediator.Send(new GetGroupQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Groups = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.Item4;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -399,150 +396,150 @@ namespace McDermott.Web.Components.Pages.Config
             if (!FormValidationState)
                 return;
 
-            if (Group.Id == 0)
-            {
-                var existingName = await Mediator.Send(new GetGroupQuery(x => x.Name == GroupName));
+            //if (Group.Id == 0)
+            //{
+            //    var existingName = await Mediator.Send(new ValidateGroupQuery(x => x.Name == Group.Name));
 
-                if (existingName.Count > 0) return;
+            //    if (existingName.Count > 0) return;
 
-                var result = await Mediator.Send(new CreateGroupRequest(Group));
+            //    var result = await Mediator.Send(new CreateGroupRequest(Group));
 
-                var request = new List<GroupMenuDto>();
+            //    var request = new List<GroupMenuDto>();
 
-                var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
+            //    var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
-                if (GroupMenus.Any(x => x.Menu?.Name is "All"))
-                {
-                    Menus.ForEach(z =>
-                    {
-                        if (z.Id != 0 && z.Name is not "All")
-                        {
-                            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
-                            request.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                MenuId = z.Id,
-                                GroupId = group[0].Id,
-                                IsCreate = all.IsCreate,
-                                IsRead = all.IsRead,
-                                IsUpdate = all.IsUpdate,
-                                IsDelete = all.IsDelete,
-                                IsImport = all.IsImport,
-                            });
-                        }
-                    });
+            //    if (GroupMenus.Any(x => x.Menu?.Name is "All"))
+            //    {
+            //        Menus.ForEach(z =>
+            //        {
+            //            if (z.Id != 0 && z.Name is not "All")
+            //            {
+            //                var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
+            //                request.Add(new GroupMenuDto
+            //                {
+            //                    Id = 0,
+            //                    MenuId = z.Id,
+            //                    GroupId = group[0].Id,
+            //                    IsCreate = all.IsCreate,
+            //                    IsRead = all.IsRead,
+            //                    IsUpdate = all.IsUpdate,
+            //                    IsDelete = all.IsDelete,
+            //                    IsImport = all.IsImport,
+            //                });
+            //            }
+            //        });
 
-                    await Mediator.Send(new CreateListGroupMenuRequest(request));
+            //        await Mediator.Send(new CreateListGroupMenuRequest(request));
 
-                    ShowForm = false;
+            //        ShowForm = false;
 
-                    await LoadData();
+            //        await LoadData();
 
-                    return;
-                }
+            //        return;
+            //    }
 
-                GroupMenus.ForEach(x =>
-                {
-                    x.Id = 0;
-                    x.GroupId = group[0].Id;
-                });
+            //    GroupMenus.ForEach(x =>
+            //    {
+            //        x.Id = 0;
+            //        x.GroupId = group[0].Id;
+            //    });
 
-                for (int i = 0; i < GroupMenus.Count; i++)
-                {
-                    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
-                    var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
-                    if (cekP is not null)
-                    {
-                        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
-                        if (cekLagi is null)
-                        {
-                            GroupMenus.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                GroupId = group[0].Id,
-                                MenuId = cekP.Id,
-                                Menu = cekP
-                            });
-                        }
-                    }
-                }
+            //    for (int i = 0; i < GroupMenus.Count; i++)
+            //    {
+            //        var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
+            //        var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
+            //        if (cekP is not null)
+            //        {
+            //            var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
+            //            if (cekLagi is null)
+            //            {
+            //                GroupMenus.Add(new GroupMenuDto
+            //                {
+            //                    Id = 0,
+            //                    GroupId = group[0].Id,
+            //                    MenuId = cekP.Id,
+            //                    Menu = cekP
+            //                });
+            //            }
+            //        }
+            //    }
 
-                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
+            //    await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
 
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}");
-            }
-            else
-            {
-                var result = await Mediator.Send(new UpdateGroupRequest(Group));
+            //    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}");
+            //}
+            //else
+            //{
+            //    var result = await Mediator.Send(new UpdateGroupRequest(Group));
 
-                var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
+            //    var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
-                await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
+            //    await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
 
-                var request = new List<GroupMenuDto>();
+            //    var request = new List<GroupMenuDto>();
 
-                if (GroupMenus.Any(x => x.Menu?.Name is "All"))
-                {
-                    Menus.ForEach(z =>
-                    {
-                        if (z.Id != 0 && z.Name is not "All")
-                        {
-                            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
-                            request.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                MenuId = z.Id,
-                                GroupId = group[0].Id,
-                                IsCreate = all.IsCreate,
-                                IsRead = all.IsRead,
-                                IsUpdate = all.IsUpdate,
-                                IsDelete = all.IsDelete,
-                                IsImport = all.IsImport,
-                            });
-                        }
-                    });
+            //    if (GroupMenus.Any(x => x.Menu?.Name is "All"))
+            //    {
+            //        Menus.ForEach(z =>
+            //        {
+            //            if (z.Id != 0 && z.Name is not "All")
+            //            {
+            //                var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
+            //                request.Add(new GroupMenuDto
+            //                {
+            //                    Id = 0,
+            //                    MenuId = z.Id,
+            //                    GroupId = group[0].Id,
+            //                    IsCreate = all.IsCreate,
+            //                    IsRead = all.IsRead,
+            //                    IsUpdate = all.IsUpdate,
+            //                    IsDelete = all.IsDelete,
+            //                    IsImport = all.IsImport,
+            //                });
+            //            }
+            //        });
 
-                    await Mediator.Send(new CreateListGroupMenuRequest(request));
+            //        await Mediator.Send(new CreateListGroupMenuRequest(request));
 
-                    ShowForm = false;
+            //        ShowForm = false;
 
-                    NavigationManager.NavigateTo("config/group", true);
+            //        NavigationManager.NavigateTo("config/group", true);
 
-                    await LoadData();
+            //        await LoadData();
 
-                    return;
-                }
+            //        return;
+            //    }
 
-                GroupMenus.ForEach(x =>
-                {
-                    x.Id = 0;
-                    x.GroupId = group[0].Id;
-                });
+            //    GroupMenus.ForEach(x =>
+            //    {
+            //        x.Id = 0;
+            //        x.GroupId = group[0].Id;
+            //    });
 
-                for (int i = 0; i < GroupMenus.Count; i++)
-                {
-                    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
-                    var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
-                    if (cekP is not null)
-                    {
-                        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
-                        if (cekLagi is null)
-                        {
-                            GroupMenus.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                GroupId = group[0].Id,
-                                MenuId = cekP.Id,
-                                Menu = cekP
-                            });
-                        }
-                    }
-                }
+            //    for (int i = 0; i < GroupMenus.Count; i++)
+            //    {
+            //        var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
+            //        var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
+            //        if (cekP is not null)
+            //        {
+            //            var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
+            //            if (cekLagi is null)
+            //            {
+            //                GroupMenus.Add(new GroupMenuDto
+            //                {
+            //                    Id = 0,
+            //                    GroupId = group[0].Id,
+            //                    MenuId = cekP.Id,
+            //                    Menu = cekP
+            //                });
+            //            }
+            //        }
+            //    }
 
-                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
+            //    await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
 
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
-            }
+            //    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
+            //}
 
             ShowForm = false;
 
@@ -692,52 +689,68 @@ namespace McDermott.Web.Components.Pages.Config
                     }
 
                     var gg = new List<GroupMenuDto>();
+                    var parentCache = new List<MenuDto>();
 
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        bool IsValid = true;
+                    //for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    //{
+                    //    string menu = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                    //    string parentMenu = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                    //    string isCreate = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                    //    string isRead = ws.Cells[row, 4].Value?.ToString().Trim();
+                    //    string isUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim();
+                    //    string isDelete = ws.Cells[row, 6].Value?.ToString()?.Trim();
+                    //    string isImport = ws.Cells[row, 7].Value?.ToString()?.Trim();
 
-                        var ab = ws.Cells[row, 2].Value?.ToString()?.Trim();
-                        var parentId = Menus.FirstOrDefault(x => x.ParentId == null && x.Name == ab)?.Id ?? 0;
-                        if (parentId == 0)
-                        {
-                            ToastService.ShowErrorImport(row, 2, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
-                            IsValid = false;
-                        }
+                    //    bool IsValid = true;
 
-                        var aa = ws.Cells[row, 1].Value?.ToString()?.Trim();
-                        var menuId = Menus.FirstOrDefault(x => x.ParentId == parentId && x.Name == aa)?.Id ?? 0;
+                    //    var parentId = Menus.FirstOrDefault(x => x.ParentId == null && x.Name == ab)?.Id ?? 0;
+                    //    if (parentId == 0)
+                    //    {
+                    //        ToastService.ShowErrorImport(row, 2, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
+                    //        IsValid = false;
+                    //    }
 
-                        if (menuId == 0)
-                        {
-                            ToastService.ShowErrorImport(row, 1, ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty);
-                            IsValid = false;
-                        }
+                    //    var aa = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                    //    var menuId = Menus.FirstOrDefault(x => x.ParentId == parentId && x.Name == aa)?.Id ?? 0;
 
-                        if (!IsValid)
-                            continue;
+                    //    if (menuId == 0)
+                    //    {
+                    //        ToastService.ShowErrorImport(row, 1, ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty);
+                    //        IsValid = false;
+                    //    }
 
-                        var g = new GroupMenuDto
-                        {
-                            GroupId = Group.Id,
-                            MenuId = menuId,
-                            IsCreate = ws.Cells[row, 3].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsRead = ws.Cells[row, 4].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsDelete = ws.Cells[row, 6].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsImport = ws.Cells[row, 7].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                        };
+                    //    if (!IsValid)
+                    //        continue;
 
-                        if (!GroupMenus.Any(x => x.GroupId == g.GroupId && x.MenuId == g.MenuId && x.IsCreate == g.IsCreate
-                         && x.IsRead == g.IsRead && x.IsUpdate == g.IsUpdate && x.IsDelete == g.IsDelete && x.IsImport == g.IsImport))
-                            gg.Add(g);
-                    }
+                    //    var g = new GroupMenuDto
+                    //    {
+                    //        GroupId = Group.Id,
+                    //        MenuId = menuId,
+                    //        IsCreate = isCreate == "Yes",
+                    //        IsRead = isRead == "Yes",
+                    //        IsUpdate = isUpdate == "Yes",
+                    //        IsDelete = isDelete == "Yes",
+                    //        IsImport = isImport == "Yes",
+                    //    };
+
+                    //    bool exists = await Mediator.Send(new ValidateGroupMenuQuery(x =>
+                    //            x.GroupId == g.GroupId &&
+                    //            x.MenuId == g.MenuId &&
+                    //            x.IsCreate == g.IsCreate &&
+                    //            x.IsUpdate == g.IsUpdate &&
+                    //            x.IsRead == g.IsRead &&
+                    //            x.IsDelete == g.IsDelete &&
+                    //            x.IsImport == g.IsImport));
+
+                    //    if (!exists)
+                    //        gg.Add(g);
+                    //}
 
                     await Mediator.Send(new CreateListGroupMenuRequest(gg));
 
-                    NavigationManager.NavigateTo("configuration/group", true);
+                    ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
                 }
                 catch (Exception ex)
                 {

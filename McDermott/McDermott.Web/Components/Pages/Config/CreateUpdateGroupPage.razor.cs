@@ -47,7 +47,6 @@ namespace McDermott.Web.Components.Pages.Config
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
 
-        public IGrid Grid { get; set; }
         public IGrid GridGropMenu { get; set; }
         private bool IsAddMenu { get; set; } = false;
         private bool ShowForm { get; set; } = false;
@@ -60,8 +59,8 @@ namespace McDermott.Web.Components.Pages.Config
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
-        private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowVisibleIndexGroupMenu { get; set; }
+        private int FocusedRowVisibleIndexGroupMenuGroupMenu { get; set; }
         private List<GroupDto> Groups = new();
         private List<GroupMenuDto> GroupMenus = [];
         private List<GroupMenuDto> DeletedGroupMenus = [];
@@ -95,9 +94,11 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id == 0 ? null : Group.Id);
+            //var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id == 0 ? null : Group.Id);
+            var result = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id, pageIndex, pageSize, searchTerm));
             GroupMenus = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.Item4;
+            var aa = GroupMenus.Where(x => x.MenuId == 66).ToList();
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -199,13 +200,13 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 var zz = e;
             }
-            //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            //await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
             IsLoading = false;
         }
 
         private void DeleteItem_Click()
         {
-            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            GridGropMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
         }
 
         private void UpdateEditItemsEnabled(bool enabled)
@@ -233,7 +234,7 @@ namespace McDermott.Web.Components.Pages.Config
             var editedGroupMenu = GroupMenu.Adapt<GroupMenuDto>(); // GroupMenu adalah objek yang sedang diedit
 
             IsAddMenu = false;
-            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
+            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenuGroupMenu);
 
             var groupMenu = GroupMenus.FirstOrDefault(x => x.Id == editedGroupMenu.Id);
 
@@ -242,21 +243,21 @@ namespace McDermott.Web.Components.Pages.Config
                 this.GroupMenu = editedGroupMenu;
         }
 
-        private void DeleteItemGrid_Click()
+        private void DeleteItemGridGropMenu_Click()
         {
             GridGropMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
         }
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-            var state = GroupMenus.Count > 0 ? true : false;
-            UpdateEditItemsEnabled(state);
-        }
+        //private void GridGropMenu_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        //{
+        //    FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
+        //    var state = GroupMenus.Count > 0 ? true : false;
+        //    UpdateEditItemsEnabled(state);
+        //}
 
-        private void GridGroupMenu_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        private void GridGropMenu_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
+            FocusedRowVisibleIndexGroupMenuGroupMenu = args.VisibleIndex;
             var state = GroupMenus.Count > 0 ? true : false;
             UpdateEditItemsEnabled(state);
         }
@@ -289,7 +290,9 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData()
         {
-            var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
+            //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
+
+            var result = await Mediator.Send(new GetGroupQuery(x => x.Id == Id, 0, 1));
             Group = new();
             GroupMenus.Clear();
 
@@ -323,12 +326,29 @@ namespace McDermott.Web.Components.Pages.Config
         //    catch (Exception ex) { ex.HandleException(ToastService); }
         //}
 
-        private void OnDeleteGroupMenu()
+        private async Task OnDeleteGroupMenu(GridDataItemDeletingEventArgs e)
         {
-            StateHasChanged();
-            var aaa = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
-            GroupMenus.RemoveAll(x => aaa.Select(z => z.MenuId).Contains(x.MenuId));
-            SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
+            //StateHasChanged();
+            //var aaa = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
+            //GroupMenus.RemoveAll(x => aaa.Select(z => z.MenuId).Contains(x.MenuId));
+            //SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
+            try
+            {
+                if (SelectedDataItemsGroupMenu is null)
+                {
+                    await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var selectedMenus = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
+                    await Mediator.Send(new DeleteGroupMenuRequest(ids: selectedMenus.Select(x => x.Id).ToList()));
+                }
+                await LoadGroupMenus(0, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private bool FormValidationState = true;
@@ -336,7 +356,7 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task HandleValidSubmit()
         {
             if (FormValidationState)
-                await SaveItemGroupMenuGrid_Click();
+                await SaveItemGroupMenuGridGropMenu_Click();
             else
                 FormValidationState = true;
         }
@@ -359,61 +379,80 @@ namespace McDermott.Web.Components.Pages.Config
         [SupplyParameterFromForm]
         private GroupMenuDto GroupMenu { get; set; } = new();
 
-        private async Task OnSaveGroupMenu()
+        private async Task OnSaveGroupMenu(GridEditModelSavingEventArgs e)
         {
-            var groupMenu = GroupMenu;
+            var editModel = (GroupMenuDto)e.EditModel;
 
-            GroupMenuDto updateMenu = new();
+            editModel.GroupId = Group.Id;
 
-            if (IsAddMenu)
-            {
-                if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
-                    return;
-
-                updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId)!;
-                groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
-            }
+            if (editModel.Id == 0)
+                await Mediator.Send(new CreateGroupMenuRequest(editModel));
             else
-            {
-                var q = SelectedDataItemsGroupMenu[0].Adapt<GroupMenuDto>();
+                await Mediator.Send(new UpdateGroupMenuRequest(editModel));
 
-                updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == q.MenuId)!;
-                groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
-            }
+            await LoadGroupMenus();
 
-            if (IsAddMenu)
-            {
-                GroupMenus.Add(groupMenu);
-            }
-            else
-            {
-                var index = GroupMenus.IndexOf(updateMenu!);
-                GroupMenus[index] = groupMenu;
-            }
+            //var groupMenu = GroupMenu;
 
-            SelectedDataItemsGroupMenu = [];
-            GroupMenu = new();
+            //GroupMenuDto updateMenu = new();
+
+            //if (IsAddMenu)
+            //{
+            //    if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
+            //        return;
+
+            //    updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId)!;
+            //    groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
+            //}
+            //else
+            //{
+            //    var q = SelectedDataItemsGroupMenu[0].Adapt<GroupMenuDto>();
+
+            //    updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == q.MenuId)!;
+            //    groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
+            //}
+
+            //if (IsAddMenu)
+            //{
+            //    GroupMenus.Add(groupMenu);
+            //}
+            //else
+            //{
+            //    var index = GroupMenus.IndexOf(updateMenu!);
+            //    GroupMenus[index] = groupMenu;
+            //}
+
+            //SelectedDataItemsGroupMenu = [];
+            //GroupMenu = new();
         }
 
-        private void CancelItemGroupMenuGrid_Click()
+        private void CancelItemGroupMenuGridGropMenu_Click()
         {
-            GroupMenus = [];
-            Group = new();
-            SelectedDataItems = [];
-            SelectedDataItemsGroupMenu = [];
-            ShowForm = false;
+            //GroupMenus = [];
+            //Group = new();
+            //SelectedDataItems = [];
+            //SelectedDataItemsGroupMenu = [];
+            //ShowForm = false;
+
+            NavigationManager.NavigateTo("configuration/groups");
         }
 
-        private async Task SaveItemGroupMenuGrid_Click()
+        private async Task SaveItemGroupMenuGridGropMenu_Click()
         {
             if (!FormValidationState)
                 return;
 
+            if (string.IsNullOrWhiteSpace(Group.Name))
+            {
+                ToastService.ShowInfo("Please insert the Group name");
+                return;
+            }
+
             if (Group.Id == 0)
             {
-                var existingName = await Mediator.Send(new GetGroupQuery(x => x.Name == GroupName));
+                var existingName = await Mediator.Send(new ValidateGroupQuery(x => x.Name == GroupName));
 
-                if (existingName.Count > 0)
+                if (existingName)
                 {
                     ToastService.ShowInfo("Group name already exist");
                     return;
@@ -421,7 +460,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var result = await Mediator.Send(new CreateGroupRequest(Group));
 
-                var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
+                //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
                 //if (GroupMenus.Any(x => x.Menu?.Name is "All"))
                 //{
@@ -456,7 +495,7 @@ namespace McDermott.Web.Components.Pages.Config
                 GroupMenus.ForEach(x =>
                 {
                     x.Id = 0;
-                    x.GroupId = group[0].Id;
+                    x.GroupId = result.Id;
                 });
 
                 //for (int i = 0; i < GroupMenus.Count; i++)
@@ -480,13 +519,13 @@ namespace McDermott.Web.Components.Pages.Config
                 //}
 
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}");
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
             }
             else
             {
                 var result = await Mediator.Send(new UpdateGroupRequest(Group));
 
-                var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
+                //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
                 await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
 
@@ -503,7 +542,7 @@ namespace McDermott.Web.Components.Pages.Config
                             {
                                 Id = 0,
                                 MenuId = z.Id,
-                                GroupId = group[0].Id,
+                                GroupId = Group.Id,
                                 IsCreate = all.IsCreate,
                                 IsRead = all.IsRead,
                                 IsUpdate = all.IsUpdate,
@@ -516,7 +555,7 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new CreateListGroupMenuRequest(request));
 
                     ShowForm = false;
-                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}");
+                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
 
                     await LoadData();
 
@@ -526,7 +565,7 @@ namespace McDermott.Web.Components.Pages.Config
                 GroupMenus.ForEach(x =>
                 {
                     x.Id = 0;
-                    x.GroupId = group[0].Id;
+                    x.GroupId = result.Id;
                 });
 
                 for (int i = 0; i < GroupMenus.Count; i++)
@@ -541,7 +580,7 @@ namespace McDermott.Web.Components.Pages.Config
                             GroupMenus.Add(new GroupMenuDto
                             {
                                 Id = 0,
-                                GroupId = group[0].Id,
+                                GroupId = result.Id,
                                 MenuId = cekP.Id,
                                 Menu = cekP
                             });
@@ -702,56 +741,93 @@ namespace McDermott.Web.Components.Pages.Config
                     }
 
                     var gg = new List<GroupMenuDto>();
+                    var parentCache = new List<MenuDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        bool IsValid = true;
+                        string menu = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        string parentName = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        string isCreate = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        string isRead = ws.Cells[row, 4].Value?.ToString().Trim();
+                        string isUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim();
+                        string isDelete = ws.Cells[row, 6].Value?.ToString()?.Trim();
+                        string isImport = ws.Cells[row, 7].Value?.ToString()?.Trim();
 
-                        var ab = ws.Cells[row, 2].Value?.ToString()?.Trim();
-                        var parentId = Menus.FirstOrDefault(x => x.ParentId == null && x.Name == ab)?.Id ?? 0;
-                        if (parentId == 0)
+                        bool isValid = true;
+
+                        if (menu.Contains("Chronic Diagnoses"))
                         {
-                            ToastService.ShowErrorImport(row, 2, ws.Cells[row, 2].Value?.ToString()?.Trim() ?? string.Empty);
-                            IsValid = false;
+                            var a = "a";
                         }
 
-                        var aa = ws.Cells[row, 1].Value?.ToString()?.Trim();
-                        var menuId = Menus.FirstOrDefault(x => x.ParentId == parentId && x.Name == aa)?.Id ?? 0;
-
-                        if (menuId == 0)
+                        long? menuId = null;
+                        if (!string.IsNullOrEmpty(parentName))
                         {
-                            ToastService.ShowErrorImport(row, 1, ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty);
-                            IsValid = false;
+                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
+                            if (cachedParent is null)
+                            {
+                                var parentMenu = (await Mediator.Send(new GetMenuQuery(
+                                    x => x.Parent != null && x.Parent.Name == parentName,
+                                    searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+
+                                if (parentMenu is null)
+                                {
+                                    isValid = false;
+                                    ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
+                                }
+                                else
+                                {
+                                    menuId = parentMenu.Id;
+                                    parentCache.Add(parentMenu);
+                                }
+                            }
+                            else
+                            {
+                                menuId = cachedParent.Id;
+                            }
                         }
 
-                        if (!IsValid)
+                        if (!isValid)
                             continue;
 
                         var g = new GroupMenuDto
                         {
                             GroupId = Group.Id,
                             MenuId = menuId,
-                            IsCreate = ws.Cells[row, 3].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsRead = ws.Cells[row, 4].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsDelete = ws.Cells[row, 6].Value?.ToString()?.Trim() == "Yes" ? true : false,
-                            IsImport = ws.Cells[row, 7].Value?.ToString()?.Trim() == "Yes" ? true : false,
+                            IsCreate = isCreate == "Yes",
+                            IsRead = isRead == "Yes",
+                            IsUpdate = isUpdate == "Yes",
+                            IsDelete = isDelete == "Yes",
+                            IsImport = isImport == "Yes",
                         };
 
-                        if (!GroupMenus.Any(x => x.GroupId == g.GroupId && x.MenuId == g.MenuId && x.IsCreate == g.IsCreate
-                         && x.IsRead == g.IsRead && x.IsUpdate == g.IsUpdate && x.IsDelete == g.IsDelete && x.IsImport == g.IsImport))
+                        bool exists = await Mediator.Send(new ValidateGroupMenuQuery(x =>
+                                x.GroupId == g.GroupId &&
+                                x.MenuId == g.MenuId));
+
+                        if (!exists)
                             gg.Add(g);
                     }
 
-                    await Mediator.Send(new CreateListGroupMenuRequest(gg));
+                    if (gg.Count > 0)
+                    {
+                        SelectedDataItemsGroupMenu = [];
+                        gg = gg.DistinctBy(x => x.MenuId).ToList();
+                        await Mediator.Send(new CreateListGroupMenuRequest(gg));
+                        await LoadGroupMenus(0, pageSize);
+                    }
 
-                    NavigationManager.NavigateTo("configuration/groups", true);
+                    ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                    //NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
                 }
                 catch (Exception ex)
                 {
                     ToastService.ShowError(ex.Message);
+                }
+                finally
+                {
+                    PanelVisible = false;
                 }
             }
             PanelVisible = false;

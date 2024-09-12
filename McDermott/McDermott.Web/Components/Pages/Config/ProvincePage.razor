@@ -3,7 +3,7 @@
 
 <PageTitle>McHealthCare - Province</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
@@ -23,12 +23,12 @@
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
                                 <MyGridPaginate @ref="Grid"
-                                        Data="Provinces"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        SearchTextChanged="OnSearchBoxChanged"
-                                        KeyFieldName="Id">
+                                                Data="Provinces"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="ProvinceDto"
@@ -38,10 +38,10 @@
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
                                                          Grid="Grid"
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -50,7 +50,7 @@
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                         @* <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" /> *@
+                                        @* <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" /> *@
                                         <DxGridDataColumn MinWidth="200" FieldName="Country.Name" Caption="Country" />
                                     </Columns>
 
@@ -63,10 +63,6 @@
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
-                                          @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Code" />
-                                                <ValidationMessage For="@(()=> a.Code)"   />
-                                            </DxFormLayoutItem> *@
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Countries"
@@ -77,7 +73,7 @@
                                                               ValueFieldName="Id"
                                                               TextChanged="((string e) => OnInputCountryChanged(e))">
                                                     <Buttons>
-                                                        <DxEditorButton Click="OnSearchCountryndexDecrement"
+                                                        <DxEditorButton Click="OnSearchCountryIndexDecrement"
                                                                         IconCssClass="fa-solid fa-caret-left"
                                                                         Tooltip="Previous Index" />
                                                         <DxEditorButton Click="OnSearchCountry"
@@ -87,6 +83,10 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CountryId)" />
                                             </DxFormLayoutItem>
@@ -132,6 +132,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {
