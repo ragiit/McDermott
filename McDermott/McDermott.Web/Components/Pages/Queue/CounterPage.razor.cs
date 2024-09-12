@@ -180,7 +180,7 @@ namespace McDermott.Web.Components.Pages.Queue
             IsLoading = true;
             counters = await Mediator.Send(new GetCounterQuery());
             IsLoading = false;
-            Services = await Mediator.Send(new GetServiceQuery());
+            //Services = await Mediator.Send(new GetServiceQuery());
             ServiceK = [.. Services.Where(x => x.IsKiosk == true)];
             var Physician = await Mediator.Send(new GetUserQuery());
             Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];

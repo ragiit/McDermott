@@ -3,7 +3,7 @@
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class InsuranceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetInsuranceQuery, List<InsuranceDto>>,
+        IRequestHandler<GetInsuranceQuery, (List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateInsuranceRequest, InsuranceDto>,
         IRequestHandler<CreateListInsuranceRequest, List<InsuranceDto>>,
         IRequestHandler<UpdateInsuranceRequest, InsuranceDto>,
@@ -12,36 +12,52 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<List<InsuranceDto>> Handle(GetInsuranceQuery request, CancellationToken cancellationToken)
+        public async Task<(List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetInsuranceQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetInsuranceQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<Insurance>().Entities
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Insurance>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<Insurance>().Entities
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.AdminFee.ToString(), $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Presentase.ToString(), $"%{request.SearchTerm}%"));
                 }
 
-                result ??= [];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var skip = (request.PageIndex) * request.PageSize;
 
-                return result.ToList().Adapt<List<InsuranceDto>>();
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<InsuranceDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateInsuranceQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Insurance>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

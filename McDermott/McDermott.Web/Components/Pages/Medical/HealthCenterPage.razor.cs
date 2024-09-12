@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using McDermott.Domain.Entities;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class HealthCenterPage
     {
@@ -55,12 +57,206 @@
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
+        private Timer _timer;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
         }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        #region Load Data
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+            await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+                await GetUserInfo();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = new ObservableRangeCollection<object>();
+            var result = await Mediator.Send(new GetHealthCenterQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            HealthCenters = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+
+        #region ComboBox
+        #region ComboBox Sampel TypeCountry
+        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
+        private int CountryComboBoxIndex { get; set; } = 0;
+        private int totalCountCountry = 0;
+
+        private async Task OnSearchCountry()
+        {
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task OnSearchCountryIndexIncrement()
+        {
+            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            {
+                CountryComboBoxIndex++;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCountryIndexDecrement()
+        {
+            if (CountryComboBoxIndex > 0)
+            {
+                CountryComboBoxIndex--;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCountryChanged(string e)
+        {
+            CountryComboBoxIndex = 0;
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetCountryQuery(searchTerm: refCountryComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+            Countries = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+
+        #region ComboBox Sampel Province
+        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+        private int ProvinceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvince = 0;
+
+        private async Task OnSearchProvince()
+        {
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task OnSearchProvinceIndexIncrement()
+        {
+            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            {
+                ProvinceComboBoxIndex++;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvinceIndexDecrement()
+        {
+            if (ProvinceComboBoxIndex > 0)
+            {
+                ProvinceComboBoxIndex--;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceChanged(string e)
+        {
+            ProvinceComboBoxIndex = 0;
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetProvinceQuery(searchTerm: refProvinceComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+            Provinces = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+
+        #region ComboBox City
+        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
+        private int CityComboBoxIndex { get; set; } = 0;
+        private int totalCountCity = 0;
+
+        private async Task OnSearchCity()
+        {
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task OnSearchCityIndexIncrement()
+        {
+            if (CityComboBoxIndex < (totalCountCity - 1))
+            {
+                CityComboBoxIndex++;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCityIndexDecrement()
+        {
+            if (CityComboBoxIndex > 0)
+            {
+                CityComboBoxIndex--;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCityChanged(string e)
+        {
+            CityComboBoxIndex = 0;
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetCityQuery(searchTerm: refCityComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+            Cities = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+
+
+        #endregion
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -103,20 +299,7 @@
             FocusedRowVisibleIndex = args.VisibleIndex;
             EditItemsEnabled = true;
         }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
+                
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -132,58 +315,88 @@
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
+       
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+        
+        
 
-        private async Task ExportXlsxItem_Click()
+
+        private async Task ImportFile()
         {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        protected override async Task OnInitializedAsync()
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
             PanelVisible = true;
-            var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1;
-            Provinces = await Mediator.Send(new GetProvinceQuery());
-            Cities = await Mediator.Send(new GetCityQuery());
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
 
-            await GetUserInfo();
-            await LoadData();
-        }
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-        private async Task LoadData()
-        {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
+                    var headerNames = new List<string>() { "Name", "Type" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<HealthCenterDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var c = new HealthCenterDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Type = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!HealthCenters.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Type.Trim().ToLower() == c?.Type?.Trim().ToLower()))
+                            list.Add(c);
+                    }
+
+                    await Mediator.Send(new CreateListHealthCenterRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
             PanelVisible = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "NursingDiagnoses_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Type"
+                },
+            ]);
         }
 
         #endregion Default Grid

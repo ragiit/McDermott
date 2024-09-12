@@ -4,10 +4,18 @@ namespace McDermott.Application.Features.Commands.Medical
     {
         #region GET 
 
-        public class GetSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null, bool removeCache = false) : IRequest<List<SpecialityDto>>
+        public class GetSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Speciality, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class ValidateSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Speciality, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion

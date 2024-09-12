@@ -10,6 +10,7 @@ namespace McDermott.Web.Components.Pages.Medical
          
         private List<ProjectDto> Projects = []; 
         private HubConnection hubConnection;
+    
 
         #region UserLoginAndAccessRole
 
@@ -52,25 +53,66 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
-
+        private Timer _timer;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private string names { get; set; }
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-
-            await GetUserInfo();
             await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+                await GetUserInfo();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            Projects = await Mediator.Send(new GetProjectQuery());
+            var result = await Mediator.Send(new GetProjectQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Projects = result.Item1;
+            totalCount = result.pageCount;
             SelectedDataItems = new ObservableRangeCollection<object>();
             PanelVisible = false;
         }

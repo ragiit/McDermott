@@ -4,6 +4,32 @@
     {
         private List<NursingDiagnosesDto> NursingDiagnoses = [];
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         #region Grid Properties
 
         #region UserLoginAndAccessRole
@@ -47,6 +73,7 @@
         private int FocusedRowVisibleIndex { get; set; }
 
         public IGrid Grid { get; set; }
+        private Timer _timer;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         #endregion Grid Properties
@@ -55,14 +82,31 @@
 
         protected override async Task OnInitializedAsync()
         {
-            await GetUserInfo();
+            PanelVisible = true;
             await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
+            try
+            {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+                await GetUserInfo();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            NursingDiagnoses = await Mediator.Send(new GetNursingDiagnosesQuery());
+            var result = await Mediator.Send(new GetNursingDiagnosesQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            NursingDiagnoses = result.Item1;
+            totalCount = result.pageCount;
             SelectedDataItems = new ObservableRangeCollection<object>();
             PanelVisible = false;
         }
@@ -71,15 +115,81 @@
 
         #region Grid Function
 
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        private async Task ImportFile()
         {
-            FocusedRowVisibleIndex = args.VisibleIndex;
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Problems", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<NursingDiagnosesDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var c = new NursingDiagnosesDto
+                        {
+                            Problem = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        if (!NursingDiagnoses.Any(x => x.Problem.Trim().ToLower() == c?.Problem?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
+                            list.Add(c);
+                    }
+
+                    await Mediator.Send(new CreateListNursingDiagnosesRequest(list));
+
+                    await LoadData();
+                    SelectedDataItems = [];
+
+                    ToastService.ShowSuccess("Successfully Imported.");
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
         }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "NursingDiagnoses_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Problems",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Code"
+                },
+            ]);
+        }
+
 
         #region SaveDelete
 
@@ -124,50 +234,6 @@
 
         #region ToolBar Button
 
-        public async Task ImportExcelFile(InputFileChangeEventArgs e)
-        {
-            foreach (var file in e.GetMultipleFiles(1))
-            {
-                try
-                {
-                    using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
-                    ms.Position = 0;
-
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                    using ExcelPackage package = new(ms);
-                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-
-                    var headerNames = new List<string>() { "Problem", "Code" };
-
-                    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
-                    {
-                        ToastService.ShowInfo("The header must match the grid.");
-                        return;
-                    }
-
-                    var nursings = new List<NursingDiagnosesDto>();
-
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        var nursing = new NursingDiagnosesDto
-                        {
-                            Problem = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim()
-                        };
-
-                        if (!NursingDiagnoses.Any(x => x.Problem.Trim().ToLower() == nursing.Problem.Trim().ToLower()) && !nursings.Any(x => x.Problem.Trim().ToLower() == nursing.Problem.Trim().ToLower()))
-                            nursings.Add(nursing);
-                    }
-
-                    await Mediator.Send(new CreateListNursingDiagnosesRequest(nursings));
-
-                    await LoadData();
-                }
-                catch { }
-            }
-        }
 
         private async Task Refresh_Click()
         {
@@ -187,40 +253,6 @@
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ImportFile()
-        {
-            await JsRuntime.InvokeVoidAsync("clickInputFile");
         }
 
         #endregion ToolBar Button

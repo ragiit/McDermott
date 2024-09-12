@@ -1,44 +1,66 @@
 ﻿
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Reflection.Metadata;
+using System.Threading;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
-
 namespace McDermott.Application.Features.Queries.Config
 {
     public class ProjectQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetProjectQuery, List<ProjectDto>>,
-        IRequestHandler<CreateProjectRequest, ProjectDto>,
-        IRequestHandler<CreateListProjectRequest, List<ProjectDto>>,
-        IRequestHandler<UpdateProjectRequest, ProjectDto>,
-        IRequestHandler<UpdateListProjectRequest, List<ProjectDto>>,
+    IRequestHandler<GetProjectQuery, (List<ProjectDto>, int pageIndex, int pageSize, int pageCount)>,
+    IRequestHandler<CreateProjectRequest, ProjectDto>,
+    IRequestHandler<CreateListProjectRequest, List<ProjectDto>>,
+    IRequestHandler<UpdateProjectRequest, ProjectDto>,
+    IRequestHandler<UpdateListProjectRequest, List<ProjectDto>>,
         IRequestHandler<DeleteProjectRequest, bool>
     {
         #region GET
 
-        public async Task<List<ProjectDto>> Handle(GetProjectQuery request, CancellationToken cancellationToken)
+        public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProjectQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetProjectQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<Project>().Entities
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Project>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<Project>().Entities.AsNoTracking().ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<ProjectDto>>();
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateProjectQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Project>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

@@ -6,21 +6,7 @@
 @if (IsAccess)
 {
     <div class="wrapper">
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Lab Test</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="/">Home</a></li>
-                            <li class="breadcrumb-item" @onclick="LoadData"><a href="/medical/lab-test">Lab Test</a></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <BaseHeaderPage Title="LabTest" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -36,50 +22,29 @@
                                                     ApplyBackgroundShading="true"
                                                     IndicatorAreaVisible="false"
                                                     Text="Fetching Data...">
-                                        <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                Data="LabTests"
-                                                PageSize="10"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                KeyFieldName="Id"
-                                                CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                DataItemDeleting="OnDelete"
-                                                AllowSelectRowByClick="true"
-                                                EditMode="GridEditMode.PopupEditForm"
-                                                PopupEditFormCssClass="pw-800"
-                                                PagerPosition="GridPagerPosition.Bottom"
-                                                PageSizeSelectorVisible="true"
-                                                PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                PageSizeSelectorAllRowsItemVisible="true"
-                                                EditorRenderMode="GridEditorRenderMode.Detached"
-                                                PagerSwitchToInputBoxButtonCount="10"
-                                                FocusedRowEnabled="true"
-                                                PagerVisibleNumericButtonCount="10"
-                                                TextWrapEnabled="false"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                ShowGroupPanel="true"
-                                                AutoExpandAllGroupRows="true"
-                                                ShowFilterRow="true"
-                                                RowDoubleClick="EditItem_Click"
-                                                CustomizeElement="Grid_CustomizeElement"
-                                                ShowSearchBox="true"
-                                                SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                KeyboardNavigationEnabled="true">
+                                        <MyGridPaginate @ref="Grid"
+                                                        Data="LabTests"
+                                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                                        EditModelSaving="OnSave"
+                                                        DataItemDeleting="OnDelete"
+                                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                                        SearchTextChanged="OnSearchBoxChanged"
+                                                        KeyFieldName="Id">
                                             <ToolbarTemplate>
-                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
-                                                    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && LabTests.Count > 0" />
-                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                    <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                        <Items>
-                                                            <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                            <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                            <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                        </Items>
-                                                    </DxToolbarItem>
-                                                </DxToolbar>
+                                                <MyDxToolbarBase TItem="LabTestDto"
+                                                                 Items="@LabTests"
+                                                                 SelectedDataItems="@SelectedDataItems"
+                                                                 NewItem_Click="@NewItem_Click"
+                                                                 EditItem_Click="@EditItem_Click"
+                                                                 DeleteItem_Click="@DeleteItem_Click"
+                                                                 Refresh_Click="@Refresh_Click"
+                                                                 IsImport="true"
+                                                                 Grid="Grid"
+                                                                 ImportFile="ImportFile"
+                                                                 ExportToExcel="ExportToExcel"
+                                                                 VisibleNew="UserAccessCRUID.Create"
+                                                                 VisibleEdit="UserAccessCRUID.Update"
+                                                                 VisibleDelete="UserAccessCRUID.Delete" />
                                             </ToolbarTemplate>
                                             <Columns>
                                                 <DxGridSelectionColumn Width="15px" />
@@ -87,7 +52,37 @@
                                                 <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
                                                 <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
                                             </Columns>
-                                        </DxGrid>
+                                            <TotalSummary>
+                                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                   FieldName="Name"
+                                                                   Visible="true" />
+                                            </TotalSummary>
+                                        </MyGridPaginate>
+                                        <div class="row">
+                                            <DxFormLayout>
+                                                <div class="col-md-8">
+                                                    <DxFormLayoutItem>
+                                                        <DxPager PageCount="totalCount"
+                                                                 ActivePageIndexChanged="OnPageIndexChanged"
+                                                                 ActivePageIndex="activePageIndex"
+                                                                 VisibleNumericButtonCount="10"
+                                                                 SizeMode="SizeMode.Medium"
+                                                                 NavigationMode="PagerNavigationMode.Auto">
+                                                        </DxPager>
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <DxFormLayoutItem Caption="Page Size:">
+                                                        <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                      NullText="Select Page Size"
+                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                      SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                      @bind-Value="pageSize">
+                                                        </MyDxComboBox>
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                            </DxFormLayout>
+                                        </div>
                                     </DxLoadingPanel>
                                 </div>
                             }
@@ -114,15 +109,25 @@
                                         </DxFormLayoutItem>
 
                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sample Type" ColSpanMd="12">
-                                            <DxComboBox ShowValidationIcon="true"
-                                                        Data="@SampleTypes"
-                                                        NullText="Select Sample Type..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                        @bind-Value="@LabTest.SampleTypeId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id">
-                                            </DxComboBox>
+                                            <MyDxComboBox Data="@SampleTypes"
+                                                          NullText="Select Sampel type..."
+                                                          @ref="refSampleTypesComboBox"
+                                                          @bind-Value="@LabTest.SampleTypeId"
+                                                          TextFieldName="Name"
+                                                          ValueFieldName="Id"
+                                                          TextChanged="((string e) => OnInputSampleTypesChanged(e))">
+                                                <Buttons>
+                                                    <DxEditorButton Click="OnSearchSampleTypesIndexDecrement"
+                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                    Tooltip="Previous Index" />
+                                                    <DxEditorButton Click="OnSearchSampleTypes"
+                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                    Tooltip="Search" />
+                                                    <DxEditorButton Click="OnSearchSampleTypesIndexIncrement"
+                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                    Tooltip="Next Index" />
+                                                </Buttons>
+                                            </MyDxComboBox>
                                             <ValidationMessage For="@(()=> LabTest.SampleTypeId)"   />
                                         </DxFormLayoutItem>
 
@@ -148,50 +153,29 @@
                                                                 ApplyBackgroundShading="true"
                                                                 IndicatorAreaVisible="false"
                                                                 Text="Fetching Data...">
-                                                    <DxGrid @ref="GridDetail" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                            Data="LabTestDetailForms"
-                                                            PageSize="10"
-                                                            @bind-SelectedDataItems="@SelectedDetailDataItems"
-                                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                            KeyFieldName="Id"
-                                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                            EditModelSaving="OnSave"
-                                                            DataItemDeleting="OnDeleteLabTestDetail"
-                                                            AllowSelectRowByClick="true"
-                                                            EditMode="GridEditMode.PopupEditForm"
-                                                            PopupEditFormCssClass="pw-800"
-                                                            PagerPosition="GridPagerPosition.Bottom"
-                                                            PageSizeSelectorVisible="true"
-                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                            PageSizeSelectorAllRowsItemVisible="true"
-                                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                                            PagerSwitchToInputBoxButtonCount="10"
-                                                            FocusedRowEnabled="true"
-                                                            PagerVisibleNumericButtonCount="10"
-                                                            TextWrapEnabled="false"
-                                                            FocusedRowChanged="GridDetail_FocusedRowChanged"
-                                                            ShowGroupPanel="true"
-                                                            AutoExpandAllGroupRows="true"
-                                                            ShowFilterRow="true"
-                                                            CustomizeElement="Grid_CustomizeElement"
-                                                            ShowSearchBox="true"
-                                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                                            KeyboardNavigationEnabled="true">
+                                                    <MyGridPaginate @ref="Grid"
+                                                                    Data="LabTestDetailForms"
+                                                                    @bind-SelectedDataItems="@SelectedDetailDataItems"
+                                                                    EditModelSaving="OnSave"
+                                                                    DataItemDeleting="OnDeleteLabTestDetail"
+                                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                                    SearchTextChanged="OnSearchBoxChanged"
+                                                                    KeyFieldName="Id">
                                                         <ToolbarTemplate>
-                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItemDetail_Click" IconCssClass="fa-solid fa-plus" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="() => EditItemDetail_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
-                                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItemDetail_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDetailDataItems.Count > 0 && LabTestDetailForms.Count > 0" />
-                                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                                    <Items>
-                                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                                    </Items>
-                                                                </DxToolbarItem>
-                                                            </DxToolbar>
+                                                            <MyDxToolbarBase TItem="LabTestDetailDto"
+                                                                             Items="@LabTestDetailForms"
+                                                                             SelectedDataItems="@SelectedDetailDataItems"
+                                                                             NewItem_Click="@NewItemDetail_Click"
+                                                                             EditItem_Click="@(()=>EditItemDetail_Click(context.Grid))"
+                                                                             DeleteItem_Click="@DeleteItemDetail_Click"
+                                                                             Refresh_Click="@RefreshDetail_Click"
+                                                                             IsImport="true"
+                                                                             Grid="Grid"
+                                                                             ImportFile="ImportFile"
+                                                                             ExportToExcel="ExportToExcel"
+                                                                             VisibleNew="UserAccessCRUID.Create"
+                                                                             VisibleEdit="UserAccessCRUID.Update"
+                                                                             VisibleDelete="UserAccessCRUID.Delete" />
                                                         </ToolbarTemplate>
                                                         <Columns>
                                                             <DxGridSelectionColumn Width="15px" />
@@ -227,15 +211,25 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
-                                                                    <DxComboBox ShowValidationIcon="true"
-                                                                                Data="@LabUoms"
-                                                                                NullText="Select UoM..."
-                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                @bind-Value="@a.LabUomId"
-                                                                                TextFieldName="Name"
-                                                                                ValueFieldName="Id">
-                                                                    </DxComboBox>
+                                                                    <MyDxComboBox Data="@LabUoms"
+                                                                                  NullText="Select Lab Uom..."
+                                                                                  @ref="refLabUomComboBox"
+                                                                                  @bind-Value="@a.LabUomId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputLabUomChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchLabUomIndexDecrement"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchLabUom"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchLabUomIndexIncrement"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons>
+                                                                    </MyDxComboBox>
                                                                     <ValidationMessage For="@(()=> a.LabUomId)"   />
                                                                 </DxFormLayoutItem>
 
@@ -256,7 +250,7 @@
                                                                 </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </EditFormTemplate>
-                                                    </DxGrid>
+                                                        </MyGridPaginate>
                                                 </DxLoadingPanel>
                                             </Template>
                                         </DxFormLayoutItem>

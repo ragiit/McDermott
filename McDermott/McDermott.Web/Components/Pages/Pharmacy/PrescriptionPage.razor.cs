@@ -1210,7 +1210,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
                 PreciptionLocations = await Mediator.Send(new GetLocationQuery());
                 ActiveComponentt = await Mediator.Send(new GetActiveComponentQuery());
-                Services = await Mediator.Send(new GetServiceQuery());
+                //Services = await Mediator.Send(new GetServiceQuery());
                 Products = await Mediator.Send(new GetProductQuery());
                 DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
                 MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == false));

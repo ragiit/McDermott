@@ -991,6 +991,32 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion Grid Lab Test
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         private async Task OnPrint()
         {
             if (FormRegis.Id == 0)
@@ -1672,13 +1698,15 @@ namespace McDermott.Web.Components.Pages.Transaction
             public string NmSpesialis { get; set; }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             showForm = false;
             PanelVisible = true;
             PatientAllergy = new();
             SelectedDataItems = [];
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery());
+            var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            GeneralConsultanServices = result.item1;
+            totalCount = result.pageCount;
             IsReferTo = false;
             PopUpVisible = false;
             PanelVisible = false;
@@ -1756,7 +1784,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 return;
-                var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId));
+                var result = await Mediator.Send(new GetDoctorScheduleSlotQuery(searchTerm: searchTerm, pageSize: 10, pageIndex: 0));
+                var slots = result.Item1.Where(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId).ToList();
 
                 Times.Clear();
 
@@ -2076,7 +2105,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             AllInsurances = await Mediator.Send(new GetInsuranceQuery());
 
             //Medical Type
-            Services = await Mediator.Send(new GetServiceQuery());
+            //Services = await Mediator.Send(new GetServiceQuery());
         }
 
         private bool FormValidationState = true;

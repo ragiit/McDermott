@@ -2279,7 +2279,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadComboBox()
         {
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            Services = await Mediator.Send(new GetServiceQuery());
+            //Services = await Mediator.Send(new GetServiceQuery());
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));

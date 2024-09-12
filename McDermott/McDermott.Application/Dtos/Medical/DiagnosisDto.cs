@@ -15,6 +15,6 @@
         public long? CronisCategoryId { get; set; }
 
         public virtual DiseaseCategoryDto? DiseaseCategory { get; set; }
-        public virtual CronisCategoryDto? CronisKategory { get; set; }
+        public virtual CronisCategoryDto? CronisCategory { get; set; }
     }
 }

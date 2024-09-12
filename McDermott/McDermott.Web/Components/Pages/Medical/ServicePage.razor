@@ -15,86 +15,125 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <MyGrid @ref="Grid"
-                                    Data="Services"
-                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                    KeyFieldName="Id"
-                                    EditModelSaving="OnSave"
-                                    DataItemDeleting="OnDelete"
-                                    FocusedRowChanged="Grid_FocusedRowChanged">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="Services"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                KeyFieldName="Id">
 
-                                <ToolbarTemplate>
-                                    <MyDxToolbarBase TItem="ServiceDto"
-                                                     Items="@Services"
-                                                     Grid="Grid"
-                                                     SelectedDataItems="@SelectedDataItems"
-                                                     NewItem_Click="@NewItem_Click"
-                                                     EditItem_Click="@EditItem_Click"
-                                                     DeleteItem_Click="@DeleteItem_Click"
-                                                     Refresh_Click="@Refresh_Click"
-                                                     IsImport="true"
-                                                     VisibleNew="UserAccessCRUID.IsCreate"
-                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
-                                </ToolbarTemplate>
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="ServiceDto"
+                                                         Items="@Services"
+                                                         Grid="Grid"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="true"
+                                                         VisibleNew="UserAccessCRUID.Create"
+                                                         VisibleEdit="UserAccessCRUID.Update"
+                                                         VisibleDelete="UserAccessCRUID.Delete" />
+                                    </ToolbarTemplate>
 
-                                <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
-                                    <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
-                                </Columns>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
+                                    </Columns>
 
-                                <EditFormTemplate Context="EditFormContext">
-                                    @{
-                                        var a = (ServiceDto)EditFormContext.EditModel;
-                                    }
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service Name" ColSpanMd="12">
-                                            <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
-                                            <ValidationMessage For="@(()=>a.Name)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
-                                            <MyTextBox @bind-Text="@a.Code" NullText="Code..." />
-                                            <ValidationMessage For="@(()=>a.Code)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota:" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Quota" NullText="Quota Service.." />
-                                            <ValidationMessage For="@(()=>a.Quota)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@a.IsPatient" />
-                                            <ValidationMessage For="@(()=>a.IsPatient)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
-                                            <MyDxComboBox Data="@ServicesK"
-                                                          @bind-Value="@a.ServicedId"
-                                                          NullText="select Service Counter.."
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"></MyDxComboBox>
-                                            <ValidationMessage For="@(()=>a.ServicedId)" />
-                                        </DxFormLayoutItem> 
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Counter" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@a.IsKiosk" />
-                                            <ValidationMessage For="@(()=>a.IsKiosk)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mcu" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@a.IsMcu" />
-                                            <ValidationMessage For="@(()=>a.IsMcu)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Vaccination" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@a.IsVaccination" />
-                                            <ValidationMessage For="@(()=>a.IsVaccination)" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
-                                            <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
-                                            <ValidationMessage For="@(()=>a.IsTelemedicine)" />
-                                        </DxFormLayoutItem>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (ServiceDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service Name" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
+                                                <ValidationMessage For="@(()=>a.Name)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Code" NullText="Code..." />
+                                                <ValidationMessage For="@(()=>a.Code)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota:" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Quota" NullText="Quota Service.." />
+                                                <ValidationMessage For="@(()=>a.Quota)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsPatient" />
+                                                <ValidationMessage For="@(()=>a.IsPatient)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
+                                                <MyDxComboBox Data="@ServicesK"
+                                                              @bind-Value="@a.ServicedId"
+                                                              NullText="select Service Counter.."
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"></MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.ServicedId)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Counter" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsKiosk" />
+                                                <ValidationMessage For="@(()=>a.IsKiosk)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mcu" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsMcu" />
+                                                <ValidationMessage For="@(()=>a.IsMcu)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Vaccination" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsVaccination" />
+                                                <ValidationMessage For="@(()=>a.IsVaccination)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
+                                                <ValidationMessage For="@(()=>a.IsTelemedicine)" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-8">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-4 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
                                     </DxFormLayout>
-                                </EditFormTemplate>
-                            </MyGrid>
+                                </div>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>

@@ -678,7 +678,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             var p = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
             ReferToGeneralConsultanService.PatientId = p.Id;
             ReferToGeneralConsultanService.Patient = p;
-            ServicesReferTo = await Mediator.Send(new GetServiceQuery(x => x.Name == "General Clinic"));
+            //ServicesReferTo = await Mediator.Send(new GetServiceQuery(x => x.Name == "General Clinic"));
         }
 
         private async Task SendPcareGetSpesialis()
@@ -1113,7 +1113,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            Services = await Mediator.Send(new GetServiceQuery(x => x.IsMcu == true));
+            //Services = await Mediator.Send(new GetServiceQuery(x => x.IsMcu == true));
         }
 
         private void DeleteItem_Click()
