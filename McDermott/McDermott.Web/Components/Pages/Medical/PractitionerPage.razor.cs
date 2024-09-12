@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class PractitionerPage
     {
@@ -58,7 +55,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private bool PanelVisible = false;
         private bool FormValidationState = true;
-         private Timer _timer;
         private IBrowserFile BrowserFile { get; set; }
 
         private bool ShowForm { get; set; } = false;
@@ -103,62 +99,12 @@ namespace McDermott.Web.Components.Pages.Medical
             }
         }
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
-            await GetUserInfo();
-            PanelVisible = false;
 
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-
-            ShowForm = false;
-            UserForm = new UserDto();
-            SelectedDataItems = [];
-            //Specialities = await Mediator.Send(new GetSpecialityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            //Services = await Mediator.Send(new GetServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Specialities = await Mediator.Send(new GetSpecialityQuery());
+            Services = await Mediator.Send(new GetServiceQuery());
             var countries = await Mediator.Send(new GetCountryQuery());
             Countries = countries.Item1; Provinces = await Mediator.Send(new GetProvinceQuery());
             //Cities = await Mediator.Send(new GetCityQuery());
@@ -168,6 +114,18 @@ namespace McDermott.Web.Components.Pages.Medical
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
+
+            await GetUserInfo();
+            await LoadData();
+        }
+
+        private async Task LoadData()
+        {
+            PanelVisible = true;
+
+            ShowForm = false;
+            UserForm = new UserDto();
+            SelectedDataItems = [];
             Users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
             PanelVisible = false;

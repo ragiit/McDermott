@@ -1,10 +1,7 @@
-﻿
-using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
-
-namespace McDermott.Application.Features.Queries.Medical
+﻿namespace McDermott.Application.Features.Queries.Medical
 {
     public class LabTestQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetLabTestQuery, (List<LabTestDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetLabTestQuery, List<LabTestDto>>,
         IRequestHandler<CreateLabTestRequest, LabTestDto>,
         IRequestHandler<CreateListLabTestRequest, List<LabTestDto>>,
         IRequestHandler<UpdateLabTestRequest, LabTestDto>,
@@ -13,50 +10,36 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<LabTestDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabTestQuery request, CancellationToken cancellationToken)
+        public async Task<List<LabTestDto>> Handle(GetLabTestQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<LabTest>().Entities
-                    .Include(x=>x.SampleType)
-                    .AsNoTracking()
-                    .AsQueryable();
+                string cacheKey = $"GetLabTestQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<LabTest>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<LabTest>().GetAsync(
+                        null,
+                        x => x
+                        .Include(z => z.SampleType),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<LabTestDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<LabTestDto>>();
             }
             catch (Exception)
             {
                 throw;
             }
-        }
-
-        public async Task<bool> Handle(ValidateLabTestQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<LabTest>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

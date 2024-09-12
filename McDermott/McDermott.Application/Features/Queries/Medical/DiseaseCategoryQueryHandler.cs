@@ -1,10 +1,9 @@
-﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class DiseaseCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetDiseaseCategoryQuery, (List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetDiseaseCategoryQuery, List<DiseaseCategoryDto>>,
         IRequestHandler<CreateDiseaseCategoryRequest, DiseaseCategoryDto>,
         IRequestHandler<CreateListDiseaseCategoryRequest, List<DiseaseCategoryDto>>,
         IRequestHandler<UpdateDiseaseCategoryRequest, DiseaseCategoryDto>,
@@ -13,51 +12,37 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDiseaseCategoryQuery request, CancellationToken cancellationToken)
+        public async Task<List<DiseaseCategoryDto>> Handle(GetDiseaseCategoryQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<DiseaseCategory>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                string cacheKey = $"GetDiseaseCategoryQuery_";
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<DiseaseCategory>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ParentCategory, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<DiseaseCategory>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                result ??= [];
 
-                var skip = (request.PageIndex) * request.PageSize;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<DiseaseCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<DiseaseCategoryDto>>();
             }
             catch (Exception)
             {
                 throw;
             }
         }
-
-        public async Task<bool> Handle(ValidateDiseaseCategoryQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<DiseaseCategory>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
-        }
-
 
         #endregion GET
 

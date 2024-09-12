@@ -292,11 +292,11 @@
         ShowForm = true;
         var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
 
-        // if (labTest.Count > 0)
-        // {
-        //     LabTest = labTest[0];
-        //     LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
-        // }
+        if (labTest.Count > 0)
+        {
+            LabTest = labTest[0];
+            LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+        }
     }
     private async Task OnDelete(GridDataItemDeletingEventArgs e)
     {

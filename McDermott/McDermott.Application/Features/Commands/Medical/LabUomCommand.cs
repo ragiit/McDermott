@@ -4,20 +4,11 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null, bool removeCache = false) : IRequest<List<LabUomDto>>
         {
             public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
         }
-
-        public class ValidateLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null) : IRequest<bool>
-        {
-            public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
-        }
-
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 

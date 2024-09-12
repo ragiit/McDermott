@@ -3,7 +3,7 @@
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class DiagnosisQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetDiagnosisQuery, (List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetDiagnosisQuery, List<DiagnosisDto>>,
         IRequestHandler<CreateDiagnosisRequest, DiagnosisDto>,
         IRequestHandler<CreateListDiagnosisRequest, List<DiagnosisDto>>,
         IRequestHandler<UpdateDiagnosisRequest, DiagnosisDto>,
@@ -12,51 +12,38 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDiagnosisQuery request, CancellationToken cancellationToken)
+        public async Task<List<DiagnosisDto>> Handle(GetDiagnosisQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Diagnosis>().Entities
-                    .Include(x=>x.DiseaseCategory)
-                    .Include(x=>x.CronisCategory)
-                    .AsNoTracking()
-                    .AsQueryable();
+                string cacheKey = $"GetDiagnosisQuery_";
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Diagnosis>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<Diagnosis>().Entities
+                        .Include(x => x.DiseaseCategory)
+                        .Include(x => x.CronisKategory)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                result ??= [];
 
-                var skip = (request.PageIndex) * request.PageSize;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<DiagnosisDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<DiagnosisDto>>();
             }
             catch (Exception)
             {
                 throw;
             }
-        }
-
-        public async Task<bool> Handle(ValidateDiagnosisQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<Diagnosis>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

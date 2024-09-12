@@ -21,28 +21,50 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <MyGridPaginate @ref="Grid"
-                                                    Data="HealthCenters"
-                                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                                    EditModelSaving="OnSave"
-                                                    DataItemDeleting="OnDelete"
-                                                    SearchTextChanged="OnSearchBoxChanged"
-                                                    KeyFieldName="Id">
+                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
+                                            Data="HealthCenters"
+                                            PageSize="10"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                            KeyFieldName="Id"
+                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
+                                            EditModelSaving="OnSave"
+                                            DataItemDeleting="OnDelete"
+                                            EditMode="GridEditMode.PopupEditForm"
+                                            PopupEditFormCssClass="pw-800"
+                                            PagerPosition="GridPagerPosition.Bottom"
+                                            PageSizeSelectorVisible="true"
+                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                            PageSizeSelectorAllRowsItemVisible="true"
+                                            PagerSwitchToInputBoxButtonCount="10"
+                                            FocusedRowEnabled="true"
+                                            PagerVisibleNumericButtonCount="10"
+                                            AllowSelectRowByClick="true"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                            ShowGroupPanel="true"
+                                            AutoExpandAllGroupRows="true"
+                                            TextWrapEnabled="false"
+                                            ShowFilterRow="true"
+                                            CustomizeElement="Grid_CustomizeElement"
+                                            ShowSearchBox="true"
+                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
+                                            KeyboardNavigationEnabled="true">
                                         <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="HealthCenterDto"
-                                                             Items="@HealthCenters"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@EditItem_Click"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@Refresh_Click"
-                                                             IsImport="true"
-                                                             Grid="Grid"
-                                                             ImportFile="ImportFile"
-                                                             ExportToExcel="ExportToExcel"
-                                                             VisibleNew="UserAccessCRUID.Create"
-                                                             VisibleEdit="UserAccessCRUID.Update"
-                                                             VisibleDelete="UserAccessCRUID.Delete" />
+                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                                                <DxToolbarItem Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
+                                                <DxToolbarItem Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && HealthCenters.Count > 0" />
+                                                <DxToolbarItem Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && HealthCenters.Count > 0" />
+                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
+                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
+                                                    <Items>
+                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
+                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
+                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
+                                                    </Items>
+                                                </DxToolbarItem>
+                                            </DxToolbar>
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
@@ -100,71 +122,35 @@
                                                                 </DxGridLayoutItem>
                                                                 <DxGridLayoutItem Row="2" Column="0">
                                                                     <Template>
-                                                                        <MyDxComboBox Data="@Provinces"
-                                                                                      NullText="Select Province..."
-                                                                                      @ref="refProvinceComboBox"
-                                                                                      @bind-Value="@a.ProvinceId"
-                                                                                      TextFieldName="Name"
-                                                                                      ValueFieldName="Id"
-                                                                                      TextChanged="((string e) => OnInputProvinceChanged(e))">
-                                                                            <Buttons>
-                                                                                <DxEditorButton Click="OnSearchProvinceIndexDecrement"
-                                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                                Tooltip="Previous Index" />
-                                                                                <DxEditorButton Click="OnSearchProvince"
-                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                Tooltip="Search" />
-                                                                                <DxEditorButton Click="OnSearchProvinceIndexIncrement"
-                                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                                Tooltip="Next Index" />
-                                                                            </Buttons>
-                                                                        </MyDxComboBox>
+                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    Data="@Provinces"
+                                                                                    NullText="Select Province..."
+                                                                                    @bind-Value="@a.ProvinceId"
+                                                                                    TextFieldName="Name"
+                                                                                    ValueFieldName="Id">
+                                                                        </DxComboBox>
                                                                     </Template>
                                                                 </DxGridLayoutItem>
                                                                 <DxGridLayoutItem Row="2" Column="1">
                                                                     <Template>
-                                                                        <MyDxComboBox Data="@Cities.Where(x => a.ProvinceId == a.ProvinceId)"
-                                                                                      NullText="Select City..."
-                                                                                      @ref="refCityComboBox"
-                                                                                      @bind-Value="@a.CityId"
-                                                                                      TextFieldName="Name"
-                                                                                      ValueFieldName="Id"
-                                                                                      TextChanged="((string e) => OnInputCityChanged(e))">
-                                                                            <Buttons>
-                                                                                <DxEditorButton Click="OnSearchCityIndexDecrement"
-                                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                                Tooltip="Previous Index" />
-                                                                                <DxEditorButton Click="OnSearchCity"
-                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                Tooltip="Search" />
-                                                                                <DxEditorButton Click="OnSearchCityIndexIncrement"
-                                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                                Tooltip="Next Index" />
-                                                                            </Buttons>
-                                                                        </MyDxComboBox>
+                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    Data="@Cities.Where(x => x.ProvinceId == a.ProvinceId)"
+                                                                                    NullText="Select City..."
+                                                                                    @bind-Value="@a.CityId"
+                                                                                    TextFieldName="Name"
+                                                                                    ValueFieldName="Id">
+                                                                        </DxComboBox>
                                                                     </Template>
                                                                 </DxGridLayoutItem>
                                                                 <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12" CssClass="mt">
                                                                     <Template>
-                                                                        <MyDxComboBox Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
-                                                                                      NullText="Select Sampel type..."
-                                                                                      @ref="refCountryComboBox"
-                                                                                      @bind-Value="@a.CountryId"
-                                                                                      TextFieldName="Name"
-                                                                                      ValueFieldName="Id"
-                                                                                      TextChanged="((string e) => OnInputCountryChanged(e))">
-                                                                            <Buttons>
-                                                                                <DxEditorButton Click="OnSearchCountryIndexDecrement"
-                                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                                Tooltip="Previous Index" />
-                                                                                <DxEditorButton Click="OnSearchCountry"
-                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                Tooltip="Search" />
-                                                                                <DxEditorButton Click="OnSearchCountryIndexIncrement"
-                                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                                Tooltip="Next Index" />
-                                                                            </Buttons>
-                                                                        </MyDxComboBox>
+                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
+                                                                                    NullText="Select Country..."
+                                                                                    @bind-Value="@a.CountryId"
+                                                                                    TextFieldName="Name"
+                                                                                    ValueFieldName="Id">
+                                                                        </DxComboBox>
                                                                     </Template>
                                                                 </DxGridLayoutItem>
                                                             </Items>
@@ -173,38 +159,7 @@
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                         </EditFormTemplate>
-                                        <TotalSummary>
-                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                               FieldName="Name"
-                                                               Visible="true" />
-                                        </TotalSummary>
-                                    </MyGridPaginate>
-                                    <div class="row">
-                                        <DxFormLayout>
-                                            <div class="col-md-8">
-                                                <DxFormLayoutItem>
-                                                    <DxPager PageCount="totalCount"
-                                                             ActivePageIndexChanged="OnPageIndexChanged"
-                                                             ActivePageIndex="activePageIndex"
-                                                             VisibleNumericButtonCount="10"
-                                                             SizeMode="SizeMode.Medium"
-                                                             NavigationMode="PagerNavigationMode.Auto">
-                                                    </DxPager>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                            <div class="col-md-4 d-flex justify-content-end">
-                                                <DxFormLayoutItem Caption="Page Size:">
-                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                                  NullText="Select Page Size"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                                  @bind-Value="pageSize">
-                                                    </MyDxComboBox>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                        </DxFormLayout>
-                                    </div>
-
+                                    </DxGrid>
                                 </DxLoadingPanel>
                             </div>
                         </div>

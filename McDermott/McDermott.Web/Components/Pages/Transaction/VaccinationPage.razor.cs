@@ -746,7 +746,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Locations = await Mediator.Send(new GetLocationQuery());
             Products = await Mediator.Send(new GetProductQuery(x => x.HospitalType != null && x.HospitalType.Equals("Vactination")));
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            //Services = await Mediator.Send(new GetServiceQuery(x => x.Name.Equals("Vaccination")));
+            Services = await Mediator.Send(new GetServiceQuery(x => x.Name.Equals("Vaccination")));
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));

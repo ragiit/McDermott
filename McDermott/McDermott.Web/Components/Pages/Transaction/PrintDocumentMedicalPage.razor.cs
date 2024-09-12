@@ -1,8 +1,6 @@
-﻿using DevExpress.Blazor.RichEdit;
-using DevExpress.Data.Helpers;
+﻿using DevExpress.Data.Helpers;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components;
-using System.Net;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -15,11 +13,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         [Parameter]
         public string IdEncrypt { get; set; } = string.Empty;
         private long? Ids { get; set; }
-        public bool PanelVisible { get; set; } = false;
-        public bool ViewVisible { get; set; } = false;
-        private DxRichEdit richEdit;
-        private DevExpress.Blazor.RichEdit.Document documentAPI;
-        public byte[]? DocumentContent;
+        public bool PanelVisible {  get; set; }=false;
 
         #endregion
         // Metode untuk mendekripsi ID
@@ -39,17 +33,6 @@ namespace McDermott.Web.Components.Pages.Transaction
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-
-        private List<string> CertifiedMedicalCategroy =
-        [
-            "AUTHORIZATION FOR RELEASE OF MEDICAL",
-            "INFORMED CONSENT MEDICAL ACTIONS",
-            "REFERENCE ANSWER",
-            "REFUSAL OF MEDICAL TREATMENT",
-            "ACCIDENT REFERRAL",
-            "GENERAL REFERRAL",
-            "CERTIFICATE OF FITNESS"
-        ];
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -89,7 +72,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             catch { }
 
-            
             await LoadData();
             await Decrypt();
         }
@@ -101,60 +83,14 @@ namespace McDermott.Web.Components.Pages.Transaction
                 PanelVisible = true;
                 getGeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Ids));
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
             finally
             {
                 PanelVisible = false;
             }
-        }
-
-        private async Task SelectCategory()
-        {
-            switch (postGenerateMedicalcertificates.JenisSurat)
-            {
-                case "AUTHORIZATION FOR RELEASE OF MEDICAL":
-                    await AuthorizationForReleaseOfMedical();
-                    break;
-                case "INFORMED CONSENT MEDICAL ACTIONS":
-                    await InformedConsentMedicalActions();
-                    break;
-                case "REFERENCE ANSWER":
-                    await ReferenceAnswer();
-                    break;
-                case "REFUSAL OF MEDICAL TREATMENT":
-                    await RefusalOfMedicalTreatment();
-                    break;
-                case "ACCIDENT REFERRAL":
-                    await AccidentReferral();
-                    break;
-                case "GENERAL REFERRAL":
-                    await GeneralReferral();
-                    break;
-                case "CERTIFICATE OF FITNESS":
-                    await CertificateOfFitness();
-                    break;
-                default: break;
-            }
-        }
-
-        private async Task AuthorizationForReleaseOfMedical()
-        {
-            ViewVisible = true;
-
-        }
-
-        private async Task InformedConsentMedicalActions()
-        {
-
-        }
-
-        private async Task ReferenceAnswer() { }
-        private async Task RefusalOfMedicalTreatment() { }
-        private async Task AccidentReferral() { }
-        private async Task GeneralReferral() { }
-        private async Task CertificateOfFitness()
-        {
-
         }
     }
 }

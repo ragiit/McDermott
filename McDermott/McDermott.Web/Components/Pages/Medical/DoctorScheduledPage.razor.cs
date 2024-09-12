@@ -113,7 +113,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
 
-            //Services = await Mediator.Send(new GetServiceQuery());
+            Services = await Mediator.Send(new GetServiceQuery());
 
             await GetUserInfo();
             await LoadData();

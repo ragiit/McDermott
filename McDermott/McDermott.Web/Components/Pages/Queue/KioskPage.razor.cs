@@ -334,7 +334,7 @@ namespace McDermott.Web.Components.Pages.Queue
             InsurancePolices = await Mediator.Send(new GetInsurancePolicyQuery());
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
-            //Services = await Mediator.Send(new GetServiceQuery());
+            Services = await Mediator.Send(new GetServiceQuery());
             var kconfig = await Mediator.Send(new GetKioskConfigQuery());
             KioskConf = kconfig.Where(x => x.Id == Id).ToList();
             classTypes = await Mediator.Send(new GetClassTypeQuery());

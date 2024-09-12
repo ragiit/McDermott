@@ -4,18 +4,10 @@
     {
         #region GET 
 
-        public class GetDoctorScheduleSlotQuery(Expression<Func<DoctorScheduleSlot, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DoctorScheduleSlotDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetDoctorScheduleSlotQuery(Expression<Func<DoctorScheduleSlot, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DoctorScheduleSlotDto>>
         {
             public Expression<Func<DoctorScheduleSlot, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
-        }
-
-        public class ValidateDoctorScheduleSlotQuery(Expression<Func<DoctorScheduleSlot, bool>>? predicate = null) : IRequest<bool>
-        {
-            public Expression<Func<DoctorScheduleSlot, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion  

@@ -1,9 +1,7 @@
-﻿using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
-
-namespace McDermott.Application.Features.Queries.Medical
+﻿namespace McDermott.Application.Features.Queries.Medical
 {
     public class BuildingQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetBuildingQuery, (List<BuildingDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetBuildingQuery, List<BuildingDto>>,
         IRequestHandler<CreateBuildingRequest, BuildingDto>,
         IRequestHandler<CreateListBuildingRequest, List<BuildingDto>>,
         IRequestHandler<UpdateBuildingRequest, BuildingDto>,
@@ -12,36 +10,32 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<BuildingDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBuildingQuery request, CancellationToken cancellationToken)
+        public async Task<List<BuildingDto>> Handle(GetBuildingQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Building>().Entities
-                    .Include(x=>x.HealthCenter)
-                    .AsNoTracking()
-                    .AsQueryable();
+                string cacheKey = $"GetBuildingQuery_";
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Building>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<Building>().Entities
+                       .Include(x => x.HealthCenter)
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                result ??= [];
 
-                var skip = (request.PageIndex) * request.PageSize;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<BuildingDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<BuildingDto>>();
             }
             catch (Exception)
             {
@@ -49,14 +43,6 @@ namespace McDermott.Application.Features.Queries.Medical
             }
         }
 
-        public async Task<bool> Handle(ValidateBuildingQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<Building>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
-        }
         #endregion GET
 
         #region CREATE

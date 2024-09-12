@@ -1,9 +1,7 @@
-﻿using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
-
-namespace McDermott.Application.Features.Queries.Medical
+﻿namespace McDermott.Application.Features.Queries.Medical
 {
     public class CronisCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetCronisCategoryQuery, (List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetCronisCategoryQuery, List<CronisCategoryDto>>,
         IRequestHandler<CreateCronisCategoryRequest, CronisCategoryDto>,
         IRequestHandler<CreateListCronisCategoryRequest, List<CronisCategoryDto>>,
         IRequestHandler<UpdateCronisCategoryRequest, CronisCategoryDto>,
@@ -12,35 +10,31 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCronisCategoryQuery request, CancellationToken cancellationToken)
+        public async Task<List<CronisCategoryDto>> Handle(GetCronisCategoryQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<CronisCategory>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                string cacheKey = $"GetCronisCategoryQuery_";
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<CronisCategory>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Description, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<CronisCategory>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                result ??= [];
 
-                var skip = (request.PageIndex) * request.PageSize;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<CronisCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<CronisCategoryDto>>();
             }
             catch (Exception)
             {
@@ -48,14 +42,6 @@ namespace McDermott.Application.Features.Queries.Medical
             }
         }
 
-        public async Task<bool> Handle(ValidateCronisCategoryQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<CronisCategory>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
-        }
         #endregion GET
 
         #region CREATE

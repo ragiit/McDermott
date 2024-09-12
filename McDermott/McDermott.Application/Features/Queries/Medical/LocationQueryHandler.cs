@@ -1,10 +1,9 @@
 ﻿
-using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class LocationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetLocationQuery, (List<LocationDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetLocationQuery, List<LocationDto>>,
         IRequestHandler<CreateLocationRequest, LocationDto>,
         IRequestHandler<CreateListLocationRequest, List<LocationDto>>,
         IRequestHandler<UpdateLocationRequest, LocationDto>,
@@ -13,55 +12,38 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationQuery request, CancellationToken cancellationToken)
+        public async Task<List<LocationDto>> Handle(GetLocationQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Location>().Entities
-                    .Include(x=>x.ParentLocation)
-                    .AsNoTracking()
-                    .AsQueryable();
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
+                string cacheKey = $"GetLocationQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Location>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ParentLocation.Name, $"{request.SearchTerm}")||
-                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<Location>().Entities
+                       .Include(x => x.ParentLocation)
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                result ??= [];
 
-                var skip = (request.PageIndex) * request.PageSize;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<LocationDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<LocationDto>>();
             }
             catch (Exception)
             {
                 throw;
             }
         }
-
-        public async Task<bool> Handle(ValidateLocationQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<Location>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
-        }
-
 
         #endregion GET
 

@@ -4,6 +4,12 @@
     {
         #region GET
 
+        //public class GetCountryQuery(Expression<Func<Country, bool>>? predicate = null, bool removeCache = false) : IRequest<List<CountryDto>>
+        //{
+        //    public Expression<Func<Country, bool>> Predicate { get; } = predicate!;
+        //    public bool RemoveCache { get; } = removeCache!;
+        //}
+
         public class GetCountryQuery(Expression<Func<Country, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Country, bool>> Predicate { get; } = predicate!;

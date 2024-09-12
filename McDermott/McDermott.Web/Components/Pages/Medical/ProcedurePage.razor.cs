@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -9,37 +8,11 @@ namespace McDermott.Web.Components.Pages.Medical
 
         public IGrid Grid { get; set; }
         private List<ProcedureDto> Procedures = new();
-        private Timer _timer;
+
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
-
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
 
         #region UserLoginAndAccessRole
 
@@ -87,32 +60,15 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnInitializedAsync()
         {
-            PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
-            PanelVisible = false;
-
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
+            await LoadData();
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            var result = await Mediator.Send(new GetProcedureQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Procedures = result.Item1;
-            totalCount = result.pageCount;
+            Procedures = await Mediator.Send(new GetProcedureQuery());
             PanelVisible = false;
         }
 
@@ -145,83 +101,6 @@ namespace McDermott.Web.Components.Pages.Medical
             }
         }
 
-        private async Task ImportFile()
-        {
-            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
-        }
-
-        public async Task ImportExcelFile(InputFileChangeEventArgs e)
-        {
-            PanelVisible = true;
-            foreach (var file in e.GetMultipleFiles(1))
-            {
-                try
-                {
-                    using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
-                    ms.Position = 0;
-
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                    using ExcelPackage package = new(ms);
-                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-
-                    var headerNames = new List<string>() { "Name", "Code", "Clasdification" };
-
-                    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
-                    {
-                        PanelVisible = false;
-                        ToastService.ShowInfo("The header must match with the template.");
-                        return;
-                    }
-
-                    var list = new List<ProcedureDto>();
-
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        var c = new ProjectDto
-                        {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                        };
-
-                        if (!Procedures.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                            list.Add(c);
-                    }
-
-                    await Mediator.Send(new CreateListProcedureRequest(list));
-
-                    await LoadData();
-                    SelectedDataItems = [];
-
-                    ToastService.ShowSuccess("Successfully Imported.");
-                }
-                catch (Exception ex)
-                {
-                    ToastService.ShowError(ex.Message);
-                }
-            }
-            PanelVisible = false;
-        }
-
-        private async Task ExportToExcel()
-        {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Code"
-                },
-                new(){
-                    Column = "Clasdification"
-                },
-            ]);
-        }
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();

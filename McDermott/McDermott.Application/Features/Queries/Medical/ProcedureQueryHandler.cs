@@ -1,10 +1,9 @@
-﻿
-using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class ProcedureQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetProcedureQuery, (List<ProcedureDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetProcedureQuery, List<ProcedureDto>>,
         IRequestHandler<CreateProcedureRequest, ProcedureDto>,
         IRequestHandler<CreateListProcedureRequest, List<ProcedureDto>>,
         IRequestHandler<UpdateProcedureRequest, ProcedureDto>,
@@ -13,50 +12,36 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
-        public async Task<(List<ProcedureDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProcedureQuery request, CancellationToken cancellationToken)
+        public async Task<List<ProcedureDto>> Handle(GetProcedureQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Procedure>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                string cacheKey = $"GetProcedureQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Procedure>? result))
                 {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code_Test, $"%{request.SearchTerm}%")||
-                        EF.Functions.Like(v.Classification, $"%{request.SearchTerm}%"));
+                    result = await _unitOfWork.Repository<Procedure>().Entities
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                result ??= [];
 
-                var skip = (request.PageIndex) * request.PageSize;
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<ProcedureDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return result.ToList().Adapt<List<ProcedureDto>>();
             }
             catch (Exception)
             {
                 throw;
             }
-        }
-
-        public async Task<bool> Handle(ValidateProcedureQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<Procedure>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

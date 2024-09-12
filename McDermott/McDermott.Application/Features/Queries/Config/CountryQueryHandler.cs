@@ -118,7 +118,7 @@ IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize,
                 throw;
             }
         }
-        #endregion DELETE
+
         public async Task<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCountryQuery request, CancellationToken cancellationToken)
         {
             try
@@ -164,6 +164,6 @@ IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize,
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
-        
+        #endregion DELETE
     }
 }

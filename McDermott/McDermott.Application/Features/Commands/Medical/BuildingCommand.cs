@@ -4,18 +4,10 @@
     {
         #region GET 
 
-        public class GetBuildingQuery(Expression<Func<Building, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<BuildingDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetBuildingQuery(Expression<Func<Building, bool>>? predicate = null, bool removeCache = false) : IRequest<List<BuildingDto>>
         {
             public Expression<Func<Building, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
-        }
-
-        public class ValidateBuildingQuery(Expression<Func<Building, bool>>? predicate = null) : IRequest<bool>
-        {
-            public Expression<Func<Building, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion  
