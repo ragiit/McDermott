@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Config.ProvinceCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -43,17 +44,9 @@ namespace McDermott.Application.Features.Queries.Config
 
                 var pagedResult = query.OrderBy(x => x.Name);
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                var (totalCount, pagedProvinces, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<ProvinceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedProvinces.Adapt<List<ProvinceDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

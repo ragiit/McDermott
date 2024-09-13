@@ -1,9 +1,12 @@
+using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
     public class OccupationalQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetOccupationalQuery, List<OccupationalDto>>,
+        IRequestHandler<GetOccupationalQuery, (List<OccupationalDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateOccupationalQuery, bool>,
+        IRequestHandler<BulkValidateOccupationalQuery, List<OccupationalDto>>,
         IRequestHandler<CreateOccupationalRequest, OccupationalDto>,
         IRequestHandler<CreateListOccupationalRequest, List<OccupationalDto>>,
         IRequestHandler<UpdateOccupationalRequest, OccupationalDto>,
@@ -12,34 +15,59 @@ namespace McDermott.Application.Features.Queries.Config
     {
         #region GET
 
-        public async Task<List<OccupationalDto>> Handle(GetOccupationalQuery request, CancellationToken cancellationToken)
+        public async Task<List<OccupationalDto>> Handle(BulkValidateOccupationalQuery request, CancellationToken cancellationToken)
+        {
+            var OccupationalDtos = request.OccupationalsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var OccupationalNames = OccupationalDtos.Select(x => x.Name).Distinct().ToList();
+
+            var existingOccupationals = await _unitOfWork.Repository<Occupational>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => OccupationalNames.Contains(v.Name))
+                .ToListAsync(cancellationToken);
+
+            return existingOccupationals.Adapt<List<OccupationalDto>>();
+        }
+
+        public async Task<(List<OccupationalDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetOccupationalQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetOccupationalQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<Occupational>().Entities
+                    .AsNoTracking()
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<Occupational>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<Occupational>().Entities
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<OccupationalDto>>();
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+
+                return (paged.Adapt<List<OccupationalDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateOccupationalQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Occupational>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

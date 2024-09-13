@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Config.MenuCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Config.MenuCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -41,17 +42,10 @@ namespace McDermott.Application.Features.Queries.Config
                         EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<MenuDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

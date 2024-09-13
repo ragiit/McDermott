@@ -177,6 +177,7 @@ namespace McDermott.Web.Components.Pages.Config
                 {
                     ToastService.ShowError(ex.Message);
                 }
+                finally { PanelVisible = false; }
             }
             PanelVisible = false;
         }

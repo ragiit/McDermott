@@ -107,9 +107,9 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+                var result = await Mediator.Send(new GetMenuQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
                 Menus = result.Item1;
-                totalCount = result.Item2;
+                totalCount = result.pageCount;
                 activePageIndex = pageIndex;
                 PanelVisible = false;
             }

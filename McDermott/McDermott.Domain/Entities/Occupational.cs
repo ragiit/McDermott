@@ -6,6 +6,6 @@ namespace McDermott.Domain.Entities
         public string Name { get; set; } = string.Empty;
 
         [StringLength(300)]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
+﻿using McDermott.Application.Features.Services;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
 
 using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
 
@@ -43,20 +45,10 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Menu.Name, $"%{request.SearchTerm}%"));
+                    EF.Functions.Like(v.Menu.Name, $"%{request.SearchTerm}%"));
                 }
 
-                //var pagedResult = query
-                //            .OrderBy(x => x.Group.Name);
-
-                var totalCount = await query.CountAsync(cancellationToken);
-                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
-
-                var paged = query
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, null, cancellationToken: cancellationToken);
 
                 return (paged.Adapt<List<GroupMenuDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

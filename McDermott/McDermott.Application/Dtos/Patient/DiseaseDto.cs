@@ -1,5 +1,4 @@
-﻿
-namespace McDermott.Application.Dtos.Patient
+﻿namespace McDermott.Application.Dtos.Patient
 {
     public class DiseaseDto
     {

@@ -1,4 +1,6 @@
-﻿using McDermott.Application.Features.Services;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using MailKit.Search;
+using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -201,7 +203,8 @@ namespace McDermott.Web.Components.Pages.Config
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
-            Occupationals = await Mediator.Send(new GetOccupationalQuery());
+            var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
+            Occupationals = resultOccupationals.Item1;
         }
 
         private async Task OnSave()

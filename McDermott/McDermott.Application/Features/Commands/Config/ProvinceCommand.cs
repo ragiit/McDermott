@@ -10,7 +10,7 @@
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public int PageSize { get; set; } = pageSize ?? 10;
         }
 
         public class ValidateProvinceQuery(Expression<Func<Province, bool>>? predicate = null) : IRequest<bool>

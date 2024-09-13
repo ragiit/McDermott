@@ -26,8 +26,8 @@ namespace McDermott.Application.Dtos.Inventory
         public int? RepeatNumber { get; set; }
         public string? RepeatWork { get; set; }
         public EnumStatusMaintainance? Status { get; set; }
-        public string? Note {  get; set; }
-        public DateTime CreatedDate {  get; set; } = DateTime.UtcNow;
+        public string? Note { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [SetToNull]
         public virtual UserDto? RequestBy { get; set; }
@@ -37,6 +37,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual ProductDto? Equipment { get; set; }
+
         [SetToNull]
         public virtual LocationDto? Location { get; set; }
     }

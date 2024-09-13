@@ -33,7 +33,7 @@ namespace McDermott.Application.Features.Queries.Medical
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
+                var skip = (request.PageIndex) * request.PageSize;
 
                 var paged = pagedResult
                             .Skip(skip)

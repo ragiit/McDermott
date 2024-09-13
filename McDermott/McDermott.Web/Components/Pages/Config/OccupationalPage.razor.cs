@@ -165,9 +165,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetOccupationals(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
+            var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: searchTerm));
             Occupationals = result.Item1;
-            totalCount = result.Item2;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
