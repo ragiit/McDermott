@@ -119,7 +119,9 @@ namespace McDermott.Application.Features.Queries.Config
                 throw;
             }
         }
+
         #endregion DELETE
+
         public async Task<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCountryQuery request, CancellationToken cancellationToken)
         {
             try
@@ -138,12 +140,12 @@ namespace McDermott.Application.Features.Queries.Config
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
+
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)
@@ -167,7 +169,5 @@ namespace McDermott.Application.Features.Queries.Config
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
-
-        
     }
 }

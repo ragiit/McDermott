@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DevExpress.Data.Access;
+using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
@@ -155,7 +156,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
+            //var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetMenuQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refMenuComboBox?.Text));
             Menus = result.Item1;
             ////Menus.Insert(0, new MenuDto
             ////{
@@ -163,7 +165,7 @@ namespace McDermott.Web.Components.Pages.Config
             ////    Name = "All",
             //});
             Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.Item2;
+            totalCountMenu = result.pageCount;
             PanelVisible = false;
         }
 

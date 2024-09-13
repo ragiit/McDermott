@@ -359,7 +359,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var headerNames = new List<string>() { "Name", "Postal Code", "Province", "City", "District" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                        .Any(i => !headerNames[i - 1].Trim().Equals(ws.Cells[1, i].Value?.ToString()?.Trim().ToLower(), StringComparison.CurrentCultureIgnoreCase)))
                     {
                         ToastService.ShowInfo("The header must match with the template.");
                         return;
@@ -391,9 +391,9 @@ namespace McDermott.Web.Components.Pages.Config
                             districtNames.Add(district.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name), 0, int.MaxValue))).Item1;
-                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name), 0, int.MaxValue))).Item1;
-                    list3 = (await Mediator.Send(new GetDistrictQuery(x => districtNames.Contains(x.Name), 0, int.MaxValue))).Item1;
+                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name), 0, 0))).Item1;
+                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name), 0, 0))).Item1;
+                    list3 = (await Mediator.Send(new GetDistrictQuery(x => districtNames.Contains(x.Name), 0, 0))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -410,7 +410,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                         if (!string.IsNullOrEmpty(prov))
                         {
-                            var cachedParent = list1.FirstOrDefault(x => x.Name.ToLower() == prov.ToLower());
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(prov, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
                                 var parentProvince = (await Mediator.Send(new GetProvinceQuery(x => x.Name == prov, searchTerm: prov, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
@@ -434,7 +434,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                         if (!string.IsNullOrEmpty(city))
                         {
-                            var cachedParent = list2.FirstOrDefault(x => x.Name.ToLower() == city.ToLower());
+                            var cachedParent = list2.FirstOrDefault(x => x.Name.Equals(city, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
                                 var parentCityince = (await Mediator.Send(new GetCityQuery(x => x.Name == city, searchTerm: city, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
@@ -458,7 +458,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                         if (!string.IsNullOrEmpty(district))
                         {
-                            var cachedParent = list3.FirstOrDefault(x => x.Name.ToLower() == district.ToLower());
+                            var cachedParent = list3.FirstOrDefault(x => x.Name.Equals(district, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
                                 var parentDistrictince = (await Mediator.Send(new GetDistrictQuery(x => x.Name == district, searchTerm: district, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
@@ -492,15 +492,6 @@ namespace McDermott.Web.Components.Pages.Config
                             PostalCode = code,
                         };
 
-                        //bool exists = await Mediator.Send(new ValidateVillageQuery(x =>
-                        //    x.Name == newMenu.Name &&
-                        //    x.PostalCode == newMenu.PostalCode &&
-                        //    x.ProvinceId == newMenu.ProvinceId &&
-                        //    x.CityId == newMenu.CityId &&
-                        //    x.DistrictId == newMenu.DistrictId
-                        //));
-
-                        //if (!exists)
                         list.Add(newMenu);
                     }
 
@@ -521,8 +512,6 @@ namespace McDermott.Web.Components.Pages.Config
                                 ev.DistrictId == village.DistrictId
                             )
                         ).ToList();
-
-                        // At this point, `duplicates` contains all the duplicate VillageDto entries based on the specified properties.
 
                         await Mediator.Send(new CreateListVillageRequest(list));
                         await LoadData(0, pageSize);

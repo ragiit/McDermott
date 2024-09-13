@@ -55,9 +55,9 @@ namespace McDermott.Application.Features.Queries.Transaction
                 //var pagedResult = query
                 //            .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
                 var totalCount = await query.CountAsync(cancellationToken);
+
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = query
                             .Skip(skip)

@@ -1,5 +1,4 @@
-﻿
-using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
@@ -28,12 +27,11 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.ResultType, $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)

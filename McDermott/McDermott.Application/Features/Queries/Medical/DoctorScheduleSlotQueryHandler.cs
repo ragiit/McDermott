@@ -19,8 +19,8 @@ namespace McDermott.Application.Features.Queries.Medical
             try
             {
                 var query = _unitOfWork.Repository<DoctorScheduleSlot>().Entities
-                    .Include(x=>x.Physician)
-                    .Include(x=>x.DoctorSchedule)
+                    .Include(x => x.Physician)
+                    .Include(x => x.DoctorSchedule)
                     .AsNoTracking()
                     .AsQueryable();
 
@@ -28,16 +28,15 @@ namespace McDermott.Application.Features.Queries.Medical
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.StartDate.ToString(), $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.WorkFrom.ToString(), $"%{request.SearchTerm}%")||
+                        EF.Functions.Like(v.WorkFrom.ToString(), $"%{request.SearchTerm}%") ||
                         EF.Functions.Like(v.WorkTo.ToString(), $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
                             .OrderBy(x => x.StartDate);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)

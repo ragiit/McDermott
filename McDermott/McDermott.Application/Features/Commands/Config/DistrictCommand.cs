@@ -13,6 +13,11 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateDistrictQuery(List<DistrictDto> DistrictsToValidate) : IRequest<List<DistrictDto>>
+        {
+            public List<DistrictDto> DistrictsToValidate { get; } = DistrictsToValidate;
+        }
+
         public class ValidateDistrictQuery(Expression<Func<District, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<District, bool>> Predicate { get; } = predicate!;

@@ -6,7 +6,6 @@ using static McDermott.Application.Features.Commands.Transaction.AccidentCommand
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 using System.Text.Json;
-using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Components.Web;
 using Blazor.Extensions.Canvas.Canvas2D;
 using Blazor.Extensions;

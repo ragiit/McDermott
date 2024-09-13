@@ -17,8 +17,8 @@ namespace McDermott.Application.Features.Queries.Medical
             try
             {
                 var query = _unitOfWork.Repository<BuildingLocation>().Entities
-                    .Include(x=>x.Building)
-                    .Include(x=>x.Location)
+                    .Include(x => x.Building)
+                    .Include(x => x.Location)
                     .AsNoTracking()
                     .AsQueryable();
 
@@ -29,12 +29,12 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.LocationId.ToString(), $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
+
                 var pagedResult = query
                             .OrderBy(x => x.BuildingId);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)

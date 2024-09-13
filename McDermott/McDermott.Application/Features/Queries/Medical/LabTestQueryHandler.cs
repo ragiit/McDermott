@@ -1,5 +1,4 @@
-﻿
-using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
@@ -18,7 +17,7 @@ namespace McDermott.Application.Features.Queries.Medical
             try
             {
                 var query = _unitOfWork.Repository<LabTest>().Entities
-                    .Include(x=>x.SampleType)
+                    .Include(x => x.SampleType)
                     .AsNoTracking()
                     .AsQueryable();
 
@@ -29,12 +28,12 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
+
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)
