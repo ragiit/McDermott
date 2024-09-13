@@ -66,7 +66,7 @@ namespace McDermott.Web.Components.Pages.Medical
             var HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
             this.HealthCenters = HealthCenters.Item1;
             var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            this.Locations = Locations.Item1;
+            this.Locations = Locations;
 
             await GetUserInfo();
             await LoadData();
@@ -235,8 +235,8 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 if (Building != null)
                 {
-                    var DeletedBuildingLocations = await Mediator.Send(new GetBuildingLocationQuery(x => x.BuildingId == Building.Id));
-                    this.DeletedBuildingLocations = DeletedBuildingLocations.Item1;
+                    var DeletedBuildingLocations = (await Mediator.Send(new GetBuildingLocationQuery(x => x.BuildingId == Building.Id))).Item1;
+                    this.DeletedBuildingLocations = DeletedBuildingLocations;
                     BuildingLocations = [.. this.DeletedBuildingLocations];
                 }
             }

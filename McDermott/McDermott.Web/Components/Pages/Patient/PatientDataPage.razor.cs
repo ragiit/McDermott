@@ -374,7 +374,7 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 IsVaccinations = true;
                 IsLoadingGeneralConsultantServiceVaccinations = true;
-                GeneralConsultanServiceVaccinations = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"));
+                GeneralConsultanServiceVaccinations = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"))).Item1;
                 IsLoadingGeneralConsultantServiceVaccinations = false;
                 return;
             }

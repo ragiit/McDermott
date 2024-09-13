@@ -143,7 +143,7 @@ namespace McDermott.Web.Components.Pages.Employee
                 Users = await Mediator.Send(new GetUserQuery());
                 CPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
                 var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
-                this.Diagnoses = diagnoses.Item1;
+                this.Diagnoses = Diagnoses;
 
                 foreach (var item in SickLeaves)
                 {

@@ -940,7 +940,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = true;
             try
             {
-                GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).Item1.FirstOrDefault() ?? new();
                 UserForm = GeneralConsultanService.Patient ?? new();
                 Physicions = (await Mediator.Send(new GetUserQuery(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(GeneralConsultanService.ServiceId.GetValueOrDefault()))));
                 GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == GeneralConsultanService.PatientId) ?? new();
@@ -1134,7 +1134,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 TypeMedical = "Annual MCU",
             };
             SelectedDataItems = [];
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "MCU" && x.IsMcu == true));
+            GeneralConsultanServices = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "MCU" && x.IsMcu == true))).Item1;
 
             statusMcuData = GetStatusMcuCounts(GeneralConsultanServices);
 

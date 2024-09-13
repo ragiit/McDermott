@@ -74,7 +74,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                             ShowForm = true;
                             IsLoading = true;
                             Id = id;
-                            GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).FirstOrDefault() ?? new();
+                            GeneralConsultanService = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).Item1).Item1.FirstOrDefault() ?? new();
 
                             await LoadSelectedData();
                             IsLoading = false;
@@ -176,7 +176,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task LoadPoints()
         {
-            var dto = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).FirstOrDefault(); // Gantilah ID sesuai kebutuhan
+            var dto = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).Item1.FirstOrDefault(); // Gantilah ID sesuai kebutuhan
 
             if (dto != null)
             {
@@ -365,7 +365,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (GeneralConsultanService.Id == 0)
                     return;
 
-                var gen = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
+                var gen = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).Item1.FirstOrDefault() ?? new();
                 var accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == gen.Id))).FirstOrDefault() ?? new();
                 isPrint = true;
                 var mergeFields = new Dictionary<string, string>
@@ -1309,7 +1309,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             PanelVisible = true;
             ShowForm = false;
             SelectedDataItems = [];
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "Accident"));
+            GeneralConsultanServices = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.TypeRegistration == "Accident"))).Item1;
             // Populate the Accident property
             foreach (var service in GeneralConsultanServices)
             {
@@ -1499,7 +1499,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).FirstOrDefault() ?? new();
+                GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).Item1.FirstOrDefault() ?? new();
                 UserForm = GeneralConsultanService.Patient ?? new();
                 //NavigationManager.NavigateTo($"clinic-service/accident?id={GeneralConsultanService.Id}");
                 //Id = GeneralConsultanService.Id;

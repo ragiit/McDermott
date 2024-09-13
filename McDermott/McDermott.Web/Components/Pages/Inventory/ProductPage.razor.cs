@@ -278,7 +278,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
                 Medicaments = await Mediator.Send(new GetMedicamentQuery());
                 var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-                this.Locations = Locations.Item1;
+                this.Locations = Locations;
 
                 getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
 

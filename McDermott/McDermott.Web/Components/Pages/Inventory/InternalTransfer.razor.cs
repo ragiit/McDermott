@@ -133,7 +133,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            this.Locations = Locations.Item1;
+            this.Locations = Locations;
             Products = await Mediator.Send(new GetProductQuery());
             Uoms = await Mediator.Send(new GetUomQuery());
             UomName = Uoms.Select(x => x.Name).FirstOrDefault();
