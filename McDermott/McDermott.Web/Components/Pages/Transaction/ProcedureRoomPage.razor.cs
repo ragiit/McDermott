@@ -221,7 +221,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         new YesNoOptions { Text = "No", Value = false }
     };
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
             PertamaKali = true;
@@ -639,7 +639,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
-                    var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == ((GeneralConsultanMedicalSupportDto)e.DataItem).GeneralConsultanServiceId))).FirstOrDefault();
+                    var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == ((GeneralConsultanMedicalSupportDto)e.DataItem).GeneralConsultanServiceId))).Item1.FirstOrDefault();
 
                     if (u is not null)
                     {
@@ -654,7 +654,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var selectedItems = SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>();
                     foreach (var item in selectedItems)
                     {
-                        var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == item.GeneralConsultanServiceId))).FirstOrDefault();
+                        var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == item.GeneralConsultanServiceId))).Item1.FirstOrDefault();
 
                         if (u is not null)
                         {

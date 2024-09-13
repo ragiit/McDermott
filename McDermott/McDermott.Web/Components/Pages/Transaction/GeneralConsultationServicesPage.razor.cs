@@ -1850,7 +1850,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 IsHistoricalRecordPatient = true;
                 IsLoadingHistoricalRecordPatient = true;
-                GeneralConsultanServicesHistoricalMR = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == GeneralConsultanService.PatientId))).Item1.Item1.OrderBy(x => x.RegistrationDate).ToList();
+                GeneralConsultanServicesHistoricalMR = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == GeneralConsultanService.PatientId))).Item1.OrderBy(x => x.RegistrationDate).ToList();
                 IsLoadingHistoricalRecordPatient = false;
             }
             IsLoadingHistoricalRecordPatient = false;
@@ -2012,7 +2012,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                var patient = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != ReferToGeneralConsultanService.Id && x.ServiceId == ReferToGeneralConsultanService.ServiceId && x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1).Item1;
+                var patient = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != ReferToGeneralConsultanService.Id && x.ServiceId == ReferToGeneralConsultanService.ServiceId && x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1);
 
                 if (patient.Count > 0)
                 {
@@ -2134,7 +2134,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     case EnumStatusGeneralConsultantService.Planned:
 
-                        var patient = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1).Item1;
+                        var patient = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1);
 
                         if (patient.Count > 0)
                         {

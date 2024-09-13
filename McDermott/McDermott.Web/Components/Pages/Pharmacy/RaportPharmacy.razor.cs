@@ -374,12 +374,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             long totalPatiens = 0;
             int counts = 0;
 
-            foreach (var item in generals.Item1)
+            foreach (var item in generals)
             {
                 if (namee.Contains(item.Service?.Name!))
                     continue;
 
-                long count = generals.Item1.Where(x => x.ServiceId == item.ServiceId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
+                long count = generals.Where(x => x.ServiceId == item.ServiceId && x.RegistrationDate.Date == item.RegistrationDate.Date).Count();
 
                 ws.Cells[startRow, 1].Value = item.RegistrationDate.Date.ToString("dd/MM/yyyy", cultureInfo);
                 ws.Cells[startRow, 2].Value = item.Service?.Name;
@@ -452,12 +452,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             long totalPatiens = 0;
             int counts = 0;
 
-            foreach (var item in generals.Item1)
+            foreach (var item in generals)
             {
                 if (namee.Contains(item.Patient?.Department?.Name!))
                     continue;
 
-                long count = generals.Item1.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId).Count();
+                long count = generals.Where(x => x.Patient?.DepartmentId == item.Patient?.DepartmentId).Count();
 
                 ws.Cells[startRow, 1].Value = item.Patient?.Department?.Name;
                 ws.Cells[startRow, 2].Value = count;

@@ -609,6 +609,33 @@ namespace McDermott.Web.Components.Pages.Transaction
     "Other",
     ];
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+
         private Task OnSelectedFoodAllergiesChanged(IEnumerable<AllergyDto> selectedFoodAllergies)
         {
             SelectedFoodAllergies = selectedFoodAllergies;
@@ -778,7 +805,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             PanelVisible = true;
             var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            GeneralConsultanServices = result.Item1.Where(x => x.Service != null && x.Service.IsVaccination == true).ToList()s;
+            GeneralConsultanServices = result.Item1.Where(x => x.Service != null && x.Service.IsVaccination == true).ToList();
             PanelVisible = false;
         }
 
@@ -1008,6 +1035,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var prev = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x
                         => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished)))
+                        .Item1
                         .OrderByDescending(x => x.CreatedDate)
                         .FirstOrDefault() ?? new();
 
