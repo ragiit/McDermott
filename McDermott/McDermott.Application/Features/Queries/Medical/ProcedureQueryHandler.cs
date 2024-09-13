@@ -1,5 +1,4 @@
-﻿
-using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
@@ -25,16 +24,16 @@ namespace McDermott.Application.Features.Queries.Medical
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code_Test, $"%{request.SearchTerm}%")||
+                        EF.Functions.Like(v.Code_Test, $"%{request.SearchTerm}%") ||
                         EF.Functions.Like(v.Classification, $"%{request.SearchTerm}%"));
                 }
+
+                var totalCount = await query.CountAsync(cancellationToken);
 
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)

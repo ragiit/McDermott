@@ -750,7 +750,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                     ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
 
-                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
+                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
                 }
                 catch (Exception ex)
                 {

@@ -6179,7 +6179,7 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.Diagnosis", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.CronisCategory", "CronisKategory")
+                    b.HasOne("McDermott.Domain.Entities.CronisCategory", "CronisCategory")
                         .WithMany()
                         .HasForeignKey("CronisCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -6189,7 +6189,7 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("DiseaseCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("CronisKategory");
+                    b.Navigation("CronisCategory");
 
                     b.Navigation("DiseaseCategory");
                 });

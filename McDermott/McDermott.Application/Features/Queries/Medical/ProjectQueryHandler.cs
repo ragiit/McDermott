@@ -1,11 +1,11 @@
-﻿
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Reflection.Metadata;
 using System.Threading;
 using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
+
 namespace McDermott.Application.Features.Queries.Config
 {
     public class ProjectQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
@@ -33,12 +33,11 @@ namespace McDermott.Application.Features.Queries.Config
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)

@@ -87,6 +87,11 @@ namespace McDermott.Web.Components.Pages.Config
             [
                 new()
                 {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
                     Column = "Province",
                     Notes = "Mandatory"
                 },
@@ -94,12 +99,7 @@ namespace McDermott.Web.Components.Pages.Config
                 {
                     Column = "City",
                     Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
+                }
             ]);
         }
 
@@ -118,28 +118,51 @@ namespace McDermott.Web.Components.Pages.Config
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Province", "City", "Name" };
+                    var headerNames = new List<string>() { "Name", "Province", "City" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                        .Any(i => !headerNames[i - 1].Trim().Equals(ws.Cells[1, i].Value?.ToString()?.Trim().ToLower(), StringComparison.CurrentCultureIgnoreCase)))
                     {
                         ToastService.ShowInfo("The header must match with the template.");
                         return;
                     }
 
                     var list = new List<DistrictDto>();
-                    var parentCache = new List<CityDto>();
-                    var parentProvinceCache = new List<ProvinceDto>();
+
+                    var provinceNames = new HashSet<string>();
+                    var cityNames = new HashSet<string>();
+
+                    var list1 = new List<ProvinceDto>();
+                    var list2 = new List<CityDto>();
+
+                    // First loop: Collect unique province, city, and district names
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var prov = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var city = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(prov))
+                            provinceNames.Add(prov.ToLower());
+
+                        if (!string.IsNullOrEmpty(city))
+                            cityNames.Add(city.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name), 0, 0))).Item1;
+                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name), 0, 0))).Item1;
+
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         bool isValid = true;
 
                         long? provinceId = null;
-                        var province = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var province = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var city = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
                         // Cari parent di cache atau database
                         if (!string.IsNullOrEmpty(province))
                         {
-                            var cachedParent = parentProvinceCache.FirstOrDefault(x => x.Name == province);
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(province, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
                                 var parentMenu = (await Mediator.Send(new GetProvinceQuery(x =>
@@ -154,7 +177,7 @@ namespace McDermott.Web.Components.Pages.Config
                                 else
                                 {
                                     provinceId = parentMenu.Id;
-                                    parentProvinceCache.Add(parentMenu);
+                                    list1.Add(parentMenu);
                                 }
                             }
                             else
@@ -164,10 +187,9 @@ namespace McDermott.Web.Components.Pages.Config
                         }
 
                         long? cityId = null;
-                        var city = ws.Cells[row, 2].Value?.ToString()?.Trim();
                         if (!string.IsNullOrEmpty(city))
                         {
-                            var cachedParent = parentProvinceCache.FirstOrDefault(x => x.Name == city);
+                            var cachedParent = list2.FirstOrDefault(x => x.Name.Equals(city, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
                                 var parentMenu = (await Mediator.Send(new GetCityQuery(x =>
@@ -182,7 +204,7 @@ namespace McDermott.Web.Components.Pages.Config
                                 else
                                 {
                                     cityId = parentMenu.Id;
-                                    parentCache.Add(parentMenu);
+                                    list2.Add(parentMenu);
                                 }
                             }
                             else
@@ -191,7 +213,6 @@ namespace McDermott.Web.Components.Pages.Config
                             }
                         }
 
-                        // Lewati baris jika tidak valid
                         if (!isValid)
                             continue;
 
@@ -214,6 +235,19 @@ namespace McDermott.Web.Components.Pages.Config
                     if (list.Count > 0)
                     {
                         list = list.DistinctBy(x => new { x.ProvinceId, x.Name, x.CityId }).ToList();
+
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateDistrictQuery(list));
+
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.ProvinceId == village.ProvinceId &&
+                                ev.CityId == village.CityId
+                            )
+                        ).ToList();
+
                         await Mediator.Send(new CreateListDistrictRequest(list));
                         await LoadData(0, pageSize);
                         SelectedDataItems = [];

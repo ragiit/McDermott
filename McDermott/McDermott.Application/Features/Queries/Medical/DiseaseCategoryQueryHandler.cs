@@ -28,12 +28,11 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.ParentCategory, $"%{request.SearchTerm}%"));
                 }
 
+                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)
@@ -57,7 +56,6 @@ namespace McDermott.Application.Features.Queries.Medical
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
-
 
         #endregion GET
 

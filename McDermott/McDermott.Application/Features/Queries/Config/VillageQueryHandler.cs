@@ -47,7 +47,7 @@ namespace McDermott.Application.Features.Queries.Config
         //        var pagedResult = query
         //                    .OrderBy(x => x.Name);
 
-        //        var skip = (request.PageIndex) * request.PageSize;
+        //                        var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
         //        var totalCount = await query.CountAsync(cancellationToken);
 
@@ -99,9 +99,8 @@ namespace McDermott.Application.Features.Queries.Config
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
                 var totalCount = await query.CountAsync(cancellationToken);
+                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
 
                 var paged = pagedResult
                             .Skip(skip)
