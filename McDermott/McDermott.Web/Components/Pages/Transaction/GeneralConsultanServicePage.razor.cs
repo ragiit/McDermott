@@ -1726,7 +1726,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             });
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
-            NursingDiagnoses = ((await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;).Item1;
+            NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;
             //LabTests = (await Mediator.Send(new GetLabTestQuery())).Item1;
 
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp

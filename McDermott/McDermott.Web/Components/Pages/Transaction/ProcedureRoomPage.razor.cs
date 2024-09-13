@@ -612,7 +612,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
-                    var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == ((GeneralConsultanMedicalSupportDto)e.DataItem).GeneralConsultanServiceId))).FirstOrDefault();
+                    var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == ((GeneralConsultanMedicalSupportDto)e.DataItem).GeneralConsultanServiceId))).Item1.FirstOrDefault();
 
                     if (u is not null)
                     {
@@ -627,7 +627,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     var selectedItems = SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>();
                     foreach (var item in selectedItems)
                     {
-                        var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == item.GeneralConsultanServiceId))).FirstOrDefault();
+                        var u = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == item.GeneralConsultanServiceId))).Item1.FirstOrDefault();
 
                         if (u is not null)
                         {
@@ -820,7 +820,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //GeneralConsultanMedicalSupport.SignatureEmployeeImagesMedicalHistory = Encoding.UTF8.GetBytes($"data:image/png;base64, {GeneralConsultanMedicalSupport.SignatureEmployeeImagesMedicalHistoryBase64}");
             //GeneralConsultanMedicalSupport.SignatureEximinedDoctor = Encoding.UTF8.GetBytes($"data:image/png;base64, {GeneralConsultanMedicalSupport.SignatureEximinedDoctorBase64}");
 
-            var generalConsultanService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId));
+            var generalConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId))).Item1;
 
             if (generalConsultanService.Count == 0)
                 return;

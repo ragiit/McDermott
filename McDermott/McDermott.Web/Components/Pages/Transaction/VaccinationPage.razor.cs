@@ -776,7 +776,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadData()
         {
             PanelVisible = true;
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Service != null && x.Service.IsVaccination == true));
+            GeneralConsultanServices = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Service != null && x.Service.IsVaccination == true))).Item1;
             PanelVisible = false;
         }
 
@@ -1006,6 +1006,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     var prev = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x
                         => x.PatientId == GeneralConsultanService.PatientId && x.Id < GeneralConsultanService.Id && x.Status == EnumStatusGeneralConsultantService.Finished)))
+                        .Item1
                         .OrderByDescending(x => x.CreatedDate)
                         .FirstOrDefault() ?? new();
 

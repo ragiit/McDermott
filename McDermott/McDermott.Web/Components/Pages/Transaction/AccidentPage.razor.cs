@@ -74,7 +74,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                             ShowForm = true;
                             IsLoading = true;
                             Id = id;
-                            GeneralConsultanService = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).Item1).Item1.FirstOrDefault() ?? new();
+                            GeneralConsultanService = ((await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).Item1).FirstOrDefault() ?? new();
 
                             await LoadSelectedData();
                             IsLoading = false;
