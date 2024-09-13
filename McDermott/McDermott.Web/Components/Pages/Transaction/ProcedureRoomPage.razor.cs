@@ -152,6 +152,33 @@ namespace McDermott.Web.Components.Pages.Transaction
             NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
         }
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+
         private void OnSelectEmployee(UserDto e)
         {
             if (e is null)
@@ -820,7 +847,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //GeneralConsultanMedicalSupport.SignatureEmployeeImagesMedicalHistory = Encoding.UTF8.GetBytes($"data:image/png;base64, {GeneralConsultanMedicalSupport.SignatureEmployeeImagesMedicalHistoryBase64}");
             //GeneralConsultanMedicalSupport.SignatureEximinedDoctor = Encoding.UTF8.GetBytes($"data:image/png;base64, {GeneralConsultanMedicalSupport.SignatureEximinedDoctorBase64}");
 
-            var generalConsultanService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId));
+            var generalConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanMedicalSupport.GeneralConsultanServiceId))).Item1;
 
             if (generalConsultanService.Count == 0)
                 return;

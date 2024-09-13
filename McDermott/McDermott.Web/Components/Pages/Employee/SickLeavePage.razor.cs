@@ -34,7 +34,9 @@ namespace McDermott.Web.Components.Pages.Employee
 
         public byte[]? DocumentContent;
         private IGrid Grid { get; set; }
+        private Timer _timer;
         private bool IsLoading { get; set; } = false;
+        private bool PanelVisible {  get; set; }
         private bool isPrint { get; set; } = false;
         private bool isShow { get; set; } = false;
         private bool Employee { get; set; } = false;
@@ -82,20 +84,56 @@ namespace McDermott.Web.Components.Pages.Employee
 
         #endregion UserLoginAndAccessRole
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         #region async Data
 
         protected override async Task OnInitializedAsync()
         {
+            PanelVisible = true;
+            await LoadData();
+            await GetUserInfo();
+            PanelVisible = false;
+
+            return;
+
             try
             {
+                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
                 await GetUserInfo();
             }
-            catch { }
-
-            await LoadData();
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             try
             {

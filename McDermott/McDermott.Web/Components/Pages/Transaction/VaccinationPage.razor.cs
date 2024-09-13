@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using MailKit.Search;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel;
@@ -773,10 +774,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             NavigationManager.NavigateTo(Url);
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            GeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Service != null && x.Service.IsVaccination == true));
+            var result = await Mediator.Send(new GetGeneralConsultanServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            GeneralConsultanServices = result.Item1.Where(x => x.Service != null && x.Service.IsVaccination == true).ToList()s;
             PanelVisible = false;
         }
 
@@ -1052,7 +1054,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
-                        var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                        var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1;
 
                         if (patient.Count > 0)
                         {
@@ -1262,7 +1264,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     case EnumStatusGeneralConsultantService.Planned:
 
-                        var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                        var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1;
 
                         if (patient.Count > 0)
                         {

@@ -363,7 +363,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[7, 1].Style.Font.Bold = true;
             ws.Cells[9, 3].Style.Font.Bold = true;
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+            var generals = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date))).Item1;
 
             ws.Cells[9, 1].Value = "Date";
             ws.Cells[9, 2].Value = "Service";
@@ -442,7 +442,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ws.Cells[6, 1].Style.Font.Bold = true;
             ws.Cells[7, 1].Style.Font.Bold = true;
 
-            var generals = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date));
+            var generals = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.CreatedDate.GetValueOrDefault().Date >= FormReports.StartDate.GetValueOrDefault().Date && x.CreatedDate.GetValueOrDefault().Date <= FormReports.EndDate.GetValueOrDefault().Date))).Item1;
 
             ws.Cells[9, 1].Value = "Departement";
             ws.Cells[9, 2].Value = "Total Patients";
