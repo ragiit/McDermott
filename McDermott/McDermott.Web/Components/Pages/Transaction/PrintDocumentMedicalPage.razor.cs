@@ -99,7 +99,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 PanelVisible = true;
-                getGeneralConsultanServices = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Ids));
+                getGeneralConsultanServices = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Ids))).Item1;
             }
             catch { }
             finally

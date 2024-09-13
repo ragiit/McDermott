@@ -163,7 +163,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 getEquipment = await Mediator.Send(new GetProductQuery(x => x.HospitalType == "Medical Equipment"));
                 getRequestBy = await Mediator.Send(new GetUserQuery());
                 var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-                this.getLocation = Locations.Item1;
+                this.getLocation = Locations;
                 getResponsibleBy = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
             }
             catch (Exception ex)

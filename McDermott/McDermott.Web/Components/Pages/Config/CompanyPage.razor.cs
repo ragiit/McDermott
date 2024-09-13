@@ -78,7 +78,7 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             SelectedDataItems = [];
             var Companys = (await Mediator.Send(new GetCompanyQuery())).Item1;
-            this.Companys = Companys.Item1;
+            this.Companys = Companys;
             //DetailCompanies = [.. Companys.ToList()];
             PanelVisible = false;
         }

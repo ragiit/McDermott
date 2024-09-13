@@ -120,7 +120,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     ShowForm = false;
                     ToastService.ShowInfo(genserv.ToString());
-                    GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == genSetValue.ToString().ToLong()))).FirstOrDefault() ?? new();
+                    GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == genSetValue.ToString().ToLong()))).Item1.FirstOrDefault() ?? new();
                     ShowForm = true;
                 }
                 PanelVisible = false;
@@ -142,8 +142,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             Employees = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true && x.IsPatient == true));
             var LabUoms = await Mediator.Send(new GetLabUomQuery());
             this.LabUoms = LabUoms.Item1;
-            var LabTests = await Mediator.Send(new GetLabTestQuery());
-            this.LabTests = LabTests.Item1;
+            var LabTests = (await Mediator.Send(new GetLabTestQuery())).Item1;
+            this.LabTests = LabTests;
             Doctors = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
             groups = result2.Item1;

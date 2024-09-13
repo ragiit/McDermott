@@ -80,9 +80,9 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = true;
 
             var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            this.Locations = Locations.Item1;
+            this.Locations = Locations;
             var Companies = (await Mediator.Send(new GetCompanyQuery())).Item1;
-            this.Companies = Companies.Item1;
+            this.Companies = Companies;
             Uoms = await Mediator.Send(new GetUomQuery());
             Products = await Mediator.Send(new GetProductQuery());
             AllProducts = Products.Select(x => x).ToList();

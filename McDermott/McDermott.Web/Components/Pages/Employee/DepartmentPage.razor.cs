@@ -62,7 +62,7 @@
             SelectedDataItems = new ObservableRangeCollection<object>();
 
             var Companys = (await Mediator.Send(new GetCompanyQuery())).Item1;
-            this.Companies = Companys.Item1;
+            this.Companies = Companys;
 
             await GetUserInfo();
             await LoadData();

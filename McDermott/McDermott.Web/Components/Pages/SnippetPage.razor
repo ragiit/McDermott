@@ -372,13 +372,13 @@
         PanelVisible = true;
         ShowForm = false;
         SelectedDataItems = [];
-        LabTests = await Mediator.Send(new GetLabTestQuery());
+        LabTests = (await Mediator.Send(new GetLabTestQuery())).Item1;
         PanelVisible = false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-    LabUoms = await Mediator.Send(new GetLabUomQuery());
+        LabUoms = (await Mediator.Send(new GetLabUomQuery())).Item1;
         await LoadData();
     }
 
@@ -509,7 +509,7 @@
     private async Task LoadLabTestDetails()
     {
         SelectedDetailDataItems = [];
-        LabTestDetailForms = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id));
+        LabTestDetailForms = (await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id))).Item1;
     }
 
     private async Task SaveItemLabTest()

@@ -91,7 +91,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            Insurances = await Mediator.Send(new GetInsuranceQuery());
+            Insurances = (await Mediator.Send(new GetInsuranceQuery())).Item1;
 
             await GetUserInfo();
             await LoadData();

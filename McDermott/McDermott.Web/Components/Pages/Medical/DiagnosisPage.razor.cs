@@ -69,7 +69,7 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
             var Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
-            this.Diagnoses = Diagnoses.Item1;
+            this.Diagnoses = Diagnoses;
             PanelVisible = false;
         }
 

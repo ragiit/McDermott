@@ -212,7 +212,7 @@ namespace McDermott.Web.Components.Pages.Queue
             var schedules = await Mediator.Send(new GetDoctorScheduleQuery(x => x.ServiceId == FormKios.ServiceId && x.PhysicionIds != null && x.PhysicionIds.Contains(FormKios.PhysicianId.GetValueOrDefault())));
             if (schedules.Count > 0)
             {
-                DoctorScheduleSlots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.DoctorScheduleId == schedules[0].Id && x.PhysicianId == FormKios.PhysicianId));
+                DoctorScheduleSlots = (await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.DoctorScheduleId == schedules[0].Id && x.PhysicianId == FormKios.PhysicianId))).Item1;
             }
         }
 

@@ -235,7 +235,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (Id == 0)
                 return;
 
-            generalConsultantService = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id));
+            generalConsultantService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).Item1;
             if (generalConsultantService.Count == 0 || generalConsultantService is null)
                 return;
 
@@ -2594,7 +2594,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 DateTime? startSickLeave = null;
                 DateTime? endSickLeave = null;
-                var gc = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == Pharmacy.PatientId))).FirstOrDefault();
+                var gc = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == Pharmacy.PatientId))).Item1.FirstOrDefault();
                 var culture = new System.Globalization.CultureInfo("id-ID");
 
                 var patienss = Patients.Where(x => x.Id == Pharmacy.PatientId).FirstOrDefault() ?? new();

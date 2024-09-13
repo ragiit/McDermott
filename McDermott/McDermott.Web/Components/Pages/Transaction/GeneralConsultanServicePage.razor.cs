@@ -238,7 +238,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    var patient = await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.Status!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date));
+                    var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == FormRegis.PatientId && x.Status!.Equals("Planned") && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1;
 
                     if (patient.Count > 0)
                     {
@@ -1726,8 +1726,8 @@ namespace McDermott.Web.Components.Pages.Transaction
             });
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
-            NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;
-            //LabTests = await Mediator.Send(new GetLabTestQuery());
+            NursingDiagnoses = ((await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;).Item1;
+            //LabTests = (await Mediator.Send(new GetLabTestQuery())).Item1;
 
             var nursingDiagnosesTemps = NursingDiagnoses.Select(x => new NursingDiagnosesTemp
             {
@@ -2882,8 +2882,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         {
             var LabUoms = await Mediator.Send(new GetLabUomQuery());
             this.LabUoms = LabUoms.Item1;
-            var LabTests = await Mediator.Send(new GetLabTestQuery());
-            this.LabTests = LabTests.Item1;
+            var LabTests = (await Mediator.Send(new GetLabTestQuery())).Item1;
+            this.LabTests = LabTests;
 
             LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
 
