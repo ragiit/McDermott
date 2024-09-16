@@ -1,0 +1,80 @@
+await LoadDataVillage(0, 10);
+
+ #region ComboboxVillage
+
+ private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
+ private int VillageComboBoxIndex { get; set; } = 0;
+ private int totalCountVillage = 0;
+
+ private async Task OnSearchVillage()
+ {
+     await LoadDataVillage(0, 10);
+ }
+
+ private async Task OnSearchVillageIndexIncrement()
+ {
+     if (VillageComboBoxIndex < (totalCountVillage - 1))
+     {
+         VillageComboBoxIndex++;
+         await LoadDataVillage(VillageComboBoxIndex, 10);
+     }
+ }
+
+ private async Task OnSearchVillagendexDecrement()
+ {
+     if (VillageComboBoxIndex > 0)
+     {
+         VillageComboBoxIndex--;
+         await LoadDataVillage(VillageComboBoxIndex, 10);
+     }
+ }
+
+ private async Task OnInputVillageChanged(string e)
+ {
+     VillageComboBoxIndex = 0;
+     await LoadDataVillage(0, 10);
+ }
+
+ private async Task LoadDataVillage(int pageIndex = 0, int pageSize = 10)
+ {
+     PanelVisible = true;
+     SelectedDataItems = [];
+     var result = await Mediator.Send(new GetVillageQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refVillageComboBox?.Text ?? ""));
+     Villages = result.Item1;
+     totalCountVillage = result.pageCount;
+     PanelVisible = false;
+ }
+
+ #endregion ComboboxVillage
+
+
+
+
+
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Village" ColSpanMd="12">
+    <MyDxComboBox Data="@Villages"
+                  NullText="Select Village..."
+                  @ref="refVillageComboBox"
+                  @bind-Value="@a.VillageId"
+                  TextFieldName="Name"
+                  ValueFieldName="Id"
+                  TextChanged="((string e) => OnInputVillageChanged(e))">
+        <Buttons>
+            <DxEditorButton Click="OnSearchVillagendexDecrement"
+                            IconCssClass="fa-solid fa-caret-left"
+                            Tooltip="Previous Index" />
+            <DxEditorButton Click="OnSearchVillage"
+                            IconCssClass="fa-solid fa-magnifying-glass"
+                            Tooltip="Search" />
+            <DxEditorButton Click="OnSearchVillageIndexIncrement"
+                            IconCssClass="fa-solid fa-caret-right"
+                            Tooltip="Next Index" />
+        </Buttons>
+        <Columns>
+            <DxListEditorColumn FieldName="@nameof(VillageDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Village.Name" Caption="Village" />
+            <DxListEditorColumn FieldName="@nameof(VillageDto.Code)" Caption="Code" />
+        </Columns>
+    </MyDxComboBox>
+    <ValidationMessage For="@(()=>a.VillageId)" />
+</DxFormLayoutItem>
