@@ -24,6 +24,25 @@ namespace McDermott.Web.Extentions
             ToastService.ShowSuccess($"{count} items were successfully imported.");
         }
 
+        public static string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
+        public static readonly List<string> IdentityTypes =
+        [
+            "KTP",
+            "Paspor",
+            "SIM",
+            "VISA",
+        ];
+
+        public static readonly List<string> MartialStatuss =
+        [
+            "Single",
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Separated",
+            "Unmarried"
+        ];
+
         public static List<string> URLS =
         [
             // Clinic Services

@@ -1,13 +1,29 @@
 ﻿using DevExpress.Data.Access;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
+using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
-namespace McDermott.Web.Components.Pages.Config
+namespace McDermott.Web.Components.Pages.Config.Users
 {
-    public partial class CreateUpdateGroupPage
+    public partial class CreateUpdateUserPage
     {
+        private List<UserDto> Users = new();
+        private UserDto UserForm = new();
+        public List<CountryDto> Countries = [];
+        public List<ProvinceDto> Provinces = [];
+        public List<CityDto> Cities = [];
+        public List<DistrictDto> Districts = [];
+        public List<VillageDto> Villages = [];
+        private List<OccupationalDto> Occupationals = [];
+        public List<GroupDto> Groups = [];
+        public List<ReligionDto> Religions = [];
+        public List<GenderDto> Genders = [];
+        public List<DepartmentDto> Departments = [];
+        public List<JobPositionDto> JobPositions = [];
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -43,7 +59,7 @@ namespace McDermott.Web.Components.Pages.Config
         private bool PanelVisible { get; set; } = true;
 
         [SupplyParameterFromQuery]
-        private long? Id { get; set; }
+        private long? Id { get; set; } 
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
@@ -57,12 +73,12 @@ namespace McDermott.Web.Components.Pages.Config
 
         [SupplyParameterFromForm]
         private GroupDto Group { get; set; } = new();
+        private char Placeholder { get; set; } = '_';
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndexGroupMenu { get; set; }
-        private int FocusedRowVisibleIndexGroupMenuGroupMenu { get; set; }
-        private List<GroupDto> Groups = new();
+        private int FocusedRowVisibleIndexGroupMenuGroupMenu { get; set; } 
         private List<GroupMenuDto> GroupMenus = [];
         private List<GroupMenuDto> DeletedGroupMenus = [];
         private List<MenuDto> Menus = [];
@@ -302,7 +318,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 if (result.Item1.Count == 0 || !Id.HasValue)
                 {
-                    NavigationManager.NavigateTo("configuration/groups");
+                    NavigationManager.NavigateTo("configuration/users");
                     return;
                 }
 
@@ -436,7 +452,7 @@ namespace McDermott.Web.Components.Pages.Config
             //SelectedDataItemsGroupMenu = [];
             //ShowForm = false;
 
-            NavigationManager.NavigateTo("configuration/groups");
+            NavigationManager.NavigateTo("configuration/users");
         }
 
         private async Task SaveItemGroupMenuGridGropMenu_Click()
@@ -521,7 +537,7 @@ namespace McDermott.Web.Components.Pages.Config
                 //}
 
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
+                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
             }
             else
             {
@@ -557,7 +573,7 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new CreateListGroupMenuRequest(request));
 
                     ShowForm = false;
-                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
+                    NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
 
                     await LoadData();
 
@@ -592,7 +608,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
 
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update}?Id={result.Id}", true);
+                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update}?Id={result.Id}", true);
             }
 
             ShowForm = false;
@@ -821,7 +837,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                     ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
 
-                    //NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
+                    //NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
                 }
                 catch (Exception ex)
                 {
@@ -976,5 +992,328 @@ namespace McDermott.Web.Components.Pages.Config
             //        NavigationManager.NavigateTo("menus");
             //}
         }
+
+        #region ComboboxVillage
+
+        private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
+        private int VillageComboBoxIndex { get; set; } = 0;
+        private int totalCountVillage = 0;
+
+        private async Task OnSearchVillage()
+        {
+            await LoadDataVillage(0, 10);
+        }
+
+        private async Task OnSearchVillageIndexIncrement()
+        {
+            if (VillageComboBoxIndex < (totalCountVillage - 1))
+            {
+                VillageComboBoxIndex++;
+                await LoadDataVillage(VillageComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchVillagendexDecrement()
+        {
+            if (VillageComboBoxIndex > 0)
+            {
+                VillageComboBoxIndex--;
+                await LoadDataVillage(VillageComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputVillageChanged(string e)
+        {
+            VillageComboBoxIndex = 0;
+            await LoadDataVillage(0, 10);
+        }
+
+        private async Task LoadDataVillage(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetVillageQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refVillageComboBox?.Text ?? ""));
+            Villages = result.Item1;
+            totalCountVillage = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxVillage 
+        #region ComboboxCountry
+
+        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
+        private int CountryComboBoxIndex { get; set; } = 0;
+        private int totalCountCountry = 0;
+
+        private async Task OnSearchCountry()
+        {
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task OnSearchCountryIndexIncrement()
+        {
+            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            {
+                CountryComboBoxIndex++;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCountryndexDecrement()
+        {
+            if (CountryComboBoxIndex > 0)
+            {
+                CountryComboBoxIndex--;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCountryChanged(string e)
+        {
+            CountryComboBoxIndex = 0;
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            Countries = result.Item1;
+            totalCountCountry = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCountry
+        #region ComboboxCity
+
+        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
+        private int CityComboBoxIndex { get; set; } = 0;
+        private int totalCountCity = 0;
+
+        private async Task OnSearchCity()
+        {
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task OnSearchCityIndexIncrement()
+        {
+            if (CityComboBoxIndex < (totalCountCity - 1))
+            {
+                CityComboBoxIndex++;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCityndexDecrement()
+        {
+            if (CityComboBoxIndex > 0)
+            {
+                CityComboBoxIndex--;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCityChanged(string e)
+        {
+            CityComboBoxIndex = 0;
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+            Cities = result.Item1;
+            totalCountCity = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCity 
+        #region ComboboxProvince
+
+        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+        private int ProvinceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvince = 0;
+
+        private async Task OnSearchProvince()
+        {
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task OnSearchProvinceIndexIncrement()
+        {
+            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            {
+                ProvinceComboBoxIndex++;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvincendexDecrement()
+        {
+            if (ProvinceComboBoxIndex > 0)
+            {
+                ProvinceComboBoxIndex--;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceChanged(string e)
+        {
+            ProvinceComboBoxIndex = 0;
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            Provinces = result.Item1;
+            totalCountProvince = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxProvince
+        #region ComboboxDistrict
+
+        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
+        private int DistrictComboBoxIndex { get; set; } = 0;
+        private int totalCountDistrict = 0;
+
+        private async Task OnSearchDistrict()
+        {
+            await LoadDataDistrict(0, 10);
+        }
+
+        private async Task OnSearchDistrictIndexIncrement()
+        {
+            if (DistrictComboBoxIndex < (totalCountDistrict - 1))
+            {
+                DistrictComboBoxIndex++;
+                await LoadDataDistrict(DistrictComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDistrictndexDecrement()
+        {
+            if (DistrictComboBoxIndex > 0)
+            {
+                DistrictComboBoxIndex--;
+                await LoadDataDistrict(DistrictComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDistrictChanged(string e)
+        {
+            DistrictComboBoxIndex = 0;
+            await LoadDataDistrict(0, 10);
+        }
+
+        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetDistrictQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
+            Districts = result.Item1;
+            totalCountDistrict = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxDistrict 
+        #region ComboboxGroup
+
+        private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
+        private int GroupComboBoxIndex { get; set; } = 0;
+        private int totalCountGroup = 0;
+
+        private async Task OnSearchGroup()
+        {
+            await LoadDataGroup(0, 10);
+        }
+
+        private async Task OnSearchGroupIndexIncrement()
+        {
+            if (GroupComboBoxIndex < (totalCountGroup - 1))
+            {
+                GroupComboBoxIndex++;
+                await LoadDataGroup(GroupComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchGroupndexDecrement()
+        {
+            if (GroupComboBoxIndex > 0)
+            {
+                GroupComboBoxIndex--;
+                await LoadDataGroup(GroupComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputGroupChanged(string e)
+        {
+            GroupComboBoxIndex = 0;
+            await LoadDataGroup(0, 10);
+        }
+
+        private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetGroupQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refGroupComboBox?.Text ?? ""));
+            Groups = result.Item1;
+            totalCountGroup = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxGroup 
+        #region ComboboxOccupational
+
+        private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
+        private int OccupationalComboBoxIndex { get; set; } = 0;
+        private int totalCountOccupational = 0;
+
+        private async Task OnSearchOccupational()
+        {
+            await LoadDataOccupational(0, 10);
+        }
+
+        private async Task OnSearchOccupationalIndexIncrement()
+        {
+            if (OccupationalComboBoxIndex < (totalCountOccupational - 1))
+            {
+                OccupationalComboBoxIndex++;
+                await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchOccupationalndexDecrement()
+        {
+            if (OccupationalComboBoxIndex > 0)
+            {
+                OccupationalComboBoxIndex--;
+                await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputOccupationalChanged(string e)
+        {
+            OccupationalComboBoxIndex = 0;
+            await LoadDataOccupational(0, 10);
+        }
+
+        private async Task LoadDataOccupational(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refOccupationalComboBox?.Text ?? ""));
+            Occupationals = result.Item1;
+            totalCountOccupational = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxOccupational
     }
 }

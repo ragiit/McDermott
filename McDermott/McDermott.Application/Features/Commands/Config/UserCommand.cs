@@ -18,6 +18,21 @@
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
         }
 
+        public class GetUserQuerys(Expression<Func<User, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<UserDto>, int pageIndex, int pageSize, int pageCount)>
+        {
+            public Expression<Func<User, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; set; } = pageSize ?? 10;
+        }
+
+        public class BulkValidateUserQuery(List<UserDto> UsersToValidate) : IRequest<List<UserDto>>
+        {
+            public List<UserDto> UsersToValidate { get; } = UsersToValidate;
+        }
+
+
         public class GetUserQuery(Expression<Func<User, bool>>? predicate = null, bool removeCache = false) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;

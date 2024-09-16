@@ -1,13 +1,17 @@
 ﻿using McDermott.Application.Features.Services;
 using Microsoft.Extensions.Caching.Distributed;
 using static McDermott.Application.Features.Commands.Config.UserCommand;
+using static McDermott.Application.Features.Commands.Config.UserCommand;
+using static McDermott.Application.Features.Commands.Config.UserCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
     public class UserQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetUserQuery, List<UserDto>>,
-        IRequestHandler<GetUserQuery2, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetUserQuerys, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateUserQuery, bool>,
+        IRequestHandler<BulkValidateUserQuery, List<UserDto>>,
+        IRequestHandler<GetUserQuery2, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>, 
         IRequestHandler<GetUserInfoGroupQuery, List<UserDto>>,
         IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
         IRequestHandler<CreateUserRequest, UserDto>,
@@ -15,7 +19,70 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteUserRequest, bool>
     {
         #region Get
+        public async Task<List<UserDto>> Handle(BulkValidateUserQuery request, CancellationToken cancellationToken)
+        {
+            var UserDtos = request.UsersToValidate;
 
+            // Ekstrak semua kombinasi yang akan dicari di database
+            //var UserNames = UserDtos.Select(x => x.Name).Distinct().ToList();
+            //var provinceIds = UserDtos.Select(x => x.GroupId).Distinct().ToList();
+
+            //var existingUsers = await _unitOfWork.Repository<User>()
+            //    .Entities
+            //    .AsNoTracking()
+            //    .Where(v => UserNames.Contains(v.Name)
+            //                && provinceIds.Contains(v.ProvinceId))
+            //    .ToListAsync(cancellationToken);
+
+            return [];
+            //return existingUsers.Adapt<List<UserDto>>();
+        }
+
+        public async Task<(List<UserDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUserQuerys request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<User>().Entities
+                    .AsNoTracking()
+                    .Include(x => x.Group)
+                    .Include(x => x.Gender)
+                    .Include(x => x.Supervisor)
+                    .Include(x => x.Department)
+                    .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") 
+                        //||
+                        //EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%")
+                        );
+                }
+
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
+
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+
+                return (paged.Adapt<List<UserDto>>(), request.PageIndex, request.PageSize, totalPages);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> Handle(ValidateUserQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<User>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
         public async Task<(List<UserDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUserQuery2 request, CancellationToken cancellationToken)
         {
             try
@@ -50,16 +117,7 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 throw;
             }
-        }
-
-        public async Task<bool> Handle(ValidateUserQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<User>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
-        }
+        } 
 
         public async Task<List<UserDto>> Handle(GetUserInfoGroupQuery request, CancellationToken cancellationToken)
         {
