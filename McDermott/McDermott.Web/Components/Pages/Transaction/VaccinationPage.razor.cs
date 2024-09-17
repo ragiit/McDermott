@@ -243,12 +243,12 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task SelectedBatchGiven(string stockProduct)
         {
-            VaccinationGiven.TeoriticalQty = 0;
-
             if (stockProduct is null)
             {
                 return;
             }
+
+            VaccinationGiven.TeoriticalQty = 0;
 
             VaccinationGiven.Batch = stockProduct;
 
@@ -298,6 +298,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 Batch.Clear();
+                VaccinationGiven.Batch = null;
+                VaccinationPlan.Batch = null;
+                VaccinationGiven.TeoriticalQty = 0;
+                VaccinationPlan.TeoriticalQty = 0;
 
                 if (e == null) return;
 
@@ -309,6 +313,8 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
+                    VaccinationGiven.TeoriticalQty = stockProducts2.Sum(x => x.Quantity);
+                    VaccinationPlan.TeoriticalQty = stockProducts2.Sum(x => x.Quantity);
                 }
 
                 return;
@@ -453,6 +459,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                         Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
                         Batch = Batch.Distinct().ToList();
                     }
+                    else
+                    {
+                        VaccinationGiven.TeoriticalQty = stockProducts2.Sum(x => x.Quantity);
+                    }
 
                     await SelectedBatchGiven(VaccinationGiven.Batch);
                 }
@@ -473,7 +483,25 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 VaccinationPlan = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
 
-                await SelectedBatchPlan(VaccinationGiven.Batch);
+                try
+                {
+                    var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == VaccinationPlan.ProductId)) ?? []);
+                    if (VaccinationPlan.Product?.TraceAbility ?? false)
+                    {
+                        Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                        Batch = Batch.Distinct().ToList();
+                    }
+                    else
+                    {
+                        VaccinationPlan.TeoriticalQty = stockProducts2.Sum(x => x.Quantity);
+                    }
+
+                    await SelectedBatchGiven(VaccinationPlan.Batch);
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
 
                 StateHasChanged();
             }

@@ -622,7 +622,7 @@
                                                                                                 {
                                                                                                     VaccinationGiven = (VaccinationPlanDto)EditFormContextGivens.EditModel;
                                                                                                 }
-                                                                                                var IsBatch = Products.FirstOrDefault(x => x.Id == VaccinationGiven.ProductId)?.TraceAbility ?? false;
+                                                                                                var IsBatch = Products.FirstOrDefault(x => x.Id == VaccinationGiven.ProductId)?.TraceAbility ?? false; 
                                                                                             }
 
                                                                                             <div class="row w-100">
@@ -638,11 +638,12 @@
                                                                                                             <ValidationMessage For="@(()=> VaccinationGiven.ProductId)"   />
                                                                                                         </DxFormLayoutItem>
 
-                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                        <DxFormLayoutItem Caption="Batch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyDxComboBox Data="@Batch"
                                                                                                                           NullText="Select Batch..."
                                                                                                                           SelectedItemChanged="@((string a)=> SelectedBatchGiven(a))"
                                                                                                                           AllowUserInput="true"
+                                                                                                                          Enabled="@IsBatch"
                                                                                                                           @bind-Value="@VaccinationGiven.Batch"
                                                                                                                           @bind-Text="@VaccinationGiven.Batch" />
                                                                                                             <ValidationMessage For="@(() => VaccinationGiven.Batch)" />
@@ -823,8 +824,9 @@
                                                                                                             <ValidationMessage For="@(()=> VaccinationPlan.ProductId)"   />
                                                                                                         </DxFormLayoutItem>
 
-                                                                                                        <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                        <DxFormLayoutItem Caption="Batch"  CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                             <MyDxComboBox Data="@Batch"
+                                                                                                                        Enabled="IsBatch"
                                                                                                                           NullText="Select Batch..."
                                                                                                                           SelectedItemChanged="@((string a)=> SelectedBatchPlan(a))"
                                                                                                                           AllowUserInput="true"
