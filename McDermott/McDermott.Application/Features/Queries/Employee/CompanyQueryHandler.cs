@@ -86,7 +86,9 @@ namespace McDermott.Application.Features.Queries.Employee
         {
             try
             {
-                var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<Company>());
+                var req = request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>();
+
+                var result = await _unitOfWork.Repository<Company>().AddAsync(req);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -104,6 +106,8 @@ namespace McDermott.Application.Features.Queries.Employee
         {
             try
             {
+                var req = request.CompanyDtos.Adapt<CreateUpdateCompanyDto>().Adapt<Company>();
+
                 var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<Company>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -126,7 +130,9 @@ namespace McDermott.Application.Features.Queries.Employee
         {
             try
             {
-                var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<Company>());
+                var req = request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>();
+
+                var result = await _unitOfWork.Repository<Company>().UpdateAsync(req);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

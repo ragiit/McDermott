@@ -21,7 +21,7 @@
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
+                                            Text="Fetching Data">
 
                                 <MyGridPaginate @ref="Grid"
                                                 Data="Cities"
@@ -65,7 +65,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Provinces"
-                                                              NullText="Select Province..."
+                                                              NullText="Select Province"
                                                               @ref="refProvinceComboBox"
                                                               @bind-Value="@a.ProvinceId"
                                                               TextFieldName="Name"

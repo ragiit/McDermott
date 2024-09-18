@@ -146,8 +146,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
             catch { }
         }
 
-
-
         private void SelectedUserFormChanged(string ee)
         {
             UserForm.TypeId = ee;
@@ -234,7 +232,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
 
             Religions = await Mediator.Send(new GetReligionQuery());
-            Genders = await Mediator.Send(new GetGenderQuery()); 
+            Genders = await Mediator.Send(new GetGenderQuery());
         }
 
         private async Task OnSave()
@@ -417,6 +415,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         private async Task NewItem_Click()
         {
+            NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Create.GetDisplayName()}");
+            return;
             UserForm = new();
             ShowForm = true;
         }
@@ -426,7 +426,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
-                ShowForm = true;
+                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}");
+                //ShowForm = true;
             }
             catch { }
         }
@@ -436,6 +437,9 @@ namespace McDermott.Web.Components.Pages.Config.Users
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}");
+                return;
+
                 ShowForm = true;
             }
             catch (Exception)
@@ -523,7 +527,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             PanelVisible = false;
         }
 
-        #endregion ComboboxVillage 
+        #endregion ComboboxVillage
+
         #region ComboboxCountry
 
         private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
@@ -570,6 +575,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxCountry
+
         #region ComboboxCity
 
         private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
@@ -615,7 +621,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             PanelVisible = false;
         }
 
-        #endregion ComboboxCity 
+        #endregion ComboboxCity
+
         #region ComboboxProvince
 
         private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
@@ -662,6 +669,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxProvince
+
         #region ComboboxDistrict
 
         private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
@@ -707,7 +715,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             PanelVisible = false;
         }
 
-        #endregion ComboboxDistrict 
+        #endregion ComboboxDistrict
+
         #region ComboboxGroup
 
         private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
@@ -753,7 +762,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             PanelVisible = false;
         }
 
-        #endregion ComboboxGroup 
+        #endregion ComboboxGroup
+
         #region ComboboxOccupational
 
         private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
@@ -800,6 +810,5 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxOccupational
-
     }
 }

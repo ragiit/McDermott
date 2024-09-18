@@ -59,7 +59,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         private bool PanelVisible { get; set; } = true;
 
         [SupplyParameterFromQuery]
-        private long? Id { get; set; } 
+        private long? Id { get; set; }
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
@@ -73,12 +73,13 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         [SupplyParameterFromForm]
         private GroupDto Group { get; set; } = new();
+
         private char Placeholder { get; set; } = '_';
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndexGroupMenu { get; set; }
-        private int FocusedRowVisibleIndexGroupMenuGroupMenu { get; set; } 
+        private int FocusedRowVisibleIndexGroupMenuGroupMenu { get; set; }
         private List<GroupMenuDto> GroupMenus = [];
         private List<GroupMenuDto> DeletedGroupMenus = [];
         private List<MenuDto> Menus = [];
@@ -106,6 +107,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 ee.HandleException(ToastService);
             }
         }
+
+        private List<SpecialityDto> Specialities = [];
 
         private async Task LoadGroupMenus(int pageIndex = 0, int pageSize = 10)
         {
@@ -166,23 +169,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             MenuComboBoxIndex = 0;
             await LoadComboBox(0, 10);
-        }
-
-        private async Task LoadComboBox(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            //var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
-            var result = await Mediator.Send(new GetMenuQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refMenuComboBox?.Text));
-            Menus = result.Item1;
-            ////Menus.Insert(0, new MenuDto
-            ////{
-            ////    Id = 0,
-            ////    Name = "All",
-            //});
-            Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.pageCount;
-            PanelVisible = false;
         }
 
         #endregion ComboboxMenu
@@ -306,13 +292,15 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #endregion Searching
 
+        private IEnumerable<ServiceDto> Services { get; set; } = [];
+        private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
+
         private async Task LoadData()
         {
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
 
-            var result = await Mediator.Send(new GetGroupQuery(x => x.Id == Id, 0, 1));
-            Group = new();
-            GroupMenus.Clear();
+            var result = await Mediator.Send(new GetUserQuery2(x => x.Id == Id, 0, 1));
+            UserForm = new();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -322,8 +310,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                     return;
                 }
 
-                Group = result.Item1.FirstOrDefault() ?? new();
-                await LoadGroupMenus();
+                UserForm = result.Item1.FirstOrDefault() ?? new();
             }
         }
 
@@ -993,6 +980,27 @@ namespace McDermott.Web.Components.Pages.Config.Users
             //}
         }
 
+        private async Task LoadComboBox(int pageIndex = 0, int pageSize = 10)
+        {
+            #region KTP Address
+
+            await LoadDataCountry();
+            await LoadDataProvince();
+            await LoadDataCity();
+            await LoadDataDistrict();
+            await LoadDataVillage();
+
+            #endregion KTP Address
+
+            await LoadDataGroup();
+            await LoadDataOccupational();
+            Departments = await Mediator.Send(new GetDepartmentQuery());
+            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+
+            Religions = await Mediator.Send(new GetReligionQuery());
+            Genders = await Mediator.Send(new GetGenderQuery());
+        }
+
         #region ComboboxVillage
 
         private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
@@ -1013,7 +1021,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             }
         }
 
-        private async Task OnSearchVillagendexDecrement()
+        private async Task OnSearchVillageIndexDecrement()
         {
             if (VillageComboBoxIndex > 0)
             {
@@ -1032,13 +1040,16 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetVillageQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refVillageComboBox?.Text ?? ""));
+            var districtId = refDistrictComboBox?.Value.GetValueOrDefault();
+            var id = refVillageComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetVillageQuery(x => x.DistrictId == districtId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refVillageComboBox?.Text ?? ""));
             Villages = result.Item1;
             totalCountVillage = result.pageCount;
             PanelVisible = false;
         }
 
-        #endregion ComboboxVillage 
+        #endregion ComboboxVillage
+
         #region ComboboxCountry
 
         private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
@@ -1059,7 +1070,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             }
         }
 
-        private async Task OnSearchCountryndexDecrement()
+        private async Task OnSearchCountryIndexDecrement()
         {
             if (CountryComboBoxIndex > 0)
             {
@@ -1078,13 +1089,23 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            Provinces.Clear();
+            Cities.Clear();
+            Districts.Clear();
+            Villages.Clear();
+            UserForm.IdCardProvinceId = null;
+            UserForm.IdCardCityId = null;
+            UserForm.IdCardDistrictId = null;
+            UserForm.IdCardVillageId = null;
+            var id = refCountryComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetCountryQuery(x => (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
             Countries = result.Item1;
             totalCountCountry = result.pageCount;
             PanelVisible = false;
         }
 
         #endregion ComboboxCountry
+
         #region ComboboxCity
 
         private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
@@ -1105,7 +1126,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             }
         }
 
-        private async Task OnSearchCityndexDecrement()
+        private async Task OnSearchCityIndexDecrement()
         {
             if (CityComboBoxIndex > 0)
             {
@@ -1124,13 +1145,18 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
+            UserForm.IdCardDistrictId = null;
+            UserForm.IdCardVillageId = null;
+            var id = refCityComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
             Cities = result.Item1;
             totalCountCity = result.pageCount;
             PanelVisible = false;
         }
 
-        #endregion ComboboxCity 
+        #endregion ComboboxCity
+
         #region ComboboxProvince
 
         private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
@@ -1151,7 +1177,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             }
         }
 
-        private async Task OnSearchProvincendexDecrement()
+        private async Task OnSearchProvinceIndexDecrement()
         {
             if (ProvinceComboBoxIndex > 0)
             {
@@ -1170,13 +1196,20 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            var countryId = refCountryComboBox?.Value.GetValueOrDefault();
+            UserForm.IdCardCityId = null;
+            UserForm.IdCardDistrictId = null;
+            UserForm.IdCardVillageId = null;
+
+            var id = refProvinceComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == countryId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
             Provinces = result.Item1;
             totalCountProvince = result.pageCount;
             PanelVisible = false;
         }
 
         #endregion ComboboxProvince
+
         #region ComboboxDistrict
 
         private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
@@ -1216,13 +1249,17 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDistrictQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
+            var cityId = refCityComboBox?.Value.GetValueOrDefault();
+            UserForm.IdCardVillageId = null;
+            var id = refDistrictComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetDistrictQuery(x => x.CityId == cityId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
             Districts = result.Item1;
             totalCountDistrict = result.pageCount;
             PanelVisible = false;
         }
 
-        #endregion ComboboxDistrict 
+        #endregion ComboboxDistrict
+
         #region ComboboxGroup
 
         private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
@@ -1268,7 +1305,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             PanelVisible = false;
         }
 
-        #endregion ComboboxGroup 
+        #endregion ComboboxGroup
+
         #region ComboboxOccupational
 
         private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }

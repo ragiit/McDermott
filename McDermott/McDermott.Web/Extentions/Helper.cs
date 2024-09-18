@@ -25,6 +25,7 @@ namespace McDermott.Web.Extentions
         }
 
         public static string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
+
         public static readonly List<string> IdentityTypes =
         [
             "KTP",
@@ -32,6 +33,14 @@ namespace McDermott.Web.Extentions
             "SIM",
             "VISA",
         ];
+
+        public static List<string> EmployeeTypes = new()
+        {
+            "Employee",
+            "Pre Employee",
+            "Nurse",
+            "Doctor",
+        };
 
         public static readonly List<string> MartialStatuss =
         [

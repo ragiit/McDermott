@@ -79,7 +79,6 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = Array.Empty<object>();
-
             var result = await Mediator.Send(new GetProvinceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Provinces = result.Item1;
             totalCount = result.pageCount;
@@ -123,12 +122,11 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCountries(0, 10);
         }
 
-        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10, long? countryId = null)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
 
-            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetCountryQuery(countryId == null ? null : x => x.Id == countryId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
             Countries = result.Item1;
             totalCountCountry = result.pageCount;
 
@@ -189,6 +187,7 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            await LoadDataCountries(countryId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).CountryId);
         }
 
         private void DeleteItem_Click()
@@ -203,8 +202,8 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            refCountryComboBox = null;
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)

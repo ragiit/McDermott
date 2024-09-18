@@ -2,7 +2,7 @@
 @using McDermott.Web.Components.Layout
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Group</PageTitle>
+<PageTitle>McHealthCare - Users</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
@@ -11,7 +11,7 @@
 
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Group" OnClickBack="@(async () => NavigationManager.NavigateTo("configuration/users"))" ShowBackButton="true" />
+        <BaseHeaderPage Title="Users" OnClickBack="@(async () => NavigationManager.NavigateTo("configuration/users"))" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">
@@ -20,524 +20,699 @@
                         <DxLoadingPanel @bind-Visible="IsLoading"
                                         IsContentBlocked="true"
                                         CssClass="w-100"
-                                        ApplyBackgroundShading="true"> 
+                                        ApplyBackgroundShading="true">
                             <EditForm Model="@UserForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                                       OnInvalidSubmit="@HandleInvalidSubmit">
                                 <DataAnnotationsValidator />
-                                <DxFormLayout CssClass="mt">
-
-                                    <DxFormLayoutGroup Caption="General Information" ColSpanMd="12">
-                                        <div class="row w-100">
-                                            <div class="col-md-6">
-                                                <DxFormLayout CssClass="mt">
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@UserForm.Name"
-                                                                   ShowValidationIcon="true"
-                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                   NullText="Name" />
-                                                        <ValidationMessage For="@(() => UserForm.Name)"   />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Email" ColSpanMd="12">
-                                                        <DxMaskedInput @bind-Value="@UserForm.Email"
-                                                                       Mask="@Helper.EmailMask"
-                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                       NullText="mail@domain.com"
-                                                                       ShowValidationIcon="true"
-                                                                       MaskMode="MaskMode.RegEx">
-                                                            <Buttons>
-                                                                <DxEditorButton IconCssClass="fa-solid fa-envelope" />
-                                                            </Buttons>
-                                                            <ChildContent>
-                                                                <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
-                                                                                       Placeholder="@('_')"
-                                                                                       PlaceholdersVisible="true" />
-                                                            </ChildContent>
-                                                        </DxMaskedInput>
-                                                        <ValidationMessage For="@(() => UserForm.Email)"   />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Identity Number" ColSpanMd="12" CaptionCssClass="normal-caption">
-                                                        <DxMaskedInput @bind-Value="@UserForm.NoId"
-                                                                       ShowValidationIcon="true"
-                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                       NullText="Identity Number">
-                                                            <DxTextMaskProperties Placeholder="Placeholder" />
-                                                        </DxMaskedInput>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Type" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@Helper.IdentityTypes" @bind-Value="@UserForm.TypeId"></MyDxComboBox>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Expired Identity"
-                                                                      Visible="@((UserForm.TypeId == null || UserForm.TypeId.Contains("VISA") || UserForm.TypeId.Contains("SIM")))">
-                                                        <DxDateEdit NullText="Expired Identity" @bind-Date="@UserForm.ExpiredId" Mask="@DateTimeMask.ShortDate" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Religion" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@Religions" NullText="Religion" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth" ColSpanMd="12">
-                                                        <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" MaxDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Gender" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Martial Status" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@Helper.MartialStatuss" @bind-Value="@UserForm.MartialStatus" NullText="Select Martial Status..."></MyDxComboBox>
-                                                    </DxFormLayoutItem>
-                                                </DxFormLayout>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <DxFormLayout CssClass="mt">
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Mobile" ColSpanMd="12">
-                                                        <DxMaskedInput @bind-Value="@UserForm.MobilePhone"
-                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                       NullText="Mobile Phone"
-                                                                       ShowValidationIcon="true">
-                                                            <DxTextMaskProperties Placeholder="Placeholder" />
-                                                        </DxMaskedInput>
-                                                        <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
-                                                        <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
-                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                       NullText="Current Mobile"
-                                                                       ShowValidationIcon="true">
-                                                            <DxTextMaskProperties Placeholder="Placeholder" />
-                                                        </DxMaskedInput>
-                                                        <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Phone" ColSpanMd="12">
-                                                        <DxMaskedInput @bind-Value="@UserForm.HomePhoneNumber"
-                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                       ShowValidationIcon="true"
-                                                                       NullText="Home Mobile Phone">
-                                                            <DxTextMaskProperties Placeholder="Placeholder" />
-                                                        </DxMaskedInput>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NPWP" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
-                                                    </DxFormLayoutItem>
-
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Name" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@UserForm.EmergencyName" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Name" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Relation" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@UserForm.EmergencyRelation" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Relation" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Email" ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@UserForm.EmergencyEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Email" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Phone" ColSpanMd="12">
-                                                        <DxMaskedInput @bind-Value="@UserForm.EmergencyPhone"
-                                                                       NullText="Emergency Phone"
-                                                                       ShowValidationIcon="true"
-                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                            <DxTextMaskProperties Placeholder="Placeholder" />
-                                                        </DxMaskedInput>
-                                                    </DxFormLayoutItem>
-                                                </DxFormLayout>
+                                <DxFormLayout>
+                                    <div class="card w-100 sticky">
+                                        <div class="card-body">
+                                            <div class=" row w-100">
+                                                <div class="w-100 row justify-content-end mt-2 mb-2">
+                                                    <div class="col-auto align-self-end p-0 m-0">
+                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                        </DxButton>
+                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelItemGroupMenuGridGropMenu_Click"></DxButton>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="row w-100">
-                                            <div class="col-md-12">
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Residence Address" ColSpanMd="12">
-                                                    <DxCheckBox @bind-Checked="@UserForm.IsSameDomicileAddress" />
-                                                </DxFormLayoutItem>
+                                    </div>
+
+                                    @* General Information *@
+                                    <div class="w-100">
+                                        <div class="w-100">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <span class="fw-bolder">General Information</span>
+                                                </div>
+
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout>
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@UserForm.Name"
+                                                                               ShowValidationIcon="true"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                               NullText="Name" />
+                                                                    <ValidationMessage For="@(() => UserForm.Name)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Email" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.Email"
+                                                                                   Mask="@Helper.EmailMask"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="mail@domain.com"
+                                                                                   ShowValidationIcon="true"
+                                                                                   MaskMode="MaskMode.RegEx">
+                                                                        <Buttons>
+                                                                            <DxEditorButton IconCssClass="fa-solid fa-envelope" />
+                                                                        </Buttons>
+                                                                        <ChildContent>
+                                                                            <DxRegExMaskProperties MaskAutoCompleteMode="@MaskAutoCompleteMode.Strong"
+                                                                                                   Placeholder="@('_')"
+                                                                                                   PlaceholdersVisible="true" />
+                                                                        </ChildContent>
+                                                                    </DxMaskedInput>
+                                                                    <ValidationMessage For="@(() => UserForm.Email)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem Caption="Identity Number" ColSpanMd="12" CaptionCssClass="normal-caption">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.NoId"
+                                                                                   ShowValidationIcon="true"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="Identity Number">
+                                                                        <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                    </DxMaskedInput>
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Type" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Helper.IdentityTypes" @bind-Value="@UserForm.TypeId"></MyDxComboBox>
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Expired Identity"
+                                                                                  Visible="@((UserForm.TypeId == null || UserForm.TypeId.Contains("VISA") || UserForm.TypeId.Contains("SIM")))">
+                                                                    <DxDateEdit NullText="Expired Identity" @bind-Date="@UserForm.ExpiredId" Mask="@DateTimeMask.ShortDate" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Religion" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Religions" NullText="Religion" @bind-Value="@UserForm.ReligionId" TextFieldName="Name" ValueFieldName="Id" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth" ColSpanMd="12">
+                                                                    <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" MaxDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Gender" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Martial Status" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Helper.MartialStatuss" @bind-Value="@UserForm.MartialStatus" NullText="Select Martial Status"></MyDxComboBox>
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout>
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Mobile" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.MobilePhone"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="Mobile Phone"
+                                                                                   ShowValidationIcon="true">
+                                                                        <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                    </DxMaskedInput>
+                                                                    <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="Current Mobile"
+                                                                                   ShowValidationIcon="true">
+                                                                        <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                    </DxMaskedInput>
+                                                                    <ValidationMessage For="@(() => UserForm.MobilePhone)"   />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Phone" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.HomePhoneNumber"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   ShowValidationIcon="true"
+                                                                                   NullText="Home Mobile Phone">
+                                                                        <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                    </DxMaskedInput>
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="NPWP" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@UserForm.Npwp" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="NPWP" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Name" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@UserForm.EmergencyName" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Name" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Relation" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@UserForm.EmergencyRelation" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Relation" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Email" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@UserForm.EmergencyEmail" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Emergency Email" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Emergency Phone" ColSpanMd="12">
+                                                                    <DxMaskedInput @bind-Value="@UserForm.EmergencyPhone"
+                                                                                   NullText="Emergency Phone"
+                                                                                   ShowValidationIcon="true"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                        <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                    </DxMaskedInput>
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <DxFormLayout>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Residence Address" ColSpanMd="12">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsSameDomicileAddress" />
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="KTP Address" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.IdCardAddress1" NullText="Street 1" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.IdCardAddress2" NullText="Street 2" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="2" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.IdCardRtRw" NullText="RT/RW" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Countries"
+                                                                                                      NullText="Select Country"
+                                                                                                      @bind-Value="@UserForm.IdCardCountryId"
+                                                                                                      @ref="refCountryComboBox"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id"
+                                                                                                      TextChanged="((string e) => OnInputCountryChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchCountryIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchCountry"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchCountryIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
+                                                                                            </Columns>
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="4" Column="0">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Provinces"
+                                                                                                      NullText="Select Province"
+                                                                                                      @bind-Value="@UserForm.IdCardProvinceId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      @ref="refProvinceComboBox"
+                                                                                                      ValueFieldName="Id" TextChanged="((string e) => OnInputProvinceChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchProvinceIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchProvince"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchProvinceIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
+                                                                                                <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                                                            </Columns>
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="4" Column="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Cities"
+                                                                                                      NullText="Select City"
+                                                                                                      @bind-Value="@UserForm.IdCardCityId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      @ref="refCityComboBox"
+                                                                                                      ValueFieldName="Id" TextChanged="((string e) => OnInputCityChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchCityIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchCity"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchCityIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                                            </Columns>
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="5" Column="0">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Districts.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId)"
+                                                                                                      NullText="Select District"
+                                                                                                      @bind-Value="@UserForm.IdCardDistrictId"
+                                                                                                      @ref="refDistrictComboBox"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id" TextChanged="((string e) => OnInputDistrictChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchDistrictndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchDistrict"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchDistrictIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(District.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                                                <DxListEditorColumn FieldName="City.Name" Caption="City" /> 
+                                                                                            </Columns>
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="5" Column="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Villages.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId && x.DistrictId == UserForm.IdCardDistrictId)"
+                                                                                                      NullText="Select Village"
+                                                                                                      @bind-Value="@UserForm.IdCardVillageId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id"
+                                                                                                      TextChanged="((string e) => OnInputVillageChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchVillageIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchVillage"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchVillageIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(VillageDto.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                                                <DxListEditorColumn FieldName="City.Name" Caption="City" />
+                                                                                                <DxListEditorColumn FieldName="District.Name" Caption="District" />
+                                                                                            </Columns>
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+                                                                <DxFormLayoutItem Visible="@(!UserForm.IsSameDomicileAddress)" CaptionCssClass="normal-caption" Caption="Residence Address" ColSpanMd="12">
+                                                                    <Template>
+                                                                        <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
+                                                                            <Rows>
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                                <DxGridLayoutRow />
+                                                                            </Rows>
+                                                                            <Columns>
+                                                                                <DxGridLayoutColumn />
+                                                                                <DxGridLayoutColumn />
+                                                                            </Columns>
+                                                                            <Items>
+                                                                                <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.DomicileAddress1" NullText="Street 1" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.DomicileAddress2" NullText="Street 2" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="2" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.DomicileRtRw" NullText="RT/RW" />
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+
+                                                                                <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Countries.Where(x => UserForm.DomicileProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == UserForm.DomicileProvinceId)?.CountryId)"
+                                                                                                      NullText="Select Country"
+                                                                                                      @bind-Value="@UserForm.DomicileCountryId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="4" Column="0">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Provinces"
+                                                                                                      NullText="Select Province"
+                                                                                                      @bind-Value="@UserForm.DomicileProvinceId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="4" Column="1" CssClass="mt ml">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.DomicileProvinceId.GetValueOrDefault())"
+                                                                                                      NullText="Select City"
+                                                                                                      @bind-Value="@UserForm.DomicileCityId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="5" Column="0">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Districts.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId)"
+                                                                                                      NullText="Select District"
+                                                                                                      @bind-Value="@UserForm.DomicileDistrictId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                                <DxGridLayoutItem Row="5" Column="1">
+                                                                                    <Template>
+                                                                                        <MyDxComboBox Data="@Villages.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId && x.DistrictId == UserForm.DomicileDistrictId)"
+                                                                                                      NullText="Select Village"
+                                                                                                      @bind-Value="@UserForm.DomicileVillageId"
+                                                                                                      TextFieldName="Name"
+                                                                                                      ValueFieldName="Id">
+                                                                                        </MyDxComboBox>
+                                                                                    </Template>
+                                                                                </DxGridLayoutItem>
+                                                                            </Items>
+                                                                        </DxGridLayout>
+                                                                    </Template>
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="KTP Address" ColSpanMd="12">
-                                            <Template>
-                                                <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
-                                                    <Rows>
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                    </Rows>
-                                                    <Columns>
-                                                        <DxGridLayoutColumn />
-                                                        <DxGridLayoutColumn />
-                                                    </Columns>
-                                                    <Items>
-                                                        <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.IdCardAddress1" NullText="Street 1..." />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.IdCardAddress2" NullText="Street 2..." />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="2" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.IdCardRtRw" NullText="RT/RW..." />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="0">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Provinces"
-                                                                              NullText="Select Province..."
-                                                                              @bind-Value="@UserForm.IdCardProvinceId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="1">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.IdCardProvinceId)"
-                                                                              NullText="Select City..."
-                                                                              @bind-Value="@UserForm.IdCardCityId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="4" Column="0">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Districts.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId)"
-                                                                              NullText="Select District..."
-                                                                              @bind-Value="@UserForm.IdCardDistrictId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="4" Column="1">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Villages.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId && x.DistrictId == UserForm.IdCardDistrictId)"
-                                                                              NullText="Select Village..."
-                                                                              @bind-Value="@UserForm.IdCardVillageId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="5" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Countries.Where(x => UserForm.IdCardProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == UserForm.IdCardProvinceId)?.CountryId)"
-                                                                              NullText="Select Country..."
-                                                                              @bind-Value="@UserForm.IdCardCountryId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                    </Items>
-                                                </DxGridLayout>
-                                            </Template>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Visible="@(!UserForm.IsSameDomicileAddress)" CaptionCssClass="normal-caption" Caption="Residence Address" ColSpanMd="12">
-                                            <Template>
-                                                <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
-                                                    <Rows>
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                        <DxGridLayoutRow />
-                                                    </Rows>
-                                                    <Columns>
-                                                        <DxGridLayoutColumn />
-                                                        <DxGridLayoutColumn />
-                                                    </Columns>
-                                                    <Items>
-                                                        <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.DomicileAddress1" NullText="Street 1..." />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.DomicileAddress2" NullText="Street 2..." />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="2" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" @bind-Text="@UserForm.DomicileRtRw" NullText="RT/RW..." />
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="0">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Provinces"
-                                                                              NullText="Select Province..."
-                                                                              @bind-Value="@UserForm.DomicileProvinceId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="3" Column="1" CssClass="mt ml">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.DomicileProvinceId.GetValueOrDefault())"
-                                                                              NullText="Select City..."
-                                                                              @bind-Value="@UserForm.DomicileCityId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="4" Column="0">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Districts.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId)"
-                                                                              NullText="Select District..."
-                                                                              @bind-Value="@UserForm.DomicileDistrictId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="4" Column="1">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Villages.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId && x.DistrictId == UserForm.DomicileDistrictId)"
-                                                                              NullText="Select Village..."
-                                                                              @bind-Value="@UserForm.DomicileVillageId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                        <DxGridLayoutItem Row="5" Column="0" ColumnSpan="12">
-                                                            <Template>
-                                                                <MyDxComboBox Data="@Countries.Where(x => UserForm.DomicileProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == UserForm.DomicileProvinceId)?.CountryId)"
-                                                                              NullText="Select Country..."
-                                                                              @bind-Value="@UserForm.DomicileCountryId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id">
-                                                                </MyDxComboBox>
-                                                            </Template>
-                                                        </DxGridLayoutItem>
-                                                    </Items>
-                                                </DxGridLayout>
-                                            </Template>
-                                        </DxFormLayoutItem>
-                                        <div class="text-center row-12">
-                                            <DxGridLayout ColumnSpacing="12">
-                                                <Rows>
-                                                    <DxGridLayoutRow />
-                                                </Rows>
-                                                <Columns>
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                    <DxGridLayoutColumn />
-                                                </Columns>
-                                                <Items>
-                                                    <DxGridLayoutItem Row="0" Column="0">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Allow Login">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsUser" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="0" Column="1" CssClass="layout-margin-l">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Practitioner">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsDoctor" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="0" Column="2" CssClass="layout-margin-l">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Employee">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsEmployee" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="0" Column="3" CssClass="layout-margin-l">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsPatient" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="0" Column="4" CssClass="layout-margin-l">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacy">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsPharmacy" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="0" Column="5" CssClass="layout-margin-l">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="MCU">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsMcu" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                    <DxGridLayoutItem Row="0" Column="6" CssClass="layout-margin-l">
-                                                        <Template>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR">
-                                                                <DxCheckBox @bind-Checked="@UserForm.IsHr" />
-                                                            </DxFormLayoutItem>
-                                                        </Template>
-                                                    </DxGridLayoutItem>
-                                                </Items>
-                                            </DxGridLayout>
+                                    </div>
+
+                                    @* Roles Information *@
+                                    <div class="w-100">
+                                        <div class="w-100">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <span class="fw-bolder">Roles Information</span>
+                                                </div>
+
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Allow Login">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsUser" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Practitioner">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsDoctor" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Employee">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsEmployee" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsPatient" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacy">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsPharmacy" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="MCU">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsMcu" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR">
+                                                                    <DxCheckBox @bind-Checked="@UserForm.IsHr" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </DxFormLayoutGroup>
+                                    </div>
 
-                                    <DxFormLayoutGroup Caption="User" ColSpanMd="12" Visible="@Convert.ToBoolean(UserForm.IsUser)">
-                                        <Items>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Password">
-                                                <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Password="true" @bind-Text="@UserForm.Password" NullText="Password" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Group" CaptionCssClass="normal-caption">
-                                                <MyDxComboBox Data="@Groups"
-                                                              NullText="Select Group..."
-                                                              @bind-Value="@UserForm.GroupId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id">
-                                                </MyDxComboBox>
-                                            </DxFormLayoutItem>
-                                        </Items>
-                                    </DxFormLayoutGroup>
+                                    @* User Information *@
+                                    @if (Convert.ToBoolean(UserForm.IsUser))
+                                    {
+                                        <div class="w-100">
+                                            <div class="w-100">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <span class="fw-bolder">User Information</span>
+                                                    </div>
 
-                                    <DxFormLayoutGroup Caption="Practitioner License" ColSpanMd="12" Visible="@Convert.ToBoolean(UserForm.IsDoctor)">
-                                        <DxGridLayout ColumnSpacing="3">
-                                            <Rows>
-                                                <DxGridLayoutRow />
-                                            </Rows>
-                                            <Columns>
-                                                <DxGridLayoutColumn />
-                                                <DxGridLayoutColumn />
-                                            </Columns>
-                                            <Items>
-                                                <DxGridLayoutItem Row="0" Column="0">
-                                                    <Template>
-                                                        <DxFormLayoutItem Caption="Physicion" CaptionCssClass="normal-caption">
-                                                            <DxCheckBox @bind-Checked="@UserForm.IsPhysicion" />
-                                                        </DxFormLayoutItem>
-                                                    </Template>
-                                                </DxGridLayoutItem>
-                                                <DxGridLayoutItem Row="0" Column="1" CssClass="layout-margin-l">
-                                                    <Template>
-                                                        <DxFormLayoutItem Caption="Nurse" CaptionCssClass="normal-caption">
-                                                            <DxCheckBox @bind-Checked="@UserForm.IsNurse" />
-                                                        </DxFormLayoutItem>
-                                                    </Template>
-                                                </DxGridLayoutItem>
-                                            </Items>
-                                        </DxGridLayout>
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Password" ColSpanMd="12">
+                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Password="true" @bind-Text="@UserForm.Password" NullText="Password" />
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem Caption="Group" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                        <MyDxComboBox Data="@Groups"
+                                                                                      NullText="Select Group"
+                                                                                      @bind-Value="@UserForm.GroupId"
+                                                                                      TextFieldName="Name"
+                                                                                      ValueFieldName="Id">
+                                                                        </MyDxComboBox>
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
 
-                                        <DxFormLayoutItem Caption="Sip Number" CaptionCssClass="normal-caption">
-                                            <DxMaskedInput @bind-Value="@UserForm.SipNo"
-                                                           NullText="Sip Number"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                <DxTextMaskProperties Placeholder="Placeholder" />
-                                            </DxMaskedInput>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Str Number" CaptionCssClass="normal-caption">
-                                            <DxMaskedInput @bind-Value="@UserForm.StrNo"
-                                                           NullText="Str Number"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                <DxTextMaskProperties Placeholder="Placeholder" />
-                                            </DxMaskedInput>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Sip File" CaptionCssClass="normal-caption">
-                                            <DxMaskedInput @bind-Value="@UserForm.SipFile"
-                                                           ShowValidationIcon="true"
-                                                           ReadOnly="true"
-                                                           MaskMode="MaskMode.RegEx">
-                                               @*   <Buttons>
-                                                     <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@SelectFiles" multiple="false" style="display:none" />
-                                                     <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
-                                                     <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
-                                                     <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
-                                                 </Buttons> *@
-                                            </DxMaskedInput>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Str Expired" CaptionCssClass="normal-caption">
-                                            <DxDateEdit @bind-Date="@UserForm.StrExp" NullText="Str Expired" Mask="@DateTimeMask.ShortDate" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem Caption="Sip Expired" CaptionCssClass="normal-caption">
-                                            <DxDateEdit @bind-Date="@UserForm.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
-                                        </DxFormLayoutItem>
-                                    </DxFormLayoutGroup>
+                                    @* Practitioner License Information *@
+                                    @if (Convert.ToBoolean(UserForm.IsDoctor))
+                                    {
+                                        <div class="w-100">
+                                            <div class="w-100">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <span class="fw-bolder">Practitioner License Information</span>
+                                                    </div>
 
-                                    <DxFormLayoutGroup Caption="Employee" ColSpanMd="12" Visible="@Convert.ToBoolean(UserForm.IsEmployee)">
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Physicion">
+                                                                        <DxCheckBox @bind-Checked="@UserForm.IsPhysicion" />
+                                                                    </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="6">
-                                            <MyDxComboBox Data="@(Users.Where(x => x.Id != UserForm.Id).AsEnumerable())"
-                                                          NullText="Select Supervisor..."
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"
-                                                          @bind-Value="UserForm.SupervisorId">
-                                            </MyDxComboBox>
-                                            <ValidationMessage For="@(() => UserForm.SupervisorId)" />
-                                        </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" Visible="UserForm.IsPhysicion" CaptionCssClass="required-caption normal-caption" Caption="Physician Code">
+                                                                        <DxTextBox @bind-Text="@UserForm.PhysicanCode"
+                                                                                   ShowValidationIcon="true"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="Physican Code" />
+                                                                        <ValidationMessage For="@(() => UserForm.PhysicanCode)"   />
+                                                                    </DxFormLayoutItem>
 
-                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Occupational" ColSpanMd="6">
-                                            <MyDxComboBox Data="@Occupationals"
-                                                          NullText="Select Occupational..."
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"
-                                                          @bind-Value="UserForm.OccupationalId">
-                                            </MyDxComboBox>
-                                            <ValidationMessage For="@(() => UserForm.OccupationalId)" />
-                                        </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="required-caption normal-caption" Caption="Sip Number">
+                                                                        <DxMaskedInput @bind-Value="@UserForm.SipNo"
+                                                                                       NullText="Sip Number"
+                                                                                       ShowValidationIcon="true"
+                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                            <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                        </DxMaskedInput>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="-caption normal-caption" Caption="Sip File">
+                                                                        <DxMaskedInput @bind-Value="@UserForm.SipFile"
+                                                                                       ShowValidationIcon="true"
+                                                                                       ReadOnly="true"
+                                                                                       MaskMode="MaskMode.RegEx">
+                                                                            @*   <Buttons>
+                                                                    <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                                    <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+                                                                    <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
+                                                                    <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                                                    </Buttons> *@
+                                                                        </DxMaskedInput>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Sip Expired">
+                                                                        <DxDateEdit @bind-Date="@UserForm.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="-caption normal-caption" Caption="Speciality">
+                                                                        <Template>
+                                                                            <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                        Data="@Specialities"
+                                                                                        NullText="Select Speciality"
+                                                                                        @bind-Value="@UserForm.SpecialityId"
+                                                                                        TextFieldName="Name"
+                                                                                        ValueFieldName="Id">
+                                                                            </DxComboBox>
+                                                                        </Template>
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
 
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Job Position">
-                                            <MyDxComboBox Data="@JobPositions"
-                                                          NullText="Select Job Position..."
-                                                          @bind-Value="@UserForm.JobPositionId"
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id">
-                                            </MyDxComboBox>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS TK Number">
-                                            <DxMaskedInput @bind-Value="@UserForm.NoBpjsTk"
-                                                           NullText="BPJS TK Number"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                <DxTextMaskProperties Placeholder="Placeholder" />
-                                            </DxMaskedInput>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department">
-                                            <MyDxComboBox Data="@Departments"
-                                                          NullText="Select Department..."
-                                                          @bind-Value="@UserForm.DepartmentId"
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id">
-                                            </MyDxComboBox>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Join Date">
-                                            <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number">
-                                            <DxMaskedInput @bind-Value="@UserForm.NoBpjsKs"
-                                                           NullText="BPJS KS Number"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                <DxTextMaskProperties Placeholder="Placeholder" />
-                                            </DxMaskedInput>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="NIP Number">
-                                            <DxMaskedInput @bind-Value="@UserForm.NIP"
-                                                           NullText="NIP"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                <DxTextMaskProperties Placeholder="Placeholder" />
-                                            </DxMaskedInput>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Legacy Number">
-                                            <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Oracle Number">
-                                            <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="SAP Number">
-                                            <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
-                                        </DxFormLayoutItem>
-                                    </DxFormLayoutGroup>
-                                </DxFormLayout> 
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Nurse:">
+                                                                        <DxCheckBox @bind-Checked="@UserForm.IsNurse" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Number">
+                                                                        <DxMaskedInput @bind-Value="@UserForm.StrNo"
+                                                                                       NullText="Str Number"
+                                                                                       ShowValidationIcon="true"
+                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                            <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                        </DxMaskedInput>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Expired">
+                                                                        <DxDateEdit @bind-Date="@UserForm.StrExp" NullText="Str Expired" Mask="@DateTimeMask.ShortDate" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services">
+                                                                        <DxTagBox Data="@Services"
+                                                                                  FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                  @bind-Values="@SelectedServices"
+                                                                                  TextFieldName="Name"
+                                                                                  NullText="Select Service"
+                                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @* Employee Information *@
+                                    @if (@Convert.ToBoolean(UserForm.IsEmployee))
+                                    {
+                                        <div class="w-100">
+                                            <div class="w-100">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <span class="fw-bolder">Employee Information </span>
+                                                    </div>
+
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="12">
+                                                                        <MyDxComboBox Data="@(Users.Where(x => x.Id != UserForm.Id).AsEnumerable())"
+                                                                                      NullText="Select Supervisor"
+                                                                                      TextFieldName="Name"
+                                                                                      ValueFieldName="Id"
+                                                                                      @bind-Value="UserForm.SupervisorId">
+                                                                        </MyDxComboBox>
+                                                                        <ValidationMessage For="@(() => UserForm.SupervisorId)" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Job Position" ColSpanMd="12">
+                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    Data="@JobPositions"
+                                                                                    NullText="Select Job Position"
+                                                                                    @bind-Value="@UserForm.JobPositionId"
+                                                                                    TextFieldName="Name"
+                                                                                    ValueFieldName="Id">
+                                                                        </DxComboBox>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department" ColSpanMd="12">
+                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    Data="@Departments"
+                                                                                    NullText="Select Department"
+                                                                                    @bind-Value="@UserForm.DepartmentId"
+                                                                                    TextFieldName="Name"
+                                                                                    ValueFieldName="Id">
+                                                                        </DxComboBox>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number" ColSpanMd="12">
+                                                                        <DxMaskedInput @bind-Value="@UserForm.NoBpjsKs"
+                                                                                       NullText="BPJS KS Number"
+                                                                                       ShowValidationIcon="true"
+                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                            <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                        </DxMaskedInput>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Legacy Number" ColSpanMd="12">
+                                                                        <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="SAP Number" ColSpanMd="12">
+                                                                        <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Occupational" ColSpanMd="12">
+                                                                        <MyDxComboBox Data="@Occupationals"
+                                                                                      NullText="Select Occupational"
+                                                                                      TextFieldName="Name"
+                                                                                      ValueFieldName="Id"
+                                                                                      @bind-Value="UserForm.OccupationalId">
+                                                                        </MyDxComboBox>
+                                                                        <ValidationMessage For="@(() => UserForm.OccupationalId)" />
+                                                                    </DxFormLayoutItem>
+
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS TK Number" ColSpanMd="12">
+                                                                        <DxMaskedInput @bind-Value="@UserForm.NoBpjsTk"
+                                                                                       NullText="BPJS TK Number"
+                                                                                       ShowValidationIcon="true"
+                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                            <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                        </DxMaskedInput>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Join Date" ColSpanMd="12">
+                                                                        <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="NIP Number" ColSpanMd="12">
+                                                                        <DxMaskedInput @bind-Value="@UserForm.NIP"
+                                                                                       NullText="NIP"
+                                                                                       ShowValidationIcon="true"
+                                                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                            <DxTextMaskProperties Placeholder="Placeholder" />
+                                                                        </DxMaskedInput>
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Oracle Number" ColSpanMd="12">
+                                                                        <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
+                                                                    </DxFormLayoutItem>
+                                                                    <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Employee Type" ColSpanMd="12">
+                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                    Data="@Helper.EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type" />
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </DxFormLayout>
                             </EditForm>
 
                             <div class="mt-2"></div>

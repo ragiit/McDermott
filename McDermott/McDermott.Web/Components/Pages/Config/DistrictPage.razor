@@ -3,7 +3,8 @@
 
 <PageTitle>McHealthCare - Master Data District</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+
 {
     <div class="wrapper">
 
@@ -21,12 +22,13 @@
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
+                                            Text="Fetching Data">
                                 <MyGridPaginate @ref="Grid"
                                                 Data="Districts"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 EditModelSaving="OnSave"
                                                 SearchTextChanged="OnSearchBoxChanged"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
                                                 DataItemDeleting="OnDelete"
                                                 KeyFieldName="Id">
 
@@ -38,10 +40,10 @@
                                                          NewItem_Click="@NewItem_Click"
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
+                                                         Refresh_Click="@Refresh_Click" 
                                                          ImportFile="ImportFile"
                                                          ExportToExcel="ExportToExcel"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -66,7 +68,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Provinces"
-                                                              NullText="Select Province..."
+                                                              NullText="Select Province"
                                                               @ref="refProvinceComboBox"
                                                               @bind-Value="@a.ProvinceId"
                                                               TextFieldName="Name"
@@ -93,7 +95,7 @@
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Cities"
-                                                              NullText="Select City..."
+                                                              NullText="Select City"
                                                               @ref="refCityComboBox"
                                                               @bind-Value="@a.CityId"
                                                               TextFieldName="Name"
@@ -162,8 +164,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
     <LoadingIndicatorLayout />
 }
-

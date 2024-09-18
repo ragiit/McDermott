@@ -415,14 +415,14 @@
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Join Date">
                                                 <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number">
-                                                <DxMaskedInput @bind-Value="@UserForm.NoBpjsKs"
-                                                               NullText="BPJS KS Number"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                    <DxTextMaskProperties Placeholder="Placeholder" />
-                                                </DxMaskedInput>
-                                            </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number">
+                                                    <DxMaskedInput @bind-Value="@UserForm.NoBpjsKs"
+                                                                   NullText="BPJS KS Number"
+                                                                   ShowValidationIcon="true"
+                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                        <DxTextMaskProperties Placeholder="Placeholder" />
+                                                    </DxMaskedInput>
+                                                </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="NIP Number">
                                                 <DxMaskedInput @bind-Value="@UserForm.NIP"
                                                                NullText="NIP"

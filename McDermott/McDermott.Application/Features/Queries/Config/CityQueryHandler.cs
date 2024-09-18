@@ -82,7 +82,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<City>().AddAsync(request.CityDto.Adapt<City>());
+                var result = await _unitOfWork.Repository<City>().AddAsync(request.CityDto.Adapt<CreateUpdateCityDto>().Adapt<City>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -100,8 +100,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<City>().AddAsync(request.CityDtos.Adapt<List<City>>());
-
+                var result = await _unitOfWork.Repository<City>().AddAsync(request.CityDtos.Adapt<CreateUpdateCityDto>().Adapt<List<City>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
@@ -122,8 +121,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<City>().UpdateAsync(request.CityDto.Adapt<City>());
-
+                var result = await _unitOfWork.Repository<City>().UpdateAsync(request.CityDto.Adapt<CreateUpdateCityDto>().Adapt<City>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai
@@ -140,8 +138,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<City>().UpdateAsync(request.CityDtos.Adapt<List<City>>());
-
+                var result = await _unitOfWork.Repository<City>().UpdateAsync(request.CityDtos.Adapt<CreateUpdateCityDto>().Adapt<List<City>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetCityQuery_"); // Ganti dengan key yang sesuai

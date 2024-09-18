@@ -39,11 +39,10 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataProvince(0, 10);
         }
 
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetProvinceQuery(provinceId == null ? null : x => x.Id == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
             Provinces = result.Item1;
             totalCountProvince = result.pageCount;
             PanelVisible = false;
@@ -144,8 +143,6 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            //var result = await MyQuery.GetCities(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
             var result = await Mediator.Send(new GetCityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Cities = result.Item1;
             totalCount = result.pageCount;
@@ -155,6 +152,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            refProvinceComboBox = null;
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
@@ -305,6 +303,7 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            await LoadDataProvince(provinceId: (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new()).ProvinceId);
         }
 
         private void DeleteItem_Click()

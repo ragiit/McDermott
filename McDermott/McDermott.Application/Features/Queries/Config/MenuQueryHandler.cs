@@ -63,8 +63,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDto.Adapt<Menu>());
-
+                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDto.Adapt<CreateUpdateMenuDto>().Adapt<Menu>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
@@ -82,8 +81,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDtos.Adapt<List<Menu>>());
-
+                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDtos.Adapt<CreateUpdateMenuDto>().Adapt<List<Menu>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
@@ -105,8 +103,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDto.Adapt<Menu>());
-
+                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDto.Adapt<CreateUpdateMenuDto>().Adapt<Menu>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
@@ -124,8 +121,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDtos.Adapt<List<Menu>>());
-
+                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDtos.Adapt<CreateUpdateMenuDto>().Adapt<List<Menu>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
