@@ -10,7 +10,12 @@
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public int PageSize { get; set; } = pageSize ?? 10;
+        }
+
+        public class BulkValidateCityQuery(List<CityDto> CitysToValidate) : IRequest<List<CityDto>>
+        {
+            public List<CityDto> CitysToValidate { get; } = CitysToValidate;
         }
 
         public class ValidateCityQuery(Expression<Func<City, bool>>? predicate = null) : IRequest<bool>

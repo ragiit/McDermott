@@ -92,7 +92,9 @@ namespace McDermott.Web.Components.Pages.Patient
                     Departments = await Mediator.Send(new GetDepartmentQuery());
                     JobPositions = await Mediator.Send(new GetJobPositionQuery());
                     Families = await Mediator.Send(new GetFamilyQuery());
-                    Occupationals = await Mediator.Send(new GetOccupationalQuery());
+                    var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
+                    Occupationals = resultOccupationals.Item1;
+
                     StateHasChanged();
                 }
                 catch { }

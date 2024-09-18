@@ -359,7 +359,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var headerNames = new List<string>() { "Name", "Postal Code", "Province", "City", "District" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => !headerNames[i - 1].Trim().Equals(ws.Cells[1, i].Value?.ToString()?.Trim().ToLower(), StringComparison.CurrentCultureIgnoreCase)))
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
                     {
                         ToastService.ShowInfo("The header must match with the template.");
                         return;

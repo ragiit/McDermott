@@ -2,7 +2,7 @@ namespace McDermott.Application.Features.Commands.Config
 {
     public class CompanyCommand
     {
-        #region GET (Bisa berdasarkan kondisi WHERE juga)
+        #region
 
         public class GetCompanyQuery(Expression<Func<Company, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -10,7 +10,12 @@ namespace McDermott.Application.Features.Commands.Config
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public int PageSize { get; set; } = pageSize ?? 10;
+        }
+
+        public class BulkValidateCompanyQuery(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
+        {
+            public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
         }
 
         public class ValidateCompanyQuery(Expression<Func<Company, bool>>? predicate = null) : IRequest<bool>

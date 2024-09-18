@@ -1,10 +1,12 @@
-﻿using static McDermott.Application.Features.Commands.Config.CityCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Config.CityCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
     public class CityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetCityQuery, (List<CityDto>, int pageIndex, int pageSize, int pageCount)>,
-  IRequestHandler<ValidateCityQuery, bool>,
+        IRequestHandler<ValidateCityQuery, bool>,
+        IRequestHandler<BulkValidateCityQuery, List<CityDto>>,
         IRequestHandler<CreateCityRequest, CityDto>,
         IRequestHandler<CreateListCityRequest, List<CityDto>>,
         IRequestHandler<UpdateCityRequest, CityDto>,
@@ -12,6 +14,24 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteCityRequest, bool>
     {
         #region GET
+
+        public async Task<List<CityDto>> Handle(BulkValidateCityQuery request, CancellationToken cancellationToken)
+        {
+            var CityDtos = request.CitysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var CityNames = CityDtos.Select(x => x.Name).Distinct().ToList();
+            var provinceIds = CityDtos.Select(x => x.ProvinceId).Distinct().ToList();
+
+            var existingCitys = await _unitOfWork.Repository<City>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => CityNames.Contains(v.Name)
+                            && provinceIds.Contains(v.ProvinceId))
+                .ToListAsync(cancellationToken);
+
+            return existingCitys.Adapt<List<CityDto>>();
+        }
 
         public async Task<(List<CityDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCityQuery request, CancellationToken cancellationToken)
         {
@@ -35,15 +55,7 @@ namespace McDermott.Application.Features.Queries.Config
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var skip = (request.PageIndex) * (request.PageSize == 0 ? totalCount : request.PageSize);
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<CityDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

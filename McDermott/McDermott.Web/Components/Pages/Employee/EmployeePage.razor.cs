@@ -117,7 +117,8 @@ namespace McDermott.Web.Components.Pages.Employee
             Genders = await Mediator.Send(new GetGenderQuery());
             Departments = await Mediator.Send(new GetDepartmentQuery());
             JobPositions = await Mediator.Send(new GetJobPositionQuery());
-            Occupationals = await Mediator.Send(new GetOccupationalQuery());
+            var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
+            Occupationals = resultOccupationals.Item1;
 
             await GetUserInfo();
             await LoadData();

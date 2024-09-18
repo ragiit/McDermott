@@ -1,17 +1,15 @@
+using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CompanyPage
     {
-        private CompanyDto CompanyForm = new();
-
-        public List<CompanyDto> Companys = new();
-        public CompanyDto formCompanies = new();
-        public CompanyDto DetailCompanies = new();
-        public List<CountryDto> Countries { get; set; }
-        public List<ProvinceDto> Provinces { get; set; }
-        public List<CityDto> Cities { get; set; }
+        public List<CompanyDto> Companys = [];
+        public List<CountryDto> Countries { get; set; } = [];
+        public List<ProvinceDto> Provinces { get; set; } = [];
+        public List<CityDto> Cities { get; set; } = [];
+        public List<VillageDto> Villages { get; set; } = [];
 
         #region UserLoginAndAccessRole
 
@@ -21,32 +19,6 @@ namespace McDermott.Web.Components.Pages.Config
         private GroupMenuDto UserAccessCRUID = new();
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
-            }
-        }
 
         private async Task GetUserInfo()
         {
@@ -72,65 +44,81 @@ namespace McDermott.Web.Components.Pages.Config
         private int FocusedRowVisibleIndex { get; set; }
         private bool PanelVisible { get; set; } = true;
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            showForm = false;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
             PanelVisible = true;
             SelectedDataItems = [];
-            var Companys = (await Mediator.Send(new GetCompanyQuery())).Item1;
-            this.Companys = Companys;
-            //DetailCompanies = [.. Companys.ToList()];
+            var countries = await Mediator.Send(new GetCompanyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Companys = countries.Item1;
+            totalCount = countries.Item4;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
         protected override async Task OnInitializedAsync()
         {
-            SelectedDataItems = [];
-            var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1;
-            var result = await Mediator.Send(new GetProvinceQuery());
-            Provinces = result.Item1;
-            var results = await Mediator.Send(new GetCityQuery());
-            Cities = results.Item1;
-
+            PanelVisible = true;
             await GetUserInfo();
             await LoadData();
+            await LoadDataProvince();
+            await LoadDataCity();
+            await LoadDataCountry();
+            PanelVisible = false;
         }
 
-        private void OnCancel()
-        {
-            formCompanies = new();
-            showForm = false;
-            isDetail = false;
-        }
-
-        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
-        {
-            showForm = false;
-            isDetail = true;
-            var company = SelectedDataItems[0].Adapt<CompanyDto>();
-            DetailCompanies = company;
-        }
-
-        private async Task OnSave()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
-                var editModel = formCompanies;
+                var editModel = (CompanyDto)e.EditModel;
+
+                bool validate = await Mediator.Send(new ValidateCompanyQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"Company with name '{editModel.Name}' is already exists");
+                    e.Cancel = true;
+                    return;
+                }
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateCompanyRequest(editModel));
                 else
                     await Mediator.Send(new UpdateCompanyRequest(editModel));
 
+                SelectedDataItems = [];
                 await LoadData();
             }
-            catch { }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -147,17 +135,12 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new DeleteCompanyRequest(ids: a.Select(x => x.Id).ToList()));
                 }
 
-                await LoadData();
+                await LoadData(0, pageSize);
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
         }
 
         private async Task Refresh_Click()
@@ -170,38 +153,14 @@ namespace McDermott.Web.Components.Pages.Config
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private async Task NewItem_Click()
         {
-            isDetail = false;
-            showForm = true;
-            textPopUp = "Add Data Companies";
+            await Grid.StartEditNewRowAsync();
         }
 
         private async Task EditItem_Click()
         {
-            var company = SelectedDataItems[0].Adapt<CompanyDto>();
-            formCompanies = company;
-            showForm = true;
-            isDetail = false;
-            textPopUp = "Edit Data Companies";
-        }
-
-        private async Task Back_Click()
-        {
-            showForm = false;
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()
@@ -209,30 +168,150 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         #endregion Default Grid Components
+
+        #region ComboboxProvince
+
+        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+        private int ProvinceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvince = 0;
+
+        private async Task OnSearchProvince()
+        {
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task OnSearchProvinceIndexIncrement()
+        {
+            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            {
+                ProvinceComboBoxIndex++;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvinceIndexDecrement()
+        {
+            if (ProvinceComboBoxIndex > 0)
+            {
+                ProvinceComboBoxIndex--;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceChanged(string e)
+        {
+            ProvinceComboBoxIndex = 0;
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var countryId = refCountryComboBox?.Value.GetValueOrDefault();
+            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == countryId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            Provinces = result.Item1;
+            totalCountProvince = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxProvince
+
+        #region ComboboxCity
+
+        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
+        private int CityComboBoxIndex { get; set; } = 0;
+        private int totalCountCity = 0;
+
+        private async Task OnSearchCity()
+        {
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task OnSearchCityIndexIncrement()
+        {
+            if (CityComboBoxIndex < (totalCountCity - 1))
+            {
+                CityComboBoxIndex++;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCityIndexDecrement()
+        {
+            if (CityComboBoxIndex > 0)
+            {
+                CityComboBoxIndex--;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCityChanged(string e)
+        {
+            CityComboBoxIndex = 0;
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+
+            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
+            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+            Cities = result.Item1;
+            totalCountCity = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCity
+
+        #region ComboboxCountry
+
+        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
+        private int CountryComboBoxIndex { get; set; } = 0;
+        private int totalCountCountry = 0;
+
+        private async Task OnSearchCountry()
+        {
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task OnSearchCountryIndexIncrement()
+        {
+            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            {
+                CountryComboBoxIndex++;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCountryIndexDecrement()
+        {
+            if (CountryComboBoxIndex > 0)
+            {
+                CountryComboBoxIndex--;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCountryChanged(string e)
+        {
+            CountryComboBoxIndex = 0;
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            Countries = result.Item1;
+            totalCountCountry = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCountry
     }
 }
