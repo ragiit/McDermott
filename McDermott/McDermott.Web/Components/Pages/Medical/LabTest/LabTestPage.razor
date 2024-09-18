@@ -1,21 +1,21 @@
-﻿@page "/medical/sample-types"
+﻿@page "/medical/lab-tests"
+
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Sample Type</PageTitle>
+<PageTitle>McHealthCare - Lab Test</PageTitle>
 
 @if (IsAccess)
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Master Data Sample Type" />
+        <BaseHeaderPage Title="Lab Test" OnClickBack="@(async () => NavigationManager.NavigateTo("medical/lab-tests"))" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
+                            <div class="card-body">
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
@@ -23,51 +23,35 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <MyGridPaginate @ref="Grid"
-                                                    Data="SampleTypes"
+                                                    Data="LabTests"
                                                     @bind-SelectedDataItems="@SelectedDataItems"
-                                                    EditModelSaving="OnSave"
                                                     DataItemDeleting="OnDelete"
-                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    
+                                                    SelectAllCheckboxMode="CurrentSelectAllCheckboxMode"
                                                     SearchTextChanged="OnSearchBoxChanged"
                                                     KeyFieldName="Id">
                                         <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="SampleTypeDto"
-                                                             Items="@SampleTypes"
-                                                             Grid="Grid"
+                                            <MyDxToolbarBase TItem="LabTestDto"
+                                                             Items="@LabTests"
                                                              SelectedDataItems="@SelectedDataItems"
                                                              NewItem_Click="@NewItem_Click"
                                                              EditItem_Click="@EditItem_Click"
                                                              DeleteItem_Click="@DeleteItem_Click"
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="true"
+                                                             Grid="Grid"
                                                              ImportFile="ImportFile"
                                                              ExportToExcel="ExportToExcel"
                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
                                                              VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
-
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Description" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
                                         </Columns>
-
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (SampleTypeDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Name" NullText="Name" InputCssClass="fw-normal" />
-                                                    <ValidationMessage For="@(() => a.Name)" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Description" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Description" NullText="Description" InputCssClass="fw-normal" />
-                                                    <ValidationMessage For="@(() => a.Description)" />
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
                                         <TotalSummary>
                                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
                                                                FieldName="Name"
@@ -111,8 +95,8 @@
 else
 {
     <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="LabSampletype" />
+        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Laboratorium Test" />
 
         <LoadingIndicatorLayout></LoadingIndicatorLayout>
     </div>
-}
+} 

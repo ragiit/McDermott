@@ -3,6 +3,7 @@
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class LabTestDetailQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetAllLabTestDetailQuery, List<LabTestDetailDto>>,
         IRequestHandler<GetLabTestDetailQuery, (List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateLabTestDetailRequest, LabTestDetailDto>,
         IRequestHandler<CreateListLabTestDetailRequest, List<LabTestDetailDto>>,
@@ -12,13 +13,50 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
+        public async Task<List<LabTestDetailDto>> Handle(GetAllLabTestDetailQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetAllLabTestDetailQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<LabTestDetail>? result))
+                {
+                    result = await _unitOfWork.Repository<LabTestDetail>().GetAsync(
+                        null,
+                        x => x
+                        .Include(z => z.LabTest)
+                        .Include(x => x.LabUom),
+                        cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                }
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<LabTestDetailDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<(List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabTestDetailQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var query = _unitOfWork.Repository<LabTestDetail>().Entities
+                    .Include(x=>x.LabUom)
                     .AsNoTracking()
                     .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {

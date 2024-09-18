@@ -1,0 +1,216 @@
+﻿@page "/medical/lab-tests/{PageMode}"
+@using McDermott.Web.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Lab Test</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Group" OnClickBack="@(async () => NavigationManager.NavigateTo("medical/lab-tests"))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+
+                        <EditForm Model="@LabTest" @onkeypress="@KeyPressHandler" Context="EditFormContext22" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                            <DataAnnotationsValidator />
+                            <AntiforgeryToken />
+                            <div class="card sticky">
+                                <div class="card-body">
+                                    <div class=" row w-100">
+                                        <div class="w-100 row justify-content-end mt-2 mb-2">
+                                            <div class="col-auto align-self-end p-0 m-0">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                </DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelItem_Click"></DxButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@LabTest.Name"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Name" />
+                                                <ValidationMessage For="@(() => LabTest.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Caption="Code" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@LabTest.Code"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Code" />
+                                                <ValidationMessage For="@(() => LabTest.Code)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sample Type" ColSpanMd="12">
+                                                <MyDxComboBox Data="@SampleTypes"
+                                                              NullText="Select Sampel type..."
+                                                              @ref="refSampleTypesComboBox"
+                                                              @bind-Value="@LabTest.SampleTypeId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputSampleTypesChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchSampleTypesIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchSampleTypes"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchSampleTypesIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=> LabTest.SampleTypeId)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
+                                                <DxComboBox ShowValidationIcon="true"
+                                                            Data="@ResultValueTypes"
+                                                            NullText="Select Result Type..."
+                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                            @bind-Value="@LabTest.ResultType">
+                                                </DxComboBox>
+                                                <ValidationMessage For="@(()=> LabTest.ResultType)"   />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                        <hr />
+                                        @if (LabTest.Id != 0)
+                                        {
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass=" required-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Diagnosis" ColSpanMd="12">
+                                                    <Template>
+                                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                        IsContentBlocked="true"
+                                                                        ApplyBackgroundShading="true"
+                                                                        IndicatorAreaVisible="false"
+                                                                        Text="Fetching Data...">
+                                                            <MyGridPaginate @ref="GridDetail"
+                                                                            Data="LabTestDetailForms"
+                                                                            @bind-SelectedDataItems="@SelectedDetailDataItems"
+                                                                            EditModelSaving="OnSave"
+                                                                            DataItemDeleting="OnDeleteLabTestDetail"
+                                                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                                                            SearchTextChanged="OnSearchBoxChanged"
+                                                                            KeyFieldName="Id">
+                                                                <ToolbarTemplate>
+                                                                    <MyDxToolbarBase TItem="LabTestDetailDto"
+                                                                                     Items="@LabTestDetailForms"
+                                                                                     SelectedDataItems="@SelectedDetailDataItems"
+                                                                                     NewItem_Click="@NewItemDetail_Click"
+                                                                                     EditItem_Click="@(()=>EditItemDetail_Click(context.Grid))"
+                                                                                     DeleteItem_Click="@DeleteItemDetail_Click"
+                                                                                     Refresh_Click="@RefreshDetail_Click"
+                                                                                     IsImport="true"
+                                                                                     ImportFile="ImportFile2"
+                                                                                     ExportToExcel="ExportToExcel2"
+                                                                                     VisibleNew="UserAccessCRUID.IsCreate"
+                                                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                                </ToolbarTemplate>
+                                                                <Columns>
+                                                                    <DxGridSelectionColumn Width="15px" />
+                                                                    <DxGridDataColumn MinWidth="200" FieldName="Name" Caption="Parameter" SortIndex="0" />
+                                                                    <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
+                                                                    <DxGridDataColumn MinWidth="200" FieldName="NormalRangeMale" Caption="Normal Range (Male)" />
+                                                                    <DxGridDataColumn MinWidth="200" FieldName="NormalRangeFemale" Caption="Normal Range (Female)" />
+                                                                    <DxGridDataColumn MinWidth="200" FieldName="ResultValueType" Caption="Result Value Type" />
+                                                                    <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
+                                                                </Columns>
+                                                                <EditFormTemplate Context="EditFormContext">
+                                                                    @{
+                                                                        var a = (LabTestDetailDto)EditFormContext.EditModel;
+                                                                        if (string.IsNullOrWhiteSpace(a.ResultValueType))
+                                                                        {
+                                                                            a.ResultValueType = LabTest.ResultType;
+                                                                        }
+                                                                    }
+                                                                    <DxFormLayout CssClass="w-100">
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Parameter" ColSpanMd="12">
+                                                                            <DxTextBox @bind-Text="@a.Name" NullText="Parameter" InputCssClass="fw-normal" ShowValidationIcon="true" />
+                                                                            <ValidationMessage For="@(() => a.Name)" />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Male)" ColSpanMd="12">
+                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeMale" NullText="Normal Range (Male)" InputCssClass="fw-normal" />
+                                                                            <ValidationMessage For="@(() => a.NormalRangeMale)" />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Female)" ColSpanMd="12">
+                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeFemale" NullText="Normal Range (Female)" InputCssClass="fw-normal" />
+                                                                            <ValidationMessage For="@(() => a.NormalRangeFemale)" />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
+                                                                            <MyDxComboBox Data="@LabUoms"
+                                                                                          NullText="Select Lab Uom..."
+                                                                                          @ref="refLabUomComboBox"
+                                                                                          @bind-Value="@a.LabUomId"
+                                                                                          TextFieldName="Name"
+                                                                                          ValueFieldName="Id"
+                                                                                          TextChanged="((string e) => OnInputLabUomChanged(e))">
+                                                                                <Buttons>
+                                                                                    <DxEditorButton Click="OnSearchLabUomIndexDecrement"
+                                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                                    Tooltip="Previous Index" />
+                                                                                    <DxEditorButton Click="OnSearchLabUom"
+                                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                    Tooltip="Search" />
+                                                                                    <DxEditorButton Click="OnSearchLabUomIndexIncrement"
+                                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                                    Tooltip="Next Index" />
+                                                                                </Buttons>
+                                                                            </MyDxComboBox>
+                                                                            <ValidationMessage For="@(()=> a.LabUomId)"   />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Value Type" ColSpanMd="12">
+                                                                            <DxComboBox ShowValidationIcon="true"
+                                                                                        Data="@ResultValueTypes"
+                                                                                        NullText="Select Result Value Type..."
+                                                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                        @bind-Value="@a.ResultValueType">
+                                                                            </DxComboBox>
+                                                                            <ValidationMessage For="@(()=> a.ResultValueType)"   />
+                                                                        </DxFormLayoutItem>
+
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Remark" ColSpanMd="12">
+                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@a.Remark" NullText="Remark" InputCssClass="fw-normal" />
+                                                                            <ValidationMessage For="@(() => a.Remark)" />
+                                                                        </DxFormLayoutItem>
+                                                                    </DxFormLayout>
+                                                                </EditFormTemplate>
+                                                            </MyGridPaginate>
+                                                        </DxLoadingPanel>
+                                                    </Template>
+                                                </DxFormLayoutItem>
+
+                                            </DxFormLayout>
+                                        }
+                                    </div>
+                                </div>
+                            </DxLoadingPanel>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

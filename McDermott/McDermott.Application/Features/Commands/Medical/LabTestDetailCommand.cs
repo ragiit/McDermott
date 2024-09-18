@@ -3,7 +3,11 @@
     public class LabTestDetailCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
-
+        public class GetAllLabTestDetailQuery(Expression<Func<LabTestDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<LabTestDetailDto>>
+        {
+            public Expression<Func<LabTestDetail, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
         public class GetLabTestDetailQuery(Expression<Func<LabTestDetail, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<LabTestDetail, bool>> Predicate { get; } = predicate!;

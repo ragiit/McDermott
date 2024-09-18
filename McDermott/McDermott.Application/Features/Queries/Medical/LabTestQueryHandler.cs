@@ -4,6 +4,7 @@ namespace McDermott.Application.Features.Queries.Medical
 {
     public class LabTestQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLabTestQuery, (List<LabTestDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateLabTestQuery, bool>,
         IRequestHandler<CreateLabTestRequest, LabTestDto>,
         IRequestHandler<CreateListLabTestRequest, List<LabTestDto>>,
         IRequestHandler<UpdateLabTestRequest, LabTestDto>,
@@ -20,6 +21,9 @@ namespace McDermott.Application.Features.Queries.Medical
                     .Include(x => x.SampleType)
                     .AsNoTracking()
                     .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
