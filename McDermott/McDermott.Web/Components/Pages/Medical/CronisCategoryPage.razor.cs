@@ -60,42 +60,135 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
         }
 
-        private async Task LoadData()
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var Chronises = await Mediator.Send(new GetCronisCategoryQuery());
-            this.Chronises = Chronises.Item1;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Description" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<CronisCategoryDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var c = new CronisCategoryDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Description = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        list.Add(c);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Description, }).ToList();
+
+                        // Panggil BulkValidateCronisCategoryQuery untuk validasi bulk
+                        var existingCronisCategorys = await Mediator.Send(new BulkValidateCronisCategoryQuery(list));
+
+                        // Filter CronisCategory baru yang tidak ada di database
+                        list = list.Where(CronisCategory =>
+                            !existingCronisCategorys.Any(ev =>
+                                ev.Name == CronisCategory.Name &&
+                                ev.Description == CronisCategory.Description
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListCronisCategoryRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
             PanelVisible = false;
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
+        private async Task ExportToExcel()
         {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "cronis_category_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Description"
+                },
+            ]);
         }
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
         }
 
-        private void UpdateEditItemsEnabled(bool enabled)
+        private async Task OnPageSizeIndexChanged(int newPageSize)
         {
-            EditItemsEnabled = enabled;
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var countries = await Mediator.Send(new GetCronisCategoryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Chronises = countries.Item1;
+            totalCount = countries.pageCount;
+            activePageIndex = pageIndex;
+            PanelVisible = false;
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task NewItem_Click()

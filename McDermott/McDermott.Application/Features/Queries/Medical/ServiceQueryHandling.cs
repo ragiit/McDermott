@@ -1,17 +1,41 @@
 ﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 
+using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
+using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
+
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class ServiceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateServiceRequest, ServiceDto>,
+IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
         IRequestHandler<CreateListServiceRequest, List<ServiceDto>>,
         IRequestHandler<UpdateServiceRequest, ServiceDto>,
         IRequestHandler<UpdateListServiceRequest, List<ServiceDto>>,
         IRequestHandler<DeleteServiceRequest, bool>
     {
         #region GET
+
+        public async Task<List<ServiceDto>> Handle(BulkValidateServiceQuery request, CancellationToken cancellationToken)
+        {
+            var ServiceDtos = request.ServicesToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ServiceNames = ServiceDtos.Select(x => x.Name).Distinct().ToList();
+            var B = ServiceDtos.Select(x => x.Code).Distinct().ToList();
+            var C = ServiceDtos.Select(x => x.Quota).Distinct().ToList();
+
+            var existingServices = await _unitOfWork.Repository<Service>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ServiceNames.Contains(v.Name)
+                            && B.Contains(v.Code)
+                            && C.Contains(v.Quota))
+                .ToListAsync(cancellationToken);
+
+            return existingServices.Adapt<List<ServiceDto>>();
+        }
 
         public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetServiceQuery request, CancellationToken cancellationToken)
         {

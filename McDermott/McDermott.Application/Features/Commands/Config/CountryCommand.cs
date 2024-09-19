@@ -13,6 +13,11 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateCountryQuery(List<CountryDto> CountrysToValidate) : IRequest<List<CountryDto>>
+        {
+            public List<CountryDto> CountrysToValidate { get; } = CountrysToValidate;
+        }
+
         public class ValidateCountryQuery(Expression<Func<Country, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Country, bool>> Predicate { get; } = predicate!;

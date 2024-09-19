@@ -135,7 +135,7 @@
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Problems", "Code" };
+                    var headerNames = new List<string>() { "Problem", "Code" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -149,22 +149,34 @@
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var c = new NursingDiagnosesDto
+                        list.Add(new NursingDiagnosesDto
                         {
                             Problem = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                             Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                        };
-
-                        if (!NursingDiagnoses.Any(x => x.Problem.Trim().ToLower() == c?.Problem?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                            list.Add(c);
+                        });
                     }
 
-                    await Mediator.Send(new CreateListNursingDiagnosesRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Problem, x.Code }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateNursingDiagnosesQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Problem == village.Problem &&
+                                ev.Code == village.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListNursingDiagnosesRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
@@ -176,11 +188,11 @@
 
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "NursingDiagnoses_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "nursing_diagnoses_template.xlsx",
             [
                 new()
                 {
-                    Column = "Problems",
+                    Column = "Problem",
                     Notes = "Mandatory"
                 },
                 new()
@@ -189,7 +201,6 @@
                 },
             ]);
         }
-
 
         #region SaveDelete
 
@@ -233,7 +244,6 @@
         #endregion SaveDelete
 
         #region ToolBar Button
-
 
         private async Task Refresh_Click()
         {

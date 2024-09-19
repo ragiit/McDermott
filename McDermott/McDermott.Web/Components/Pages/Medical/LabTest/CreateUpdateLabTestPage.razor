@@ -8,7 +8,7 @@
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Group" OnClickBack="@(async () => NavigationManager.NavigateTo("medical/lab-tests"))" ShowBackButton="true" />
+        <BaseHeaderPage Title="Lab Test" OnClickBack="@(async () => NavigationManager.NavigateTo("medical/lab-tests"))" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">
@@ -23,7 +23,7 @@
                                     <div class=" row w-100">
                                         <div class="w-100 row justify-content-end mt-2 mb-2">
                                             <div class="col-auto align-self-end p-0 m-0">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Info" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
                                                 </DxButton>
                                                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelItem_Click"></DxButton>
                                             </div>
@@ -75,6 +75,10 @@
                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
+                                                      <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(SampleType.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(SampleType.Description)" Caption="Description" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=> LabTest.SampleTypeId)"   />
                                             </DxFormLayoutItem>
@@ -93,7 +97,7 @@
                                         @if (LabTest.Id != 0)
                                         {
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass=" required-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Diagnosis" ColSpanMd="12">
+                                                <DxFormLayoutItem CaptionCssClass=" required-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
                                                     <Template>
                                                         <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                         IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
@@ -213,4 +217,12 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
 }

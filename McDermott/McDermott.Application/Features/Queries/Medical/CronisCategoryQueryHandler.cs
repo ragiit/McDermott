@@ -5,12 +5,29 @@ namespace McDermott.Application.Features.Queries.Medical
     public class CronisCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetCronisCategoryQuery, (List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateCronisCategoryRequest, CronisCategoryDto>,
+        IRequestHandler<BulkValidateCronisCategoryQuery, List<CronisCategoryDto>>,
         IRequestHandler<CreateListCronisCategoryRequest, List<CronisCategoryDto>>,
         IRequestHandler<UpdateCronisCategoryRequest, CronisCategoryDto>,
         IRequestHandler<UpdateListCronisCategoryRequest, List<CronisCategoryDto>>,
         IRequestHandler<DeleteCronisCategoryRequest, bool>
     {
         #region GET
+
+        public async Task<List<CronisCategoryDto>> Handle(BulkValidateCronisCategoryQuery request, CancellationToken cancellationToken)
+        {
+            var CronisCategoryDtos = request.CronisCategorysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var CronisCategoryNames = CronisCategoryDtos.Select(x => x.Name).Distinct().ToList();
+
+            var existingCronisCategorys = await _unitOfWork.Repository<CronisCategory>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => CronisCategoryNames.Contains(v.Name))
+                .ToListAsync(cancellationToken);
+
+            return existingCronisCategorys.Adapt<List<CronisCategoryDto>>();
+        }
 
         public async Task<(List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCronisCategoryQuery request, CancellationToken cancellationToken)
         {

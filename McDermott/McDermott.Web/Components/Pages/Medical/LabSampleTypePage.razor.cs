@@ -86,7 +86,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #endregion Searching
 
-
         #region SaveDelete
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -108,6 +107,7 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -115,6 +115,16 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 SampleType = ((SampleTypeDto)e.EditModel);
+
+                bool validate = await Mediator.Send(new ValidateSampleTypeQuery(x => x.Id != SampleType.Id && x.Name == SampleType.Name));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"Sample Type with name '{SampleType.Name}' is already exists");
+                    e.Cancel = true;
+                    return;
+                }
+
                 if (SampleType.Id == 0)
                     await Mediator.Send(new CreateSampleTypeRequest(SampleType));
                 else
@@ -126,6 +136,7 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         #endregion SaveDelete
@@ -155,51 +166,100 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SampleType = new();
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetSampleTypeQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            SampleTypes = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SampleType = new();
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetSampleTypeQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                SampleTypes = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion LoadData
 
         #region Grid Function
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
         }
 
         #region ToolBar Button
 
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
+            PanelVisible = true;
             foreach (var file in e.GetMultipleFiles(1))
             {
-                
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Description" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<SampleTypeDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var SampleType = new SampleTypeDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Description = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        list.Add(SampleType);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Description, }).ToList();
+
+                        // Panggil BulkValidateSampleTypeQuery untuk validasi bulk
+                        var existingSampleTypes = await Mediator.Send(new BulkValidateSampleTypeQuery(list));
+
+                        // Filter SampleType baru yang tidak ada di database
+                        list = list.Where(SampleType =>
+                            !existingSampleTypes.Any(ev =>
+                                ev.Name == SampleType.Name
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListSampleTypeRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+                finally { PanelVisible = false; }
             }
+            PanelVisible = false;
         }
 
         private async Task Refresh_Click()
@@ -225,20 +285,21 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task ImportFile()
         {
-            await JsRuntime.InvokeVoidAsync("clickInputFile");
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
+
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Speciality_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "sample_type_template.xlsx",
             [
-                new()
-                {
-                    Column = "Code"
-                },
                 new()
                 {
                     Column = "Name",
                     Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Description"
                 },
             ]);
         }

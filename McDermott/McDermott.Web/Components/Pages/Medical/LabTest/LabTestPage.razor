@@ -4,87 +4,85 @@
 
 <PageTitle>McHealthCare - Lab Test</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
-        <BaseHeaderPage Title="Lab Test" OnClickBack="@(async () => NavigationManager.NavigateTo("medical/lab-tests"))" ShowBackButton="true" />
+        <BaseHeaderPage Title="Lab Test" OnClickBack="@(async () => NavigationManager.NavigateTo("medical/lab-tests"))" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <MyGridPaginate @ref="Grid"
-                                                    Data="LabTests"
-                                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                                    DataItemDeleting="OnDelete"
-                                                    
-                                                    SelectAllCheckboxMode="CurrentSelectAllCheckboxMode"
-                                                    SearchTextChanged="OnSearchBoxChanged"
-                                                    KeyFieldName="Id">
-                                        <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="LabTestDto"
-                                                             Items="@LabTests"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@EditItem_Click"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@Refresh_Click"
-                                                             IsImport="true"
-                                                             Grid="Grid"
-                                                             ImportFile="ImportFile"
-                                                             ExportToExcel="ExportToExcel"
-                                                             VisibleNew="UserAccessCRUID.IsCreate"
-                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
-                                        </Columns>
-                                        <TotalSummary>
-                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                               FieldName="Name"
-                                                               Visible="true" />
-                                        </TotalSummary>
-                                    </MyGridPaginate>
-                                    <div class="row">
-                                        <DxFormLayout>
-                                            <div class="col-md-8">
-                                                <DxFormLayoutItem>
-                                                    <DxPager PageCount="totalCount"
-                                                             ActivePageIndexChanged="OnPageIndexChanged"
-                                                             ActivePageIndex="activePageIndex"
-                                                             VisibleNumericButtonCount="10"
-                                                             SizeMode="SizeMode.Medium"
-                                                             NavigationMode="PagerNavigationMode.Auto">
-                                                    </DxPager>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                            <div class="col-md-4 d-flex justify-content-end">
-                                                <DxFormLayoutItem Caption="Page Size:">
-                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                                  NullText="Select Page Size"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                                  @bind-Value="pageSize">
-                                                    </MyDxComboBox>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                        </DxFormLayout>
-                                    </div>
-                                </DxLoadingPanel>
-                            </div>
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="LabTests"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                DataItemDeleting="OnDelete"
+                                                SelectAllCheckboxMode="CurrentSelectAllCheckboxMode"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                KeyFieldName="Id">
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="LabTestDto"
+                                                         Items="@LabTests"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="UserAccessCRUID.IsImport"
+                                                         Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="ResultType" SortIndex="0" />
+                                    </Columns>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-8">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-4 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
@@ -92,11 +90,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Laboratorium Test" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
-} 
+    <LoadingIndicatorLayout />
+}

@@ -107,9 +107,10 @@
         {
             PanelVisible = true;
             PopUpVisible = false;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            SelectedDataItems = [];
             var result = await Mediator.Send(new GetServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Services = result.Item1;
+            activePageIndex = pageIndex;
             totalCount = result.pageCount;
             ServicesK = [.. Services.Where(x => x.IsKiosk == true).ToList()];
 
@@ -184,7 +185,6 @@
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            
             try
             {
                 var editModel = (ServiceDto)e.EditModel;
@@ -211,17 +211,97 @@
             EditItemsEnabled = true;
         }
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
             {
-                e.CssClass = "alt-item";
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Code", "Quota" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<ServiceDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        list.Add(new ServiceDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                            Quota = ws.Cells[row, 3].Value?.ToString()?.Trim(),
+                        });
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, x.Quota }).ToList();
+
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateServiceQuery(list));
+
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.Quota == village.Quota &&
+                                ev.Code == village.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListServiceRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
             }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
+            PanelVisible = false;
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "services_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Code"
+                },
+                new()
+                {
+                    Column = "Quota"
+                },
+            ]);
         }
 
         private async Task NewItem_Click()
@@ -264,9 +344,6 @@
         {
             Grid.ShowColumnChooser();
         }
-
-        
-        
 
         #endregion Default Grid
     }

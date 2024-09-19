@@ -20,16 +20,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-            }
         }
 
         private async Task GetUserInfo()
@@ -91,8 +81,11 @@ namespace McDermott.Web.Components.Pages.Medical
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
+            await LoadDataProvince();
+            await LoadDataCity();
+            await LoadDataCountry();
             PanelVisible = false;
 
             return;
@@ -162,9 +155,9 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCountryQuery(searchTerm: refCountryComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetCountryQuery(searchTerm: refCountryComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             Countries = result.Item1;
-            totalCount = result.pageCount;
+            totalCountCountry = result.pageCount;
             PanelVisible = false;
         }
 
@@ -209,9 +202,10 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProvinceQuery(searchTerm: refProvinceComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var c = refCountryComboBox?.Value;
+            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == c, searchTerm: refProvinceComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             Provinces = result.Item1;
-            totalCount = result.pageCount;
+            totalCountProvince = result.pageCount;
             PanelVisible = false;
         }
 
@@ -256,9 +250,10 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCityQuery(searchTerm: refCityComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var c = refProvinceComboBox?.Value;
+            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == c, searchTerm: refCityComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             Cities = result.Item1;
-            totalCount = result.pageCount;
+            totalCountCity = result.pageCount;
             PanelVisible = false;
         }
 

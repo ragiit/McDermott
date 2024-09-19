@@ -1,16 +1,33 @@
-﻿using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
-
-namespace McDermott.Application.Features.Queries.Medical
+﻿namespace McDermott.Application.Features.Queries.Medical
 {
     public class NursingDiagnosesQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          IRequestHandler<GetNursingDiagnosesQuery, (List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>,
     IRequestHandler<CreateNursingDiagnosesRequest, NursingDiagnosesDto>,
+IRequestHandler<BulkValidateNursingDiagnosesQuery, List<NursingDiagnosesDto>>,
     IRequestHandler<CreateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>,
     IRequestHandler<UpdateNursingDiagnosesRequest, NursingDiagnosesDto>,
     IRequestHandler<UpdateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>,
         IRequestHandler<DeleteNursingDiagnosesRequest, bool>
     {
         #region GET
+
+        public async Task<List<NursingDiagnosesDto>> Handle(BulkValidateNursingDiagnosesQuery request, CancellationToken cancellationToken)
+        {
+            var NursingDiagnosesDtos = request.NursingDiagnosessToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var NursingDiagnosesNames = NursingDiagnosesDtos.Select(x => x.Problem).Distinct().ToList();
+            var A = NursingDiagnosesDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingNursingDiagnosess = await _unitOfWork.Repository<NursingDiagnoses>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => NursingDiagnosesNames.Contains(v.Problem)
+                            && A.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingNursingDiagnosess.Adapt<List<NursingDiagnosesDto>>();
+        }
 
         public async Task<(List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetNursingDiagnosesQuery request, CancellationToken cancellationToken)
         {

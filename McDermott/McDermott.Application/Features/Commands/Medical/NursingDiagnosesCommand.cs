@@ -1,8 +1,11 @@
-﻿namespace McDermott.Application.Features.Commands.Medical
+﻿using McDermott.Application.Interfaces.Repositories;
+using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
+
+namespace McDermott.Application.Features.Commands.Medical
 {
     public class NursingDiagnosesCommand
     {
-        #region GET 
+        #region GET
 
         public class GetNursingDiagnosesQuery(Expression<Func<NursingDiagnoses, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -13,12 +16,19 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateNursingDiagnosesQuery(List<NursingDiagnosesDto> NursingDiagnosessToValidate) : IRequest<List<NursingDiagnosesDto>>
+        {
+            public List<NursingDiagnosesDto> NursingDiagnosessToValidate { get; } = NursingDiagnosessToValidate;
+        }
+
         public class ValidateNursingDiagnosesQuery(Expression<Func<NursingDiagnoses, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<NursingDiagnoses, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 

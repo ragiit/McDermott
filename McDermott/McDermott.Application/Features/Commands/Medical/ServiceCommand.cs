@@ -2,7 +2,7 @@
 {
     public class ServiceCommand
     {
-        #region GET 
+        #region GET
 
         public class GetServiceQuery(Expression<Func<Service, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -13,13 +13,19 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateServiceQuery(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>
+        {
+            public List<ServiceDto> ServicesToValidate { get; } = ServicesToValidate;
+        }
+
         public class ValidateServiceQuery(Expression<Func<Service, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
         }
 
+        #endregion GET
 
-        #endregion  
+
 
         #region CREATE
 

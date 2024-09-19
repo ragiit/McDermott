@@ -1,10 +1,13 @@
 ﻿using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 
+using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class LabTestQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLabTestQuery, (List<LabTestDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateLabTestQuery, bool>,
+        IRequestHandler<BulkValidateLabTestQuery, List<LabTestDto>>,
         IRequestHandler<CreateLabTestRequest, LabTestDto>,
         IRequestHandler<CreateListLabTestRequest, List<LabTestDto>>,
         IRequestHandler<UpdateLabTestRequest, LabTestDto>,
@@ -12,6 +15,29 @@ namespace McDermott.Application.Features.Queries.Medical
         IRequestHandler<DeleteLabTestRequest, bool>
     {
         #region GET
+
+        public async Task<List<LabTestDto>> Handle(BulkValidateLabTestQuery request, CancellationToken cancellationToken)
+        {
+            var LabTestDtos = request.LabTestsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var A = LabTestDtos.Select(x => x.Name).Distinct().ToList();
+            var B = LabTestDtos.Select(x => x.Code).Distinct().ToList();
+            var C = LabTestDtos.Select(x => x.ResultType).Distinct().ToList();
+            var D = LabTestDtos.Select(x => x.SampleTypeId).Distinct().ToList();
+
+            var existingLabTests = await _unitOfWork.Repository<LabTest>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => A.Contains(v.Name)
+                            && B.Contains(v.Code)
+                            && C.Contains(v.ResultType)
+                            && D.Contains(v.SampleTypeId)
+                            )
+                .ToListAsync(cancellationToken);
+
+            return existingLabTests.Adapt<List<LabTestDto>>();
+        }
 
         public async Task<(List<LabTestDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabTestQuery request, CancellationToken cancellationToken)
         {
