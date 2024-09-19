@@ -1,9 +1,12 @@
-﻿using static McDermott.Application.Features.Commands.Employee.JobPositionCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Employee.JobPositionCommand;
 
 namespace McDermott.Application.Features.Queries.Employee
 {
     public class JobPositionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetJobPositionQuery, List<JobPositionDto>>,
+       IRequestHandler<GetJobPositionQuery, (List<JobPositionDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidateJobPositionQuery, bool>,
+IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
         IRequestHandler<CreateJobPositionRequest, JobPositionDto>,
         IRequestHandler<CreateListJobPositionRequest, List<JobPositionDto>>,
         IRequestHandler<UpdateJobPositionRequest, JobPositionDto>,
@@ -12,35 +15,63 @@ namespace McDermott.Application.Features.Queries.Employee
     {
         #region GET
 
-        public async Task<List<JobPositionDto>> Handle(GetJobPositionQuery request, CancellationToken cancellationToken)
+        public async Task<List<JobPositionDto>> Handle(BulkValidateJobPositionQuery request, CancellationToken cancellationToken)
+        {
+            var JobPositionDtos = request.JobPositionsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var JobPositionNames = JobPositionDtos.Select(x => x.Name).Distinct().ToList();
+            var provinceIds = JobPositionDtos.Select(x => x.DepartmentId).Distinct().ToList();
+
+            var existingJobPositions = await _unitOfWork.Repository<JobPosition>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => JobPositionNames.Contains(v.Name)
+                            && provinceIds.Contains(v.DepartmentId))
+                .ToListAsync(cancellationToken);
+
+            return existingJobPositions.Adapt<List<JobPositionDto>>();
+        }
+
+        public async Task<(List<JobPositionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetJobPositionQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetJobPositionQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<JobPosition>().Entities
+                    .AsNoTracking()
+                    .Include(v => v.Department)
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<JobPosition>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<JobPosition>().GetAsync(
-                        null,
-                        x => x.Include(z => z.Department),
-                        cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Department.Name, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<JobPositionDto>>();
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+
+                return (paged.Adapt<List<JobPositionDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateJobPositionQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<JobPosition>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

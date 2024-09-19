@@ -1243,7 +1243,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
             Diagnoses = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
             Awareness = await Mediator.Send(new GetAwarenessQuery());
-            Departments = await Mediator.Send(new GetDepartmentQuery());
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
             Projects = (await Mediator.Send(new GetProjectQuery())).Item1;
         }
 

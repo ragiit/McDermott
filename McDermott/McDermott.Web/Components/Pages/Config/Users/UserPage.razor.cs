@@ -228,8 +228,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataGroup(0, 10);
             await LoadDataDistrict(0, 10);
             await LoadDataOccupational(0, 10);
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
 
             Religions = await Mediator.Send(new GetReligionQuery());
             Genders = await Mediator.Send(new GetGenderQuery());

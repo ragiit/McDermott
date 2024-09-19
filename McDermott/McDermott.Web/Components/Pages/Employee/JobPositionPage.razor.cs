@@ -156,7 +156,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            Departments = await Mediator.Send(new GetDepartmentQuery());
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
 
             await GetUserInfo();
             await LoadData();
@@ -166,7 +166,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
             PanelVisible = false;
         }
 

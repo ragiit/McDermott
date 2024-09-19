@@ -4,10 +4,23 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetDepartmentQuery(Expression<Func<Department, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DepartmentDto>>
+        public class GetDepartmentQuery(Expression<Func<Department, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DepartmentDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Department, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; set; } = pageSize ?? 10;
+        }
+
+        public class BulkValidateDepartmentQuery(List<DepartmentDto> DepartmentsToValidate) : IRequest<List<DepartmentDto>>
+        {
+            public List<DepartmentDto> DepartmentsToValidate { get; } = DepartmentsToValidate;
+        }
+
+        public class ValidateDepartmentQuery(Expression<Func<Department, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Department, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)

@@ -1,46 +1,79 @@
-﻿using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
 
 namespace McDermott.Application.Features.Queries.Employee
 {
     public class DepartmentQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-         IRequestHandler<GetDepartmentQuery, List<DepartmentDto>>,
+         IRequestHandler<GetDepartmentQuery, (List<DepartmentDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateDepartmentQuery, bool>,
+        IRequestHandler<BulkValidateDepartmentQuery, List<DepartmentDto>>,
          IRequestHandler<CreateDepartmentRequest, DepartmentDto>,
          IRequestHandler<CreateListDepartmentRequest, List<DepartmentDto>>,
          IRequestHandler<UpdateDepartmentRequest, DepartmentDto>,
          IRequestHandler<UpdateListDepartmentRequest, List<DepartmentDto>>,
          IRequestHandler<DeleteDepartmentRequest, bool>
     {
-        public async Task<List<DepartmentDto>> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)
+        public async Task<List<DepartmentDto>> Handle(BulkValidateDepartmentQuery request, CancellationToken cancellationToken)
+        {
+            var DepartmentDtos = request.DepartmentsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var DepartmentNames = DepartmentDtos.Select(x => x.Name).Distinct().ToList();
+            //var provinceIds = DepartmentDtos.Select(x => x.ProvinceId).Distinct().ToList();
+
+            //var existingDepartments = await _unitOfWork.Repository<Department>()
+            //    .Entities
+            //    .AsNoTracking()
+            //    .Where(v => DepartmentNames.Contains(v.Name)
+            //                && provinceIds.Contains(v.ProvinceId))
+            //    .ToListAsync(cancellationToken);
+            return [];
+            //return existingDepartments.Adapt<List<DepartmentDto>>();
+        }
+
+        public async Task<(List<DepartmentDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetDepartmentQuery_";
+                var query = _unitOfWork.Repository<Department>().Entities
+                    .AsNoTracking()
+                    .Include(v => v.Manager)
+                    .Include(v => v.ParentDepartment)
+                    .Include(v => v.Company)
+                    .AsQueryable();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<Department>? result))
+                if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    result = await _unitOfWork.Repository<Department>().Entities
-                        .Include(z => z.Manager)
-                        .Include(z => z.ParentDepartment)
-                        .Include(z => z.Company)
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Manager.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.ParentDepartment.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<DepartmentDto>>();
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+
+                return (paged.Adapt<List<DepartmentDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateDepartmentQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Department>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         public async Task<DepartmentDto> Handle(CreateDepartmentRequest request, CancellationToken cancellationToken)

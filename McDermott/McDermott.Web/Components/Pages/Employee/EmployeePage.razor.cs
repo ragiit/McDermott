@@ -115,8 +115,8 @@ namespace McDermott.Web.Components.Pages.Employee
             //Villages = await Mediator.Send(new GetVillageQuery());
             Religions = await Mediator.Send(new GetReligionQuery());
             Genders = await Mediator.Send(new GetGenderQuery());
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
             var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
             Occupationals = resultOccupationals.Item1;
 
