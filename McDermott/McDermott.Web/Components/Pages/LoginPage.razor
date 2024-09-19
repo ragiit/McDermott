@@ -46,7 +46,7 @@
                 @text
                 </div> *@
 
-                <form method="POST" action="/login">
+              @*   <form method="POST" action="/login">
                     <div class="input-group mb-3">
                         <input @bind="LoginForm.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
@@ -78,9 +78,9 @@
                 <form method="POST" action="/login">
                     <input type="text" name="data" value="test">
                     <input type="submit" value="Submit">
-                </form>
+                </form> *@
 
-                <DxComboBox @bind-Value="SelectedValue"
+               @*  <DxComboBox @bind-Value="SelectedValue"
                             @bind-Text="Hehehe"
                             Data="@Villages"
                             ValueFieldName="Id"
@@ -93,7 +93,7 @@
                         <DxEditorButton Click="OnSearch" IconCssClass="fa-solid fa-magnifying-glass" />
                     </Buttons>
                 </DxComboBox>
-
+ *@
 
                 <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                           OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">
@@ -159,13 +159,13 @@
 @code {
     private async Task PerformSearch()
     {
-        ToastService.ShowInfo("dawd");
+        // ToastService.ShowInfo("dawd");
     }
     private async Task OnEmailChanged(string newValue)
     {
         // Handle the value change, e.g., perform a search or show a toast message
         LoginForm.Email = newValue;
-        ToastService.ShowInfo("Email changed: " + newValue);
+        // ToastService.ShowInfo("Email changed: " + newValue);
     }
     [SupplyParameterFromForm(FormName = "dawda")]
     public LoginTemp LoginForm { get; set; } = new();

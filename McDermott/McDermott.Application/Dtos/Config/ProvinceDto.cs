@@ -16,4 +16,12 @@
 
         public CountryDto? Country { get; set; }
     }
+
+    public class CreateUpdateProvinceDto
+    {
+        public long Id { get; set; }
+        public long? CountryId { get; set; }
+        public string Name { get; set; } = string.Empty; // State Name
+        public string Code { get; set; } = string.Empty; // State Code
+    }
 }

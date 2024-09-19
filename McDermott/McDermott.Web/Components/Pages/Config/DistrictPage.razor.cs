@@ -1,6 +1,8 @@
 ﻿using Google.Apis.Http;
+using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
 using OfficeOpenXml.Style;
+using System.Linq.Expressions;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -321,11 +323,15 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataProvince(0, 10);
         }
 
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            Cities.Clear();
+
+            if (refCityComboBox != null)
+                refCityComboBox.Text = null;
+
+            var result = await Mediator.Send(new GetProvinceQuery(provinceId == null ? null : x => x.Id == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
             Provinces = result.Item1;
             totalCountProvince = result.pageCount;
             PanelVisible = false;
@@ -368,11 +374,16 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCity(0, 10);
         }
 
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10, long? cityId = null, long? provinceId = null, Expression<Func<City, bool>>? predicate = null)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+            var provId = refProvinceComboBox?.Value ?? null;
+            var id = refCityComboBox?.Value ?? null;
+            var result = predicate == null ?
+                await Mediator.Send(new GetCityQuery(x => (x.ProvinceId == provinceId || x.ProvinceId == provId) && (id == null || x.Id == id || x.Id == cityId), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""))
+                :
+                await Mediator.Send(new GetCityQuery(predicate, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+
             Cities = result.Item1;
             totalCountCity = result.pageCount;
             PanelVisible = false;
@@ -400,8 +411,9 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
+            refProvinceComboBox = null;
+            refCityComboBox = null;
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task NewItem_Click()
@@ -417,6 +429,9 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DistrictDto ?? new());
+            await LoadDataProvince(provinceId: a.ProvinceId);
+            await LoadDataCity(predicate: x => x.ProvinceId == a.ProvinceId && x.Id == a.CityId);
         }
 
         private void DeleteItem_Click()

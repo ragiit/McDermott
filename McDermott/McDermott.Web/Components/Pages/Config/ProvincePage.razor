@@ -21,13 +21,14 @@
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
+                                            Text="Fetching Data">
                                 <MyGridPaginate @ref="Grid"
                                                 Data="Provinces"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
                                                 SearchTextChanged="OnSearchBoxChanged"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
                                                 KeyFieldName="Id">
 
                                     <ToolbarTemplate>
@@ -49,8 +50,7 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                        @* <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" /> *@
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" /> 
                                         <DxGridDataColumn MinWidth="200" FieldName="Country.Name" Caption="Country" />
                                     </Columns>
 
@@ -66,7 +66,7 @@
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Countries"
-                                                              NullText="Select Country..."
+                                                              NullText="Select Country"
                                                               @ref="refCountryComboBox"
                                                               @bind-Value="@a.CountryId"
                                                               TextFieldName="Name"

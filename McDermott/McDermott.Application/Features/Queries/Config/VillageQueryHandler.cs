@@ -149,8 +149,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDto.Adapt<Village>());
-
+                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDto.Adapt<CreateUpdateVillageDto>().Adapt<Village>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
@@ -167,7 +166,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDtos.Adapt<List<Village>>());
+                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDtos.Adapt<CreateUpdateVillageDto>().Adapt<List<Village>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -189,8 +188,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDto.Adapt<Village>());
-
+                var result = await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDto.Adapt<CreateUpdateVillageDto>().Adapt<Village>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetVillageQuery_"); // Ganti dengan key yang sesuai
@@ -207,7 +205,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDtos.Adapt<List<Village>>());
+                var result = await _unitOfWork.Repository<Village>().UpdateAsync(request.VillageDtos.Adapt<CreateUpdateVillageDto>().Adapt<List<Village>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

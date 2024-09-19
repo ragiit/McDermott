@@ -46,6 +46,7 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
+
             if (firstRender)
             {
                 await GetUserInfo();

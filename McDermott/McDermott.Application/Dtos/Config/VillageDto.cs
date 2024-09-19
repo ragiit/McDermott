@@ -24,4 +24,14 @@
         public virtual CityDto? City { get; set; }
         public virtual DistrictDto? District { get; set; }
     }
+
+    public class CreateUpdateVillageDto
+    {
+        public long Id { get; set; }
+        public long? ProvinceId { get; set; }
+        public long? CityId { get; set; } // Kabupaten
+        public long? DistrictId { get; set; } // Kecamatan
+        public string Name { get; set; } = string.Empty; // Kelurahan
+        public string PostalCode { get; set; } = string.Empty; // Kode Pos
+    }
 }

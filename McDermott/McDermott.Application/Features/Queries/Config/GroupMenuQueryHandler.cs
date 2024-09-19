@@ -66,8 +66,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<GroupMenu>().AddAsync(request.GroupMenuDto.Adapt<GroupMenu>());
-
+                var result = await _unitOfWork.Repository<GroupMenu>().AddAsync(request.GroupMenuDto.Adapt<CreateUpdateGroupMenuDto>().Adapt<GroupMenu>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetGroupMenuQuery_"); // Ganti dengan key yang sesuai
@@ -84,7 +83,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<GroupMenu>().AddAsync(request.GroupMenuDtos.Adapt<List<GroupMenu>>());
+                var result = await _unitOfWork.Repository<GroupMenu>().AddAsync(request.GroupMenuDtos.Adapt<CreateUpdateGroupMenuDto>().Adapt<List<GroupMenu>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -106,8 +105,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<GroupMenu>().UpdateAsync(request.GroupMenuDto.Adapt<GroupMenu>());
-
+                var result = await _unitOfWork.Repository<GroupMenu>().UpdateAsync(request.GroupMenuDto.Adapt<CreateUpdateGroupMenuDto>().Adapt<GroupMenu>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetGroupMenuQuery_"); // Ganti dengan key yang sesuai
@@ -124,7 +122,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<GroupMenu>().UpdateAsync(request.GroupMenuDtos.Adapt<List<GroupMenu>>());
+                var result = await _unitOfWork.Repository<GroupMenu>().UpdateAsync(request.GroupMenuDtos.Adapt<CreateUpdateGroupMenuDto>().Adapt<List<GroupMenu>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

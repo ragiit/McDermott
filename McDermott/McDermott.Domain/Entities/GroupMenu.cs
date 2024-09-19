@@ -11,10 +11,7 @@
         public bool? IsDelete { get; set; }
         public bool? IsImport { get; set; }
 
-        [SetToNull]
         public virtual Group? Group { get; set; }
-
-        [SetToNull]
         public virtual Menu? Menu { get; set; }
     }
 }

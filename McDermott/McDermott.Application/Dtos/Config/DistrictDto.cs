@@ -17,4 +17,12 @@
         public virtual CityDto? City { get; set; }
         public virtual ProvinceDto? Province { get; set; }
     }
+
+    public class CreateUpdateDistrictDto
+    {
+        public long Id { get; set; }
+        public string Name { get; set; } = string.Empty; // Kecamatan
+        public long? CityId { get; set; } // Kabupaten
+        public long? ProvinceId { get; set; }
+    }
 }
