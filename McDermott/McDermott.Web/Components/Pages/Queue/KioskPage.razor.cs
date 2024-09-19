@@ -16,38 +16,41 @@ namespace McDermott.Web.Components.Pages.Queue
             [JsonProperty("nik")]
             public string Nik { get; set; }
 
-            [JsonProperty("nohp")]
-            public string Nohp { get; set; }
-
             [JsonProperty("kodepoli")]
             public string Kodepoli { get; set; }
-
-            [JsonProperty("namapoli")]
-            public string Namapoli { get; set; }
-
-            [JsonProperty("norm")]
-            public string Norm { get; set; }
 
             [JsonProperty("tanggalperiksa")]
             public string Tanggalperiksa { get; set; }
 
+            [JsonProperty("keluhan")]
+            public string Keluhan { get; set; }
+
             [JsonProperty("kodedokter")]
             public string Kodedokter { get; set; }
-
-            [JsonProperty("namadokter")]
-            public string Namadokter { get; set; }
 
             [JsonProperty("jampraktek")]
             public string Jampraktek { get; set; }
 
-            [JsonProperty("nomorantrean")]
-            public string Nomorantrean { get; set; }
+            [JsonProperty("norm")]
+            public string Norm { get; set; }
 
-            [JsonProperty("angkaantrean")]
-            public int Angkaantrean { get; set; }
+            [JsonProperty("nohp")]
+            public string Nohp { get; set; }
 
-            [JsonProperty("keterangan")]
-            public string Keterangan { get; set; }
+            //[JsonProperty("namapoli")]
+            //public string Namapoli { get; set; }
+
+            //[JsonProperty("namadokter")]
+            //public string Namadokter { get; set; }
+
+            //[JsonProperty("nomorantrean")]
+            //public string Nomorantrean { get; set; }
+
+            //[JsonProperty("angkaantrean")]
+            //public int Angkaantrean { get; set; }
+
+            //[JsonProperty("keterangan")]
+            //public string Keterangan { get; set; }
         }
 
         public class UpdateStatusPanggilAntreanRequestPCare
@@ -1024,17 +1027,18 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     Nomorkartu = bpjs.NoKartu ?? string.Empty,
                     Nik = bpjs.NoKTP ?? string.Empty,
-                    Nohp = bpjs.NoHP ?? string.Empty,
                     Kodepoli = service?.Code ?? string.Empty,
-                    Namapoli = service?.Name ?? string.Empty,
-                    Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
+                    Keluhan = "",
                     Kodedokter = physician?.PhysicanCode ?? null,
-                    Namadokter = physician.Name ?? null,
                     Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
-                    Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
-                    Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
-                    Keterangan = ""
+                    Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
+                    Nohp = bpjs.NoHP ?? string.Empty,
+                    //Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
+                    //Keterangan = "",
+                    //Namadokter = physician.Name ?? null,
+                    //Namapoli = service?.Name ?? string.Empty,
+                    //Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
                 };
 
                 Console.WriteLine("Sending antrean/add...");
