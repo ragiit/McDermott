@@ -471,8 +471,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             if (!FormValidationState)
                 return;
 
-            var a = Users.FirstOrDefault(x => x.NoId == UserForm.NoId && x.Id != UserForm.Id);
-            if (a != null)
+            var a = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.NoId == UserForm.NoId));
+            if (a)
             {
                 ToastService.ShowInfo("The Identity Number already exist");
                 return;
@@ -934,11 +934,15 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             await LoadDataGroup();
             await LoadDataOccupational();
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            await LoadDataSpeciality();
+            await LoadDataService();
+            await LoadDataSupervisor();
+            await LoadDataJobPosition();
+            await LoadDataDepartment();
 
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
             Religions = await Mediator.Send(new GetReligionQuery());
-            Genders = await Mediator.Send(new GetGenderQuery());
         }
 
         #region ComboboxVillage
@@ -1293,5 +1297,237 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxOccupational
+
+        #region ComboboxSpeciality
+
+        private DxComboBox<SpecialityDto, long?> refSpecialityComboBox { get; set; }
+        private int SpecialityComboBoxIndex { get; set; } = 0;
+        private int totalCountSpeciality = 0;
+
+        private async Task OnSearchSpeciality()
+        {
+            await LoadDataSpeciality(0, 10);
+        }
+
+        private async Task OnSearchSpecialityIndexIncrement()
+        {
+            if (SpecialityComboBoxIndex < (totalCountSpeciality - 1))
+            {
+                SpecialityComboBoxIndex++;
+                await LoadDataSpeciality(SpecialityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchSpecialityndexDecrement()
+        {
+            if (SpecialityComboBoxIndex > 0)
+            {
+                SpecialityComboBoxIndex--;
+                await LoadDataSpeciality(SpecialityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputSpecialityChanged(string e)
+        {
+            SpecialityComboBoxIndex = 0;
+            await LoadDataSpeciality(0, 10);
+        }
+
+        private async Task LoadDataSpeciality(int pageIndex = 0, int pageSize = 10, long? SpecialityId = null)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetSpecialityQuery(SpecialityId == null ? null : x => x.Id == SpecialityId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refSpecialityComboBox?.Text ?? ""));
+            Specialities = result.Item1;
+            totalCountSpeciality = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxSpeciality
+
+        #region ComboboxService
+
+        private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
+        private int ServiceComboBoxIndex { get; set; } = 0;
+        private int totalCountService = 0;
+
+        private async Task OnSearchService()
+        {
+            await LoadDataService();
+        }
+
+        private async Task OnSearchServiceIndexIncrement()
+        {
+            if (ServiceComboBoxIndex < (totalCountService - 1))
+            {
+                ServiceComboBoxIndex++;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchServicendexDecrement()
+        {
+            if (ServiceComboBoxIndex > 0)
+            {
+                ServiceComboBoxIndex--;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputServiceChanged(string e)
+        {
+            ServiceComboBoxIndex = 0;
+            await LoadDataService();
+        }
+
+        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10, long? ServiceId = null)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetServiceQuery(ServiceId == null ? null : x => x.Id == ServiceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+            Services = result.Item1;
+            totalCountService = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxService
+
+        #region ComboboxSupervisor
+
+        private DxComboBox<UserDto, long?> refSupervisorComboBox { get; set; }
+        private int SupervisorComboBoxIndex { get; set; } = 0;
+        private int totalCountSupervisor = 0;
+
+        private async Task OnSearchSupervisor()
+        {
+            await LoadDataSupervisor();
+        }
+
+        private async Task OnSearchSupervisorIndexIncrement()
+        {
+            if (SupervisorComboBoxIndex < (totalCountSupervisor - 1))
+            {
+                SupervisorComboBoxIndex++;
+                await LoadDataSupervisor(SupervisorComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchSupervisorndexDecrement()
+        {
+            if (SupervisorComboBoxIndex > 0)
+            {
+                SupervisorComboBoxIndex--;
+                await LoadDataSupervisor(SupervisorComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputSupervisorChanged(string e)
+        {
+            SupervisorComboBoxIndex = 0;
+            await LoadDataSupervisor();
+        }
+
+        private List<UserDto> Supervisors = [];
+
+        private async Task LoadDataSupervisor(int pageIndex = 0, int pageSize = 10, long? SupervisorId = null)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetUserQuery2(SupervisorId == null ? null : x => x.Id == SupervisorId && x.IsEmployee == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refSupervisorComboBox?.Text ?? ""));
+            Supervisors = result.Item1;
+            totalCountSupervisor = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxSupervisor
+
+        #region ComboboxJobPosition
+
+        private DxComboBox<JobPositionDto, long?> refJobPositionComboBox { get; set; }
+        private int JobPositionComboBoxIndex { get; set; } = 0;
+        private int totalCountJobPosition = 0;
+
+        private async Task OnSearchJobPosition()
+        {
+            await LoadDataJobPosition();
+        }
+
+        private async Task OnSearchJobPositionIndexIncrement()
+        {
+            if (JobPositionComboBoxIndex < (totalCountJobPosition - 1))
+            {
+                JobPositionComboBoxIndex++;
+                await LoadDataJobPosition(JobPositionComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchJobPositionndexDecrement()
+        {
+            if (JobPositionComboBoxIndex > 0)
+            {
+                JobPositionComboBoxIndex--;
+                await LoadDataJobPosition(JobPositionComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputJobPositionChanged(string e)
+        {
+            JobPositionComboBoxIndex = 0;
+            await LoadDataJobPosition();
+        }
+
+        private async Task LoadDataJobPosition(int pageIndex = 0, int pageSize = 10, long? JobPositionId = null)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetJobPositionQuery(JobPositionId == null ? null : x => x.Id == JobPositionId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refJobPositionComboBox?.Text ?? ""));
+            JobPositions = result.Item1;
+            totalCountJobPosition = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxJobPosition
+
+        #region ComboboxDepartment
+
+        private DxComboBox<DepartmentDto, long?> refDepartmentComboBox { get; set; }
+        private int DepartmentComboBoxIndex { get; set; } = 0;
+        private int totalCountDepartment = 0;
+
+        private async Task OnSearchDepartment()
+        {
+            await LoadDataDepartment();
+        }
+
+        private async Task OnSearchDepartmentIndexIncrement()
+        {
+            if (DepartmentComboBoxIndex < (totalCountDepartment - 1))
+            {
+                DepartmentComboBoxIndex++;
+                await LoadDataDepartment(DepartmentComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDepartmentndexDecrement()
+        {
+            if (DepartmentComboBoxIndex > 0)
+            {
+                DepartmentComboBoxIndex--;
+                await LoadDataDepartment(DepartmentComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDepartmentChanged(string e)
+        {
+            DepartmentComboBoxIndex = 0;
+            await LoadDataDepartment();
+        }
+
+        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10, long? DepartmentId = null)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetDepartmentQuery(DepartmentId == null ? null : x => x.Id == DepartmentId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDepartmentComboBox?.Text ?? ""));
+            Departments = result.Item1;
+            totalCountDepartment = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxDepartment
     }
 }

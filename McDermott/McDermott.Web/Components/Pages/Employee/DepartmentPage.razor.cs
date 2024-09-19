@@ -73,8 +73,8 @@
             PanelVisible = true;
 
             Users = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            ParentDepartments = await Mediator.Send(new GetDepartmentQuery(x => x.ParentDepartmentId == null));
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
+            ParentDepartments = (await Mediator.Send(new GetDepartmentQuery(x => x.ParentDepartmentId == null))).Item1;
             AllParentDepartments = [.. ParentDepartments];
 
             //Departments.ForEach(x =>

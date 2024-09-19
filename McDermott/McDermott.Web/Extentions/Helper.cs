@@ -34,6 +34,12 @@ namespace McDermott.Web.Extentions
             "VISA",
         ];
 
+        public static readonly List<string> Genders =
+        [
+            "Male",
+            "Female"
+        ];
+
         public static List<string> EmployeeTypes = new()
         {
             "Employee",

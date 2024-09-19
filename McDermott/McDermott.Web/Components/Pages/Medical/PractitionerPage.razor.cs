@@ -58,7 +58,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private bool PanelVisible = false;
         private bool FormValidationState = true;
-         private Timer _timer;
+        private Timer _timer;
         private IBrowserFile BrowserFile { get; set; }
 
         private bool ShowForm { get; set; } = false;
@@ -169,8 +169,8 @@ namespace McDermott.Web.Components.Pages.Medical
             //Villages = await Mediator.Send(new GetVillageQuery());
             Religions = await Mediator.Send(new GetReligionQuery());
             Genders = await Mediator.Send(new GetGenderQuery());
-            Departments = await Mediator.Send(new GetDepartmentQuery());
-            JobPositions = await Mediator.Send(new GetJobPositionQuery());
+            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
             Users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
 
             PanelVisible = false;
