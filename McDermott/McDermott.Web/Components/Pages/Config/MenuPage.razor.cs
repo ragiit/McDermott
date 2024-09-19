@@ -157,8 +157,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMenuQuery(x => x.Parent != null, searchTerm: refParentMenuComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
-            ParentMenuDto = [.. result.Item1.OrderBy(x => x.Name).ThenBy(x => x.Sequence)];
+            var result = await Mediator.Send(new GetMenuQuery(x => x.Parent == null, searchTerm: refParentMenuComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
+            ParentMenuDto = [.. result.Item1.OrderBy(x => x.Sequence)];
             totalCountParentMenu = result.pageCount;
             PanelVisible = false;
         }

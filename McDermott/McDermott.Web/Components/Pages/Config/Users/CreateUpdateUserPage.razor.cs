@@ -1,6 +1,7 @@
 ﻿using DevExpress.Data.Access;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
+using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
@@ -311,6 +312,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 }
 
                 UserForm = result.Item1.FirstOrDefault() ?? new();
+                UserForm.Password = Helper.HashMD5(UserForm.Password);
             }
         }
 
@@ -364,6 +366,23 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 await SaveItemGroupMenuGridGropMenu_Click();
             else
                 FormValidationState = true;
+        }
+
+        private bool showPassword = false;
+        private string showPasswordIcon = "fa-solid fa-eye-slash";
+
+        private void TogglePasswordVisibility()
+        {
+            showPassword = !showPassword;
+
+            if (showPassword == true)
+            {
+                showPasswordIcon = "fa-solid fa-eye";
+            }
+            else
+            {
+                showPasswordIcon = "fa-solid fa-eye-slash";
+            }
         }
 
         private void KeyPressHandler(KeyboardEventArgs args)
@@ -442,165 +461,86 @@ namespace McDermott.Web.Components.Pages.Config.Users
             NavigationManager.NavigateTo("configuration/users");
         }
 
+        [Inject]
+        public CustomAuthenticationStateProvider CustomAuth { get; set; }
+
+        private IBrowserFile BrowserFile;
+
         private async Task SaveItemGroupMenuGridGropMenu_Click()
         {
             if (!FormValidationState)
                 return;
 
-            if (string.IsNullOrWhiteSpace(Group.Name))
+            var a = Users.FirstOrDefault(x => x.NoId == UserForm.NoId && x.Id != UserForm.Id);
+            if (a != null)
             {
-                ToastService.ShowInfo("Please insert the Group name");
+                ToastService.ShowInfo("The Identity Number already exist");
                 return;
             }
 
-            if (Group.Id == 0)
+            if (Convert.ToBoolean(UserForm.IsPatient))
             {
-                var existingName = await Mediator.Send(new ValidateGroupQuery(x => x.Name == GroupName));
+                var date = DateTime.Now;
+                var lastId = Users.Where(x => x.IsPatient == true).ToList().LastOrDefault();
 
-                if (existingName)
-                {
-                    ToastService.ShowInfo("Group name already exist");
-                    return;
-                }
+                UserForm.NoRm = lastId is null
+                         ? $"{date:dd-MM-yyyy}-0001"
+                         : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+            }
 
-                var result = await Mediator.Send(new CreateGroupRequest(Group));
+            if (UserForm.IsSameDomicileAddress)
+            {
+                UserForm.DomicileAddress1 = UserForm.IdCardAddress1;
+                UserForm.DomicileAddress2 = UserForm.IdCardAddress2;
+                UserForm.DomicileRtRw = UserForm.IdCardRtRw;
+                UserForm.DomicileProvinceId = UserForm.IdCardProvinceId;
+                UserForm.DomicileCityId = UserForm.IdCardCityId;
+                UserForm.DomicileDistrictId = UserForm.IdCardDistrictId;
+                UserForm.DomicileVillageId = UserForm.IdCardVillageId;
+                UserForm.DomicileCountryId = UserForm.IdCardCountryId;
+            }
 
-                //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
+            if (!string.IsNullOrWhiteSpace(UserForm.Password))
+                UserForm.Password = Helper.HashMD5(UserForm.Password);
 
-                //if (GroupMenus.Any(x => x.Menu?.Name is "All"))
-                //{
-                //    Menus.ForEach(z =>
-                //    {
-                //        if (z.Id != 0 && z.Name is not "All")
-                //        {
-                //            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
-                //            request.Add(new GroupMenuDto
-                //            {
-                //                Id = 0,
-                //                MenuId = z.Id,
-                //                GroupId = group[0].Id,
-                //                IsCreate = all.IsCreate,
-                //                IsRead = all.IsRead,
-                //                IsUpdate = all.IsUpdate,
-                //                IsDelete = all.IsDelete,
-                //                IsImport = all.IsImport,
-                //            });
-                //        }
-                //    });
-
-                //    await Mediator.Send(new CreateListGroupMenuRequest(request));
-
-                //    ShowForm = false;
-
-                //    await LoadData();
-
-                //    return;
-                //}
-
-                GroupMenus.ForEach(x =>
-                {
-                    x.Id = 0;
-                    x.GroupId = result.Id;
-                });
-
-                //for (int i = 0; i < GroupMenus.Count; i++)
-                //{
-                //    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
-                //    var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
-                //    if (cekP is not null)
-                //    {
-                //        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
-                //        if (cekLagi is null)
-                //        {
-                //            GroupMenus.Add(new GroupMenuDto
-                //            {
-                //                Id = 0,
-                //                GroupId = group[0].Id,
-                //                MenuId = cekP.Id,
-                //                Menu = cekP
-                //            });
-                //        }
-                //    }
-                //}
-
-                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
+            if (UserForm.Id == 0)
+            {
+                await FileUploadService.UploadFileAsync(BrowserFile);
+                UserForm = await Mediator.Send(new CreateUserRequest(UserForm));
             }
             else
             {
-                var result = await Mediator.Send(new UpdateGroupRequest(Group));
+                //var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
 
-                //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
+                //if (UserForm.SipFile != userDtoSipFile)
+                //{
+                //    if (UserForm.SipFile != null)
+                //        Helper.DeleteFile(UserForm.SipFile);
 
-                await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
+                //    if (userDtoSipFile != null)
+                //        Helper.DeleteFile(userDtoSipFile);
+                //}
 
-                var request = new List<GroupMenuDto>();
+                var result = await Mediator.Send(new UpdateUserRequest(UserForm));
 
-                if (GroupMenus.Any(x => x.Menu?.Name is "All"))
+                //if (UserForm.SipFile != userDtoSipFile)
+                //{
+                //    if (UserForm.SipFile != null)
+                //        await FileUploadService.UploadFileAsync(BrowserFile);
+                //}
+
+                if (UserLogin.Id == result.Id)
                 {
-                    Menus.ForEach(z =>
-                    {
-                        if (z.Id != 0 && z.Name is not "All")
-                        {
-                            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
-                            request.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                MenuId = z.Id,
-                                GroupId = Group.Id,
-                                IsCreate = all.IsCreate,
-                                IsRead = all.IsRead,
-                                IsUpdate = all.IsUpdate,
-                                IsDelete = all.IsDelete,
-                                IsImport = all.IsImport,
-                            });
-                        }
-                    });
+                    await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
 
-                    await Mediator.Send(new CreateListGroupMenuRequest(request));
+                    var aa = (CustomAuthenticationStateProvider)CustomAuth;
+                    await aa.UpdateAuthState(string.Empty);
 
-                    ShowForm = false;
-                    NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
-
-                    await LoadData();
-
-                    return;
+                    await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, Helper.Encrypt(JsonConvert.SerializeObject(result)), 2);
                 }
-
-                GroupMenus.ForEach(x =>
-                {
-                    x.Id = 0;
-                    x.GroupId = result.Id;
-                });
-
-                for (int i = 0; i < GroupMenus.Count; i++)
-                {
-                    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
-                    var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
-                    if (cekP is not null)
-                    {
-                        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
-                        if (cekLagi is null)
-                        {
-                            GroupMenus.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                GroupId = result.Id,
-                                MenuId = cekP.Id,
-                                Menu = cekP
-                            });
-                        }
-                    }
-                }
-
-                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-
-                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update}?Id={result.Id}", true);
             }
 
-            ShowForm = false;
-
-            await LoadData();
+            NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}", true);
         }
 
         private async Task ExportToExcel()

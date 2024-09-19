@@ -504,6 +504,14 @@ public class SeedData
                 Email = "admin@example.com",
                 Password = Helper.HashMD5("admin1123"),
                 IsAdmin = true,
+                IsUser = true,
+                IsDoctor = true,
+                IsPatient = true,
+                IsEmployee = true,
+                IsHr = true,
+                IsMcu = true,
+                IsPharmacy = true,
+                IsPhysicion = true,
                 IsDefaultData = true,
             };
 

@@ -58,6 +58,16 @@
                                                                                NullText="Name" />
                                                                     <ValidationMessage For="@(() => UserForm.Name)"   />
                                                                 </DxFormLayoutItem>
+                                                                @if (Convert.ToBoolean(UserForm.IsPatient))
+                                                                {
+                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medical Record" ColSpanMd="12">
+                                                                        <DxTextBox @bind-Text="@UserForm.NoRm"
+                                                                                   ShowValidationIcon="true"
+                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   NullText="Medical Record" />
+                                                                        <ValidationMessage For="@(() => UserForm.NoRm)"   />
+                                                                    </DxFormLayoutItem>
+                                                                }
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Email" ColSpanMd="12">
                                                                     <DxMaskedInput @bind-Value="@UserForm.Email"
                                                                                    Mask="@Helper.EmailMask"
@@ -293,7 +303,7 @@
                                                                                             <Columns>
                                                                                                 <DxListEditorColumn FieldName="@nameof(District.Name)" Caption="Name" />
                                                                                                 <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
-                                                                                                <DxListEditorColumn FieldName="City.Name" Caption="City" /> 
+                                                                                                <DxListEditorColumn FieldName="City.Name" Caption="City" />
                                                                                             </Columns>
                                                                                         </MyDxComboBox>
                                                                                     </Template>
@@ -489,7 +499,14 @@
                                                             <div class="col-md-6">
                                                                 <DxFormLayout>
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Password" ColSpanMd="12">
-                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" Password="true" @bind-Text="@UserForm.Password" NullText="Password" />
+                                                                        <DxTextBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                   @bind-Text="@UserForm.Password"
+                                                                                   Password="showPassword"
+                                                                                   NullText="Password">
+                                                                            <Buttons>
+                                                                                <DxEditorButton IconCssClass="@showPasswordIcon" Tooltip="show password" Click="@TogglePasswordVisibility" />
+                                                                            </Buttons>
+                                                                        </DxTextBox>
                                                                     </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </div>

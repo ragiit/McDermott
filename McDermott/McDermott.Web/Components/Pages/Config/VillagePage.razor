@@ -130,6 +130,7 @@
                                                               @bind-Value="@a.DistrictId"
                                                               @ref="refDistrictComboBox"
                                                               TextFieldName="Name"
+                                                              SelectedItemChanged="((DistrictDto? e) => OnDistrictChanged(e))"
                                                               ValueFieldName="Id" TextChanged="((string e) => OnInputDistrictChanged(e))">
                                                     <Buttons>
                                                         <DxEditorButton Click="OnSearchDistrictndexDecrement"

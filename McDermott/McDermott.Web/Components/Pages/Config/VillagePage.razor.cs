@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
 using Microsoft.AspNetCore.HttpLogging;
+using System.Linq.Expressions;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -43,24 +44,22 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCity(0, 10);
         }
 
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10, long? cityId = null)
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10, long? cityId = null, Expression<Func<Domain.Entities.City, bool>>? predicate = null)
         {
             PanelVisible = true;
 
             if (refDistrictComboBox != null)
                 refDistrictComboBox.Text = null;
 
-            Districts.Clear();
+            //Districts.Clear();
 
             var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
 
-            //var result = cityId != null ?
-            //           await Mediator.Send(new GetCityQuery(cityId == null ? null : x => x.Id == cityId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""))
-            //           :
-            //           await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
-
             var id = refCityComboBox?.Value ?? null;
-            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+            var result = predicate == null ?
+                await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""))
+                :
+                await Mediator.Send(new GetCityQuery(predicate, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
 
             Cities = result.Item1;
             totalCountCity = result.pageCount;
@@ -71,7 +70,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region ComboboxDistrict
 
-        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
+        private DxComboBox<DistrictDto?, long?> refDistrictComboBox { get; set; }
         private int DistrictComboBoxIndex { get; set; } = 0;
         private int totalCountDistrict = 0;
 
@@ -98,37 +97,32 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        private async Task OnDistrictChanged(DistrictDto? e)
-        {
-            //if (e is null)
-            //{
-            //    return;
-            //}
-
-            //await LoadDataDistrict(DistrictComboBoxIndex, districtId: e.Id);
-            //DistrictComboBoxIndex = 0;
-        }
-
         private async Task OnInputDistrictChanged(string e)
         {
             DistrictComboBoxIndex = 0;
             await LoadDataDistrict(0, 10);
         }
 
-        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10, long? districtId = null)
+        private async Task OnDistrictChanged(DistrictDto? districtId)
+        {
+            if (districtId != null)
+            {
+                await LoadDataDistrict(districtId: districtId.Id);
+            }
+        }
+
+        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10, long? districtId = null, Expression<Func<District, bool>>? predicate = null)
         {
             PanelVisible = true;
 
             var cityId = refCityComboBox?.Value.GetValueOrDefault();
 
-            //var id = refDistrictComboBox?.Value.GetValueOrDefault();
-
-            //var result = districtId != null ?
-            //       await Mediator.Send(new GetDistrictQuery(districtId == null ? null : x => x.Id == districtId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""))
-            //       :
-            //       await Mediator.Send(new GetDistrictQuery(x => x.CityId == cityId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
             var id = refDistrictComboBox?.Value ?? null;
-            var result = await Mediator.Send(new GetDistrictQuery(x => x.CityId == cityId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
+
+            var result = predicate == null ?
+                await Mediator.Send(new GetDistrictQuery(x => x.CityId == cityId || (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""))
+                :
+                await Mediator.Send(new GetDistrictQuery(predicate, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
             Districts = result.Item1;
             totalCountDistrict = result.pageCount;
             PanelVisible = false;
@@ -321,9 +315,13 @@ namespace McDermott.Web.Components.Pages.Config
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
 
             var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
+
+            if (refDistrictComboBox is not null)
+                refDistrictComboBox.Value = a.DistrictId;
+
             await LoadDataProvince(provinceId: a.ProvinceId);
-            await LoadDataCity(cityId: a.CityId);
-            await LoadDataDistrict(districtId: a.DistrictId);
+            await LoadDataCity(predicate: x => x.Id == a.CityId);
+            await LoadDataDistrict(predicate: x => x.Id == a.DistrictId);
         }
 
         private void DeleteItem_Click()
