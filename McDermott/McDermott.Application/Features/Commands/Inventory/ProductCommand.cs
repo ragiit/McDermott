@@ -4,12 +4,20 @@ namespace McDermott.Application.Features.Commands.Inventory
 {
     public class ProductCommand
     {
-        #region GET 
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetProductQuery(Expression<Func<Product, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProductDto>>
+        public class GetProductQuery(Expression<Func<Product, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ProductDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Product, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class ValidateProductQuery(Expression<Func<Product, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Product, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
@@ -21,9 +29,9 @@ namespace McDermott.Application.Features.Commands.Inventory
             public ProductDto ProductDto { get; set; } = ProductDto;
         }
 
-        public class CreateListProductRequest(List<ProductDto> ProductDtos) : IRequest<List<ProductDto>>
+        public class CreateListProductRequest(List<ProductDto> GeneralConsultanCPPTDtos) : IRequest<List<ProductDto>>
         {
-            public List<ProductDto> ProductDtos { get; set; } = ProductDtos;
+            public List<ProductDto> ProductDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
         #endregion CREATE

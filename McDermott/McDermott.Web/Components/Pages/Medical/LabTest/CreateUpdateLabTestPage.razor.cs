@@ -65,15 +65,15 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         private List<string> ResultTypes =
                 [
                     "Numeric",
-    "Qualitative",
-    "Binary"
+                    "Qualitative",
+                    "Binary"
                 ];
 
         private List<string> ResultValueTypes =
             [
                 "Quantitative",
-    "Qualitative",
-    ];
+                "Qualitative",
+            ];
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {

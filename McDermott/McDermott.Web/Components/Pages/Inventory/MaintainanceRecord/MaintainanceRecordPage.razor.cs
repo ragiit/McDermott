@@ -14,6 +14,7 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintainanceRecord
         private List<MaintainanceRecordDto> GetMaintainanceRecords = [];
         private MaintainanceRecordDto PostMaintaiananceRecords = new();
         #endregion
+
         #region Variable Static
         private bool PanelVisible { get; set; } = false;
         private Timer _timer;

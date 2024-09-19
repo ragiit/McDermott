@@ -8,12 +8,20 @@ namespace McDermott.Application.Features.Commands.Inventory
 {
     public class MaintainanceCommand
     {
-        #region GET 
+        #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetMaintainanceQuery(Expression<Func<Maintainance, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MaintainanceDto>>
+        public class GetMaintainanceQuery(Expression<Func<Maintainance, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<MaintainanceDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Maintainance, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class ValidateMaintainanceQuery(Expression<Func<Maintainance, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Maintainance, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
@@ -25,9 +33,9 @@ namespace McDermott.Application.Features.Commands.Inventory
             public MaintainanceDto MaintainanceDto { get; set; } = MaintainanceDto;
         }
 
-        public class CreateListMaintainanceRequest(List<MaintainanceDto> MaintainanceDtos) : IRequest<List<MaintainanceDto>>
+        public class CreateListMaintainanceRequest(List<MaintainanceDto> GeneralConsultanCPPTDtos) : IRequest<List<MaintainanceDto>>
         {
-            public List<MaintainanceDto> MaintainanceDtos { get; set; } = MaintainanceDtos;
+            public List<MaintainanceDto> MaintainanceDtos { get; set; } = GeneralConsultanCPPTDtos;
         }
 
         #endregion CREATE

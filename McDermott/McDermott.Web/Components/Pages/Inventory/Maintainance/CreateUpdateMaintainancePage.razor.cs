@@ -1,12 +1,14 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory
+namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 {
-    public partial class MaintainancePage
+    public partial class CreateUpdateMaintainancePage
     {
+        #region Relation data
         private List<MaintainanceDto> getMaintainance = [];
         private List<UserDto> getResponsibleBy = [];
         private List<UserDto> getRequestBy = [];
@@ -14,19 +16,27 @@ namespace McDermott.Web.Components.Pages.Inventory
         private List<LocationDto> getLocation = [];
         private List<TransactionStockDto> TransactionStocks = [];
         private MaintainanceDto postMaintainance = new();
+        private MaintainanceDto getMaintainanceById = new();
         private TransactionStockDto postTransactionStock = new();
+        #endregion
 
-        #region Variable
+        #region variable Static
+        [SupplyParameterFromQuery]
+        private long? Id { get; set; }
 
-        private IGrid Grid { get; set; }
+        [Parameter]
+        public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
+
+        private IGrid Grid {  get; set; }
+        private Timer _timer;
         private bool PanelVisible { get; set; } = false;
-        private bool isActiveButton { get; set; } = false;
-        private bool showForm { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
-        private int FocusedRowVisibleIndexDetail { get; set; }
 
+        #endregion
+
+        #region Boolean Data
         private void unCheckIN(bool newValue)
         {
             postMaintainance.isInternal = true;
@@ -91,8 +101,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             "Months",
             "Years"
         };
-
-        #endregion Variable
+        #endregion
 
         #region UserLoginAndAccessRole
 
@@ -151,179 +160,234 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         #endregion UserLoginAndAccessRole
 
-        #region Load
-
+        #region Load data
         private async Task LoadData()
         {
-            try
+            var result = await Mediator.Send(new GetMaintainanceQuery(x=>x.Id == Id, pageSize: 0, pageIndex: 1));
+            postMaintainance = new();
+            if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
-                PanelVisible = true;
-                showForm = false;
-                getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
-                getEquipment = await Mediator.Send(new GetProductQuery(x => x.HospitalType == "Medical Equipment"));
-                getRequestBy = await Mediator.Send(new GetUserQuery());
-                var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-                this.getLocation = Locations;
-                getResponsibleBy = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally
-            {
-                PanelVisible = false;
-            }
-        }
-
-        public MarkupString GetIssueStatusIconHtml(EnumStatusMaintainance? status)
-        {
-            string priorityClass;
-            string title;
-
-            switch (status)
-            {
-                case EnumStatusMaintainance.Request:
-                    priorityClass = "info";
-                    title = "Request";
-                    break;
-
-                case EnumStatusMaintainance.InProgress:
-                    priorityClass = "primary";
-                    title = "In Progress";
-                    break;
-
-                case EnumStatusMaintainance.Repaired:
-                    priorityClass = "warning";
-                    title = "Repaire";
-                    break;
-
-                case EnumStatusMaintainance.Scrap:
-                    priorityClass = "warning";
-                    title = "Scrap";
-                    break;
-
-                case EnumStatusMaintainance.Done:
-                    priorityClass = "success";
-                    title = "Done";
-                    break;
-
-                case EnumStatusMaintainance.Canceled:
-                    priorityClass = "danger";
-                    title = "Cancel";
-                    break;
-
-                default:
-                    return new MarkupString("");
-            }
-
-            string html = $"<div class='row '><div class='col-3'>" +
-                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
-
-            return new MarkupString(html);
-        }
-
-        #endregion Load
-
-        #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndex = args.VisibleIndex;
-
-            try
-            {
-                if ((MaintainanceDto)args.DataItem is null)
-                    return;
-
-                isActiveButton = ((MaintainanceDto)args.DataItem)!.Status!.Equals(EnumStatusMaintainance.Request);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-        }
-
-        private async Task OnRowDoubleClick(GridRowClickEventArgs e)
-        {
-            await EditItem_Click();
-        }
-
-        #endregion Grid
-
-        #region button
-
-        private async Task HandleValidSubmit()
-        {
-            //IsLoading = true;
-            FormValidationState = true;
-            await OnSave();
-            //IsLoading = false;
-        }
-
-        private async Task HandleInvalidSubmit()
-        {
-            showForm = true;
-            FormValidationState = false;
-        }
-
-        private async Task NewItem_Click()
-        {
-            showForm = true;
-        }
-
-        private async Task EditItem_Click(MaintainanceDto? p = null)
-        {
-            try
-            {
-                showForm = true;
-                PanelVisible = true;
-
-                if (p != null)
+                if (result.Item1.Count == 0 || !Id.HasValue)
                 {
-                    postMaintainance = p;
-                }
-                else if (SelectedDataItems.Count > 0)
-                {
-                    postMaintainance = SelectedDataItems[0].Adapt<MaintainanceDto>();
-                }
-                else
-                {
-                    ToastService.ShowWarning("No item selected for editing.");
+                    NavigationManager.NavigateTo("inventory/maintainance");
                     return;
                 }
+
+                postMaintainance = result.Item1.FirstOrDefault() ?? new();
+               
+
             }
-            catch (Exception ex)
+        }
+        #endregion
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            //await LoadLabTestDetails(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            //await LoadLabTestDetails(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            //await LoadLabTestDetails(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        #region Load ComboBox
+        #region ComboBox Product
+        private DxComboBox<ProductDto, long?> refProductsComboBox { get; set; }
+        private int ProductsComboBoxIndex { get; set; } = 0;
+        private int totalCountProducts = 0;
+
+        private async Task OnSearchProducts()
+        {
+            await LoadDataProducts(0, 10);
+        }
+
+        private async Task OnSearchProductsIndexIncrement()
+        {
+            if (ProductsComboBoxIndex < (totalCountProducts - 1))
             {
-                ex.HandleException(ToastService);
-            }
-            finally
-            {
-                PanelVisible = false;
+                ProductsComboBoxIndex++;
+                await LoadDataProducts(ProductsComboBoxIndex, 10);
             }
         }
 
-        private async Task Cancel_Click()
-        { }
+        private async Task OnSearchProductsIndexDecrement()
+        {
+            if (ProductsComboBoxIndex > 0)
+            {
+                ProductsComboBoxIndex--;
+                await LoadDataProducts(ProductsComboBoxIndex, 10);
+            }
+        }
 
+        private async Task OnInputProductsChanged(string e)
+        {
+            ProductsComboBoxIndex = 0;
+            await LoadDataProducts(0, 10);
+        }
+
+        private async Task LoadDataProducts(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            getEquipment = result.Item1.Where(x=>x.HospitalType == "Medical Equipment").ToList();
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+        #region Combo Box Request By
+        private DxComboBox<UserDto, long?> refRequestByComboBox { get; set; }
+        private int RequestByComboBoxIndex { get; set; } = 0;
+        private int totalCountRequestBy = 0;
+
+        private async Task OnSearchRequestBy()
+        {
+            await LoadDataRequestBy(0, 10);
+        }
+
+        private async Task OnSearchRequestByIndexIncrement()
+        {
+            if (RequestByComboBoxIndex < (totalCountRequestBy - 1))
+            {
+                RequestByComboBoxIndex++;
+                await LoadDataRequestBy(RequestByComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchRequestByIndexDecrement()
+        {
+            if (RequestByComboBoxIndex > 0)
+            {
+                RequestByComboBoxIndex--;
+                await LoadDataRequestBy(RequestByComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputRequestByChanged(string e)
+        {
+            RequestByComboBoxIndex = 0;
+            await LoadDataRequestBy(0, 10);
+        }
+
+        private async Task LoadDataRequestBy(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetUserQuery2(searchTerm: refRequestByComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            getRequestBy = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+        #region Combo Box Location
+        private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
+        private int LocationComboBoxIndex { get; set; } = 0;
+        private int totalCountLocation = 0;
+
+        private async Task OnSearchLocation()
+        {
+            await LoadDataLocation(0, 10);
+        }
+
+        private async Task OnSearchLocationIndexIncrement()
+        {
+            if (LocationComboBoxIndex < (totalCountLocation - 1))
+            {
+                LocationComboBoxIndex++;
+                await LoadDataLocation(LocationComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchLocationIndexDecrement()
+        {
+            if (LocationComboBoxIndex > 0)
+            {
+                LocationComboBoxIndex--;
+                await LoadDataLocation(LocationComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputLocationChanged(string e)
+        {
+            LocationComboBoxIndex = 0;
+            await LoadDataLocation(0, 10);
+        }
+
+        private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetLocationQuery(searchTerm: refLocationComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            getLocation = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+        #region Combo Box Responsible
+        private DxComboBox<UserDto, long?> refResponsibleByComboBox { get; set; }
+        private int ResponsibleByComboBoxIndex { get; set; } = 0;
+        private int totalCountResponsibleBy = 0;
+
+        private async Task OnSearchResponsibleBy()
+        {
+            await LoadDataResponsibleBy(0, 10);
+        }
+
+        private async Task OnSearchResponsibleByIndexIncrement()
+        {
+            if (ResponsibleByComboBoxIndex < (totalCountResponsibleBy - 1))
+            {
+                ResponsibleByComboBoxIndex++;
+                await LoadDataResponsibleBy(ResponsibleByComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchResponsibleByIndexDecrement()
+        {
+            if (ResponsibleByComboBoxIndex > 0)
+            {
+                ResponsibleByComboBoxIndex--;
+                await LoadDataResponsibleBy(ResponsibleByComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputResponsibleByChanged(string e)
+        {
+            ResponsibleByComboBoxIndex = 0;
+            await LoadDataResponsibleBy(0, 10);
+        }
+
+        private async Task LoadDataResponsibleBy(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetUserQuery2(searchTerm: refResponsibleByComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            getResponsibleBy = result.Item1.Where(x => x.IsEmployee == true).ToList();
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+
+
+        #endregion
+
+        #region function step
         private async Task InProgress_Click()
         {
             try
@@ -332,7 +396,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 postMaintainance.Status = EnumStatusMaintainance.InProgress;
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;
-                await EditItem_Click(getMaintainanceById);
+                NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}");
             }
             catch (Exception ex)
             {
@@ -348,7 +412,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 postMaintainance.Status = EnumStatusMaintainance.Repaired;
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;
-                await EditItem_Click(getMaintainanceById);
+                NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}");
             }
             catch (Exception ex)
             {
@@ -362,7 +426,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             {
                 PanelVisible = true;
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-                getMaintainance = await Mediator.Send(new GetMaintainanceQuery());
+                var result = await Mediator.Send(new GetMaintainanceQuery(searchTerm: searchTerm, pageSize: 0, pageIndex: 1));
+                getMaintainance = result.Item1;
                 var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Maintainance))
                            .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
@@ -395,7 +460,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 postMaintainance.Status = EnumStatusMaintainance.Scrap;
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;
-                await EditItem_Click(getMaintainanceById);
+                NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}");
             }
             catch (Exception ex)
             {
@@ -411,66 +476,23 @@ namespace McDermott.Web.Components.Pages.Inventory
                 postMaintainance.Status = EnumStatusMaintainance.Done;
                 getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                 PanelVisible = false;
-                await EditItem_Click(getMaintainanceById);
+                NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}");
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
+
 
         private async Task onDiscard()
         {
-            await LoadData();
+            NavigationManager.NavigateTo($"inventory/maintainance/");
             StateHasChanged();
         }
-
-        private async Task Refresh_Click()
-        {
-            await LoadData();
-        }
-
-        private void DeleteItem_Click()
-        {
-            Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        #endregion button
-
-        #region Delete
-
-        private async Task OnDelete(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                PanelVisible = true;
-                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
-                {
-                    await Mediator.Send(new DeleteMaintainanceRequest(((MaintainanceDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var a = SelectedDataItems.Adapt<List<MaintainanceDto>>();
-                    await Mediator.Send(new DeleteMaintainanceRequest(ids: a.Select(x => x.Id).ToList()));
-                }
-                PanelVisible = false;
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally
-            {
-                await LoadData();
-                StateHasChanged();
-            }
-        }
-
-        #endregion Delete
+        #endregion
 
         #region save
-
-        private MaintainanceDto getMaintainanceById = new();
 
         private async Task OnSave()
         {
@@ -508,7 +530,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 }
 
                 PanelVisible = false;
-                await EditItem_Click(getMaintainanceById);
+                NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}");
             }
             catch (Exception ex)
             {
@@ -517,5 +539,23 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #endregion save
+
+
+        #region Handler Vaidation
+        private async Task HandleValidSubmit()
+        {
+            //IsLoading = true;
+            FormValidationState = true;
+            await OnSave();
+            //IsLoading = false;
+        }
+
+        private async Task HandleInvalidSubmit()
+        {
+          
+            FormValidationState = false;
+        }
+
+        #endregion
     }
 }

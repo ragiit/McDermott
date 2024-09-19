@@ -312,7 +312,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 }
 
                 UserForm = result.Item1.FirstOrDefault() ?? new();
-                UserForm.Password = Helper.HashMD5(UserForm.Password);
             }
         }
 

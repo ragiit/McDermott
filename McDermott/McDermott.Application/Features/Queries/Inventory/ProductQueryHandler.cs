@@ -8,7 +8,8 @@ using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class ProductQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetProductQuery, List<ProductDto>>,
+        IRequestHandler<GetProductQuery, (List<ProductDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateProductQuery, bool>,
         IRequestHandler<CreateProductRequest, ProductDto>,
         IRequestHandler<CreateListProductRequest, List<ProductDto>>,
         IRequestHandler<UpdateProductRequest, ProductDto>,
@@ -17,38 +18,54 @@ namespace McDermott.Application.Features.Queries.Inventory
     {
         #region GET
 
-        public async Task<List<ProductDto>> Handle(GetProductQuery request, CancellationToken cancellationToken)
+        public async Task<(List<ProductDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetProductQuery_";
-
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Product>? result))
-                {
-                    result = await _unitOfWork.Repository<Product>().Entities
-                      .Include(x => x.Medicaments)
-                      .Include(x => x.Uom)
-                      //.Include(x => x.StockProduct)
-                      .AsNoTracking()
-                      .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
-                }
-
-                result ??= [];
+                var query = _unitOfWork.Repository<Product>().Entities
+                    .Include(x => x.Uom)
+                    .Include(x => x.PurchaseUom)
+                    .Include(x => x.BpjsClassification)
+                    .AsNoTracking()
+                    .AsQueryable();
 
                 if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                    query = query.Where(request.Predicate);
 
-                return result.ToList().Adapt<List<ProductDto>>();
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+                }
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
+
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<ProductDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateProductQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Product>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

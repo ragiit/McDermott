@@ -4,7 +4,7 @@ using static McDermott.Application.Features.Commands.Inventory.TransactionStockC
 using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory
+namespace McDermott.Web.Components.Pages.Inventory.Product
 {
     public partial class ProductPage
     {
