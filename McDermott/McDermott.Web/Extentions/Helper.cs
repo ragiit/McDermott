@@ -108,6 +108,8 @@ namespace McDermott.Web.Extentions
             "inventory/locations",
             "inventory/reporting-inventories",
             "inventory/stock-moves",
+            "inventory/maintainance",
+            "inventory/maintainance-records",
 
             // Employees
             "employee/employees",
