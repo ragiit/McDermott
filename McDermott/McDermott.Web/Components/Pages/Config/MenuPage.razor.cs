@@ -1,4 +1,5 @@
-﻿using McDermott.Web.Components.Layout;
+﻿using McDermott.Domain.Entities;
+using McDermott.Web.Components.Layout;
 using System.Security.Policy;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -291,6 +292,20 @@ namespace McDermott.Web.Components.Pages.Config
                     var importedMenus = new List<MenuDto>();
                     var parentCache = new List<MenuDto>();
 
+                    var parentNames = new HashSet<string>();
+
+                    var list1 = new List<MenuDto>();
+
+                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    {
+                        var a = worksheet.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(a))
+                            parentNames.Add(a.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetMenuQuery(x => parentNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
+
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {
                         string name = worksheet.Cells[row, 1].Value?.ToString()?.Trim();
@@ -317,23 +332,11 @@ namespace McDermott.Web.Components.Pages.Config
                         long? parentId = null;
                         if (!string.IsNullOrEmpty(parentName))
                         {
-                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(parentName, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                var parentMenu = (await Mediator.Send(new GetMenuQuery(
-                                    x => x.Parent == null && x.Name == parentName,
-                                    searchTerm: parentName, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-
-                                if (parentMenu is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 2, parentName ?? string.Empty);
-                                }
-                                else
-                                {
-                                    parentId = parentMenu.Id;
-                                    parentCache.Add(parentMenu);
-                                }
+                                ToastService.ShowErrorImport(row, 2, parentName ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {
@@ -355,20 +358,28 @@ namespace McDermott.Web.Components.Pages.Config
                             Url = url
                         };
 
-                        bool exists = await Mediator.Send(new ValidateMenuQuery(x =>
-                            x.Name == newMenu.Name &&
-                            x.ParentId == newMenu.ParentId &&
-                            x.Sequence == newMenu.Sequence &&
-                            x.Url == newMenu.Url));
-
-                        if (!exists)
-                            importedMenus.Add(newMenu);
+                        importedMenus.Add(newMenu);
                     }
 
-                    if (importedMenus.Count != 0)
+                    if (importedMenus.Count > 0)
                     {
+                        importedMenus = importedMenus.DistinctBy(x => new { x.Name, x.ParentId, x.Sequence, x.Url }).ToList();
+
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateMenuQuery(importedMenus));
+
+                        // Filter village baru yang tidak ada di database
+                        importedMenus = importedMenus.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.ParentId == village.ParentId &&
+                                ev.Sequence == village.Sequence &&
+                                ev.Url == village.Url
+                            )
+                        ).ToList();
+
                         await Mediator.Send(new CreateListMenuRequest(importedMenus));
-                        await LoadData();
+                        await LoadData(0, pageSize);
                         SelectedDataItems = [];
                     }
 

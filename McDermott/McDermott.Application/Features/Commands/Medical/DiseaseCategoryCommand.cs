@@ -2,7 +2,7 @@
 {
     public class DiseaseCategoryCommand
     {
-        #region GET 
+        #region GET
 
         public class GetDiseaseCategoryQuery(Expression<Func<DiseaseCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -13,12 +13,19 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateDiseaseCategoryQuery(List<DiseaseCategoryDto> DiseaseCategorysToValidate) : IRequest<List<DiseaseCategoryDto>>
+        {
+            public List<DiseaseCategoryDto> DiseaseCategorysToValidate { get; } = DiseaseCategorysToValidate;
+        }
+
         public class ValidateDiseaseCategoryQuery(Expression<Func<DiseaseCategory, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<DiseaseCategory, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 

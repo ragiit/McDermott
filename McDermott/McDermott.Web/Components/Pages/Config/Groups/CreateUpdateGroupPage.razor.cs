@@ -1,6 +1,7 @@
 ﻿using DevExpress.Data.Access;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
 
@@ -743,7 +744,25 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                     }
 
                     var gg = new List<GroupMenuDto>();
-                    var parentCache = new List<MenuDto>();
+
+                    var menus = new HashSet<string>();
+                    var parentMenus = new HashSet<string>();
+
+                    var list1 = new List<MenuDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var a = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var b = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(a))
+                            menus.Add(a.ToLower());
+
+                        if (!string.IsNullOrEmpty(b))
+                            parentMenus.Add(b.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetMenuQuery(x => parentMenus.Contains(x.Parent.Name) && menus.Contains(x.Name.ToLower()), 0, 0))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -757,31 +776,14 @@ namespace McDermott.Web.Components.Pages.Config.Groups
 
                         bool isValid = true;
 
-                        if (menu.Contains("Chronic Diagnoses"))
-                        {
-                            var a = "a";
-                        }
-
                         long? menuId = null;
-                        if (!string.IsNullOrEmpty(parentName))
+                        if (!string.IsNullOrEmpty(menu) && !string.IsNullOrEmpty(parentName))
                         {
-                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
+                            var cachedParent = list1.FirstOrDefault(x => x.Parent.Name.Equals(parentName, StringComparison.CurrentCultureIgnoreCase) && x.Name.Equals(menu, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                var parentMenu = (await Mediator.Send(new GetMenuQuery(
-                                    x => x.Parent != null && x.Parent.Name == parentName,
-                                    searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-
-                                if (parentMenu is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
-                                }
-                                else
-                                {
-                                    menuId = parentMenu.Id;
-                                    parentCache.Add(parentMenu);
-                                }
+                                ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
+                                isValid = false;
                             }
                             else
                             {
@@ -802,26 +804,33 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                             IsDelete = isDelete == "Yes",
                             IsImport = isImport == "Yes",
                         };
-
-                        bool exists = await Mediator.Send(new ValidateGroupMenuQuery(x =>
-                                x.GroupId == g.GroupId &&
-                                x.MenuId == g.MenuId));
-
-                        if (!exists)
-                            gg.Add(g);
+                        gg.Add(g);
                     }
-
                     if (gg.Count > 0)
                     {
-                        SelectedDataItemsGroupMenu = [];
-                        gg = gg.DistinctBy(x => x.MenuId).ToList();
+                        gg = gg.DistinctBy(x => new { x.GroupId, x.MenuId, x.IsCreate, x.IsRead, x.IsUpdate, x.IsDelete, x.IsImport }).ToList();
+
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateGroupMenuQuery(gg));
+
+                        // Filter village baru yang tidak ada di database
+                        gg = gg.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.GroupId == village.GroupId &&
+                                ev.MenuId == village.MenuId &&
+                                ev.IsCreate == village.IsCreate &&
+                                ev.IsRead == village.IsRead &&
+                                ev.IsUpdate == village.IsUpdate &&
+                                ev.IsDelete == village.IsDelete &&
+                                ev.IsImport == village.IsImport
+                            )
+                        ).ToList();
+
                         await Mediator.Send(new CreateListGroupMenuRequest(gg));
-                        await LoadGroupMenus(0, pageSize);
+                        NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
                     }
 
-                    ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
-
-                    //NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
+                    ToastService.ShowSuccessCountImported(gg.Count);
                 }
                 catch (Exception ex)
                 {

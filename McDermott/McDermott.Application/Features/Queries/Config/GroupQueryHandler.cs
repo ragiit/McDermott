@@ -6,6 +6,8 @@ namespace McDermott.Application.Features.Queries.Config
     public class GroupQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateGroupQuery, bool>,
+        IRequestHandler<BulkValidateGroupQuery, List<GroupDto>>,
+
         IRequestHandler<CreateGroupRequest, GroupDto>,
         IRequestHandler<CreateListGroupRequest, List<GroupDto>>,
         IRequestHandler<UpdateGroupRequest, GroupDto>,
@@ -13,6 +15,22 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteGroupRequest, bool>
     {
         #region GET
+
+        public async Task<List<GroupDto>> Handle(BulkValidateGroupQuery request, CancellationToken cancellationToken)
+        {
+            var GroupDtos = request.GroupsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var GroupNames = GroupDtos.Select(x => x.Name).Distinct().ToList();
+
+            var existingGroups = await _unitOfWork.Repository<Group>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => GroupNames.Contains(v.Name))
+                .ToListAsync(cancellationToken);
+
+            return existingGroups.Adapt<List<GroupDto>>();
+        }
 
         public async Task<(List<GroupDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGroupQuery request, CancellationToken cancellationToken)
         {

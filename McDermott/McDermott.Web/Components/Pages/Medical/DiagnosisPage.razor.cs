@@ -56,7 +56,7 @@ namespace McDermott.Web.Components.Pages.Medical
         protected override async Task OnInitializedAsync()
         {
             var a = await Mediator.Send(new GetDiseaseCategoryQuery());
-            Diseases = [.. a.Item1.Where(x => x.ParentCategory != null || x.ParentCategory != "")];
+            Diseases = [.. a.Item1.Where(x => x.ParentDiseaseCategoryId != null || x.ParentDiseaseCategoryId != 0)];
             var Chronises = await Mediator.Send(new GetCronisCategoryQuery());
             this.Cronises = Chronises.Item1;
 

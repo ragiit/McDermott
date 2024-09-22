@@ -1346,8 +1346,8 @@ namespace McDermott.Persistence.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<string>("ParentCategory")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<long?>("ParentDiseaseCategoryId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -1356,6 +1356,8 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentDiseaseCategoryId");
 
                     b.ToTable("DiseaseCategories");
                 });
@@ -6236,6 +6238,16 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("CronisCategory");
 
                     b.Navigation("DiseaseCategory");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.DiseaseCategory", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.DiseaseCategory", "ParentDiseaseCategory")
+                        .WithMany()
+                        .HasForeignKey("ParentDiseaseCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ParentDiseaseCategory");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.District", b =>

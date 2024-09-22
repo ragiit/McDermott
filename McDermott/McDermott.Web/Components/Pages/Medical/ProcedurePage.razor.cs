@@ -1,4 +1,5 @@
 ﻿using McDermott.Domain.Entities;
+using System.Security.Policy;
 using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -93,56 +94,33 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = false;
 
             return;
+        }
 
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
             try
             {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetProcedureQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                Procedures = result.Item1;
+                activePageIndex = pageIndex;
+                totalCount = result.pageCount;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            var result = await Mediator.Send(new GetProcedureQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Procedures = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
         }
 
         private async Task ImportFile()
@@ -165,7 +143,7 @@ namespace McDermott.Web.Components.Pages.Medical
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Code", "Clasdification" };
+                    var headerNames = new List<string>() { "Name", "Code", "Classification" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -179,26 +157,62 @@ namespace McDermott.Web.Components.Pages.Medical
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var c = new ProjectDto
+                        string a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        bool isValid = true;
+
+                        // Validasi URL
+                        if (!Classification.Contains(a) && !string.IsNullOrEmpty(a))
+                        {
+                            isValid = false;
+                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                        }
+
+                        // Lewati baris jika tidak valid
+                        if (!isValid)
+                            continue;
+
+                        var c = new ProcedureDto
                         {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                            Code_Test = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                            Classification = ws.Cells[row, 3].Value?.ToString()?.Trim(),
                         };
 
                         //if (!Procedures.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                        //    list.Add(c);
+                        list.Add(c);
                     }
 
-                    await Mediator.Send(new CreateListProcedureRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code_Test, x.Classification }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateProcedureQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.Code_Test == village.Code_Test &&
+                                ev.Classification == village.Classification
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListProcedureRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
-                    ToastService.ShowError(ex.Message);
+                    ex.HandleException(ToastService);
+                }
+                finally
+                {
+                    PanelVisible = false;
                 }
             }
             PanelVisible = false;
@@ -206,7 +220,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "procedure_template.xlsx",
             [
                 new()
                 {
@@ -218,7 +232,7 @@ namespace McDermott.Web.Components.Pages.Medical
                     Column = "Code"
                 },
                 new(){
-                    Column = "Clasdification"
+                    Column = "Classification"
                 },
             ]);
         }
@@ -243,62 +257,55 @@ namespace McDermott.Web.Components.Pages.Medical
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteProcedureRequest(((ProcedureDto)e.DataItem).Id));
+                PanelVisible = true;
+
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteProcedureRequest(((ProcedureDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<ProcedureDto>>();
+                    await Mediator.Send(new DeleteProcedureRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                await LoadData();
             }
-            else
+            catch (Exception ex)
             {
-                var a = SelectedDataItems.Adapt<List<ProcedureDto>>();
-                await Mediator.Send(new DeleteProcedureRequest(ids: a.Select(x => x.Id).ToList()));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ProcedureDto)e.EditModel;
+            try
+            {
+                PanelVisible = true;
+                var editModel = (ProcedureDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateProcedureRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateProcedureRequest(editModel));
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateProcedureRequest(editModel));
-            else
-                await Mediator.Send(new UpdateProcedureRequest(editModel));
-
-            await LoadData();
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
     }
 }

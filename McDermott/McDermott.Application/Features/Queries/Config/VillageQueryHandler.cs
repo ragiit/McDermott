@@ -166,7 +166,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDtos.Adapt<CreateUpdateVillageDto>().Adapt<List<Village>>());
+                var result = await _unitOfWork.Repository<Village>().AddAsync(request.VillageDtos.Adapt<List<Village>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
