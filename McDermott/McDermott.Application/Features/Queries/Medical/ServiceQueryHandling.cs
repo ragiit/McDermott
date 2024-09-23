@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 
 using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
@@ -46,6 +47,9 @@ IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
                     .AsNoTracking()
                     .AsQueryable();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
@@ -53,17 +57,9 @@ IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                var pagedResult = query.OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<ServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

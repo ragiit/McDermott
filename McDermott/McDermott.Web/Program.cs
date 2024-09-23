@@ -115,7 +115,7 @@ builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true; // Mengaktifkan kompresi untuk HTTPS
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/javascript", "text/css", "application/json" });
+        ["application/javascript", "text/css", "application/json"]);
 });
 
 //builder.Services.AddServerSideBlazor();

@@ -106,31 +106,40 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            var result = await Mediator.Send(new GetSpecialityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Specialitys = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetSpecialityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                Specialitys = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task ImportFile()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
+
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Speciality_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "speciality_template.xlsx",
             [
-                new()
-                {
-                    Column = "Code"
-                },
                 new()
                 {
                     Column = "Name",
                     Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Code"
                 },
             ]);
         }
@@ -145,21 +154,24 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteSpecialityRequest(((SpecialityDto)e.DataItem).Id));
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteSpecialityRequest(((SpecialityDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<SpecialityDto>>();
+                    await Mediator.Send(new DeleteSpecialityRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                await LoadData(activePageIndex, pageSize);
             }
-            else
+            catch (Exception ex)
             {
-                var a = SelectedDataItems.Adapt<List<SpecialityDto>>();
-                await Mediator.Send(new DeleteSpecialityRequest(ids: a.Select(x => x.Id).ToList()));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
-        }
-
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
+            finally { PanelVisible = false; }
         }
 
         private bool EditItemsEnabled { get; set; }
@@ -173,31 +185,6 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task Refresh_Click()
         {
             await LoadData();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private bool UploadVisible { get; set; } = false;
@@ -222,7 +209,6 @@ namespace McDermott.Web.Components.Pages.Medical
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task EditItem_Click()
@@ -236,34 +222,96 @@ namespace McDermott.Web.Components.Pages.Medical
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
             {
-                e.CssClass = "alt-item";
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<SpecialityDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var c = new SpecialityDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        };
+
+                        list.Add(c);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
+
+                        // Panggil BulkValidateSpecialityQuery untuk validasi bulk
+                        var existingSpecialitys = await Mediator.Send(new BulkValidateSpecialityQuery(list));
+
+                        // Filter Speciality baru yang tidak ada di database
+                        list = list.Where(Speciality =>
+                            !existingSpecialitys.Any(ev =>
+                                ev.Name == Speciality.Name &&
+                                ev.Code == Speciality.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListSpecialityRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+                finally { PanelVisible = false; }
             }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
+            PanelVisible = false;
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (SpecialityDto)e.EditModel;
+            try
+            {
+                var editModel = (SpecialityDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateSpecialityRequest(editModel));
-            else
-                await Mediator.Send(new UpdateSpecialityRequest(editModel));
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateSpecialityRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateSpecialityRequest(editModel));
 
-            await LoadData();
+                await LoadData();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
     }
 }

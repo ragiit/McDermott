@@ -1,4 +1,5 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -316,6 +317,16 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as HealthCenterDto ?? new());
+
+            await LoadComboboxEdit(a);
+        }
+
+        private async Task LoadComboboxEdit(HealthCenterDto a)
+        {
+            Countries = (await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId))).Item1;
+            Provinces = (await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId))).Item1;
+            Cities = (await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId))).Item1;
         }
 
         private void DeleteItem_Click()

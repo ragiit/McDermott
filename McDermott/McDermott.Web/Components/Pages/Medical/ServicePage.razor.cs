@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class ServicePage
     {
@@ -87,6 +90,7 @@
             PanelVisible = true;
             await LoadData();
             await GetUserInfo();
+            await LoadDataService();
             PanelVisible = false;
 
             return;
@@ -103,6 +107,52 @@
             }
         }
 
+        #region ComboboxService
+
+        private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
+        private int ServiceComboBoxIndex { get; set; } = 0;
+        private int totalCountService = 0;
+
+        private async Task OnSearchService()
+        {
+            await LoadDataService();
+        }
+
+        private async Task OnSearchServiceIndexIncrement()
+        {
+            if (ServiceComboBoxIndex < (totalCountService - 1))
+            {
+                ServiceComboBoxIndex++;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchServicendexDecrement()
+        {
+            if (ServiceComboBoxIndex > 0)
+            {
+                ServiceComboBoxIndex--;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputServiceChanged(string e)
+        {
+            ServiceComboBoxIndex = 0;
+            await LoadDataService();
+        }
+
+        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10, long? ServiceId = null)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetServiceQuery(x => x.IsKiosk == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+            ServicesK = result.Item1;
+            totalCountService = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxService
+
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -112,7 +162,6 @@
             Services = result.Item1;
             activePageIndex = pageIndex;
             totalCount = result.pageCount;
-            ServicesK = [.. Services.Where(x => x.IsKiosk == true).ToList()];
 
             foreach (var i in Services)
             {
@@ -322,11 +371,15 @@
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            return;
-            FormService = SelectedDataItems[0].Adapt<ServiceDto>();
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ServiceDto ?? new());
 
-            PopUpVisible = true;
-            TextPopUp = "Edit Services";
+            await LoadComboboxEdit(a);
+        }
+
+        private async Task LoadComboboxEdit(ServiceDto a)
+        {
+            if (a.IsPatient)
+                ServicesK = (await Mediator.Send(new GetServiceQuery(x => x.Id == a.ServicedId && x.IsKiosk == true))).Item1;
         }
 
         private void OnCancel()

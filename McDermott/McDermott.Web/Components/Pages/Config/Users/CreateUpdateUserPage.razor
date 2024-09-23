@@ -612,9 +612,11 @@
 
                                                             <div class="col-md-6">
                                                                 <DxFormLayout>
+
                                                                     <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Nurse:">
                                                                         <DxCheckBox @bind-Checked="@UserForm.IsNurse" />
                                                                     </DxFormLayoutItem>
+
                                                                     <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Number">
                                                                         <DxMaskedInput @bind-Value="@UserForm.StrNo"
                                                                                        NullText="Str Number"
@@ -623,22 +625,56 @@
                                                                             <DxTextMaskProperties Placeholder="Placeholder" />
                                                                         </DxMaskedInput>
                                                                     </DxFormLayoutItem>
+
                                                                     <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Expired">
                                                                         <DxDateEdit @bind-Date="@UserForm.StrExp" NullText="Str Expired" Mask="@DateTimeMask.ShortDate" />
                                                                     </DxFormLayoutItem>
-                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services">
-                                                                        <DxTagBox Data="@Services"
-                                                                                  FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                  @bind-Values="@SelectedServices"
-                                                                                  TextFieldName="Name"
-                                                                                  NullText="Select Service"
-                                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
-                                                                            <Columns>
-                                                                                <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
-                                                                                <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
-                                                                                <DxListEditorColumn FieldName="@nameof(Service.Quota)" Caption="Quota" />
-                                                                            </Columns>
-                                                                        </DxTagBox>
+
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services"> 
+                                                                        <Template>
+                                                                            <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
+                                                                                <Rows>
+                                                                                    <DxGridLayoutRow />
+                                                                                </Rows>
+                                                                                <Columns>
+                                                                                    <DxGridLayoutColumn />
+                                                                                    <DxGridLayoutColumn />
+                                                                                    <DxGridLayoutColumn />
+                                                                                </Columns>
+                                                                                <Items>
+                                                                                   @*  <DxGridLayoutItem Row="0" Column="0" ColumnSpan="1">
+                                                                                        <Template> 
+                                                                                            <DxButton Text="-"></DxButton>
+                                                                                        </Template>
+                                                                                    </DxGridLayoutItem> *@
+
+                                                                                    <DxGridLayoutItem Row="0" Column="0" ColumnSpan="9">
+                                                                                        <Template> 
+                                                                                            <DxTagBox Data="@Services"
+                                                                                                      FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                                      @bind-Values="@SelectedServices"
+                                                                                                      TextFieldName="Name"
+                                                                                                      NullText="Select Service"  
+                                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"> 
+                                                                                                <Columns>
+                                                                                                    <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
+                                                                                                    <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
+                                                                                                    <DxListEditorColumn FieldName="@nameof(Service.Quota)" Caption="Quota" />
+                                                                                                </Columns>
+                                                                                            </DxTagBox>
+                                                                                        </Template>
+                                                                                    </DxGridLayoutItem>
+
+                                                                                    <DxGridLayoutItem Row="0" Column="1" ColumnSpan="1">
+                                                                                        <Template>   
+                                                                                            <DxButton Text="-"></DxButton>
+                                                                                            <DxButton Text="S"></DxButton>
+                                                                                            <DxButton Text="+"></DxButton>
+                                                                                        </Template>
+                                                                                    </DxGridLayoutItem>
+                                                                                </Items>
+                                                                            </DxGridLayout>
+                                                                        </Template>
                                                                     </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </div>

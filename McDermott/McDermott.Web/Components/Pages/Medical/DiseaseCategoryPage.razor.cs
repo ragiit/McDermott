@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
 using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
@@ -284,7 +285,12 @@ namespace McDermott.Web.Components.Pages.Medical
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
 
             var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new());
-            await LoadDataDiseaseCategory(a: a.ParentDiseaseCategoryId);
+            await LoadComboboxEdit(a);
+        }
+
+        private async Task LoadComboboxEdit(DiseaseCategoryDto a)
+        {
+            ParentCategoryDto = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.ParentDiseaseCategoryId == null && x.Id == a.ParentDiseaseCategoryId))).Item1;
         }
 
         private void DeleteItem_Click()

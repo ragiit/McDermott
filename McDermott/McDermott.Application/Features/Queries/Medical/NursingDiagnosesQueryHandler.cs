@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Features.Queries.Medical
+﻿using McDermott.Application.Features.Services;
+
+namespace McDermott.Application.Features.Queries.Medical
 {
     public class NursingDiagnosesQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          IRequestHandler<GetNursingDiagnosesQuery, (List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>,
@@ -44,17 +46,9 @@ IRequestHandler<BulkValidateNursingDiagnosesQuery, List<NursingDiagnosesDto>>,
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-                var pagedResult = query
-                            .OrderBy(x => x.Problem);
+                var pagedResult = query.OrderBy(x => x.Problem);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<NursingDiagnosesDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

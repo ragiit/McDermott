@@ -1346,7 +1346,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboboxService
 
-        private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
+        private DxComboBox<ServiceDto?, long?> refServiceComboBox { get; set; }
         private int ServiceComboBoxIndex { get; set; } = 0;
         private int totalCountService = 0;
 

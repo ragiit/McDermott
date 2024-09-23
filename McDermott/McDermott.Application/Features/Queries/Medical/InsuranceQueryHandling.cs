@@ -5,12 +5,39 @@ namespace McDermott.Application.Features.Queries.Medical
     public class InsuranceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetInsuranceQuery, (List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateInsuranceRequest, InsuranceDto>,
+        IRequestHandler<BulkValidateInsuranceQuery, List<InsuranceDto>>,
         IRequestHandler<CreateListInsuranceRequest, List<InsuranceDto>>,
         IRequestHandler<UpdateInsuranceRequest, InsuranceDto>,
         IRequestHandler<UpdateListInsuranceRequest, List<InsuranceDto>>,
         IRequestHandler<DeleteInsuranceRequest, bool>
     {
         #region GET
+
+        public async Task<List<InsuranceDto>> Handle(BulkValidateInsuranceQuery request, CancellationToken cancellationToken)
+        {
+            var InsuranceDtos = request.InsurancesToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var InsuranceNames = InsuranceDtos.Select(x => x.Name).Distinct().ToList();
+            var a = InsuranceDtos.Select(x => x.Code).Distinct().ToList();
+            var b = InsuranceDtos.Select(x => x.Type).Distinct().ToList();
+            var c = InsuranceDtos.Select(x => x.AdminFee).Distinct().ToList();
+            var d = InsuranceDtos.Select(x => x.Presentase).Distinct().ToList();
+            var e = InsuranceDtos.Select(x => x.AdminFeeMax).Distinct().ToList();
+
+            var existingInsurances = await _unitOfWork.Repository<Insurance>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => InsuranceNames.Contains(v.Name)
+                            && a.Contains(v.Code)
+                            && b.Contains(v.Type)
+                            && c.Contains(v.AdminFee)
+                            && d.Contains(v.Presentase)
+                            && e.Contains(v.AdminFeeMax))
+                .ToListAsync(cancellationToken);
+
+            return existingInsurances.Adapt<List<InsuranceDto>>();
+        }
 
         public async Task<(List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetInsuranceQuery request, CancellationToken cancellationToken)
         {

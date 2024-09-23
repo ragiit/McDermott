@@ -2,7 +2,7 @@
 {
     public class InsuranceCommand
     {
-        #region GET 
+        #region GET
 
         public class GetInsuranceQuery(Expression<Func<Insurance, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -18,13 +18,20 @@
             public Expression<Func<Insurance, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 
         public class CreateInsuranceRequest(InsuranceDto InsuranceDto) : IRequest<InsuranceDto>
         {
             public InsuranceDto InsuranceDto { get; set; } = InsuranceDto;
+        }
+
+        public class BulkValidateInsuranceQuery(List<InsuranceDto> InsurancesToValidate) : IRequest<List<InsuranceDto>>
+        {
+            public List<InsuranceDto> InsurancesToValidate { get; } = InsurancesToValidate;
         }
 
         public class CreateListInsuranceRequest(List<InsuranceDto> InsuranceDtos) : IRequest<List<InsuranceDto>>

@@ -35,6 +35,7 @@ global using DevExpress.Data.XtraReports.Native;
 
 global using OfficeOpenXml;
 
+global using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 global using static McDermott.Application.Features.Commands.Inventory.InventoryAdjusmentCommand;
 global using static McDermott.Application.Features.Commands.Inventory.InventoryAdjusmentDetailCommand;
 global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleSlotCommand;

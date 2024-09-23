@@ -21,7 +21,7 @@
                 PagerVisible = false;
                 PageSizeSelectorVisible = true;
                 FocusedRowEnabled = true;
-                TextWrapEnabled = true;
+                TextWrapEnabled = false;
                 VirtualScrollingEnabled = true;
                 ValidationEnabled = true;
                 ColumnResizeMode = GridColumnResizeMode.NextColumn;

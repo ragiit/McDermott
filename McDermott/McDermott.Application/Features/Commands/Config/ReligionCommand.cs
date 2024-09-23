@@ -10,6 +10,16 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
+        public class BulkValidateReligionQuery(List<ReligionDto> ReligionsToValidate) : IRequest<List<ReligionDto>>
+        {
+            public List<ReligionDto> ReligionsToValidate { get; } = ReligionsToValidate;
+        }
+
+        public class ValidateReligionQuery(Expression<Func<Religion, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Religion, bool>> Predicate { get; } = predicate!;
+        }
+
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE
