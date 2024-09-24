@@ -13,6 +13,11 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateSampleTypeQuery(List<SampleTypeDto> SampleTypesToValidate) : IRequest<List<SampleTypeDto>>
+        {
+            public List<SampleTypeDto> SampleTypesToValidate { get; } = SampleTypesToValidate;
+        }
+
         public class ValidateSampleTypeQuery(Expression<Func<SampleType, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<SampleType, bool>> Predicate { get; } = predicate!;

@@ -2,7 +2,7 @@
 {
     public class CronisCategoryCommand
     {
-        #region GET 
+        #region GET
 
         public class GetCronisCategoryQuery(Expression<Func<CronisCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -13,12 +13,19 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateCronisCategoryQuery(List<CronisCategoryDto> CronisCategorysToValidate) : IRequest<List<CronisCategoryDto>>
+        {
+            public List<CronisCategoryDto> CronisCategorysToValidate { get; } = CronisCategorysToValidate;
+        }
+
         public class ValidateCronisCategoryQuery(Expression<Func<CronisCategory, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<CronisCategory, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 

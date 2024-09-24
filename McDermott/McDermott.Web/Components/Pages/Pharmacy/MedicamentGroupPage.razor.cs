@@ -1,5 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Host.Mef;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 
@@ -169,18 +169,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = true;
         }
 
-        private async Task LoadAsyncData()
+        private async Task LoadAsyncData(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
                 PanelVisible = true;
-                var user = await Mediator.Send(new GetUserQuery());
-                FormDrugs = await Mediator.Send(new GetFormDrugQuery());
-                UoMs = await Mediator.Send(new GetUomQuery());
-                ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-                Frequencys = await Mediator.Send(new GetDrugDosageQuery());
-                Phy = [.. user.Where(x => x.IsPhysicion == true)];
-                Products = await Mediator.Send(new GetProductQuery());
+                //var user = await Mediator.Send(new GetUserQuery());
+                //FormDrugs = await Mediator.Send(new GetDrugFormQuery());
+                //UoMs = await Mediator.Send(new GetUomQuery());
+                //ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+                //Frequencys = await Mediator.Send(new GetDrugDosageQuery());
+                //Phy = [.. user.Where(x => x.IsPhysicion == true)];
+                //Products = await Mediator.Send(new GetProductQuery());
                 PanelVisible = false;
             }
             catch { }

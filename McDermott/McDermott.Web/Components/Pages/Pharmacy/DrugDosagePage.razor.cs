@@ -70,7 +70,7 @@
         {
             IsAccess = false;
 
-            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+            //DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
 
             await GetUserInfo();
             await LoadData();

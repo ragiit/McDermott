@@ -129,17 +129,17 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadAsyncData()
         {
-            TransferStocks = await Mediator.Send(new GetTransferStockQuery());
-            TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery());
-            TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            this.Locations = Locations;
-            Products = await Mediator.Send(new GetProductQuery());
-            Uoms = await Mediator.Send(new GetUomQuery());
-            UomName = Uoms.Select(x => x.Name).FirstOrDefault();
-            TransferStockLogs = await Mediator.Send(new GetTransferStockLogQuery());
-            var user_group = await Mediator.Send(new GetUserQuery());
-            NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+            //TransferStocks = await Mediator.Send(new GetTransferStockQuery());
+            //TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery());
+            //TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+            //var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            //this.Locations = Locations;
+            //Products = await Mediator.Send(new GetProductQuery());
+            //Uoms = await Mediator.Send(new GetUomQuery());
+            //UomName = Uoms.Select(x => x.Name).FirstOrDefault();
+            //TransferStockLogs = await Mediator.Send(new GetTransferStockLogQuery());
+            //var user_group = await Mediator.Send(new GetUserQuery());
+            //NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
         }
 
         private async Task LoadData()
@@ -464,7 +464,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             }
             try
             {
-                Products = await Mediator.Send(new GetProductQuery());
+                //Products = await Mediator.Send(new GetProductQuery());
                 AllProducts = Products.Select(x => x).ToList();
 
                 TempFormInternalTransfer = new();
@@ -508,12 +508,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 // Pre-load Uoms and Products (if not already loaded)
                 if (Uoms == null || Uoms.Count == 0)
                 {
-                    Uoms = await Mediator.Send(new GetUomQuery());
+                    //Uoms = await Mediator.Send(new GetUomQuery());
                 }
 
                 if (Products == null || Products.Count == 0)
                 {
-                    Products = await Mediator.Send(new GetProductQuery());
+                    //Products = await Mediator.Send(new GetProductQuery());
                 }
 
                 TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery(x => x.TransferStockId == FormInternalTransfer.Id));

@@ -484,6 +484,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             }
         }
 
+        private async Task Cancel_Click()
+        { }
 
         private async Task onDiscard()
         {

@@ -1,5 +1,4 @@
-﻿
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class LabTestCommand
     {
@@ -12,6 +11,11 @@ namespace McDermott.Application.Features.Commands.Medical
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class BulkValidateLabTestQuery(List<LabTestDto> LabTestsToValidate) : IRequest<List<LabTestDto>>
+        {
+            public List<LabTestDto> LabTestsToValidate { get; } = LabTestsToValidate;
         }
 
         public class ValidateLabTestQuery(Expression<Func<LabTest, bool>>? predicate = null) : IRequest<bool>

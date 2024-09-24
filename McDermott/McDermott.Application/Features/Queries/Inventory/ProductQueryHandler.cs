@@ -9,6 +9,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 {
     public class ProductQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetProductQuery, (List<ProductDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetAllProductQuery, List<ProductDto>>,
         IRequestHandler<ValidateProductQuery, bool>,
         IRequestHandler<CreateProductRequest, ProductDto>,
         IRequestHandler<CreateListProductRequest, List<ProductDto>>,
@@ -17,6 +18,39 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<DeleteProductRequest, bool>
     {
         #region GET
+
+        public async Task<List<ProductDto>> Handle(GetAllProductQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetProductQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Product>? result))
+                {
+                    result = await _unitOfWork.Repository<Product>().Entities
+                        .Include(x => x.ProductCategory)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<ProductDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<(List<ProductDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductQuery request, CancellationToken cancellationToken)
         {

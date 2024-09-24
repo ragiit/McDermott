@@ -87,7 +87,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            ProductCategories = await Mediator.Send(new GetProductCategoryQuery());
+            //ProductCategories = await Mediator.Send(new GetProductCategoryQuery());
             PanelVisible = false;
         }
 

@@ -8,6 +8,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateCountryQuery, bool>,
         IRequestHandler<CreateCountryRequest, CountryDto>,
+        IRequestHandler<BulkValidateCountryQuery, List<CountryDto>>,
         IRequestHandler<CreateListCountryRequest, List<CountryDto>>,
         IRequestHandler<UpdateCountryRequest, CountryDto>,
         IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
@@ -152,6 +153,23 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 throw;
             }
+        }
+
+        public async Task<List<CountryDto>> Handle(BulkValidateCountryQuery request, CancellationToken cancellationToken)
+        {
+            var CountryDtos = request.CountrysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
+            var Codes = CountryDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingCountrys = await _unitOfWork.Repository<Country>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => CountryNames.Contains(v.Name) && Codes.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingCountrys.Adapt<List<CountryDto>>();
         }
 
         public async Task<bool> Handle(ValidateCountryQuery request, CancellationToken cancellationToken)

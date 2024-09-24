@@ -67,7 +67,7 @@
 
         protected override async Task OnInitializedAsync()
         {
-            Uoms = await Mediator.Send(new GetUomQuery(x => x.Active == true));
+            //Uoms = await Mediator.Send(new GetUomQuery(x => x.Active == true));
             await GetUserInfo();
             await LoadData();
         }

@@ -58,10 +58,12 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         private bool ShowForm { get; set; } = false;
         private bool PanelVisible { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
+
         //private int FocusedRowDetailVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
+
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        GridSelectAllCheckboxMode CurrentSelectAllCheckboxMode { get; set; }
+        private GridSelectAllCheckboxMode CurrentSelectAllCheckboxMode { get; set; }
 
         #endregion Static
 
@@ -97,6 +99,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         {
             try
             {
+                PanelVisible = true;
                 var LabTest = SelectedDataItems[0].Adapt<LabTestDto>();
                 var labTestIds = SelectedDataItems is null || SelectedDataItems.Count == 1
                     ? new List<long> { LabTest.Id }
@@ -121,6 +124,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         #endregion SaveDelete
@@ -156,6 +160,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             var result = await Mediator.Send(new GetLabTestQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             LabTests = result.Item1;
             totalCount = result.pageCount;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
@@ -168,19 +173,13 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
         #region ToolBar Button
-
 
         private async Task Refresh_Click()
         {
             await LoadData();
         }
-              
+
         private string EditedResultType = string.Empty;
 
         private async Task EditItem_Click()
@@ -191,9 +190,12 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                 var Ids = SecureHelper.EncryptIdToBase64(LabTest.Id);
                 NavigationManager.NavigateTo($"medical/lab-tests/{EnumPageMode.Update.GetDisplayName()}?Id={LabTest.Id}");
                 return;
-                
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
@@ -243,7 +245,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Code" };
+                    var headerNames = new List<string>() { "Name", "Code", "Sample Type", "Result Type" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -255,36 +257,109 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
 
                     var list = new List<LabTestDto>();
 
+                    var sampleTypes = new HashSet<string>();
+                    var list1 = new List<SampleTypeDto>();
+
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var c = new LabTestDto
+                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(a))
+                            sampleTypes.Add(a.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetSampleTypeQuery(x => sampleTypes.Contains(x.Name.ToLower()), 0, 0))).Item1;
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        bool isValid = true;
+
+                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        long? sampleTypeId = null;
+                        if (!string.IsNullOrEmpty(a))
+                        {
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(a, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                                isValid = false;
+                            }
+                            else
+                            {
+                                sampleTypeId = cachedParent.Id;
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                            isValid = false;
+                        }
+
+                        var resultType = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        if (!string.IsNullOrWhiteSpace(resultType))
+                        {
+                            var exist = Helper.ResultValueTypes.Any(x => x.Equals(resultType, StringComparison.CurrentCultureIgnoreCase));
+                            if (!exist)
+                            {
+                                ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
+                                isValid = false;
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
+                            isValid = false;
+                        }
+
+                        if (!isValid)
+                            continue;
+
+                        list.Add(new LabTestDto
                         {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                             Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                        };
-
-                        if (!LabTests.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                            list.Add(c);
+                            SampleTypeId = sampleTypeId,
+                            ResultType = resultType,
+                        });
                     }
 
-                    await Mediator.Send(new CreateListLabTestRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateLabTestQuery untuk validasi bulk
+                        var existingLabTests = await Mediator.Send(new BulkValidateLabTestQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter LabTest baru yang tidak ada di database
+                        list = list.Where(LabTest =>
+                            !existingLabTests.Any(ev =>
+                                ev.Name == LabTest.Name &&
+                                ev.Code == LabTest.Code &&
+                                ev.SampleTypeId == LabTest.SampleTypeId &&
+                                ev.ResultType == LabTest.ResultType
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListLabTestRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
-                    ToastService.ShowError(ex.Message);
+                    ex.HandleException(ToastService);
                 }
+                finally { PanelVisible = false; }
             }
             PanelVisible = false;
         }
 
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "lab_test_template.xlsx",
             [
                 new()
                 {
@@ -295,13 +370,21 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                 {
                     Column = "Code"
                 },
+                new()
+                {
+                    Column = "Sample Type",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Result Type",
+                    Notes = "Select one: Quantitative/Qualitative"
+                },
             ]);
         }
 
         #endregion ToolBar Button
 
         #endregion Grid Function
-
-        
     }
 }

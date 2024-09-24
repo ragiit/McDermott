@@ -3,9 +3,8 @@
 
 <PageTitle>McHealthCare - Service</PageTitle>
 
-@if (IsAccess)
-{
-
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead) 
+{ 
     <div class="wrapper">
 
         <BaseHeaderPage Title="Service" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
@@ -15,6 +14,8 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
@@ -39,7 +40,9 @@
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
+                                                         IsImport="UserAccessCRUID.IsImport"
+                                                         ExportToExcel="ExportToExcel"
+                                                         ImportFile="ImportFile"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -59,16 +62,16 @@
                                             var a = (ServiceDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service Name" ColSpanMd="12">
-                                                <MyTextBox @bind-Text="@a.Name" NullText="Service Name..." />
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Name" NullText="Name" />
                                                 <ValidationMessage For="@(()=>a.Name)" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
-                                                <MyTextBox @bind-Text="@a.Code" NullText="Code..." />
+                                                <MyTextBox @bind-Text="@a.Code" NullText="Code" />
                                                 <ValidationMessage For="@(()=>a.Code)" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota:" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Quota" NullText="Quota Service.." />
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Quota" NullText="Quota" />
                                                 <ValidationMessage For="@(()=>a.Quota)" />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
@@ -78,7 +81,7 @@
                                             <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
                                                 <MyDxComboBox Data="@ServicesK"
                                                               @bind-Value="@a.ServicedId"
-                                                              NullText="select Service Counter.."
+                                                              NullText="select Service Counter"
                                                               TextFieldName="Name"
                                                               ValueFieldName="Id"></MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ServicedId)" />
@@ -140,6 +143,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

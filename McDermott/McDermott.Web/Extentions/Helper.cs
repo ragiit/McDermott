@@ -48,6 +48,12 @@ namespace McDermott.Web.Extentions
             "Doctor",
         };
 
+        public static List<string> ResultValueTypes =
+        [
+            "Quantitative",
+            "Qualitative",
+        ];
+
         public static readonly List<string> MartialStatuss =
         [
             "Single",

@@ -7,6 +7,8 @@
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
     <div class="wrapper">
+        <BaseHeaderPage Title="Group" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/maintainance"))" ShowBackButton="true" />
+
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -26,7 +28,6 @@
                                 </div>
                             </div>
                         }
-
 
                         @if (postMaintainance.Status != EnumStatusMaintainance.Done && postMaintainance.Status != EnumStatusMaintainance.Canceled && postMaintainance.Status != EnumStatusMaintainance.Scrap)
                         {

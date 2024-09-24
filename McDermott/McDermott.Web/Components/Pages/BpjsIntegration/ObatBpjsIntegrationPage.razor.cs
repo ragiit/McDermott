@@ -39,7 +39,7 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
         {
             IsLoading = true;
             await LoadData();
-            Products = await Mediator.Send(new GetProductQuery());
+            //Products = await Mediator.Send(new GetProductQuery());
             IsLoading = false;
         }
 

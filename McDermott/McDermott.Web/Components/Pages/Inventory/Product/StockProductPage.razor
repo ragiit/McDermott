@@ -1,0 +1,91 @@
+﻿@page "/inventory/products/stock-product/{PageMode}"
+
+@rendermode InteractiveServer
+
+<PageTitle>@Helper.APP_NAME - Product</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Group" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/products"))" ShowBackButton="true" />
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5> Stock Product @NameProduct</h5>
+                                    </div>
+                                    <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                    IsContentBlocked="true"
+                                                    ApplyBackgroundShading="true"
+                                                    IndicatorAreaVisible="true"
+                                                    Text="Fetching Data...">
+                                        <MyGridPaginate @ref="Grid"
+                                                        Data="GetStockProducts"
+                                                        FocusedRowEnabled="false"
+                                                        KeyFieldName="Id"
+                                                        AllowSelectRowByClick="false">
+                                            <ToolbarTemplate>
+                                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                    <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
+                                                    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                </DxToolbar>
+                                            </ToolbarTemplate>
+                                            <Columns>
+                                                <DxGridDataColumn FieldName="DestinanceName" Caption="Location" GroupIndex="0" />
+                                                @if (FieldHideStock == true)
+                                                {
+                                                    <DxGridDataColumn FieldName="Batch" Caption="Batch" />
+                                                }
+                                                <DxGridDataColumn FieldName="ProductName" Caption="Product Name" />
+                                                <DxGridDataColumn FieldName="Qty" Caption="On Hand Qty" />
+                                                <DxGridDataColumn FieldName="UomName" Caption="Unit Of Measure" />
+                                                @if (FieldHideStock == true)
+                                                {
+                                                    <DxGridDataColumn FieldName="Expired" Caption="Expired Date" DisplayFormat="dd MMMM yyyy" />
+                                                }
+                                            </Columns>
+                                            <TotalSummary>
+                                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                   FieldName="Name"
+                                                                   Visible="true" />
+                                            </TotalSummary>
+                                        </MyGridPaginate>
+                                        <div class="row">
+                                            <DxFormLayout>
+                                                <div class="col-md-8">
+                                                    <DxFormLayoutItem>
+                                                        <DxPager PageCount="totalCount"
+                                                                 ActivePageIndexChanged="OnPageIndexChanged"
+                                                                 ActivePageIndex="activePageIndex"
+                                                                 VisibleNumericButtonCount="10"
+                                                                 SizeMode="SizeMode.Medium"
+                                                                 NavigationMode="PagerNavigationMode.Auto">
+                                                        </DxPager>
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <DxFormLayoutItem Caption="Page Size:">
+                                                        <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                      NullText="Select Page Size"
+                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                      SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                      @bind-Value="pageSize">
+                                                        </MyDxComboBox>
+                                                    </DxFormLayoutItem>
+                                                </div>
+                                            </DxFormLayout>
+                                        </div>
+                                    </DxLoadingPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

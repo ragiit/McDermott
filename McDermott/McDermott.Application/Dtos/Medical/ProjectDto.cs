@@ -11,4 +11,11 @@
         [StringLength(5)]
         public string? Code { get; set; }
     }
+
+    public class CreateUpdateProjectDto
+    {
+        public long Id { get; set; }
+        public string? Name { get; set; }
+        public string? Code { get; set; }
+    }
 }

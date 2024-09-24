@@ -1,16 +1,37 @@
 ﻿using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
 
+using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
+
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class LabUomQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLabUomQuery, (List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateLabUomRequest, LabUomDto>,
+        IRequestHandler<BulkValidateLabUomQuery, List<LabUomDto>>,
         IRequestHandler<CreateListLabUomRequest, List<LabUomDto>>,
         IRequestHandler<UpdateLabUomRequest, LabUomDto>,
         IRequestHandler<UpdateListLabUomRequest, List<LabUomDto>>,
         IRequestHandler<DeleteLabUomRequest, bool>
     {
         #region GET
+
+        public async Task<List<LabUomDto>> Handle(BulkValidateLabUomQuery request, CancellationToken cancellationToken)
+        {
+            var LabUomDtos = request.LabUomsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var LabUomNames = LabUomDtos.Select(x => x.Name).Distinct().ToList();
+            var Codes = LabUomDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingLabUoms = await _unitOfWork.Repository<LabUom>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => LabUomNames.Contains(v.Name)
+                            && Codes.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingLabUoms.Adapt<List<LabUomDto>>();
+        }
 
         public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabUomQuery request, CancellationToken cancellationToken)
         {

@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
+using McDermott.Application.Features.Services;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System.Reflection.Metadata;
 using System.Threading;
@@ -9,14 +10,33 @@ using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
 namespace McDermott.Application.Features.Queries.Config
 {
     public class ProjectQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-    IRequestHandler<GetProjectQuery, (List<ProjectDto>, int pageIndex, int pageSize, int pageCount)>,
-    IRequestHandler<CreateProjectRequest, ProjectDto>,
-    IRequestHandler<CreateListProjectRequest, List<ProjectDto>>,
-    IRequestHandler<UpdateProjectRequest, ProjectDto>,
-    IRequestHandler<UpdateListProjectRequest, List<ProjectDto>>,
+        IRequestHandler<GetProjectQuery, (List<ProjectDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateProjectQuery, bool>,
+        IRequestHandler<BulkValidateProjectQuery, List<ProjectDto>>,
+        IRequestHandler<CreateProjectRequest, ProjectDto>,
+        IRequestHandler<CreateListProjectRequest, List<ProjectDto>>,
+        IRequestHandler<UpdateProjectRequest, ProjectDto>,
+        IRequestHandler<UpdateListProjectRequest, List<ProjectDto>>,
         IRequestHandler<DeleteProjectRequest, bool>
     {
         #region GET
+
+        public async Task<List<ProjectDto>> Handle(BulkValidateProjectQuery request, CancellationToken cancellationToken)
+        {
+            var ProjectDtos = request.ProjectsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ProjectNames = ProjectDtos.Select(x => x.Name).Distinct().ToList();
+            var Codes = ProjectDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingProjects = await _unitOfWork.Repository<Project>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ProjectNames.Contains(v.Name) && Codes.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingProjects.Adapt<List<ProjectDto>>();
+        }
 
         public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProjectQuery request, CancellationToken cancellationToken)
         {
@@ -26,24 +46,19 @@ namespace McDermott.Application.Features.Queries.Config
                     .AsNoTracking()
                     .AsQueryable();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
                             .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
@@ -70,7 +85,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Project>().AddAsync(request.ProjectDto.Adapt<Project>());
+                var result = await _unitOfWork.Repository<Project>().AddAsync(request.ProjectDto.Adapt<CreateUpdateProjectDto>().Adapt<Project>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -110,7 +125,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Project>().UpdateAsync(request.ProjectDto.Adapt<Project>());
+                var result = await _unitOfWork.Repository<Project>().UpdateAsync(request.ProjectDto.Adapt<CreateUpdateProjectDto>().Adapt<Project>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

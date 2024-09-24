@@ -106,8 +106,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx", new List<ExportFileData>
         {
+            new ExportFileData { Column = "Name", Notes = "Mandatory" },
             new ExportFileData { Column = "Code", Notes = "Mandatory" },
-            new ExportFileData { Column = "Name", Notes = "Mandatory" }
         });
         }
 
@@ -139,7 +139,7 @@ namespace McDermott.Web.Components.Pages.Config
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Code", "Name" };
+                    var headerNames = new List<string>() { "Name", "Code", };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -148,7 +148,7 @@ namespace McDermott.Web.Components.Pages.Config
                         return;
                     }
 
-                    var countries = new List<CountryDto>();
+                    var list = new List<CountryDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -158,21 +158,30 @@ namespace McDermott.Web.Components.Pages.Config
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        bool exists = await Mediator.Send(new ValidateCountryQuery(x => x.Name == country.Name && x.Code == country.Code));
-
-                        if (!exists)
-                            countries.Add(country);
+                        list.Add(country);
                     }
 
-                    if (countries.Count > 0)
+                    if (list.Count > 0)
                     {
-                        countries = countries.DistinctBy(x => new { x.Code, x.Name }).ToList();
-                        await Mediator.Send(new CreateListCountryRequest(countries));
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
+
+                        // Panggil BulkValidateCountryQuery untuk validasi bulk
+                        var existingCountrys = await Mediator.Send(new BulkValidateCountryQuery(list));
+
+                        // Filter Country baru yang tidak ada di database
+                        list = list.Where(Country =>
+                            !existingCountrys.Any(ev =>
+                                ev.Name == Country.Name &&
+                                ev.Code == Country.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListCountryRequest(list));
                         await LoadData(0, pageSize);
                         SelectedDataItems = [];
                     }
 
-                    ToastService.ShowSuccessCountImported(countries.Count);
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
@@ -228,6 +237,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -257,6 +267,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         #endregion Grid Events

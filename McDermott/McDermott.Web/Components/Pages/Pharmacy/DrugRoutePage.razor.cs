@@ -74,7 +74,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+            //DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
             PanelVisible = false;
         }
 

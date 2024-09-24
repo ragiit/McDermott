@@ -83,8 +83,8 @@ namespace McDermott.Web.Components.Pages.Inventory
             this.Locations = Locations;
             var Companies = (await Mediator.Send(new GetCompanyQuery())).Item1;
             this.Companies = Companies;
-            Uoms = await Mediator.Send(new GetUomQuery());
-            Products = await Mediator.Send(new GetProductQuery());
+            //Uoms = await Mediator.Send(new GetUomQuery());
+            //Products = await Mediator.Send(new GetProductQuery());
             AllProducts = Products.Select(x => x).ToList();
 
             await GetUserInfo();
@@ -571,7 +571,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 return;
             }
 
-            Products = await Mediator.Send(new GetProductQuery());
+            Products = (await Mediator.Send(new GetProductQuery())).Item1;
             AllProducts = Products.Select(x => x).ToList();
 
             FormInventoryAdjusmentDetail = new();

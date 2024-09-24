@@ -83,7 +83,7 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            Uoms = await Mediator.Send(new GetUomQuery());
+            //Uoms = await Mediator.Send(new GetUomQuery());
             PanelVisible = false;
         }
 

@@ -10,6 +10,12 @@ namespace McDermott.Application.Features.Commands.Inventory
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
+        public class GetAllMaintainanceQuery(Expression<Func<Maintainance, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MaintainanceDto>>
+        {
+            public Expression<Func<Maintainance, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
+
         public class GetMaintainanceQuery(Expression<Func<Maintainance, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<MaintainanceDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Maintainance, bool>> Predicate { get; } = predicate!;

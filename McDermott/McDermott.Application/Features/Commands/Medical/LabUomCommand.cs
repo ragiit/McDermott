@@ -13,11 +13,15 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateLabUomQuery(List<LabUomDto> LabUomsToValidate) : IRequest<List<LabUomDto>>
+        {
+            public List<LabUomDto> LabUomsToValidate { get; } = LabUomsToValidate;
+        }
+
         public class ValidateLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
         }
-
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 

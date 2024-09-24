@@ -1,212 +1,223 @@
-﻿@page "/medical/health-center"
+﻿@page "/medical/health-centers"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Health Center</PageTitle>
+<PageTitle>McHealthCare - Health Center</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Health Center" />
+        <BaseHeaderPage Title="Health Center" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <MyGridPaginate @ref="Grid"
-                                                    Data="HealthCenters"
-                                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                                    EditModelSaving="OnSave"
-                                                    DataItemDeleting="OnDelete"
-                                                    SearchTextChanged="OnSearchBoxChanged"
-                                                    KeyFieldName="Id">
-                                        <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="HealthCenterDto"
-                                                             Items="@HealthCenters"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@EditItem_Click"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@Refresh_Click"
-                                                             IsImport="true"
-                                                             Grid="Grid"
-                                                             ImportFile="ImportFile"
-                                                             ExportToExcel="ExportToExcel"
-                                                             VisibleNew="UserAccessCRUID.IsCreate"
-                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Street1" Caption="Street" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="WebsiteLink" Caption="Website Link" />
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (HealthCenterDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
-                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                Data="@Types" @bind-Value="@a.Type" NullText="Types" ShowValidationIcon="true" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Phone" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Mobile" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Mobile" NullText="Mobile" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Email" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Email" NullText="Email" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Website Link" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.WebsiteLink" NullText="Website Link" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Address" ColSpanMd="12">
-                                                    <Template>
-                                                        <DxGridLayout>
-                                                            <Rows>
-                                                                <DxGridLayoutRow />
-                                                                <DxGridLayoutRow />
-                                                                <DxGridLayoutRow />
-                                                                <DxGridLayoutRow />
-                                                            </Rows>
-                                                            <Columns>
-                                                                <DxGridLayoutColumn />
-                                                                <DxGridLayoutColumn />
-                                                            </Columns>
-                                                            <Items>
-                                                                <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
-                                                                    <Template>
-                                                                        <DxTextBox @bind-Text="@a.Street1" NullText="Street1" />
-                                                                    </Template>
-                                                                </DxGridLayoutItem>
-                                                                <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
-                                                                    <Template>
-                                                                        <DxTextBox @bind-Text="@a.Street2" NullText="Street2" />
-                                                                    </Template>
-                                                                </DxGridLayoutItem>
-                                                                <DxGridLayoutItem Row="2" Column="0">
-                                                                    <Template>
-                                                                        <MyDxComboBox Data="@Provinces"
-                                                                                      NullText="Select Province..."
-                                                                                      @ref="refProvinceComboBox"
-                                                                                      @bind-Value="@a.ProvinceId"
-                                                                                      TextFieldName="Name"
-                                                                                      ValueFieldName="Id"
-                                                                                      TextChanged="((string e) => OnInputProvinceChanged(e))">
-                                                                            <Buttons>
-                                                                                <DxEditorButton Click="OnSearchProvinceIndexDecrement"
-                                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                                Tooltip="Previous Index" />
-                                                                                <DxEditorButton Click="OnSearchProvince"
-                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                Tooltip="Search" />
-                                                                                <DxEditorButton Click="OnSearchProvinceIndexIncrement"
-                                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                                Tooltip="Next Index" />
-                                                                            </Buttons>
-                                                                        </MyDxComboBox>
-                                                                    </Template>
-                                                                </DxGridLayoutItem>
-                                                                <DxGridLayoutItem Row="2" Column="1">
-                                                                    <Template>
-                                                                        <MyDxComboBox Data="@Cities.Where(x => a.ProvinceId == a.ProvinceId)"
-                                                                                      NullText="Select City..."
-                                                                                      @ref="refCityComboBox"
-                                                                                      @bind-Value="@a.CityId"
-                                                                                      TextFieldName="Name"
-                                                                                      ValueFieldName="Id"
-                                                                                      TextChanged="((string e) => OnInputCityChanged(e))">
-                                                                            <Buttons>
-                                                                                <DxEditorButton Click="OnSearchCityIndexDecrement"
-                                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                                Tooltip="Previous Index" />
-                                                                                <DxEditorButton Click="OnSearchCity"
-                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                Tooltip="Search" />
-                                                                                <DxEditorButton Click="OnSearchCityIndexIncrement"
-                                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                                Tooltip="Next Index" />
-                                                                            </Buttons>
-                                                                        </MyDxComboBox>
-                                                                    </Template>
-                                                                </DxGridLayoutItem>
-                                                                <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12" CssClass="mt">
-                                                                    <Template>
-                                                                        <MyDxComboBox Data="@Countries.Where(x => a.ProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == a.ProvinceId)?.CountryId)"
-                                                                                      NullText="Select Sampel type..."
-                                                                                      @ref="refCountryComboBox"
-                                                                                      @bind-Value="@a.CountryId"
-                                                                                      TextFieldName="Name"
-                                                                                      ValueFieldName="Id"
-                                                                                      TextChanged="((string e) => OnInputCountryChanged(e))">
-                                                                            <Buttons>
-                                                                                <DxEditorButton Click="OnSearchCountryIndexDecrement"
-                                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                                Tooltip="Previous Index" />
-                                                                                <DxEditorButton Click="OnSearchCountry"
-                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                Tooltip="Search" />
-                                                                                <DxEditorButton Click="OnSearchCountryIndexIncrement"
-                                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                                Tooltip="Next Index" />
-                                                                            </Buttons>
-                                                                        </MyDxComboBox>
-                                                                    </Template>
-                                                                </DxGridLayoutItem>
-                                                            </Items>
-                                                        </DxGridLayout>
-                                                    </Template>
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                        <TotalSummary>
-                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                               FieldName="Name"
-                                                               Visible="true" />
-                                        </TotalSummary>
-                                    </MyGridPaginate>
-                                    <div class="row">
-                                        <DxFormLayout>
-                                            <div class="col-md-8">
-                                                <DxFormLayoutItem>
-                                                    <DxPager PageCount="totalCount"
-                                                             ActivePageIndexChanged="OnPageIndexChanged"
-                                                             ActivePageIndex="activePageIndex"
-                                                             VisibleNumericButtonCount="10"
-                                                             SizeMode="SizeMode.Medium"
-                                                             NavigationMode="PagerNavigationMode.Auto">
-                                                    </DxPager>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                            <div class="col-md-4 d-flex justify-content-end">
-                                                <DxFormLayoutItem Caption="Page Size:">
-                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                                  NullText="Select Page Size"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                                  @bind-Value="pageSize">
-                                                    </MyDxComboBox>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                        </DxFormLayout>
-                                    </div>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="HealthCenters"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                KeyFieldName="Id">
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="HealthCenterDto"
+                                                         Items="@HealthCenters"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Street1" Caption="Street" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="WebsiteLink" Caption="Website Link" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (HealthCenterDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
+                                                <ValidationMessage For="@(() => a.Name)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Types" @bind-Value="@a.Type" NullText="Select Types" />
 
-                                </DxLoadingPanel>
-                            </div>
+                                                <ValidationMessage For="@(() => a.Type)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Phone" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Phone" NullText="Phone" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Mobile" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Mobile" NullText="Mobile" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Email" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Email" NullText="Email" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Website Link" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.WebsiteLink" NullText="Website Link" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Address" ColSpanMd="12">
+                                                <Template>
+                                                    <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
+                                                        <Rows>
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                            <DxGridLayoutRow />
+                                                        </Rows>
+                                                        <Columns>
+                                                            <DxGridLayoutColumn />
+                                                            <DxGridLayoutColumn />
+                                                        </Columns>
+                                                        <Items>
+                                                            <DxGridLayoutItem Row="0" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@a.Street1" NullText="Street1" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="1" Column="0" ColumnSpan="12">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@a.Street2" NullText="Street2" />
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+
+                                                            <DxGridLayoutItem Row="2" Column="0" ColumnSpan="12" CssClass="mt">
+                                                                <Template>
+                                                                    <MyDxComboBox Data="@Countries"
+                                                                                  NullText="Select Country"
+                                                                                  @ref="refCountryComboBox"
+                                                                                  @bind-Value="@a.CountryId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputCountryChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchCountryIndexDecrement"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchCountry"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchCountryIndexIncrement"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons> <Columns>
+                                                                            <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
+                                                                            <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
+                                                                        </Columns>
+                                                                    </MyDxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="3" Column="0">
+                                                                <Template>
+                                                                    <MyDxComboBox Data="@Provinces"
+                                                                                  NullText="Select Province"
+                                                                                  @ref="refProvinceComboBox"
+                                                                                  @bind-Value="@a.ProvinceId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputProvinceChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchProvinceIndexDecrement"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchProvince"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchProvinceIndexIncrement"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons> <Columns>
+                                                                            <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
+                                                                            <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
+                                                                            <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                                        </Columns>
+                                                                    </MyDxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="3" Column="1">
+                                                                <Template>
+                                                                    <MyDxComboBox Data="@Cities.Where(x => a.ProvinceId == a.ProvinceId)"
+                                                                                  NullText="Select City"
+                                                                                  @ref="refCityComboBox"
+                                                                                  @bind-Value="@a.CityId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputCityChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchCityIndexDecrement"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchCity"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchCityIndexIncrement"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons> <Columns>
+                                                                            <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
+                                                                            <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                        </Columns>
+                                                                    </MyDxComboBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                        </Items>
+                                                    </DxGridLayout>
+                                                </Template>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-8">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-4 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
@@ -214,11 +225,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Health Center" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

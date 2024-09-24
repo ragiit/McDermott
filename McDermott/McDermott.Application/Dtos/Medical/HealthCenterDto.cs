@@ -11,7 +11,7 @@
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        public string Type { get; set; } = string.Empty;
+        public string? Type { get; set; } = string.Empty;
 
         public string? Phone { get; set; }
         public string? Mobile { get; set; }

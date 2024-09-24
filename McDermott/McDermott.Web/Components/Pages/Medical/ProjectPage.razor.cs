@@ -7,10 +7,9 @@ namespace McDermott.Web.Components.Pages.Medical
     public partial class ProjectPage
     {
         private DxUpload MyUpload { get; set; }
-         
-        private List<ProjectDto> Projects = []; 
+
+        private List<ProjectDto> Projects = [];
         private HubConnection hubConnection;
-    
 
         #region UserLoginAndAccessRole
 
@@ -113,7 +112,7 @@ namespace McDermott.Web.Components.Pages.Medical
             var result = await Mediator.Send(new GetProjectQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Projects = result.Item1;
             totalCount = result.pageCount;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
@@ -147,7 +146,7 @@ namespace McDermott.Web.Components.Pages.Medical
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Project", "Code" };
+                    var headerNames = new List<string>() { "Name", "Code" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -160,23 +159,37 @@ namespace McDermott.Web.Components.Pages.Medical
                     var list = new List<ProjectDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    { 
+                    {
                         var c = new ProjectDto
-                        { 
+                        {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                             Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Projects.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                            list.Add(c);
+                        list.Add(c);
                     }
 
-                    await Mediator.Send(new CreateListProjectRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateProjectQuery untuk validasi bulk
+                        var existingProjects = await Mediator.Send(new BulkValidateProjectQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter Project baru yang tidak ada di database
+                        list = list.Where(Project =>
+                            !existingProjects.Any(ev =>
+                                ev.Name == Project.Name &&
+                                ev.Code == Project.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListProjectRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
@@ -192,12 +205,12 @@ namespace McDermott.Web.Components.Pages.Medical
             [
                 new()
                 {
-                    Column = "Project",
+                    Column = "Name",
                     Notes = "Mandatory"
                 },
                 new()
                 {
-                    Column = "Code" 
+                    Column = "Code"
                 },
             ]);
         }
@@ -221,6 +234,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteProjectRequest(((ProjectDto)e.DataItem).Id));
@@ -232,7 +246,14 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -241,8 +262,14 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 var editModel = (ProjectDto)e.EditModel;
 
-                if (string.IsNullOrWhiteSpace(editModel.Name))
+                bool validate = await Mediator.Send(new ValidateProjectQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"Project with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
+                    e.Cancel = true;
                     return;
+                }
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateProjectRequest(editModel));
@@ -251,7 +278,14 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         #endregion Default Grid Components

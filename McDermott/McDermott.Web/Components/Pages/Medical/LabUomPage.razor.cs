@@ -85,14 +85,13 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #endregion Searching
 
-
         #region LoadData
 
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             PanelVisible = false;
 
             return;
@@ -117,6 +116,7 @@ namespace McDermott.Web.Components.Pages.Medical
             var result = await Mediator.Send(new GetLabUomQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             LabUoms = result.Item1;
             totalCount = result.pageCount;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
@@ -149,11 +149,22 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                LabUom = ((LabUomDto)e.EditModel);
+                PanelVisible = true;
+                var editModel = ((LabUomDto)e.EditModel);
+
+                bool validate = await Mediator.Send(new ValidateLabUomQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"Lab Uom with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
+                    e.Cancel = true;
+                    return;
+                }
+
                 if (LabUom.Id == 0)
-                    await Mediator.Send(new CreateLabUomRequest(LabUom));
+                    await Mediator.Send(new CreateLabUomRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateLabUomRequest(LabUom));
+                    await Mediator.Send(new UpdateLabUomRequest(editModel));
 
                 await LoadData();
             }
@@ -161,6 +172,7 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         #endregion SaveDelete
@@ -199,34 +211,47 @@ namespace McDermott.Web.Components.Pages.Medical
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var c = new LabUomDto
+                        list.Add(new LabUomDto
                         {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                             Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                        };
-
-                        if (!LabUoms.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Code.Trim().ToLower() == c?.Code?.Trim().ToLower()))
-                            list.Add(c);
+                        });
                     }
 
-                    await Mediator.Send(new CreateListLabUomRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateLabUomQuery untuk validasi bulk
+                        var existingLabUoms = await Mediator.Send(new BulkValidateLabUomQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter LabUom baru yang tidak ada di database
+                        list = list.Where(LabUom =>
+                            !existingLabUoms.Any(ev =>
+                                ev.Name == LabUom.Name &&
+                                ev.Code == LabUom.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListLabUomRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
-                    ToastService.ShowError(ex.Message);
+                    ex.HandleException(ToastService);
                 }
+                finally { PanelVisible = false; }
             }
             PanelVisible = false;
         }
 
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "lab_uom_template.xlsx",
             [
                 new()
                 {
@@ -242,17 +267,12 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region Grid Function
 
-        
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        
         #region ToolBar Button
-
-        
 
         private async Task Refresh_Click()
         {
@@ -274,8 +294,6 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-
-        
 
         #endregion ToolBar Button
 

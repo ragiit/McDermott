@@ -9,6 +9,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 {
     public class MaintainanceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetMaintainanceQuery, (List<MaintainanceDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetAllMaintainanceQuery, List<MaintainanceDto>>,
         IRequestHandler<ValidateMaintainanceQuery, bool>,
         IRequestHandler<CreateMaintainanceRequest, MaintainanceDto>,
         IRequestHandler<CreateListMaintainanceRequest, List<MaintainanceDto>>,
@@ -17,6 +18,40 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<DeleteMaintainanceRequest, bool>
     {
         #region GET
+
+        public async Task<List<MaintainanceDto>> Handle(GetAllMaintainanceQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetMaintainanceQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<Maintainance>? result))
+                {
+                    result = await _unitOfWork.Repository<Maintainance>().Entities
+                     .Include(x => x.RequestBy)
+                    .Include(x => x.Location)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<MaintainanceDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<(List<MaintainanceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMaintainanceQuery request, CancellationToken cancellationToken)
         {

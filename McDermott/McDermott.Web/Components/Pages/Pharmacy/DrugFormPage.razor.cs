@@ -1,4 +1,4 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
@@ -81,7 +81,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             showForm = false;
             PanelVisible = true;
             SelectedDataItems = new ObservableRangeCollection<object>();
-            DataFormDrugs = await Mediator.Send(new GetFormDrugQuery());
+            //DataFormDrugs = await Mediator.Send(new GetDrugFormQuery());
             PanelVisible = false;
         }
 
@@ -165,11 +165,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (SelectedDataItems is null)
                 {
-                    await Mediator.Send(new DeleteFormDrugRequest(((DrugFormDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteDrugFormRequest(((DrugFormDto)e.DataItem).Id));
                 }
                 else
                 {
-                    await Mediator.Send(new DeleteFormDrugRequest(ids: SelectedDataItems.Adapt<List<DrugFormDto>>().Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteDrugFormRequest(ids: SelectedDataItems.Adapt<List<DrugFormDto>>().Select(x => x.Id).ToList()));
                 }
 
                 await LoadData();
@@ -190,11 +190,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (FormDrugs.Id == 0)
                 {
-                    await Mediator.Send(new CreateFormDrugRequest(FormDrugs));
+                    await Mediator.Send(new CreateDrugFormRequest(FormDrugs));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateFormDrugRequest(FormDrugs));
+                    await Mediator.Send(new UpdateDrugFormRequest(FormDrugs));
                 }
 
                 await LoadData();

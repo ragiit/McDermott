@@ -52,12 +52,14 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowDetailVisibleIndex { get; set; }
-        #endregion
+
+        #endregion Static Variabel
 
         #region Relation
 
         [SupplyParameterFromForm]
         private LabTestDto LabTest { get; set; } = new();
+
         private List<LabUomDto> LabUoms = [];
         private List<SampleTypeDto> SampleTypes = [];
         private List<LabTestDetailDto> LabTestDetailForms = [];
@@ -79,11 +81,13 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
+
         private async Task NewItemDetail_Click()
         {
             await GridDetail.StartEditNewRowAsync();
         }
-        #endregion
+
+        #endregion Relation
 
         private void KeyPressHandler(KeyboardEventArgs args)
         {
@@ -121,7 +125,9 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         #endregion Searching
 
         #region Load ComboBox
+
         #region ComboBox Sampel Type
+
         private DxComboBox<SampleTypeDto, long?> refSampleTypesComboBox { get; set; }
         private int SampleTypesComboBoxIndex { get; set; } = 0;
         private int totalCountSampleTypes = 0;
@@ -161,11 +167,14 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             SelectedDataItems = [];
             var result = await Mediator.Send(new GetSampleTypeQuery(searchTerm: refSampleTypesComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             SampleTypes = result.Item1;
-            totalCount = result.pageCount;
+            totalCountSampleTypes = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion ComboBox Sampel Type
+
         #region Combo Box Lab Uoms
+
         private DxComboBox<LabUomDto, long?> refLabUomComboBox { get; set; }
         private int LabUomComboBoxIndex { get; set; } = 0;
         private int totalCountLabUom = 0;
@@ -208,10 +217,13 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
-        #endregion
+
+        #endregion Combo Box Lab Uoms
+
+        #endregion Load ComboBox
 
         #region load Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -235,6 +247,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task LoadLabTestDetails(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -261,17 +274,19 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
 
                 LabTest = result.Item1.FirstOrDefault() ?? new();
                 await LoadLabTestDetails();
-
             }
         }
-        #endregion
+
+        #endregion load Data
 
         #region Handle Submit
+
         private void HandleInvalidSubmit()
         {
             ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
             FormValidationState = false;
         }
+
         private async Task HandleValidSubmit()
         {
             if (FormValidationState)
@@ -279,9 +294,11 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             else
                 FormValidationState = true;
         }
-        #endregion
+
+        #endregion Handle Submit
 
         #region Save
+
         private async Task SaveItemLabTest()
         {
             try
@@ -315,13 +332,13 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                     var result = await Mediator.Send(new UpdateLabTestRequest(LabTest));
                     NavigationManager.NavigateTo($"medical/lab-tests/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
                 }
-
             }
             catch (Exception e)
             {
                 e.HandleException(ToastService);
             }
         }
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
@@ -330,7 +347,6 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                     return;
 
                 var labTestDetail = (LabTestDetailDto)e.EditModel;
-
 
                 if (labTestDetail.Id == 0)
                 {
@@ -345,12 +361,13 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             }
             catch (Exception ex)
             {
-
             }
         }
-        #endregion
+
+        #endregion Save
 
         #region Delete
+
         private async Task OnDeleteLabTestDetail(GridDataItemDeletingEventArgs e)
         {
             if (LabTest.Id == 0)
@@ -397,14 +414,17 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             }
         }
 
-        #endregion
+        #endregion Delete
 
         #region click Methode
+
         private void DeleteItemDetail_Click()
         {
             GridDetail.ShowRowDeleteConfirmation(FocusedRowDetailVisibleIndex);
         }
+
         private bool IsLoading { get; set; } = false;
+
         private async Task EditItem_Click()
         {
             try
@@ -424,6 +444,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             //await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
             IsLoading = false;
         }
+
         private async Task EditItemDetail_Click(IGrid context)
         {
             var selected = (LabTestDetailDto)context.SelectedDataItem;
@@ -438,13 +459,16 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             // Gunakan salinan objek yang diedit
             //this.GroupMenu = copy;
         }
+
         private async Task RefreshDetail_Click()
         {
             await LoadLabTestDetails();
         }
-        #endregion
+
+        #endregion click Methode
 
         #region Impor & Export
+
         private async Task ImportFile2()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
@@ -519,7 +543,9 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
                 },
             ]);
         }
-        #endregion
+
+        #endregion Impor & Export
+
         private void CancelItem_Click()
         {
             NavigationManager.NavigateTo($"medical/lab-tests");

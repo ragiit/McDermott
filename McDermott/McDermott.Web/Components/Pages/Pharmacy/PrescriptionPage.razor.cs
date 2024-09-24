@@ -10,7 +10,7 @@ using static McDermott.Application.Features.Commands.Inventory.StockProductComma
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.FormDrugCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
@@ -979,7 +979,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Prescriptions = await Mediator.Send(new GetPrescriptionQuery(x => x.PharmacyId == Pharmacy.Id));
             Concoctions = await Mediator.Send(new GetConcoctionQuery());
             var concoctionId = Concoctions.Where(x => x.PharmacyId == Pharmacy.Id).FirstOrDefault();
-            Products = await Mediator.Send(new GetProductQuery());
+            //Products = await Mediator.Send(new GetProductQuery());
             TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             if (concoctionId is not null)
             {
@@ -1198,47 +1198,47 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 var aopop = User;
-                PanelVisible = true;
-                Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
-                Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
-                PreciptionLocations = (await Mediator.Send(new GetLocationQuery())).Item1;
-                ActiveComponentt = await Mediator.Send(new GetActiveComponentQuery());
-                //Services = await Mediator.Send(new GetServiceQuery());
-                Products = await Mediator.Send(new GetProductQuery());
-                DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
-                MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == false));
-                MedicamentGroupsConcoction = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == true));
-                DrugForms = await Mediator.Send(new GetFormDrugQuery());
-                Signas = await Mediator.Send(new GetSignaQuery());
-                DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
-                Uoms = await Mediator.Send(new GetUomQuery());
-                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-                Medicaments = await Mediator.Send(new GetMedicamentQuery());
-                ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
-                if (User.Id == null)
-                {
-                    Pharmacies = await Mediator.Send(new GetPharmacyQuery());
-                }
-                else
-                {
-                    Pharmacies = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == User.Id));
-                }
-                Concoctions = new List<ConcoctionDto>();
-                PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
-                allergies = await Mediator.Send(new GetAllergyQuery());
-                var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
-                groups = result2.Item1;
-                NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
-                var user_group = await Mediator.Send(new GetUserQuery());
-                NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
+                //PanelVisible = true;
+                //Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
+                //Practitioners = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
+                //PreciptionLocations = (await Mediator.Send(new GetLocationQuery())).Item1;
+                //ActiveComponentt = await Mediator.Send(new GetActiveComponentQuery());
+                ////Services = await Mediator.Send(new GetServiceQuery());
+                //Products = await Mediator.Send(new GetProductQuery());
+                //DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
+                //MedicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == false));
+                //MedicamentGroupsConcoction = await Mediator.Send(new GetMedicamentGroupQuery(x => x.IsConcoction == true));
+                //DrugForms = await Mediator.Send(new GetFormDrugQuery());
+                //Signas = await Mediator.Send(new GetSignaQuery());
+                //DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
+                //Uoms = await Mediator.Send(new GetUomQuery());
+                //TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                //Medicaments = await Mediator.Send(new GetMedicamentQuery());
+                //ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+                //if (User.Id == null)
+                //{
+                //    Pharmacies = await Mediator.Send(new GetPharmacyQuery());
+                //}
+                //else
+                //{
+                //    Pharmacies = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == User.Id));
+                //}
+                //Concoctions = new List<ConcoctionDto>();
+                //PatientAllergies = await Mediator.Send(new GetPatientAllergyQuery());
+                //allergies = await Mediator.Send(new GetAllergyQuery());
+                //var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
+                //groups = result2.Item1;
+                //NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+                //var user_group = await Mediator.Send(new GetUserQuery());
+                //NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
 
-                allergies.ForEach(x =>
-                {
-                    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                    if (a is not null)
-                        x.TypeString = a.Name;
-                });
-                var c = Concoctions;
+                //allergies.ForEach(x =>
+                //{
+                //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                //    if (a is not null)
+                //        x.TypeString = a.Name;
+                //});
+                //var c = Concoctions;
                 PanelVisible = false;
             }
             catch (Exception ex)

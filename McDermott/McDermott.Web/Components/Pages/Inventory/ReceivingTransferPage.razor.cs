@@ -130,14 +130,14 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private async Task LoadAsyncData()
         {
-            ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
-            TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            this.Locations = Locations;
-            Products = await Mediator.Send(new GetProductQuery());
-            Uoms = await Mediator.Send(new GetUomQuery());
-            receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
-            ReceivingLogs = await Mediator.Send(new GetReceivingLogQuery());
+            //ReceivingStocks = await Mediator.Send(new GetReceivingStockQuery());
+            //TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+            //var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            //this.Locations = Locations;
+            //Products = await Mediator.Send(new GetProductQuery());
+            //Uoms = await Mediator.Send(new GetUomQuery());
+            //receivingStockDetails = await Mediator.Send(new GetReceivingStockProductQuery());
+            //ReceivingLogs = await Mediator.Send(new GetReceivingLogQuery());
         }
 
         private async Task LoadData_Detail()
@@ -373,12 +373,12 @@ namespace McDermott.Web.Components.Pages.Inventory
                 // Pre-load Uoms and Products (if not already loaded)
                 if (Uoms == null || Uoms.Count == 0)
                 {
-                    Uoms = await Mediator.Send(new GetUomQuery());
+                    //Uoms = await Mediator.Send(new GetUomQuery());
                 }
 
                 if (Products == null || Products.Count == 0)
                 {
-                    Products = await Mediator.Send(new GetProductQuery());
+                    //Products = await Mediator.Send(new GetProductQuery());
                 }
 
                 // Filter and update receiving stock details
