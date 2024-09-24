@@ -106,8 +106,8 @@ namespace McDermott.Web.Components.Pages.Config
         {
             await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx", new List<ExportFileData>
         {
-            new ExportFileData { Column = "Name", Notes = "Mandatory" },
-            new ExportFileData { Column = "Code", Notes = "Mandatory" },
+            new() { Column = "Name", Notes = "Mandatory" },
+            new() { Column = "Code"},
         });
         }
 
@@ -154,8 +154,8 @@ namespace McDermott.Web.Components.Pages.Config
                     {
                         var country = new CountryDto
                         {
-                            Code = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
                         list.Add(country);

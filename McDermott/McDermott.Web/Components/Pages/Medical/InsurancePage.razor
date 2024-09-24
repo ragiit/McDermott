@@ -1,9 +1,9 @@
-﻿@page "/medical/insurance"
+﻿@page "/medical/insurances"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Insurance</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
@@ -14,6 +14,8 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
@@ -28,7 +30,6 @@
                                                 DataItemDeleting="OnDelete"
                                                 SearchTextChanged="OnSearchBoxChanged"
                                                 KeyFieldName="Id">
-
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="InsuranceDto"
                                                          Items="@Insurances"
@@ -37,23 +38,26 @@
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="false"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
 
+
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Visible="false" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="IsBPJSKesehatan" Caption="BPJS KS" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="IsBPJSTK" Caption="BPJS TK" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Type" Visible="false" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Presentase" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Visible="true" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Type" Visible="true" />
                                         <DxGridDataColumn MinWidth="200" FieldName="AdminFee" Caption="Admin Fee %" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Presentase" />
                                         <DxGridDataColumn MinWidth="200" FieldName="AdminFeeMax" Caption="Admin Fee Max" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="IsBPJSTK" Caption="BPJS TK" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="IsBPJSKesehatan" Caption="BPJS KS" />
                                     </Columns>
 
                                     <EditFormTemplate Context="EditFormContext">
@@ -158,6 +162,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

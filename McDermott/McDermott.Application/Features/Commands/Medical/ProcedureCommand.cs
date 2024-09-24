@@ -2,7 +2,7 @@
 {
     public class ProcedureCommand
     {
-        #region GET 
+        #region GET
 
         public class GetProcedureQuery(Expression<Func<Procedure, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ProcedureDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -13,12 +13,19 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateProcedureQuery(List<ProcedureDto> ProceduresToValidate) : IRequest<List<ProcedureDto>>
+        {
+            public List<ProcedureDto> ProceduresToValidate { get; } = ProceduresToValidate;
+        }
+
         public class ValidateProcedureQuery(Expression<Func<Procedure, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Procedure, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 

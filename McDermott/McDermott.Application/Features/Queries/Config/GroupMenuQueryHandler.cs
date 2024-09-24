@@ -9,14 +9,43 @@ namespace McDermott.Application.Features.Queries.Config
     public class GroupMenuQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
         IRequestHandler<GetGroupMenuQuery, (List<GroupMenuDto>, int pageIndex, int pageSize, int pageCount)>,
-         IRequestHandler<ValidateGroupMenuQuery, bool>,
+        IRequestHandler<ValidateGroupMenuQuery, bool>,
         IRequestHandler<CreateGroupMenuRequest, GroupMenuDto>,
+        IRequestHandler<BulkValidateGroupMenuQuery, List<GroupMenuDto>>,
         IRequestHandler<CreateListGroupMenuRequest, List<GroupMenuDto>>,
         IRequestHandler<UpdateGroupMenuRequest, GroupMenuDto>,
         IRequestHandler<UpdateListGroupMenuRequest, List<GroupMenuDto>>,
         IRequestHandler<DeleteGroupMenuRequest, bool>
     {
         #region GET
+
+        public async Task<List<GroupMenuDto>> Handle(BulkValidateGroupMenuQuery request, CancellationToken cancellationToken)
+        {
+            var GroupMenuDtos = request.GroupMenusToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var GroupMenuNames = GroupMenuDtos.Select(x => x.GroupId).Distinct().ToList();
+            var A = GroupMenuDtos.Select(x => x.MenuId).Distinct().ToList();
+            var B = GroupMenuDtos.Select(x => x.IsCreate).Distinct().ToList();
+            var C = GroupMenuDtos.Select(x => x.IsRead).Distinct().ToList();
+            var D = GroupMenuDtos.Select(x => x.IsUpdate).Distinct().ToList();
+            var E = GroupMenuDtos.Select(x => x.IsDelete).Distinct().ToList();
+            var F = GroupMenuDtos.Select(x => x.IsImport).Distinct().ToList();
+
+            var existingGroupMenus = await _unitOfWork.Repository<GroupMenu>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => GroupMenuNames.Contains(v.GroupId)
+                            && A.Contains(v.MenuId)
+                            && B.Contains((bool)(v.IsCreate))
+                            && C.Contains((bool)(v.IsRead))
+                            && D.Contains((bool)(v.IsUpdate))
+                            && E.Contains((bool)(v.IsDelete))
+                            && F.Contains((bool)(v.IsImport)))
+                .ToListAsync(cancellationToken);
+
+            return existingGroupMenus.Adapt<List<GroupMenuDto>>();
+        }
 
         public async Task<bool> Handle(ValidateGroupMenuQuery request, CancellationToken cancellationToken)
         {
@@ -83,7 +112,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<GroupMenu>().AddAsync(request.GroupMenuDtos.Adapt<CreateUpdateGroupMenuDto>().Adapt<List<GroupMenu>>());
+                var result = await _unitOfWork.Repository<GroupMenu>().AddAsync(request.GroupMenuDtos.Adapt<List<GroupMenu>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -122,7 +151,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<GroupMenu>().UpdateAsync(request.GroupMenuDtos.Adapt<CreateUpdateGroupMenuDto>().Adapt<List<GroupMenu>>());
+                var result = await _unitOfWork.Repository<GroupMenu>().UpdateAsync(request.GroupMenuDtos.Adapt<List<GroupMenu>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

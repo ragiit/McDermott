@@ -100,7 +100,7 @@
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<ReligionDto>>();
-                    await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteReligionRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -175,16 +175,29 @@
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Religions.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower()))
-                            list.Add(c);
+                        list.Add(c);
                     }
 
-                    await Mediator.Send(new CreateListReligionRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateReligionQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListReligionRequest(list));
+                        await LoadData();
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {

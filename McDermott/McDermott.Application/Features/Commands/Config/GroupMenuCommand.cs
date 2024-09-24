@@ -13,6 +13,11 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateGroupMenuQuery(List<GroupMenuDto> GroupMenusToValidate) : IRequest<List<GroupMenuDto>>
+        {
+            public List<GroupMenuDto> GroupMenusToValidate { get; } = GroupMenusToValidate;
+        }
+
         public class ValidateGroupMenuQuery(Expression<Func<GroupMenu, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<GroupMenu, bool>> Predicate { get; } = predicate!;

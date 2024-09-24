@@ -15,6 +15,11 @@ namespace McDermott.Application.Features.Commands.Config
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateGroupQuery(List<GroupDto> GroupsToValidate) : IRequest<List<GroupDto>>
+        {
+            public List<GroupDto> GroupsToValidate { get; } = GroupsToValidate;
+        }
+
         public class ValidateGroupQuery(Expression<Func<Group, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Group, bool>> Predicate { get; } = predicate!;

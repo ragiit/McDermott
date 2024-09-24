@@ -2,6 +2,8 @@
 {
     public class ReligionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetReligionQuery, List<ReligionDto>>,
+        IRequestHandler<ValidateReligionQuery, bool>,
+        IRequestHandler<BulkValidateReligionQuery, List<ReligionDto>>,
         IRequestHandler<CreateReligionRequest, ReligionDto>,
         IRequestHandler<CreateListReligionRequest, List<ReligionDto>>,
         IRequestHandler<UpdateReligionRequest, ReligionDto>,
@@ -9,6 +11,31 @@
         IRequestHandler<DeleteReligionRequest, bool>
     {
         #region GET
+
+        public async Task<List<ReligionDto>> Handle(BulkValidateReligionQuery request, CancellationToken cancellationToken)
+        {
+            var ReligionDtos = request.ReligionsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ReligionNames = ReligionDtos.Select(x => x.Name).Distinct().ToList();
+
+            var existingReligions = await _unitOfWork.Repository<Religion>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ReligionNames.Contains(v.Name))
+                .ToListAsync(cancellationToken);
+
+            return existingReligions.Adapt<List<ReligionDto>>();
+        }
+
+        public async Task<bool> Handle(ValidateReligionQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Religion>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
 
         public async Task<List<ReligionDto>> Handle(GetReligionQuery request, CancellationToken cancellationToken)
         {

@@ -104,7 +104,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<District>().AddAsync(request.DistrictDtos.Adapt<CreateUpdateDistrictDto>().Adapt<List<District>>());
+                var result = await _unitOfWork.Repository<District>().AddAsync(request.DistrictDtos.Adapt<List<District>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai
@@ -143,7 +143,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<District>().UpdateAsync(request.DistrictDtos.Adapt<CreateUpdateDistrictDto>().Adapt<List<District>>());
+                var result = await _unitOfWork.Repository<District>().UpdateAsync(request.DistrictDtos.Adapt<List<District>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetDistrictQuery_"); // Ganti dengan key yang sesuai

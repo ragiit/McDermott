@@ -636,7 +636,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                         return;
                     }
 
-                    var countries = new List<GroupDto>();
+                    var list = new List<GroupDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -645,16 +645,29 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                         };
 
-                        if (!Groups.Any(x => x.Name.Trim().ToLower() == country?.Name?.Trim().ToLower()))
-                            countries.Add(country);
+                        list.Add(country);
                     }
 
-                    await Mediator.Send(new CreateListGroupRequest(countries));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateGroupQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListGroupRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {

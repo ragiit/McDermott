@@ -1,3 +1,4 @@
+using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Medical.SpecialityCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
@@ -5,12 +6,31 @@ namespace McDermott.Application.Features.Queries.Medical
     public class SpecialityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetSpecialityQuery, (List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateSpecialityRequest, SpecialityDto>,
+        IRequestHandler<BulkValidateSpecialityQuery, List<SpecialityDto>>,
         IRequestHandler<CreateListSpecialityRequest, List<SpecialityDto>>,
         IRequestHandler<UpdateSpecialityRequest, SpecialityDto>,
         IRequestHandler<UpdateListSpecialityRequest, List<SpecialityDto>>,
         IRequestHandler<DeleteSpecialityRequest, bool>
     {
         #region GET
+
+        public async Task<List<SpecialityDto>> Handle(BulkValidateSpecialityQuery request, CancellationToken cancellationToken)
+        {
+            var SpecialityDtos = request.SpecialitysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var SpecialityNames = SpecialityDtos.Select(x => x.Name).Distinct().ToList();
+            var a = SpecialityDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingSpecialitys = await _unitOfWork.Repository<Speciality>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => SpecialityNames.Contains(v.Name)
+                            && a.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingSpecialitys.Adapt<List<SpecialityDto>>();
+        }
 
         public async Task<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetSpecialityQuery request, CancellationToken cancellationToken)
         {
@@ -27,17 +47,9 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                var pagedResult = query.OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<SpecialityDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

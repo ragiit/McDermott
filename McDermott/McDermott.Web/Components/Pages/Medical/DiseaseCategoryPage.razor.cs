@@ -1,12 +1,17 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
+using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
+using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class DiseaseCategoryPage
     {
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
-        private List<DiseaseCategoryDto> DiseaseCategorys = new();
-        private List<DiseaseCategoryDto> ParentCategoryDto = new();
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private List<DiseaseCategoryDto> DiseaseCategorys = [];
+        private List<DiseaseCategoryDto> ParentCategoryDto = [];
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
 
@@ -47,14 +52,209 @@
 
         #endregion UserLoginAndAccessRole
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        #region ComboboxDiseaseCategory
+
+        private DxComboBox<DiseaseCategoryDto, long?> refDiseaseCategoryComboBox { get; set; }
+        private int DiseaseCategoryComboBoxIndex { get; set; } = 0;
+        private int totalCountDiseaseCategory = 0;
+
+        private async Task OnSearchDiseaseCategory()
+        {
+            await LoadDataDiseaseCategory();
+        }
+
+        private async Task OnSearchDiseaseCategoryIndexIncrement()
+        {
+            if (DiseaseCategoryComboBoxIndex < (totalCountDiseaseCategory - 1))
+            {
+                DiseaseCategoryComboBoxIndex++;
+                await LoadDataDiseaseCategory(DiseaseCategoryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDiseaseCategoryndexDecrement()
+        {
+            if (DiseaseCategoryComboBoxIndex > 0)
+            {
+                DiseaseCategoryComboBoxIndex--;
+                await LoadDataDiseaseCategory(DiseaseCategoryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDiseaseCategoryChanged(string e)
+        {
+            DiseaseCategoryComboBoxIndex = 0;
+            await LoadDataDiseaseCategory();
+        }
+
+        private async Task LoadDataDiseaseCategory(int pageIndex = 0, int pageSize = 10, long? a = null)
         {
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            var DiseaseCategorys = await Mediator.Send(new GetDiseaseCategoryQuery());
-            this.DiseaseCategorys = [.. DiseaseCategorys.Item1.OrderBy(x => x.ParentCategory == null)];
-            var q = await Mediator.Send(new GetDiseaseCategoryQuery());
-            ParentCategoryDto = [.. q.Item1.Where(x => x.ParentCategory == null || x.ParentCategory == "")];
+            var result = await Mediator.Send(new GetDiseaseCategoryQuery(a == null ? null : x => x.ParentDiseaseCategoryId == null && x.Id == a, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiseaseCategoryComboBox?.Text ?? ""));
+            ParentCategoryDto = result.Item1;
+            totalCountDiseaseCategory = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxDiseaseCategory
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var a = await Mediator.Send(new GetDiseaseCategoryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            DiseaseCategorys = a.Item1;
+            totalCount = a.pageCount;
+            activePageIndex = pageIndex;
+            PanelVisible = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "disease_category_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Parent"
+                },
+            ]);
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Parent", };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<DiseaseCategoryDto>();
+
+                    var parentNames = new HashSet<string>();
+
+                    var list1 = new List<DiseaseCategoryDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var a = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(a))
+                            parentNames.Add(a.ToLower());
+                    }
+                    list1 = (await Mediator.Send(new GetDiseaseCategoryQuery(x => parentNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        bool isValid = true;
+                        string parentName = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        long? parentId = null;
+                        if (!string.IsNullOrEmpty(parentName))
+                        {
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(parentName, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                ToastService.ShowErrorImport(row, 2, parentName ?? string.Empty);
+                                isValid = false;
+                            }
+                            else
+                            {
+                                parentId = cachedParent.Id;
+                            }
+                        }
+
+                        // Lewati baris jika tidak valid
+                        if (!isValid)
+                            continue;
+
+                        var country = new DiseaseCategoryDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            ParentDiseaseCategoryId = parentId,
+                        };
+
+                        list.Add(country);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.ParentDiseaseCategoryId, }).ToList();
+
+                        // Panggil BulkValidateCountryQuery untuk validasi bulk
+                        var existingCountrys = await Mediator.Send(new BulkValidateDiseaseCategoryQuery(list));
+
+                        // Filter Country baru yang tidak ada di database
+                        list = list.Where(Country =>
+                            !existingCountrys.Any(ev =>
+                                ev.Name == Country.Name &&
+                                ev.ParentDiseaseCategoryId == Country.ParentDiseaseCategoryId
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListDiseaseCategoryRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+                finally { PanelVisible = false; }
+            }
             PanelVisible = false;
         }
 
@@ -62,35 +262,12 @@
         {
             await GetUserInfo();
             await LoadData();
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
+            await LoadDataDiseaseCategory();
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            UpdateEditItemsEnabled(true);
         }
 
         private async Task NewItem_Click()
@@ -106,6 +283,14 @@
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new());
+            await LoadComboboxEdit(a);
+        }
+
+        private async Task LoadComboboxEdit(DiseaseCategoryDto a)
+        {
+            ParentCategoryDto = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.ParentDiseaseCategoryId == null && x.Id == a.ParentDiseaseCategoryId))).Item1;
         }
 
         private void DeleteItem_Click()

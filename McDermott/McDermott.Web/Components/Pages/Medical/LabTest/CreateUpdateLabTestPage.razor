@@ -121,7 +121,7 @@
                                                                                      EditItem_Click="@(()=>EditItemDetail_Click(context.Grid))"
                                                                                      DeleteItem_Click="@DeleteItemDetail_Click"
                                                                                      Refresh_Click="@RefreshDetail_Click"
-                                                                                     IsImport="true"
+                                                                                     IsImport="false"
                                                                                      ImportFile="ImportFile2"
                                                                                      ExportToExcel="ExportToExcel2"
                                                                                      VisibleNew="UserAccessCRUID.IsCreate"
@@ -130,12 +130,12 @@
                                                                 </ToolbarTemplate>
                                                                 <Columns>
                                                                     <DxGridSelectionColumn Width="15px" />
-                                                                    <DxGridDataColumn MinWidth="200" FieldName="Name" Caption="Parameter" SortIndex="0" />
-                                                                    <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
-                                                                    <DxGridDataColumn MinWidth="200" FieldName="NormalRangeMale" Caption="Normal Range (Male)" />
-                                                                    <DxGridDataColumn MinWidth="200" FieldName="NormalRangeFemale" Caption="Normal Range (Female)" />
-                                                                    <DxGridDataColumn MinWidth="200" FieldName="ResultValueType" Caption="Result Value Type" />
-                                                                    <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
+                                                                    <DxGridDataColumn FieldName="Name" Caption="Parameter" SortIndex="0" />
+                                                                    <DxGridDataColumn FieldName="LabUom.Name" Caption="UoM" />
+                                                                    <DxGridDataColumn FieldName="NormalRangeMale" Caption="Normal Range (Male)" />
+                                                                    <DxGridDataColumn FieldName="NormalRangeFemale" Caption="Normal Range (Female)" />
+                                                                    <DxGridDataColumn FieldName="ResultValueType" Caption="Result Value Type" />
+                                                                    <DxGridDataColumn FieldName="Remark" Caption="Remark" />
                                                                 </Columns>
                                                                 <EditFormTemplate Context="EditFormContext">
                                                                     @{
@@ -180,6 +180,10 @@
                                                                                                     IconCssClass="fa-solid fa-caret-right"
                                                                                                     Tooltip="Next Index" />
                                                                                 </Buttons>
+                                                                                <Columns>
+                                                                                    <DxListEditorColumn FieldName="@nameof(LabUomDto.Name)" Caption="Name" /> 
+                                                                                    <DxListEditorColumn FieldName="@nameof(LabUomDto.Code)" Caption="Code" />
+                                                                                </Columns>
                                                                             </MyDxComboBox>
                                                                             <ValidationMessage For="@(()=> a.LabUomId)"   />
                                                                         </DxFormLayoutItem>
@@ -202,6 +206,31 @@
                                                                     </DxFormLayout>
                                                                 </EditFormTemplate>
                                                             </MyGridPaginate>
+                                                            <div class="row">
+                                                                <DxFormLayout>
+                                                                    <div class="col-md-9">
+                                                                        <DxFormLayoutItem>
+                                                                            <DxPager PageCount="totalCount"
+                                                                                     ActivePageIndexChanged="OnPageIndexChanged"
+                                                                                     ActivePageIndex="activePageIndex"
+                                                                                     VisibleNumericButtonCount="10"
+                                                                                     SizeMode="SizeMode.Medium"
+                                                                                     NavigationMode="PagerNavigationMode.Auto">
+                                                                            </DxPager>
+                                                                        </DxFormLayoutItem>
+                                                                    </div>
+                                                                    <div class="col-md-3 d-flex justify-content-end">
+                                                                        <DxFormLayoutItem Caption="Page Size:">
+                                                                            <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                                          NullText="Select Page Size"
+                                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                                          SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                                          @bind-Value="pageSize">
+                                                                            </MyDxComboBox>
+                                                                        </DxFormLayoutItem>
+                                                                    </div>
+                                                                </DxFormLayout>
+                                                            </div>
                                                         </DxLoadingPanel>
                                                     </Template>
                                                 </DxFormLayoutItem>

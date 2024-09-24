@@ -161,6 +161,11 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             await LoadDataSampleTypes(0, 10);
         }
 
+        private async Task LoadDataSampleTypesEdit()
+        {
+            SampleTypes = (await Mediator.Send(new GetSampleTypeQuery(x => x.Id == LabTest.SampleTypeId))).Item1;
+        }
+
         private async Task LoadDataSampleTypes(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -214,7 +219,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
             SelectedDataItems = [];
             var result = await Mediator.Send(new GetLabUomQuery(searchTerm: refLabUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             LabUoms = result.Item1;
-            totalCount = result.pageCount;
+            totalCountLabUom = result.pageCount;
             PanelVisible = false;
         }
 
@@ -227,11 +232,11 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadLabTestDetails();
-            await LoadDataSampleTypes();
-            await LoadDataLabUom();
             await LoadData();
             await GetUserInfo();
+            await LoadLabTestDetails();
+            await LoadDataSampleTypesEdit();
+            await LoadDataLabUom();
             PanelVisible = false;
 
             return;
@@ -447,17 +452,23 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
 
         private async Task EditItemDetail_Click(IGrid context)
         {
-            var selected = (LabTestDetailDto)context.SelectedDataItem;
-            // Buat salinan objek yang akan diedit menggunakan Mapster
-            var copy = selected.Adapt<LabTestDetailDto>(); // GroupMenu adalah objek yang sedang diedit
-
             await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
+            var a = (LabTestDetailDto)context.SelectedDataItem;
+            await LoadComboboxEdit(a);
 
-            var w = LabTestDetailForms.FirstOrDefault(x => x.Id == copy.Id);
+            // Buat salinan objek yang akan diedit menggunakan Mapster
+            //var copy = selected.Adapt<LabTestDetailDto>(); // GroupMenu adalah objek yang sedang diedit
+
+            //var w = LabTestDetailForms.FirstOrDefault(x => x.Id == copy.Id);
 
             //if (copy is not null)
             // Gunakan salinan objek yang diedit
             //this.GroupMenu = copy;
+        }
+
+        private async Task LoadComboboxEdit(LabTestDetailDto a)
+        {
+            LabUoms = (await Mediator.Send(new GetLabUomQuery(x => x.Id == a.LabUomId))).Item1;
         }
 
         private async Task RefreshDetail_Click()

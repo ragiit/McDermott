@@ -7,6 +7,8 @@ namespace McDermott.Application.Features.Queries.Config
         (IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetMenuQuery, (List<MenuDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateMenuRequest, MenuDto>,
+        IRequestHandler<BulkValidateMenuQuery, List<MenuDto>>,
+
         IRequestHandler<ValidateMenuQuery, bool>,
         IRequestHandler<CreateListMenuRequest, List<MenuDto>>,
         IRequestHandler<UpdateMenuRequest, MenuDto>,
@@ -14,6 +16,28 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteMenuRequest, bool>
     {
         #region GET
+
+        public async Task<List<MenuDto>> Handle(BulkValidateMenuQuery request, CancellationToken cancellationToken)
+        {
+            var MenuDtos = request.MenusToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var MenuNames = MenuDtos.Select(x => x.Name).Distinct().ToList();
+            var A = MenuDtos.Select(x => x.ParentId).Distinct().ToList();
+            var B = MenuDtos.Select(x => x.Url).Distinct().ToList();
+            var C = MenuDtos.Select(x => x.Sequence).Distinct().ToList();
+
+            var existingMenus = await _unitOfWork.Repository<Menu>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => MenuNames.Contains(v.Name)
+                            && A.Contains(v.ParentId)
+                            && B.Contains(v.Url)
+                            && C.Contains(v.Sequence))
+                .ToListAsync(cancellationToken);
+
+            return existingMenus.Adapt<List<MenuDto>>();
+        }
 
         public async Task<bool> Handle(ValidateMenuQuery request, CancellationToken cancellationToken)
         {
@@ -81,7 +105,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDtos.Adapt<CreateUpdateMenuDto>().Adapt<List<Menu>>());
+                var result = await _unitOfWork.Repository<Menu>().AddAsync(request.MenuDtos.Adapt<List<Menu>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");
@@ -121,7 +145,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDtos.Adapt<CreateUpdateMenuDto>().Adapt<List<Menu>>());
+                var result = await _unitOfWork.Repository<Menu>().UpdateAsync(request.MenuDtos.Adapt<List<Menu>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetMenuQuery_");

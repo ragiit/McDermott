@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Config.CountryCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
@@ -6,6 +7,7 @@ namespace McDermott.Application.Features.Queries.Medical
     public class DiseaseCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDiseaseCategoryQuery, (List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateDiseaseCategoryRequest, DiseaseCategoryDto>,
+        IRequestHandler<BulkValidateDiseaseCategoryQuery, List<DiseaseCategoryDto>>,
         IRequestHandler<CreateListDiseaseCategoryRequest, List<DiseaseCategoryDto>>,
         IRequestHandler<UpdateDiseaseCategoryRequest, DiseaseCategoryDto>,
         IRequestHandler<UpdateListDiseaseCategoryRequest, List<DiseaseCategoryDto>>,
@@ -13,32 +15,47 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
+        public async Task<List<DiseaseCategoryDto>> Handle(BulkValidateDiseaseCategoryQuery request, CancellationToken cancellationToken)
+        {
+            var DiseaseCategoryDtos = request.DiseaseCategorysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var DiseaseCategoryNames = DiseaseCategoryDtos.Select(x => x.Name).Distinct().ToList();
+            var a = DiseaseCategoryDtos.Select(x => x.ParentDiseaseCategoryId).Distinct().ToList();
+
+            var existingDiseaseCategorys = await _unitOfWork.Repository<DiseaseCategory>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => DiseaseCategoryNames.Contains(v.Name)
+                            && a.Contains(v.ParentDiseaseCategoryId))
+                .ToListAsync(cancellationToken);
+
+            return existingDiseaseCategorys.Adapt<List<DiseaseCategoryDto>>();
+        }
+
         public async Task<(List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDiseaseCategoryQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 var query = _unitOfWork.Repository<DiseaseCategory>().Entities
                     .AsNoTracking()
+                    .Include(x => x.ParentDiseaseCategory)
                     .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ParentCategory, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.ParentDiseaseCategory.Name, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
                 var pagedResult = query
-                            .OrderBy(x => x.Name);
+                                  .OrderBy(x => x.Name);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<DiseaseCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
@@ -65,7 +82,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<DiseaseCategory>().AddAsync(request.DiseaseCategoryDto.Adapt<DiseaseCategory>());
+                var result = await _unitOfWork.Repository<DiseaseCategory>().AddAsync(request.DiseaseCategoryDto.Adapt<CreateUpdateDiseaseCategoryDto>().Adapt<DiseaseCategory>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

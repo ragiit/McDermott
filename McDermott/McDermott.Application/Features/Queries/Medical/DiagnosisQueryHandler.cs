@@ -5,12 +5,35 @@ namespace McDermott.Application.Features.Queries.Medical
     public class DiagnosisQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDiagnosisQuery, (List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateDiagnosisRequest, DiagnosisDto>,
+        IRequestHandler<BulkValidateDiagnosisQuery, List<DiagnosisDto>>,
         IRequestHandler<CreateListDiagnosisRequest, List<DiagnosisDto>>,
         IRequestHandler<UpdateDiagnosisRequest, DiagnosisDto>,
         IRequestHandler<UpdateListDiagnosisRequest, List<DiagnosisDto>>,
         IRequestHandler<DeleteDiagnosisRequest, bool>
     {
         #region GET
+
+        public async Task<List<DiagnosisDto>> Handle(BulkValidateDiagnosisQuery request, CancellationToken cancellationToken)
+        {
+            var DiagnosisDtos = request.DiagnosissToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var DiagnosisNames = DiagnosisDtos.Select(x => x.Name).Distinct().ToList();
+            var a = DiagnosisDtos.Select(x => x.Code).Distinct().ToList();
+            var b = DiagnosisDtos.Select(x => x.DiseaseCategoryId).Distinct().ToList();
+            var c = DiagnosisDtos.Select(x => x.CronisCategoryId).Distinct().ToList();
+
+            var existingDiagnosiss = await _unitOfWork.Repository<Diagnosis>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => DiagnosisNames.Contains(v.Name)
+                            && a.Contains(v.Code)
+                            && b.Contains(v.DiseaseCategoryId)
+                            && c.Contains(v.CronisCategoryId))
+                .ToListAsync(cancellationToken);
+
+            return existingDiagnosiss.Adapt<List<DiagnosisDto>>();
+        }
 
         public async Task<(List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDiagnosisQuery request, CancellationToken cancellationToken)
         {

@@ -2,7 +2,7 @@ namespace McDermott.Application.Features.Commands.Medical
 {
     public class SpecialityCommand
     {
-        #region GET 
+        #region GET
 
         public class GetSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)>
         {
@@ -18,13 +18,18 @@ namespace McDermott.Application.Features.Commands.Medical
             public Expression<Func<Speciality, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion
+        #endregion GET
 
         #region CREATE
 
         public class CreateSpecialityRequest(SpecialityDto SpecialityDto) : IRequest<SpecialityDto>
         {
             public SpecialityDto SpecialityDto { get; set; } = SpecialityDto;
+        }
+
+        public class BulkValidateSpecialityQuery(List<SpecialityDto> SpecialitysToValidate) : IRequest<List<SpecialityDto>>
+        {
+            public List<SpecialityDto> SpecialitysToValidate { get; } = SpecialitysToValidate;
         }
 
         public class CreateListSpecialityRequest(List<SpecialityDto> SpecialityDtos) : IRequest<List<SpecialityDto>>

@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
@@ -22,6 +23,9 @@ namespace McDermott.Application.Features.Queries.Medical
                     .AsNoTracking()
                     .AsQueryable();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
@@ -29,18 +33,7 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.LocationId.ToString(), $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-
-                var pagedResult = query
-                            .OrderBy(x => x.BuildingId);
-
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, null, cancellationToken);
 
                 return (paged.Adapt<List<BuildingLocationDto>>(), request.PageIndex, request.PageSize, totalPages);
             }

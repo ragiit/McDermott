@@ -76,16 +76,24 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-            if (SelectedDataItems is null)
+            try
             {
-                await Mediator.Send(new DeleteOccupationalRequest(((OccupationalDto)e.DataItem).Id));
+                if (SelectedDataItems is null)
+                {
+                    await Mediator.Send(new DeleteOccupationalRequest(((OccupationalDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataItems.Adapt<List<OccupationalDto>>();
+                    await Mediator.Send(new DeleteOccupationalRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                await LoadData(0, pageSize);
             }
-            else
+            catch (Exception ex)
             {
-                var a = SelectedDataItems.Adapt<List<OccupationalDto>>();
-                await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
+                ex.HandleException(ToastService);
             }
-            await LoadData();
+            finally { PanelVisible = false; }
         }
 
         private bool EditItemsEnabled { get; set; }
@@ -174,17 +182,25 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (OccupationalDto)e.EditModel;
+            try
+            {
+                var editModel = (OccupationalDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateOccupationalRequest(editModel));
-            else
-                await Mediator.Send(new UpdateOccupationalRequest(editModel));
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateOccupationalRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateOccupationalRequest(editModel));
 
-            await LoadData();
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task ImportFile()
@@ -241,22 +257,36 @@ namespace McDermott.Web.Components.Pages.Config
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
                             Description = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
-
-                        if (!Occupationals.Any(x => x.Name.Trim().ToLower() == c?.Name?.Trim().ToLower() && x.Description.Trim().ToLower() == c?.Description?.Trim().ToLower()))
-                            list.Add(c);
+                        list.Add(c);
                     }
 
-                    await Mediator.Send(new CreateListOccupationalRequest(list));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Description }).ToList();
 
-                    await LoadData();
-                    SelectedDataItems = [];
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateOccupationalQuery(list));
 
-                    ToastService.ShowSuccess("Successfully Imported.");
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.Description == village.Description
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListOccupationalRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
                 catch (Exception ex)
                 {
-                    ToastService.ShowError(ex.Message);
+                    ex.HandleException(ToastService);
                 }
+                finally { PanelVisible = false; }
             }
             PanelVisible = false;
         }

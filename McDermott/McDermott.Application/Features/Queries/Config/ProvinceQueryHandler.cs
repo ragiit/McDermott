@@ -80,7 +80,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Province>().AddAsync(request.ProvinceDtos.Adapt<CreateUpdateProvinceDto>().Adapt<List<Province>>());
+                var result = await _unitOfWork.Repository<Province>().AddAsync(request.ProvinceDtos.Adapt<List<Province>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai
@@ -119,7 +119,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var result = await _unitOfWork.Repository<Province>().UpdateAsync(request.ProvinceDtos.Adapt<CreateUpdateProvinceDto>().Adapt<List<Province>>());
+                var result = await _unitOfWork.Repository<Province>().UpdateAsync(request.ProvinceDtos.Adapt<List<Province>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetProvinceQuery_"); // Ganti dengan key yang sesuai

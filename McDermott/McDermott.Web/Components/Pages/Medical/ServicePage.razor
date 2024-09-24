@@ -77,15 +77,36 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsPatient" />
                                                 <ValidationMessage For="@(()=>a.IsPatient)" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Counter" Visible="@Convert.ToBoolean(a.IsPatient)">
+                                            </DxFormLayoutItem> 
+
+                                            <DxFormLayoutItem Visible="@Convert.ToBoolean(a.IsPatient)" CaptionCssClass="normal-caption" Caption="Service Counter" ColSpanMd="12">
                                                 <MyDxComboBox Data="@ServicesK"
+                                                              NullText="Select Counter Service"
+                                                              @ref="refServiceComboBox"
                                                               @bind-Value="@a.ServicedId"
-                                                              NullText="select Service Counter"
                                                               TextFieldName="Name"
-                                                              ValueFieldName="Id"></MyDxComboBox>
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputServiceChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchServicendexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchService"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" /> 
+                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Quota)" Caption="Quota" />
+                                                    </Columns>
+                                                </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ServicedId)" />
                                             </DxFormLayoutItem>
+
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Counter" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsKiosk" />
                                                 <ValidationMessage For="@(()=>a.IsKiosk)" />

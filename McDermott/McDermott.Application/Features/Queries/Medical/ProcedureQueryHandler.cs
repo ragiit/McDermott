@@ -1,16 +1,38 @@
-﻿using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class ProcedureQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetProcedureQuery, (List<ProcedureDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateProcedureRequest, ProcedureDto>,
+        IRequestHandler<BulkValidateProcedureQuery, List<ProcedureDto>>,
         IRequestHandler<CreateListProcedureRequest, List<ProcedureDto>>,
         IRequestHandler<UpdateProcedureRequest, ProcedureDto>,
         IRequestHandler<UpdateListProcedureRequest, List<ProcedureDto>>,
         IRequestHandler<DeleteProcedureRequest, bool>
     {
         #region GET
+
+        public async Task<List<ProcedureDto>> Handle(BulkValidateProcedureQuery request, CancellationToken cancellationToken)
+        {
+            var ProcedureDtos = request.ProceduresToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ProcedureNames = ProcedureDtos.Select(x => x.Name).Distinct().ToList();
+            var a = ProcedureDtos.Select(x => x.Code_Test).Distinct().ToList();
+            var b = ProcedureDtos.Select(x => x.Classification).Distinct().ToList();
+
+            var existingProcedures = await _unitOfWork.Repository<Procedure>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ProcedureNames.Contains(v.Name)
+                            && a.Contains(v.Code_Test)
+                            && b.Contains(v.Classification))
+                .ToListAsync(cancellationToken);
+
+            return existingProcedures.Adapt<List<ProcedureDto>>();
+        }
 
         public async Task<(List<ProcedureDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProcedureQuery request, CancellationToken cancellationToken)
         {
@@ -28,18 +50,9 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.Classification, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                var pagedResult = query.OrderBy(x => x.Name);
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
-
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
                 return (paged.Adapt<List<ProcedureDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
