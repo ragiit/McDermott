@@ -148,7 +148,13 @@ namespace McDermott.Application.Dtos.Config
         public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
-        public List<long> PatientAllergyIds { get; set; } = new List<long>();
+        public List<long> PatientAllergyIds { get; set; } = [];
+        public bool IsWeatherPatientAllergyIds { get; set; }
+        public bool IsPharmacologyPatientAllergyIds { get; set; }
+        public bool IsFoodPatientAllergyIds { get; set; }
+        public List<long> WeatherPatientAllergyIds { get; set; } = [];
+        public List<long> PharmacologyPatientAllergyIds { get; set; } = [];
+        public List<long> FoodPatientAllergyIds { get; set; } = [];
         public long? SupervisorId { get; set; }  // ID Supervisor
         public long? OccupationalId { get; set; }  // ID Supervisor
         public string IsFamilyMedicalHistory { get; set; } = "No";
@@ -342,7 +348,13 @@ namespace McDermott.Application.Dtos.Config
         public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
-        public List<long> PatientAllergyIds { get; set; } = new List<long>();
+        public List<long> PatientAllergyIds { get; set; } = [];
+        public bool IsWeatherPatientAllergyIds { get; set; }
+        public bool IsPharmacologyPatientAllergyIds { get; set; }
+        public bool IsFoodPatientAllergyIds { get; set; }
+        public List<long> WeatherPatientAllergyIds { get; set; } = [];
+        public List<long> PharmacologyPatientAllergyIds { get; set; } = [];
+        public List<long> FoodPatientAllergyIds { get; set; } = [];
         public long? SupervisorId { get; set; }  // ID Supervisor
         public long? OccupationalId { get; set; }  // ID Supervisor
         public string? IsFamilyMedicalHistory { get; set; }

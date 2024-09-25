@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240925084336_UpdateAllergyField")]
+    partial class UpdateAllergyField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -5586,9 +5589,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("IsFamilyMedicalHistory")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsFoodPatientAllergyIds")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsHr")
                         .HasColumnType("bit");
 
@@ -5604,9 +5604,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsPatient")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsPharmacologyPatientAllergyIds")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsPharmacy")
                         .HasColumnType("bit");
 
@@ -5617,9 +5614,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsUser")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsWeatherPatientAllergyIds")
                         .HasColumnType("bit");
 
                     b.Property<long?>("JobPositionId")
