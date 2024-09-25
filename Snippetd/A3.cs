@@ -1,50 +1,50 @@
- public class GetCompanyQuery(Expression<Func<Company, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>
+ public class GetInsuranceQuery(Expression<Func<Insurance, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)>
  {
-     public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<Insurance, bool>> Predicate { get; } = predicate!;
      public bool RemoveCache { get; } = removeCache!;
      public string SearchTerm { get; } = searchTerm!;
      public int PageIndex { get; } = pageIndex;
      public int PageSize { get; set; } = pageSize ?? 10;
  }
 
- public class BulkValidateCompanyQuery(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
+ public class BulkValidateInsuranceQuery(List<InsuranceDto> InsurancesToValidate) : IRequest<List<InsuranceDto>>
  {
-     public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
+     public List<InsuranceDto> InsurancesToValidate { get; } = InsurancesToValidate;
  }
 
- public class ValidateCompanyQuery(Expression<Func<Company, bool>>? predicate = null) : IRequest<bool>
+ public class ValidateInsuranceQuery(Expression<Func<Insurance, bool>>? predicate = null) : IRequest<bool>
  {
-     public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<Insurance, bool>> Predicate { get; } = predicate!;
  }
 
-IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidateCompanyQuery, bool>,
-IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
+IRequestHandler<GetInsuranceQuery, (List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidateInsuranceQuery, bool>,
+IRequestHandler<BulkValidateInsuranceQuery, List<InsuranceDto>>,
 
 
-public async Task<List<CompanyDto>> Handle(BulkValidateCompanyQuery request, CancellationToken cancellationToken)
+public async Task<List<InsuranceDto>> Handle(BulkValidateInsuranceQuery request, CancellationToken cancellationToken)
 {
-    var CompanyDtos = request.CompanysToValidate;
+    var InsuranceDtos = request.InsurancesToValidate;
 
     // Ekstrak semua kombinasi yang akan dicari di database
-    var CompanyNames = CompanyDtos.Select(x => x.Name).Distinct().ToList();
-    var provinceIds = CompanyDtos.Select(x => x.ProvinceId).Distinct().ToList();
+    var InsuranceNames = InsuranceDtos.Select(x => x.Name).Distinct().ToList();
+    var provinceIds = InsuranceDtos.Select(x => x.ProvinceId).Distinct().ToList();
 
-    var existingCompanys = await _unitOfWork.Repository<Company>()
+    var existingInsurances = await _unitOfWork.Repository<Insurance>()
         .Entities
         .AsNoTracking()
-        .Where(v => CompanyNames.Contains(v.Name)
+        .Where(v => InsuranceNames.Contains(v.Name)
                     && provinceIds.Contains(v.ProvinceId))
         .ToListAsync(cancellationToken);
 
-    return existingCompanys.Adapt<List<CompanyDto>>();
+    return existingInsurances.Adapt<List<InsuranceDto>>();
 }
 
-public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
+public async Task<(List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetInsuranceQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<Company>().Entities
+        var query = _unitOfWork.Repository<Insurance>().Entities
             .AsNoTracking()
             .Include(v => v.Province)
             .AsQueryable();
@@ -59,12 +59,11 @@ public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)
                 EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
         }
 
-        var pagedResult = query
-                    .OrderBy(x => x.Name);
+        var pagedResult = query.OrderBy(x => x.Name);
 
         var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-        return (paged.Adapt<List<CompanyDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (paged.Adapt<List<InsuranceDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -72,9 +71,9 @@ public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)
     }
 }
 
-public async Task<bool> Handle(ValidateCompanyQuery request, CancellationToken cancellationToken)
+public async Task<bool> Handle(ValidateInsuranceQuery request, CancellationToken cancellationToken)
 {
-    return await _unitOfWork.Repository<Company>()
+    return await _unitOfWork.Repository<Insurance>()
         .Entities
         .AsNoTracking()
         .Where(request.Predicate)  // Apply the Predicate for filtering

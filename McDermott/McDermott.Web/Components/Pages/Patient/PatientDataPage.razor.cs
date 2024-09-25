@@ -20,7 +20,7 @@ namespace McDermott.Web.Components.Pages.Patient
         private List<DepartmentDto> Departments = [];
         private List<JobPositionDto> JobPositions = [];
         private List<ReligionDto> Religions = [];
-        private List<GenderDto> Genders = [];
+
         private List<PatientFamilyRelationDto> AllPatientFamilyRelations = [];
         private List<PatientFamilyRelationDto> PatientFamilyRelations = [];
         private List<FamilyDto> Familys = [];
@@ -88,7 +88,7 @@ namespace McDermott.Web.Components.Pages.Patient
                     Districts = resultDistrict.Item1;
                     //Villages = await Mediator.Send(new GetVillageQuery());
                     Religions = await Mediator.Send(new GetReligionQuery());
-                    Genders = await Mediator.Send(new GetGenderQuery());
+
                     Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
                     JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
                     Families = await Mediator.Send(new GetFamilyQuery());

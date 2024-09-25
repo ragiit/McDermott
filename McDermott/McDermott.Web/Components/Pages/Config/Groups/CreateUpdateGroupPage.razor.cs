@@ -231,13 +231,25 @@ namespace McDermott.Web.Components.Pages.Config.Groups
 
         private async Task EditItemGroup_Click(IGrid context)
         {
+            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenuGroupMenu);
+
+            var a = (GridGropMenu.GetDataItem(FocusedRowVisibleIndexGroupMenuGroupMenu) as GroupMenuDto ?? new());
+
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetMenuQuery(x => x.Id == a.MenuId));
+            Menus = result.Item1;
+            Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
+            totalCountMenu = result.pageCount;
+            PanelVisible = false;
+
+            return;
             var aa = context;
             GroupMenu = (GroupMenuDto)context.SelectedDataItem;
             // Buat salinan objek yang akan diedit menggunakan Mapster
             var editedGroupMenu = GroupMenu.Adapt<GroupMenuDto>(); // GroupMenu adalah objek yang sedang diedit
 
             IsAddMenu = false;
-            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenuGroupMenu);
 
             var groupMenu = GroupMenus.FirstOrDefault(x => x.Id == editedGroupMenu.Id);
 

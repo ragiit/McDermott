@@ -15,7 +15,6 @@ namespace McDermott.Web.Components.Pages.Employee
         public List<DepartmentDto> Departments = [];
         public List<JobPositionDto> JobPositions = [];
         public List<ReligionDto> Religions = [];
-        public List<GenderDto> Genders = [];
 
         private UserDto UserForm = new();
 
@@ -114,7 +113,7 @@ namespace McDermott.Web.Components.Pages.Employee
             Districts = resultDistrict.Item1;
             //Villages = await Mediator.Send(new GetVillageQuery());
             Religions = await Mediator.Send(new GetReligionQuery());
-            Genders = await Mediator.Send(new GetGenderQuery());
+
             Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
             JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
             var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());

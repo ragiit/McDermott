@@ -77,7 +77,6 @@ global using static McDermott.Application.Features.Commands.Transaction.GeneralC
 global using static McDermott.Application.Features.Commands.Queue.KioskCommand;
 global using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
 global using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
-global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.CountryCommand;
 global using static McDermott.Application.Features.Commands.Config.MenuCommand;
 global using static McDermott.Application.Features.Commands.Medical.HealthCenterCommand;

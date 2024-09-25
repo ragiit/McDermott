@@ -24,39 +24,49 @@
 
     #endregion Searching
 
-private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-{
-    PanelVisible = true;
-    SelectedDataItems = [];
-    var countries = await Mediator.Send(new GetCountryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-    Countries = countries.Item1;
-    totalCount = countries.Item4;
-    activePageIndex = pageIndex;
-    PanelVisible = false;
-}
 
+ private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+ {
+     try
+     { 
+         PanelVisible = true;
+         SelectedDataItems = [];
+         var a = await Mediator.Send(new GetJobPositionQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+         JobPositions = a.Item1;
+         totalCount = a.pageCount;
+         activePageIndex = pageIndex; 
+     }
+     catch (Exception ex)
+     {
+         ex.HandleException(ToastService);
+     }
+     finally { PanelVisible = false; }
+ }
+
+SearchTextChanged="OnSearchBoxChanged"
 try
 {
-    var editModel = (CountryDto)e.EditModel;
+    var editModel = (JobPositionDto)e.EditModel;
 
-    bool validate = await Mediator.Send(new ValidateCountryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+    bool validate = await Mediator.Send(new ValidateJobPositionQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
     if (validate)
     {
-        ToastService.ShowInfo($"Country with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
+        ToastService.ShowInfo($"JobPosition with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
         e.Cancel = true;
         return;
     }
 
     if (editModel.Id == 0)
-        await Mediator.Send(new CreateCountryRequest(editModel));
+        await Mediator.Send(new CreateJobPositionRequest(editModel));
     else
-        await Mediator.Send(new UpdateCountryRequest(editModel));
+        await Mediator.Send(new UpdateJobPositionRequest(editModel));
 
     SelectedDataItems = [];
     await LoadData();
 }
-catch (Exception ex)
-{
-    ex.HandleException(ToastService);
-}
+  catch (Exception ex)
+  {
+      ex.HandleException(ToastService);
+  }
+  finally { PanelVisible = false; }

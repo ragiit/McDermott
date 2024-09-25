@@ -316,12 +316,21 @@ namespace McDermott.Web.Components.Pages.Config
 
             var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-            if (refDistrictComboBox is not null)
-                refDistrictComboBox.Value = a.DistrictId;
+            PanelVisible = true;
 
-            await LoadDataProvince(provinceId: a.ProvinceId);
-            await LoadDataCity(predicate: x => x.Id == a.CityId);
-            await LoadDataDistrict(predicate: x => x.Id == a.DistrictId);
+            var resultz = await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId));
+            Provinces = resultz.Item1;
+            totalCountProvince = resultz.pageCount;
+
+            var result = await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId));
+            Cities = result.Item1;
+            totalCountCity = result.pageCount;
+
+            var b = await Mediator.Send(new GetDistrictQuery(x => x.Id == a.DistrictId));
+            Districts = b.Item1;
+            totalCountDistrict = b.pageCount;
+
+            PanelVisible = false;
         }
 
         private void DeleteItem_Click()

@@ -944,7 +944,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     IsFromDB = true,
                     Id = Helper.RandomNumber,
-                    NormalRange = FormRegis.Patient.Gender is not null && FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    NormalRange = FormRegis.Patient.Gender is not null && FormRegis.Patient.Gender.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
                     Parameter = item.Name,
                     Remark = item.Remark,
                     LabUomId = item.LabUomId,
@@ -963,7 +963,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //        {
             //            IsFromDB = true,
             //            Id = Helper.RandomNumber,
-            //            NormalRange = FormRegis.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+            //            NormalRange = FormRegis.Patient.Gender.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
             //            Parameter = item.Name,
             //            Remark = item.Remark,
             //            LabUomId = item.LabUomId,
@@ -3272,10 +3272,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //Gender
                 string Gender = "";
                 string OppositeSex = "";
-                if (patienss.GenderId != null)
+                if (patienss.Gender != null)
                 {
-                    Gender = patienss.Gender.Name == "Male" ? "MALE(L)" : "FEMALE(P)";
-                    OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                    Gender = patienss.Gender == "Male" ? "MALE(L)" : "FEMALE(P)";
+                    OppositeSex = patienss.Gender == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
                 isPrint = true;

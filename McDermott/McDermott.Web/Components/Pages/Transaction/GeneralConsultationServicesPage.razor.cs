@@ -206,10 +206,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                 //Gender
                 string Gender = "";
                 string OppositeSex = "";
-                if (patienss.GenderId != null)
+                if (patienss.Gender != null)
                 {
-                    Gender = patienss.Gender.Name == "Male" ? "MALE (L)" : "FEMALE (P)";
-                    OppositeSex = patienss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                    Gender = patienss.Gender == "Male" ? "MALE (L)" : "FEMALE (P)";
+                    OppositeSex = patienss.Gender == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
                 isPrint = true;

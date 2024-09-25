@@ -11,4 +11,11 @@
 
         public virtual DepartmentDto? Department { get; set; }
     }
+
+    public class CreateUpdateJobPositionDto
+    {
+        public long Id { get; set; }
+        public long? DepartmentId { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
 }

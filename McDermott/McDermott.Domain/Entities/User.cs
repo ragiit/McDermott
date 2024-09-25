@@ -15,7 +15,7 @@
 
         public string Password { get; set; } = string.Empty;
 
-        public long? GenderId { get; set; }
+        public string? Gender { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
@@ -57,6 +57,7 @@
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
         public DateTime? StrExp { get; set; }
+        public bool IsSameDomicileAddress { get; set; } = true;
         public long? SpecialityId { get; set; }
         public string? UserPhoto { get; set; }
         public long? JobPositionId { get; set; }
@@ -115,7 +116,7 @@
         public virtual Group? Group { get; set; }
 
         //[SetToNull]
-        public virtual Gender? Gender { get; set; }
+        //public virtual Gender? Gender { get; set; }
 
         //[SetToNull]
         public virtual Country? IdCardCountry { get; set; } // KTP Negara

@@ -88,7 +88,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         private List<OccupationalDto> Occupationals = [];
         public List<GroupDto> Groups = [];
         public List<ReligionDto> Religions = [];
-        public List<GenderDto> Genders = [];
+
         public List<DepartmentDto> Departments = [];
         public List<JobPositionDto> JobPositions = [];
 
@@ -232,7 +232,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
             JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
 
             Religions = await Mediator.Send(new GetReligionQuery());
-            Genders = await Mediator.Send(new GetGenderQuery());
         }
 
         private async Task OnSave()

@@ -1,80 +1,105 @@
-await LoadDataOccupational(0, 10);
+await LoadDataGroup();
 
- #region ComboboxOccupational
+ #region ComboboxGroup
 
- private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
- private int OccupationalComboBoxIndex { get; set; } = 0;
- private int totalCountOccupational = 0;
+ private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
+ private int GroupComboBoxIndex { get; set; } = 0;
+ private int totalCountGroup = 0;
 
- private async Task OnSearchOccupational()
+ private async Task OnSearchGroup()
  {
-     await LoadDataOccupational(0, 10);
+     await LoadDataGroup();
  }
 
- private async Task OnSearchOccupationalIndexIncrement()
+ private async Task OnSearchGroupIndexIncrement()
  {
-     if (OccupationalComboBoxIndex < (totalCountOccupational - 1))
+     if (GroupComboBoxIndex < (totalCountGroup - 1))
      {
-         OccupationalComboBoxIndex++;
-         await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+         GroupComboBoxIndex++;
+         await LoadDataGroup(GroupComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchOccupationalndexDecrement()
+ private async Task OnSearchGroupndexDecrement()
  {
-     if (OccupationalComboBoxIndex > 0)
+     if (GroupComboBoxIndex > 0)
      {
-         OccupationalComboBoxIndex--;
-         await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+         GroupComboBoxIndex--;
+         await LoadDataGroup(GroupComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputOccupationalChanged(string e)
+ private async Task OnInputGroupChanged(string e)
  {
-     OccupationalComboBoxIndex = 0;
-     await LoadDataOccupational(0, 10);
+     GroupComboBoxIndex = 0;
+     await LoadDataGroup();
  }
 
- private async Task LoadDataOccupational(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10, long? GroupId = null)
  {
-     PanelVisible = true;
-     SelectedDataItems = [];
-     var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refOccupationalComboBox?.Text ?? ""));
-     Occupationals = result.Item1;
-     totalCountOccupational = result.pageCount;
+     PanelVisible = true; 
+     var result = await Mediator.Send(new GetGroupQuery(GroupId == null ? null : x => x.Id == GroupId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refGroupComboBox?.Text ?? ""));
+     Groups = result.Item1;
+     totalCountGroup = result.pageCount;
      PanelVisible = false;
  }
 
- #endregion ComboboxOccupational
+ #endregion ComboboxGroup
 
 
+await LoadDataGroup(GroupId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).GroupId);
 
 
+var id = refDistrictComboBox?.Value ?? null;
+&& (id == null || x.Id == id)
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Occupational" ColSpanMd="12">
-    <MyDxComboBox Data="@Occupationals"
-                  NullText="Select Occupational..."
-                  @ref="refOccupationalComboBox"
-                  @bind-Value="@a.OccupationalId"
+   var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
+
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Group" ColSpanMd="12">
+    <MyDxComboBox Data="@Groups"
+                  NullText="Select Group"
+                  @ref="refGroupComboBox"
+                  @bind-Value="@a.GroupId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputOccupationalChanged(e))">
+                  TextChanged="((string e) => OnInputGroupChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchOccupationalndexDecrement"
+            <DxEditorButton Click="OnSearchGroupndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchOccupational"
+            <DxEditorButton Click="OnSearchGroup"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchOccupationalIndexIncrement"
+            <DxEditorButton Click="OnSearchGroupIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(OccupationalDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Occupational.Name" Caption="Occupational" />
-            <DxListEditorColumn FieldName="@nameof(OccupationalDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(GroupDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Group.Name" Caption="Group" />
+            <DxListEditorColumn FieldName="@nameof(GroupDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.OccupationalId)" />
+    <ValidationMessage For="@(()=>a.GroupId)" />
 </DxFormLayoutItem>
+
+await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new());
+
+ await LoadComboboxEdit(a);
+
+  private async Task LoadComboboxEdit(DiagnosisDto a)
+ {
+     Cronises = (await Mediator.Send(new GetGroupQuery(x => x.Id == a.GroupId))).Item1;
+     Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
+ }
+
+ 
+var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new());
+PanelVisible = true; 
+
+var resultz = await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId));
+Countries = resultz.Item1;
+totalCountCountry = resultz.pageCount;  
+
+PanelVisible = false;

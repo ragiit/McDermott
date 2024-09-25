@@ -20,7 +20,6 @@ namespace McDermott.Application.Dtos.Config
 
         public string Password { get; set; } = string.Empty;
 
-        public long? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
@@ -62,6 +61,7 @@ namespace McDermott.Application.Dtos.Config
         //[RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? CurrentMobile { get; set; }
 
+        public string? Gender { get; set; }
         public string? HomePhoneNumber { get; set; }
 
         public string? Npwp { get; set; }
@@ -165,7 +165,7 @@ namespace McDermott.Application.Dtos.Config
         public virtual SpecialityDto? Speciality { get; set; }
 
         //[SetToNull]
-        public virtual GenderDto? Gender { get; set; }
+        //public virtual GenderDto? Gender { get; set; }
 
         //[SetToNull]
         public virtual Country? IdCardCountry { get; set; } // KTP Negara
@@ -208,12 +208,13 @@ namespace McDermott.Application.Dtos.Config
         //[Required]
         public string UserName { get; set; } = string.Empty;
 
+        public string? Gender { get; set; }
+
         [Required]
         public string Email { get; set; } = string.Empty;
 
         public string Password { get; set; } = string.Empty;
 
-        public long? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 

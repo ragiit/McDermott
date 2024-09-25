@@ -132,10 +132,10 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth" ColSpanMd="12">
                                                             <DxDateEdit @bind-Date="@UserForm.DateOfBirth" NullText="Date of Birth" MaxDate="DateTime.Now" Mask="@DateTimeMask.ShortDate" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Gender" ColSpanMd="12">
+                                                    @*     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Gender" ColSpanMd="12">
                                                             <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                        Data="@Genders" NullText="Gender" @bind-Value="@UserForm.GenderId" TextFieldName="Name" ValueFieldName="Id" />
-                                                        </DxFormLayoutItem>
+                                                                        Data="@Genders" NullText="Gender" @bind-Value="@UserForm.Gender" TextFieldName="Name" ValueFieldName="Id" />
+                                                        </DxFormLayoutItem> *@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Martial Status" ColSpanMd="12">
                                                             <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
                                                                         Data="@MartialStatuss" @bind-Value="@UserForm.MartialStatus" NullText="Select Martial Status..."></DxComboBox>
