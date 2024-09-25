@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using MailKit.Search;
 
-namespace McDermott.Web.Components.Pages.Medical
+namespace McDermott.Web.Components.Pages.Medical.Practitioners
 {
     public partial class PractitionerPage
     {
@@ -15,7 +15,6 @@ namespace McDermott.Web.Components.Pages.Medical
         public List<DepartmentDto> Departments = [];
         public List<JobPositionDto> JobPositions = [];
         public List<ReligionDto> Religions = [];
-        
 
         private UserDto UserForm = new();
 
@@ -132,8 +131,8 @@ namespace McDermott.Web.Components.Pages.Medical
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             PanelVisible = false;
 
             return;
@@ -153,61 +152,15 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-
-            ShowForm = false;
-            UserForm = new UserDto();
             SelectedDataItems = [];
-            //Specialities = await Mediator.Send(new GetSpecialityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            //Services = await Mediator.Send(new GetServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1;
-            var result = await Mediator.Send(new GetProvinceQuery());
-            Provinces = result.Item1;
-            //Cities = await Mediator.Send(new GetCityQuery());
-            var resultDistrict = await Mediator.Send(new GetDistrictQuery());
-            Districts = resultDistrict.Item1;
-            //Villages = await Mediator.Send(new GetVillageQuery());
-            Religions = await Mediator.Send(new GetReligionQuery());
-            
-            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
-            Users = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true));
-
+            var result = await Mediator.Send(new GetUserQuery2(x => x.IsDoctor == true, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Users = result.Item1;
+            totalCount = result.pageCount;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
-        private void RemoveSelectedFile()
-        {
-            UserForm.SipFile = null;
-        }
-
-        private void SelectFiles(InputFileChangeEventArgs e)
-        {
-            BrowserFile = e.File;
-            UserForm.SipFile = e.File.Name;
-        }
-
-        private async Task SelectFile()
-        {
-            await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
-        }
-
-        private async Task DownloadFile()
-        {
-            if (UserForm.Id != 0 && !string.IsNullOrWhiteSpace(UserForm.SipFile))
-            {
-                await Helper.DownloadFile(UserForm.SipFile, HttpContextAccessor, HttpClient, JsRuntime);
-            }
-        }
-
         #region Grid
-
-        private void OnRowDoubleClick(GridRowClickEventArgs e)
-        {
-            UserForm = SelectedDataItems[0].Adapt<UserDto>();
-            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
-            ShowForm = true;
-        }
 
         private async Task HandleValidSubmit()
         {
@@ -319,9 +272,18 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private void NewItem_Click()
         {
-            UserForm = new();
-            ShowForm = true;
-            UserForm.IsPhysicion = true;
+            NavigationManager.NavigateTo($"medical/practitioners/{EnumPageMode.Create.GetDisplayName()}");
+        }
+
+        private void OnRowDoubleClick()
+        {
+            try
+            {
+                UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                NavigationManager.NavigateTo($"medical/practitioners/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}");
+                //ShowForm = true;
+            }
+            catch { }
         }
 
         private void EditItem_Click()
@@ -329,10 +291,15 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
-                SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
+                NavigationManager.NavigateTo($"medical/practitioners/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}");
+                return;
+
                 ShowForm = true;
             }
-            catch { }
+            catch (Exception)
+            {
+            }
+            //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()

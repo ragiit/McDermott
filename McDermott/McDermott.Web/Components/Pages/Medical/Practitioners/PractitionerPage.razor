@@ -1,14 +1,12 @@
-﻿@page "/configuration/users"
-@using System.Security.Claims
-@rendermode InteractiveServer
+﻿@page "/medical/practitioners"
 
-<PageTitle>McHealthCare - Users</PageTitle>
+<PageTitle>McHealthCare - Practitioners</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Users" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+        <BaseHeaderPage Title="Practitioners" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -25,7 +23,7 @@
                                                 Text="Fetching Data...">
                                     <MyGridPaginate @ref="Grid"
                                                     Data="Users"
-                                                    @bind-SelectedDataItems="@SelectedDataItems" 
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
                                                     FocusedRowChanged="Grid_FocusedRowChanged"
                                                     RowDoubleClick="OnRowDoubleClick"
                                                     SearchTextChanged="OnSearchBoxChanged"
@@ -49,20 +47,14 @@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />     
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Email" />
                                             <DxGridDataColumn MinWidth="200" FieldName="MobilePhone" Caption="Mobile Phone" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Gender" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date Of Birth" DisplayFormat="@Helper.DefaultFormatDate" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date Of Birth" DisplayFormat="@Helper.DefaultFormatDate"/>
+                                            <DxGridDataColumn MinWidth="200" FieldName="IsPhysicion" Caption="Physicion" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="IsNurse" Caption="Nurse" />
                                             <DxGridDataColumn FieldName="Group.Name" MinWidth="200" Caption="Group" />
-                                            <DxGridDataColumn FieldName="IsEmployee" MinWidth="200" Caption="Employee" />
-                                            <DxGridDataColumn FieldName="IsPatient" MinWidth="200" Caption="Patient" />
-                                            <DxGridDataColumn FieldName="IsUser" MinWidth="200" Caption="User" />
-                                            <DxGridDataColumn FieldName="IsPhysicion" MinWidth="200" Caption="Physicion" />
-                                            <DxGridDataColumn FieldName="IsNurse" MinWidth="200" Caption="Nurse" />
-                                            <DxGridDataColumn FieldName="IsPharmacy" MinWidth="200" Caption="Pharmacy" />
-                                            <DxGridDataColumn FieldName="IsMcu" MinWidth="200" Caption="MCU" />
-                                            <DxGridDataColumn FieldName="IsHr" MinWidth="200" Caption="HR" />
                                         </Columns>
 
                                         <TotalSummary>
@@ -97,7 +89,7 @@
                                         </DxFormLayout>
                                     </div>
                                 </DxLoadingPanel>
-                            } 
+                            }
                         </div>
                     </div>
                 </div>

@@ -1,19 +1,12 @@
-﻿using DevExpress.Data.Access;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using GreenDonut;
-using Humanizer;
-using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using MediatR;
+﻿using McDermott.Application.Features.Services;
 using Microsoft.AspNetCore.Components.Web;
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+using System.Linq.Expressions;
+using System.ComponentModel.DataAnnotations;
 
-namespace McDermott.Web.Components.Pages.Config.Users
+namespace McDermott.Web.Components.Pages.Employee.Employees
 {
-    public partial class CreateUpdateUserPage
+    public partial class CreateUpdateEmployeePage
     {
         private List<UserDto> Users = new();
         private UserDto UserForm = new();
@@ -328,7 +321,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             {
                 if (result.Item1.Count == 0 || !Id.HasValue)
                 {
-                    NavigationManager.NavigateTo("configuration/users");
+                    NavigationManager.NavigateTo("employee/employees");
                     return;
                 }
 
@@ -479,7 +472,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             //SelectedDataItemsGroupMenu = [];
             //ShowForm = false;
 
-            NavigationManager.NavigateTo("configuration/users");
+            NavigationManager.NavigateTo("employee/employees");
         }
 
         [Inject]
@@ -527,6 +520,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             if (!FormValidationState)
                 return;
 
+            UserForm.IsEmployee = true;
+
             bool isValid = true;
             var a = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.NoId == UserForm.NoId));
             if (a)
@@ -542,35 +537,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 isValid = false;
             }
 
-            if (UserForm.IsPhysicion)
-            {
-                var b = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.PhysicanCode == UserForm.PhysicanCode));
-                if (b)
-                {
-                    ToastService.ShowInfo("The Physician Code is already exist");
-                    isValid = false;
-                }
-            }
-
-            if (Convert.ToBoolean(UserForm.IsEmployee))
-            {
-                var isOk = await CheckUserFormAsync();
-                if (!isOk)
-                    isValid = false;
-            }
+            var isOk = await CheckUserFormAsync();
+            if (!isOk)
+                isValid = false;
 
             if (!isValid)
                 return;
-
-            if (Convert.ToBoolean(UserForm.IsPatient))
-            {
-                var date = DateTime.Now;
-                var lastId = Users.Where(x => x.IsPatient == true).ToList().LastOrDefault();
-
-                UserForm.NoRm = lastId is null
-                         ? $"{date:dd-MM-yyyy}-0001"
-                         : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
-            }
 
             if (UserForm.IsSameDomicileAddress)
             {
@@ -583,12 +555,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 UserForm.DomicileVillageId = UserForm.IdCardVillageId;
                 UserForm.DomicileCountryId = UserForm.IdCardCountryId;
             }
-
-            if (!string.IsNullOrWhiteSpace(UserForm.Password))
-                UserForm.Password = Helper.HashMD5(UserForm.Password);
-
-            var ax = SelectedServices.Select(x => x.Id).ToList();
-            UserForm.DoctorServiceIds?.AddRange(ax);
 
             if (UserForm.Id == 0)
             {
@@ -627,7 +593,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 }
             }
 
-            NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}", true);
+            NavigationManager.NavigateTo($"employee/employees/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}", true);
         }
 
         private async Task ExportToExcel()
@@ -851,7 +817,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                     ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
 
-                    //NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
+                    //NavigationManager.NavigateTo($"employee/employees/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
                 }
                 catch (Exception ex)
                 {

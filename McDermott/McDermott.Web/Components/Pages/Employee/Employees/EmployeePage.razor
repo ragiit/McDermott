@@ -1,14 +1,13 @@
-﻿@page "/configuration/users"
-@using System.Security.Claims
-@rendermode InteractiveServer
+﻿@page "/employee/employees"
+@inject IHttpContextAccessor _httpContextAccessor
 
-<PageTitle>McHealthCare - Users</PageTitle>
+<PageTitle>McHealthCare - Employees</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Users" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+        <BaseHeaderPage Title="Employees" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -25,7 +24,7 @@
                                                 Text="Fetching Data...">
                                     <MyGridPaginate @ref="Grid"
                                                     Data="Users"
-                                                    @bind-SelectedDataItems="@SelectedDataItems" 
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
                                                     FocusedRowChanged="Grid_FocusedRowChanged"
                                                     RowDoubleClick="OnRowDoubleClick"
                                                     SearchTextChanged="OnSearchBoxChanged"
@@ -49,20 +48,26 @@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />     
+                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Email" MinWidth="200" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Email" />
                                             <DxGridDataColumn MinWidth="200" FieldName="MobilePhone" Caption="Mobile Phone" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Gender" />
                                             <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date Of Birth" DisplayFormat="@Helper.DefaultFormatDate" />
-                                            <DxGridDataColumn FieldName="Group.Name" MinWidth="200" Caption="Group" />
-                                            <DxGridDataColumn FieldName="IsEmployee" MinWidth="200" Caption="Employee" />
-                                            <DxGridDataColumn FieldName="IsPatient" MinWidth="200" Caption="Patient" />
-                                            <DxGridDataColumn FieldName="IsUser" MinWidth="200" Caption="User" />
-                                            <DxGridDataColumn FieldName="IsPhysicion" MinWidth="200" Caption="Physicion" />
-                                            <DxGridDataColumn FieldName="IsNurse" MinWidth="200" Caption="Nurse" />
-                                            <DxGridDataColumn FieldName="IsPharmacy" MinWidth="200" Caption="Pharmacy" />
-                                            <DxGridDataColumn FieldName="IsMcu" MinWidth="200" Caption="MCU" />
-                                            <DxGridDataColumn FieldName="IsHr" MinWidth="200" Caption="HR" />
+
+                                            <DxGridDataColumn MinWidth="200" FieldName="Supervisor.Name" Caption="Supervisor" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="JobPosition.Name" Caption="Job Position" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Occupational.Name" Caption="Occupational" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EmployeeType" Caption="Employee Type" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="JoinDate" Caption="Join Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="NoBpjsKs" Caption="BPJS KS Number" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="NoBpjsTk" Caption="BPJS TK Number" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Legacy"/>
+                                            <DxGridDataColumn MinWidth="200" FieldName="SAP"/>
+                                            <DxGridDataColumn MinWidth="200" FieldName="NIP"/>
+                                            <DxGridDataColumn MinWidth="200" FieldName="Oracle"/>          
+                                          
                                         </Columns>
 
                                         <TotalSummary>
@@ -97,7 +102,7 @@
                                         </DxFormLayout>
                                     </div>
                                 </DxLoadingPanel>
-                            } 
+                            }
                         </div>
                     </div>
                 </div>

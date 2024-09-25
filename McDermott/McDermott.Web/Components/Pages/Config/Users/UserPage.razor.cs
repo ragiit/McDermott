@@ -210,7 +210,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuerys(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetUserQuery2(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Users = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;

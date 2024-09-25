@@ -1,7 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿using MailKit.Search;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
-namespace McDermott.Web.Components.Pages.Employee
+namespace McDermott.Web.Components.Pages.Employee.Employees
 {
     public partial class EmployeePage
     {
@@ -95,53 +96,48 @@ namespace McDermott.Web.Components.Pages.Employee
         {
             PanelVisible = true;
 
-            try
-            {
-                var result = await NavigationManager.CheckAccessUser(oLocal);
-                IsAccess = result.Item1;
-                UserAccessCRUID = result.Item2;
-            }
-            catch { }
-
-            var countries = await Mediator.Send(new GetCountryQuery());
-            Countries = countries.Item1;
-            var results = await Mediator.Send(new GetProvinceQuery());
-            Provinces = results.Item1;
-            var resultsCity = await Mediator.Send(new GetCityQuery());
-            Cities = resultsCity.Item1;
-            var resultDistrict = await Mediator.Send(new GetDistrictQuery());
-            Districts = resultDistrict.Item1;
-            //Villages = await Mediator.Send(new GetVillageQuery());
-            Religions = await Mediator.Send(new GetReligionQuery());
-
-            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
-            var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
-            Occupationals = resultOccupationals.Item1;
-
             await GetUserInfo();
             await LoadData();
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-
-            ShowForm = false;
-
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Users = await Mediator.Send(new GetUserQuery(x => x.IsEmployee == true));
-
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetUserQuery2(x => x.IsEmployee == true, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            Users = result.Item1;
+            totalCount = result.pageCount;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
         #region Grid
-
-        private void OnRowDoubleClick(GridRowClickEventArgs e)
-        {
-            UserForm = SelectedDataItems[0].Adapt<UserDto>();
-            ShowForm = true;
-        }
 
         private async Task HandleValidSubmit()
         {
@@ -324,8 +320,18 @@ namespace McDermott.Web.Components.Pages.Employee
 
         private async Task NewItem_Click()
         {
-            UserForm = new();
-            ShowForm = true;
+            NavigationManager.NavigateTo($"employee/employees/{EnumPageMode.Create.GetDisplayName()}");
+        }
+
+        private void OnRowDoubleClick()
+        {
+            try
+            {
+                UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                NavigationManager.NavigateTo($"employee/employees/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}");
+                //ShowForm = true;
+            }
+            catch { }
         }
 
         private void EditItem_Click()
@@ -333,9 +339,15 @@ namespace McDermott.Web.Components.Pages.Employee
             try
             {
                 UserForm = SelectedDataItems[0].Adapt<UserDto>();
+                NavigationManager.NavigateTo($"employee/employees/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}");
+                return;
+
                 ShowForm = true;
             }
-            catch { }
+            catch (Exception)
+            {
+            }
+            //await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()
