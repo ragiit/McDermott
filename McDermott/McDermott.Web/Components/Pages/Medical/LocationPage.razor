@@ -1,4 +1,4 @@
-﻿@page "/inventory/location"
+﻿@page "/inventory/locations"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Locations</PageTitle>
@@ -38,7 +38,7 @@
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="false"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          Grid="Grid" 
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
@@ -47,15 +47,15 @@
                                  
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="NameAndParent" Caption="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Type" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Company.Name" Caption="Company" />
+                                        <DxGridDataColumn FieldName="NameAndParent" Caption="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Type" />
+                                        <DxGridDataColumn FieldName="Company.Name" Caption="Company" />
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
                                             var a = (LocationDto)EditFormContext.EditModel;
                                             a.Type = Types[0];
-                                            a.CompanyId = Companies[0].Id;
+                                            a.CompanyId = Companies.FirstOrDefault()?.Id ?? null;
                                         }
                                         <DxFormLayout CssClass="w-100">
 
@@ -138,8 +138,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-
     <LoadingIndicatorLayout />
 }

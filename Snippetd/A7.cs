@@ -1,53 +1,61 @@
-await LoadDataGroup();
+await LoadDataFamily();
 
- #region ComboboxGroup
+ #region ComboboxFamily
 
- private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
- private int GroupComboBoxIndex { get; set; } = 0;
- private int totalCountGroup = 0;
+ private DxComboBox<FamilyDto, long?> refFamilyComboBox { get; set; }
+ private int FamilyComboBoxIndex { get; set; } = 0;
+ private int totalCountFamily = 0;
 
- private async Task OnSearchGroup()
+ private async Task OnSearchFamily()
  {
-     await LoadDataGroup();
+     await LoadDataFamily();
  }
 
- private async Task OnSearchGroupIndexIncrement()
+ private async Task OnSearchFamilyIndexIncrement()
  {
-     if (GroupComboBoxIndex < (totalCountGroup - 1))
+     if (FamilyComboBoxIndex < (totalCountFamily - 1))
      {
-         GroupComboBoxIndex++;
-         await LoadDataGroup(GroupComboBoxIndex, 10);
+         FamilyComboBoxIndex++;
+         await LoadDataFamily(FamilyComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchGroupndexDecrement()
+ private async Task OnSearchFamilyndexDecrement()
  {
-     if (GroupComboBoxIndex > 0)
+     if (FamilyComboBoxIndex > 0)
      {
-         GroupComboBoxIndex--;
-         await LoadDataGroup(GroupComboBoxIndex, 10);
+         FamilyComboBoxIndex--;
+         await LoadDataFamily(FamilyComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputGroupChanged(string e)
+ private async Task OnInputFamilyChanged(string e)
  {
-     GroupComboBoxIndex = 0;
-     await LoadDataGroup();
+     FamilyComboBoxIndex = 0;
+     await LoadDataFamily();
  }
 
-private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10, long? GroupId = null)
+private async Task LoadDataFamily(int pageIndex = 0, int pageSize = 10, long? FamilyId = null)
  {
-     PanelVisible = true; 
-     var result = await Mediator.Send(new GetGroupQuery(GroupId == null ? null : x => x.Id == GroupId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refGroupComboBox?.Text ?? ""));
-     Groups = result.Item1;
-     totalCountGroup = result.pageCount;
-     PanelVisible = false;
+    try
+    {
+        PanelVisible = true; 
+        var result = await Mediator.Send(new GetFamilyQuery(FamilyId == null ? null : x => x.Id == FamilyId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refFamilyComboBox?.Text ?? ""));
+        Familys = result.Item1;
+        totalCountFamily = result.pageCount;
+        PanelVisible = false;
+    }
+    catch (Exception ex)
+    {
+        ex.HandleException(ToastService);
+    }
+    finally { PanelVisible = false; }
  }
 
- #endregion ComboboxGroup
+ #endregion ComboboxFamily
 
 
-await LoadDataGroup(GroupId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).GroupId);
+await LoadDataFamily(FamilyId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).FamilyId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -55,32 +63,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Group" ColSpanMd="12">
-    <MyDxComboBox Data="@Groups"
-                  NullText="Select Group"
-                  @ref="refGroupComboBox"
-                  @bind-Value="@a.GroupId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Family" ColSpanMd="12">
+    <MyDxComboBox Data="@Familys"
+                  NullText="Select Family"
+                  @ref="refFamilyComboBox"
+                  @bind-Value="@a.FamilyId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputGroupChanged(e))">
+                  TextChanged="((string e) => OnInputFamilyChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchGroupndexDecrement"
+            <DxEditorButton Click="OnSearchFamilyndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchGroup"
+            <DxEditorButton Click="OnSearchFamily"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchGroupIndexIncrement"
+            <DxEditorButton Click="OnSearchFamilyIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(GroupDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Group.Name" Caption="Group" />
-            <DxListEditorColumn FieldName="@nameof(GroupDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(FamilyDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Family.Name" Caption="Family" />
+            <DxListEditorColumn FieldName="@nameof(FamilyDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.GroupId)" />
+    <ValidationMessage For="@(()=>a.FamilyId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -90,7 +98,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetGroupQuery(x => x.Id == a.GroupId))).Item1;
+     Cronises = (await Mediator.Send(new GetFamilyQuery(x => x.Id == a.FamilyId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

@@ -1,9 +1,12 @@
-﻿using static McDermott.Application.Features.Commands.Patient.FamilyRelationCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Patient.FamilyRelationCommand;
 
 namespace McDermott.Application.Features.Queries.Patient
 {
     public class FamilyRelationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetFamilyQuery, List<FamilyDto>>,
+       IRequestHandler<GetFamilyQuery, (List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateFamilyQuery, bool>,
+        IRequestHandler<BulkValidateFamilyQuery, List<FamilyDto>>,
         IRequestHandler<CreateFamilyRequest, FamilyDto>,
         IRequestHandler<CreateListFamilyRequest, List<FamilyDto>>,
         IRequestHandler<UpdateFamilyRequest, FamilyDto>,
@@ -12,30 +15,62 @@ namespace McDermott.Application.Features.Queries.Patient
     {
         #region GET
 
-        public async Task<List<FamilyDto>> Handle(GetFamilyQuery request, CancellationToken cancellationToken)
+        public async Task<List<FamilyDto>> Handle(BulkValidateFamilyQuery request, CancellationToken cancellationToken)
+        {
+            var FamilyDtos = request.FamilysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var FamilyNames = FamilyDtos.Select(x => x.Name).Distinct().ToList();
+            var a = FamilyDtos.Select(x => x.InverseRelationId).Distinct().ToList();
+
+            var existingFamilys = await _unitOfWork.Repository<Family>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => FamilyNames.Contains(v.Name)
+                            && a.Contains(v.InverseRelationId))
+                .ToListAsync(cancellationToken);
+
+            return existingFamilys.Adapt<List<FamilyDto>>();
+        }
+
+        public async Task<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetFamilyQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetFamilyQuery_{request.Predicate?.ToString()}"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
-                if (!_cache.TryGetValue(cacheKey, out List<Family>? result))
-                {
-                    result = await _unitOfWork.Repository<Family>().GetAsync(
-                        request.Predicate,
-                        cancellationToken: cancellationToken);
+                var query = _unitOfWork.Repository<Family>().Entities
+                    .AsNoTracking()
+                    .Include(v => v.InverseRelation)
+                    .AsQueryable();
 
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.InverseRelation.Name, $"%{request.SearchTerm}%"));
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                var pagedResult = query.OrderBy(x => x.Name);
 
-                return result.ToList().Adapt<List<FamilyDto>>();
+                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+
+                return (paged.Adapt<List<FamilyDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateFamilyQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Family>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET
@@ -46,7 +81,7 @@ namespace McDermott.Application.Features.Queries.Patient
         {
             try
             {
-                var result = await _unitOfWork.Repository<Family>().AddAsync(request.FamilyDto.Adapt<Family>());
+                var result = await _unitOfWork.Repository<Family>().AddAsync(request.FamilyDto.Adapt<CreateUpdateFamilyDto>().Adapt<Family>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -86,7 +121,7 @@ namespace McDermott.Application.Features.Queries.Patient
         {
             try
             {
-                var result = await _unitOfWork.Repository<Family>().UpdateAsync(request.FamilyDto.Adapt<Family>());
+                var result = await _unitOfWork.Repository<Family>().UpdateAsync(request.FamilyDto.Adapt<CreateUpdateFamilyDto>().Adapt<Family>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

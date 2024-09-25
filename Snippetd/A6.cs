@@ -31,8 +31,8 @@
      { 
          PanelVisible = true;
          SelectedDataItems = [];
-         var a = await Mediator.Send(new GetJobPositionQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-         JobPositions = a.Item1;
+         var a = await Mediator.Send(new GetFamilyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+         Familys = a.Item1;
          totalCount = a.pageCount;
          activePageIndex = pageIndex; 
      }
@@ -46,21 +46,21 @@
 SearchTextChanged="OnSearchBoxChanged"
 try
 {
-    var editModel = (JobPositionDto)e.EditModel;
+    var editModel = (FamilyDto)e.EditModel;
 
-    bool validate = await Mediator.Send(new ValidateJobPositionQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+    bool validate = await Mediator.Send(new ValidateFamilyQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
     if (validate)
     {
-        ToastService.ShowInfo($"JobPosition with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
+        ToastService.ShowInfo($"Family with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
         e.Cancel = true;
         return;
     }
 
     if (editModel.Id == 0)
-        await Mediator.Send(new CreateJobPositionRequest(editModel));
+        await Mediator.Send(new CreateFamilyRequest(editModel));
     else
-        await Mediator.Send(new UpdateJobPositionRequest(editModel));
+        await Mediator.Send(new UpdateFamilyRequest(editModel));
 
     SelectedDataItems = [];
     await LoadData();

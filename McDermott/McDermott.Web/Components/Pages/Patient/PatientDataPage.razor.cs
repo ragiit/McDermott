@@ -91,7 +91,7 @@ namespace McDermott.Web.Components.Pages.Patient
 
                     Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
                     JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
-                    Families = await Mediator.Send(new GetFamilyQuery());
+                    //Families = await Mediator.Send(new GetFamilyQuery());
                     var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
                     Occupationals = resultOccupationals.Item1;
 
@@ -525,7 +525,7 @@ namespace McDermott.Web.Components.Pages.Patient
                         {
                             PatientId = x.FamilyMemberId.GetValueOrDefault(),
                             FamilyMemberId = x.PatientId,
-                            FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
+                            //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
                         });
                     });
 
@@ -568,7 +568,7 @@ namespace McDermott.Web.Components.Pages.Patient
                         {
                             PatientId = x.FamilyMemberId.GetValueOrDefault(),
                             FamilyMemberId = x.PatientId,
-                            FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
+                            //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
                         });
                     });
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class A : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -230,9 +230,7 @@ namespace McDermott.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ParentRelation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ChildRelation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Relation = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    InverseRelationId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -241,6 +239,12 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Families", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Families_Families_InverseRelationId",
+                        column: x => x.InverseRelationId,
+                        principalTable: "Families",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -3804,6 +3808,11 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_EmailTemplates_EmailFromId",
                 table: "EmailTemplates",
                 column: "EmailFromId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Families_InverseRelationId",
+                table: "Families",
+                column: "InverseRelationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanCPPTs_GeneralConsultanServiceId",

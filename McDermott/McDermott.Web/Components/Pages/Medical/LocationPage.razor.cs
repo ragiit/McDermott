@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class LocationPage
     {
@@ -84,12 +86,13 @@
         #endregion UserLoginAndAccessRole
 
         #region Load Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await GetUserInfo();
             await LoadData();
             await LoadDataParentLocations();
-            await GetUserInfo();
             PanelVisible = false;
 
             return;
@@ -108,16 +111,26 @@
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Locations = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetLocationQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                Locations = result.Item1;
+                totalCount = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
-        #endregion
+
+        #endregion Load Data
 
         #region Load ComboBox
+
         private DxComboBox<LocationDto, long?> refParentLocationsComboBox { get; set; }
         private int ParentLocationsComboBoxIndex { get; set; } = 0;
         private int totalCountParentLocations = 0;
@@ -153,12 +166,22 @@
 
         private async Task LoadDataParentLocations(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery(x => x.ParentLocationId != null, searchTerm: refParentLocationsComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
-            ParentLocations = result.Item1.Where(x => x.ParentLocationId is not null).OrderBy(x => x.Name).ToList();
-            totalCountParentLocations = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetLocationQuery(x => x.ParentLocationId != null, searchTerm: refParentLocationsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+                if (result.Item1 != null)
+                {
+                    ParentLocations = [.. result.Item1.Where(x => x.ParentLocationId is not null).OrderBy(x => x.Name)];
+                    totalCountParentLocations = result.pageCount;
+                }
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private DxComboBox<CompanyDto, long?> refCompaniesComboBox { get; set; }
@@ -196,19 +219,29 @@
 
         private async Task LoadDataCompanies(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCompanyQuery(searchTerm: refCompaniesComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
-            Companies = result.Item1;
-            totalCountCompanies = result.Item2;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetCompanyQuery(searchTerm: refCompaniesComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+                Companies = result.Item1;
+                totalCountCompanies = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
-        #endregion
+
+        #endregion Load ComboBox
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is not null && SelectedDataItems.Count == 1)
                 {
                     await Mediator.Send(new DeleteLocationRequest(((LocationDto)e.DataItem).Id));
@@ -220,25 +253,34 @@
                 }
                 await LoadData();
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (LocationDto)e.EditModel;
+            try
+            {
+                var editModel = (LocationDto)e.EditModel;
 
-            if (string.IsNullOrWhiteSpace(editModel.Name))
-                return;
+                if (string.IsNullOrWhiteSpace(editModel.Name))
+                    return;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateLocationRequest(editModel));
-            else
-                await Mediator.Send(new UpdateLocationRequest(editModel));
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateLocationRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateLocationRequest(editModel));
 
-            await LoadData();
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -246,7 +288,7 @@
             FocusedRowVisibleIndex = args.VisibleIndex;
             EditItemsEnabled = true;
         }
-                
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -260,6 +302,16 @@
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as LocationDto ?? new());
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetLocationQuery(x => x.Id == a.ParentLocationId));
+            ParentLocations = result.Item1.Where(x => x.ParentLocationId is not null).OrderBy(x => x.Name).ToList();
+            totalCountParentLocations = result.pageCount;
+            var ax = await Mediator.Send(new GetCompanyQuery(x => x.Id == a.CompanyId));
+            Companies = ax.Item1;
+            totalCountCompanies = ax.pageCount;
+            PanelVisible = false;
         }
 
         private void DeleteItem_Click()

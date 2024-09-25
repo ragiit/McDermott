@@ -5,10 +5,7 @@
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
 
-        public string? ParentRelation { get; set; }
-        public string? ChildRelation { get; set; }
-
-        [StringLength(200)]
-        public string? Relation { get; set; }
+        public long? InverseRelationId { get; set; }
+        public Family? InverseRelation { get; set; }
     }
 }

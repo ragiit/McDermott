@@ -328,6 +328,12 @@ namespace McDermott.Persistence.Context
                   .WithOne(c => c.GeneralConsultanService)
                   .OnDelete(DeleteBehavior.Cascade);
 
+            //modelBuilder.Entity<Family>()
+            //      .HasOne(m => m.InverseRelation)
+            //      .WithMany() // This indicates the inverse can have many related entities
+            //      .HasForeignKey(m => m.InverseRelationId)
+            //      .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<GeneralConsultanService>()
                 .HasMany(m => m.Accidents)
                 .WithOne(c => c.GeneralConsultanService)
