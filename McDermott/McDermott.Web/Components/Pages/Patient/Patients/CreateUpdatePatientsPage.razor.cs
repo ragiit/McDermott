@@ -5,11 +5,339 @@ using Microsoft.JSInterop;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using System.Linq.Expressions;
 using System.ComponentModel.DataAnnotations;
+using McDermott.Domain.Entities;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace McDermott.Web.Components.Pages.Patient.Patients
 {
     public partial class CreateUpdatePatientsPage
     {
+        #region Family Relation
+
+        private List<PatientFamilyRelationDto> PatientFamilyRelations { get; set; } = [];
+        private List<UserDto> UserPatients { get; set; } = [];
+        private List<FamilyDto> Families { get; set; } = [];
+        public IGrid GridFamilyRelation { get; set; }
+        private IReadOnlyList<object> SelectedDataItemsFamilyRelation { get; set; } = [];
+        private int FocusedRowVisibleIndexFamilyRelation { get; set; }
+
+        private async Task NewItemFamilyRelation_Click()
+        {
+            await GridFamilyRelation.StartEditNewRowAsync();
+        }
+
+        private PatientFamilyRelationDto TempFamilyRelation { get; set; } = new();
+
+        private async Task EditItemFamilyRelation_Click(IGrid context)
+        {
+            await GridFamilyRelation.StartEditRowAsync(FocusedRowVisibleIndexFamilyRelation);
+
+            var a = (GridFamilyRelation.GetDataItem(FocusedRowVisibleIndexFamilyRelation) as PatientFamilyRelationDto ?? new());
+
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetFamilyQuery(x => x.Id == a.FamilyId));
+            Families = result.Item1;
+            totalCountFamily = result.pageCount;
+
+            var ax = await Mediator.Send(new GetUserQuery2(x => x.Id == a.FamilyMemberId));
+            UserPatients = ax.Item1;
+            totalCountUserFamilyRelation = ax.pageCount;
+
+            TempFamilyRelation = a;
+
+            PanelVisible = false;
+        }
+
+        private void DeleteItemGridFamilyRelation_Click()
+        {
+            GridFamilyRelation.ShowRowDeleteConfirmation(FocusedRowVisibleIndexFamilyRelation);
+        }
+
+        private void GridFamilyRelation_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexFamilyRelation = args.VisibleIndex;
+        }
+
+        private void DeleteItemFamilyRelation_Click()
+        {
+            GridFamilyRelation.ShowRowDeleteConfirmation(FocusedRowVisibleIndexFamilyRelation);
+        }
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadDataFamilyRelation(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadDataFamilyRelation(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadDataFamilyRelation(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private int totalCountFamilyRelation { get; set; } = 0;
+
+        private async Task LoadDataFamilyRelation(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItemsFamilyRelation = [];
+                var a = await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == UserForm.Id, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                PatientFamilyRelations = a.Item1;
+                totalCountFamilyRelation = a.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        private async Task OnSaveFamilyRelation(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+                var editModel = (PatientFamilyRelationDto)e.EditModel;
+
+                var pat2 = (await Mediator.Send(new GetFamilyQuery(x => x.Id == editModel.FamilyId))).Item1.FirstOrDefault() ?? new();
+                if (editModel.Id == 0)
+                {
+                    var patients = new List<PatientFamilyRelationDto>
+                    {
+                        new()
+                        {
+                            PatientId = UserForm.Id,
+                            FamilyMemberId = editModel.FamilyMemberId,
+                            FamilyId = editModel.FamilyId,
+                        },
+                        new()
+                        {
+                            PatientId = editModel.FamilyMemberId,
+                            FamilyMemberId = UserForm.Id,
+                            FamilyId = pat2.InverseRelationId,
+                        },
+                    };
+
+                    await Mediator.Send(new CreateListPatientFamilyRelationRequest(patients));
+                }
+                else
+                {
+                    var patients = new List<PatientFamilyRelationDto>
+                    {
+                        new()
+                        {
+                            Id = editModel.Id,
+                            PatientId = UserForm.Id,
+                            FamilyMemberId = editModel.FamilyMemberId,
+                            FamilyId = editModel.FamilyId,
+                        }
+                    };
+
+                    if (TempFamilyRelation.FamilyMemberId == editModel.FamilyMemberId && TempFamilyRelation.PatientId == UserForm.Id)
+                    {
+                        var b = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == editModel.FamilyMemberId && x.FamilyMemberId == editModel.PatientId))).Item1.FirstOrDefault() ?? null;
+
+                        if (b is not null)
+                        {
+                            patients.Add(new PatientFamilyRelationDto
+                            {
+                                Id = b.Id,
+                                PatientId = editModel.FamilyMemberId,
+                                FamilyMemberId = UserForm.Id,
+                                FamilyId = pat2.InverseRelationId,
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var b = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == TempFamilyRelation.FamilyMemberId && x.FamilyMemberId == TempFamilyRelation.PatientId && x.FamilyId == TempFamilyRelation.Family.InverseRelationId))).Item1.FirstOrDefault() ?? null;
+
+                        patients.Add(new PatientFamilyRelationDto
+                        {
+                            Id = b.Id,
+                            PatientId = editModel.FamilyMemberId,
+                            FamilyMemberId = UserForm.Id,
+                            FamilyId = pat2.InverseRelationId,
+                        });
+                    }
+
+                    await Mediator.Send(new UpdateListPatientFamilyRelationRequest(patients));
+                }
+
+                await LoadDataFamilyRelation(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        private async Task OnDeleteFamilyRelation(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+                if (SelectedDataItemsFamilyRelation is null || SelectedDataItemsFamilyRelation.Count == 1)
+                {
+                    var a = ((PatientFamilyRelationDto)e.DataItem);
+                    var p = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.FamilyMemberId == a.PatientId && x.PatientId == a.FamilyMemberId))).Item1.FirstOrDefault() ?? new();
+
+                    await Mediator.Send(new DeletePatientFamilyRelationRequest(a.Id));
+                    await Mediator.Send(new DeletePatientFamilyRelationRequest(p.Id));
+                }
+                else
+                {
+                    var selectedMenus = SelectedDataItemsFamilyRelation.Adapt<List<PatientFamilyRelationDto>>();
+
+                    // Loop through each selected family relation and delete the corresponding relations
+                    foreach (var item in selectedMenus)
+                    {
+                        // Query for a related PatientFamilyRelation for each selected item
+                        var p = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.FamilyMemberId == item.PatientId && x.PatientId == item.FamilyMemberId)))
+                                .Item1.FirstOrDefault() ?? new();
+
+                        // Delete both the selected relation and the counterpart relation
+                        await Mediator.Send(new DeletePatientFamilyRelationRequest(item.Id));
+                        await Mediator.Send(new DeletePatientFamilyRelationRequest(p.Id));
+                    }
+                }
+                await LoadDataFamilyRelation(0, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #region ComboboxUserFamilyRelation
+
+        private DxComboBox<UserDto, long> refUserFamilyRelationComboBox { get; set; }
+        private int UserFamilyRelationComboBoxIndex { get; set; } = 0;
+        private int totalCountUserFamilyRelation = 0;
+
+        private async Task OnSearchUserFamilyRelation()
+        {
+            await LoadDataUserFamilyRelation();
+        }
+
+        private async Task OnSearchUserFamilyRelationIndexIncrement()
+        {
+            if (UserFamilyRelationComboBoxIndex < (totalCountUserFamilyRelation - 1))
+            {
+                UserFamilyRelationComboBoxIndex++;
+                await LoadDataUserFamilyRelation(UserFamilyRelationComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchUserFamilyRelationndexDecrement()
+        {
+            if (UserFamilyRelationComboBoxIndex > 0)
+            {
+                UserFamilyRelationComboBoxIndex--;
+                await LoadDataUserFamilyRelation(UserFamilyRelationComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputUserFamilyRelationChanged(string e)
+        {
+            UserFamilyRelationComboBoxIndex = 0;
+            await LoadDataUserFamilyRelation();
+        }
+
+        private async Task LoadDataUserFamilyRelation(int pageIndex = 0, int pageSize = 10, long? UserFamilyRelationId = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetUserQuery2(x => x.IsPatient == true && x.Id != UserForm.Id, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUserFamilyRelationComboBox?.Text ?? ""));
+                UserPatients = result.Item1;
+                totalCountUserFamilyRelation = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxUserFamilyRelation
+
+        #region ComboboxFamily
+
+        private DxComboBox<FamilyDto, long?> refFamilyComboBox { get; set; }
+        private int FamilyComboBoxIndex { get; set; } = 0;
+        private int totalCountFamily = 0;
+
+        private async Task OnSearchFamily()
+        {
+            await LoadDataFamily();
+        }
+
+        private async Task OnSearchFamilyIndexIncrement()
+        {
+            if (FamilyComboBoxIndex < (totalCountFamily - 1))
+            {
+                FamilyComboBoxIndex++;
+                await LoadDataFamily(FamilyComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchFamilyIndexDecrement()
+        {
+            if (FamilyComboBoxIndex > 0)
+            {
+                FamilyComboBoxIndex--;
+                await LoadDataFamily(FamilyComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputFamilyChanged(string e)
+        {
+            FamilyComboBoxIndex = 0;
+            await LoadDataFamily();
+        }
+
+        private async Task LoadDataFamily(int pageIndex = 0, int pageSize = 10, long? FamilyId = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetFamilyQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refFamilyComboBox?.Text ?? ""));
+                Families = result.Item1;
+                totalCountFamily = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxFamily
+
+        #endregion Family Relation
+
         private List<AwarenessDto> Awareness { get; set; } = [];
         private List<AllergyDto> WeatherAllergies = [];
         private List<AllergyDto> FoodAllergies = [];
@@ -241,12 +569,18 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
             SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
 
-            PanelVisible = false;
-        }
+            var alergy = (await Mediator.Send(new GetAllergyQuery()));
+            FoodAllergies = alergy.Where(x => x.Type == "01").ToList();
+            WeatherAllergies = alergy.Where(x => x.Type == "02").ToList();
+            PharmacologyAllergies = alergy.Where(x => x.Type == "03").ToList();
 
-        private async Task Refresh_Click()
-        {
-            await LoadData();
+            SelectedFoodAllergies = FoodAllergies.Where(x => UserForm.FoodPatientAllergyIds.Contains(x.Id));
+            SelectedWeatherAllergies = WeatherAllergies.Where(x => UserForm.WeatherPatientAllergyIds.Contains(x.Id));
+            SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => UserForm.PharmacologyPatientAllergyIds.Contains(x.Id));
+
+            await LoadDataFamilyRelation();
+
+            PanelVisible = false;
         }
 
         private void NewItem_Click()
@@ -279,89 +613,10 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             IsLoading = false;
         }
 
-        private void DeleteItem_Click()
-        {
-            GridGropMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
-        }
-
         private void UpdateEditItemsEnabled(bool enabled)
         {
             EditItemsGroupEnabled = enabled;
         }
-
-        private void UpdateEditItemsGroupEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
-        private async Task NewItemGroup_Click()
-        {
-            GroupMenu = new();
-            IsAddMenu = true;
-            await GridGropMenu.StartEditNewRowAsync();
-        }
-
-        private async Task EditItemGroup_Click(IGrid context)
-        {
-            var aa = context;
-            GroupMenu = (GroupMenuDto)context.SelectedDataItem;
-            // Buat salinan objek yang akan diedit menggunakan Mapster
-            var editedGroupMenu = GroupMenu.Adapt<GroupMenuDto>(); // GroupMenu adalah objek yang sedang diedit
-
-            IsAddMenu = false;
-            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenuGroupMenu);
-
-            var groupMenu = GroupMenus.FirstOrDefault(x => x.Id == editedGroupMenu.Id);
-
-            if (groupMenu is not null)
-                // Gunakan salinan objek yang diedit
-                this.GroupMenu = editedGroupMenu;
-        }
-
-        private void DeleteItemGridGropMenu_Click()
-        {
-            GridGropMenu.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
-        }
-
-        //private void GridGropMenu_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        //{
-        //    FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
-        //    var state = GroupMenus.Count > 0 ? true : false;
-        //    UpdateEditItemsEnabled(state);
-        //}
-
-        private void GridGropMenu_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndexGroupMenuGroupMenu = args.VisibleIndex;
-            var state = GroupMenus.Count > 0 ? true : false;
-            UpdateEditItemsEnabled(state);
-        }
-
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadGroupMenus(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadGroupMenus(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadGroupMenus(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
 
         private IEnumerable<ServiceDto> Services { get; set; } = [];
         private IEnumerable<ServiceDto> SelectedServices { get; set; } = [];
@@ -370,7 +625,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
 
-            var result = await Mediator.Send(new GetUserQuery2(x => x.Id == Id, 0, 1));
+            var result = await Mediator.Send(new GetUserQuery2(x => x.Id == Id && x.IsPatient == true, 0, 1));
             UserForm = new();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -402,31 +657,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         //    }
         //    catch (Exception ex) { ex.HandleException(ToastService); }
         //}
-
-        private async Task OnDeleteGroupMenu(GridDataItemDeletingEventArgs e)
-        {
-            //StateHasChanged();
-            //var aaa = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
-            //GroupMenus.RemoveAll(x => aaa.Select(z => z.MenuId).Contains(x.MenuId));
-            //SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
-            try
-            {
-                if (SelectedDataItemsGroupMenu is null)
-                {
-                    await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var selectedMenus = SelectedDataItemsGroupMenu.Adapt<List<GroupMenuDto>>();
-                    await Mediator.Send(new DeleteGroupMenuRequest(ids: selectedMenus.Select(x => x.Id).ToList()));
-                }
-                await LoadGroupMenus(0, pageSize);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-        }
 
         private bool FormValidationState = true;
 
@@ -472,53 +702,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
         [SupplyParameterFromForm]
         private GroupMenuDto GroupMenu { get; set; } = new();
-
-        private async Task OnSaveGroupMenu(GridEditModelSavingEventArgs e)
-        {
-            var editModel = (GroupMenuDto)e.EditModel;
-
-            editModel.GroupId = Group.Id;
-
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateGroupMenuRequest(editModel));
-            else
-                await Mediator.Send(new UpdateGroupMenuRequest(editModel));
-
-            await LoadGroupMenus();
-
-            //var groupMenu = GroupMenu;
-
-            //GroupMenuDto updateMenu = new();
-
-            //if (IsAddMenu)
-            //{
-            //    if (GroupMenus.Where(x => x.MenuId == groupMenu.MenuId).Any())
-            //        return;
-
-            //    updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == groupMenu.MenuId)!;
-            //    groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
-            //}
-            //else
-            //{
-            //    var q = SelectedDataItemsGroupMenu[0].Adapt<GroupMenuDto>();
-
-            //    updateMenu = GroupMenus.FirstOrDefault(x => x.MenuId == q.MenuId)!;
-            //    groupMenu.Menu = Menus.FirstOrDefault(x => x.Id == groupMenu.MenuId);
-            //}
-
-            //if (IsAddMenu)
-            //{
-            //    GroupMenus.Add(groupMenu);
-            //}
-            //else
-            //{
-            //    var index = GroupMenus.IndexOf(updateMenu!);
-            //    GroupMenus[index] = groupMenu;
-            //}
-
-            //SelectedDataItemsGroupMenu = [];
-            //GroupMenu = new();
-        }
 
         private void CancelItemGroupMenuGridGropMenu_Click()
         {
@@ -575,6 +758,8 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             if (!FormValidationState)
                 return;
+
+            UserForm.IsPatient = true;
 
             bool isValid = true;
             var a = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.NoId == UserForm.NoId));
@@ -638,6 +823,18 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
             var ax = SelectedServices.Select(x => x.Id).ToList();
             UserForm.DoctorServiceIds?.AddRange(ax);
+
+            UserForm.WeatherPatientAllergyIds = UserForm.IsWeatherPatientAllergyIds
+                ? SelectedWeatherAllergies.Select(x => x.Id).ToList()
+                : [];
+
+            UserForm.PharmacologyPatientAllergyIds = UserForm.IsPharmacologyPatientAllergyIds
+                ? SelectedPharmacologyAllergies.Select(x => x.Id).ToList()
+                : [];
+
+            UserForm.FoodPatientAllergyIds = UserForm.IsFoodPatientAllergyIds
+                ? SelectedFoodAllergies.Select(x => x.Id).ToList()
+                : [];
 
             if (UserForm.Id == 0)
             {

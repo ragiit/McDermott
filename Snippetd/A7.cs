@@ -20,7 +20,7 @@ await LoadDataFamily();
      }
  }
 
- private async Task OnSearchFamilyndexDecrement()
+ private async Task OnSearchFamilyIndexDecrement()
  {
      if (FamilyComboBoxIndex > 0)
      {
@@ -72,7 +72,7 @@ var id = refDistrictComboBox?.Value ?? null;
                   ValueFieldName="Id"
                   TextChanged="((string e) => OnInputFamilyChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchFamilyndexDecrement"
+            <DxEditorButton Click="OnSearchFamilyIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
             <DxEditorButton Click="OnSearchFamily"

@@ -2,7 +2,7 @@
 @using McDermott.Web.Components.Layout
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Users</PageTitle>
+<PageTitle>McHealthCare - Patients</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
@@ -11,7 +11,7 @@
 
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Users" OnClickBack="@(async () => NavigationManager.NavigateTo("patient/patients"))" ShowBackButton="true" />
+        <BaseHeaderPage Title="Patients" OnClickBack="@(async () => NavigationManager.NavigateTo("patient/patients"))" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">
@@ -571,6 +571,7 @@
                                         </div>
                                     </div>
 
+                                    @* History Medical *@
                                     <div class="w-100">
                                         <div class="card">
                                             <div class="card-header">
@@ -589,7 +590,7 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox  @bind-Checked="@UserForm.IsWeatherPatientAllergyIds" />
+                                                                            <DxCheckBox @bind-Checked="@UserForm.IsWeatherPatientAllergyIds" />
                                                                         </div>
                                                                         <div class="col-md-11">
                                                                             @if (UserForm.IsWeatherPatientAllergyIds)
@@ -597,13 +598,13 @@
                                                                                 <DxTagBox Data="@WeatherAllergies"
                                                                                           NullText="Select Allergy"
                                                                                           @bind-Values="@SelectedWeatherAllergies"
-                                                                                          EditFormat="{1}"
+                                                                                          EditFormat="{0}"
                                                                                           InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                                         Caption="Code"
                                                                                                         Width="100px" />
-                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                                        Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
                                                                                                         Caption="Type" />
                                                                                 </DxTagBox>
@@ -615,22 +616,21 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox  @bind-Checked="@UserForm.IsPharmacologyPatientAllergyIds" />
+                                                                            <DxCheckBox @bind-Checked="@UserForm.IsPharmacologyPatientAllergyIds" />
                                                                         </div>
                                                                         <div class="col">
                                                                             @if (UserForm.IsPharmacologyPatientAllergyIds)
                                                                             {
                                                                                 <DxTagBox Data="@PharmacologyAllergies"
-                                                                                          
                                                                                           NullText="Select Allergy"
                                                                                           @bind-Values="@SelectedPharmacologyAllergies"
-                                                                                          EditFormat="{1}"
+                                                                                          EditFormat="{0}"
                                                                                           InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                                         Caption="Code"
                                                                                                         Width="100px" />
-                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                                        Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
                                                                                                         Caption="Type" />
                                                                                 </DxTagBox>
@@ -642,7 +642,7 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
                                                                     <div class="row w-100">
                                                                         <div class="col-md-1">
-                                                                            <DxCheckBox  @bind-Checked="@UserForm.IsFoodPatientAllergyIds" />
+                                                                            <DxCheckBox @bind-Checked="@UserForm.IsFoodPatientAllergyIds" />
                                                                         </div>
                                                                         <div class="col-md-11">
                                                                             @if (UserForm.IsFoodPatientAllergyIds)
@@ -650,14 +650,13 @@
                                                                                 <DxTagBox Data="@FoodAllergies"
                                                                                           NullText="Select Allergy"
                                                                                           @bind-Values="@SelectedFoodAllergies"
-                                                                                          EditFormat="{1}"
-                                                                                          
+                                                                                          EditFormat="{0}"
                                                                                           InputId="tbMultiColumn">
+                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
+                                                                                                        Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.KdAllergy)"
                                                                                                         Caption="Code"
                                                                                                         Width="100px" />
-                                                                                    <DxListEditorColumn FieldName="@nameof(AllergyDto.NmAllergy)"
-                                                                                                        Caption="Name" />
                                                                                     <DxListEditorColumn FieldName="@nameof(AllergyDto.TypeString)"
                                                                                                         Caption="Type" />
                                                                                 </DxTagBox>
@@ -755,6 +754,147 @@
                                             </div>
                                         </div>
                                     </div>
+
+
+                                    @* Family Relation *@
+                                    @if (UserForm.Id != 0)
+                                    {
+                                        <div class="w-100">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <span class="fw-bolder">Family Relation</span>
+                                                </div>
+                                                <MyGridPaginate @ref="GridFamilyRelation"
+                                                                Data="PatientFamilyRelations"
+                                                                @bind-SelectedDataItems="@SelectedDataItemsFamilyRelation"
+                                                                KeyFieldName="Id"
+                                                                FocusedRowChanged="GridFamilyRelation_FocusedRowChanged"
+                                                                EditModelSaving="OnSaveFamilyRelation"
+                                                                SearchTextChanged="OnSearchBoxChanged"
+                                                                DataItemDeleting="OnDeleteFamilyRelation">
+
+                                                    <ToolbarTemplate>
+                                                        <MyDxToolbarBase TItem="PatientFamilyRelationDto"
+                                                                         Items="@PatientFamilyRelations"
+                                                                         SelectedDataItems="@SelectedDataItemsFamilyRelation"
+                                                                         NewItem_Click="@NewItemFamilyRelation_Click"
+                                                                         EditItem_Click="() => EditItemFamilyRelation_Click(GridFamilyRelation)"
+                                                                         DeleteItem_Click="@DeleteItemFamilyRelation_Click"
+                                                                         Refresh_Click="(() => LoadDataFamilyRelation())"
+                                                                         IsImport="false"
+                                                                         Grid="GridFamilyRelation"
+                                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                    </ToolbarTemplate>
+
+                                                    <Columns>
+                                                        <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
+                                                        <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="FamilyMember.Name" Caption="Family Member" SortIndex="0" />
+                                                        <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Family.InverseRelationString" Caption="Relation" SortIndex="0" />
+                                                    </Columns>
+
+
+                                                    <TotalSummary>
+                                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                           FieldName="Menu.Name"
+                                                                           Visible="true" />
+                                                    </TotalSummary>
+
+                                                    <EditFormTemplate Context="EditFormContext2">
+                                                        @{
+                                                            var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
+                                                        }
+                                                        <DxFormLayout CssClass="w-100">
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="UserFamilyRelation" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@UserPatients"
+                                                                              NullText="Select UserFamilyRelation"
+                                                                              @ref="refUserFamilyRelationComboBox"
+                                                                              @bind-Value="@a.FamilyMemberId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputUserFamilyRelationChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchUserFamilyRelationndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchUserFamilyRelation"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchUserFamilyRelationIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="NoRm" Caption="NoRm" />
+                                                                        <DxListEditorColumn FieldName="Name" Caption="Name" />
+                                                                        <DxListEditorColumn FieldName="Email" Caption="Email" />
+                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                        <DxListEditorColumn FieldName="Gender" Caption="Gender" />
+                                                                        <DxListEditorColumn   FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>a.FamilyMemberId)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Family" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Families"
+                                                                              NullText="Select Family"
+                                                                              @ref="refFamilyComboBox"
+                                                                              @bind-Value="@a.FamilyId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputFamilyChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchFamilyIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchFamily"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchFamilyIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(FamilyDto.Name)" Caption="Name" />
+                                                                        <DxListEditorColumn FieldName="@nameof(FamilyDto.InverseRelationString)" Caption="Relation" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>a.FamilyId)" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </EditFormTemplate>
+                                                </MyGridPaginate>
+
+                                                <div class="row">
+                                                    <DxFormLayout>
+                                                        <div class="col-md-9">
+                                                            <DxFormLayoutItem>
+                                                                <DxPager PageCount="totalCountFamilyRelation"
+                                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                                         ActivePageIndex="activePageIndex"
+                                                                         VisibleNumericButtonCount="10"
+                                                                         SizeMode="SizeMode.Medium"
+                                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                                </DxPager>
+                                                            </DxFormLayoutItem>
+                                                        </div>
+                                                        <div class="col-md-3 d-flex justify-content-end">
+                                                            <DxFormLayoutItem Caption="Page Size:">
+                                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                              NullText="Select Page Size"
+                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                              @bind-Value="pageSize">
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                        </div>
+                                                    </DxFormLayout>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                 </DxFormLayout>
                             </EditForm>
 

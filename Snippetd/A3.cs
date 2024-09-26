@@ -1,50 +1,50 @@
- public class GetFamilyQuery(Expression<Func<Family, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>
+ public class GetPatientFamilyRelationQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)>
  {
-     public Expression<Func<Family, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<PatientFamilyRelation, bool>> Predicate { get; } = predicate!;
      public bool RemoveCache { get; } = removeCache!;
      public string SearchTerm { get; } = searchTerm!;
      public int PageIndex { get; } = pageIndex;
      public int PageSize { get; set; } = pageSize ?? 10;
  }
 
- public class BulkValidateFamilyQuery(List<FamilyDto> FamilysToValidate) : IRequest<List<FamilyDto>>
+ public class BulkValidatePatientFamilyRelationQuery(List<PatientFamilyRelationDto> PatientFamilyRelationsToValidate) : IRequest<List<PatientFamilyRelationDto>>
  {
-     public List<FamilyDto> FamilysToValidate { get; } = FamilysToValidate;
+     public List<PatientFamilyRelationDto> PatientFamilyRelationsToValidate { get; } = PatientFamilyRelationsToValidate;
  }
 
- public class ValidateFamilyQuery(Expression<Func<Family, bool>>? predicate = null) : IRequest<bool>
+ public class ValidatePatientFamilyRelationQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null) : IRequest<bool>
  {
-     public Expression<Func<Family, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<PatientFamilyRelation, bool>> Predicate { get; } = predicate!;
  }
 
-IRequestHandler<GetFamilyQuery, (List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidateFamilyQuery, bool>,
-IRequestHandler<BulkValidateFamilyQuery, List<FamilyDto>>,
+IRequestHandler<GetPatientFamilyRelationQuery, (List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidatePatientFamilyRelationQuery, bool>,
+IRequestHandler<BulkValidatePatientFamilyRelationQuery, List<PatientFamilyRelationDto>>,
 
 
-public async Task<List<FamilyDto>> Handle(BulkValidateFamilyQuery request, CancellationToken cancellationToken)
+public async Task<List<PatientFamilyRelationDto>> Handle(BulkValidatePatientFamilyRelationQuery request, CancellationToken cancellationToken)
 {
-    var FamilyDtos = request.FamilysToValidate;
+    var PatientFamilyRelationDtos = request.PatientFamilyRelationsToValidate;
 
     // Ekstrak semua kombinasi yang akan dicari di database
-    var FamilyNames = FamilyDtos.Select(x => x.Name).Distinct().ToList();
-    var provinceIds = FamilyDtos.Select(x => x.ProvinceId).Distinct().ToList();
+    var PatientFamilyRelationNames = PatientFamilyRelationDtos.Select(x => x.Name).Distinct().ToList();
+    var provinceIds = PatientFamilyRelationDtos.Select(x => x.ProvinceId).Distinct().ToList();
 
-    var existingFamilys = await _unitOfWork.Repository<Family>()
+    var existingPatientFamilyRelations = await _unitOfWork.Repository<PatientFamilyRelation>()
         .Entities
         .AsNoTracking()
-        .Where(v => FamilyNames.Contains(v.Name)
+        .Where(v => PatientFamilyRelationNames.Contains(v.Name)
                     && provinceIds.Contains(v.ProvinceId))
         .ToListAsync(cancellationToken);
 
-    return existingFamilys.Adapt<List<FamilyDto>>();
+    return existingPatientFamilyRelations.Adapt<List<PatientFamilyRelationDto>>();
 }
 
-public async Task<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetFamilyQuery request, CancellationToken cancellationToken)
+public async Task<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPatientFamilyRelationQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<Family>().Entities
+        var query = _unitOfWork.Repository<PatientFamilyRelation>().Entities
             .AsNoTracking()
             .Include(v => v.Province)
             .AsQueryable();
@@ -63,7 +63,7 @@ public async Task<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>
 
         var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-        return (paged.Adapt<List<FamilyDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (paged.Adapt<List<PatientFamilyRelationDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -71,9 +71,9 @@ public async Task<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>
     }
 }
 
-public async Task<bool> Handle(ValidateFamilyQuery request, CancellationToken cancellationToken)
+public async Task<bool> Handle(ValidatePatientFamilyRelationQuery request, CancellationToken cancellationToken)
 {
-    return await _unitOfWork.Repository<Family>()
+    return await _unitOfWork.Repository<PatientFamilyRelation>()
         .Entities
         .AsNoTracking()
         .Where(request.Predicate)  // Apply the Predicate for filtering

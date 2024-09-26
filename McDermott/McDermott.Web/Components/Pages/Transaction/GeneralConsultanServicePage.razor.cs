@@ -1718,12 +1718,12 @@ namespace McDermott.Web.Components.Pages.Transaction
             Awareness = await Mediator.Send(new GetAwarenessQuery());
 
             Allergies = await Mediator.Send(new GetAllergyQuery());
-            Allergies.ForEach(x =>
-            {
-                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                if (a is not null)
-                    x.TypeString = a.Name;
-            });
+            //Allergies.ForEach(x =>
+            //{
+            //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+            //    if (a is not null)
+            //        x.TypeString = a.Name;
+            //});
 
             InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;

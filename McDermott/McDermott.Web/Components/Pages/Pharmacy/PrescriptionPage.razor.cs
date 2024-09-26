@@ -249,12 +249,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
             allergies = await Mediator.Send(new GetAllergyQuery());
-            allergies.ForEach(x =>
-            {
-                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                if (a is not null)
-                    x.TypeString = a.Name;
-            });
+            //allergies.ForEach(x =>
+            //{
+            //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+            //    if (a is not null)
+            //        x.TypeString = a.Name;
+            //});
             await GetPatientAllergy(Pharmacy.PatientId);
         }
 
@@ -1232,12 +1232,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 var user_group = await Mediator.Send(new GetUserQuery());
                 NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
 
-                allergies.ForEach(x =>
-                {
-                    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                    if (a is not null)
-                        x.TypeString = a.Name;
-                });
+                //allergies.ForEach(x =>
+                //{
+                //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                //    if (a is not null)
+                //        x.TypeString = a.Name;
+                //});
                 var c = Concoctions;
                 PanelVisible = false;
             }

@@ -1,3 +1,3 @@
-var result = await _unitOfWork.Repository<Family>().UpdateAsync(request.FamilyDto.Adapt<CreateUpdateFamilyDto>().Adapt<Family>());
+var result = await _unitOfWork.Repository<PatientFamilyRelation>().UpdateAsync(request.PatientFamilyRelationDto.Adapt<CreateUpdatePatientFamilyRelationDto>().Adapt<PatientFamilyRelation>());
 
-var result = await _unitOfWork.Repository<Family>().UpdateAsync(request.FamilyDtos.Adapt<List<Family>>());
+var result = await _unitOfWork.Repository<PatientFamilyRelation>().UpdateAsync(request.PatientFamilyRelationDtos.Adapt<List<PatientFamilyRelation>>());

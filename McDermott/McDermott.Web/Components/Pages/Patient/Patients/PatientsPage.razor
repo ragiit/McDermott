@@ -2,15 +2,13 @@
 @using System.Security.Claims
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Users</PageTitle>
+<PageTitle>McHealthCare - Patients</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Users" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
-
-        
+        <BaseHeaderPage Title="Patients" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -52,7 +50,7 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="NoRm" Caption="Medical Record" SortOrder="GridColumnSortOrder.Descending" />
-                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Email" />
                                             <DxGridDataColumn MinWidth="200" FieldName="MobilePhone" Caption="Mobile Phone" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Gender" />

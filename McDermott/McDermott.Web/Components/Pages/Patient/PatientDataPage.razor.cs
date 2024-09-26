@@ -70,14 +70,15 @@ namespace McDermott.Web.Components.Pages.Patient
                     await LoadData();
                     StateHasChanged();
 
+                    return;
                     Allergies = await Mediator.Send(new GetAllergyQuery());
 
-                    Allergies.ForEach(x =>
-                    {
-                        var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                        if (a is not null)
-                            x.TypeString = a.Name;
-                    });
+                    //Allergies.ForEach(x =>
+                    //{
+                    //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                    //    if (a is not null)
+                    //        x.TypeString = a.Name;
+                    //});
 
                     var countries = await Mediator.Send(new GetCountryQuery());
                     var result = await Mediator.Send(new GetProvinceQuery());
@@ -519,15 +520,15 @@ namespace McDermott.Web.Components.Pages.Patient
 
                     PatientFamilyRelations.ForEach(x => { x.PatientId = UserForm.Id; x.Id = 0; });
                     var temp = new List<PatientFamilyRelationDto>();
-                    PatientFamilyRelations.ForEach(x =>
-                    {
-                        temp.Add(new PatientFamilyRelationDto
-                        {
-                            PatientId = x.FamilyMemberId.GetValueOrDefault(),
-                            FamilyMemberId = x.PatientId,
-                            //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
-                        });
-                    });
+                    //PatientFamilyRelations.ForEach(x =>
+                    //{
+                    //    temp.Add(new PatientFamilyRelationDto
+                    //    {
+                    //        PatientId = x.FamilyMemberId.GetValueOrDefault(),
+                    //        FamilyMemberId = x.PatientId,
+                    //        //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
+                    //    });
+                    //});
 
                     PatientFamilyRelations.AddRange(temp);
                     await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
@@ -564,12 +565,12 @@ namespace McDermott.Web.Components.Pages.Patient
                     var temps = new List<PatientFamilyRelationDto>();
                     PatientFamilyRelations.ForEach(x =>
                     {
-                        temps.Add(new PatientFamilyRelationDto
-                        {
-                            PatientId = x.FamilyMemberId.GetValueOrDefault(),
-                            FamilyMemberId = x.PatientId,
-                            //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
-                        });
+                        //temps.Add(new PatientFamilyRelationDto
+                        //{
+                        //    PatientId = x.FamilyMemberId.GetValueOrDefault(),
+                        //    FamilyMemberId = x.PatientId,
+                        //    //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
+                        //});
                     });
 
                     PatientFamilyRelations.AddRange(temps);
