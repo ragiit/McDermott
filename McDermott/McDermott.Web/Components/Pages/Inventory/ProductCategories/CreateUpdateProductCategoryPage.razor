@@ -1,0 +1,67 @@
+﻿@page "/inventory/product-categories/{PageMode}"
+@using McDermott.Web.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Product category</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Product Category" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/product-categories"))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <EditForm Model="@PostProductCategory" @onkeypress="@KeyPressHandler" Context="EditFormContext" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                            <DataAnnotationsValidator />
+                            <AntiforgeryToken />
+                            <div class="card sticky">
+                                <div class="card-body">
+                                    <div class=" row w-100">
+                                        <div class="w-100 row justify-content-end mt-2 mb-2">
+                                            <div class="col-auto align-self-end p-0 m-0">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                </DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="Discard_Click"></DxButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@PostProductCategory.Name"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Name" />
+                                                <ValidationMessage For="@(()=> PostProductCategory.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Code" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@PostProductCategory.Code"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Code" />
+                                                <ValidationMessage For="@(()=> PostProductCategory.Code)"   />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </div>
+                                </div>
+                            </DxLoadingPanel>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

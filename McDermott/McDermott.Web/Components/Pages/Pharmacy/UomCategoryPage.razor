@@ -20,53 +20,28 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
-
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="UomCategories"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            AllowSelectRowByClick="true"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            CssClass="ch-480"
-                                            ShowFilterRow="true"
-                                            TextWrapEnabled="false"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
+                                    <MyGridPaginate @ref="Grid"
+                                                    Data="UomCategories"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    EditModelSaving="OnSave"
+                                                    DataItemDeleting="OnDelete"
+                                                    SearchTextChanged="OnSearchBoxChanged"
+                                                    KeyFieldName="Id">
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && UomCategories.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && UomCategories.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
+                                            <MyDxToolbarBase TItem="UomCategoryDto"
+                                                             Items="@UomCategories"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             IsImport="UserAccessCRUID.IsImport"
+                                                             Grid="Grid"
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
@@ -74,6 +49,11 @@
                                             <DxGridDataColumn FieldName="Type" />
 
                                         </Columns>
+                                        <TotalSummary>
+                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                               FieldName="Name"
+                                                               Visible="true" />
+                                        </TotalSummary>
                                         <EditFormTemplate Context="EditFormContext">
                                             @{
                                                 var a = (UomCategoryDto)EditFormContext.EditModel;
@@ -98,10 +78,36 @@
                                                     </DxComboBox>
                                                     <ValidationMessage For="@(()=> a.Type)"   />
                                                 </DxFormLayoutItem>
-
                                             </DxFormLayout>
+                                           
                                         </EditFormTemplate>
-                                    </DxGrid>
+                                    </MyGridPaginate>
+                                    <div class="row">
+                                        <DxFormLayout>
+                                            <div class="col-md-8">
+                                                <DxFormLayoutItem>
+                                                    <DxPager PageCount="totalCount"
+                                                             ActivePageIndexChanged="OnPageIndexChanged"
+                                                             ActivePageIndex="activePageIndex"
+                                                             VisibleNumericButtonCount="10"
+                                                             SizeMode="SizeMode.Medium"
+                                                             NavigationMode="PagerNavigationMode.Auto">
+                                                    </DxPager>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                            <div class="col-md-4 d-flex justify-content-end">
+                                                <DxFormLayoutItem Caption="Page Size:">
+                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                  NullText="Select Page Size"
+                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                  @bind-Value="pageSize">
+                                                    </MyDxComboBox>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                        </DxFormLayout>
+                                    </div>
+
                                 </DxLoadingPanel>
                             </div>
                         </div>

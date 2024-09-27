@@ -3,9 +3,10 @@
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class UomQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-
         IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetAllUomQuery, List<UomDto>>,
+        IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
+        IRequestHandler<ValidateUomQuery, bool>,
         IRequestHandler<CreateUomRequest, UomDto>,
         IRequestHandler<CreateListUomRequest, List<UomDto>>,
         IRequestHandler<UpdateUomRequest, UomDto>,
@@ -86,6 +87,26 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
+        public async Task<List<UomDto>> Handle(BulkValidateUomQuery request, CancellationToken cancellationToken)
+        {
+            var Uoms = request.UomToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var A = Uoms.Select(x => x.Name).Distinct().ToList();
+            var B = Uoms.Select(x => x.Type).Distinct().ToList();
+            var C = Uoms.Select(x => x.UomCategoryId).Distinct().ToList();
+
+            var existingLabTests = await _unitOfWork.Repository<Uom>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => A.Contains(v.Name)
+                            && B.Contains(v.Type)
+                            && C.Contains(v.UomCategoryId)
+                            )
+                .ToListAsync(cancellationToken);
+
+            return existingLabTests.Adapt<List<UomDto>>();
+        }
         public async Task<bool> Handle(ValidateUomQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<Uom>()

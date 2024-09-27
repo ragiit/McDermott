@@ -3,7 +3,10 @@
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class UomCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetUomCategoryQuery, List<UomCategoryDto>>,
+        IRequestHandler<GetUomCategoryQuery, (List<UomCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetAllUomCategoryQuery, List<UomCategoryDto>>,
+        IRequestHandler<BulkValidateUomCategoryQuery, List<UomCategoryDto>>,
+        IRequestHandler<ValidateUomCategoryQuery, bool>,
         IRequestHandler<CreateUomCategoryRequest, UomCategoryDto>,
         IRequestHandler<CreateListUomCategoryRequest, List<UomCategoryDto>>,
         IRequestHandler<UpdateUomCategoryRequest, UomCategoryDto>,
@@ -12,7 +15,7 @@ namespace McDermott.Application.Features.Queries.Inventory
     {
         #region GET
 
-        public async Task<List<UomCategoryDto>> Handle(GetUomCategoryQuery request, CancellationToken cancellationToken)
+        public async Task<List<UomCategoryDto>> Handle(GetAllUomCategoryQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -42,6 +45,73 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
+
+        public async Task<(List<UomCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUomCategoryQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<UomCategory>().Entities
+                    .AsNoTracking()
+                    .AsQueryable();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+                }
+
+                var totalCount = await query.CountAsync(cancellationToken);
+
+                var pagedResult = query
+                            .OrderBy(x => x.Name);
+
+                var skip = (request.PageIndex) * request.PageSize;
+
+                var paged = pagedResult
+                            .Skip(skip)
+                            .Take(request.PageSize);
+
+                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
+
+                return (paged.Adapt<List<UomCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<UomCategoryDto>> Handle(BulkValidateUomCategoryQuery request, CancellationToken cancellationToken)
+        {
+            var UomsCategory = request.UomCategoryToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var A = UomsCategory.Select(x => x.Name).Distinct().ToList();
+            var B = UomsCategory.Select(x => x.Type).Distinct().ToList();
+            var existingLabTests = await _unitOfWork.Repository<UomCategory>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => A.Contains(v.Name)
+                            && B.Contains(v.Type)
+                            )
+                .ToListAsync(cancellationToken);
+
+            return existingLabTests.Adapt<List<UomCategoryDto>>();
+        }
+
+
+        public async Task<bool> Handle(ValidateUomCategoryQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<UomCategory>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
 
         #endregion GET
 

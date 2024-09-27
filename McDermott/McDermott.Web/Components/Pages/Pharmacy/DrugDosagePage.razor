@@ -1,4 +1,4 @@
-﻿@page "/pharmacy/drug-dosage"
+﻿@page "/pharmacy/medicine-dosages"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Regimen of Use</PageTitle>
@@ -21,53 +21,29 @@
                                                 IndicatorAreaVisible="true"
                                                 Text="Fetching Data...">
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="DrugDosages"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            AllowSelectRowByClick="true"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            PopupEditFormHeaderText="@(IsAddForm ? "Add Drug Dosage" : "Edit Drug Dosage")"
-                                            CssClass="ch-480"
-                                            ShowFilterRow="true"
-                                            TextWrapEnabled="false"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
+                                    <MyGridPaginate @ref="Grid"
+                                                    Data="GetDrugDosages"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    EditModelSaving="OnSave"
+                                                    DataItemDeleting="OnDelete"
+                                                    SearchTextChanged="OnSearchBoxChanged"
+                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    KeyFieldName="Id">
                                         <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DrugDosages.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DrugDosages.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
+                                            <MyDxToolbarBase TItem="DrugDosageDto"
+                                                             Items="@GetDrugDosages"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             Grid="Grid"
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
+                                                             IsImport="UserAccessCRUID.IsImport"
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
@@ -118,10 +94,9 @@
                                                                 BindValueMode="BindValueMode.OnInput" />
                                                     <ValidationMessage For="@(()=> a.Days)"   />
                                                 </DxFormLayoutItem>
-
                                             </DxFormLayout>
                                         </EditFormTemplate>
-                                    </DxGrid>
+                                    </MyGridPaginate>
                                 </DxLoadingPanel>
                             </div>
                         </div>

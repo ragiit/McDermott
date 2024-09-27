@@ -71,6 +71,32 @@
 
         #endregion Static
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         #region Load
 
         protected override async Task OnInitializedAsync()
@@ -79,12 +105,21 @@
             await LoadData();
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            UomCategories = await Mediator.Send(new GetUomCategoryQuery());
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetUomCategoryQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+                UomCategories = result.Item1;
+                totalCount = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         #endregion Load
@@ -116,29 +151,161 @@
             Grid.ShowColumnChooser();
         }
 
-        private async Task ExportXlsxItem_Click()
+        private async Task ImportFile()
         {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 
-        private async Task ExportXlsItem_Click()
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
             {
-                ExportSelectedRowsOnly = true,
-            });
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Type" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<UomCategoryDto>();
+
+                    var sampleTypes = new HashSet<string>();
+                    var list1 = new List<UomCategoryDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(a))
+                            sampleTypes.Add(a.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetUomCategoryQuery(x => sampleTypes.Contains(x.Name.ToLower()), 0, 0))).Item1;
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        bool isValid = true;
+
+                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        long? sampleTypeId = null;
+                        if (!string.IsNullOrEmpty(a))
+                        {
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(a, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                                isValid = false;
+                            }
+                            else
+                            {
+                                sampleTypeId = cachedParent.Id;
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                            isValid = false;
+                        }
+
+                        var resultType = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        if (!string.IsNullOrWhiteSpace(resultType))
+                        {
+                            var exist = Helper.ResultValueTypes.Any(x => x.Equals(resultType, StringComparison.CurrentCultureIgnoreCase));
+                            if (!exist)
+                            {
+                                ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
+                                isValid = false;
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
+                            isValid = false;
+                        }
+
+                        if (!isValid)
+                            continue;
+
+                        list.Add(new UomCategoryDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Type = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                            
+                        });
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Type, }).ToList();
+
+                        // Panggil BulkValidateLabTestQuery untuk validasi bulk
+                        var existingLabTests = await Mediator.Send(new BulkValidateUomCategoryQuery(list));
+
+                        // Filter LabTest baru yang tidak ada di database
+                        list = list.Where(UomCategory =>
+                            !existingLabTests.Any(ev =>
+                                ev.Name == UomCategory.Name &&
+                                ev.Type == UomCategory.Type 
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListUomCategoryRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+                finally { PanelVisible = false; }
+            }
+            PanelVisible = false;
         }
 
-        private async Task ExportCsvItem_Click()
+        private async Task ExportToExcel()
         {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Uom_template.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Code"
+                },
+                new()
+                {
+                    Column = "Sample Type",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Result Type",
+                    Notes = "Select one: Quantitative/Qualitative"
+                },
+            ]);
         }
+
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -164,7 +331,12 @@
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (UomCategoryDto)e.EditModel;
-
+            bool exists = await Mediator.Send(new ValidateUomCategoryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
+            if (exists)
+            {
+                ToastService.ShowWarning($"Uom Category with name '{editModel.Name}' already exists.");
+                return;
+            }
             if (editModel.Id == 0)
                 await Mediator.Send(new CreateUomCategoryRequest(editModel));
             else

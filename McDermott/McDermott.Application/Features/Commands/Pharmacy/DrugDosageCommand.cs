@@ -5,11 +5,30 @@ namespace McDermott.Application.Features.Commands.Pharmacy
     {
         #region GET  
 
-        public class GetDrugDosageQuery(Expression<Func<DrugDosage, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DrugDosageDto>>
+        public class GetAllDrugDosageQuery(Expression<Func<DrugDosage, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DrugDosageDto>>
         {
             public Expression<Func<DrugDosage, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
+        public class GetDrugDosageQuery(Expression<Func<DrugDosage, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DrugDosageDto>, int pageIndex, int pageSize, int pageCount)>
+        {
+            public Expression<Func<DrugDosage, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+        }
+
+        public class BulkValidateDrugDosageQuery(List<DrugDosageDto> DrugDosageToValidate) : IRequest<List<DrugDosageDto>>
+        {
+            public List<DrugDosageDto> DrugDosageToValidate { get; } = DrugDosageToValidate;
+        }
+        public class ValidateDrugDosageQuery(Expression<Func<DrugDosage, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<DrugDosage, bool>> Predicate { get; } = predicate!;
+        }
+
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 

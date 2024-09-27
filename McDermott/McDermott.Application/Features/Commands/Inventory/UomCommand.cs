@@ -19,6 +19,10 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class BulkValidateUomQuery(List<UomDto> UomToValidate) : IRequest<List<UomDto>>
+        {
+            public List<UomDto> UomToValidate { get; } = UomToValidate;
+        }
         public class ValidateUomQuery(Expression<Func<Uom, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;

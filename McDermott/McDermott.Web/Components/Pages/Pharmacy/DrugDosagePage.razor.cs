@@ -59,10 +59,36 @@
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private List<DrugDosageDto> DrugDosages = [];
+        private List<DrugDosageDto> GetDrugDosages = [];
         private List<DrugRouteDto> DrugRoutes = [];
 
         #endregion Static
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
 
         #region Load
 
@@ -76,11 +102,13 @@
             await LoadData();
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            DrugDosages = await Mediator.Send(new GetDrugDosageQuery());
+            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            GetDrugDosages = result.Item1;
+            totalCount = result.pageCount;
             PanelVisible = false;
         }
 
@@ -115,28 +143,130 @@
             Grid.ShowColumnChooser();
         }
 
-        private async Task ExportXlsxItem_Click()
+        private async Task ExportToExcel()
         {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "DrugDosages_template.xlsx",
+            [
+                new() { Column = "Frequency", Notes = "Mandatory" },
+                new() { Column = "Total Qty Per Day" },
+                new() { Column = "Days" },
+                new() { Column = "Route"}
+            ]);
         }
 
-        private async Task ExportXlsItem_Click()
+        private async Task ImportFile()
         {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
         }
 
-        private async Task ExportCsvItem_Click()
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
             {
-                ExportSelectedRowsOnly = true,
-            });
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Frequency", "Total QTy PerDay", "Day", "Route" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<DrugDosageDto>();
+
+                    var sampleTypes = new HashSet<string>();
+                    var list1 = new List<DrugRouteDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(a))
+                            sampleTypes.Add(a.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetDrugRouteQuery(x => sampleTypes.Contains(x.Route.ToLower()), 0, 0))).Item1;
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        bool isValid = true;
+
+                        var a = ws.Cells[row, 4].Value?.ToString()?.Trim();
+
+                        long? sampleTypeId = null;
+                        if (!string.IsNullOrEmpty(a))
+                        {
+                            var cachedParent = list1.FirstOrDefault(x => x.Route.Equals(a, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                                isValid = false;
+                            }
+                            else
+                            {
+                                sampleTypeId = cachedParent.Id;
+                            }
+                        }
+                        else
+                        {
+                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                            isValid = false;
+                        }
+
+                        if (!isValid)
+                            continue;
+
+                        list.Add(new DrugDosageDto
+                        {
+                            Frequency = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
+                            TotalQtyPerDay = float.Parse(ws.Cells[row, 2].Value?.ToString()?.Trim() ?? "0", CultureInfo.InvariantCulture),
+                            Days = float.Parse(ws.Cells[row, 3].Value?.ToString()?.Trim() ?? "0", CultureInfo.InvariantCulture),
+
+                        });
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Frequency, x.TotalQtyPerDay,x.Days, }).ToList();
+
+                        // Panggil BulkValidateLabTestQuery untuk validasi bulk
+                        var existingLabTests = await Mediator.Send(new BulkValidateDrugDosageQuery(list));
+
+                        // Filter LabTest baru yang tidak ada di database
+                        list = list.Where(DrugDosage =>
+                            !existingLabTests.Any(ev =>
+                                ev.Frequency == DrugDosage.Frequency &&
+                                ev.TotalQtyPerDay == DrugDosage.TotalQtyPerDay &&
+                                ev.Days == DrugDosage.Days 
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListDrugDosageRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+                finally { PanelVisible = false; }
+            }
+            PanelVisible = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)

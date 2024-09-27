@@ -11,13 +11,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Product
         #region Relation Data
         private List<ProductDto> GetProduct = [];
         private List<MedicamentDto> GetMedicaments = [];
-        private List<BpjsClassificationDto> BpjsClassifications = [];
+        private List<BpjsClassificationDto> GetBPJSCl = [];
         private List<UomDto> GetUoms = [];
         private List<DrugFormDto> GetDrugForms = [];
         private List<DrugRouteDto> GetDrugRoutes = [];
         private List<ProductCategoryDto> GetProductCategories = [];
         private List<ActiveComponentDto> ActiveComponents = [];
-        private List<DrugDosageDto> Frequencys = [];
+        private List<DrugDosageDto> GetDrugDosage = [];
         private List<LocationDto> GetLocations = [];
         private List<StockProductDto> StockProducts = [];
         private List<TransactionStockDto> TransactionStocks = [];
@@ -194,6 +194,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Product
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await LoadDataUom();
+            //await LoadDataBPJSCl();
+            await LoadDataDrugForm();
+            await LoadDataDrugRoute();
+            await LoadDataLocation();
+            await LoadDataProductCategory();
+            PanelVisible = false;
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -255,31 +262,30 @@ namespace McDermott.Web.Components.Pages.Inventory.Product
                     TotalMaintainanceQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap).Count();
                 }
                 // Ambil nama satuan ukur
-                NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
+               
+            }
 
-                if (PostProductDetails.UomId == 0)
-                {
-                    PostProductDetails.UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0;
+            NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
 
-                    SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
-                }
-
-                PostProductDetails = new ProductDetailDto
-                {
-                    ProductType = ProductTypes[2],
-                    HospitalType = HospitalProducts[0],
-                    SalesPrice = 100,
-                    Tax = "11%",
-                    UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0
-                };
+            if (PostProductDetails.UomId == 0)
+            {
+                PostProductDetails.UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0;
 
                 SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
-
             }
-            PanelVisible = false;
 
-            BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
-            Frequencys = await Mediator.Send(new GetDrugDosageQuery());
+            PostProductDetails = new ProductDetailDto
+            {
+                ProductType = ProductTypes[2],
+                HospitalType = HospitalProducts[0],
+                SalesPrice = 100,
+                Tax = "11%",
+                UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0
+            };
+
+            SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
+
+            GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
         }
         #endregion
@@ -520,6 +526,97 @@ namespace McDermott.Web.Components.Pages.Inventory.Product
             PanelVisible = false;
         }
         #endregion
+
+        #region ComboBox Uom
+        private DxComboBox<DrugDosageDto, long?> refDrugDosageComboBox { get; set; }
+        private int DrugDosageComboBoxIndex { get; set; } = 0;
+        private int totalCountDrugDosage = 0;
+
+        private async Task OnSearchDrugDosage()
+        {
+            await LoadDataDrugDosage(0, 10);
+        }
+
+        private async Task OnSearchDrugDosageIndexIncrement()
+        {
+            if (UomComboBoxIndex < (totalCountUom - 1))
+            {
+                UomComboBoxIndex++;
+                await LoadDataDrugDosage(DrugDosageComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDrugDosageIndexDecrement()
+        {
+            if (DrugDosageComboBoxIndex > 0)
+            {
+                UomComboBoxIndex--;
+                await LoadDataDrugDosage(DrugDosageComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDrugDosageChanged(string e)
+        {
+            DrugDosageComboBoxIndex = 0;
+            await LoadDataDrugDosage(0, 10);
+        }
+
+        private async Task LoadDataDrugDosage(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: refUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            GetDrugDosage = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+        #endregion
+
+
+        //#region ComboBox BPJS Classification
+        //private DxComboBox<BpjsClassificationDto, long?> refBPJSClComboBox { get; set; }
+        //private int BPJSClComboBoxIndex { get; set; } = 0;
+        //private int totalCountBPJSCl = 0;
+
+        //private async Task OnSearchBPJSCl()
+        //{
+        //    await LoadDataBPJSCl(0, 10);
+        //}
+
+        //private async Task OnSearchBPJSClIndexIncrement()
+        //{
+        //    if (BPJSClComboBoxIndex < (totalCountBPJSCl - 1))
+        //    {
+        //        BPJSClComboBoxIndex++;
+        //        await LoadDataBPJSCl(BPJSClComboBoxIndex, 10);
+        //    }
+        //}
+
+        //private async Task OnSearchBPJSClIndexDecrement()
+        //{
+        //    if (BPJSClComboBoxIndex > 0)
+        //    {
+        //        BPJSClComboBoxIndex--;
+        //        await LoadDataBPJSCl(BPJSClComboBoxIndex, 10);
+        //    }
+        //}
+
+        //private async Task OnInputBPJSClChanged(string e)
+        //{
+        //    BPJSClComboBoxIndex = 0;
+        //    await LoadDataBPJSCl(0, 10);
+        //}
+
+        //private async Task LoadDataBPJSCl(int pageIndex = 0, int pageSize = 10)
+        //{
+        //    PanelVisible = true;
+        //    SelectedDataItems = [];
+        //    var result = await Mediator.Send(new GetBPJSIntegrationQuery(searchTerm: refUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+        //    GetBPJSCls = result.Item1;
+        //    totalCount = result.pageCount;
+        //    PanelVisible = false;
+        //}
+        //#endregion
 
         #endregion
 

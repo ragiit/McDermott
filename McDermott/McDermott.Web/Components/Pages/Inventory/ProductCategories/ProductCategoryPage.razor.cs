@@ -1,4 +1,4 @@
-﻿namespace McDermott.Web.Components.Pages.Inventory
+﻿namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
 {
     public partial class ProductCategoryPage
     {
@@ -58,7 +58,7 @@
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        private List<ProductCategoryDto> ProductCategories = [];
+        private List<ProductCategoryDto> GetProductCategory = [];
 
         private List<string> CostingMethod = new List<string>
         {
@@ -75,6 +75,32 @@
 
         #endregion Static
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         #region Load
 
         protected override async Task OnInitializedAsync()
@@ -83,11 +109,13 @@
             await LoadData();
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //ProductCategories = await Mediator.Send(new GetProductCategoryQuery());
+            var result = await Mediator.Send(new GetProductCategoryQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+            GetProductCategory = result.Item1;
+            totalCount = result.pageCount;
             PanelVisible = false;
         }
 
@@ -168,7 +196,12 @@
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             var editModel = (ProductCategoryDto)e.EditModel;
-
+            bool exists = await Mediator.Send(new ValidateProductCategoryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+            if (exists)
+            {
+                ToastService.ShowWarning($"Category Product with name '{editModel.Name}' & Code '{editModel.Code}' already exists.");
+                return;
+            }
             if (editModel.Id == 0)
                 await Mediator.Send(new CreateProductCategoryRequest(editModel));
             else
