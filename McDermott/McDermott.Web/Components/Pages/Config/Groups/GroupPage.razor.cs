@@ -175,7 +175,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             try
             {
                 Group = SelectedDataItems[0].Adapt<GroupDto>();
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Ids={Helper.Encrypt(Group.Id.ToString())}");
                 return;
                 IsLoading = true;
                 ShowForm = true;
