@@ -91,18 +91,30 @@ namespace McDermott.Application.Features.Queries.Config
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.District.Name, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+                    //||
+                    //EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%") ||
+                    //EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
+                    //EF.Functions.Like(v.District.Name, $"%{request.SearchTerm}%")
+                    //);
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                //var pagedResult = query
+                //            .OrderBy(x => x.Name);
 
-                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+                //var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-                return (paged.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
+                //return (paged.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
+
+                // Menggunakan metode paginate dan sort
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                    query,
+                    request.PageSize,
+                    request.PageIndex,
+                    q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                    cancellationToken);
+
+                return (pagedItems.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
