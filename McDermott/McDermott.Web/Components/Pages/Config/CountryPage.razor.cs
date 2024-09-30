@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
+using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -77,18 +78,17 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             PanelVisible = false;
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var countries = await Mediator.Send(new GetCountryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Countries = countries.Item1;
-            totalCount = countries.Item4;
+            var result = await Mediator.QueryGetHelper<Country, CountryDto>(null, pageIndex, pageSize, searchTerm);
+            Countries = result.Item1;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }

@@ -4,13 +4,16 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetProvinceQuery(Expression<Func<Province, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetProvinceQuery(Expression<Func<Province, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Province, object>>>? includes = null, Expression<Func<Province, Province>>? select = null) : IRequest<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Province, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; set; } = pageSize ?? 10;
+            public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Province, object>>> Includes { get; } = includes!;
+            public Expression<Func<Province, Province>>? Select { get; } = select!;
         }
 
         public class ValidateProvinceQuery(Expression<Func<Province, bool>>? predicate = null) : IRequest<bool>

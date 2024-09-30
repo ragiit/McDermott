@@ -114,7 +114,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                     }
 
                     groups = (await Mediator.Send(new GetGroupQuery(x => groupNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
-                    religions = (await Mediator.Send(new GetReligionQuery(x => groupNames.Contains(x.Name.ToLower()))));
+                    religions = (await Mediator.Send(new GetReligionQuery(x => religionNames.Contains(x.Name.ToLower()))));
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -178,7 +178,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                         if (!string.IsNullOrWhiteSpace(marital))
                         {
-                            if (!Helper.Genders.Contains(marital) && !string.IsNullOrEmpty(marital))
+                            if (!Helper.MartialStatuss.Contains(marital) && !string.IsNullOrEmpty(marital))
                             {
                                 ToastService.ShowErrorImport(row, 9, marital ?? string.Empty);
                                 isValid = false;
@@ -480,7 +480,37 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetUserQuery2(
+                searchTerm: searchTerm,
+                pageSize: pageSize,
+                pageIndex:
+                pageIndex,
+                includes:
+                [
+                    user => user.Group
+                ],
+                select: x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth,
+                    Group = new Domain.Entities.Group
+                    {
+                        Name = x.Group.Name
+                    },
+                    IsEmployee = x.IsEmployee,
+                    IsPatient = x.IsPatient,
+                    IsUser = x.IsUser,
+                    IsPhysicion = x.IsPhysicion,
+                    IsNurse = x.IsNurse,
+                    IsPharmacy = x.IsPharmacy,
+                    IsMcu = x.IsMcu,
+                    IsHr = x.IsHr,
+                }
+            ));
             Users = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;

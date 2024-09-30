@@ -105,6 +105,40 @@
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as JobPositionDto ?? new());
+
+            var result = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == a.DepartmentId,
+            includes:
+            [
+                x => x.Manager,
+                x => x.ParentDepartment,
+                x => x.Company,
+            ],
+            select: x => new Department
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ParentDepartmentId = x.ParentDepartmentId,
+                CompanyId = x.CompanyId,
+                ManagerId = x.ManagerId,
+                ParentDepartment = new Domain.Entities.Department
+                {
+                    Name = x.ParentDepartment.Name
+                },
+                Company = new Domain.Entities.Company
+                {
+                    Name = x.Company.Name
+                },
+                Manager = new Domain.Entities.User
+                {
+                    Name = x.Manager.Name
+                },
+                DepartmentCategory = x.DepartmentCategory
+            })));
+
+            Departments = result.Item1;
+            totalCountDepartment = result.pageCount;
         }
 
         private void DeleteItem_Click()
@@ -148,7 +182,21 @@
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetJobPositionQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var a = await Mediator.Send(new GetJobPositionQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex,
+                includes:
+                [
+                    x => x.Department
+                ],
+                select: x => new JobPosition
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    DepartmentId = x.DepartmentId,
+                    Department = new Domain.Entities.Department
+                    {
+                        Name = x.Department.Name
+                    },
+                }));
                 JobPositions = a.Item1;
                 totalCount = a.pageCount;
                 activePageIndex = pageIndex;

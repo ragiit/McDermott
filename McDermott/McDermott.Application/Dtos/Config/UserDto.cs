@@ -164,6 +164,13 @@ namespace McDermott.Application.Dtos.Config
         public string? MedicationHistory { get; set; }
         public string? PastMedicalHistory { get; set; }
 
+        #region NotMapped
+
+        [NotMapped]
+        public string? GroupName { get; set; }
+
+        #endregion NotMapped
+
         //[SetToNull]
         public UserDto? Supervisor { get; set; }  // Referensi ke Supervisor
 
@@ -363,5 +370,12 @@ namespace McDermott.Application.Dtos.Config
         public string? IsMedicationHistory { get; set; }
         public string? MedicationHistory { get; set; }
         public string? PastMedicalHistory { get; set; }
+
+        #region NotMapped
+
+        [NotMapped]
+        public string? GroupName { get; set; }
+
+        #endregion NotMapped
     }
 }

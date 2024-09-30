@@ -78,8 +78,8 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = Array.Empty<object>();
-            var result = await Mediator.Send(new GetProvinceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            SelectedDataItems = [];
+            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(null, pageIndex, pageSize, searchTerm);
             Provinces = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;
@@ -122,14 +122,12 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCountries(0, 10);
         }
 
-        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10, long? countryId = null)
+        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-
-            var result = await Mediator.Send(new GetCountryQuery(countryId == null ? null : x => x.Id == countryId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            var result = await Mediator.QueryGetHelper<Country, CountryDto>(null, pageIndex, pageSize, searchTerm);
             Countries = result.Item1;
             totalCountCountry = result.pageCount;
-
             PanelVisible = false;
         }
 
@@ -189,13 +187,8 @@ namespace McDermott.Web.Components.Pages.Config
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
 
             PanelVisible = true;
-
             var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
-
-            var resultz = await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId));
-            Countries = resultz.Item1;
-            totalCountCountry = resultz.pageCount;
-
+            Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(x => x.Id == a.CountryId)).Item1;
             PanelVisible = false;
         }
 

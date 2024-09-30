@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
+using HotChocolate.Utilities;
 using Humanizer;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
@@ -182,9 +183,55 @@ namespace McDermott.Web.Components.Pages.Config.Users
             #endregion Residence  Address
 
             Groups = (await Mediator.Send(new GetGroupQuery(x => x.Id == UserForm.GroupId))).Item1;
-            Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId))).Item1;
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery(x => x.Id == UserForm.JobPositionId))).Item1;
-            Departments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == UserForm.DepartmentId))).Item1;
+            Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId,
+            select: x => new User
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Email = x.Email
+            }))).Item1;
+
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery(x => x.Id == UserForm.JobPositionId,
+            includes:
+            [
+                x => x.Department
+            ],
+            select: x => new JobPosition
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Department = new Domain.Entities.Department
+                {
+                    Name = x.Department.Name
+                },
+            }))).Item1;
+
+            Departments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == UserForm.DepartmentId,
+            includes:
+            [
+                x => x.Manager,
+                x => x.ParentDepartment,
+                x => x.Company,
+            ],
+            select: x => new Department
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ParentDepartment = new Domain.Entities.Department
+                {
+                    Name = x.ParentDepartment.Name
+                },
+                Company = new Domain.Entities.Company
+                {
+                    Name = x.Company.Name
+                },
+                Manager = new Domain.Entities.User
+                {
+                    Name = x.Manager.Name
+                },
+                DepartmentCategory = x.DepartmentCategory
+            }))).Item1;
+
             Occupationals = (await Mediator.Send(new GetOccupationalQuery(x => x.Id == UserForm.OccupationalId))).Item1;
 
             Specialities = (await Mediator.Send(new GetSpecialityQuery(x => x.Id == UserForm.SpecialityId))).Item1;
@@ -333,7 +380,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 }
 
                 UserForm = result.Item1.FirstOrDefault() ?? new();
-                UserForm.Password = Helper.HashMD5(UserForm.Password);
+                //UserForm.Password = Helper.HashMD5(UserForm.Password);
             }
         }
 
@@ -1373,8 +1420,18 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refOccupationalComboBox?.Text ?? ""));
-            Occupationals = result.Item1;
+            var result = await Mediator.Send(new GetOccupationalQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refOccupationalComboBox?.Text ?? "",
+                select: x => new Occupational
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description
+                }
+
+            )); Occupationals = result.Item1;
             totalCountOccupational = result.pageCount;
             PanelVisible = false;
         }
@@ -1523,10 +1580,22 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         private List<UserDto> Supervisors = [];
 
-        private async Task LoadDataSupervisor(int pageIndex = 0, int pageSize = 10, long? SupervisorId = null)
+        private async Task LoadDataSupervisor(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetUserQuery2(SupervisorId == null ? null : x => x.Id == SupervisorId && x.IsEmployee == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refSupervisorComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetUserQuery2(
+                 predicate: x => x.IsEmployee == true,
+                 pageIndex: pageIndex,
+                 pageSize: pageSize,
+                 searchTerm: refSupervisorComboBox?.Text ?? "",
+                 select: x => new User
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Email = x.Email
+                 }
+
+            ));
             Supervisors = result.Item1;
             totalCountSupervisor = result.pageCount;
             PanelVisible = false;
@@ -1569,10 +1638,28 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataJobPosition();
         }
 
-        private async Task LoadDataJobPosition(int pageIndex = 0, int pageSize = 10, long? JobPositionId = null)
+        private async Task LoadDataJobPosition(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetJobPositionQuery(JobPositionId == null ? null : x => x.Id == JobPositionId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refJobPositionComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetJobPositionQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refJobPositionComboBox?.Text ?? "",
+                includes:
+                [
+                    x => x.Department
+                ],
+                select: x => new JobPosition
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Department = new Domain.Entities.Department
+                    {
+                        Name = x.Department.Name
+                    },
+                }
+
+            ));
             JobPositions = result.Item1;
             totalCountJobPosition = result.pageCount;
             PanelVisible = false;
@@ -1615,10 +1702,38 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataDepartment();
         }
 
-        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10, long? DepartmentId = null)
+        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetDepartmentQuery(DepartmentId == null ? null : x => x.Id == DepartmentId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDepartmentComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetDepartmentQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refDepartmentComboBox?.Text ?? "",
+                includes:
+                [
+                    x => x.Manager,
+                    x => x.ParentDepartment,
+                    x => x.Company,
+                ],
+                select: x => new Department
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ParentDepartment = new Domain.Entities.Department
+                    {
+                        Name = x.ParentDepartment.Name
+                    },
+                    Company = new Domain.Entities.Company
+                    {
+                        Name = x.Company.Name
+                    },
+                    Manager = new Domain.Entities.User
+                    {
+                        Name = x.Manager.Name
+                    },
+                    DepartmentCategory = x.DepartmentCategory
+                }
+            ));
             Departments = result.Item1;
             totalCountDepartment = result.pageCount;
             PanelVisible = false;

@@ -110,7 +110,13 @@ namespace McDermott.Web.Components.Pages.Employee
         private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10, long? UserId = null)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetUserQuery2(z => z.IsEmployee == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUserComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetUserQuery2(z => z.IsEmployee == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUserComboBox?.Text ?? "",
+            select: x => new User
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Email = x.Email
+            }));
             Users = result.Item1;
             totalCountUser = result.pageCount;
             PanelVisible = false;
@@ -156,8 +162,18 @@ namespace McDermott.Web.Components.Pages.Employee
         private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10, long? CompanyId = null)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetCompanyQuery(CompanyId == null ? null : x => x.Id == CompanyId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCompanyComboBox?.Text ?? ""));
-            Companies = result.Item1;
+            var result = await Mediator.Send(new GetCompanyQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refCompanyComboBox?.Text ?? "",
+                select: x => new Company
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email
+                }
+
+            )); Companies = result.Item1;
             totalCountCompany = result.pageCount;
             PanelVisible = false;
         }
@@ -196,7 +212,35 @@ namespace McDermott.Web.Components.Pages.Employee
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetDepartmentQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var a = await Mediator.Send(new GetDepartmentQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex,
+                includes:
+                [
+                    x => x.Manager,
+                    x => x.ParentDepartment,
+                    x => x.Company,
+                ],
+                select: x => new Department
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ParentDepartmentId = x.ParentDepartmentId.GetValueOrDefault(),
+                    CompanyId = x.CompanyId.GetValueOrDefault(),
+                    ManagerId = x.ManagerId.GetValueOrDefault(),
+                    ParentDepartment = new Department
+                    {
+                        Name = x.ParentDepartment.Name
+                    },
+                    Company = new Company
+                    {
+                        Name = x.Company.Name
+                    },
+                    Manager = new User
+                    {
+                        Name = x.Manager.Name
+                    },
+                    DepartmentCategory = x.DepartmentCategory
+                }));
+
                 Departments = a.Item1;
                 totalCount = a.pageCount;
                 activePageIndex = pageIndex;
@@ -468,9 +512,53 @@ namespace McDermott.Web.Components.Pages.Employee
 
         private async Task LoadComboboxEdit(DepartmentDto a)
         {
-            ParentDepartments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == a.ParentDepartmentId))).Item1;
-            Companies = (await Mediator.Send(new GetCompanyQuery(x => x.Id == a.CompanyId))).Item1;
-            Users = (await Mediator.Send(new GetUserQuery2(x => x.Id == a.ManagerId))).Item1;
+            ParentDepartments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == a.ParentDepartmentId,
+            includes:
+            [
+                x => x.Manager,
+                x => x.ParentDepartment,
+                x => x.Company,
+            ],
+            select: x => new Department
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ParentDepartment = new Department
+                {
+                    Name = x.ParentDepartment.Name
+                },
+                Company = new Company
+                {
+                    Name = x.Company.Name
+                },
+                Manager = new User
+                {
+                    Name = x.Manager.Name
+                },
+                DepartmentCategory = x.DepartmentCategory
+            }))).Item1;
+
+            Companies = (await Mediator.Send(new GetCompanyQuery(x => x.Id == a.CompanyId,
+            includes:
+            [
+                x => x.Country,
+                x => x.City,
+                x => x.Province
+            ],
+            select: x => new Company
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Email = x.Email
+            }))).Item1;
+
+            Users = (await Mediator.Send(new GetUserQuery2(x => x.Id == a.ManagerId,
+            select: x => new User
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Email = x.Email
+            }))).Item1;
         }
 
         private void DeleteItem_Click()
@@ -515,12 +603,36 @@ namespace McDermott.Web.Components.Pages.Employee
             await LoadDataParentDepartment();
         }
 
-        private async Task LoadDataParentDepartment(int pageIndex = 0, int pageSize = 10, long? ParentDepartmentId = null)
+        private async Task LoadDataParentDepartment(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetDepartmentQuery(x => x.ParentDepartmentId == null, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refParentDepartmentComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetDepartmentQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refParentDepartmentComboBox?.Text ?? "",
+                includes:
+                [
+                    x => x.Manager,
+                    x => x.ParentDepartment,
+                    x => x.Company,
+                ],
+                select: x => new Department
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ParentDepartment = new Department
+                    {
+                        Name = x.ParentDepartment.Name
+                    },
+                    Company = new Company
+                    {
+                        Name = x.Company.Name
+                    },
+                    Manager = new User
+                    {
+                        Name = x.Manager.Name
+                    },
+                    DepartmentCategory = x.DepartmentCategory
+                }));
                 ParentDepartments = result.Item1;
                 totalCountParentDepartment = result.pageCount;
                 PanelVisible = false;
