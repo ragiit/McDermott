@@ -35,6 +35,6 @@
         public virtual Province? Province { get; set; }
         public virtual Country? Country { get; set; }
         public virtual List<ReorderingRule>? ReorderingRules { get; set; }
-        public virtual List<Location>? Locations { get; set; }
+        public virtual List<Locations>? Locations { get; set; }
     }
 }

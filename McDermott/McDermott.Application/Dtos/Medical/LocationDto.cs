@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Application.Dtos.Medical
 {
-    public class LocationDto : IMapFrom<Location>
+    public class LocationDto : IMapFrom<Locations>
     {
         public long Id { get; set; }
 

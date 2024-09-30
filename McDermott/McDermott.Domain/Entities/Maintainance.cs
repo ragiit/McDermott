@@ -35,7 +35,7 @@ namespace McDermott.Domain.Entities
         [SetToNull]
         public virtual Product? Equipment { get; set; }
         [SetToNull]
-        public virtual Location? Location { get; set; }
+        public virtual Locations? Location { get; set; }
 
 
     }

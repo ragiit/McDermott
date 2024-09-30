@@ -17,10 +17,10 @@ namespace McDermott.Domain.Entities
         public bool? StockRequest { get; set; }
 
         [SetToNull]
-        public Location? Source { get; set; }
+        public Locations? Source { get; set; }
 
         [SetToNull]
-        public Location? Destination { get; set; }
+        public Locations? Destination { get; set; }
 
         [SetToNull]
         public List<TransferStockProduct>? TransferStockProduct { get; set; }

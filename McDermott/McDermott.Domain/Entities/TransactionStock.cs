@@ -20,7 +20,7 @@ namespace McDermott.Domain.Entities
         public bool? Validate { get; set; }
 
         public Product? Product { get; set; }
-        public Location? Location { get; set; }
+        public Locations? Location { get; set; }
         public Uom? Uom { get; set; }
         public List<StockOutLines>? StockOutLines { get; set; }
         public List<StockOutPrescription>? StockOutPrescription { get; set; }

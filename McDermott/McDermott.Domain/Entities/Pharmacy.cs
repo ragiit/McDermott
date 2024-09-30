@@ -15,7 +15,7 @@
         public EnumStatusPharmacy? Status { get; set; }
 
         [SetToNull]
-        public Location? Location { get; set; }
+        public Locations? Location { get; set; }
 
         [SetToNull]
         public MedicamentGroup? MedicamentGroup { get; set; }

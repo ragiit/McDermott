@@ -17,7 +17,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<Location>().Entities
+                var query = _unitOfWork.Repository<Locations>().Entities
                     .Include(x => x.ParentLocation)
                     .AsNoTracking()
                     .AsQueryable();
@@ -46,7 +46,7 @@ namespace McDermott.Application.Features.Queries.Medical
 
         public async Task<bool> Handle(ValidateLocationQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Repository<Location>()
+            return await _unitOfWork.Repository<Locations>()
                 .Entities
                 .AsNoTracking()
                 .Where(request.Predicate)  // Apply the Predicate for filtering
@@ -61,7 +61,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<Location>().AddAsync(request.LocationDto.Adapt<Location>());
+                var result = await _unitOfWork.Repository<Locations>().AddAsync(request.LocationDto.Adapt<Locations>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -79,7 +79,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<Location>().AddAsync(request.LocationDtos.Adapt<List<Location>>());
+                var result = await _unitOfWork.Repository<Locations>().AddAsync(request.LocationDtos.Adapt<List<Locations>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -101,7 +101,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<Location>().UpdateAsync(request.LocationDto.Adapt<Location>());
+                var result = await _unitOfWork.Repository<Locations>().UpdateAsync(request.LocationDto.Adapt<Locations>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -119,7 +119,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<Location>().UpdateAsync(request.LocationDtos.Adapt<List<Location>>());
+                var result = await _unitOfWork.Repository<Locations>().UpdateAsync(request.LocationDtos.Adapt<List<Locations>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -143,37 +143,37 @@ namespace McDermott.Application.Features.Queries.Medical
             {
                 if (request.Id > 0)
                 {
-                    var result = await _unitOfWork.Repository<Location>().Entities.Where(x => x.ParentLocationId == request.Id).ToListAsync(cancellationToken);
+                    var result = await _unitOfWork.Repository<Locations>().Entities.Where(x => x.ParentLocationId == request.Id).ToListAsync(cancellationToken);
 
                     foreach (var item in result)
                     {
                         item.ParentLocationId = null;
                     }
 
-                    await _unitOfWork.Repository<Location>().UpdateAsync(result);
+                    await _unitOfWork.Repository<Locations>().UpdateAsync(result);
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                     //await _unitOfWork.Repository<Location>().DeleteAsync(x => result.Select(z => z.Id).Contains(x.Id));
 
-                    await _unitOfWork.Repository<Location>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<Locations>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
                     foreach (var item in request.Ids)
                     {
-                        var result = await _unitOfWork.Repository<Location>().Entities.Where(x => x.ParentLocationId == item).ToListAsync(cancellationToken);
+                        var result = await _unitOfWork.Repository<Locations>().Entities.Where(x => x.ParentLocationId == item).ToListAsync(cancellationToken);
 
                         foreach (var item2 in result)
                         {
                             item2.ParentLocationId = null;
                         }
 
-                        await _unitOfWork.Repository<Location>().UpdateAsync(result);
+                        await _unitOfWork.Repository<Locations>().UpdateAsync(result);
                     }
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                    await _unitOfWork.Repository<Location>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<Locations>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

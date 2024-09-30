@@ -4,7 +4,7 @@ using static McDermott.Application.Features.Commands.Inventory.MaintainanceComma
 using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.Product
+namespace McDermott.Web.Components.Pages.Inventory.Products
 {
     public partial class CreateUpdateProductPage
     {
@@ -736,7 +736,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Product
         {
             //IsLoading = true;
             FormValidationState = true;
-            //await OnSave();
+            await OnSave();
             //IsLoading = false;
         }
 

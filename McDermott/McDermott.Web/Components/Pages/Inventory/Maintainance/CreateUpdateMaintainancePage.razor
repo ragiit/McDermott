@@ -92,21 +92,56 @@
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Location">
                                                         <MyDxComboBox Data="@getLocation"
-                                                                      NullText="select Location..."
-                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                      NullText="Select Location"
+                                                                      @ref="refLocationComboBox"
                                                                       @bind-Value="@postMaintainance.LocationId"
-                                                                      SelectedItemChanged="@((LocationDto value)=>selectByLocation(value))"
                                                                       TextFieldName="Name"
-                                                                      ValueFieldName="Id"></MyDxComboBox>
+                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                      ValueFieldName="Id"
+                                                                      TextChanged="((string e) => OnInputLocationChanged(e))">
+                                                            <Buttons>
+                                                                <DxEditorButton Click="OnSearchLocationIndexDecrement"
+                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                Tooltip="Previous Index" />
+                                                                <DxEditorButton Click="OnSearchLocation"
+                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                Tooltip="Search" />
+                                                                <DxEditorButton Click="OnSearchLocationIndexIncrement"
+                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                Tooltip="Next Index" />
+                                                            </Buttons>
+                                                            <Columns>
+                                                                <DxListEditorColumn FieldName="@nameof(Locations.Name)" Caption="Name" />
+                                                                <DxListEditorColumn FieldName="@nameof(Locations.Type)" Caption="Code" />
+                                                            </Columns>
+                                                        </MyDxComboBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Equipment">
                                                         <MyDxComboBox Data="@getEquipment"
-                                                                      NullText="select Equipment..."
-                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
-                                                                      @bind-Value="@postMaintainance.EquipmentId"
-                                                                      SelectedItemChanged="@((ProductDto value)=>selectByProduct(value))"
+                                                                      NullText="Select Product.."
+                                                                      @ref="refProductsComboBox"
+                                                                      @bind-Value="@postMaintainance.LocationId"
                                                                       TextFieldName="Name"
-                                                                      ValueFieldName="Id"></MyDxComboBox>
+                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                      SelectedItemChanged="@((ProductDto value)=>selectByProduct(value))"
+                                                                      ValueFieldName="Id"
+                                                                      TextChanged="((string e) => OnInputProductsChanged(e))">
+                                                            <Buttons>
+                                                                <DxEditorButton Click="OnSearchProductsIndexDecrement"
+                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                Tooltip="Previous Index" />
+                                                                <DxEditorButton Click="OnSearchProducts"
+                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                Tooltip="Search" />
+                                                                <DxEditorButton Click="OnSearchProductsIndexIncrement"
+                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                Tooltip="Next Index" />
+                                                            </Buttons>
+                                                            <Columns>
+                                                                <DxListEditorColumn FieldName="@nameof(Product.Name)" Caption="Name" />
+                                                                <DxListEditorColumn FieldName="@nameof(Product.Brand)" Caption="Brand" />
+                                                            </Columns>
+                                                        </MyDxComboBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Serial Number/Batch">
                                                         <MyDxComboBox Data="@Batch" @bind-Value="@postMaintainance.SerialNumber" NullText="Serial Number" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></MyDxComboBox>

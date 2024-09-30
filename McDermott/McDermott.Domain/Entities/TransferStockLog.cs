@@ -17,9 +17,9 @@ namespace McDermott.Domain.Entities
         public TransferStock? TransferStock { get; set; }
 
         [SetToNull]
-        public Location? Source { get; set; }
+        public Locations? Source { get; set; }
 
         [SetToNull]
-        public Location? Destination { get; set; }
+        public Locations? Destination { get; set; }
     }
 }

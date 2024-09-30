@@ -1,6 +1,6 @@
 ﻿namespace McDermott.Domain.Entities
 {
-    public class Location : BaseAuditableEntity
+    public class Locations : BaseAuditableEntity
     {
         public long? ParentLocationId { get; set; }
         public long? CompanyId { get; set; }
@@ -18,7 +18,7 @@
         public virtual List<ReorderingRule>? ReorderingRules { get; set; }
 
         [SetToNull]
-        public virtual Location? ParentLocation { get; set; }
+        public virtual Locations? ParentLocation { get; set; }
 
         [SetToNull]
         public virtual Company? Company { get; set; }

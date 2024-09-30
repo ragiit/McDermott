@@ -15,6 +15,6 @@ namespace McDermott.Domain.Entities
 
         public ReceivingStock? Receiving {  get; set; }
         public User? UserBy { get; set; }
-        public Location? Source { get; set; }
+        public Locations? Source { get; set; }
     }
 }

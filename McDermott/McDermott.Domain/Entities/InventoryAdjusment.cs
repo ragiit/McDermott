@@ -10,7 +10,7 @@
         public EnumStatusInventoryAdjustment Status { get; set; }
 
         [SetToNull]
-        public virtual Location? Location { get; set; }
+        public virtual Locations? Location { get; set; }
         [SetToNull]
         public virtual Company? Company { get; set; }
 

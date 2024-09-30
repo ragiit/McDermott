@@ -23,9 +23,9 @@ namespace McDermott.Domain.Entities
         [SetToNull]
         public Product? Product { get; set; }
         [SetToNull]
-        public Location? Source { get; set; }
+        public Locations? Source { get; set; }
         [SetToNull]
-        public Location? Destinance { get; set; }
+        public Locations? Destinance { get; set; }
         [SetToNull]
         public Uom? Uom { get; set; }
         [SetToNull]

@@ -63,7 +63,7 @@ namespace McDermott.Persistence.Context
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Insurance> Insurances { get; set; }
-        public DbSet<Location> Locations { get; set; }
+        public DbSet<Locations> Locations { get; set; }
         public DbSet<BuildingLocation> BuildingLocations { get; set; }
         public DbSet<LabTestDetail> LabTestDetails { get; set; }
         public DbSet<LabTest> LabTests { get; set; }
@@ -273,7 +273,7 @@ namespace McDermott.Persistence.Context
                .WithMany(m => m.LabTests)
                .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Location>()
+            modelBuilder.Entity<Locations>()
             .HasOne(e => e.ParentLocation)
             .WithMany()
             .HasForeignKey(e => e.ParentLocationId)
@@ -288,7 +288,7 @@ namespace McDermott.Persistence.Context
                  .WithOne(c => c.DrugRoute)
                  .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Location>()
+            modelBuilder.Entity<Locations>()
                 .HasMany(m => m.ReorderingRules)
                 .WithOne(c => c.Location)
                 .OnDelete(DeleteBehavior.SetNull);

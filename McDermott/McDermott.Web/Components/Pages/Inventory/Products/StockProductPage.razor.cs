@@ -1,7 +1,7 @@
 ﻿using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.Product
+namespace McDermott.Web.Components.Pages.Inventory.Products
 {
     public partial class StockProductPage
     {

@@ -4,7 +4,7 @@ using static McDermott.Application.Features.Commands.Inventory.StockProductComma
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.Product
+namespace McDermott.Web.Components.Pages.Inventory.Products
 {
     public partial class ProductPage
     {

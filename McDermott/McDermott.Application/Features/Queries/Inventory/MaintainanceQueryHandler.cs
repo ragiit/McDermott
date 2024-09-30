@@ -31,7 +31,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!_cache.TryGetValue(cacheKey, out List<Maintainance>? result))
                 {
                     result = await _unitOfWork.Repository<Maintainance>().Entities
-                     .Include(x => x.RequestBy)
+                    .Include(x => x.RequestBy)
                     .Include(x => x.Location)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);

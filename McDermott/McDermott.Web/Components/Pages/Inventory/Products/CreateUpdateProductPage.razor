@@ -83,10 +83,22 @@
                                     </div>
                                 </div>
                             }
-                            <div class="card-body">
-                                <EditForm Model="@PostProductDetails" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
-                                    <DataAnnotationsValidator />
-                                    <AntiforgeryToken />
+                            <EditForm Model="@PostProductDetails" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+                                <DataAnnotationsValidator />
+                                <AntiforgeryToken />
+                                <div class="card sticky">
+                                    <div class="card-body">
+                                        <div class=" row w-100">
+                                            <div class="w-100 row justify-content-end mt-2 mb-2">
+                                                <div class="col-auto align-self-end p-0 m-0">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscard"></DxButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
                                     <DxFormLayout CssClass="mt w-100">
                                         <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@PostProductDetails.Name"
@@ -99,177 +111,6 @@
                                     <hr />
                                     <div class="cw-480">
                                         <DxTabs>
-                                            <DxTabPage Text="MEDICAMENT" Visible="@(PostProductDetails.HospitalType == "Medicament")" TabIconCssClass="fa-solid fa-pills">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <DxFormLayout CssClass="mt w-100">
-                                                            <DxFormLayoutItem Caption="Drug Form" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@GetDrugForms"
-                                                                              NullText="Select Uom"
-                                                                              @ref="refDrugFormComboBox"
-                                                                              @bind-Value="@PostProductDetails.FormId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id"
-                                                                              TextChanged="((string e) => OnInputDrugFormChanged(e))">
-                                                                    <Buttons>
-                                                                        <DxEditorButton Click="OnSearchDrugFormIndexDecrement"
-                                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                                        Tooltip="Previous Index" />
-                                                                        <DxEditorButton Click="OnSearchDrugForm"
-                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                        Tooltip="Search" />
-                                                                        <DxEditorButton Click="OnSearchDrugFormIndexIncrement"
-                                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                                        Tooltip="Next Index" />
-                                                                    </Buttons>
-                                                                    <Columns>
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugForm.Name)" Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugForm.Code)" Caption="Code" />
-                                                                    </Columns>
-                                                                </MyDxComboBox>
-                                                            </DxFormLayoutItem>
-
-                                                            <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
-
-                                                                <MyDxComboBox Data="@GetDrugRoutes"
-                                                                              NullText="Select Routes"
-                                                                              @ref="refDrugRouteComboBox"
-                                                                              @bind-Value="@PostProductDetails.FormId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id"
-                                                                              TextChanged="((string e) => OnInputDrugRouteChanged(e))">
-                                                                    <Buttons>
-                                                                        <DxEditorButton Click="OnSearchDrugRouteIndexDecrement"
-                                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                                        Tooltip="Previous Index" />
-                                                                        <DxEditorButton Click="OnSearchDrugRoute"
-                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                        Tooltip="Search" />
-                                                                        <DxEditorButton Click="OnSearchDrugRouteIndexIncrement"
-                                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                                        Tooltip="Next Index" />
-                                                                    </Buttons>
-                                                                    <Columns>
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugRoute.Route)" Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugRoute.Code)" Caption="Code" />
-                                                                    </Columns>
-                                                                </MyDxComboBox>
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption="Dosage" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <Template>
-                                                                    <DxGridLayout ColumnSpacing="8px">
-                                                                        <Rows>
-                                                                            <DxGridLayoutRow />
-                                                                        </Rows>
-                                                                        <Columns>
-                                                                            <DxGridLayoutColumn />
-                                                                            <DxGridLayoutColumn />
-                                                                        </Columns>
-                                                                        <Items>
-                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption " ColumnSpan="1">
-                                                                                <Template>
-                                                                                    <DxSpinEdit @bind-Value="@PostProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
-                                                                                </Template>
-                                                                            </DxGridLayoutItem>
-                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6">
-                                                                                <Template>
-                                                                                    <MyDxComboBox Data="@GetUoms"
-                                                                                                  NullText="Select Uom"
-                                                                                                  @ref="refUomComboBox"
-                                                                                                  @bind-Value="@PostProductDetails.UomMId"
-                                                                                                  TextFieldName="Name"
-                                                                                                  ValueFieldName="Id"
-                                                                                                  TextChanged="((string e) => OnInputUomChanged(e))">
-                                                                                        <Buttons>
-                                                                                            <DxEditorButton Click="OnSearchUomIndexDecrement"
-                                                                                                            IconCssClass="fa-solid fa-caret-left"
-                                                                                                            Tooltip="Previous Index" />
-                                                                                            <DxEditorButton Click="OnSearchUom"
-                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                                            Tooltip="Search" />
-                                                                                            <DxEditorButton Click="OnSearchUomIndexIncrement"
-                                                                                                            IconCssClass="fa-solid fa-caret-right"
-                                                                                                            Tooltip="Next Index" />
-                                                                                        </Buttons>
-                                                                                        <Columns>
-                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
-                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.Type)" Caption="Type" />
-                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.UomCategory.Name)" Caption="Uom category" />
-                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.BiggerRatio)" Caption="Big Ratio" />
-                                                                                        </Columns>
-                                                                                    </MyDxComboBox>
-                                                                                </Template>
-                                                                            </DxGridLayoutItem>
-                                                                        </Items>
-                                                                    </DxGridLayout>
-                                                                </Template>
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption="Chronies" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <DxCheckBox @bind-Checked="@Checkin" LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                            </DxFormLayoutItem>
-                                                            @if (Chronis)
-                                                            {
-                                                                <DxFormLayoutItem Caption="Montly Max" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@PostProductDetails.MontlyMax" NullText="0.00" />
-                                                                </DxFormLayoutItem>
-                                                            }
-                                                            <DxFormLayoutItem Caption="High Alert" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <DxCheckBox @bind-Checked="@PostProductDetails.HighAlert" LabelPosition="LabelPosition.Left" CssClass="w-100" />
-                                                            </DxFormLayoutItem>
-                                                        </DxFormLayout>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <DxFormLayout CssClass="mt w-100">
-                                                            <DxFormLayoutItem Caption="Instruction" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@GetDrugDosage"
-                                                                              NullText="Select DrugDosage"
-                                                                              @ref="refDrugDosageComboBox"
-                                                                              @bind-Value="@PostProductDetails.FrequencyId"
-                                                                              TextFieldName="Name"
-                                                                              ValueFieldName="Id"
-                                                                              TextChanged="((string e) => OnInputUomChanged(e))">
-                                                                    <Buttons>
-                                                                        <DxEditorButton Click="OnSearchDrugDosageIndexDecrement"
-                                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                                        Tooltip="Previous Index" />
-                                                                        <DxEditorButton Click="OnSearchDrugDosage"
-                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                        Tooltip="Search" />
-                                                                        <DxEditorButton Click="OnSearchDrugDosageIndexIncrement"
-                                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                                        Tooltip="Next Index" />
-                                                                    </Buttons>
-                                                                    <Columns>
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.Frequency)" Caption="Intructoin" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.TotalQtyPerDay)" Caption="Total Dosage" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.Days)" Caption="Day" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.DrugRoute.Route)" Caption="Big Ratio" />
-                                                                    </Columns>
-                                                                </MyDxComboBox>
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption="Active Component" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <DxTagBox Data="@ActiveComponents"
-                                                                          FilteringMode="@DataGridFilteringMode.Contains"
-                                                                          @bind-Values="@selectedActiveComponents"
-                                                                          NullText="Select Active Component.."
-                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                          TextFieldName="Name" />
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass=" normal-caption" ColSpanMd="12">
-                                                                <DxCheckBox @bind-Checked="@PostProductDetails.PregnancyWarning" />
-                                                            </DxFormLayoutItem>
-                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
-                                                                <DxCheckBox CssClass="normal-caption" @bind-Checked="@PostProductDetails.IsTopicalMedication">
-                                                                    <div class="normal-caption">Topical Medication</div>
-                                                                </DxCheckBox>
-                                                                <DxCheckBox @bind-Checked="@(PostProductDetails.IsOralMedication)">
-                                                                    <div class="normal-caption">Oral Medication</div>
-                                                                </DxCheckBox>
-                                                            </DxFormLayoutItem>
-                                                        </DxFormLayout>
-                                                    </div>
-                                                </div>
-                                            </DxTabPage>
                                             <DxTabPage Text="GENERAL INFORMATION" TabIconCssClass="fa-solid fa-circle-info">
                                                 <div class="row">
                                                     <div class="col-md-6">
@@ -470,18 +311,188 @@
                                                     </div>
                                                 </div>
                                             </DxTabPage>
+                                                                                        <DxTabPage Text="MEDICAMENT" Visible="@(PostProductDetails.HospitalType == "Medicament")" TabIconCssClass="fa-solid fa-pills">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout CssClass="mt w-100">
+                                                            <DxFormLayoutItem Caption="Drug Form" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@GetDrugForms"
+                                                                              NullText="Select Uom"
+                                                                              @ref="refDrugFormComboBox"
+                                                                              @bind-Value="@PostProductDetails.FormId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputDrugFormChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchDrugFormIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchDrugForm"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchDrugFormIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugForm.Name)" Caption="Name" />
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugForm.Code)" Caption="Code" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
+
+                                                                <MyDxComboBox Data="@GetDrugRoutes"
+                                                                              NullText="Select Routes"
+                                                                              @ref="refDrugRouteComboBox"
+                                                                              @bind-Value="@PostProductDetails.FormId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputDrugRouteChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchDrugRouteIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchDrugRoute"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchDrugRouteIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugRoute.Route)" Caption="Name" />
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugRoute.Code)" Caption="Code" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem Caption="Dosage" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <Template>
+                                                                    <DxGridLayout ColumnSpacing="8px">
+                                                                        <Rows>
+                                                                            <DxGridLayoutRow />
+                                                                        </Rows>
+                                                                        <Columns>
+                                                                            <DxGridLayoutColumn />
+                                                                            <DxGridLayoutColumn />
+                                                                        </Columns>
+                                                                        <Items>
+                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption " ColumnSpan="1">
+                                                                                <Template>
+                                                                                    <DxSpinEdit @bind-Value="@PostProductDetails.Dosage" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"></DxSpinEdit>
+                                                                                </Template>
+                                                                            </DxGridLayoutItem>
+                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption " ColumnSpan="6">
+                                                                                <Template>
+                                                                                    <MyDxComboBox Data="@GetUoms"
+                                                                                                  NullText="Select Uom"
+                                                                                                  @ref="refUomComboBox"
+                                                                                                  @bind-Value="@PostProductDetails.UomMId"
+                                                                                                  TextFieldName="Name"
+                                                                                                  ValueFieldName="Id"
+                                                                                                  TextChanged="((string e) => OnInputUomChanged(e))">
+                                                                                        <Buttons>
+                                                                                            <DxEditorButton Click="OnSearchUomIndexDecrement"
+                                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                                            Tooltip="Previous Index" />
+                                                                                            <DxEditorButton Click="OnSearchUom"
+                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                            Tooltip="Search" />
+                                                                                            <DxEditorButton Click="OnSearchUomIndexIncrement"
+                                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                                            Tooltip="Next Index" />
+                                                                                        </Buttons>
+                                                                                        <Columns>
+                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.Type)" Caption="Type" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.UomCategory.Name)" Caption="Uom category" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.BiggerRatio)" Caption="Big Ratio" />
+                                                                                        </Columns>
+                                                                                    </MyDxComboBox>
+                                                                                </Template>
+                                                                            </DxGridLayoutItem>
+                                                                        </Items>
+                                                                    </DxGridLayout>
+                                                                </Template>
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem Caption="Chronies" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <DxCheckBox @bind-Checked="@Checkin" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                            </DxFormLayoutItem>
+                                                            @if (Chronis)
+                                                            {
+                                                                <DxFormLayoutItem Caption="Montly Max" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@PostProductDetails.MontlyMax" NullText="0.00" />
+                                                                </DxFormLayoutItem>
+                                                            }
+                                                            <DxFormLayoutItem Caption="High Alert" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <DxCheckBox @bind-Checked="@PostProductDetails.HighAlert" LabelPosition="LabelPosition.Left" CssClass="w-100" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout CssClass="mt w-100">
+                                                            <DxFormLayoutItem Caption="Instruction" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@GetDrugDosage"
+                                                                              NullText="Select DrugDosage"
+                                                                              @ref="refDrugDosageComboBox"
+                                                                              @bind-Value="@PostProductDetails.FrequencyId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputUomChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchDrugDosageIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchDrugDosage"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchDrugDosageIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.Frequency)" Caption="Intructoin" />
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.TotalQtyPerDay)" Caption="Total Dosage" />
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.Days)" Caption="Day" />
+                                                                        <DxListEditorColumn FieldName="@nameof(DrugDosage.DrugRoute.Route)" Caption="Big Ratio" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem Caption="Active Component" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <DxTagBox Data="@ActiveComponents"
+                                                                          FilteringMode="@DataGridFilteringMode.Contains"
+                                                                          @bind-Values="@selectedActiveComponents"
+                                                                          NullText="Select Active Component.."
+                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                          TextFieldName="Name" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem Caption="Pregnancy Warning" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                <DxCheckBox @bind-Checked="@PostProductDetails.PregnancyWarning" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medicine Type" ColSpanMd="12">
+                                                                <DxCheckBox CssClass="normal-caption" @bind-Checked="@PostProductDetails.IsTopicalMedication">
+                                                                    <div class="normal-caption">Topical Medication</div>
+                                                                </DxCheckBox>
+                                                                <DxCheckBox @bind-Checked="@(PostProductDetails.IsOralMedication)">
+                                                                    <div class="normal-caption">Oral Medication</div>
+                                                                </DxCheckBox>
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                </div>
+                                            </DxTabPage>
+
                                         </DxTabs>
                                     </div>
 
                                     <hr />
-                                    <DxFormLayout class="mt">
-                                        <div class="col d-flex justify-content-end">
-                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" SubmitFormOnClick="true" Click="onDiscard"></DxButton>
-                                        </div>
-                                    </DxFormLayout>
-                                </EditForm>
-                            </div>
+                                    @* <DxFormLayout class="mt">
+                                <div class="col d-flex justify-content-end">
+                                </div>
+                                </DxFormLayout> *@
+                                </div>
+                            </EditForm>
                         </div>
                     </div>
                 </div>

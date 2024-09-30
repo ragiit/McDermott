@@ -18,7 +18,7 @@ namespace McDermott.Domain.Entities
         public EnumStatusReceiving? Status { get; set; }
 
         [SetToNull]
-        public Location? Destination { get; set; }
+        public Locations? Destination { get; set; }
 
         [SetToNull]
         public List<ReceivingStockProduct>? receivingStockProduct { get; set; }

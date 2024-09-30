@@ -141,7 +141,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 }
                 catch { }
 
-                await LoadData();
+                await LoadDataLocation();
+                await LoadDataProducts();
                 StateHasChanged();
             }
         }
