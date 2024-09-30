@@ -16,6 +16,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetUserInfoGroupQuery, List<UserDto>>,
         IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
         IRequestHandler<CreateUserRequest, UserDto>,
+        IRequestHandler<CreateListUserRequest, List<UserDto>>,
         IRequestHandler<UpdateUserRequest, UserDto>,
         IRequestHandler<DeleteUserRequest, bool>
     {
@@ -23,21 +24,46 @@ namespace McDermott.Application.Features.Queries.Config
 
         public async Task<List<UserDto>> Handle(BulkValidateUserQuery request, CancellationToken cancellationToken)
         {
-            var UserDtos = request.UsersToValidate;
+            var userDtos = request.UsersToValidate;
 
-            // Ekstrak semua kombinasi yang akan dicari di database
-            //var UserNames = UserDtos.Select(x => x.Name).Distinct().ToList();
-            //var provinceIds = UserDtos.Select(x => x.GroupId).Distinct().ToList();
+            // Get distinct values from UserDtos
+            var userNames = userDtos.Select(x => x.Name).Distinct().ToList();
+            var groupIds = userDtos.Select(x => x.GroupId).Distinct().ToList();
+            var identityNumbers = userDtos.Select(x => x.NoId).Distinct().ToList();
+            var religionIds = userDtos.Select(x => x.ReligionId).Distinct().ToList();
+            var datesOfBirth = userDtos.Select(x => x.DateOfBirth).Distinct().ToList();
+            var genders = userDtos.Select(x => x.Gender).Distinct().ToList();
+            var martialStatuses = userDtos.Select(x => x.MartialStatus).Distinct().ToList();
+            var mobilePhones = userDtos.Select(x => x.MobilePhone).Distinct().ToList();
+            var currentMobiles = userDtos.Select(x => x.CurrentMobile).Distinct().ToList();
+            var homePhoneNumbers = userDtos.Select(x => x.HomePhoneNumber).Distinct().ToList();
+            var npwps = userDtos.Select(x => x.Npwp).Distinct().ToList();
+            var emergencyNames = userDtos.Select(x => x.EmergencyName).Distinct().ToList();
+            var emergencyEmails = userDtos.Select(x => x.EmergencyEmail).Distinct().ToList();
+            var emergencyPhones = userDtos.Select(x => x.EmergencyPhone).Distinct().ToList();
 
-            //var existingUsers = await _unitOfWork.Repository<User>()
-            //    .Entities
-            //    .AsNoTracking()
-            //    .Where(v => UserNames.Contains(v.Name)
-            //                && provinceIds.Contains(v.ProvinceId))
-            //    .ToListAsync(cancellationToken);
+            // Fetch existing users
+            var existingUsers = await _unitOfWork.Repository<User>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => userNames.Contains(v.Name) &&
+                            groupIds.Contains(v.GroupId) && // Assuming GroupId corresponds to your DTO
+                            identityNumbers.Contains(v.NoId) && // Match by NoId
+                            religionIds.Contains(v.ReligionId) && // Match by ReligionId
+                            datesOfBirth.Contains(v.DateOfBirth) && // Match by DateOfBirth
+                            genders.Contains(v.Gender) && // Match by Gender
+                            martialStatuses.Contains(v.MartialStatus) && // Match by MartialStatus
+                            mobilePhones.Contains(v.MobilePhone) && // Match by MobilePhone
+                            currentMobiles.Contains(v.CurrentMobile) && // Match by CurrentMobile
+                            homePhoneNumbers.Contains(v.HomePhoneNumber) && // Match by HomePhoneNumber
+                            npwps.Contains(v.Npwp) && // Match by Npwp
+                            emergencyNames.Contains(v.EmergencyName) && // Match by EmergencyName
+                            emergencyEmails.Contains(v.EmergencyEmail) && // Match by EmergencyEmail
+                            emergencyPhones.Contains(v.EmergencyPhone) // Match by EmergencyPhone
+                )
+                .ToListAsync(cancellationToken);
 
-            return [];
-            //return existingUsers.Adapt<List<UserDto>>();
+            return existingUsers.Adapt<List<UserDto>>();
         }
 
         public async Task<(List<UserDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUserQuerys request, CancellationToken cancellationToken)
@@ -235,26 +261,26 @@ namespace McDermott.Application.Features.Queries.Config
                     if (idUser != null)
                     {
                         // Fetch patient-family relations for the user
-                        var asiop = await _unitOfWork.Repository<PatientFamilyRelation>().GetAllAsync(x => x.PatientId.Equals(idUser));
+                        var asiop = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(idUser));
 
                         // Create a list to accumulate family members' data
-                        List<UserDto> familyMembersData = new List<UserDto>();
+                        List<UserDto> familyMembersData = [];
 
-                        foreach (var relation in asiop)
-                        {
-                            // Fetch family members based on the relation's FamilyMemberId
-                            var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(relation.FamilyMemberId));
-                            var FamilyId = await _unitOfWork.Repository<Family>().GetAllAsync(x => x.Id.Equals(relation.FamilyId));
-                            var nameFamily = FamilyId.Select(x => x.Name).FirstOrDefault();
+                        //foreach (var relation in asiop)
+                        //{
+                        //    // Fetch family members based on the relation's FamilyMemberId
+                        //    var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(relation.FamilyMemberId));
+                        //    var FamilyId = await _unitOfWork.Repository<Family>().GetAllAsync(x => x.Id.Equals(relation.FamilyId));
+                        //    var nameFamily = FamilyId.Select(x => x.Name).FirstOrDefault();
 
-                            // Convert the family members to UserDto and add to the family members' data list
-                            var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
-                            foreach (var familyMemberDto in familyMemberDtos)
-                            {
-                                familyMemberDto.FamilyRelation = nameFamily;  // Assuming the relation entity has a RelationshipType property
-                            }
-                            familyMembersData.AddRange(familyMemberDtos);
-                        }
+                        //    // Convert the family members to UserDto and add to the family members' data list
+                        //    var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
+                        //    foreach (var familyMemberDto in familyMemberDtos)
+                        //    {
+                        //        familyMemberDto.FamilyRelation = nameFamily;  // Assuming the relation entity has a RelationshipType property
+                        //    }
+                        //    familyMembersData.AddRange(familyMemberDtos);
+                        //}
 
                         // Add the accumulated family members' data to the main data list
                         data.AddRange(familyMembersData);
@@ -377,6 +403,26 @@ namespace McDermott.Application.Features.Queries.Config
                 _cache.Remove("GetGeneralConsultanServiceQuery_");
 
                 return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<UserDto>> Handle(CreateListUserRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var createUpdateDtos = request.UserDtos.Adapt<List<CreateUpdateUserDto>>();
+                var Users = createUpdateDtos.Adapt<List<User>>();
+                var result = await _unitOfWork.Repository<User>().AddAsync(Users);
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetUserQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<UserDto>>();
             }
             catch (Exception)
             {

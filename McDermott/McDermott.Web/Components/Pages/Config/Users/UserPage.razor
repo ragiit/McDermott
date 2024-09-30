@@ -15,6 +15,8 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                             @if (!ShowForm)
                             {
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -25,7 +27,7 @@
                                                 Text="Fetching Data...">
                                     <MyGridPaginate @ref="Grid"
                                                     Data="Users"
-                                                    @bind-SelectedDataItems="@SelectedDataItems" 
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
                                                     FocusedRowChanged="Grid_FocusedRowChanged"
                                                     RowDoubleClick="OnRowDoubleClick"
                                                     SearchTextChanged="OnSearchBoxChanged"
@@ -39,9 +41,11 @@
                                                              EditItem_Click="@EditItem_Click"
                                                              DeleteItem_Click="@DeleteItem_Click"
                                                              Refresh_Click="@Refresh_Click"
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
                                                              EnableDelete="!IsDeleted"
-                                                             IsImport="false"
                                                              Grid="Grid"
+                                                             IsImport="UserAccessCRUID.IsImport"
                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
                                                              VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -49,7 +53,7 @@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />     
+                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Email" />
                                             <DxGridDataColumn MinWidth="200" FieldName="MobilePhone" Caption="Mobile Phone" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Gender" />
@@ -97,7 +101,7 @@
                                         </DxFormLayout>
                                     </div>
                                 </DxLoadingPanel>
-                            } 
+                            }
                         </div>
                     </div>
                 </div>

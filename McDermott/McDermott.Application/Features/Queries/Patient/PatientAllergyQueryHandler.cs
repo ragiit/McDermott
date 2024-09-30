@@ -1,8 +1,4 @@
-﻿
-
-
-
-namespace McDermott.Application.Features.Queries.Patient
+﻿namespace McDermott.Application.Features.Queries.Patient
 {
     public class PatientAllergyQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetPatientAllergyQuery, List<PatientAllergyDto>>,

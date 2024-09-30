@@ -44,7 +44,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         private bool PanelVisible { get; set; } = true;
 
         [SupplyParameterFromQuery]
-        private string? Id { get; set; }
+        private long? Id { get; set; }
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
@@ -308,8 +308,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
 
             //Id = McDermott.Extentions.SecureHelper.DecryptIdFromBase64(Ids);
-            long? Id = Helper.Decrypt(this.Id ?? "").ToLong();
-            var result = await Mediator.Send(new GetGroupQuery(x => x.Id == Id.ToInt32(), 0, 1));
+            var result = await Mediator.Send(new GetGroupQuery(x => x.Id == Id, 0, 1));
             Group = new();
             GroupMenus.Clear();
 
@@ -536,7 +535,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                 //}
 
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
             }
             else
             {
@@ -572,7 +571,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                     await Mediator.Send(new CreateListGroupMenuRequest(request));
 
                     ShowForm = false;
-                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
+                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
 
                     await LoadData();
 
@@ -607,7 +606,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
 
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
 
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update}?Id={result.Id}", true);
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update}?Id={Group.Id}", true);
             }
 
             ShowForm = false;
