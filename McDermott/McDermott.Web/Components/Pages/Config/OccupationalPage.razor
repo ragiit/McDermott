@@ -4,7 +4,7 @@
 
 <PageTitle>McHealthCare - Occupational</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
         <BaseHeaderPage Title="Occupational" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
@@ -108,6 +108,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

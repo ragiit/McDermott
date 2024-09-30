@@ -85,12 +85,19 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Country, CountryDto>(null, pageIndex, pageSize, searchTerm);
-            Countries = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, searchTerm);
+                Countries = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         public void Dispose()
@@ -220,6 +227,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems == null || !SelectedDataItems.Any())
                 {
                     await Mediator.Send(new DeleteCountryRequest(((CountryDto)e.DataItem).Id));
@@ -231,7 +239,7 @@ namespace McDermott.Web.Components.Pages.Config
                 }
 
                 SelectedDataItems = [];
-                await LoadData(0, pageSize);
+                await LoadData(activePageIndex, pageSize);
             }
             catch (Exception ex)
             {
@@ -244,6 +252,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
+                PanelVisible = true;
                 var editModel = (CountryDto)e.EditModel;
 
                 bool validate = await Mediator.Send(new ValidateCountryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));

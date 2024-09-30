@@ -41,11 +41,19 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
         {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetProvinceQuery(provinceId == null ? null : x => x.Id == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
-            Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+                Provinces = result.Item1;
+                totalCountProvince = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxProvince
@@ -142,17 +150,24 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetCityQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Cities = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, searchTerm);
+                Cities = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            refProvinceComboBox = null;
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
@@ -302,17 +317,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
 
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
 
-            PanelVisible = true;
-
-            var resultz = await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId));
-            Provinces = resultz.Item1;
-            totalCountProvince = resultz.pageCount;
-
-            PanelVisible = false;
+                PanelVisible = true;
+                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
@@ -334,7 +353,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var a = SelectedDataItems.Adapt<List<CityDto>>();
                     await Mediator.Send(new DeleteCityRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData();
+                await LoadData(activePageIndex, pageSize);
             }
             catch (Exception ex) { ex.HandleException(ToastService); }
             finally { PanelVisible = false; }
@@ -367,10 +386,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 ex.HandleException(ToastService);
             }
-            finally
-            {
-                PanelVisible = false;
-            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Default Grid Components

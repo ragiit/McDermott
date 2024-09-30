@@ -25,21 +25,6 @@ namespace McDermott.Web.Components.Pages.Config
                     StateHasChanged();
                 }
                 catch { }
-
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
-
-                await LoadData();
-                StateHasChanged();
             }
         }
 
@@ -72,12 +57,15 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await LoadData();
+            StateHasChanged();
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteOccupationalRequest(((OccupationalDto)e.DataItem).Id));
@@ -171,19 +159,28 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: searchTerm));
-            Occupationals = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.QueryGetHelper<Occupational, OccupationalDto>(pageIndex, pageSize, searchTerm);
+                Occupationals = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
                 var editModel = (OccupationalDto)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))

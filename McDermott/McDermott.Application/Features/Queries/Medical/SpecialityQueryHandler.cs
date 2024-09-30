@@ -36,22 +36,42 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<Speciality>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Speciality>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var pagedResult = query.OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                return (paged.Adapt<List<SpecialityDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<SpecialityDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

@@ -4,13 +4,16 @@
     {
         #region GET
 
-        public class GetServiceQuery(Expression<Func<Service, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetServiceQuery(Expression<Func<Service, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Service, object>>>? includes = null, Expression<Func<Service, Service>>? select = null) : IRequest<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Service, object>>> Includes { get; } = includes!;
+            public Expression<Func<Service, Service>>? Select { get; } = select!;
         }
 
         public class BulkValidateServiceQuery(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>
@@ -24,8 +27,6 @@
         }
 
         #endregion GET
-
-
 
         #region CREATE
 

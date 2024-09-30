@@ -1,15 +1,15 @@
-private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
  {
      PanelVisible = true;
-     var result = await Mediator.Send(new GetProvinceQuery(
+     var result = await Mediator.Send(new GetCityQuery(
          pageIndex: pageIndex,
          pageSize: pageSize,
-         searchTerm: refProvinceComboBox?.Text ?? "",
+         searchTerm: refCityComboBox?.Text ?? "",
          includes:
          [
              x => x.Department
          ],
-         select: x => new Province
+         select: x => new City
          {
              Id = x.Id,
              Name = x.Name,
@@ -20,20 +20,20 @@ private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
          }
 
      ));
-     Provinces = result.Item1;
-     totalCountProvince = result.pageCount;
+     Citys = result.Item1;
+     totalCountCity = result.pageCount;
      PanelVisible = false;
  }
 
-var result = await Mediator.Send(new GetProvinceQuery(
+var result = await Mediator.Send(new GetCityQuery(
     pageIndex: pageIndex,
     pageSize: pageSize,
-    searchTerm: refProvinceComboBox?.Text ?? "",
+    searchTerm: refCityComboBox?.Text ?? "",
     includes:
     [
         x => x.Department
     ],
-    select: x => new Province
+    select: x => new City
     {
         Id = x.Id,
         Name = x.Name,
@@ -45,4 +45,4 @@ var result = await Mediator.Send(new GetProvinceQuery(
 
 ));
 
-Province
+City

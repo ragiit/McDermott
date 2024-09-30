@@ -3,7 +3,8 @@
 
 <PageTitle>McHealthCare - Religion</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+
 {
     <div class="wrapper">
 
@@ -71,6 +72,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

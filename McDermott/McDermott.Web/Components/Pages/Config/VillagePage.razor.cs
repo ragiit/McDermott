@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
+﻿using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
@@ -46,24 +46,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10, long? cityId = null, Expression<Func<Domain.Entities.City, bool>>? predicate = null)
         {
-            PanelVisible = true;
-
-            if (refDistrictComboBox != null)
-                refDistrictComboBox.Text = null;
-
-            //Districts.Clear();
-
-            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
-
-            var id = refCityComboBox?.Value ?? null;
-            var result = predicate == null ?
-                await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""))
-                :
-                await Mediator.Send(new GetCityQuery(predicate, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
-
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                Districts.Clear();
+                var provId = refProvinceComboBox?.Value;
+                var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == provId);
+                Cities = result.Item1;
+                totalCountCity = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxCity
@@ -113,19 +110,22 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10, long? districtId = null, Expression<Func<District, bool>>? predicate = null)
         {
-            PanelVisible = true;
+            try
+            {
+                PanelVisible = true;
 
-            var cityId = refCityComboBox?.Value.GetValueOrDefault();
-
-            var id = refDistrictComboBox?.Value ?? null;
-
-            var result = predicate == null ?
-                await Mediator.Send(new GetDistrictQuery(x => x.CityId == cityId || (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""))
-                :
-                await Mediator.Send(new GetDistrictQuery(predicate, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
-            Districts = result.Item1;
-            totalCountDistrict = result.pageCount;
-            PanelVisible = false;
+                var cityId = refCityComboBox?.Value.GetValueOrDefault();
+                var provId = refProvinceComboBox?.Value.GetValueOrDefault();
+                var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, refDistrictComboBox?.Text ?? "", x => x.CityId == cityId && x.ProvinceId == provId);
+                Districts = result.Item1;
+                totalCountDistrict = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxDistrict
@@ -177,20 +177,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
         {
-            PanelVisible = true;
-            Cities.Clear();
-            Districts.Clear();
-
-            if (refCityComboBox != null)
-                refCityComboBox.Text = null;
-
-            if (refDistrictComboBox != null)
-                refDistrictComboBox.Text = null;
-
-            var result = await Mediator.Send(new GetProvinceQuery(provinceId == null ? null : x => x.Id == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
-            Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                Cities.Clear();
+                Districts.Clear();
+                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+                Provinces = result.Item1;
+                totalCountProvince = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxProvince
@@ -223,14 +224,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            //var result = await MyQuery.GetVillages(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "");
-            var result = await Mediator.Send(new GetVillageQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Villages = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.QueryGetHelper<Village, VillageDto>(pageIndex, pageSize, searchTerm);
+                Villages = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #region UserLoginAndAccessRole
@@ -283,7 +291,6 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            //var haleh = await Mediator.Send(new GetVillageQuery());
             await GetUserInfo();
             await LoadData();
             await LoadDataProvince();
@@ -312,25 +319,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
-
-            PanelVisible = true;
-
-            var resultz = await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId));
-            Provinces = resultz.Item1;
-            totalCountProvince = resultz.pageCount;
-
-            var result = await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId));
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
-
-            var b = await Mediator.Send(new GetDistrictQuery(x => x.Id == a.DistrictId));
-            Districts = b.Item1;
-            totalCountDistrict = b.pageCount;
-
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
+                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
+                Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
+                Districts = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == a.DistrictId)).Item1;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()

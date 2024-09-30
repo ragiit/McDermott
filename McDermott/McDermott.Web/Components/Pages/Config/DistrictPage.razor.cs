@@ -28,18 +28,6 @@ namespace McDermott.Web.Components.Pages.Config
                     await GetUserInfo();
                 }
                 catch { }
-
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
             }
         }
 
@@ -248,7 +236,6 @@ namespace McDermott.Web.Components.Pages.Config
                 }
                 finally { PanelVisible = false; }
             }
-            PanelVisible = false;
         }
 
         #region Searching
@@ -279,13 +266,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDistrictQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Districts = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, searchTerm);
+                Districts = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #region ComboboxProvince
@@ -325,16 +320,20 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
         {
-            PanelVisible = true;
-            Cities.Clear();
-
-            if (refCityComboBox != null)
-                refCityComboBox.Text = null;
-
-            var result = await Mediator.Send(new GetProvinceQuery(provinceId == null ? null : x => x.Id == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
-            Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                Cities.Clear();
+                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+                Provinces = result.Item1;
+                totalCountProvince = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxProvince
@@ -374,45 +373,27 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCity(0, 10);
         }
 
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10, long? cityId = null, long? provinceId = null, Expression<Func<City, bool>>? predicate = null)
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            var provId = refProvinceComboBox?.Value ?? null;
-            var id = refCityComboBox?.Value ?? null;
-            var result = predicate == null ?
-                await Mediator.Send(new GetCityQuery(x => (x.ProvinceId == provinceId || x.ProvinceId == provId) && (id == null || x.Id == id || x.Id == cityId), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""))
-                :
-                await Mediator.Send(new GetCityQuery(predicate, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
-
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var provId = refProvinceComboBox?.Value;
+                var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == provId);
+                Cities = result.Item1;
+                totalCountCity = result.pageCount;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxCity
 
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            refProvinceComboBox = null;
-            refCityComboBox = null;
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
@@ -428,21 +409,20 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                PanelVisible = true;
 
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DistrictDto ?? new());
-
-            PanelVisible = true;
-
-            var resultz = await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId));
-            Provinces = resultz.Item1;
-            totalCountProvince = resultz.pageCount;
-
-            var result = await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId));
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
-
-            PanelVisible = false;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DistrictDto ?? new());
+                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
+                Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
@@ -450,44 +430,11 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
                 var aq = SelectedDataItems.Count;
                 if (SelectedDataItems is null)
                 {
@@ -500,31 +447,41 @@ namespace McDermott.Web.Components.Pages.Config
                 }
                 await LoadData(0, pageSize);
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                await JsRuntime.InvokeVoidAsync("alert", ee.InnerException.Message); // Alert
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DistrictDto)e.EditModel;
-
-            bool validate = await Mediator.Send(new ValidateDistrictQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId && x.CityId == editModel.CityId));
-
-            if (validate)
+            try
             {
-                ToastService.ShowInfo($"District with name '{editModel.Name}', province '{refProvinceComboBox.Text}' and city '{refCityComboBox.Text}' is already exists");
-                e.Cancel = true;
-                return;
+                PanelVisible = true;
+                var editModel = (DistrictDto)e.EditModel;
+
+                bool validate = await Mediator.Send(new ValidateDistrictQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId && x.CityId == editModel.CityId));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"District with name '{editModel.Name}', province '{refProvinceComboBox.Text}' and city '{refCityComboBox.Text}' is already exists");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateDistrictRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateDistrictRequest(editModel));
+
+                await LoadData(activePageIndex, pageSize);
             }
-
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateDistrictRequest(editModel));
-            else
-                await Mediator.Send(new UpdateDistrictRequest(editModel));
-
-            await LoadData();
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
     }
 }
