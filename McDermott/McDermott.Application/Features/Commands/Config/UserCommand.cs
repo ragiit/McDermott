@@ -32,7 +32,6 @@
             public List<UserDto> UsersToValidate { get; } = UsersToValidate;
         }
 
-
         public class GetUserQuery(Expression<Func<User, bool>>? predicate = null, bool removeCache = false) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
@@ -62,6 +61,11 @@
         public class CreateUserRequest(UserDto UserDto) : IRequest<UserDto>
         {
             public UserDto UserDto { get; set; } = UserDto;
+        }
+
+        public class CreateListUserRequest(List<UserDto> UserDtos) : IRequest<List<UserDto>>
+        {
+            public List<UserDto> UserDtos { get; set; } = UserDtos;
         }
 
         #endregion Create
