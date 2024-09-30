@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 
@@ -161,6 +162,24 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CompanyDto ?? new());
+
+            PanelVisible = true;
+
+            var resultz = await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId));
+            Countries = resultz.Item1;
+            totalCountCountry = resultz.pageCount;
+
+            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == a.CountryId && x.Id == a.ProvinceId));
+            Provinces = result.Item1;
+            totalCountProvince = result.pageCount;
+
+            var resultx = await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId && x.ProvinceId == a.ProvinceId));
+            Cities = resultx.Item1;
+            totalCountCity = resultx.pageCount;
+
+            PanelVisible = false;
         }
 
         private void DeleteItem_Click()

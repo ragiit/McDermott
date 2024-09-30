@@ -36,7 +36,7 @@ namespace McDermott.Web.Components.Pages.Employee
         private IGrid Grid { get; set; }
         private Timer _timer;
         private bool IsLoading { get; set; } = false;
-        private bool PanelVisible {  get; set; }
+        private bool PanelVisible { get; set; }
         private bool isPrint { get; set; } = false;
         private bool isShow { get; set; } = false;
         private bool Employee { get; set; } = false;
@@ -322,10 +322,10 @@ namespace McDermott.Web.Components.Pages.Employee
                     //Gender
                     string Gender = "";
                     string OppositeSex = "";
-                    if (Patientss.GenderId != null)
+                    if (Patientss.Gender != null)
                     {
-                        Gender = Patientss.Gender.Name == "Male" ? "MAlE(L)" : "FEMALE(P)";
-                        OppositeSex = Patientss.Gender.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                        Gender = Patientss.Gender == "Male" ? "MAlE(L)" : "FEMALE(P)";
+                        OppositeSex = Patientss.Gender == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                     }
 
                     //Days

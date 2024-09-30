@@ -1,10 +1,14 @@
 ﻿using DevExpress.Data.Access;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
+using Humanizer;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Config.Users
@@ -13,15 +17,31 @@ namespace McDermott.Web.Components.Pages.Config.Users
     {
         private List<UserDto> Users = new();
         private UserDto UserForm = new();
+
+        #region KTP Address
+
         public List<CountryDto> Countries = [];
         public List<ProvinceDto> Provinces = [];
         public List<CityDto> Cities = [];
         public List<DistrictDto> Districts = [];
         public List<VillageDto> Villages = [];
+
+        #endregion KTP Address
+
+        #region Residence  Address
+
+        public List<CountryDto> CountriesResidence = [];
+        public List<ProvinceDto> ProvincesResidence = [];
+        public List<CityDto> CitiesResidence = [];
+        public List<DistrictDto> DistrictsResidence = [];
+        public List<VillageDto> VillagesResidence = [];
+
+        #endregion Residence  Address
+
         private List<OccupationalDto> Occupationals = [];
         public List<GroupDto> Groups = [];
         public List<ReligionDto> Religions = [];
-        public List<GenderDto> Genders = [];
+
         public List<DepartmentDto> Departments = [];
         public List<JobPositionDto> JobPositions = [];
 
@@ -127,52 +147,53 @@ namespace McDermott.Web.Components.Pages.Config.Users
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+
+            Religions = await Mediator.Send(new GetReligionQuery());
+
             await GetUserInfo();
-            await LoadComboBox();
             await LoadData();
+            await LoadComboBoxEdit();
             PanelVisible = false;
             return;
-            await GetUserInfo();
-            await LoadData();
-            await LoadComboBox();
         }
 
-        #region ComboboxMenu
-
-        private DxComboBox<MenuDto, long?> refMenuComboBox { get; set; }
-        private int MenuComboBoxIndex { get; set; } = 0;
-        private int totalCountMenu = 0;
-
-        private async Task OnSearchMenu()
+        private async Task LoadComboBoxEdit()
         {
-            await LoadComboBox(0, 10);
-        }
+            PanelVisible = true;
 
-        private async Task OnSearchMenuIndexIncrement()
-        {
-            if (MenuComboBoxIndex < (totalCountMenu - 1))
-            {
-                MenuComboBoxIndex++;
-                await LoadComboBox(MenuComboBoxIndex, 10);
-            }
-        }
+            #region KTP Address
 
-        private async Task OnSearchMenundexDecrement()
-        {
-            if (MenuComboBoxIndex > 0)
-            {
-                MenuComboBoxIndex--;
-                await LoadComboBox(MenuComboBoxIndex, 10);
-            }
-        }
+            Countries = (await Mediator.Send(new GetCountryQuery(x => x.Id == UserForm.IdCardCountryId))).Item1;
+            Provinces = (await Mediator.Send(new GetProvinceQuery(x => x.Id == UserForm.IdCardProvinceId))).Item1;
+            Cities = (await Mediator.Send(new GetCityQuery(x => x.Id == UserForm.IdCardCityId))).Item1;
+            Districts = (await Mediator.Send(new GetDistrictQuery(x => x.Id == UserForm.IdCardDistrictId))).Item1;
+            Villages = (await Mediator.Send(new GetVillageQuery(x => x.Id == UserForm.IdCardVillageId))).Item1;
 
-        private async Task OnInputMenuChanged(string e)
-        {
-            MenuComboBoxIndex = 0;
-            await LoadComboBox(0, 10);
-        }
+            #endregion KTP Address
 
-        #endregion ComboboxMenu
+            #region Residence  Address
+
+            CountriesResidence = (await Mediator.Send(new GetCountryQuery(x => x.Id == UserForm.DomicileCountryId))).Item1;
+            ProvincesResidence = (await Mediator.Send(new GetProvinceQuery(x => x.Id == UserForm.DomicileProvinceId))).Item1;
+            CitiesResidence = (await Mediator.Send(new GetCityQuery(x => x.Id == UserForm.DomicileCityId))).Item1;
+            DistrictsResidence = (await Mediator.Send(new GetDistrictQuery(x => x.Id == UserForm.DomicileDistrictId))).Item1;
+            VillagesResidence = (await Mediator.Send(new GetVillageQuery(x => x.Id == UserForm.DomicileVillageId))).Item1;
+
+            #endregion Residence  Address
+
+            Groups = (await Mediator.Send(new GetGroupQuery(x => x.Id == UserForm.GroupId))).Item1;
+            Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId))).Item1;
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery(x => x.Id == UserForm.JobPositionId))).Item1;
+            Departments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == UserForm.DepartmentId))).Item1;
+            Occupationals = (await Mediator.Send(new GetOccupationalQuery(x => x.Id == UserForm.OccupationalId))).Item1;
+
+            Specialities = (await Mediator.Send(new GetSpecialityQuery(x => x.Id == UserForm.SpecialityId))).Item1;
+            Services = (await Mediator.Send(new GetServiceQuery(x => UserForm.DoctorServiceIds != null && UserForm.DoctorServiceIds.Contains(x.Id)))).Item1;
+
+            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
+
+            PanelVisible = false;
+        }
 
         private async Task Refresh_Click()
         {
@@ -362,7 +383,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         private async Task HandleValidSubmit()
         {
             if (FormValidationState)
-                await SaveItemGroupMenuGridGropMenu_Click();
+                await SaveUser();
             else
                 FormValidationState = true;
         }
@@ -465,17 +486,80 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         private IBrowserFile BrowserFile;
 
-        private async Task SaveItemGroupMenuGridGropMenu_Click()
+        private async Task<bool> CheckExistingNumber(Expression<Func<User, bool>> predicate, string numberType)
+        {
+            var users = await Mediator.Send(new ValidateUserQuery(predicate));
+            var isOkOk = false;
+            if (users)
+            {
+                ToastService.ShowInfo($"{numberType} Number already exists");
+                isOkOk = true;
+            }
+            return isOkOk;
+        }
+
+        public async Task<bool> CheckUserFormAsync()
+        {
+            var checks = new List<Func<Task<bool>>>
+            {
+                () => CheckExistingNumber(x => UserForm.Id != x.Id && UserForm.NIP != null && x.IsEmployee == true && x.NIP != null && x.NIP.ToLower().Trim().Equals(UserForm.NIP.ToLower().Trim()), "NIP"),
+                () => CheckExistingNumber(x => UserForm.Id != x.Id && UserForm.Oracle != null && x.IsEmployee == true && x.Oracle != null && x.Oracle.ToLower().Trim().Equals(UserForm.Oracle.ToLower().Trim()), "Oracle"),
+                () => CheckExistingNumber(x => UserForm.Id != x.Id && UserForm.Legacy != null && x.IsEmployee == true && x.Legacy != null && x.Legacy.ToLower().Trim().Equals(UserForm.Legacy.ToLower().Trim()), "Legacy"),
+                () => CheckExistingNumber(x => UserForm.Id != x.Id && UserForm.SAP != null && x.IsEmployee == true && x.SAP != null && x.SAP.ToLower().Trim().Equals(UserForm.SAP.ToLower().Trim()), "SAP")
+            };
+
+            var isOkOk = true;
+
+            foreach (var check in checks)
+            {
+                if (await check())
+                {
+                    isOkOk = false;
+                }
+            }
+
+            return isOkOk;
+        }
+
+        private async Task SaveUser()
         {
             if (!FormValidationState)
                 return;
 
+            bool isValid = true;
             var a = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.NoId == UserForm.NoId));
             if (a)
             {
-                ToastService.ShowInfo("The Identity Number already exist");
-                return;
+                ToastService.ShowInfo("The Identity Number is already exist");
+                isValid = false;
             }
+
+            var chekcEmail = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.Email == UserForm.Email));
+            if (chekcEmail)
+            {
+                ToastService.ShowInfo("The Email is already exist");
+                isValid = false;
+            }
+
+            if (UserForm.IsPhysicion)
+            {
+                var b = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.PhysicanCode == UserForm.PhysicanCode));
+                if (b)
+                {
+                    ToastService.ShowInfo("The Physician Code is already exist");
+                    isValid = false;
+                }
+            }
+
+            if (Convert.ToBoolean(UserForm.IsEmployee))
+            {
+                var isOk = await CheckUserFormAsync();
+                if (!isOk)
+                    isValid = false;
+            }
+
+            if (!isValid)
+                return;
 
             if (Convert.ToBoolean(UserForm.IsPatient))
             {
@@ -501,6 +585,9 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             if (!string.IsNullOrWhiteSpace(UserForm.Password))
                 UserForm.Password = Helper.HashMD5(UserForm.Password);
+
+            var ax = SelectedServices.Select(x => x.Id).ToList();
+            UserForm.DoctorServiceIds?.AddRange(ax);
 
             if (UserForm.Id == 0)
             {
@@ -938,10 +1025,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataSupervisor();
             await LoadDataJobPosition();
             await LoadDataDepartment();
-
-            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
-            Religions = await Mediator.Send(new GetReligionQuery());
         }
 
         #region ComboboxVillage
@@ -1349,7 +1432,15 @@ namespace McDermott.Web.Components.Pages.Config.Users
         private int ServiceComboBoxIndex { get; set; } = 0;
         private int totalCountService = 0;
 
-        private async Task OnSearchService()
+        public string SearchTextService { get; set; }
+
+        private async Task OnSearchService(string e)
+        {
+            SearchTextService = e;
+            await LoadDataService();
+        }
+
+        private async Task OnSearchServiceClick()
         {
             await LoadDataService();
         }
@@ -1378,10 +1469,15 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataService();
         }
 
-        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10, long? ServiceId = null)
+        private void aaa(IEnumerable<string> aa)
+        {
+            var aaa = aa;
+        }
+
+        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10, long? ServiceId = null, string? e = null)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetServiceQuery(ServiceId == null ? null : x => x.Id == ServiceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetServiceQuery(ServiceId == null ? null : x => x.Id == ServiceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: SearchTextService ?? ""));
             Services = result.Item1;
             totalCountService = result.pageCount;
             PanelVisible = false;
@@ -1528,5 +1624,247 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxDepartment
+
+        #region Residence Address
+
+        #region ComboboxVillageResidence
+
+        private DxComboBox<VillageDto, long?> refVillageResidenceComboBox { get; set; }
+        private int VillageResidenceComboBoxIndex { get; set; } = 0;
+        private int totalCountVillageResidence = 0;
+
+        private async Task OnSearchVillageResidence()
+        {
+            await LoadDataVillageResidence(0, 10);
+        }
+
+        private async Task OnSearchVillageResidenceIndexIncrement()
+        {
+            if (VillageResidenceComboBoxIndex < (totalCountVillageResidence - 1))
+            {
+                VillageResidenceComboBoxIndex++;
+                await LoadDataVillageResidence(VillageResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchVillageResidenceIndexDecrement()
+        {
+            if (VillageResidenceComboBoxIndex > 0)
+            {
+                VillageResidenceComboBoxIndex--;
+                await LoadDataVillageResidence(VillageResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputVillageResidenceChanged(string e)
+        {
+            VillageResidenceComboBoxIndex = 0;
+            await LoadDataVillageResidence(0, 10);
+        }
+
+        private async Task LoadDataVillageResidence(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            var DistrictResidenceId = refDistrictResidenceComboBox?.Value.GetValueOrDefault();
+            var result = await Mediator.Send(new GetVillageQuery(x => x.DistrictId == DistrictResidenceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refVillageResidenceComboBox?.Text ?? ""));
+            VillagesResidence = result.Item1;
+            totalCountVillageResidence = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxVillageResidence
+
+        #region ComboboxCountryResidence
+
+        private DxComboBox<CountryDto, long?> refCountryResidenceComboBox { get; set; }
+        private int CountryResidenceComboBoxIndex { get; set; } = 0;
+        private int totalCountCountryResidence = 0;
+
+        private async Task OnSearchCountryResidence()
+        {
+            await LoadDataCountryResidence(0, 10);
+        }
+
+        private async Task OnSearchCountryResidenceIndexIncrement()
+        {
+            if (CountryResidenceComboBoxIndex < (totalCountCountryResidence - 1))
+            {
+                CountryResidenceComboBoxIndex++;
+                await LoadDataCountryResidence(CountryResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCountryResidenceIndexDecrement()
+        {
+            if (CountryResidenceComboBoxIndex > 0)
+            {
+                CountryResidenceComboBoxIndex--;
+                await LoadDataCountryResidence(CountryResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCountryResidenceChanged(string e)
+        {
+            CountryResidenceComboBoxIndex = 0;
+            await LoadDataCountryResidence(0, 10);
+        }
+
+        private async Task LoadDataCountryResidence(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            var id = refCountryResidenceComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetCountryQuery(x => (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryResidenceComboBox?.Text ?? ""));
+            CountriesResidence = result.Item1;
+            totalCountCountryResidence = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCountryResidence
+
+        #region ComboboxCityResidence
+
+        private DxComboBox<CityDto, long?> refCityResidenceComboBox { get; set; }
+        private int CityResidenceComboBoxIndex { get; set; } = 0;
+        private int totalCountCityResidence = 0;
+
+        private async Task OnSearchCityResidence()
+        {
+            await LoadDataCityResidence(0, 10);
+        }
+
+        private async Task OnSearchCityResidenceIndexIncrement()
+        {
+            if (CityResidenceComboBoxIndex < (totalCountCityResidence - 1))
+            {
+                CityResidenceComboBoxIndex++;
+                await LoadDataCityResidence(CityResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCityResidenceIndexDecrement()
+        {
+            if (CityResidenceComboBoxIndex > 0)
+            {
+                CityResidenceComboBoxIndex--;
+                await LoadDataCityResidence(CityResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCityResidenceChanged(string e)
+        {
+            CityResidenceComboBoxIndex = 0;
+            await LoadDataCityResidence(0, 10);
+        }
+
+        private async Task LoadDataCityResidence(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var ProvinceResidenceId = refProvinceResidenceComboBox?.Value.GetValueOrDefault();
+            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == ProvinceResidenceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityResidenceComboBox?.Text ?? ""));
+            CitiesResidence = result.Item1;
+            totalCountCityResidence = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCityResidence
+
+        #region ComboboxProvinceResidence
+
+        private DxComboBox<ProvinceDto, long?> refProvinceResidenceComboBox { get; set; }
+        private int ProvinceResidenceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvinceResidence = 0;
+
+        private async Task OnSearchProvinceResidence()
+        {
+            await LoadDataProvinceResidence(0, 10);
+        }
+
+        private async Task OnSearchProvinceResidenceIndexIncrement()
+        {
+            if (ProvinceResidenceComboBoxIndex < (totalCountProvinceResidence - 1))
+            {
+                ProvinceResidenceComboBoxIndex++;
+                await LoadDataProvinceResidence(ProvinceResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvinceResidenceIndexDecrement()
+        {
+            if (ProvinceResidenceComboBoxIndex > 0)
+            {
+                ProvinceResidenceComboBoxIndex--;
+                await LoadDataProvinceResidence(ProvinceResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceResidenceChanged(string e)
+        {
+            ProvinceResidenceComboBoxIndex = 0;
+            await LoadDataProvinceResidence(0, 10);
+        }
+
+        private async Task LoadDataProvinceResidence(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            var CountryResidenceId = refCountryResidenceComboBox?.Value.GetValueOrDefault();
+
+            var id = refProvinceResidenceComboBox?.Value ?? null;
+            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == CountryResidenceId && (id == null || x.Id == id), pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceResidenceComboBox?.Text ?? ""));
+            ProvincesResidence = result.Item1;
+            totalCountProvinceResidence = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxProvinceResidence
+
+        #region ComboboxDistrictResidence
+
+        private DxComboBox<DistrictDto, long?> refDistrictResidenceComboBox { get; set; }
+        private int DistrictResidenceComboBoxIndex { get; set; } = 0;
+        private int totalCountDistrictResidence = 0;
+
+        private async Task OnSearchDistrictResidence()
+        {
+            await LoadDataDistrictResidence(0, 10);
+        }
+
+        private async Task OnSearchDistrictResidenceIndexIncrement()
+        {
+            if (DistrictResidenceComboBoxIndex < (totalCountDistrictResidence - 1))
+            {
+                DistrictResidenceComboBoxIndex++;
+                await LoadDataDistrictResidence(DistrictResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDistrictResidencendexDecrement()
+        {
+            if (DistrictResidenceComboBoxIndex > 0)
+            {
+                DistrictResidenceComboBoxIndex--;
+                await LoadDataDistrictResidence(DistrictResidenceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDistrictResidenceChanged(string e)
+        {
+            DistrictResidenceComboBoxIndex = 0;
+            await LoadDataDistrictResidence(0, 10);
+        }
+
+        private async Task LoadDataDistrictResidence(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            var CityResidenceId = refCityResidenceComboBox?.Value.GetValueOrDefault();
+            var result = await Mediator.Send(new GetDistrictQuery(x => x.CityId == CityResidenceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictResidenceComboBox?.Text ?? ""));
+            DistrictsResidence = result.Item1;
+            totalCountDistrictResidence = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxDistrictResidence
+
+        #endregion Residence Address
     }
 }

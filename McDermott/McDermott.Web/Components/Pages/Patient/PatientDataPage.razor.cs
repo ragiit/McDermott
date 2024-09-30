@@ -20,7 +20,7 @@ namespace McDermott.Web.Components.Pages.Patient
         private List<DepartmentDto> Departments = [];
         private List<JobPositionDto> JobPositions = [];
         private List<ReligionDto> Religions = [];
-        private List<GenderDto> Genders = [];
+
         private List<PatientFamilyRelationDto> AllPatientFamilyRelations = [];
         private List<PatientFamilyRelationDto> PatientFamilyRelations = [];
         private List<FamilyDto> Familys = [];
@@ -70,14 +70,15 @@ namespace McDermott.Web.Components.Pages.Patient
                     await LoadData();
                     StateHasChanged();
 
+                    return;
                     Allergies = await Mediator.Send(new GetAllergyQuery());
 
-                    Allergies.ForEach(x =>
-                    {
-                        var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                        if (a is not null)
-                            x.TypeString = a.Name;
-                    });
+                    //Allergies.ForEach(x =>
+                    //{
+                    //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+                    //    if (a is not null)
+                    //        x.TypeString = a.Name;
+                    //});
 
                     var countries = await Mediator.Send(new GetCountryQuery());
                     var result = await Mediator.Send(new GetProvinceQuery());
@@ -88,10 +89,10 @@ namespace McDermott.Web.Components.Pages.Patient
                     Districts = resultDistrict.Item1;
                     //Villages = await Mediator.Send(new GetVillageQuery());
                     Religions = await Mediator.Send(new GetReligionQuery());
-                    Genders = await Mediator.Send(new GetGenderQuery());
+
                     Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
                     JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
-                    Families = await Mediator.Send(new GetFamilyQuery());
+                    //Families = await Mediator.Send(new GetFamilyQuery());
                     var resultOccupationals = await Mediator.Send(new GetOccupationalQuery());
                     Occupationals = resultOccupationals.Item1;
 
@@ -519,15 +520,15 @@ namespace McDermott.Web.Components.Pages.Patient
 
                     PatientFamilyRelations.ForEach(x => { x.PatientId = UserForm.Id; x.Id = 0; });
                     var temp = new List<PatientFamilyRelationDto>();
-                    PatientFamilyRelations.ForEach(x =>
-                    {
-                        temp.Add(new PatientFamilyRelationDto
-                        {
-                            PatientId = x.FamilyMemberId.GetValueOrDefault(),
-                            FamilyMemberId = x.PatientId,
-                            FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
-                        });
-                    });
+                    //PatientFamilyRelations.ForEach(x =>
+                    //{
+                    //    temp.Add(new PatientFamilyRelationDto
+                    //    {
+                    //        PatientId = x.FamilyMemberId.GetValueOrDefault(),
+                    //        FamilyMemberId = x.PatientId,
+                    //        //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation)!.Id
+                    //    });
+                    //});
 
                     PatientFamilyRelations.AddRange(temp);
                     await Mediator.Send(new CreateListPatientFamilyRelationRequest(PatientFamilyRelations));
@@ -564,12 +565,12 @@ namespace McDermott.Web.Components.Pages.Patient
                     var temps = new List<PatientFamilyRelationDto>();
                     PatientFamilyRelations.ForEach(x =>
                     {
-                        temps.Add(new PatientFamilyRelationDto
-                        {
-                            PatientId = x.FamilyMemberId.GetValueOrDefault(),
-                            FamilyMemberId = x.PatientId,
-                            FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
-                        });
+                        //temps.Add(new PatientFamilyRelationDto
+                        //{
+                        //    PatientId = x.FamilyMemberId.GetValueOrDefault(),
+                        //    FamilyMemberId = x.PatientId,
+                        //    //FamilyId = Families.FirstOrDefault(y => y.Name == Families.FirstOrDefault(z => z.Id == x.FamilyId)!.ChildRelation).Id
+                        //});
                     });
 
                     PatientFamilyRelations.AddRange(temps);

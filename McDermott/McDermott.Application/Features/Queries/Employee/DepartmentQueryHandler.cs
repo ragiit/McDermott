@@ -17,18 +17,22 @@ namespace McDermott.Application.Features.Queries.Employee
         {
             var DepartmentDtos = request.DepartmentsToValidate;
 
-            // Ekstrak semua kombinasi yang akan dicari di database
             var DepartmentNames = DepartmentDtos.Select(x => x.Name).Distinct().ToList();
-            //var provinceIds = DepartmentDtos.Select(x => x.ProvinceId).Distinct().ToList();
+            var a = DepartmentDtos.Select(x => x.ParentDepartmentId).Distinct().ToList();
+            var b = DepartmentDtos.Select(x => x.ManagerId).Distinct().ToList();
+            var c = DepartmentDtos.Select(x => x.CompanyId).Distinct().ToList();
+            var d = DepartmentDtos.Select(x => x.DepartmentCategory).Distinct().ToList();
 
-            //var existingDepartments = await _unitOfWork.Repository<Department>()
-            //    .Entities
-            //    .AsNoTracking()
-            //    .Where(v => DepartmentNames.Contains(v.Name)
-            //                && provinceIds.Contains(v.ProvinceId))
-            //    .ToListAsync(cancellationToken);
-            return [];
-            //return existingDepartments.Adapt<List<DepartmentDto>>();
+            var existingDepartments = await _unitOfWork.Repository<Department>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => DepartmentNames.Contains(v.Name)
+                            && a.Contains(v.ParentDepartmentId)
+                            && b.Contains(v.ManagerId)
+                            && c.Contains(v.CompanyId)
+                            && d.Contains(v.DepartmentCategory))
+                .ToListAsync(cancellationToken);
+            return existingDepartments.Adapt<List<DepartmentDto>>();
         }
 
         public async Task<(List<DepartmentDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDepartmentQuery request, CancellationToken cancellationToken)

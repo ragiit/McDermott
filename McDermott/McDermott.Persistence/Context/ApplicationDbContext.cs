@@ -34,7 +34,6 @@ namespace McDermott.Persistence.Context
         public DbSet<City> Cities { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<District> Districts { get; set; }
-        public DbSet<Gender> Genders { get; set; }
         public DbSet<Province> Provinces { get; set; }
         public DbSet<Religion> Religions { get; set; }
         public DbSet<Village> Villages { get; set; }
@@ -328,6 +327,12 @@ namespace McDermott.Persistence.Context
                   .HasMany(m => m.GeneralConsultationLogs)
                   .WithOne(c => c.GeneralConsultanService)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<Family>()
+            //      .HasOne(m => m.InverseRelation)
+            //      .WithMany() // This indicates the inverse can have many related entities
+            //      .HasForeignKey(m => m.InverseRelationId)
+            //      .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanService>()
                 .HasMany(m => m.Accidents)

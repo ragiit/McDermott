@@ -1,137 +1,199 @@
-﻿@page "/employee/department"
+﻿@page "/employee/departments"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Department</PageTitle>
+<PageTitle>McHealthCare - Department</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Department" />
+        <BaseHeaderPage Title="Department" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="Departments"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            AllowSelectRowByClick="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Departments.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Departments.Count > 0" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="ParentDepartment.Name" Caption="Parent" />
-                                            <DxGridDataColumn FieldName="Company.Name" Caption="Company" />
-                                            <DxGridDataColumn FieldName="Manager.Name" Caption="Manager" />
-                                            <DxGridDataColumn FieldName="DepartmentCategory" Caption="Category" />
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (DepartmentDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                                                    <ValidationMessage For="@(() => a.Name)"   />
-                                                </DxFormLayoutItem>
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
-                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Parent Department" ColSpanMd="12">
-                                                    <Template>
-                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                    Data="@ParentDepartments"
-                                                                    NullText="Select Parent Department..."
-                                                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                                                    @bind-Value="@a.ParentDepartmentId"
-                                                                    TextFieldName="Name"
-                                                                    ValueFieldName="Id">
-                                                        </DxComboBox>
-                                                    </Template>
-                                                </DxFormLayoutItem>
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="Departments"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                SearchTextChanged="OnSearchBoxChanged">
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
-                                                    <Template>
-                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                    Data="@Companies"
-                                                                    NullText="Select Company..."
-                                                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                                                    @bind-Value="@a.CompanyId"
-                                                                    TextFieldName="Name"
-                                                                    ValueFieldName="Id">
-                                                        </DxComboBox>
-                                                    </Template>
-                                                </DxFormLayoutItem>
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="DepartmentDto"
+                                                         Items="@Departments"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="(async () => await LoadData())"
+                                                         IsImport="UserAccessCRUID.IsImport"
+                                                         Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Manager" ColSpanMd="12">
-                                                    <Template>
-                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                    Data="@Users"
-                                                                    NullText="Select Manager..."
-                                                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                                                    @bind-Value="@a.ManagerId"
-                                                                    TextFieldName="Name"
-                                                                    ValueFieldName="Id" />
-                                                    </Template>
-                                                </DxFormLayoutItem>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="ParentDepartment.Name" Caption="Parent" />
+                                        <DxGridDataColumn FieldName="Company.Name" Caption="Company" />
+                                        <DxGridDataColumn FieldName="Manager.Name" Caption="Manager" />
+                                        <DxGridDataColumn FieldName="DepartmentCategory" Caption="Category" />
+                                    </Columns>
 
-                                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Department Category" ColSpanMd="12">
-                                                    <Template>
-                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                    NullText="Select Department Category..." FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
-                                                    </Template>
-                                                </DxFormLayoutItem>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (DepartmentDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Name" NullText="Name" />
+                                                <ValidationMessage For="@(() => a.Name)"   />
+                                            </DxFormLayoutItem>
 
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                            </div>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Parent Department" ColSpanMd="12">
+                                                <MyDxComboBox Data="@ParentDepartments"
+                                                              NullText="Select Parent Department"
+                                                              @ref="refParentDepartmentComboBox"
+                                                              @bind-Value="@a.ParentDepartmentId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputParentDepartmentChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchParentDepartmentndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchParentDepartment"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchParentDepartmentIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(DepartmentDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
+                                                        <DxListEditorColumn FieldName="Manager.Name" Caption="Manager" />
+                                                        <DxListEditorColumn FieldName="DepartmentCategory" Caption="Category" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.ParentDepartmentId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Companies"
+                                                              NullText="Select Company"
+                                                              @ref="refCompanyComboBox"
+                                                              @bind-Value="@a.CompanyId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputCompanyChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchCompanyndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchCompany"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchCompanyIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(CompanyDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(CompanyDto.Email)" Caption="Email" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.CompanyId)" />
+                                            </DxFormLayoutItem>
+
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Manager" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Users"
+                                                              NullText="Select Manager"
+                                                              @ref="refUserComboBox"
+                                                              @bind-Value="@a.ManagerId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputUserChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchUserndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchUser"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchUserIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(UserDto.Name)" Caption="Name" /> 
+                                                        <DxListEditorColumn FieldName="@nameof(UserDto.Email)" Caption="Email" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.ManagerId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Category" ColSpanMd="12">
+                                                <Template>
+                                                    <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                NullText="Select Department Category" FilteringMode="@DataGridFilteringMode.Contains" Data="@DepartmentCategories" @bind-Value="@a.DepartmentCategory" />
+                                                                
+                                                <ValidationMessage For="@(()=>a.ManagerId)" />
+                                                </Template>
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
+
                         </div>
                     </div>
                 </div>
@@ -139,11 +201,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Departement" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

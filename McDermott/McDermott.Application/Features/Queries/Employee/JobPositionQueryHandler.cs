@@ -82,8 +82,7 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
         {
             try
             {
-                var result = await _unitOfWork.Repository<JobPosition>().AddAsync(request.JobPositionDto.Adapt<JobPosition>());
-
+                var result = await _unitOfWork.Repository<JobPosition>().AddAsync(request.JobPositionDto.Adapt<CreateUpdateJobPositionDto>().Adapt<JobPosition>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
@@ -101,7 +100,6 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
             try
             {
                 var result = await _unitOfWork.Repository<JobPosition>().AddAsync(request.JobPositionDtos.Adapt<List<JobPosition>>());
-
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
@@ -122,8 +120,7 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
         {
             try
             {
-                var result = await _unitOfWork.Repository<JobPosition>().UpdateAsync(request.JobPositionDto.Adapt<JobPosition>());
-
+                var result = await _unitOfWork.Repository<JobPosition>().UpdateAsync(request.JobPositionDto.Adapt<CreateUpdateJobPositionDto>().Adapt<JobPosition>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai
@@ -141,7 +138,6 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
             try
             {
                 var result = await _unitOfWork.Repository<JobPosition>().UpdateAsync(request.JobPositionDtos.Adapt<List<JobPosition>>());
-
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetJobPositionQuery_"); // Ganti dengan key yang sesuai

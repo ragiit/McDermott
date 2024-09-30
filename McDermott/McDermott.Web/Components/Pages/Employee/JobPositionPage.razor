@@ -1,99 +1,130 @@
-﻿@page "/employee/job-position"
+﻿@page "/employee/job-positions"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Job Position</PageTitle>
+<PageTitle>McHealthCare - Job Position</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Job Position" />
+        <BaseHeaderPage Title="Job Position" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="JobPositions"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            AllowSelectRowByClick="true"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            ShowFilterRow="true"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && JobPositions.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && JobPositions.Count > 0" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Department.Name" Caption="Department" />
-                                            @* <DxGridDataColumn FieldName="HealthCenter.Name" Caption="Health Center" /> *@
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (JobPositionDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Name" NullText="Name" ShowValidationIcon="true" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Department" ColSpanMd="12">
-                                                    <Template>
-                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
-                                                                    Data="@Departments"
-                                                                    NullText="Select Department..."
-                                                                    @bind-Value="@a.DepartmentId"
-                                                                    TextFieldName="Name"
-                                                                    ValueFieldName="Id">
-                                                        </DxComboBox>
-                                                    </Template>
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                            </div>
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="JobPositions"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="JobPositionDto"
+                                                         Items="@JobPositions"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="(async () => await LoadData())"
+                                                         IsImport="UserAccessCRUID.IsImport"
+                                                         Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Department.Name" Caption="Department" />
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (JobPositionDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Name" NullText="Name" />
+
+                                                <ValidationMessage For="@(()=>a.Name)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Department" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Departments"
+                                                              NullText="Select Department"
+                                                              @ref="refDepartmentComboBox"
+                                                              @bind-Value="@a.DepartmentId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputDepartmentChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchDepartmentndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchDepartment"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchDepartmentIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="Name" Caption="Name" /> 
+                                                        <DxListEditorColumn FieldName="ParentDepartment.Name" Caption="Parent" />
+                                                        <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
+                                                        <DxListEditorColumn FieldName="Manager.Name" Caption="Manager" />
+                                                        <DxListEditorColumn FieldName="DepartmentCategory" Caption="Category" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>a.DepartmentId)" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary> 
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
@@ -101,11 +132,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Job Potition" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

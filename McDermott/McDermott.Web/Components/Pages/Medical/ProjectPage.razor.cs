@@ -199,20 +199,15 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = false;
         }
 
+        private List<ExportFileData> ExportTemp =
+        [
+            new() { Column = "Name", Notes = "Mandatory" },
+            new() { Column = "Code"},
+        ];
+
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Code"
-                },
-            ]);
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "project_template.xlsx", ExportTemp);
         }
 
         private async Task Refresh_Click()

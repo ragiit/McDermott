@@ -231,7 +231,7 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="4" Column="0">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Provinces"
+                                                                                        <MyDxComboBox Data="@Provinces.Where(x => x.CountryId == UserForm.IdCardCountryId)"
                                                                                                       NullText="Select Province"
                                                                                                       @bind-Value="@UserForm.IdCardProvinceId"
                                                                                                       TextFieldName="Name"
@@ -258,7 +258,7 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="4" Column="1">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Cities"
+                                                                                        <MyDxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.IdCardProvinceId)"
                                                                                                       NullText="Select City"
                                                                                                       @bind-Value="@UserForm.IdCardCityId"
                                                                                                       TextFieldName="Name"
@@ -314,6 +314,7 @@
                                                                                         <MyDxComboBox Data="@Villages.Where(x => x.CityId == UserForm.IdCardCityId && x.ProvinceId == UserForm.IdCardProvinceId && x.DistrictId == UserForm.IdCardDistrictId)"
                                                                                                       NullText="Select Village"
                                                                                                       @bind-Value="@UserForm.IdCardVillageId"
+                                                                                                      @ref="refVillageComboBox"
                                                                                                       TextFieldName="Name"
                                                                                                       ValueFieldName="Id"
                                                                                                       TextChanged="((string e) => OnInputVillageChanged(e))">
@@ -375,51 +376,137 @@
 
                                                                                 <DxGridLayoutItem Row="3" Column="0" ColumnSpan="12">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Countries.Where(x => UserForm.DomicileProvinceId == null || x.Id == Provinces.FirstOrDefault(z => z.Id == UserForm.DomicileProvinceId)?.CountryId)"
+                                                                                        <MyDxComboBox Data="@CountriesResidence"
                                                                                                       NullText="Select Country"
                                                                                                       @bind-Value="@UserForm.DomicileCountryId"
+                                                                                                      @ref="refCountryResidenceComboBox"
                                                                                                       TextFieldName="Name"
-                                                                                                      ValueFieldName="Id">
+                                                                                                      ValueFieldName="Id"
+                                                                                                      TextChanged="((string e) => OnInputCountryResidenceChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchCountryResidenceIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchCountryResidence"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchCountryResidenceIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
+                                                                                            </Columns>
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="4" Column="0">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Provinces"
+                                                                                        <MyDxComboBox Data="@ProvincesResidence.Where(x => x.CountryId == UserForm.DomicileCountryId)"
                                                                                                       NullText="Select Province"
                                                                                                       @bind-Value="@UserForm.DomicileProvinceId"
                                                                                                       TextFieldName="Name"
-                                                                                                      ValueFieldName="Id">
+                                                                                                      @ref="refProvinceResidenceComboBox"
+                                                                                                      ValueFieldName="Id" TextChanged="((string e) => OnInputProvinceResidenceChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchProvinceResidenceIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchProvinceResidence"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchProvinceResidenceIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
+                                                                                                <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                                                            </Columns>
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="4" Column="1" CssClass="mt ml">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Cities.Where(x => x.ProvinceId == UserForm.DomicileProvinceId.GetValueOrDefault())"
+                                                                                        <MyDxComboBox Data="@CitiesResidence.Where(x => x.ProvinceId == UserForm.DomicileProvinceId)"
                                                                                                       NullText="Select City"
                                                                                                       @bind-Value="@UserForm.DomicileCityId"
                                                                                                       TextFieldName="Name"
-                                                                                                      ValueFieldName="Id">
+                                                                                                      @ref="refCityResidenceComboBox"
+                                                                                                      ValueFieldName="Id" TextChanged="((string e) => OnInputCityResidenceChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchCityResidenceIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchCityResidence"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchCityResidenceIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                                            </Columns>
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="5" Column="0">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Districts.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId)"
+                                                                                        <MyDxComboBox Data="@DistrictsResidence.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId)"
                                                                                                       NullText="Select District"
                                                                                                       @bind-Value="@UserForm.DomicileDistrictId"
+                                                                                                      @ref="refDistrictResidenceComboBox"
                                                                                                       TextFieldName="Name"
-                                                                                                      ValueFieldName="Id">
+                                                                                                      ValueFieldName="Id" TextChanged="((string e) => OnInputDistrictResidenceChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchDistrictResidencendexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchDistrictResidence"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchDistrictResidenceIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(District.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                                                <DxListEditorColumn FieldName="City.Name" Caption="City" />
+                                                                                            </Columns>
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="5" Column="1">
                                                                                     <Template>
-                                                                                        <MyDxComboBox Data="@Villages.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.DomicileProvinceId && x.DistrictId == UserForm.DomicileDistrictId)"
+                                                                                        <MyDxComboBox Data="@VillagesResidence.Where(x => x.CityId == UserForm.DomicileCityId && x.ProvinceId == UserForm.IdCardProvinceId && x.DistrictId == UserForm.DomicileDistrictId)"
                                                                                                       NullText="Select Village"
+                                                                                                      @ref="refVillageResidenceComboBox"
                                                                                                       @bind-Value="@UserForm.DomicileVillageId"
                                                                                                       TextFieldName="Name"
-                                                                                                      ValueFieldName="Id">
+                                                                                                      ValueFieldName="Id"
+                                                                                                      TextChanged="((string e) => OnInputVillageResidenceChanged(e))">
+                                                                                            <Buttons>
+                                                                                                <DxEditorButton Click="OnSearchVillageResidenceIndexDecrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                Tooltip="Previous Index" />
+                                                                                                <DxEditorButton Click="OnSearchVillageResidence"
+                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                Tooltip="Search" />
+                                                                                                <DxEditorButton Click="OnSearchVillageResidenceIndexIncrement"
+                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                Tooltip="Next Index" />
+                                                                                            </Buttons>
+                                                                                            <Columns>
+                                                                                                <DxListEditorColumn FieldName="@nameof(VillageDto.Name)" Caption="Name" />
+                                                                                                <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                                                                                                <DxListEditorColumn FieldName="City.Name" Caption="City" />
+                                                                                                <DxListEditorColumn FieldName="District.Name" Caption="District" />
+                                                                                            </Columns>
                                                                                         </MyDxComboBox>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
@@ -513,13 +600,30 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <DxFormLayout>
-                                                                    <DxFormLayoutItem Caption="Group" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Group" ColSpanMd="12">
                                                                         <MyDxComboBox Data="@Groups"
                                                                                       NullText="Select Group"
+                                                                                      @ref="refGroupComboBox"
                                                                                       @bind-Value="@UserForm.GroupId"
                                                                                       TextFieldName="Name"
-                                                                                      ValueFieldName="Id">
+                                                                                      ValueFieldName="Id"
+                                                                                      TextChanged="((string e) => OnInputGroupChanged(e))">
+                                                                            <Buttons>
+                                                                                <DxEditorButton Click="OnSearchGroupndexDecrement"
+                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                Tooltip="Previous Index" />
+                                                                                <DxEditorButton Click="OnSearchGroup"
+                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                Tooltip="Search" />
+                                                                                <DxEditorButton Click="OnSearchGroupIndexIncrement"
+                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                Tooltip="Next Index" />
+                                                                            </Buttons>
+                                                                            <Columns>
+                                                                                <DxListEditorColumn FieldName="@nameof(GroupDto.Name)" Caption="Name" />
+                                                                            </Columns>
                                                                         </MyDxComboBox>
+                                                                        <ValidationMessage For="@(()=>UserForm.GroupId)" />
                                                                     </DxFormLayoutItem>
                                                                 </DxFormLayout>
                                                             </div>
@@ -577,9 +681,11 @@
                                                                     </Buttons> *@
                                                                         </DxMaskedInput>
                                                                     </DxFormLayoutItem>
+
                                                                     <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Sip Expired">
                                                                         <DxDateEdit @bind-Date="@UserForm.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
                                                                     </DxFormLayoutItem>
+
                                                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Speciality" ColSpanMd="12">
                                                                         <MyDxComboBox Data="@Specialities"
                                                                                       NullText="Select Speciality"
@@ -630,52 +736,47 @@
                                                                         <DxDateEdit @bind-Date="@UserForm.StrExp" NullText="Str Expired" Mask="@DateTimeMask.ShortDate" />
                                                                     </DxFormLayoutItem>
 
-                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services"> 
+                                                                    <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services">
                                                                         <Template>
-                                                                            <DxGridLayout ColumnSpacing="8px" RowSpacing="8px">
-                                                                                <Rows>
-                                                                                    <DxGridLayoutRow />
-                                                                                </Rows>
-                                                                                <Columns>
-                                                                                    <DxGridLayoutColumn />
-                                                                                    <DxGridLayoutColumn />
-                                                                                    <DxGridLayoutColumn />
-                                                                                </Columns>
-                                                                                <Items>
-                                                                                   @*  <DxGridLayoutItem Row="0" Column="0" ColumnSpan="1">
-                                                                                        <Template> 
-                                                                                            <DxButton Text="-"></DxButton>
-                                                                                        </Template>
-                                                                                    </DxGridLayoutItem> *@
-
-                                                                                    <DxGridLayoutItem Row="0" Column="0" ColumnSpan="9">
-                                                                                        <Template> 
-                                                                                            <DxTagBox Data="@Services"
-                                                                                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                                      @bind-Values="@SelectedServices"
-                                                                                                      TextFieldName="Name"
-                                                                                                      NullText="Select Service"  
-                                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"> 
-                                                                                                <Columns>
-                                                                                                    <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
-                                                                                                    <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
-                                                                                                    <DxListEditorColumn FieldName="@nameof(Service.Quota)" Caption="Quota" />
-                                                                                                </Columns>
-                                                                                            </DxTagBox>
-                                                                                        </Template>
-                                                                                    </DxGridLayoutItem>
-
-                                                                                    <DxGridLayoutItem Row="0" Column="1" ColumnSpan="1">
-                                                                                        <Template>   
-                                                                                            <DxButton Text="-"></DxButton>
-                                                                                            <DxButton Text="S"></DxButton>
-                                                                                            <DxButton Text="+"></DxButton>
-                                                                                        </Template>
-                                                                                    </DxGridLayoutItem>
-                                                                                </Items>
-                                                                            </DxGridLayout>
+                                                                            <div class="row w-100">
+                                                                                <div class="col-md-12">
+                                                                                    <DxMaskedInput NullText="Search Service"
+                                                                                                   ValueExpression="@(() => SearchTextService)"
+                                                                                                   Value="SearchTextService"
+                                                                                                   ValueChanged="@((string s) => OnSearchService(s))"
+                                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                                        <Buttons>
+                                                                                            <DxEditorButton Click="OnSearchServicendexDecrement"
+                                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                                            Tooltip="Previous Index" />
+                                                                                            <DxEditorButton Click="OnSearchServiceClick"
+                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                            Tooltip="Search" />
+                                                                                            <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                                            Tooltip="Next Index" />
+                                                                                        </Buttons>
+                                                                                    </DxMaskedInput>
+                                                                                </div>
+                                                                                <div class="col-md-12 mt-2">
+                                                                                    <DxTagBox Data="@Services"
+                                                                                              FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                              @bind-Values="@SelectedServices"
+                                                                                              TextFieldName="Name"
+                                                                                              CssClass="w-100"
+                                                                                              NullText="Select Service"
+                                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                                        <Columns>
+                                                                                            <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(Service.Quota)" Caption="Quota" />
+                                                                                        </Columns>
+                                                                                    </DxTagBox>
+                                                                                </div>
+                                                                            </div>
                                                                         </Template>
                                                                     </DxFormLayoutItem>
+
                                                                 </DxFormLayout>
                                                             </div>
                                                         </div>
@@ -820,7 +921,7 @@
                                                                             </Buttons>
                                                                             <Columns>
                                                                                 <DxListEditorColumn FieldName="@nameof(OccupationalDto.Name)" Caption="Name" />
-                                                                                <DxListEditorColumn FieldName="Occupational.Description" Caption="Description" />
+                                                                                <DxListEditorColumn FieldName="@nameof(OccupationalDto.Description)" Caption="Description" />
                                                                             </Columns>
                                                                         </MyDxComboBox>
                                                                         <ValidationMessage For="@(()=>UserForm.OccupationalId)" />
@@ -849,7 +950,7 @@
                                                                         <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
                                                                     </DxFormLayoutItem>
                                                                     <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Employee Type" ColSpanMd="12">
-                                                                        <DxComboBox ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                                        <MyDxComboBox 
                                                                                     Data="@Helper.EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type" />
                                                                     </DxFormLayoutItem>
                                                                 </DxFormLayout>

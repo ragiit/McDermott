@@ -34,7 +34,6 @@ global using static McDermott.Application.Features.Commands.Pharmacy.ReorderingR
 global using static McDermott.Application.Features.Commands.Inventory.ProductCategoryCommand;
 global using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
-global using static McDermott.Application.Features.Commands.Config.GenderCommand;
 global using static McDermott.Application.Features.Commands.Config.GroupCommand;
 global using static McDermott.Application.Features.Commands.Config.ReligionCommand;
 global using static McDermott.Application.Features.Commands.Config.UserCommand;

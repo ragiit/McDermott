@@ -499,7 +499,7 @@ public class SeedData
             {
                 Name = "Administrator",
                 NoId = "3671052024",
-                UserName = "admin@example.com",
+                //UserName = "admin@example.com",
                 GroupId = groupId,
                 Email = "admin@example.com",
                 Password = Helper.HashMD5("admin1123"),

@@ -1,4 +1,5 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
 using System.Security.Policy;
 
@@ -238,6 +239,15 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as MenuDto ?? new());
+
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetMenuQuery(x => x.Id == a.ParentId));
+            ParentMenuDto = [.. result.Item1.OrderBy(x => x.Sequence)];
+            totalCountParentMenu = result.pageCount;
+            PanelVisible = false;
         }
 
         private async Task Refresh_Click()

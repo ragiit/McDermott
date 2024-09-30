@@ -303,7 +303,16 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            await LoadDataProvince(provinceId: (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new()).ProvinceId);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
+
+            PanelVisible = true;
+
+            var resultz = await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId));
+            Provinces = resultz.Item1;
+            totalCountProvince = resultz.pageCount;
+
+            PanelVisible = false;
         }
 
         private void DeleteItem_Click()

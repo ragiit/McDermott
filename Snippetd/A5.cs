@@ -1,2 +1,3 @@
-var req = request.GeneralConsultanServiceDto.Adapt<CreateUpdateGeneralConsultanServiceDto>();
-var result = await _unitOfWork.Repository<GeneralConsultanService>().AddAsync(req.Adapt<GeneralConsultanService>());
+var result = await _unitOfWork.Repository<PatientFamilyRelation>().UpdateAsync(request.PatientFamilyRelationDto.Adapt<CreateUpdatePatientFamilyRelationDto>().Adapt<PatientFamilyRelation>());
+
+var result = await _unitOfWork.Repository<PatientFamilyRelation>().UpdateAsync(request.PatientFamilyRelationDtos.Adapt<List<PatientFamilyRelation>>());

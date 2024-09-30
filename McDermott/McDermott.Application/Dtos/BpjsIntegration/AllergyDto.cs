@@ -16,6 +16,18 @@ namespace McDermott.Application.Dtos.BpjsIntegration
         public string Type { get; set; } = string.Empty;
 
         [NotMapped]
-        public string TypeString { get; set; } = string.Empty;
+        public string TypeString
+        {
+            get
+            {
+                return Type switch
+                {
+                    "01" => "Makanan",
+                    "02" => "Udara",
+                    "03" => "Obat",
+                    _ => "Unknown"
+                };
+            }
+        }
     }
 }

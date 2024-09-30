@@ -217,7 +217,7 @@
                                 </Template>
                             </DxFormLayoutItem>
 
-                            @if (GeneralConsultanService.Patient is not null && GeneralConsultanService.Patient.Gender is not null && GeneralConsultanService.Patient.Gender.Name.Trim().Equals("Female"))
+                            @if (GeneralConsultanService.Patient is not null && GeneralConsultanService.Patient.Gender is not null && GeneralConsultanService.Patient.Gender.Trim().Equals("Female"))
                             {
                                 <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption="Maternity Leave" ColSpanMd="12">
                                     <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsMaternityLeave" />

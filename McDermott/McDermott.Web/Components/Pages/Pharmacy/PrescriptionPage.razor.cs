@@ -249,12 +249,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
             allergies = await Mediator.Send(new GetAllergyQuery());
-            allergies.ForEach(x =>
-            {
-                var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
-                if (a is not null)
-                    x.TypeString = a.Name;
-            });
+            //allergies.ForEach(x =>
+            //{
+            //    var a = Helper._allergyTypes.FirstOrDefault(z => x.Type is not null && z.Code == x.Type);
+            //    if (a is not null)
+            //        x.TypeString = a.Name;
+            //});
             await GetPatientAllergy(Pharmacy.PatientId);
         }
 
@@ -1238,7 +1238,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 //    if (a is not null)
                 //        x.TypeString = a.Name;
                 //});
-                //var c = Concoctions;
+                var c = Concoctions;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -2616,10 +2616,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 //Gender
                 string Gender = "";
                 string OppositeSex = "";
-                if (patienss.GenderId != null)
+                if (patienss.Gender != null)
                 {
-                    Gender = patienss.Gender?.Name == "Male" ? "MALE (L)" : "FEMALE (P)";
-                    OppositeSex = patienss.Gender?.Name == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                    Gender = patienss.Gender == "Male" ? "MALE (L)" : "FEMALE (P)";
+                    OppositeSex = patienss.Gender == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
                 }
 
                 PopUpRecipe = true;

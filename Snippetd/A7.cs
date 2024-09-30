@@ -1,80 +1,113 @@
-await LoadDataOccupational(0, 10);
+await LoadDataFamily();
 
- #region ComboboxOccupational
+ #region ComboboxFamily
 
- private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
- private int OccupationalComboBoxIndex { get; set; } = 0;
- private int totalCountOccupational = 0;
+ private DxComboBox<FamilyDto, long?> refFamilyComboBox { get; set; }
+ private int FamilyComboBoxIndex { get; set; } = 0;
+ private int totalCountFamily = 0;
 
- private async Task OnSearchOccupational()
+ private async Task OnSearchFamily()
  {
-     await LoadDataOccupational(0, 10);
+     await LoadDataFamily();
  }
 
- private async Task OnSearchOccupationalIndexIncrement()
+ private async Task OnSearchFamilyIndexIncrement()
  {
-     if (OccupationalComboBoxIndex < (totalCountOccupational - 1))
+     if (FamilyComboBoxIndex < (totalCountFamily - 1))
      {
-         OccupationalComboBoxIndex++;
-         await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+         FamilyComboBoxIndex++;
+         await LoadDataFamily(FamilyComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchOccupationalndexDecrement()
+ private async Task OnSearchFamilyIndexDecrement()
  {
-     if (OccupationalComboBoxIndex > 0)
+     if (FamilyComboBoxIndex > 0)
      {
-         OccupationalComboBoxIndex--;
-         await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+         FamilyComboBoxIndex--;
+         await LoadDataFamily(FamilyComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputOccupationalChanged(string e)
+ private async Task OnInputFamilyChanged(string e)
  {
-     OccupationalComboBoxIndex = 0;
-     await LoadDataOccupational(0, 10);
+     FamilyComboBoxIndex = 0;
+     await LoadDataFamily();
  }
 
- private async Task LoadDataOccupational(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataFamily(int pageIndex = 0, int pageSize = 10, long? FamilyId = null)
  {
-     PanelVisible = true;
-     SelectedDataItems = [];
-     var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refOccupationalComboBox?.Text ?? ""));
-     Occupationals = result.Item1;
-     totalCountOccupational = result.pageCount;
-     PanelVisible = false;
+    try
+    {
+        PanelVisible = true; 
+        var result = await Mediator.Send(new GetFamilyQuery(FamilyId == null ? null : x => x.Id == FamilyId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refFamilyComboBox?.Text ?? ""));
+        Familys = result.Item1;
+        totalCountFamily = result.pageCount;
+        PanelVisible = false;
+    }
+    catch (Exception ex)
+    {
+        ex.HandleException(ToastService);
+    }
+    finally { PanelVisible = false; }
  }
 
- #endregion ComboboxOccupational
+ #endregion ComboboxFamily
 
 
+await LoadDataFamily(FamilyId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).FamilyId);
 
 
+var id = refDistrictComboBox?.Value ?? null;
+&& (id == null || x.Id == id)
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Occupational" ColSpanMd="12">
-    <MyDxComboBox Data="@Occupationals"
-                  NullText="Select Occupational..."
-                  @ref="refOccupationalComboBox"
-                  @bind-Value="@a.OccupationalId"
+   var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
+
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Family" ColSpanMd="12">
+    <MyDxComboBox Data="@Familys"
+                  NullText="Select Family"
+                  @ref="refFamilyComboBox"
+                  @bind-Value="@a.FamilyId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputOccupationalChanged(e))">
+                  TextChanged="((string e) => OnInputFamilyChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchOccupationalndexDecrement"
+            <DxEditorButton Click="OnSearchFamilyIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchOccupational"
+            <DxEditorButton Click="OnSearchFamily"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchOccupationalIndexIncrement"
+            <DxEditorButton Click="OnSearchFamilyIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(OccupationalDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Occupational.Name" Caption="Occupational" />
-            <DxListEditorColumn FieldName="@nameof(OccupationalDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(FamilyDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Family.Name" Caption="Family" />
+            <DxListEditorColumn FieldName="@nameof(FamilyDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.OccupationalId)" />
+    <ValidationMessage For="@(()=>a.FamilyId)" />
 </DxFormLayoutItem>
+
+await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new());
+
+ await LoadComboboxEdit(a);
+
+  private async Task LoadComboboxEdit(DiagnosisDto a)
+ {
+     Cronises = (await Mediator.Send(new GetFamilyQuery(x => x.Id == a.FamilyId))).Item1;
+     Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
+ }
+
+ 
+var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new());
+PanelVisible = true; 
+
+var resultz = await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId));
+Countries = resultz.Item1;
+totalCountCountry = resultz.pageCount;  
+
+PanelVisible = false;

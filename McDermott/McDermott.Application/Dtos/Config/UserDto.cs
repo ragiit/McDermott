@@ -20,7 +20,6 @@ namespace McDermott.Application.Dtos.Config
 
         public string Password { get; set; } = string.Empty;
 
-        public long? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
@@ -62,6 +61,7 @@ namespace McDermott.Application.Dtos.Config
         //[RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? CurrentMobile { get; set; }
 
+        public string? Gender { get; set; }
         public string? HomePhoneNumber { get; set; }
 
         public string? Npwp { get; set; }
@@ -148,7 +148,13 @@ namespace McDermott.Application.Dtos.Config
         public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
-        public List<long> PatientAllergyIds { get; set; } = new List<long>();
+        public List<long> PatientAllergyIds { get; set; } = [];
+        public bool IsWeatherPatientAllergyIds { get; set; }
+        public bool IsPharmacologyPatientAllergyIds { get; set; }
+        public bool IsFoodPatientAllergyIds { get; set; }
+        public List<long> WeatherPatientAllergyIds { get; set; } = [];
+        public List<long> PharmacologyPatientAllergyIds { get; set; } = [];
+        public List<long> FoodPatientAllergyIds { get; set; } = [];
         public long? SupervisorId { get; set; }  // ID Supervisor
         public long? OccupationalId { get; set; }  // ID Supervisor
         public string IsFamilyMedicalHistory { get; set; } = "No";
@@ -165,7 +171,7 @@ namespace McDermott.Application.Dtos.Config
         public virtual SpecialityDto? Speciality { get; set; }
 
         //[SetToNull]
-        public virtual GenderDto? Gender { get; set; }
+        //public virtual GenderDto? Gender { get; set; }
 
         //[SetToNull]
         public virtual Country? IdCardCountry { get; set; } // KTP Negara
@@ -208,12 +214,13 @@ namespace McDermott.Application.Dtos.Config
         //[Required]
         public string UserName { get; set; } = string.Empty;
 
+        public string? Gender { get; set; }
+
         [Required]
         public string Email { get; set; } = string.Empty;
 
         public string Password { get; set; } = string.Empty;
 
-        public long? GenderId { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
@@ -341,7 +348,13 @@ namespace McDermott.Application.Dtos.Config
         public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
-        public List<long> PatientAllergyIds { get; set; } = new List<long>();
+        public List<long> PatientAllergyIds { get; set; } = [];
+        public bool IsWeatherPatientAllergyIds { get; set; }
+        public bool IsPharmacologyPatientAllergyIds { get; set; }
+        public bool IsFoodPatientAllergyIds { get; set; }
+        public List<long> WeatherPatientAllergyIds { get; set; } = [];
+        public List<long> PharmacologyPatientAllergyIds { get; set; } = [];
+        public List<long> FoodPatientAllergyIds { get; set; } = [];
         public long? SupervisorId { get; set; }  // ID Supervisor
         public long? OccupationalId { get; set; }  // ID Supervisor
         public string? IsFamilyMedicalHistory { get; set; }

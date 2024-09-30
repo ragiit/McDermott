@@ -24,6 +24,64 @@ namespace McDermott.Web.Extentions
             ToastService.ShowSuccess($"{count} items were successfully imported.");
         }
 
+        public static List<string> HumptyDumpty =
+[
+"Risiko rendah 0-6",
+            "Risiko sedang 7-11",
+            "Risiko Tinggi >= 12"
+];
+
+        public static List<string> InformationFrom =
+        [
+            "Auto Anamnesa",
+            "Allo Anamnesa"
+        ];
+
+        public static List<string> YesNoOptions =
+       [
+           "Yes",
+            "No"
+       ];
+
+        public static List<string> Morse =
+        [
+            "Risiko rendah 0-24",
+            "Risiko sedang 25-44",
+            "Risiko Tinggi >= 45"
+        ];
+
+        public static List<string> RiwayatPenyakitKeluarga =
+        [
+            "DM",
+            "Hipertensi",
+            "Cancer",
+            "Jantung",
+            "TBC",
+            "Anemia",
+            "Other",
+        ];
+
+        public static List<string> Geriati =
+       [
+           "Risiko rendah 0-3",
+            "Risiko Tinggi >= 4"
+       ];
+
+        public static List<string> RiskOfFalling =
+        [
+            "Humpty Dumpty",
+            "Morse",
+            "Geriatri",
+        ];
+
+        public static List<string> Colors = new List<string>
+        {
+            "Red",
+            "Yellow",
+            "Green",
+            "Black",
+        };
+
         public static string EmailMask { get; set; } = @"(\w|[.-])+@(\w|-)+\.(\w|-){2,4}";
 
         public static readonly List<string> IdentityTypes =

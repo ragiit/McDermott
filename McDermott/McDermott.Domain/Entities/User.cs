@@ -8,14 +8,14 @@
         public string Name { get; set; } = string.Empty;
 
         //[Required]
-        public string UserName { get; set; } = string.Empty;
+        //public string UserName { get; set; } = string.Empty;
 
         [Required]
         public string Email { get; set; } = string.Empty;
 
-        public string Password { get; set; } = string.Empty;
+        public string? Password { get; set; }
 
-        public long? GenderId { get; set; }
+        public string? Gender { get; set; }
         public string? MartialStatus { get; set; }
         public string? PlaceOfBirth { get; set; }
 
@@ -57,6 +57,7 @@
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
         public DateTime? StrExp { get; set; }
+        public bool IsSameDomicileAddress { get; set; } = true;
         public long? SpecialityId { get; set; }
         public string? UserPhoto { get; set; }
         public long? JobPositionId { get; set; }
@@ -92,8 +93,13 @@
         public string? SAP { get; set; }
         public string? Oracle { get; set; }
         public List<long>? DoctorServiceIds { get; set; }
-        public List<long>? PatientAllergyIds { get; set; }
-        public long? SupervisorId { get; set; }
+        public List<long> PatientAllergyIds { get; set; } = [];
+        public bool IsWeatherPatientAllergyIds { get; set; }
+        public bool IsPharmacologyPatientAllergyIds { get; set; }
+        public bool IsFoodPatientAllergyIds { get; set; }
+        public List<long> WeatherPatientAllergyIds { get; set; } = [];
+        public List<long> PharmacologyPatientAllergyIds { get; set; } = [];
+        public List<long> FoodPatientAllergyIds { get; set; } = []; public long? SupervisorId { get; set; }
         public long? OccupationalId { get; set; }
 
         public string? IsFamilyMedicalHistory { get; set; }
@@ -115,7 +121,7 @@
         public virtual Group? Group { get; set; }
 
         //[SetToNull]
-        public virtual Gender? Gender { get; set; }
+        //public virtual Gender? Gender { get; set; }
 
         //[SetToNull]
         public virtual Country? IdCardCountry { get; set; } // KTP Negara

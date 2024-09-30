@@ -1,6 +1,7 @@
 ﻿using McDermott.Application.Features.Services;
 using Microsoft.Extensions.Caching.Distributed;
 using static McDermott.Application.Features.Commands.Config.UserCommand;
+
 using static McDermott.Application.Features.Commands.Config.UserCommand;
 using static McDermott.Application.Features.Commands.Config.UserCommand;
 
@@ -11,7 +12,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetUserQuerys, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateUserQuery, bool>,
         IRequestHandler<BulkValidateUserQuery, List<UserDto>>,
-        IRequestHandler<GetUserQuery2, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>, 
+        IRequestHandler<GetUserQuery2, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetUserInfoGroupQuery, List<UserDto>>,
         IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
         IRequestHandler<CreateUserRequest, UserDto>,
@@ -19,6 +20,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteUserRequest, bool>
     {
         #region Get
+
         public async Task<List<UserDto>> Handle(BulkValidateUserQuery request, CancellationToken cancellationToken)
         {
             var UserDtos = request.UsersToValidate;
@@ -45,7 +47,6 @@ namespace McDermott.Application.Features.Queries.Config
                 var query = _unitOfWork.Repository<User>().Entities
                     .AsNoTracking()
                     .Include(x => x.Group)
-                    .Include(x => x.Gender)
                     .Include(x => x.Supervisor)
                     .Include(x => x.Department)
                     .AsQueryable();
@@ -56,7 +57,7 @@ namespace McDermott.Application.Features.Queries.Config
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") 
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
                         //||
                         //EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%")
                         );
@@ -83,6 +84,7 @@ namespace McDermott.Application.Features.Queries.Config
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
+
         public async Task<(List<UserDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUserQuery2 request, CancellationToken cancellationToken)
         {
             try
@@ -117,7 +119,7 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 throw;
             }
-        } 
+        }
 
         public async Task<List<UserDto>> Handle(GetUserInfoGroupQuery request, CancellationToken cancellationToken)
         {
@@ -165,7 +167,6 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     result = await _unitOfWork.Repository<User>().Entities
                         .Include(x => x.Group)
-                        .Include(x => x.Gender)
                         .Include(x => x.Supervisor)
                         .Include(x => x.Department)
                         .AsNoTracking()

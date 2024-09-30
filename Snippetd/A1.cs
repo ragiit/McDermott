@@ -146,3 +146,34 @@
 
 
 "DefaultConnection": "Server=.\\ITSSB;Database=A13;MultipleActiveResultSets=true;TrustServerCertificate=True; Trusted_Connection=True;Max Pool Size=10000;"
+
+
+ catch (Exception ex)
+ {
+     ex.HandleException(ToastService);
+ }
+ finally { PanelVisible = false; }
+
+
+ 
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
+
+                        // Panggil BulkValidateCountryQuery untuk validasi bulk
+                        var existingCountrys = await Mediator.Send(new BulkValidateCountryQuery(list));
+
+                        // Filter Country baru yang tidak ada di database
+                        list = list.Where(Country =>
+                            !existingCountrys.Any(ev =>
+                                ev.Name == Country.Name &&
+                                ev.Code == Country.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListCountryRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);

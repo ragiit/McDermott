@@ -5,35 +5,31 @@
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class NullableDescription : Migration
+    public partial class a : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "Occupationals",
-                type: "nvarchar(300)",
-                maxLength: 300,
+                name: "Password",
+                table: "Users",
+                type: "nvarchar(max)",
                 nullable: true,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(300)",
-                oldMaxLength: 300);
+                oldType: "nvarchar(max)");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "Occupationals",
-                type: "nvarchar(300)",
-                maxLength: 300,
+                name: "Password",
+                table: "Users",
+                type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "",
                 oldClrType: typeof(string),
-                oldType: "nvarchar(300)",
-                oldMaxLength: 300,
+                oldType: "nvarchar(max)",
                 oldNullable: true);
         }
     }

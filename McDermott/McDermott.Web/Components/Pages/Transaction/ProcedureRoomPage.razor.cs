@@ -270,7 +270,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     IsFromDB = true,
                     Id = Helper.RandomNumber,
-                    NormalRange = GeneralConsultanService.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    NormalRange = GeneralConsultanService.Patient.Gender.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
                     Parameter = item.Name,
                     Remark = item.Remark,
                     LabUomId = item.LabUomId,
@@ -288,7 +288,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //        {
             //            IsFromDB = true,
             //            Id = Helper.RandomNumber,
-            //            NormalRange = GeneralConsultanService.Patient.Gender.Name.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+            //            NormalRange = GeneralConsultanService.Patient.Gender.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
             //            Parameter = item.Name,
             //            Remark = item.Remark,
             //            LabUomId = item.LabUomId,
