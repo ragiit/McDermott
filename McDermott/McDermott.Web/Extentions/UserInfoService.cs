@@ -15,9 +15,9 @@ namespace McDermott.Web.Extentions
                 bool isAccess = false;
                 var url = _navigationManager.Uri;
 
-                User user = await _oLocal.GetCookieUserLogin();
+                User cookieUser = await _oLocal.GetCookieUserLogin();
 
-                if (user is null)
+                if (cookieUser is null)
                 {
                     await _oLocal.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
                     _navigationManager.NavigateTo("login", true);
@@ -25,12 +25,34 @@ namespace McDermott.Web.Extentions
                 }
 
                 //var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
-                var tempUser = await _mediator.Send(new GetUserQuery2(x => x.Id == user.Id, 0, 1));
-                user = tempUser.Item1.FirstOrDefault().Adapt<User>();
-                var result2 = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!, pageIndex: 0, pageSize: short.MaxValue));
-                var groups = result2.Item1;
 
-                var asdf = "queue/kiosk/1".Contains("queue/kiosk");
+                var user = (await _mediator.Send(new GetUserQuery2(predicate: x => x.Id == cookieUser.Id, 0, short.MaxValue, includes: [],
+                    select: x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        GroupId = x.GroupId
+                    }))).Item1.FirstOrDefault() ?? new();
+
+                var groups = (await _mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(0, short.MaxValue, predicate: x => x.GroupId == (long)user!.GroupId!,
+                    includes:
+                    [
+                        x => x.Menu
+                    ],
+                    select: x => new GroupMenu
+                    {
+                        Id = x.Id,
+                        IsCreate = x.IsCreate,
+                        IsDelete = x.IsDelete,
+                        IsDefaultData = x.IsDefaultData,
+                        IsImport = x.IsImport,
+                        IsRead = x.IsRead,
+                        IsUpdate = x.IsUpdate,
+                        Menu = new Menu
+                        {
+                            Url = x.Menu.Url
+                        }
+                    })).Item1;
 
                 url = url.ToLower().Replace(_navigationManager.BaseUri, "");
 
@@ -46,7 +68,7 @@ namespace McDermott.Web.Extentions
 
                 isAccess = true;
 
-                var User = user as User;
+                var User = user.Adapt<User>();
 
                 return (isAccess, userAccessCRUID!, User);
             }

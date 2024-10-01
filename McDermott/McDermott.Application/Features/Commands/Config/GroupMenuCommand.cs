@@ -4,13 +4,16 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetGroupMenuQuery(Expression<Func<GroupMenu, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<GroupMenuDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetGroupMenuQuery(Expression<Func<GroupMenu, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<GroupMenu, object>>>? includes = null, Expression<Func<GroupMenu, GroupMenu>>? select = null) : IRequest<(List<GroupMenuDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<GroupMenu, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<GroupMenu, object>>> Includes { get; } = includes!;
+            public Expression<Func<GroupMenu, GroupMenu>>? Select { get; } = select!;
         }
 
         public class BulkValidateGroupMenuQuery(List<GroupMenuDto> GroupMenusToValidate) : IRequest<List<GroupMenuDto>>

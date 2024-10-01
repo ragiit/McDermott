@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
+﻿using MailKit.Search;
 using MediatR;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
@@ -35,6 +34,83 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
+            else if (typeof(TDto) == typeof(GroupDto))
+            {
+                var result = await mediator.Send(new GetGroupQuery(
+                    predicate as Expression<Func<Group, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new Group
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    } : select as Expression<Func<Group, Group>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(GroupMenuDto))
+            {
+                var result = await mediator.Send(new GetGroupMenuQuery(
+                    predicate as Expression<Func<GroupMenu, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Menu,
+                        x => x.Menu.Parent
+                    ] : includes as List<Expression<Func<GroupMenu, object>>>,
+                    select: select is null ? x => new GroupMenu
+                    {
+                        Id = x.Id,
+                        MenuId = x.MenuId,
+                        Menu = new Menu
+                        {
+                            Name = x.Menu.Name,
+                        },
+
+                        IsCreate = x.IsCreate,
+                        IsDelete = x.IsDelete,
+                        IsDefaultData = x.IsDefaultData,
+                        IsImport = x.IsImport,
+                        IsRead = x.IsRead,
+                        IsUpdate = x.IsUpdate,
+                    } : select as Expression<Func<GroupMenu, GroupMenu>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(MenuDto))
+            {
+                var result = await mediator.Send(new GetMenuQuery(
+                    predicate as Expression<Func<Menu, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Parent
+                    ] : includes as List<Expression<Func<Menu, object>>>,
+                    select: select is null ? x => new Menu
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Sequence = x.Sequence,
+                        Url = x.Url,
+                        ParentId = x.ParentId,
+                        Icon = x.Icon,
+                        IsDefaultData = x.IsDefaultData,
+                        Parent = new Menu
+                        {
+                            Name = x.Parent.Name
+                        }
+                    } : select as Expression<Func<Menu, Menu>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
             else if (typeof(TDto) == typeof(ProvinceDto))
             {
                 var result = await mediator.Send(new GetProvinceQuery(
@@ -46,7 +122,7 @@ namespace McDermott.Web.Extentions
                     [
                         x => x.Country
                     ] : includes as List<Expression<Func<Province, object>>>,
-                    select: x => new Province
+                    select: select is null ? x => new Province
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -55,7 +131,34 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.Country.Name
                         },
-                    }
+                    } : select as Expression<Func<Province, Province>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(ProvinceDto))
+            {
+                var result = await mediator.Send(new GetMenuQuery(
+                    predicate as Expression<Func<Menu, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Parent
+                    ] : includes as List<Expression<Func<Menu, object>>>,
+                    select: select is null ? x => new Menu
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Sequence = x.Sequence,
+                        Url = x.Url,
+                        ParentId = x.ParentId,
+                        Parent = new Domain.Entities.Menu
+                        {
+                            Name = x.Parent.Name
+                        },
+                    } : select as Expression<Func<Menu, Menu>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -71,7 +174,7 @@ namespace McDermott.Web.Extentions
                     [
                         x => x.Province
                     ] : includes as List<Expression<Func<City, object>>>,
-                    select: x => new City
+                    select: select is null ? x => new City
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -80,7 +183,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.Province.Name
                         },
-                    }
+                    } : select as Expression<Func<City, City>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -97,7 +200,7 @@ namespace McDermott.Web.Extentions
                         x => x.Province,
                         x => x.City
                     ] : includes as List<Expression<Func<District, object>>>,
-                    select: x => new District
+                    select: select is null ? x => new District
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -111,7 +214,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.City.Name
                         },
-                    }
+                    } : select as Expression<Func<District, District>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -129,7 +232,7 @@ namespace McDermott.Web.Extentions
                         x => x.City,
                         x => x.District
                     ] : includes as List<Expression<Func<Village, object>>>,
-                    select: x => new Village
+                    select: select is null ? x => new Village
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -149,7 +252,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.District.Name
                         },
-                    }
+                    } : select as Expression<Func<Village, Village>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -161,12 +264,12 @@ namespace McDermott.Web.Extentions
                     pageIndex: pageIndex,
                     pageSize: pageSize,
                     searchTerm: searchTerm ?? "",
-                    select: x => new Occupational
+                    select: select is null ? x => new Occupational
                     {
                         Id = x.Id,
                         Name = x.Name,
                         Description = x.Description
-                    }
+                    } : select as Expression<Func<Occupational, Occupational>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -178,12 +281,44 @@ namespace McDermott.Web.Extentions
                     pageIndex: pageIndex,
                     pageSize: pageSize,
                     searchTerm: searchTerm ?? "",
-                    select: x => new Speciality
+                    select: select is null ? x => new Speciality
                     {
                         Id = x.Id,
                         Name = x.Name,
                         Code = x.Code,
-                    }
+                    } : select as Expression<Func<Speciality, Speciality>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(ServiceDto))
+            {
+                var result = await mediator.Send(new GetServiceQuery(
+                    predicate as Expression<Func<Service, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Serviced,
+                    ] : includes as List<Expression<Func<Service, object>>>,
+                    select: select is null ? x => new Service
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        Quota = x.Quota,
+                        IsKiosk = x.IsKiosk,
+                        IsMcu = x.IsMcu,
+                        IsPatient = x.IsPatient,
+                        IsTelemedicine = x.IsTelemedicine,
+                        IsVaccination = x.IsVaccination,
+                        ServicedId = x.ServicedId,
+                        Serviced = new Service
+                        {
+                            Name = x.Serviced.Name
+                        }
+                    } : select as Expression<Func<Service, Service>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -199,7 +334,7 @@ namespace McDermott.Web.Extentions
                     [
                         x => x.Department,
                     ] : includes as List<Expression<Func<JobPosition, object>>>,
-                    select: x => new JobPosition
+                    select: select is null ? x => new JobPosition
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -208,7 +343,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.Department.Name
                         }
-                    }
+                    } : select as Expression<Func<JobPosition, JobPosition>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -226,7 +361,7 @@ namespace McDermott.Web.Extentions
                         x => x.Province,
                         x => x.City,
                     ] : includes as List<Expression<Func<Company, object>>>,
-                    select: x => new Company
+                    select: select is null ? x => new Company
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -254,7 +389,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.City.Name
                         },
-                    }
+                    } : select as Expression<Func<Company, Company>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -272,7 +407,7 @@ namespace McDermott.Web.Extentions
                         x => x.ParentDepartment,
                         x => x.Company,
                     ],
-                    select: x => new Department
+                    select: select is null ? x => new Department
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -292,7 +427,7 @@ namespace McDermott.Web.Extentions
                             Name = x.Manager.Name
                         },
                         DepartmentCategory = x.DepartmentCategory
-                    }
+                    } : select as Expression<Func<Department, Department>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

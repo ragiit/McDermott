@@ -6,13 +6,16 @@ namespace McDermott.Application.Features.Commands.Config
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetGroupQuery(Expression<Func<Group, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<GroupDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetGroupQuery(Expression<Func<Group, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Group, object>>>? includes = null, Expression<Func<Group, Group>>? select = null) : IRequest<(List<GroupDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Group, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Group, object>>> Includes { get; } = includes!;
+            public Expression<Func<Group, Group>>? Select { get; } = select!;
         }
 
         public class BulkValidateGroupQuery(List<GroupDto> GroupsToValidate) : IRequest<List<GroupDto>>

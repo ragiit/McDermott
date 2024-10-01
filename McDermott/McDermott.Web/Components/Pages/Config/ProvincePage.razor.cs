@@ -304,17 +304,7 @@ namespace McDermott.Web.Components.Pages.Config
                             var cachedParent = parentCache.FirstOrDefault(x => x.Name == countryName);
                             if (cachedParent is null)
                             {
-                                var parentMenu = (await Mediator.Send(new GetCountryQuery(x => x.Name == countryName, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-                                if (parentMenu is null)
-                                {
-                                    ToastService.ShowErrorImport(row, 1, countryName ?? string.Empty);
-                                    continue;
-                                }
-                                else
-                                {
-                                    parentId = parentMenu.Id;
-                                    parentCache.Add(parentMenu);
-                                }
+                                ToastService.ShowErrorImport(row, 1, countryName ?? string.Empty);
                             }
                             else
                             {

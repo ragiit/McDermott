@@ -1,21 +1,21 @@
-public class GetServiceQuery(Expression<Func<Service, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Service, object>>>? includes = null, Expression<Func<Service, Service>>? select = null) : IRequest<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>
+public class GetSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Speciality, object>>>? includes = null, Expression<Func<Speciality, Speciality>>? select = null) : IRequest<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)>
 {
-    public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
+    public Expression<Func<Speciality, bool>> Predicate { get; } = predicate!;
     public bool RemoveCache { get; } = removeCache!;
     public string SearchTerm { get; } = searchTerm!;
     public int PageIndex { get; } = pageIndex;
     public int PageSize { get; } = pageSize ?? 10;
 
-    public List<Expression<Func<Service, object>>> Includes { get; } = includes!;
-    public Expression<Func<Service, Service>>? Select { get; } = select!;
+    public List<Expression<Func<Speciality, object>>> Includes { get; } = includes!;
+    public Expression<Func<Speciality, Speciality>>? Select { get; } = select!;
 }
 
 
-public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetServiceQuery request, CancellationToken cancellationToken)
+public async Task<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetSpecialityQuery request, CancellationToken cancellationToken)
 {
     try
     { 
-        var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking();
+        var query = _unitOfWork.Repository<Speciality>().Entities.AsNoTracking();
 
         // Apply dynamic includes
         if (request.Includes is not null)
@@ -48,7 +48,7 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
                           q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
                           cancellationToken);
 
-        return (pagedItems.Adapt<List<ServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (pagedItems.Adapt<List<SpecialityDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -56,18 +56,18 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
     }
 }
 
- private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
+ private async Task LoadDataSpeciality(int pageIndex = 0, int pageSize = 10)
  {
      PanelVisible = true;
-     var result = await Mediator.Send(new GetServiceQuery(
+     var result = await Mediator.Send(new GetSpecialityQuery(
          pageIndex: pageIndex,
          pageSize: pageSize,
-         searchTerm: refServiceComboBox?.Text ?? "",
+         searchTerm: refSpecialityComboBox?.Text ?? "",
          includes:
          [
              x => x.Department
          ],
-         select: x => new Service
+         select: x => new Speciality
          {
              Id = x.Id,
              Name = x.Name,
@@ -78,10 +78,16 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
          }
 
      ));
-     Services = result.Item1;
-     totalCountService = result.pageCount;
+     Specialitys = result.Item1;
+     totalCountSpeciality = result.pageCount;
      PanelVisible = false;
  }
 
 
-var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, searchTerm);
+var result = await Mediator.QueryGetHelper<Speciality, SpecialityDto>(pageIndex, pageSize, searchTerm);
+
+var result = await Mediator.QueryGetHelper<Speciality, SpecialityDto>(pageIndex, pageSize, refSpecialityComboBox?.Text ?? "");
+
+var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+
+var result = await Mediator.QueryGetHelper<Village, VillageDto>(pageIndex, pageSize, refVillageResidenceComboBox?.Text ?? "", x => x.DistrictId == DistrictResidenceId);

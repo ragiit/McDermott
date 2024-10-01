@@ -96,7 +96,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadComboBox();
+            //await LoadComboBox();
             PanelVisible = false;
         }
 
@@ -286,9 +286,9 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             Group = new();
             ShowForm = false;
             GroupMenus = [];
-            var result = await Mediator.Send(new GetGroupQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<Group, GroupDto>(pageIndex, pageSize, searchTerm);
             Groups = result.Item1;
-            totalCount = result.Item4;
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }

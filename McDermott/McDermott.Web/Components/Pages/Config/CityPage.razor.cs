@@ -319,11 +319,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-
-                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
-
                 PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
                 Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
                 PanelVisible = false;
             }
