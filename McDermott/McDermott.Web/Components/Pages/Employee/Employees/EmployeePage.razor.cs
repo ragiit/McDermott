@@ -130,7 +130,55 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(x => x.IsEmployee == true, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            //var result = await Mediator.Send(new GetUserQuery2(x => x.IsEmployee == true, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetUserQuery2(
+                x => x.IsEmployee == true,
+                searchTerm: searchTerm,
+                pageSize: pageSize,
+                pageIndex:
+                pageIndex,
+                includes:
+                [
+                    user => user.Supervisor,
+                    user => user.JobPosition,
+                    user => user.Department,
+                    user => user.Occupational,
+                ],
+                select: x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth,
+                    Supervisor = x.Supervisor != null ? new Domain.Entities.User
+                    {
+                        Name = x.Supervisor.Name
+                    } : null,
+                    JobPosition = x.JobPosition != null ? new Domain.Entities.JobPosition
+                    {
+                        Name = x.JobPosition.Name
+                    } : null,
+                    Department = x.Department != null ? new Domain.Entities.Department
+                    {
+                        Name = x.Department.Name
+                    } : null,
+                    Occupational = x.Occupational != null ? new Domain.Entities.Occupational
+                    {
+                        Name = x.Occupational.Name
+                    } : null,
+                    EmployeeType = x.EmployeeType,
+                    JoinDate = x.JoinDate,
+                    NoBpjsKs = x.NoBpjsKs,
+                    NoBpjsTk = x.NoBpjsTk,
+                    Legacy = x.Legacy,
+                    SAP = x.SAP,
+                    NIP = x.NIP,
+                    Oracle = x.Oracle,
+                }
+
+            ));
             Users = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;

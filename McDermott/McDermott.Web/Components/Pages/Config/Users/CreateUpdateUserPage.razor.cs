@@ -1086,6 +1086,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             #endregion KTP Address
 
+            await LoadDataCountryResidence();
+            await LoadDataProvinceResidence();
+            await LoadDataCityResidence();
+            await LoadDataDistrictResidence();
+            await LoadDataVillageResidence();
+
             await LoadDataGroup();
             await LoadDataOccupational();
             await LoadDataSpeciality();
@@ -1094,263 +1100,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataJobPosition();
             await LoadDataDepartment();
         }
-
-        #region ComboboxVillage
-
-        private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
-        private int VillageComboBoxIndex { get; set; } = 0;
-        private int totalCountVillage = 0;
-
-        private async Task OnSearchVillage()
-        {
-            await LoadDataVillage(0, 10);
-        }
-
-        private async Task OnSearchVillageIndexIncrement()
-        {
-            if (VillageComboBoxIndex < (totalCountVillage - 1))
-            {
-                VillageComboBoxIndex++;
-                await LoadDataVillage(VillageComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchVillageIndexDecrement()
-        {
-            if (VillageComboBoxIndex > 0)
-            {
-                VillageComboBoxIndex--;
-                await LoadDataVillage(VillageComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputVillageChanged(string e)
-        {
-            VillageComboBoxIndex = 0;
-            await LoadDataVillage(0, 10);
-        }
-
-        private async Task LoadDataVillage(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var districtId = refDistrictComboBox?.Value.GetValueOrDefault();
-            var id = refVillageComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<Village, VillageDto>(pageIndex, pageSize, refVillageComboBox?.Text ?? "", x => x.DistrictId == districtId);
-            Villages = result.Item1;
-            totalCountVillage = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxVillage
-
-        #region ComboboxCountry
-
-        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
-        private int CountryComboBoxIndex { get; set; } = 0;
-        private int totalCountCountry = 0;
-
-        private async Task OnSearchCountry()
-        {
-            await LoadDataCountry(0, 10);
-        }
-
-        private async Task OnSearchCountryIndexIncrement()
-        {
-            if (CountryComboBoxIndex < (totalCountCountry - 1))
-            {
-                CountryComboBoxIndex++;
-                await LoadDataCountry(CountryComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchCountryIndexDecrement()
-        {
-            if (CountryComboBoxIndex > 0)
-            {
-                CountryComboBoxIndex--;
-                await LoadDataCountry(CountryComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputCountryChanged(string e)
-        {
-            CountryComboBoxIndex = 0;
-            await LoadDataCountry(0, 10);
-        }
-
-        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            Provinces.Clear();
-            Cities.Clear();
-            Districts.Clear();
-            Villages.Clear();
-            UserForm.IdCardProvinceId = null;
-            UserForm.IdCardCityId = null;
-            UserForm.IdCardDistrictId = null;
-            UserForm.IdCardVillageId = null;
-            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
-            Countries = result.Item1;
-            totalCountCountry = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCountry
-
-        #region ComboboxCity
-
-        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
-        private int CityComboBoxIndex { get; set; } = 0;
-        private int totalCountCity = 0;
-
-        private async Task OnSearchCity()
-        {
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task OnSearchCityIndexIncrement()
-        {
-            if (CityComboBoxIndex < (totalCountCity - 1))
-            {
-                CityComboBoxIndex++;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchCityIndexDecrement()
-        {
-            if (CityComboBoxIndex > 0)
-            {
-                CityComboBoxIndex--;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputCityChanged(string e)
-        {
-            CityComboBoxIndex = 0;
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
-            UserForm.IdCardDistrictId = null;
-            UserForm.IdCardVillageId = null;
-            var id = refCityComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == provinceId);
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCity
-
-        #region ComboboxProvince
-
-        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
-        private int ProvinceComboBoxIndex { get; set; } = 0;
-        private int totalCountProvince = 0;
-
-        private async Task OnSearchProvince()
-        {
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task OnSearchProvinceIndexIncrement()
-        {
-            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
-            {
-                ProvinceComboBoxIndex++;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchProvinceIndexDecrement()
-        {
-            if (ProvinceComboBoxIndex > 0)
-            {
-                ProvinceComboBoxIndex--;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputProvinceChanged(string e)
-        {
-            ProvinceComboBoxIndex = 0;
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var countryId = refCountryComboBox?.Value.GetValueOrDefault();
-            UserForm.IdCardCityId = null;
-            UserForm.IdCardDistrictId = null;
-            UserForm.IdCardVillageId = null;
-
-            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "", x => x.CountryId == countryId);
-            Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxProvince
-
-        #region ComboboxDistrict
-
-        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
-        private int DistrictComboBoxIndex { get; set; } = 0;
-        private int totalCountDistrict = 0;
-
-        private async Task OnSearchDistrict()
-        {
-            await LoadDataDistrict(0, 10);
-        }
-
-        private async Task OnSearchDistrictIndexIncrement()
-        {
-            if (DistrictComboBoxIndex < (totalCountDistrict - 1))
-            {
-                DistrictComboBoxIndex++;
-                await LoadDataDistrict(DistrictComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchDistrictndexDecrement()
-        {
-            if (DistrictComboBoxIndex > 0)
-            {
-                DistrictComboBoxIndex--;
-                await LoadDataDistrict(DistrictComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputDistrictChanged(string e)
-        {
-            DistrictComboBoxIndex = 0;
-            await LoadDataDistrict(0, 10);
-        }
-
-        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var cityId = refCityComboBox?.Value.GetValueOrDefault();
-            UserForm.IdCardVillageId = null;
-            var id = refDistrictComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, refDistrictComboBox?.Text ?? "", x => x.CityId == cityId);
-            Districts = result.Item1;
-            totalCountDistrict = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxDistrict
 
         #region ComboboxGroup
 
@@ -1775,6 +1524,267 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxDepartment
+
+        #region Ktp Address
+
+        #region ComboboxVillage
+
+        private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
+        private int VillageComboBoxIndex { get; set; } = 0;
+        private int totalCountVillage = 0;
+
+        private async Task OnSearchVillage()
+        {
+            await LoadDataVillage(0, 10);
+        }
+
+        private async Task OnSearchVillageIndexIncrement()
+        {
+            if (VillageComboBoxIndex < (totalCountVillage - 1))
+            {
+                VillageComboBoxIndex++;
+                await LoadDataVillage(VillageComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchVillageIndexDecrement()
+        {
+            if (VillageComboBoxIndex > 0)
+            {
+                VillageComboBoxIndex--;
+                await LoadDataVillage(VillageComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputVillageChanged(string e)
+        {
+            VillageComboBoxIndex = 0;
+            await LoadDataVillage(0, 10);
+        }
+
+        private async Task LoadDataVillage(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var districtId = refDistrictComboBox?.Value.GetValueOrDefault();
+            var id = refVillageComboBox?.Value ?? null;
+            var result = await Mediator.QueryGetHelper<Village, VillageDto>(pageIndex, pageSize, refVillageComboBox?.Text ?? "", x => x.DistrictId == districtId);
+            Villages = result.Item1;
+            totalCountVillage = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxVillage
+
+        #region ComboboxCountry
+
+        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
+        private int CountryComboBoxIndex { get; set; } = 0;
+        private int totalCountCountry = 0;
+
+        private async Task OnSearchCountry()
+        {
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task OnSearchCountryIndexIncrement()
+        {
+            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            {
+                CountryComboBoxIndex++;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCountryIndexDecrement()
+        {
+            if (CountryComboBoxIndex > 0)
+            {
+                CountryComboBoxIndex--;
+                await LoadDataCountry(CountryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCountryChanged(string e)
+        {
+            CountryComboBoxIndex = 0;
+            await LoadDataCountry(0, 10);
+        }
+
+        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            Provinces.Clear();
+            Cities.Clear();
+            Districts.Clear();
+            Villages.Clear();
+            UserForm.IdCardProvinceId = null;
+            UserForm.IdCardCityId = null;
+            UserForm.IdCardDistrictId = null;
+            UserForm.IdCardVillageId = null;
+            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+            Countries = result.Item1;
+            totalCountCountry = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCountry
+
+        #region ComboboxCity
+
+        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
+        private int CityComboBoxIndex { get; set; } = 0;
+        private int totalCountCity = 0;
+
+        private async Task OnSearchCity()
+        {
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task OnSearchCityIndexIncrement()
+        {
+            if (CityComboBoxIndex < (totalCountCity - 1))
+            {
+                CityComboBoxIndex++;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCityIndexDecrement()
+        {
+            if (CityComboBoxIndex > 0)
+            {
+                CityComboBoxIndex--;
+                await LoadDataCity(CityComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCityChanged(string e)
+        {
+            CityComboBoxIndex = 0;
+            await LoadDataCity(0, 10);
+        }
+
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
+            UserForm.IdCardDistrictId = null;
+            UserForm.IdCardVillageId = null;
+            var id = refCityComboBox?.Value ?? null;
+            var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == provinceId);
+            Cities = result.Item1;
+            totalCountCity = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxCity
+
+        #region ComboboxProvince
+
+        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
+        private int ProvinceComboBoxIndex { get; set; } = 0;
+        private int totalCountProvince = 0;
+
+        private async Task OnSearchProvince()
+        {
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task OnSearchProvinceIndexIncrement()
+        {
+            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            {
+                ProvinceComboBoxIndex++;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchProvinceIndexDecrement()
+        {
+            if (ProvinceComboBoxIndex > 0)
+            {
+                ProvinceComboBoxIndex--;
+                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputProvinceChanged(string e)
+        {
+            ProvinceComboBoxIndex = 0;
+            await LoadDataProvince(0, 10);
+        }
+
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var countryId = refCountryComboBox?.Value.GetValueOrDefault();
+            UserForm.IdCardCityId = null;
+            UserForm.IdCardDistrictId = null;
+            UserForm.IdCardVillageId = null;
+
+            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "", x => x.CountryId == countryId);
+            Provinces = result.Item1;
+            totalCountProvince = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxProvince
+
+        #region ComboboxDistrict
+
+        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
+        private int DistrictComboBoxIndex { get; set; } = 0;
+        private int totalCountDistrict = 0;
+
+        private async Task OnSearchDistrict()
+        {
+            await LoadDataDistrict(0, 10);
+        }
+
+        private async Task OnSearchDistrictIndexIncrement()
+        {
+            if (DistrictComboBoxIndex < (totalCountDistrict - 1))
+            {
+                DistrictComboBoxIndex++;
+                await LoadDataDistrict(DistrictComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDistrictndexDecrement()
+        {
+            if (DistrictComboBoxIndex > 0)
+            {
+                DistrictComboBoxIndex--;
+                await LoadDataDistrict(DistrictComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDistrictChanged(string e)
+        {
+            DistrictComboBoxIndex = 0;
+            await LoadDataDistrict(0, 10);
+        }
+
+        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var cityId = refCityComboBox?.Value.GetValueOrDefault();
+            UserForm.IdCardVillageId = null;
+            var id = refDistrictComboBox?.Value ?? null;
+            var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, refDistrictComboBox?.Text ?? "", x => x.CityId == cityId);
+            Districts = result.Item1;
+            totalCountDistrict = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboboxDistrict
+
+        #endregion Ktp Address
 
         #region Residence Address
 

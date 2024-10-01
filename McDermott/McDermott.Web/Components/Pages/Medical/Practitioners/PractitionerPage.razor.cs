@@ -153,7 +153,25 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(x => x.IsDoctor == true, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetUserQuery2(
+                x => x.IsDoctor == true,
+                searchTerm: searchTerm,
+                pageSize: pageSize,
+                pageIndex:
+                pageIndex,
+                includes: [],
+                select: x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth,
+                    IsPhysicion = x.IsPhysicion,
+                    IsNurse = x.IsNurse,
+                }
+            ));
             Users = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;

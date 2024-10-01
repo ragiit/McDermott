@@ -9,6 +9,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
     public partial class CreateUpdateProductPage
     {
         #region Relation Data
+
         private List<ProductDto> GetProduct = [];
         private List<MedicamentDto> GetMedicaments = [];
         private List<BpjsClassificationDto> GetBPJSCl = [];
@@ -26,13 +27,17 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private ProductDto TempProduct = new();
         private MedicamentDto PostMedicaments = new();
         private ProductDetailDto PostProductDetails = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Variable Static
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
+
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
+
         private IGrid Grid;
         private IGrid GridStock;
         private bool PanelVisible { get; set; } = false;
@@ -53,9 +58,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private IReadOnlyList<object> SelectedDataStockItems { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
-        #endregion
+
+        #endregion Variable Static
 
         #region select data static
+
         private List<string> ProductTypes =
         [
             "Consumable",
@@ -93,6 +100,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 showTabs = true;
             }
         }
+
         private bool Checkin
         {
             get => Checkins;
@@ -111,7 +119,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 }
             }
         }
-        #endregion
+
+        #endregion select data static
 
         #region UserLoginAndAccessRole
 
@@ -210,7 +219,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             var result = await Mediator.Send(new GetProductQuery(x => x.Id == Id, 0, 1));
-            PostProduct = kresult.Item1.FirstOrDefault() ?? new();
+            //PostProduct = kresult.Item1.FirstOrDefault() ?? new();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -227,7 +236,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 GetMaintainance = maintainanceResult.Item1;
                 PostProductDetails = PostProduct.Adapt<ProductDetailDto>();
 
-                //Type Medicament 
+                //Type Medicament
                 if (PostProduct != null)
                 {
                     PostProductDetails.Name = PostProduct.Name;
@@ -289,11 +298,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 }
 
                 // Ambil nama satuan ukur
-
             }
             else
             {
-
                 NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
 
                 if (PostProductDetails.UomId == 0)
@@ -317,9 +324,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
         }
-        #endregion
+
+        #endregion Load Data
 
         #region Select Data
+
         private void SelectedChangeUoM(UomDto UomId)
         {
             if (UomId != null)
@@ -331,10 +340,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 }
             }
         }
-        #endregion
+
+        #endregion Select Data
 
         #region Load ComboBox
+
         #region ComboBox Uom
+
         private DxComboBox<UomDto, long?> refUomComboBox { get; set; }
         private int UomComboBoxIndex { get; set; } = 0;
         private int totalCountUom = 0;
@@ -377,9 +389,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion ComboBox Uom
 
         #region Combo Box DrugForm
+
         private DxComboBox<DrugFormDto, long?> refDrugFormComboBox { get; set; }
         private int DrugFormComboBoxIndex { get; set; } = 0;
         private int totalCountDrugForm = 0;
@@ -422,9 +436,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Combo Box DrugForm
 
         #region Combo Box DrugRoute
+
         private DxComboBox<DrugRouteDto, long?> refDrugRouteComboBox { get; set; }
         private int DrugRouteComboBoxIndex { get; set; } = 0;
         private int totalCountDrugRoute = 0;
@@ -467,7 +483,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Combo Box DrugRoute
 
         //#region Combo Box Location
         //private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
@@ -515,6 +532,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         //#endregion
 
         #region Combo Box Product Category
+
         private DxComboBox<ProductCategoryDto, long?> refProductCategoryComboBox { get; set; }
         private int ProductCategoryComboBoxIndex { get; set; } = 0;
         private int totalCountProductCategory = 0;
@@ -557,9 +575,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Combo Box Product Category
 
         #region ComboBox Uom
+
         private DxComboBox<DrugDosageDto, long?> refDrugDosageComboBox { get; set; }
         private int DrugDosageComboBoxIndex { get; set; } = 0;
         private int totalCountDrugDosage = 0;
@@ -602,8 +622,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
 
+        #endregion ComboBox Uom
 
         //#region ComboBox BPJS Classification
         //private DxComboBox<BpjsClassificationDto, long?> refBPJSClComboBox { get; set; }
@@ -650,9 +670,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         //}
         //#endregion
 
-        #endregion
+        #endregion Load ComboBox
 
         #region Smart Button
+
         private async Task NewTableStock_Item()
         {
             //NavigationManager.NavigateTo($"inventory/products/stock-product/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.Id}");
@@ -752,9 +773,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             NavigationManager.NavigateTo($"inventory/maintainance-history/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.ProductId}");
             return;
         }
-        #endregion
+
+        #endregion Smart Button
 
         #region Button
+
         private async Task onDiscard()
         {
             NavigationManager.NavigateTo($"inventory/products");
@@ -764,15 +787,17 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private async Task Back_Click()
         {
             NavigationManager.NavigateTo($"inventory/products/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.Id}");
-
         }
+
         private async Task RefreshStock_Click()
         {
             await NewTableStock_Item();
         }
-        #endregion
+
+        #endregion Button
 
         #region Handler Vaidation
+
         private async Task HandleValidSubmit()
         {
             //IsLoading = true;
@@ -783,11 +808,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private async Task HandleInvalidSubmit()
         {
-
             FormValidationState = false;
         }
 
-        #endregion
+        #endregion Handler Vaidation
 
         #region Save
 
