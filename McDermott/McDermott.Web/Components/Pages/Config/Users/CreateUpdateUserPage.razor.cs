@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
+using HotChocolate.Utilities;
 using Humanizer;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
@@ -182,9 +183,55 @@ namespace McDermott.Web.Components.Pages.Config.Users
             #endregion Residence  Address
 
             Groups = (await Mediator.Send(new GetGroupQuery(x => x.Id == UserForm.GroupId))).Item1;
-            Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId))).Item1;
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery(x => x.Id == UserForm.JobPositionId))).Item1;
-            Departments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == UserForm.DepartmentId))).Item1;
+            Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId,
+            select: x => new User
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Email = x.Email
+            }))).Item1;
+
+            JobPositions = (await Mediator.Send(new GetJobPositionQuery(x => x.Id == UserForm.JobPositionId,
+            includes:
+            [
+                x => x.Department
+            ],
+            select: x => new JobPosition
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Department = new Domain.Entities.Department
+                {
+                    Name = x.Department.Name
+                },
+            }))).Item1;
+
+            Departments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == UserForm.DepartmentId,
+            includes:
+            [
+                x => x.Manager,
+                x => x.ParentDepartment,
+                x => x.Company,
+            ],
+            select: x => new Department
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ParentDepartment = new Domain.Entities.Department
+                {
+                    Name = x.ParentDepartment.Name
+                },
+                Company = new Domain.Entities.Company
+                {
+                    Name = x.Company.Name
+                },
+                Manager = new Domain.Entities.User
+                {
+                    Name = x.Manager.Name
+                },
+                DepartmentCategory = x.DepartmentCategory
+            }))).Item1;
+
             Occupationals = (await Mediator.Send(new GetOccupationalQuery(x => x.Id == UserForm.OccupationalId))).Item1;
 
             Specialities = (await Mediator.Send(new GetSpecialityQuery(x => x.Id == UserForm.SpecialityId))).Item1;
@@ -333,6 +380,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 }
 
                 UserForm = result.Item1.FirstOrDefault() ?? new();
+                //UserForm.Password = Helper.HashMD5(UserForm.Password);
             }
         }
 
@@ -523,110 +571,119 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         private async Task SaveUser()
         {
-            if (!FormValidationState)
-                return;
-
-            bool isValid = true;
-            var a = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.NoId == UserForm.NoId));
-            if (a)
+            try
             {
-                ToastService.ShowInfo("The Identity Number is already exist");
-                isValid = false;
-            }
+                IsLoading = true;
+                if (!FormValidationState)
+                    return;
 
-            var chekcEmail = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.Email == UserForm.Email));
-            if (chekcEmail)
-            {
-                ToastService.ShowInfo("The Email is already exist");
-                isValid = false;
-            }
-
-            if (UserForm.IsPhysicion)
-            {
-                var b = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.PhysicanCode == UserForm.PhysicanCode));
-                if (b)
+                bool isValid = true;
+                var a = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.NoId == UserForm.NoId));
+                if (a)
                 {
-                    ToastService.ShowInfo("The Physician Code is already exist");
+                    ToastService.ShowInfo("The Identity Number is already exist");
                     isValid = false;
                 }
-            }
 
-            if (Convert.ToBoolean(UserForm.IsEmployee))
-            {
-                var isOk = await CheckUserFormAsync();
-                if (!isOk)
-                    isValid = false;
-            }
-
-            if (!isValid)
-                return;
-
-            if (Convert.ToBoolean(UserForm.IsPatient))
-            {
-                var date = DateTime.Now;
-                var lastId = Users.Where(x => x.IsPatient == true).ToList().LastOrDefault();
-
-                UserForm.NoRm = lastId is null
-                         ? $"{date:dd-MM-yyyy}-0001"
-                         : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
-            }
-
-            if (UserForm.IsSameDomicileAddress)
-            {
-                UserForm.DomicileAddress1 = UserForm.IdCardAddress1;
-                UserForm.DomicileAddress2 = UserForm.IdCardAddress2;
-                UserForm.DomicileRtRw = UserForm.IdCardRtRw;
-                UserForm.DomicileProvinceId = UserForm.IdCardProvinceId;
-                UserForm.DomicileCityId = UserForm.IdCardCityId;
-                UserForm.DomicileDistrictId = UserForm.IdCardDistrictId;
-                UserForm.DomicileVillageId = UserForm.IdCardVillageId;
-                UserForm.DomicileCountryId = UserForm.IdCardCountryId;
-            }
-
-            if (!string.IsNullOrWhiteSpace(UserForm.Password))
-                UserForm.Password = Helper.HashMD5(UserForm.Password);
-
-            var ax = SelectedServices.Select(x => x.Id).ToList();
-            UserForm.DoctorServiceIds?.AddRange(ax);
-
-            if (UserForm.Id == 0)
-            {
-                await FileUploadService.UploadFileAsync(BrowserFile);
-                UserForm = await Mediator.Send(new CreateUserRequest(UserForm));
-            }
-            else
-            {
-                //var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
-
-                //if (UserForm.SipFile != userDtoSipFile)
-                //{
-                //    if (UserForm.SipFile != null)
-                //        Helper.DeleteFile(UserForm.SipFile);
-
-                //    if (userDtoSipFile != null)
-                //        Helper.DeleteFile(userDtoSipFile);
-                //}
-
-                var result = await Mediator.Send(new UpdateUserRequest(UserForm));
-
-                //if (UserForm.SipFile != userDtoSipFile)
-                //{
-                //    if (UserForm.SipFile != null)
-                //        await FileUploadService.UploadFileAsync(BrowserFile);
-                //}
-
-                if (UserLogin.Id == result.Id)
+                var chekcEmail = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.Email == UserForm.Email));
+                if (chekcEmail)
                 {
-                    await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
-
-                    var aa = (CustomAuthenticationStateProvider)CustomAuth;
-                    await aa.UpdateAuthState(string.Empty);
-
-                    await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, Helper.Encrypt(JsonConvert.SerializeObject(result)), 2);
+                    ToastService.ShowInfo("The Email is already exist");
+                    isValid = false;
                 }
-            }
 
-            NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}", true);
+                if (UserForm.IsPhysicion)
+                {
+                    var b = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.PhysicanCode == UserForm.PhysicanCode));
+                    if (b)
+                    {
+                        ToastService.ShowInfo("The Physician Code is already exist");
+                        isValid = false;
+                    }
+                }
+
+                if (Convert.ToBoolean(UserForm.IsEmployee))
+                {
+                    var isOk = await CheckUserFormAsync();
+                    if (!isOk)
+                        isValid = false;
+                }
+
+                if (!isValid)
+                    return;
+
+                if (Convert.ToBoolean(UserForm.IsPatient))
+                {
+                    var date = DateTime.Now;
+                    var lastId = Users.Where(x => x.IsPatient == true).ToList().LastOrDefault();
+
+                    UserForm.NoRm = lastId is null
+                             ? $"{date:dd-MM-yyyy}-0001"
+                             : $"{date:dd-MM-yyyy}-{(long.Parse(lastId!.NoRm!.Substring(lastId.NoRm.Length - 4)) + 1):0000}";
+                }
+
+                if (UserForm.IsSameDomicileAddress)
+                {
+                    UserForm.DomicileAddress1 = UserForm.IdCardAddress1;
+                    UserForm.DomicileAddress2 = UserForm.IdCardAddress2;
+                    UserForm.DomicileRtRw = UserForm.IdCardRtRw;
+                    UserForm.DomicileProvinceId = UserForm.IdCardProvinceId;
+                    UserForm.DomicileCityId = UserForm.IdCardCityId;
+                    UserForm.DomicileDistrictId = UserForm.IdCardDistrictId;
+                    UserForm.DomicileVillageId = UserForm.IdCardVillageId;
+                    UserForm.DomicileCountryId = UserForm.IdCardCountryId;
+                }
+
+                if (!string.IsNullOrWhiteSpace(UserForm.Password))
+                    UserForm.Password = Helper.HashMD5(UserForm.Password);
+
+                var ax = SelectedServices.Select(x => x.Id).ToList();
+                UserForm.DoctorServiceIds?.AddRange(ax);
+
+                if (UserForm.Id == 0)
+                {
+                    await FileUploadService.UploadFileAsync(BrowserFile);
+                    UserForm = await Mediator.Send(new CreateUserRequest(UserForm));
+                }
+                else
+                {
+                    //var userDtoSipFile = SelectedDataItems[0].Adapt<UserDto>().SipFile;
+
+                    //if (UserForm.SipFile != userDtoSipFile)
+                    //{
+                    //    if (UserForm.SipFile != null)
+                    //        Helper.DeleteFile(UserForm.SipFile);
+
+                    //    if (userDtoSipFile != null)
+                    //        Helper.DeleteFile(userDtoSipFile);
+                    //}
+
+                    var result = await Mediator.Send(new UpdateUserRequest(UserForm));
+
+                    //if (UserForm.SipFile != userDtoSipFile)
+                    //{
+                    //    if (UserForm.SipFile != null)
+                    //        await FileUploadService.UploadFileAsync(BrowserFile);
+                    //}
+
+                    if (UserLogin.Id == result.Id)
+                    {
+                        await JsRuntime.InvokeVoidAsync("deleteCookie", CookieHelper.USER_INFO);
+
+                        var aa = (CustomAuthenticationStateProvider)CustomAuth;
+                        await aa.UpdateAuthState(string.Empty);
+
+                        await JsRuntime.InvokeVoidAsync("setCookie", CookieHelper.USER_INFO, Helper.Encrypt(JsonConvert.SerializeObject(result)), 2);
+                    }
+                }
+
+                NavigationManager.NavigateTo($"configuration/users/{EnumPageMode.Update.GetDisplayName()}?Id={UserForm.Id}", true);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { IsLoading = false; }
         }
 
         private async Task ExportToExcel()
@@ -1372,8 +1429,18 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refOccupationalComboBox?.Text ?? ""));
-            Occupationals = result.Item1;
+            var result = await Mediator.Send(new GetOccupationalQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refOccupationalComboBox?.Text ?? "",
+                select: x => new Occupational
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description
+                }
+
+            )); Occupationals = result.Item1;
             totalCountOccupational = result.pageCount;
             PanelVisible = false;
         }
@@ -1415,13 +1482,21 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataSpeciality(0, 10);
         }
 
-        private async Task LoadDataSpeciality(int pageIndex = 0, int pageSize = 10, long? SpecialityId = null)
+        private async Task LoadDataSpeciality(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetSpecialityQuery(SpecialityId == null ? null : x => x.Id == SpecialityId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refSpecialityComboBox?.Text ?? ""));
-            Specialities = result.Item1;
-            totalCountSpeciality = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.QueryGetHelper<Speciality, SpecialityDto>(pageIndex, pageSize, searchTerm);
+                Specialities = result.Item1;
+                totalCountSpeciality = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxSpeciality
@@ -1469,18 +1544,21 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataService();
         }
 
-        private void aaa(IEnumerable<string> aa)
+        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
         {
-            var aaa = aa;
-        }
-
-        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10, long? ServiceId = null, string? e = null)
-        {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetServiceQuery(ServiceId == null ? null : x => x.Id == ServiceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: SearchTextService ?? ""));
-            Services = result.Item1;
-            totalCountService = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.QueryGetHelper<Service, ServiceDto>(pageIndex, pageSize, SearchTextService);
+                Services = result.Item1;
+                totalCountService = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxService
@@ -1522,10 +1600,22 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         private List<UserDto> Supervisors = [];
 
-        private async Task LoadDataSupervisor(int pageIndex = 0, int pageSize = 10, long? SupervisorId = null)
+        private async Task LoadDataSupervisor(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetUserQuery2(SupervisorId == null ? null : x => x.Id == SupervisorId && x.IsEmployee == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refSupervisorComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetUserQuery2(
+                 predicate: x => x.IsEmployee == true,
+                 pageIndex: pageIndex,
+                 pageSize: pageSize,
+                 searchTerm: refSupervisorComboBox?.Text ?? "",
+                 select: x => new User
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Email = x.Email
+                 }
+
+            ));
             Supervisors = result.Item1;
             totalCountSupervisor = result.pageCount;
             PanelVisible = false;
@@ -1568,10 +1658,28 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataJobPosition();
         }
 
-        private async Task LoadDataJobPosition(int pageIndex = 0, int pageSize = 10, long? JobPositionId = null)
+        private async Task LoadDataJobPosition(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetJobPositionQuery(JobPositionId == null ? null : x => x.Id == JobPositionId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refJobPositionComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetJobPositionQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refJobPositionComboBox?.Text ?? "",
+                includes:
+                [
+                    x => x.Department
+                ],
+                select: x => new JobPosition
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Department = new Domain.Entities.Department
+                    {
+                        Name = x.Department.Name
+                    },
+                }
+
+            ));
             JobPositions = result.Item1;
             totalCountJobPosition = result.pageCount;
             PanelVisible = false;
@@ -1614,10 +1722,38 @@ namespace McDermott.Web.Components.Pages.Config.Users
             await LoadDataDepartment();
         }
 
-        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10, long? DepartmentId = null)
+        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetDepartmentQuery(DepartmentId == null ? null : x => x.Id == DepartmentId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDepartmentComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetDepartmentQuery(
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                searchTerm: refDepartmentComboBox?.Text ?? "",
+                includes:
+                [
+                    x => x.Manager,
+                    x => x.ParentDepartment,
+                    x => x.Company,
+                ],
+                select: x => new Department
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ParentDepartment = new Domain.Entities.Department
+                    {
+                        Name = x.ParentDepartment.Name
+                    },
+                    Company = new Domain.Entities.Company
+                    {
+                        Name = x.Company.Name
+                    },
+                    Manager = new Domain.Entities.User
+                    {
+                        Name = x.Manager.Name
+                    },
+                    DepartmentCategory = x.DepartmentCategory
+                }
+            ));
             Departments = result.Item1;
             totalCountDepartment = result.pageCount;
             PanelVisible = false;

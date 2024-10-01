@@ -60,6 +60,15 @@
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
                                             var a = (VillageDto)EditFormContext.EditModel;
+                                            if (a.ProvinceId is null)
+                                            {
+                                                a.CityId = null;
+                                                a.DistrictId = null;
+                                            }
+                                            if (a.CityId is null)
+                                            { 
+                                                a.DistrictId = null;
+                                            }
                                         }
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">

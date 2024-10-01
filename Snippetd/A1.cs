@@ -153,7 +153,8 @@
      ex.HandleException(ToastService);
  }
  finally { PanelVisible = false; }
-
+ 
+PanelVisible = true;
 
  
                     if (list.Count > 0)

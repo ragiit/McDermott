@@ -6,13 +6,16 @@ namespace McDermott.Application.Features.Commands.Config
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetVillageQuery(Expression<Func<Village, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetVillageQuery(Expression<Func<Village, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Village, object>>>? includes = null, Expression<Func<Village, Village>>? select = null) : IRequest<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Village, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Village, object>>> Includes { get; } = includes!;
+            public Expression<Func<Village, Village>>? Select { get; } = select!;
         }
 
         public class ValidateVillageQuery(Expression<Func<Village, bool>>? predicate = null) : IRequest<bool>

@@ -4,13 +4,16 @@
     {
         #region Get
 
-        public class GetUserQuery2(Expression<Func<User, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<UserDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetUserQuery2(Expression<Func<User, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<User, object>>>? includes = null, Expression<Func<User, User>>? select = null) : IRequest<(List<UserDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<User, object>>> Includes { get; } = includes!;
+            public Expression<Func<User, User>>? Select { get; } = select!;
         }
 
         public class ValidateUserQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<bool>

@@ -77,14 +77,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = Array.Empty<object>();
-            var result = await Mediator.Send(new GetProvinceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Provinces = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, searchTerm);
+                Provinces = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #region ComboboxCountry
@@ -122,14 +129,12 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCountries(0, 10);
         }
 
-        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10, long? countryId = null)
+        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-
-            var result = await Mediator.Send(new GetCountryQuery(countryId == null ? null : x => x.Id == countryId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, searchTerm);
             Countries = result.Item1;
             totalCountCountry = result.pageCount;
-
             PanelVisible = false;
         }
 
@@ -148,6 +153,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems.Count == 0)
                 {
                     await Mediator.Send(new DeleteProvinceRequest(((ProvinceDto)e.DataItem).Id));
@@ -158,12 +164,13 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new DeleteProvinceRequest(ids: selectedProvinces.Select(x => x.Id).ToList()));
                 }
 
-                await LoadData();
+                await LoadData(activePageIndex, pageSize);
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         protected override async Task OnInitializedAsync()
@@ -186,27 +193,25 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
 
-            PanelVisible = true;
-
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
-
-            var resultz = await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId));
-            Countries = resultz.Item1;
-            totalCountCountry = resultz.pageCount;
-
-            PanelVisible = false;
+                PanelVisible = true;
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
+                Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == a.CountryId)).Item1;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private void UpdateEditItemsEnabled(bool enabled)
-        {
-            EditItemsEnabled = enabled;
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -216,26 +221,35 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (ProvinceDto)e.EditModel;
-
-            bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.CountryId == editModel.CountryId));
-            if (exists)
+            try
             {
-                ToastService.ShowInfo($"Province with name '{editModel.Name}' and country '{refCountryComboBox.Text}' already exists.");
-                e.Cancel = true;
-                return;
-            }
+                PanelVisible = true;
+                var editModel = (ProvinceDto)e.EditModel;
 
-            if (editModel.Id == 0)
-            {
-                await Mediator.Send(new CreateProvinceRequest(editModel));
-            }
-            else
-            {
-                await Mediator.Send(new UpdateProvinceRequest(editModel));
-            }
+                bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.CountryId == editModel.CountryId));
+                if (exists)
+                {
+                    ToastService.ShowInfo($"Province with name '{editModel.Name}' and country '{refCountryComboBox.Text}' already exists.");
+                    e.Cancel = true;
+                    return;
+                }
 
-            await LoadData();
+                if (editModel.Id == 0)
+                {
+                    await Mediator.Send(new CreateProvinceRequest(editModel));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateProvinceRequest(editModel));
+                }
+
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task ExportToExcel()

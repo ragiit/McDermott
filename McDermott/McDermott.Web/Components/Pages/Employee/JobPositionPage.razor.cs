@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Employee
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
+
+namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class JobPositionPage
     {
@@ -105,6 +108,9 @@
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as JobPositionDto ?? new());
+            Departments = (await Mediator.QueryGetHelper<Department, DepartmentDto>(predicate: x => x.Id == a.DepartmentId)).Item1;
         }
 
         private void DeleteItem_Click()
@@ -148,7 +154,7 @@
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetJobPositionQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var a = await Mediator.QueryGetHelper<JobPosition, JobPositionDto>(pageIndex, pageSize, searchTerm);
                 JobPositions = a.Item1;
                 totalCount = a.pageCount;
                 activePageIndex = pageIndex;
@@ -316,10 +322,10 @@
             await LoadDataDepartment();
         }
 
-        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10, long? DepartmentId = null)
+        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetDepartmentQuery(DepartmentId == null ? null : x => x.Id == DepartmentId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDepartmentComboBox?.Text ?? ""));
+            var result = await Mediator.QueryGetHelper<Department, DepartmentDto>(pageIndex, pageSize, refDepartmentComboBox?.Text ?? "");
             Departments = result.Item1;
             totalCountDepartment = result.pageCount;
             PanelVisible = false;

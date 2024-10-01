@@ -4,13 +4,16 @@ namespace McDermott.Application.Features.Commands.Config
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetOccupationalQuery(Expression<Func<Occupational, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<OccupationalDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetOccupationalQuery(Expression<Func<Occupational, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Occupational, object>>>? includes = null, Expression<Func<Occupational, Occupational>>? select = null) : IRequest<(List<OccupationalDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Occupational, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; set; } = pageSize ?? 10;
+            public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Occupational, object>>> Includes { get; } = includes!;
+            public Expression<Func<Occupational, Occupational>>? Select { get; } = select!;
         }
 
         public class BulkValidateOccupationalQuery(List<OccupationalDto> OccupationalsToValidate) : IRequest<List<OccupationalDto>>
