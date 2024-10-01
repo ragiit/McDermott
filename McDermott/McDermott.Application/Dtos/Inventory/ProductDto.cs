@@ -20,8 +20,8 @@ namespace McDermott.Application.Dtos.Inventory
         public long? SalesPrice { get; set; }
         public string? Tax { get; set; }
         public long? Cost { get; set; }
-        public bool IsTopicalMedication { get; set; }
-        public bool IsOralMedication { get; set; }
+        public bool IsTopicalMedication { get; set; } = false;
+        public bool IsOralMedication { get; set; } = false;
         public string? InternalReference { get; set; }
         public string? UomName { get; set; }
         public long? Qtys { get; set; }
@@ -89,8 +89,8 @@ namespace McDermott.Application.Dtos.Inventory
         public DateTime? LastCalibrationDate { get; set; }
         public DateTime? NextCalibrationDate { get; set; }
         public string? EquipmentCondition { get; set; }
-        public bool IsTopicalMedication { get; set; }
-        public bool IsOralMedication { get; set; }
+        public bool IsTopicalMedication { get; set; } = false;
+        public bool IsOralMedication { get; set; } = false;
         public bool HighAlert { get; set; } = false;
     }
 }

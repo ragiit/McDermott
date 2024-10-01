@@ -21,6 +21,7 @@ namespace McDermott.Application.Features.Queries.Medical
                     .Include(x => x.ParentLocation)
                     .AsNoTracking()
                     .AsQueryable();
+
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
 

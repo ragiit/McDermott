@@ -34,12 +34,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
         private IGrid Grid;
+        private IGrid GridStock;
         private bool PanelVisible { get; set; } = false;
         private bool _SmartButton { get; set; } = false;
         private bool showTabs { get; set; } = false;
         private bool Checkins { get; set; } = false;
         private bool Chronis { get; set; } = false;
         private bool FieldHideStock { get; set; } = false;
+        private bool showStockProduct { get; set; } = false;
         private long? TotalQty { get; set; }
         private long? TotalScrapQty { get; set; }
         private long? TotalMaintainanceQty { get; set; }
@@ -48,6 +50,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private string? NameProduct { get; set; }
         private bool FormValidationState { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataStockItems { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
         #endregion
@@ -198,7 +201,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             //await LoadDataBPJSCl();
             await LoadDataDrugForm();
             await LoadDataDrugRoute();
-            await LoadDataLocation();
+            //await LoadDataLocation();
             await LoadDataProductCategory();
             PanelVisible = false;
         }
@@ -207,7 +210,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             var result = await Mediator.Send(new GetProductQuery(x => x.Id == Id, 0, 1));
-            PostProductDetails = new();
+            PostProduct = kresult.Item1.FirstOrDefault() ?? new();
+
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
                 if (result.Item1.Count == 0 || !Id.HasValue)
@@ -215,76 +219,101 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     NavigationManager.NavigateTo("inventory/products");
                     return;
                 }
+                _SmartButton = true;
 
-                PostProduct = result.Item1.FirstOrDefault() ?? new();
                 GetMedicaments = await Mediator.Send(new GetMedicamentQuery(x => x.ProductId == PostProduct.Id));
                 PostMedicaments = GetMedicaments.FirstOrDefault() ?? new();
                 var maintainanceResult = await Mediator.Send(new GetMaintainanceQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
                 GetMaintainance = maintainanceResult.Item1;
+                PostProductDetails = PostProduct.Adapt<ProductDetailDto>();
 
                 //Type Medicament 
-                if (PostProduct.HospitalType == "Medicament")
+                if (PostProduct != null)
                 {
-                    if (PostMedicaments != null)
+                    PostProductDetails.Name = PostProduct.Name;
+                    PostProductDetails.ProductType = PostProduct.ProductType;
+                    PostProductDetails.HospitalType = PostProduct.HospitalType;
+                    PostProductDetails.BpjsClassificationId = PostProduct.BpjsClassificationId;
+                    PostProductDetails.UomId = PostProduct.UomId;
+                    PostProductDetails.PurchaseUomId = PostProduct.PurchaseUomId;
+                    PostProductDetails.TraceAbility = PostProduct.TraceAbility;
+                    PostProductDetails.SalesPrice = PostProduct.SalesPrice;
+                    PostProductDetails.Tax = PostProduct.Tax;
+                    PostProductDetails.Cost = PostProduct.Cost;
+                    PostProductDetails.ProductCategoryId = PostProduct.ProductCategoryId;
+                    PostProductDetails.InternalReference = PostProduct.InternalReference;
+
+                    if (PostProduct.HospitalType == "Medicament")
                     {
-                        PostProductDetails.MedicamentId = PostMedicaments.Id;
-                        PostProductDetails.FormId = PostMedicaments.FormId;
-                        PostProductDetails.RouteId = PostMedicaments.RouteId;
-                        PostProductDetails.Dosage = PostMedicaments.Dosage;
-                        PostProductDetails.UomMId = PostMedicaments.UomId;
-                        PostProductDetails.Cronies = PostMedicaments.Cronies;
-                        PostProductDetails.MontlyMax = PostMedicaments.MontlyMax;
-                        PostProductDetails.FrequencyId = PostMedicaments.FrequencyId;
-
-                        // Ambil komponen aktif jika tersedia
-                        if (PostMedicaments.ActiveComponentId != null)
+                        if (PostMedicaments != null)
                         {
-                            selectedActiveComponents = ActiveComponents.Where(a => PostMedicaments.ActiveComponentId.Contains(a.Id)).ToList();
-                        }
+                            PostProductDetails.MedicamentId = PostMedicaments.Id;
+                            PostProductDetails.FormId = PostMedicaments.FormId;
+                            PostProductDetails.RouteId = PostMedicaments.RouteId;
+                            PostProductDetails.Dosage = PostMedicaments.Dosage;
+                            PostProductDetails.UomMId = PostMedicaments.UomId;
+                            PostProductDetails.Cronies = PostMedicaments.Cronies;
+                            PostProductDetails.MontlyMax = PostMedicaments.MontlyMax;
+                            PostProductDetails.FrequencyId = PostMedicaments.FrequencyId;
 
-                        PostProductDetails.PregnancyWarning = PostMedicaments.PregnancyWarning;
-                        PostProductDetails.Pharmacologi = PostMedicaments.Pharmacologi;
-                        PostProductDetails.Weather = PostMedicaments.Weather;
-                        PostProductDetails.Food = PostMedicaments.Food;
+                            // Ambil komponen aktif jika tersedia
+                            if (PostMedicaments.ActiveComponentId != null)
+                            {
+                                selectedActiveComponents = ActiveComponents.Where(a => PostMedicaments.ActiveComponentId.Contains(a.Id)).ToList();
+                            }
+
+                            PostProductDetails.PregnancyWarning = PostMedicaments.PregnancyWarning;
+                            PostProductDetails.Pharmacologi = PostMedicaments.Pharmacologi;
+                            PostProductDetails.Weather = PostMedicaments.Weather;
+                            PostProductDetails.Food = PostMedicaments.Food;
+                        }
+                    }
+                    else if (PostProduct.HospitalType == "Medical Equipment")
+                    {
+                        PostProductDetails.Brand = PostProduct.Brand;
+                        PostProductDetails.Brand = PostProduct.Brand;
+                    }
+                    // Kelola informasi stok
+                    if (PostProduct.HospitalType != "Medical Equipment")
+                    {
+                        TotalQty = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true).Sum(z => z.Quantity);
+                    }
+                    else
+                    {
+                        var productScrap = GetMaintainance.Where(x => x.Status == EnumStatusMaintainance.Scrap).FirstOrDefault();
+                        var productMaintainance = GetMaintainance.Where(x => x.Status != EnumStatusMaintainance.Scrap).FirstOrDefault();
+                        TotalScrapQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap).Count();
+                        TotalQty = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true).Sum(z => z.Quantity);
+                        TotalMaintainanceQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap).Count();
                     }
                 }
-                // Kelola informasi stok
-                if (PostProduct.HospitalType != "Medical Equipment")
-                {
-                    TotalQty = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true).Sum(z => z.Quantity);
-                }
-                else
-                {
-                    var productScrap = GetMaintainance.Where(x => x.Status == EnumStatusMaintainance.Scrap).FirstOrDefault();
-                    var productMaintainance = GetMaintainance.Where(x => x.Status != EnumStatusMaintainance.Scrap).FirstOrDefault();
-                    TotalScrapQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap).Count();
-                    TotalQty = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true).Sum(z => z.Quantity);
-                    TotalMaintainanceQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap).Count();
-                }
+
                 // Ambil nama satuan ukur
-               
+
             }
-
-            NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
-
-            if (PostProductDetails.UomId == 0)
+            else
             {
-                PostProductDetails.UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0;
+
+                NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
+
+                if (PostProductDetails.UomId == 0)
+                {
+                    PostProductDetails.UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? null;
+
+                    SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
+                }
+
+                PostProductDetails = new ProductDetailDto
+                {
+                    ProductType = ProductTypes[2],
+                    HospitalType = HospitalProducts[0],
+                    SalesPrice = 100,
+                    Tax = "11%",
+                    UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? null
+                };
 
                 SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
             }
-
-            PostProductDetails = new ProductDetailDto
-            {
-                ProductType = ProductTypes[2],
-                HospitalType = HospitalProducts[0],
-                SalesPrice = 100,
-                Tax = "11%",
-                UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? 0
-            };
-
-            SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
-
             GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
         }
@@ -296,7 +325,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             if (UomId != null)
             {
                 var UoMId = GetUoms.Where(u => u.Id == UomId.Id).FirstOrDefault() ?? new();
-                PostProductDetails.PurchaseUomId = UoMId.Id;
+                if (UoMId.Id != 0)
+                {
+                    PostProductDetails.PurchaseUomId = UoMId.Id;
+                }
             }
         }
         #endregion
@@ -437,50 +469,50 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         }
         #endregion
 
-        #region Combo Box Location
-        private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
-        private int LocationComboBoxIndex { get; set; } = 0;
-        private int totalCountLocation = 0;
+        //#region Combo Box Location
+        //private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
+        //private int LocationComboBoxIndex { get; set; } = 0;
+        //private int totalCountLocation = 0;
 
-        private async Task OnSearchLocation()
-        {
-            await LoadDataLocation(0, 10);
-        }
+        //private async Task OnSearchLocation()
+        //{
+        //    await LoadDataLocation(0, 10);
+        //}
 
-        private async Task OnSearchLocationIndexIncrement()
-        {
-            if (LocationComboBoxIndex < (totalCountLocation - 1))
-            {
-                LocationComboBoxIndex++;
-                await LoadDataLocation(LocationComboBoxIndex, 10);
-            }
-        }
+        //private async Task OnSearchLocationIndexIncrement()
+        //{
+        //    if (LocationComboBoxIndex < (totalCountLocation - 1))
+        //    {
+        //        LocationComboBoxIndex++;
+        //        await LoadDataLocation(LocationComboBoxIndex, 10);
+        //    }
+        //}
 
-        private async Task OnSearchLocationIndexDecrement()
-        {
-            if (LocationComboBoxIndex > 0)
-            {
-                LocationComboBoxIndex--;
-                await LoadDataLocation(LocationComboBoxIndex, 10);
-            }
-        }
+        //private async Task OnSearchLocationIndexDecrement()
+        //{
+        //    if (LocationComboBoxIndex > 0)
+        //    {
+        //        LocationComboBoxIndex--;
+        //        await LoadDataLocation(LocationComboBoxIndex, 10);
+        //    }
+        //}
 
-        private async Task OnInputLocationChanged(string e)
-        {
-            LocationComboBoxIndex = 0;
-            await LoadDataLocation(0, 10);
-        }
+        //private async Task OnInputLocationChanged(string e)
+        //{
+        //    LocationComboBoxIndex = 0;
+        //    await LoadDataLocation(0, 10);
+        //}
 
-        private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery(searchTerm: refLocationComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            GetLocations = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
-        }
-        #endregion
+        //private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
+        //{
+        //    PanelVisible = true;
+        //    SelectedDataItems = [];
+        //    var result = await Mediator.Send(new GetLocationQuery(searchTerm: refLocationComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+        //    GetLocations = result.Item1;
+        //    totalCount = result.pageCount;
+        //    PanelVisible = false;
+        //}
+        //#endregion
 
         #region Combo Box Product Category
         private DxComboBox<ProductCategoryDto, long?> refProductCategoryComboBox { get; set; }
@@ -623,13 +655,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         #region Smart Button
         private async Task NewTableStock_Item()
         {
-            NavigationManager.NavigateTo($"inventory/maintainance/scrap/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.Id}");
-            return;
+            //NavigationManager.NavigateTo($"inventory/products/stock-product/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.Id}");
+            //return;
 
             try
             {
-
-
+                showStockProduct = true;
+                PanelVisible = true;
                 if (SelectedDataItems.Count == 0)
                 {
                     // Jika tidak ada item yang dipilih, gunakan produk yang sedang dipertimbangkan
@@ -729,6 +761,15 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             return;
         }
 
+        private async Task Back_Click()
+        {
+            NavigationManager.NavigateTo($"inventory/products/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.Id}");
+
+        }
+        private async Task RefreshStock_Click()
+        {
+            await NewTableStock_Item();
+        }
         #endregion
 
         #region Handler Vaidation
@@ -766,7 +807,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 }
 
                 SetPostProductDetails();
-                SetFormMedicamentDetails();
+                if (PostProductDetails.HospitalType == "Medicament")
+                {
+                    SetFormMedicamentDetails();
+                }
 
                 if (PostProductDetails.Id == 0)
                 {

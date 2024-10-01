@@ -21,8 +21,8 @@
         public DateTime? LastCalibrationDate { get; set; }
         public DateTime? NextCalibrationDate { get; set; }
         public string? EquipmentCondition { get; set; }
-        public bool IsTopicalMedication { get; set; }
-        public bool IsOralMedication { get; set; }
+        public bool IsTopicalMedication { get; set; } = false;
+        public bool IsOralMedication { get; set; } = false;
         public bool? HighAlert { get; set; }
 
         [SetToNull]

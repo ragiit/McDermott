@@ -162,13 +162,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 StockProductView = false;
                 SelectedDataItems = [];
 
+
                 // Mengambil data produk
                 var result = await Mediator.Send(new GetProductQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
                 Products = result.Item1
                     .GroupBy(x => x.Id)
                     .Select(group => group.First())
                     .ToList();
-
+                
                 // Mengambil data stok produk dan menghitung jumlahnya
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                  
@@ -236,7 +237,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private async Task EditItem_Click()
         {
-            NavigationManager.NavigateTo($"inventory/products/{EnumPageMode.Update.GetDisplayName()}?Id={FormProductDetails.Id}");
+            var DataId = Products.FirstOrDefault(); ;
+            NavigationManager.NavigateTo($"inventory/products/{EnumPageMode.Update.GetDisplayName()}?Id={DataId.Id}");
             return;
         }
 
