@@ -37,13 +37,25 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             var a = (GridFamilyRelation.GetDataItem(FocusedRowVisibleIndexFamilyRelation) as PatientFamilyRelationDto ?? new());
 
             PanelVisible = true;
-            var result = await Mediator.Send(new GetFamilyQuery(x => x.Id == a.FamilyId));
-            Families = result.Item1;
-            totalCountFamily = result.pageCount;
-
-            var ax = await Mediator.Send(new GetUserQuery2(x => x.Id == a.FamilyMemberId));
-            UserPatients = ax.Item1;
-            totalCountUserFamilyRelation = ax.pageCount;
+            Families = (await Mediator.QueryGetHelper<Family, FamilyDto>(predicate: x => x.Id == a.FamilyId)).Item1;
+            UserPatients = (await Mediator.Send(new GetUserQuery2(
+                   x => x.IsPatient == true,
+                   searchTerm: refUserFamilyRelationComboBox?.Text ?? "",
+                   pageSize: 1,
+                   pageIndex:
+                   0,
+                   includes: [],
+                   select: x => new User
+                   {
+                       Id = x.Id,
+                       Name = x.Name,
+                       NoRm = x.NoRm,
+                       Email = x.Email,
+                       MobilePhone = x.MobilePhone,
+                       Gender = x.Gender,
+                       DateOfBirth = x.DateOfBirth,
+                   }
+            ))).Item1;
 
             TempFamilyRelation = a;
 
@@ -99,7 +111,28 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             {
                 PanelVisible = true;
                 SelectedDataItemsFamilyRelation = [];
-                var a = await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == UserForm.Id, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                //var a = await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == UserForm.Id, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var a = await Mediator.QueryGetHelper<PatientFamilyRelation, PatientFamilyRelationDto>(pageIndex, pageSize, searchTerm, x => x.PatientId == UserForm.Id,
+                    includes:
+                    [
+                        x => x.Family,
+                        x => x.FamilyMember,
+                    ],
+                    select: x => new PatientFamilyRelation
+                    {
+                        Id = x.Id,
+                        FamilyMemberId = x.FamilyMemberId,
+                        FamilyMember = new User
+                        {
+                            Name = x.FamilyMember.Name
+                        },
+                        FamilyId = x.FamilyId,
+                        Family = new Family
+                        {
+                            Name = x.Family.Name
+                        }
+                    });
+
                 PatientFamilyRelations = a.Item1;
                 totalCountFamilyRelation = a.pageCount;
                 activePageIndex = pageIndex;
@@ -270,7 +303,25 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetUserQuery2(x => x.IsPatient == true && x.Id != UserForm.Id, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUserFamilyRelationComboBox?.Text ?? ""));
+                //var result = await Mediator.Send(new GetUserQuery2(x => x.IsPatient == true && x.Id != UserForm.Id, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUserFamilyRelationComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetUserQuery2(
+                    x => x.IsPatient == true,
+                    searchTerm: refUserFamilyRelationComboBox?.Text ?? "",
+                    pageSize: pageSize,
+                    pageIndex:
+                    pageIndex,
+                    includes: [],
+                    select: x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                    }
+                ));
                 UserPatients = result.Item1;
                 totalCountUserFamilyRelation = result.pageCount;
                 PanelVisible = false;
@@ -324,7 +375,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetFamilyQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refFamilyComboBox?.Text ?? ""));
+                var result = await Mediator.QueryGetHelper<Family, FamilyDto>(pageIndex, pageSize, refFamilyComboBox?.Text ?? "");
                 Families = result.Item1;
                 totalCountFamily = result.pageCount;
                 PanelVisible = false;

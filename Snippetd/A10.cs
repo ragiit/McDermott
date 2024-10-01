@@ -1,21 +1,21 @@
-public class GetSpecialityQuery(Expression<Func<Speciality, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Speciality, object>>>? includes = null, Expression<Func<Speciality, Speciality>>? select = null) : IRequest<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)>
+public class GetPatientFamilyRelationQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<PatientFamilyRelation, object>>>? includes = null, Expression<Func<PatientFamilyRelation, PatientFamilyRelation>>? select = null) : IRequest<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)>
 {
-    public Expression<Func<Speciality, bool>> Predicate { get; } = predicate!;
+    public Expression<Func<PatientFamilyRelation, bool>> Predicate { get; } = predicate!;
     public bool RemoveCache { get; } = removeCache!;
     public string SearchTerm { get; } = searchTerm!;
     public int PageIndex { get; } = pageIndex;
     public int PageSize { get; } = pageSize ?? 10;
 
-    public List<Expression<Func<Speciality, object>>> Includes { get; } = includes!;
-    public Expression<Func<Speciality, Speciality>>? Select { get; } = select!;
+    public List<Expression<Func<PatientFamilyRelation, object>>> Includes { get; } = includes!;
+    public Expression<Func<PatientFamilyRelation, PatientFamilyRelation>>? Select { get; } = select!;
 }
 
 
-public async Task<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetSpecialityQuery request, CancellationToken cancellationToken)
+public async Task<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPatientFamilyRelationQuery request, CancellationToken cancellationToken)
 {
     try
     { 
-        var query = _unitOfWork.Repository<Speciality>().Entities.AsNoTracking();
+        var query = _unitOfWork.Repository<PatientFamilyRelation>().Entities.AsNoTracking();
 
         // Apply dynamic includes
         if (request.Includes is not null)
@@ -48,7 +48,7 @@ public async Task<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCou
                           q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
                           cancellationToken);
 
-        return (pagedItems.Adapt<List<SpecialityDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (pagedItems.Adapt<List<PatientFamilyRelationDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -56,18 +56,18 @@ public async Task<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCou
     }
 }
 
- private async Task LoadDataSpeciality(int pageIndex = 0, int pageSize = 10)
+ private async Task LoadDataPatientFamilyRelation(int pageIndex = 0, int pageSize = 10)
  {
      PanelVisible = true;
-     var result = await Mediator.Send(new GetSpecialityQuery(
+     var result = await Mediator.Send(new GetPatientFamilyRelationQuery(
          pageIndex: pageIndex,
          pageSize: pageSize,
-         searchTerm: refSpecialityComboBox?.Text ?? "",
+         searchTerm: refPatientFamilyRelationComboBox?.Text ?? "",
          includes:
          [
              x => x.Department
          ],
-         select: x => new Speciality
+         select: x => new PatientFamilyRelation
          {
              Id = x.Id,
              Name = x.Name,
@@ -78,15 +78,15 @@ public async Task<(List<SpecialityDto>, int pageIndex, int pageSize, int pageCou
          }
 
      ));
-     Specialitys = result.Item1;
-     totalCountSpeciality = result.pageCount;
+     PatientFamilyRelations = result.Item1;
+     totalCountPatientFamilyRelation = result.pageCount;
      PanelVisible = false;
  }
 
 
-var result = await Mediator.QueryGetHelper<Speciality, SpecialityDto>(pageIndex, pageSize, searchTerm);
+var result = await Mediator.QueryGetHelper<PatientFamilyRelation, PatientFamilyRelationDto>(pageIndex, pageSize, searchTerm);
 
-var result = await Mediator.QueryGetHelper<Speciality, SpecialityDto>(pageIndex, pageSize, refSpecialityComboBox?.Text ?? "");
+var result = await Mediator.QueryGetHelper<PatientFamilyRelation, PatientFamilyRelationDto>(pageIndex, pageSize, refPatientFamilyRelationComboBox?.Text ?? "");
 
 var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
 

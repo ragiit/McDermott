@@ -111,6 +111,54 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
+            else if (typeof(TDto) == typeof(PatientFamilyRelationDto))
+            {
+                var result = await mediator.Send(new GetPatientFamilyRelationQuery(
+                    predicate as Expression<Func<PatientFamilyRelation, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Family,
+                        x => x.Patient,
+                        x => x.FamilyMember,
+                    ] : includes as List<Expression<Func<PatientFamilyRelation, object>>>,
+                    select: select is null ? x => new PatientFamilyRelation
+                    {
+                        Id = x.Id,
+                        PatientId = x.PatientId,
+                        FamilyId = x.FamilyId,
+                        FamilyMemberId = x.FamilyMemberId,
+                    } : select as Expression<Func<PatientFamilyRelation, PatientFamilyRelation>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(FamilyDto))
+            {
+                var result = await mediator.Send(new GetFamilyQuery(
+                    predicate as Expression<Func<Family, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.InverseRelation
+                    ] : includes as List<Expression<Func<Family, object>>>,
+                    select: select is null ? x => new Family
+                    {
+                        Id = x.Id,
+                        InverseRelationId = x.InverseRelationId,
+                        InverseRelation = new Family
+                        {
+                            Name = x.InverseRelation.Name
+                        }
+                    } : select as Expression<Func<Family, Family>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
             else if (typeof(TDto) == typeof(ProvinceDto))
             {
                 var result = await mediator.Send(new GetProvinceQuery(
