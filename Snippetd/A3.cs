@@ -1,50 +1,50 @@
- public class GetPatientFamilyRelationQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)>
+ public class GetProductCategoryQuery(Expression<Func<ProductCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>
  {
-     public Expression<Func<PatientFamilyRelation, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
      public bool RemoveCache { get; } = removeCache!;
      public string SearchTerm { get; } = searchTerm!;
      public int PageIndex { get; } = pageIndex;
      public int PageSize { get; set; } = pageSize ?? 10;
  }
 
- public class BulkValidatePatientFamilyRelationQuery(List<PatientFamilyRelationDto> PatientFamilyRelationsToValidate) : IRequest<List<PatientFamilyRelationDto>>
+ public class BulkValidateProductCategoryQuery(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
  {
-     public List<PatientFamilyRelationDto> PatientFamilyRelationsToValidate { get; } = PatientFamilyRelationsToValidate;
+     public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
  }
 
- public class ValidatePatientFamilyRelationQuery(Expression<Func<PatientFamilyRelation, bool>>? predicate = null) : IRequest<bool>
+ public class ValidateProductCategoryQuery(Expression<Func<ProductCategory, bool>>? predicate = null) : IRequest<bool>
  {
-     public Expression<Func<PatientFamilyRelation, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
  }
 
-IRequestHandler<GetPatientFamilyRelationQuery, (List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidatePatientFamilyRelationQuery, bool>,
-IRequestHandler<BulkValidatePatientFamilyRelationQuery, List<PatientFamilyRelationDto>>,
+IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidateProductCategoryQuery, bool>,
+IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
 
 
-public async Task<List<PatientFamilyRelationDto>> Handle(BulkValidatePatientFamilyRelationQuery request, CancellationToken cancellationToken)
+public async Task<List<ProductCategoryDto>> Handle(BulkValidateProductCategoryQuery request, CancellationToken cancellationToken)
 {
-    var PatientFamilyRelationDtos = request.PatientFamilyRelationsToValidate;
+    var ProductCategoryDtos = request.ProductCategorysToValidate;
 
     // Ekstrak semua kombinasi yang akan dicari di database
-    var PatientFamilyRelationNames = PatientFamilyRelationDtos.Select(x => x.Name).Distinct().ToList();
-    var provinceIds = PatientFamilyRelationDtos.Select(x => x.ProvinceId).Distinct().ToList();
+    var ProductCategoryNames = ProductCategoryDtos.Select(x => x.Name).Distinct().ToList();
+    var provinceIds = ProductCategoryDtos.Select(x => x.ProvinceId).Distinct().ToList();
 
-    var existingPatientFamilyRelations = await _unitOfWork.Repository<PatientFamilyRelation>()
+    var existingProductCategorys = await _unitOfWork.Repository<ProductCategory>()
         .Entities
         .AsNoTracking()
-        .Where(v => PatientFamilyRelationNames.Contains(v.Name)
+        .Where(v => ProductCategoryNames.Contains(v.Name)
                     && provinceIds.Contains(v.ProvinceId))
         .ToListAsync(cancellationToken);
 
-    return existingPatientFamilyRelations.Adapt<List<PatientFamilyRelationDto>>();
+    return existingProductCategorys.Adapt<List<ProductCategoryDto>>();
 }
 
-public async Task<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPatientFamilyRelationQuery request, CancellationToken cancellationToken)
+public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductCategoryQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<PatientFamilyRelation>().Entities
+        var query = _unitOfWork.Repository<ProductCategory>().Entities
             .AsNoTracking()
             .Include(v => v.Province)
             .AsQueryable();
@@ -63,7 +63,7 @@ public async Task<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, 
 
         var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-        return (paged.Adapt<List<PatientFamilyRelationDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (paged.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -71,9 +71,9 @@ public async Task<(List<PatientFamilyRelationDto>, int pageIndex, int pageSize, 
     }
 }
 
-public async Task<bool> Handle(ValidatePatientFamilyRelationQuery request, CancellationToken cancellationToken)
+public async Task<bool> Handle(ValidateProductCategoryQuery request, CancellationToken cancellationToken)
 {
-    return await _unitOfWork.Repository<PatientFamilyRelation>()
+    return await _unitOfWork.Repository<ProductCategory>()
         .Entities
         .AsNoTracking()
         .Where(request.Predicate)  // Apply the Predicate for filtering

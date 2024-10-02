@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
+﻿using static HotChocolate.ErrorCodes;
+
+namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
 {
     public partial class ProductCategoryPage
     {
@@ -113,9 +115,10 @@
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProductCategoryQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+            var result = await Mediator.QueryGetHelper<ProductCategory, ProductCategoryDto>(pageIndex, pageSize, searchTerm);
             GetProductCategory = result.Item1;
             totalCount = result.pageCount;
+            activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
@@ -146,30 +149,6 @@
         private void ColumnChooserButton_Click()
         {
             Grid!.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid!.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid!.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid!.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -220,5 +199,107 @@
         }
 
         #endregion Grid
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<ProductCategoryDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        bool isValid = true;
+
+                        var a = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var b = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        if (string.IsNullOrWhiteSpace(a))
+                        {
+                            isValid = false;
+                            ToastService.ShowErrorImport(row, 1, a ?? string.Empty);
+                        }
+
+                        if (!isValid)
+                            continue;
+
+                        list.Add(new ProductCategoryDto
+                        {
+                            Name = a,
+                            Code = b,
+                        });
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code, }).ToList();
+
+                        // Panggil BulkValidateLabTestQuery untuk validasi bulk
+                        var existingLabTests = await Mediator.Send(new BulkValidateProductCategoryQuery(list));
+
+                        // Filter LabTest baru yang tidak ada di database
+                        list = list.Where(ProductCategory =>
+                            !existingLabTests.Any(ev =>
+                                ev.Name == ProductCategory.Name &&
+                                ev.Code == ProductCategory.Code
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListProductCategoryRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+                finally { PanelVisible = false; }
+            }
+            PanelVisible = false;
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "product_category.xlsx",
+            [
+                new()
+                {
+                    Column = "Name",
+                    Notes = "Mandatory"
+                },
+                new()
+                {
+                    Column = "Code",
+                }
+            ]);
+        }
     }
 }

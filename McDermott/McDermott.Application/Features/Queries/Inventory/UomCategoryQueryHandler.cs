@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.UomCategoryCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Inventory.UomCategoryCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
@@ -50,9 +51,16 @@ namespace McDermott.Application.Features.Queries.Inventory
         {
             try
             {
-                var query = _unitOfWork.Repository<UomCategory>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<UomCategory>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -60,23 +68,25 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<UomCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<UomCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -102,7 +112,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             return existingLabTests.Adapt<List<UomCategoryDto>>();
         }
 
-
         public async Task<bool> Handle(ValidateUomCategoryQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<UomCategory>()
@@ -111,7 +120,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
-
 
         #endregion GET
 

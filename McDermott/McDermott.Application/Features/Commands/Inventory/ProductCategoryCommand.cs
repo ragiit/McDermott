@@ -10,13 +10,21 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class GetProductCategoryQuery(Expression<Func<ProductCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetProductCategoryQuery(Expression<Func<ProductCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<ProductCategory, object>>>? includes = null, Expression<Func<ProductCategory, ProductCategory>>? select = null) : IRequest<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<ProductCategory, object>>> Includes { get; } = includes!;
+            public Expression<Func<ProductCategory, ProductCategory>>? Select { get; } = select!;
+        }
+
+        public class BulkValidateProductCategoryQuery(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
+        {
+            public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
         }
 
         public class ValidateProductCategoryQuery(Expression<Func<ProductCategory, bool>>? predicate = null) : IRequest<bool>

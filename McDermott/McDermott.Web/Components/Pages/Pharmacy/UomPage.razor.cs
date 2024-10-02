@@ -1,4 +1,6 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
+using McDermott.Persistence.Migrations;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
@@ -113,11 +115,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetUomQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+                var result = await Mediator.QueryGetHelper<Uom, UomDto>(pageIndex, pageSize, searchTerm);
                 Uoms = result.Item1;
                 totalCount = result.pageCount;
+                activePageIndex = pageIndex;
                 PanelVisible = false;
-            }catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 ex.HandleException(ToastService);
             }
         }
@@ -163,14 +168,13 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUomCategoryQuery(searchTerm: refUomCategoryComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<UomCategory, UomCategoryDto>(pageIndex, pageSize, refUomCategoryComboBox?.Text ?? "");
             UomCategories = result.Item1;
             totalCountUomCategory = result.pageCount;
             PanelVisible = false;
         }
 
         #endregion Combo Box Lab Uoms
-
 
         #region Click
 
@@ -186,7 +190,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as UomDto ?? new());
+                UomCategories = (await Mediator.QueryGetHelper<UomCategory, UomCategoryDto>(predicate: x => x.Id == a.UomCategoryId)).Item1;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
@@ -194,39 +209,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
+
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteUomRequest(((UomDto)e.DataItem).Id));
@@ -238,50 +226,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                 await LoadData();
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                ee.HandleException(ToastService);
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (UomDto)e.EditModel;
-            bool exists = await Mediator.Send(new ValidateUomQuery(x => x.Id != editModel.Id && x.Name == editModel.Name ));
-            if (exists)
+            PanelVisible = true;
+            try
             {
-                ToastService.ShowWarning($"Uom with name '{editModel.Name}' already exists.");
-                return;
-            }
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateUomRequest(editModel));
-            else
-                await Mediator.Send(new UpdateUomRequest(editModel));
+                var editModel = (UomDto)e.EditModel;
+                bool exists = await Mediator.Send(new ValidateUomQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
+                if (exists)
+                {
+                    ToastService.ShowWarning($"Uom with name '{editModel.Name}' already exists.");
+                    return;
+                }
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateUomRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateUomRequest(editModel));
 
-            await LoadData();
+                await LoadData(0, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Click
 
         #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -291,6 +271,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #endregion Grid
 
         #region Import && Export
+
         private async Task ImportFile()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
@@ -311,10 +292,8 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Type", "Category uom" };
-
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                        .Any(i => ExportTemp.Select(x => x.Column).ToList()[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
                     {
                         PanelVisible = false;
                         ToastService.ShowInfo("The header must match with the template.");
@@ -323,32 +302,37 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                     var list = new List<UomDto>();
 
-                    var sampleTypes = new HashSet<string>();
+                    var uomNames = new HashSet<string>();
                     var list1 = new List<UomCategoryDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var a = ws.Cells[row, 2].Value?.ToString()?.Trim();
 
                         if (!string.IsNullOrEmpty(a))
-                            sampleTypes.Add(a.ToLower());
+                            uomNames.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetUomCategoryQuery(x => sampleTypes.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetUomCategoryQuery(x => uomNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         bool isValid = true;
 
-                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var name = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var uomCategory = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var type = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var ratio = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        var active = ws.Cells[row, 5].Value?.ToString()?.Trim();
+                        var roundingPrecision = ws.Cells[row, 6].Value?.ToString()?.Trim();
 
                         long? CategoryUomId = null;
-                        if (!string.IsNullOrEmpty(a))
+                        if (!string.IsNullOrEmpty(uomCategory))
                         {
-                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(a, StringComparison.CurrentCultureIgnoreCase));
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(uomCategory, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                                ToastService.ShowErrorImport(row, 2, uomCategory ?? string.Empty);
                                 isValid = false;
                             }
                             else
@@ -358,24 +342,35 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         }
                         else
                         {
-                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                            ToastService.ShowErrorImport(row, 2, uomCategory ?? string.Empty);
                             isValid = false;
                         }
 
-                        var resultType = ws.Cells[row, 4].Value?.ToString()?.Trim();
-                        if (!string.IsNullOrWhiteSpace(resultType))
+                        if (!string.IsNullOrEmpty(type) && !Types.Contains(type))
                         {
-                            var exist = Helper.ResultValueTypes.Any(x => x.Equals(resultType, StringComparison.CurrentCultureIgnoreCase));
-                            if (!exist)
-                            {
-                                ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
-                                isValid = false;
-                            }
+                            isValid = false;
+                            ToastService.ShowErrorImport(row, 3, type ?? string.Empty);
+                        }
+
+                        // Parse string to float
+                        if (float.TryParse(roundingPrecision, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
+                        {
+                            roundingPrecision = result.ToString();
                         }
                         else
                         {
-                            ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
-                            isValid = false;
+                            // Handle the case when the string cannot be parsed
+                            roundingPrecision = null; // or set to a default value if needed
+                        }
+
+                        if (float.TryParse(ratio, NumberStyles.Float, CultureInfo.InvariantCulture, out var rr))
+                        {
+                            ratio = rr.ToString();
+                        }
+                        else
+                        {
+                            // Handle the case when the string cannot be parsed
+                            ratio = null; // or set to a default value if needed
                         }
 
                         if (!isValid)
@@ -383,15 +378,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
                         list.Add(new UomDto
                         {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Type = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                            Name = name,
                             UomCategoryId = CategoryUomId,
+                            Type = type,
+                            BiggerRatio = type == "Reference Unit of Measure for this category" ? 0 : ratio.ToLong(),
+                            Active = active == "Yes",
+                            RoundingPrecision = float.Parse(roundingPrecision)
                         });
                     }
 
                     if (list.Count > 0)
                     {
-                        list = list.DistinctBy(x => new { x.Name, x.Type, }).ToList();
+                        list = list.DistinctBy(x => new { x.Name, x.Type, x.UomCategoryId }).ToList();
 
                         // Panggil BulkValidateLabTestQuery untuk validasi bulk
                         var existingLabTests = await Mediator.Send(new BulkValidateUomQuery(list));
@@ -401,7 +399,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                             !existingLabTests.Any(ev =>
                                 ev.Name == Uom.Name &&
                                 ev.Type == Uom.Type &&
-                                ev.UomCategoryId == Uom.UomCategoryId 
+                                ev.UomCategoryId == Uom.UomCategoryId
                             )
                         ).ToList();
 
@@ -421,27 +419,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             PanelVisible = false;
         }
 
+        private List<ExportFileData> ExportTemp =
+        [
+            new()
+            {
+                Column = "Name",
+                Notes = "Mandatory"
+            },
+            new()
+            {
+                Column = "UoM Category",
+            },
+            new()
+            {
+                Column = "Type",
+                Notes = "Select one: Bigger than the reference Unit of Measure, Reference Unit of Measure for this category, Smaller than the reference Unit of Measure"
+            },
+            new()
+            {
+                Column = "Ratio"
+            },
+            new()
+            {
+                Column = "Active",
+                Notes = "Select one: Yes/No"
+            },
+            new()
+            {
+                Column = "Rounding Precision"
+            },
+        ];
+
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Uom_template.xlsx",
-            [
-                new()
-                {
-                    Column = "Name",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Type"
-                },
-                new()
-                {
-                    Column = "Category Uom",
-                },
-               
-            ]);
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "uom_template.xlsx", ExportTemp);
         }
 
-        #endregion
+        #endregion Import && Export
     }
 }

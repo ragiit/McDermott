@@ -63,9 +63,9 @@
         private List<string> Types = new List<string>
         {
             "Default Unit",
-            "Default Weigth",
-            "Default Working Time ",
-            "Default Length ",
+            "Default Weight",
+            "Default Working Time",
+            "Default Length",
             "Default Volume"
         };
 
@@ -111,7 +111,7 @@
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetUomCategoryQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+                var result = await Mediator.QueryGetHelper<UomCategory, UomCategoryDto>(pageIndex, pageSize, searchTerm);
                 UomCategories = result.Item1;
                 totalCount = result.pageCount;
                 PanelVisible = false;
@@ -183,59 +183,23 @@
 
                     var list = new List<UomCategoryDto>();
 
-                    var sampleTypes = new HashSet<string>();
-                    var list1 = new List<UomCategoryDto>();
-
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
-
-                        if (!string.IsNullOrEmpty(a))
-                            sampleTypes.Add(a.ToLower());
-                    }
-
-                    list1 = (await Mediator.Send(new GetUomCategoryQuery(x => sampleTypes.Contains(x.Name.ToLower()), 0, 0))).Item1;
-
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         bool isValid = true;
 
-                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var a = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var b = ws.Cells[row, 2].Value?.ToString()?.Trim();
 
-                        long? sampleTypeId = null;
-                        if (!string.IsNullOrEmpty(a))
+                        if (string.IsNullOrWhiteSpace(a))
                         {
-                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(a, StringComparison.CurrentCultureIgnoreCase));
-                            if (cachedParent is null)
-                            {
-                                ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
-                                isValid = false;
-                            }
-                            else
-                            {
-                                sampleTypeId = cachedParent.Id;
-                            }
-                        }
-                        else
-                        {
-                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
                             isValid = false;
+                            ToastService.ShowErrorImport(row, 1, a ?? string.Empty);
                         }
 
-                        var resultType = ws.Cells[row, 4].Value?.ToString()?.Trim();
-                        if (!string.IsNullOrWhiteSpace(resultType))
+                        if (!string.IsNullOrEmpty(b) && !Types.Contains(b))
                         {
-                            var exist = Helper.ResultValueTypes.Any(x => x.Equals(resultType, StringComparison.CurrentCultureIgnoreCase));
-                            if (!exist)
-                            {
-                                ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
-                                isValid = false;
-                            }
-                        }
-                        else
-                        {
-                            ToastService.ShowErrorImport(row, 4, resultType ?? string.Empty);
                             isValid = false;
+                            ToastService.ShowErrorImport(row, 2, b ?? string.Empty);
                         }
 
                         if (!isValid)
@@ -243,9 +207,8 @@
 
                         list.Add(new UomCategoryDto
                         {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                            Type = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                            
+                            Name = a,
+                            Type = b,
                         });
                     }
 
@@ -260,7 +223,7 @@
                         list = list.Where(UomCategory =>
                             !existingLabTests.Any(ev =>
                                 ev.Name == UomCategory.Name &&
-                                ev.Type == UomCategory.Type 
+                                ev.Type == UomCategory.Type
                             )
                         ).ToList();
 
@@ -282,7 +245,7 @@
 
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "Uom_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "uom_category.xlsx",
             [
                 new()
                 {
@@ -291,26 +254,17 @@
                 },
                 new()
                 {
-                    Column = "Code"
-                },
-                new()
-                {
-                    Column = "Sample Type",
-                    Notes = "Mandatory"
-                },
-                new()
-                {
-                    Column = "Result Type",
-                    Notes = "Select one: Quantitative/Qualitative"
-                },
+                    Column = "Type",
+                    Notes = "Select one: Default Unit, Default Weigth, Default Working Time, Default Length, Default Volume"
+                }
             ]);
         }
-
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteUomCategoryRequest(((UomCategoryDto)e.DataItem).Id));
@@ -320,52 +274,46 @@
                     await Mediator.Send(new DeleteUomCategoryRequest(ids: SelectedDataItems.Adapt<List<UomCategoryDto>>().Select(x => x.Id).ToList()));
                 }
 
-                await LoadData();
+                await LoadData(0, pageSize);
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                ee.HandleException(ToastService);
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (UomCategoryDto)e.EditModel;
-            bool exists = await Mediator.Send(new ValidateUomCategoryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
-            if (exists)
+            try
             {
-                ToastService.ShowWarning($"Uom Category with name '{editModel.Name}' already exists.");
-                return;
-            }
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateUomCategoryRequest(editModel));
-            else
-                await Mediator.Send(new UpdateUomCategoryRequest(editModel));
+                PanelVisible = true;
+                var editModel = (UomCategoryDto)e.EditModel;
+                bool exists = await Mediator.Send(new ValidateUomCategoryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
 
-            await LoadData();
+                if (exists)
+                {
+                    ToastService.ShowWarning($"Uom Category with name '{editModel.Name}' already exists.");
+                    return;
+                }
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateUomCategoryRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateUomCategoryRequest(editModel));
+
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Click
 
         #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {

@@ -3,7 +3,7 @@
 
 <PageTitle>McHealthCare - Product Category</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
@@ -14,6 +14,8 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
@@ -22,11 +24,12 @@
 
                                 <MyGridPaginate @ref="Grid"
                                                 Data="GetProductCategory"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        KeyFieldName="Id">
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="ProductCategoryDto"
@@ -36,8 +39,10 @@
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="false"
                                                          Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -109,6 +114,10 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

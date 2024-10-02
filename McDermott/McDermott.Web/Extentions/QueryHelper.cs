@@ -34,6 +34,40 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
+            else if (typeof(TDto) == typeof(UomCategoryDto))
+            {
+                var result = await mediator.Send(new GetUomCategoryQuery(
+                    predicate as Expression<Func<UomCategory, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new UomCategory
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Type = x.Type,
+                    } : select as Expression<Func<UomCategory, UomCategory>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(ProductCategoryDto))
+            {
+                var result = await mediator.Send(new GetProductCategoryQuery(
+                    predicate as Expression<Func<ProductCategory, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new ProductCategory
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    } : select as Expression<Func<ProductCategory, ProductCategory>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
             else if (typeof(TDto) == typeof(GroupDto))
             {
                 var result = await mediator.Send(new GetGroupQuery(
@@ -107,6 +141,35 @@ namespace McDermott.Web.Extentions
                             Name = x.Parent.Name
                         }
                     } : select as Expression<Func<Menu, Menu>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(UomDto))
+            {
+                var result = await mediator.Send(new GetUomQuery(
+                    predicate as Expression<Func<Uom, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.UomCategory
+                    ] : includes as List<Expression<Func<Uom, object>>>,
+                    select: select is null ? x => new Uom
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        UomCategoryId = x.UomCategoryId,
+                        UomCategory = new UomCategory
+                        {
+                            Name = x.UomCategory.Name
+                        },
+                        BiggerRatio = x.BiggerRatio,
+                        Type = x.Type,
+                        Active = x.Active,
+                        RoundingPrecision = x.RoundingPrecision
+                    } : select as Expression<Func<Uom, Uom>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

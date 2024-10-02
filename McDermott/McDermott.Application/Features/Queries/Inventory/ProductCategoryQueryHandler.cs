@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
@@ -6,6 +7,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetAllProductCategoryQuery, List<ProductCategoryDto>>,
         IRequestHandler<ValidateProductCategoryQuery, bool>,
+        IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
         IRequestHandler<CreateProductCategoryRequest, ProductCategoryDto>,
         IRequestHandler<CreateListProductCategoryRequest, List<ProductCategoryDto>>,
         IRequestHandler<UpdateProductCategoryRequest, ProductCategoryDto>,
@@ -13,6 +15,23 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<DeleteProductCategoryRequest, bool>
     {
         #region GET
+
+        public async Task<List<ProductCategoryDto>> Handle(BulkValidateProductCategoryQuery request, CancellationToken cancellationToken)
+        {
+            var ProductCategoryDtos = request.ProductCategorysToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ProductCategoryNames = ProductCategoryDtos.Select(x => x.Name).Distinct().ToList();
+            var a = ProductCategoryDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingProductCategorys = await _unitOfWork.Repository<ProductCategory>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ProductCategoryNames.Contains(v.Name) && a.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingProductCategorys.Adapt<List<ProductCategoryDto>>();
+        }
 
         public async Task<List<ProductCategoryDto>> Handle(GetAllProductCategoryQuery request, CancellationToken cancellationToken)
         {
@@ -50,9 +69,16 @@ namespace McDermott.Application.Features.Queries.Inventory
         {
             try
             {
-                var query = _unitOfWork.Repository<ProductCategory>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -60,24 +86,25 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -93,7 +120,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
-
 
         #endregion GET
 

@@ -64,7 +64,7 @@
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Code" NullText="Name" />
+                                                <MyTextBox @bind-Text="@a.Code" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Code)"   />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
