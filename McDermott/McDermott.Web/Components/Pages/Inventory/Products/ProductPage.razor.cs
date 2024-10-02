@@ -76,32 +76,32 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
+            //await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                    StateHasChanged();
-                }
-                catch { }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //        StateHasChanged();
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
+            //    await LoadData();
+            //    StateHasChanged();
 
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
-            }
+            //    try
+            //    {
+            //        if (Grid is not null)
+            //        {
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(1);
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(2);
+            //        }
+            //    }
+            //    catch { }
+            //}
         }
 
         private async Task GetUserInfo()
@@ -149,6 +149,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await GetUserInfo();
+            await LoadData();
+            PanelVisible = false;
+
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -157,9 +161,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 // Inisialisasi variabel
                 PanelVisible = true;
-                smartButtonShow = false;
-                showForm = false;
-                StockProductView = false;
                 SelectedDataItems = [];
 
 
@@ -237,7 +238,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private async Task EditItem_Click()
         {
-            var DataId = Products.FirstOrDefault(); ;
+            var DataId = SelectedDataItems[0].Adapt<ProductDto>();
             NavigationManager.NavigateTo($"inventory/products/{EnumPageMode.Update.GetDisplayName()}?Id={DataId.Id}");
             return;
         }

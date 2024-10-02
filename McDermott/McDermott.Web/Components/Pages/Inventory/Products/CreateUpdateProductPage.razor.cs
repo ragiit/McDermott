@@ -9,6 +9,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
     public partial class CreateUpdateProductPage
     {
         #region Relation Data
+        //List Data
         private List<ProductDto> GetProduct = [];
         private List<MedicamentDto> GetMedicaments = [];
         private List<BpjsClassificationDto> GetBPJSCl = [];
@@ -22,6 +23,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<StockProductDto> StockProducts = [];
         private List<TransactionStockDto> TransactionStocks = [];
         private List<MaintainanceDto> GetMaintainance = [];
+        private List<MaintainanceDto> GetMaintainanceScrap = [];
+        private List<MaintainanceDto> GetMaintainanceHistory = [];
+
+        //Post data
         private ProductDto PostProduct = new();
         private ProductDto TempProduct = new();
         private MedicamentDto PostMedicaments = new();
@@ -42,7 +47,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private bool Chronis { get; set; } = false;
         private bool FieldHideStock { get; set; } = false;
         private bool showStockProduct { get; set; } = false;
-        private long? TotalQty { get; set; }
+        private bool showScrapProduct { get; set; } = false;
+        private bool showMaintaiananaceProduct { get; set; } = false;
+        private long TotalQty { get; set; } = 0;
         private long? TotalScrapQty { get; set; }
         private long? TotalMaintainanceQty { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -53,6 +60,55 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private IReadOnlyList<object> SelectedDataStockItems { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
+        #endregion
+
+        #region Status Maintainance
+        public MarkupString GetIssueStatusIconHtmlMaintainance(EnumStatusMaintainance? status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case EnumStatusMaintainance.Request:
+                    priorityClass = "info";
+                    title = "Request";
+                    break;
+
+                case EnumStatusMaintainance.InProgress:
+                    priorityClass = "primary";
+                    title = "In Progress";
+                    break;
+
+                case EnumStatusMaintainance.Repaired:
+                    priorityClass = "warning";
+                    title = "Repaire";
+                    break;
+
+                case EnumStatusMaintainance.Scrap:
+                    priorityClass = "warning";
+                    title = "Scrap";
+                    break;
+                case EnumStatusMaintainance.Done:
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+                case EnumStatusMaintainance.Canceled:
+                    priorityClass = "danger";
+                    title = "Cancel";
+                    break;
+
+
+
+                default:
+                    return new MarkupString("");
+            }
+
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
         #endregion
 
         #region select data static
@@ -124,32 +180,32 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
+            //await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                    StateHasChanged();
-                }
-                catch { }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //        StateHasChanged();
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
 
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
-            }
+            //    StateHasChanged();
+
+            //    try
+            //    {
+            //        if (Grid is not null)
+            //        {
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(1);
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(2);
+            //        }
+            //    }
+            //    catch { }
+            //}
         }
 
         private async Task GetUserInfo()
@@ -197,10 +253,12 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await GetUserInfo();
             await LoadDataUom();
-            //await LoadDataBPJSCl();
+            await LoadData();
             await LoadDataDrugForm();
             await LoadDataDrugRoute();
+            //await LoadDataBPJSCl();
             //await LoadDataLocation();
             await LoadDataProductCategory();
             PanelVisible = false;
@@ -209,8 +267,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
+            showStockProduct = false;
+            // Fetch product data
             var result = await Mediator.Send(new GetProductQuery(x => x.Id == Id, 0, 1));
-            PostProduct = kresult.Item1.FirstOrDefault() ?? new();
+            PostProduct = result.Item1.FirstOrDefault() ?? new();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -219,104 +279,113 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     NavigationManager.NavigateTo("inventory/products");
                     return;
                 }
+
                 _SmartButton = true;
 
+                // Fetch related data
                 GetMedicaments = await Mediator.Send(new GetMedicamentQuery(x => x.ProductId == PostProduct.Id));
                 PostMedicaments = GetMedicaments.FirstOrDefault() ?? new();
                 var maintainanceResult = await Mediator.Send(new GetMaintainanceQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
                 GetMaintainance = maintainanceResult.Item1;
+                // Map product details
                 PostProductDetails = PostProduct.Adapt<ProductDetailDto>();
+                NameProduct = PostProductDetails.Name;
+                NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
 
-                //Type Medicament 
-                if (PostProduct != null)
+                // Medicament-specific details
+                if (PostProduct.HospitalType == "Medicament")
                 {
-                    PostProductDetails.Name = PostProduct.Name;
-                    PostProductDetails.ProductType = PostProduct.ProductType;
-                    PostProductDetails.HospitalType = PostProduct.HospitalType;
-                    PostProductDetails.BpjsClassificationId = PostProduct.BpjsClassificationId;
-                    PostProductDetails.UomId = PostProduct.UomId;
-                    PostProductDetails.PurchaseUomId = PostProduct.PurchaseUomId;
-                    PostProductDetails.TraceAbility = PostProduct.TraceAbility;
-                    PostProductDetails.SalesPrice = PostProduct.SalesPrice;
-                    PostProductDetails.Tax = PostProduct.Tax;
-                    PostProductDetails.Cost = PostProduct.Cost;
-                    PostProductDetails.ProductCategoryId = PostProduct.ProductCategoryId;
-                    PostProductDetails.InternalReference = PostProduct.InternalReference;
+                    if (PostMedicaments.ProductId != null)
+                    {
+                        // Update specific medicament details instead of replacing the entire object
+                        UpdateMedicamentDetails(PostProductDetails, PostMedicaments);
 
-                    if (PostProduct.HospitalType == "Medicament")
-                    {
-                        if (PostMedicaments != null)
-                        {
-                            PostProductDetails.MedicamentId = PostMedicaments.Id;
-                            PostProductDetails.FormId = PostMedicaments.FormId;
-                            PostProductDetails.RouteId = PostMedicaments.RouteId;
-                            PostProductDetails.Dosage = PostMedicaments.Dosage;
-                            PostProductDetails.UomMId = PostMedicaments.UomId;
-                            PostProductDetails.Cronies = PostMedicaments.Cronies;
-                            PostProductDetails.MontlyMax = PostMedicaments.MontlyMax;
-                            PostProductDetails.FrequencyId = PostMedicaments.FrequencyId;
+                        selectedActiveComponents = ActiveComponents
+                            .Where(a => PostMedicaments.ActiveComponentId?.Contains(a.Id) == true).ToList();
 
-                            // Ambil komponen aktif jika tersedia
-                            if (PostMedicaments.ActiveComponentId != null)
-                            {
-                                selectedActiveComponents = ActiveComponents.Where(a => PostMedicaments.ActiveComponentId.Contains(a.Id)).ToList();
-                            }
-
-                            PostProductDetails.PregnancyWarning = PostMedicaments.PregnancyWarning;
-                            PostProductDetails.Pharmacologi = PostMedicaments.Pharmacologi;
-                            PostProductDetails.Weather = PostMedicaments.Weather;
-                            PostProductDetails.Food = PostMedicaments.Food;
-                        }
-                    }
-                    else if (PostProduct.HospitalType == "Medical Equipment")
-                    {
-                        PostProductDetails.Brand = PostProduct.Brand;
-                        PostProductDetails.Brand = PostProduct.Brand;
-                    }
-                    // Kelola informasi stok
-                    if (PostProduct.HospitalType != "Medical Equipment")
-                    {
-                        TotalQty = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true).Sum(z => z.Quantity);
-                    }
-                    else
-                    {
-                        var productScrap = GetMaintainance.Where(x => x.Status == EnumStatusMaintainance.Scrap).FirstOrDefault();
-                        var productMaintainance = GetMaintainance.Where(x => x.Status != EnumStatusMaintainance.Scrap).FirstOrDefault();
-                        TotalScrapQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap).Count();
-                        TotalQty = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true).Sum(z => z.Quantity);
-                        TotalMaintainanceQty = GetMaintainance.Where(x => x.EquipmentId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap).Count();
+                        TotalQty = TransactionStocks
+                            .Where(x => x.ProductId == PostProduct.Id && x.Validate)
+                            .Sum(z => z.Quantity) ;
                     }
                 }
-
-                // Ambil nama satuan ukur
-
+                // Medical equipment-specific details
+                else if (PostProduct.HospitalType == "Medical Equipment")
+                {
+                    PostProductDetails.Brand = PostProduct.Brand;
+                    HandleMedicalEquipmentStock();
+                }
+                else
+                {
+                    TotalQty = TransactionStocks
+                        .Where(x => x.ProductId == PostProduct.Id && x.Validate)
+                        .Sum(z => z.Quantity);
+                }
             }
             else
             {
-
-                NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
-
-                if (PostProductDetails.UomId == 0)
-                {
-                    PostProductDetails.UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? null;
-
-                    SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
-                }
-
-                PostProductDetails = new ProductDetailDto
-                {
-                    ProductType = ProductTypes[2],
-                    HospitalType = HospitalProducts[0],
-                    SalesPrice = 100,
-                    Tax = "11%",
-                    UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id ?? null
-                };
-
-                SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
+                HandleNewProductDefaults();
             }
+
+            // Fetch additional data
             GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
             ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
         }
+
+        // Maps medicament-specific details to PostProductDetails
+        // Updates only medicament-specific fields without overwriting the entire PostProductDetails object
+        private void UpdateMedicamentDetails(ProductDetailDto postProductDetails, MedicamentDto medicament)
+        {
+            postProductDetails.MedicamentId = medicament.Id;
+            postProductDetails.FormId = medicament.FormId;
+            postProductDetails.RouteId = medicament.RouteId;
+            postProductDetails.Dosage = medicament.Dosage;
+            postProductDetails.UomMId = medicament.UomId;
+            postProductDetails.Cronies = medicament.Cronies;
+            postProductDetails.MontlyMax = medicament.MontlyMax;
+            postProductDetails.FrequencyId = medicament.FrequencyId;
+            postProductDetails.PregnancyWarning = medicament.PregnancyWarning;
+            postProductDetails.Pharmacologi = medicament.Pharmacologi;
+            postProductDetails.Weather = medicament.Weather;
+            postProductDetails.Food = medicament.Food;
+        }
+
+        // Handles stock and maintenance for medical equipment
+        private void HandleMedicalEquipmentStock()
+        {
+            TotalScrapQty = GetMaintainance
+                .Count(x => x.EquipmentId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap);
+
+            TotalMaintainanceQty = GetMaintainance
+                .Count(x => x.EquipmentId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap);
+
+            TotalQty = TransactionStocks
+                .Where(x => x.ProductId == PostProduct.Id && x.Validate)
+                .Sum(z => z.Quantity);
+        }
+
+        // Handles default values for new products
+        private void HandleNewProductDefaults()
+        {            
+            if (PostProductDetails.UomId == 0)
+            {
+                PostProductDetails.UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id;
+                SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
+            }
+
+            PostProductDetails = new ProductDetailDto
+            {
+                ProductType = ProductTypes[2],
+                HospitalType = HospitalProducts[0],
+                SalesPrice = 100,
+                Tax = "11%",
+                UomId = GetUoms.FirstOrDefault(x => x.Name == "Unit")?.Id
+            };
+
+            SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
+        }
+        #endregion
+
+        #region async Data
         #endregion
 
         #region Select Data
@@ -701,7 +770,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                         }).ToList();
                         FieldHideStock = false;
                     }
-                    NameProduct = PostProduct.Name;
+
                 }
                 else
                 {
@@ -721,7 +790,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                             Qty = y.Sum(item => item.Quantity)
                         }).ToList();
 
-                    NameProduct = SelectedDataItems[0].Adapt<ProductDto>().Name;
                     if (PostProduct.TraceAbility == true)
                     {
                         FieldHideStock = true;
@@ -743,42 +811,72 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private async Task NewTableEquipment_Scrap()
         {
-            NavigationManager.NavigateTo($"inventory/maintainance-scrap/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.ProductId}");
-            return;
+            try
+            {
+                showScrapProduct = true;
+                PanelVisible = true;
+                GetMaintainanceScrap = GetMaintainance.Where(x => x.EquipmentId == Id && x.Status == EnumStatusMaintainance.Scrap).ToList();
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task NewTableEquipment_Item()
         {
-            NavigationManager.NavigateTo($"inventory/maintainance-history/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.ProductId}");
-            return;
+            try
+            {
+                showMaintaiananaceProduct = true;
+                PanelVisible = true;
+                GetMaintainanceHistory = GetMaintainance.Where(x => x.EquipmentId == Id && x.Status != EnumStatusMaintainance.Scrap).ToList();
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
         #endregion
 
         #region Button
-        private async Task onDiscard()
+        private void onDiscard()
         {
-            NavigationManager.NavigateTo($"inventory/products");
-            return;
+            NavigationManager.NavigateTo("inventory/products");
         }
 
         private async Task Back_Click()
         {
-            NavigationManager.NavigateTo($"inventory/products/{EnumPageMode.Update.GetDisplayName()}?Id={PostProductDetails.Id}");
+            showStockProduct = false;
+            StockProducts = [];
+            showScrapProduct = false;
+            GetMaintainanceScrap = [];
+            showMaintaiananaceProduct = false;
+            GetMaintainanceHistory = [];
 
         }
         private async Task RefreshStock_Click()
         {
             await NewTableStock_Item();
         }
+        private async Task RefreshScrap_Click()
+        {
+            await NewTableEquipment_Scrap();
+        }
+        private async Task RefreshMaintainance_Click()
+        {
+            await NewTableEquipment_Item();
+        }
         #endregion
 
         #region Handler Vaidation
         private async Task HandleValidSubmit()
         {
-            //IsLoading = true;
-            FormValidationState = true;
-            await OnSave();
-            //IsLoading = false;
+            if (FormValidationState)
+                await OnSave();
+            else
+                FormValidationState = true;
         }
 
         private async Task HandleInvalidSubmit()
@@ -879,6 +977,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 PostMedicaments.ActiveComponentId?.AddRange(selectedActiveComponents.Select(x => x.Id));
             }
+            
         }
 
         private async Task CreateNewProductAndMedicament()
