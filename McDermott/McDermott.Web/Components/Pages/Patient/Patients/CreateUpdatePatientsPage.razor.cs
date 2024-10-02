@@ -39,8 +39,8 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             PanelVisible = true;
             Families = (await Mediator.QueryGetHelper<Family, FamilyDto>(predicate: x => x.Id == a.FamilyId)).Item1;
             UserPatients = (await Mediator.Send(new GetUserQuery2(
-                   x => x.IsPatient == true && x.Id != UserForm.Id,
-                   searchTerm: refUserFamilyRelationComboBox?.Text ?? "",
+                   x => x.IsPatient == true && x.Id == a.FamilyMemberId,
+                   searchTerm: null,
                    pageSize: 1,
                    pageIndex:
                    0,
@@ -131,7 +131,10 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                     Family = new Family
                     {
                         Name = x.Family.Name,
-                        InverseRelation = x.Family.InverseRelation
+                        InverseRelation = new Family
+                        {
+                            Name = x.Family.InverseRelation.Name
+                        }
                     },
                 });
 
@@ -307,7 +310,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 PanelVisible = true;
                 //var result = await Mediator.Send(new GetUserQuery2(x => x.IsPatient == true && x.Id != UserForm.Id, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUserFamilyRelationComboBox?.Text ?? ""));
                 var result = await Mediator.Send(new GetUserQuery2(
-                    x => x.IsPatient == true,
+                    x => x.IsPatient == true && x.Id != UserForm.Id,
                     searchTerm: refUserFamilyRelationComboBox?.Text ?? "",
                     pageSize: pageSize,
                     pageIndex:

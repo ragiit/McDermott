@@ -16,6 +16,8 @@
                         <div class="card">
                             @if (!ShowForm)
                             {
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
