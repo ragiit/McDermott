@@ -39,7 +39,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             PanelVisible = true;
             Families = (await Mediator.QueryGetHelper<Family, FamilyDto>(predicate: x => x.Id == a.FamilyId)).Item1;
             UserPatients = (await Mediator.Send(new GetUserQuery2(
-                   x => x.IsPatient == true,
+                   x => x.IsPatient == true && x.Id != UserForm.Id,
                    searchTerm: refUserFamilyRelationComboBox?.Text ?? "",
                    pageSize: 1,
                    pageIndex:
@@ -113,25 +113,27 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 SelectedDataItemsFamilyRelation = [];
                 //var a = await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == UserForm.Id, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
                 var a = await Mediator.QueryGetHelper<PatientFamilyRelation, PatientFamilyRelationDto>(pageIndex, pageSize, searchTerm, x => x.PatientId == UserForm.Id,
-                    includes:
-                    [
-                        x => x.Family,
-                        x => x.FamilyMember,
-                    ],
-                    select: x => new PatientFamilyRelation
+                includes:
+                [
+                    x => x.Family,
+                    x => x.Family.InverseRelation,
+                    x => x.FamilyMember,
+                ],
+                select: x => new PatientFamilyRelation
+                {
+                    Id = x.Id,
+                    FamilyMemberId = x.FamilyMemberId,
+                    FamilyMember = new User
                     {
-                        Id = x.Id,
-                        FamilyMemberId = x.FamilyMemberId,
-                        FamilyMember = new User
-                        {
-                            Name = x.FamilyMember.Name
-                        },
-                        FamilyId = x.FamilyId,
-                        Family = new Family
-                        {
-                            Name = x.Family.Name
-                        }
-                    });
+                        Name = x.FamilyMember.Name
+                    },
+                    FamilyId = x.FamilyId,
+                    Family = new Family
+                    {
+                        Name = x.Family.Name,
+                        InverseRelation = x.Family.InverseRelation
+                    },
+                });
 
                 PatientFamilyRelations = a.Item1;
                 totalCountFamilyRelation = a.pageCount;

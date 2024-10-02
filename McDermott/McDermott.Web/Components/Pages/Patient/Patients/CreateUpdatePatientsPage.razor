@@ -797,8 +797,8 @@
 
                                                                     <Columns>
                                                                         <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
-                                                                        <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="FamilyMember.Name" Caption="Family Member" SortIndex="0" />
-                                                                        <DxGridDataColumn MinWidth="200" Context="ToolbarContext" FieldName="Family.InverseRelationString" Caption="Relation" SortIndex="0" />
+                                                                        <DxGridDataColumn FieldName="FamilyMember.Name" Caption="Family Member" SortIndex="0" />
+                                                                        <DxGridDataColumn FieldName="Family.InverseRelationString" Caption="Relation" SortIndex="0" />
                                                                     </Columns>
 
 
@@ -809,9 +809,9 @@
                                                                     </TotalSummary>
 
                                                                     <EditFormTemplate Context="EditFormContext2">
-                                                        @{
-                                                            var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
-                                                        }
+                                                                        @{
+                                                                            var a = (PatientFamilyRelationDto)EditFormContext2.EditModel;
+                                                                        }
                                                                         <DxFormLayout CssClass="w-100">
                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="UserFamilyRelation" ColSpanMd="12">
                                                                                 <MyDxComboBox Data="@UserPatients"

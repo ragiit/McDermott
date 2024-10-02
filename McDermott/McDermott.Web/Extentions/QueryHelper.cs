@@ -149,6 +149,7 @@ namespace McDermott.Web.Extentions
                     select: select is null ? x => new Family
                     {
                         Id = x.Id,
+                        Name = x.Name,
                         InverseRelationId = x.InverseRelationId,
                         InverseRelation = new Family
                         {
