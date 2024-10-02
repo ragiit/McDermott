@@ -15,6 +15,8 @@ namespace McDermott.Application.Dtos.Config
         //[Required]
         public string UserName { get; set; } = string.Empty;
 
+        public bool IsDefaultData { get; set; } = false;
+
         [Required]
         public string Email { get; set; } = string.Empty;
 

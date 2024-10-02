@@ -138,7 +138,7 @@ namespace McDermott.Web.Components.Pages.Patient
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetFamilyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var a = (await Mediator.QueryGetHelper<Family, FamilyDto>(pageIndex, pageSize, searchTerm ?? ""));
                 Familys = a.Item1;
                 totalCount = a.pageCount;
                 activePageIndex = pageIndex;
@@ -165,15 +165,10 @@ namespace McDermott.Web.Components.Pages.Patient
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as FamilyDto ?? new());
             PanelVisible = true;
-
-            var resultz = await Mediator.Send(new GetFamilyQuery(x => x.Id == a.InverseRelationId));
-            InverseRelations = resultz.Item1;
-            totalCountFamily = resultz.pageCount;
-
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as FamilyDto ?? new());
+            InverseRelations = (await Mediator.QueryGetHelper<Family, FamilyDto>(predicate: x => x.Id == a.InverseRelationId)).Item1;
             PanelVisible = false;
         }
 

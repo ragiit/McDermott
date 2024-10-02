@@ -206,7 +206,24 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(x => x.IsPatient == true, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetUserQuery2(
+                x => x.IsPatient == true,
+                searchTerm: searchTerm,
+                pageSize: pageSize,
+                pageIndex:
+                pageIndex,
+                includes: [],
+                select: x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    NoRm = x.NoRm,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth,
+                }
+            ));
             Users = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;

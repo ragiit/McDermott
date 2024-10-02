@@ -109,7 +109,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetMenuQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var result = await Mediator.QueryGetHelper<Menu, MenuDto>(pageIndex, pageSize, searchTerm);
                 Menus = result.Item1;
                 totalCount = result.pageCount;
                 activePageIndex = pageIndex;
@@ -159,7 +159,15 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMenuQuery(x => x.Parent == null, searchTerm: refParentMenuComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
+            //var result = await Mediator.Send(new GetMenuQuery(x => x.Parent == null, searchTerm: refParentMenuComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<Menu, MenuDto>(pageIndex, pageSize, refParentMenuComboBox?.Text ?? "", x => x.ParentId == null, includes: [],
+                select: x => new Menu
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Sequence = x.Sequence
+                });
+
             ParentMenuDto = [.. result.Item1.OrderBy(x => x.Sequence)];
             totalCountParentMenu = result.pageCount;
             PanelVisible = false;

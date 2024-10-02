@@ -77,7 +77,7 @@ namespace McDermott.Web.Components.Pages.Config
             SelectedDataItems = [];
             var countries = await Mediator.Send(new GetCompanyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
             Companys = countries.Item1;
-            totalCount = countries.Item4;
+            totalCount = countries.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -87,8 +87,6 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadDataProvince();
-            await LoadDataCity();
             await LoadDataCountry();
             PanelVisible = false;
         }

@@ -175,7 +175,7 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataProvince(0, 10);
         }
 
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
+        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
@@ -301,9 +301,6 @@ namespace McDermott.Web.Components.Pages.Config
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
-            refProvinceComboBox = null;
-            refCityComboBox = null;
-            refDistrictComboBox = null;
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
@@ -458,18 +455,7 @@ namespace McDermott.Web.Components.Pages.Config
                             var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(prov, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                var parentProvince = (await Mediator.Send(new GetProvinceQuery(x => x.Name == prov, searchTerm: prov, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-
-                                if (parentProvince is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 3, prov ?? string.Empty);
-                                }
-                                else
-                                {
-                                    provinceId = parentProvince.Id;
-                                    list1.Add(parentProvince);
-                                }
+                                ToastService.ShowErrorImport(row, 3, prov ?? string.Empty);
                             }
                             else
                             {
@@ -482,18 +468,7 @@ namespace McDermott.Web.Components.Pages.Config
                             var cachedParent = list2.FirstOrDefault(x => x.Name.Equals(city, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                var parentCityince = (await Mediator.Send(new GetCityQuery(x => x.Name == city, searchTerm: city, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-
-                                if (parentCityince is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 4, city ?? string.Empty);
-                                }
-                                else
-                                {
-                                    cityId = parentCityince.Id;
-                                    list2.Add(parentCityince);
-                                }
+                                ToastService.ShowErrorImport(row, 4, city ?? string.Empty);
                             }
                             else
                             {
@@ -506,18 +481,7 @@ namespace McDermott.Web.Components.Pages.Config
                             var cachedParent = list3.FirstOrDefault(x => x.Name.Equals(district, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                var parentDistrictince = (await Mediator.Send(new GetDistrictQuery(x => x.Name == district, searchTerm: district, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-
-                                if (parentDistrictince is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 5, district ?? string.Empty);
-                                }
-                                else
-                                {
-                                    districtId = parentDistrictince.Id;
-                                    list3.Add(parentDistrictince);
-                                }
+                                ToastService.ShowErrorImport(row, 5, district ?? string.Empty);
                             }
                             else
                             {

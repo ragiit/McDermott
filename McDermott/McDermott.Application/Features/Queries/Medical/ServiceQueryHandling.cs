@@ -1,8 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
-
-using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
@@ -10,7 +6,7 @@ namespace McDermott.Application.Features.Queries.Medical
     public class ServiceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateServiceRequest, ServiceDto>,
-IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
+        IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
         IRequestHandler<CreateListServiceRequest, List<ServiceDto>>,
         IRequestHandler<UpdateServiceRequest, ServiceDto>,
         IRequestHandler<UpdateListServiceRequest, List<ServiceDto>>,

@@ -4,6 +4,7 @@ using GreenDonut;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
+using Group = McDermott.Domain.Entities.Group;
 
 namespace McDermott.Web.Components.Pages.Config.Groups
 {
@@ -96,11 +97,9 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id == 0 ? null : Group.Id);
-            var result = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id, pageIndex, pageSize, searchTerm));
+            var result = await Mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(pageIndex, pageSize, searchTerm, predicate: x => x.GroupId == Group.Id);
             GroupMenus = result.Item1;
-            totalCount = result.Item4;
-            var aa = GroupMenus.Where(x => x.MenuId == 66).ToList();
+            totalCount = result.pageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -157,14 +156,8 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
-            var result = await Mediator.Send(new GetMenuQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refMenuComboBox?.Text));
+            var result = await Mediator.QueryGetHelper<Menu, MenuDto>(pageIndex, pageSize, refMenuComboBox?.Text ?? "");
             Menus = result.Item1;
-            ////Menus.Insert(0, new MenuDto
-            ////{
-            ////    Id = 0,
-            ////    Name = "All",
-            //});
             Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
             totalCountMenu = result.pageCount;
             PanelVisible = false;
@@ -308,7 +301,8 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
 
             //Id = McDermott.Extentions.SecureHelper.DecryptIdFromBase64(Ids);
-            var result = await Mediator.Send(new GetGroupQuery(x => x.Id == Id, 0, 1));
+            var result = await Mediator.QueryGetHelper<Group, GroupDto>(0, 0, predicate: x => x.Id == Id);
+
             Group = new();
             GroupMenus.Clear();
 
@@ -405,6 +399,8 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                 await Mediator.Send(new CreateGroupMenuRequest(editModel));
             else
                 await Mediator.Send(new UpdateGroupMenuRequest(editModel));
+
+            NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
 
             await LoadGroupMenus();
 
@@ -540,7 +536,9 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             else
             {
                 var result = await Mediator.Send(new UpdateGroupRequest(Group));
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
 
+                return;
                 //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
 
                 await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
@@ -606,7 +604,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
 
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
 
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update}?Id={Group.Id}", true);
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
             }
 
             ShowForm = false;

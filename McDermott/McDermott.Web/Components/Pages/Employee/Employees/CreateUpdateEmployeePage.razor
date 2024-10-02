@@ -2,7 +2,7 @@
 @using McDermott.Web.Components.Layout
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Users</PageTitle>
+<PageTitle>McHealthCare - Employees</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
@@ -11,7 +11,7 @@
 
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Users" OnClickBack="@(async () => NavigationManager.NavigateTo("employee/employees"))" ShowBackButton="true" />
+        <BaseHeaderPage Title="Employees" OnClickBack="@(async () => NavigationManager.NavigateTo("employee/employees"))" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">

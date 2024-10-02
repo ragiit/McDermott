@@ -1,4 +1,6 @@
-﻿using McDermott.Application.Features.Services;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using MailKit.Search;
+using McDermott.Application.Features.Services;
 using Microsoft.AspNetCore.Components.Routing;
 using OfficeOpenXml.Style;
 
@@ -73,11 +75,15 @@ namespace McDermott.Web.Components.Layout
             public long? Sequence { get; set; }
         }
 
+        [Inject]
+        private IJSRuntime _oLocal { get; set; }
+
         private async Task LoadUser()
         {
             try
             {
                 var userJson = await CookieHelper.GetCookie(JsRuntime, CookieHelper.USER_INFO);
+
                 User = JsonConvert.DeserializeObject<User>(userJson);
                 _isInitComplete = true;
 
@@ -92,20 +98,15 @@ namespace McDermott.Web.Components.Layout
                     return;
                 }
 
-                var result = await Mediator.Send(new GetMenuQuery(pageIndex: 0, pageSize: short.MaxValue));
-                var menus = result.Item1;
+                var menus = (await Mediator.QueryGetHelper<Menu, MenuDto>(0, short.MaxValue)).Item1;
+                var groups = (await Mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(0, short.MaxValue, predicate: x => x.GroupId == (long)User!.GroupId!)).Item1;
 
-                var result2 = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!, pageIndex: 0, pageSize: short.MaxValue));
-                var groups = result2.Item1;
-                //var groups = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)User!.GroupId!)!);
+                var groupMenuIds = groups.Select(x => x.MenuId).ToList();
+                var parentMenuIds = menus.Where(x => groups.Select(z => z.MenuId).Contains(x.Id)).Select(x => x.ParentId).Distinct().ToList();
+                //var childParentIds = groups.Where(x => menus.Any(m => m.Id == x.MenuId)).Select(x  => x.Menu.).Distinct().ToList();
 
-                var m = groups.Select(x => x.Menu.ParentId).ToList().Distinct().Where(x => x != null);
-                var ids = groups.Select(x => x.MenuId).ToList();
-                var parentIds = groups.Where(x => menus.Select(z => z.ParentId).Contains(x.MenuId)).Select(x => x.Id).ToList().Distinct();
-
-                ParentMenus.Clear();
                 ParentMenus = [.. menus
-                    .Where(x => x.ParentId == null && m.Contains(x.Id))
+                    .Where(x => x.ParentId == null && parentMenuIds.Contains(x.Id))
                     .Select(x => new ParentMenuTemp
                     {
                         ParentId = x.Id,
@@ -116,8 +117,14 @@ namespace McDermott.Web.Components.Layout
                     .DistinctBy(p => new { p.ParentId, p.ParentName, p.Sequence })
                     .OrderBy(x => x.Sequence)];
 
-                HeaderMenuDtos = [.. menus.Where(x => x.Parent == null && ids.Contains(x.Id) && !x.Name.Equals("Template Page")).OrderBy(x => x.Sequence.ToInt32())];
-                DetailMenuDtos = [.. menus.Where(x => x.Parent != null && ids.Contains(x.Id)).OrderBy(x => x.Sequence.ToInt32())];
+                //HeaderMenuDtos = menus
+                //    .Where(x => x.ParentId == null && groupMenuIds.Contains(x.Id) && !x.Name.Equals("Template Page"))
+                //    .OrderBy(x => x.Sequence.ToInt32())
+                //    .ToList();
+
+                DetailMenuDtos = [.. menus
+                    .Where(x => x.ParentId != null && groupMenuIds.Contains(x.Id))
+                    .OrderBy(x => x.Sequence.ToInt32())];
             }
             catch { }
         }

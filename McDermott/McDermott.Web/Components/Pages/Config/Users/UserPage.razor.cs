@@ -82,8 +82,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Code" };
-
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => ExportTemp.Select(x => x.Column).ToList()[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
                     {
@@ -203,18 +201,24 @@ namespace McDermott.Web.Components.Pages.Config.Users
                             isValid = false;
                         }
 
-                        var a = await Mediator.Send(new ValidateUserQuery(x => x.NoId == identityNum));
-                        if (a)
+                        if (!string.IsNullOrWhiteSpace(identityNum))
                         {
-                            ToastService.ShowErrorImport(row, 5, identityNum ?? string.Empty);
-                            isValid = false;
+                            var a = await Mediator.Send(new ValidateUserQuery(x => x.NoId == identityNum));
+                            if (a)
+                            {
+                                ToastService.ShowErrorImport(row, 5, identityNum ?? string.Empty);
+                                isValid = false;
+                            }
                         }
 
-                        var chekcEmail = await Mediator.Send(new ValidateUserQuery(x => x.Email == email));
-                        if (chekcEmail)
+                        if (!string.IsNullOrWhiteSpace(email))
                         {
-                            ToastService.ShowErrorImport(row, 2, email ?? string.Empty);
-                            isValid = false;
+                            var chekcEmail = await Mediator.Send(new ValidateUserQuery(x => x.Email == email));
+                            if (chekcEmail)
+                            {
+                                ToastService.ShowErrorImport(row, 2, email ?? string.Empty);
+                                isValid = false;
+                            }
                         }
 
                         if (!isValid)
@@ -626,16 +630,42 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             try
             {
-                if (SelectedDataItems is null)
+                // Check if the single item being deleted has isDeleting = true
+                var item = (UserDto)e.DataItem;
+                if (item.IsDefaultData)
                 {
-                    await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+                    ToastService.ShowWarning("This item is currently being deleted and cannot be deleted again.");
+                    return;
+                }
+
+                // If there are selected items
+                if (SelectedDataItems != null)
+                {
+                    // Adapt the selected data items to a list
+                    var selectedItems = SelectedDataItems.Adapt<List<UserDto>>();
+
+                    // Filter out items with isDeleting = true or UserLogin.Id
+                    var validItemsToDelete = selectedItems
+                        .Where(x => !x.IsDefaultData && x.Id != UserLogin.Id)
+                        .Select(x => x.Id)
+                        .ToList();
+
+                    // If no valid items left, show a warning and exit
+                    if (validItemsToDelete.Count == 0)
+                    {
+                        ToastService.ShowWarning("No valid items to delete.");
+                        return;
+                    }
+
+                    // Send the delete request for the valid items
+                    await Mediator.Send(new DeleteUserRequest(ids: validItemsToDelete));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<UserDto>>();
-
-                    await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != UserLogin.Id).Select(x => x.Id).ToList()));
+                    // No selected items, deleting a single item, check if isDeleting
+                    await Mediator.Send(new DeleteUserRequest(item.Id));
                 }
+
                 await LoadData();
             }
             catch (Exception ex)
@@ -643,6 +673,28 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 ex.HandleException(ToastService);
             }
         }
+
+        //private async Task OnDelete(GridDataItemDeletingEventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (SelectedDataItems is null)
+        //        {
+        //            await Mediator.Send(new DeleteUserRequest(((UserDto)e.DataItem).Id));
+        //        }
+        //        else
+        //        {
+        //            var a = SelectedDataItems.Adapt<List<UserDto>>();
+
+        //            await Mediator.Send(new DeleteUserRequest(ids: a.Where(x => x.Id != UserLogin.Id).Select(x => x.Id).ToList()));
+        //        }
+        //        await LoadData();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ex.HandleException(ToastService);
+        //    }
+        //}
 
         private void ColumnChooserButton_Click()
         {

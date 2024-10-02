@@ -51,10 +51,16 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var query = _unitOfWork.Repository<Menu>().Entities
-                    .AsNoTracking()
-                    .Include(x => x.Parent)
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Menu>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -63,15 +69,26 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%") ||
+                        v.Sequence.Equals(request.SearchTerm) ||
+                        EF.Functions.Like(v.Url, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                return (paged.Adapt<List<MenuDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<MenuDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

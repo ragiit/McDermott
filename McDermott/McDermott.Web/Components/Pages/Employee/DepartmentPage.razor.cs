@@ -162,7 +162,7 @@ namespace McDermott.Web.Components.Pages.Employee
         private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Company, CompanyDto>(pageIndex, pageSize, refCompanyComboBox?.Text ?? "", select: x => new Company
+            var result = await Mediator.QueryGetHelper<Company, CompanyDto>(pageIndex, pageSize, refCompanyComboBox?.Text ?? "", includes: [], select: x => new Company
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -207,35 +207,7 @@ namespace McDermott.Web.Components.Pages.Employee
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetDepartmentQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex,
-                includes:
-                [
-                    x => x.Manager,
-                    x => x.ParentDepartment,
-                    x => x.Company,
-                ],
-                select: x => new Department
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    ParentDepartmentId = x.ParentDepartmentId.GetValueOrDefault(),
-                    CompanyId = x.CompanyId.GetValueOrDefault(),
-                    ManagerId = x.ManagerId.GetValueOrDefault(),
-                    ParentDepartment = new Department
-                    {
-                        Name = x.ParentDepartment.Name
-                    },
-                    Company = new Company
-                    {
-                        Name = x.Company.Name
-                    },
-                    Manager = new User
-                    {
-                        Name = x.Manager.Name
-                    },
-                    DepartmentCategory = x.DepartmentCategory
-                }));
-
+                var a = await Mediator.QueryGetHelper<Department, DepartmentDto>(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex);
                 Departments = a.Item1;
                 totalCount = a.pageCount;
                 activePageIndex = pageIndex;

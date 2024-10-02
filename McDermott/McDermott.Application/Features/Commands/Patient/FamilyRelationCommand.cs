@@ -4,13 +4,16 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetFamilyQuery(Expression<Func<Family, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetFamilyQuery(Expression<Func<Family, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Family, object>>>? includes = null, Expression<Func<Family, Family>>? select = null) : IRequest<(List<FamilyDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Family, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; set; } = pageSize ?? 10;
+            public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Family, object>>> Includes { get; } = includes!;
+            public Expression<Func<Family, Family>>? Select { get; } = select!;
         }
 
         public class BulkValidateFamilyQuery(List<FamilyDto> FamilysToValidate) : IRequest<List<FamilyDto>>
