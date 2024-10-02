@@ -45,9 +45,15 @@
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Street1" Caption="Street" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="WebsiteLink" Caption="Website Link" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Type" Caption="Type" />
+                                        <DxGridDataColumn FieldName="Phone" Caption="Phone" />
+                                        <DxGridDataColumn FieldName="Mobile" Caption="Mobile" />
+                                        <DxGridDataColumn FieldName="Email" Caption="Email" />
+                                        <DxGridDataColumn FieldName="WebsiteLink" Caption="Website Link" />
+                                        <DxGridDataColumn FieldName="Street1" Caption="Street" /> 
+                                        <DxGridDataColumn FieldName="Street2" Caption="Street 2" /> 
+
                                     </Columns>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{

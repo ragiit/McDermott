@@ -145,6 +145,38 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
+            else if (typeof(TDto) == typeof(HealthCenterDto))
+            {
+                var result = await mediator.Send(new GetHealthCenterQuery(
+                    predicate as Expression<Func<HealthCenter, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Country,
+                        x => x.Province,
+                        x => x.City,
+                    ] : includes as List<Expression<Func<HealthCenter, object>>>,
+                    select: select is null ? x => new HealthCenter
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Type = x.Type,
+                        Phone = x.Phone,
+                        Mobile = x.Mobile,
+                        Email = x.Email,
+                        WebsiteLink = x.WebsiteLink,
+                        Street1 = x.Street1,
+                        Street2 = x.Street2,
+                        CountryId = x.CountryId,
+                        ProvinceId = x.ProvinceId,
+                        CityId = x.CityId,
+                    } : select as Expression<Func<HealthCenter, HealthCenter>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
             else if (typeof(TDto) == typeof(UomDto))
             {
                 var result = await mediator.Send(new GetUomQuery(

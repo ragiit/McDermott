@@ -1,21 +1,21 @@
-public class GetProductCategoryQuery(Expression<Func<ProductCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<ProductCategory, object>>>? includes = null, Expression<Func<ProductCategory, ProductCategory>>? select = null) : IRequest<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>
+public class GetHealthCenterQuery(Expression<Func<HealthCenter, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<HealthCenter, object>>>? includes = null, Expression<Func<HealthCenter, HealthCenter>>? select = null) : IRequest<(List<HealthCenterDto>, int pageIndex, int pageSize, int pageCount)>
 {
-    public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
+    public Expression<Func<HealthCenter, bool>> Predicate { get; } = predicate!;
     public bool RemoveCache { get; } = removeCache!;
     public string SearchTerm { get; } = searchTerm!;
     public int PageIndex { get; } = pageIndex;
     public int PageSize { get; } = pageSize ?? 10;
 
-    public List<Expression<Func<ProductCategory, object>>> Includes { get; } = includes!;
-    public Expression<Func<ProductCategory, ProductCategory>>? Select { get; } = select!;
+    public List<Expression<Func<HealthCenter, object>>> Includes { get; } = includes!;
+    public Expression<Func<HealthCenter, HealthCenter>>? Select { get; } = select!;
 }
 
 
-public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductCategoryQuery request, CancellationToken cancellationToken)
+public async Task<(List<HealthCenterDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetHealthCenterQuery request, CancellationToken cancellationToken)
 {
     try
     { 
-        var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking();
+        var query = _unitOfWork.Repository<HealthCenter>().Entities.AsNoTracking();
 
         // Apply dynamic includes
         if (request.Includes is not null)
@@ -48,7 +48,7 @@ public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pa
                           q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
                           cancellationToken);
 
-        return (pagedItems.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (pagedItems.Adapt<List<HealthCenterDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -56,18 +56,18 @@ public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pa
     }
 }
 
- private async Task LoadDataProductCategory(int pageIndex = 0, int pageSize = 10)
+ private async Task LoadDataHealthCenter(int pageIndex = 0, int pageSize = 10)
  {
      PanelVisible = true;
-     var result = await Mediator.Send(new GetProductCategoryQuery(
+     var result = await Mediator.Send(new GetHealthCenterQuery(
          pageIndex: pageIndex,
          pageSize: pageSize,
-         searchTerm: refProductCategoryComboBox?.Text ?? "",
+         searchTerm: refHealthCenterComboBox?.Text ?? "",
          includes:
          [
              x => x.Department
          ],
-         select: x => new ProductCategory
+         select: x => new HealthCenter
          {
              Id = x.Id,
              Name = x.Name,
@@ -78,15 +78,15 @@ public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pa
          }
 
      ));
-     ProductCategorys = result.Item1;
-     totalCountProductCategory = result.pageCount;
+     HealthCenters = result.Item1;
+     totalCountHealthCenter = result.pageCount;
      PanelVisible = false;
  }
 
 
-var result = await Mediator.QueryGetHelper<ProductCategory, ProductCategoryDto>(pageIndex, pageSize, searchTerm);
+var result = await Mediator.QueryGetHelper<HealthCenter, HealthCenterDto>(pageIndex, pageSize, searchTerm);
 
-var result = await Mediator.QueryGetHelper<ProductCategory, ProductCategoryDto>(pageIndex, pageSize, refProductCategoryComboBox?.Text ?? "");
+var result = await Mediator.QueryGetHelper<HealthCenter, HealthCenterDto>(pageIndex, pageSize, refHealthCenterComboBox?.Text ?? "");
 
 var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
 

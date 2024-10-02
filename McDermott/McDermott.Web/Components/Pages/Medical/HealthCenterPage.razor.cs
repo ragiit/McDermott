@@ -49,7 +49,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private Timer _timer;
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #region Searching
 
@@ -84,8 +84,6 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadDataProvince();
-            await LoadDataCity();
             await LoadDataCountry();
             PanelVisible = false;
 
@@ -106,8 +104,8 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            var result = await Mediator.Send(new GetHealthCenterQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            SelectedDataItems = [];
+            var result = await Mediator.QueryGetHelper<HealthCenter, HealthCenterDto>(pageIndex, pageSize, searchTerm);
             HealthCenters = result.Item1;
             totalCount = result.pageCount;
             PanelVisible = false;
@@ -155,8 +153,7 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCountryQuery(searchTerm: refCountryComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
             Countries = result.Item1;
             totalCountCountry = result.pageCount;
             PanelVisible = false;
@@ -204,7 +201,7 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             SelectedDataItems = [];
             var c = refCountryComboBox?.Value;
-            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == c, searchTerm: refProvinceComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "", x => x.CountryId == c);
             Provinces = result.Item1;
             totalCountProvince = result.pageCount;
             PanelVisible = false;
@@ -252,7 +249,7 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             SelectedDataItems = [];
             var c = refProvinceComboBox?.Value;
-            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == c, searchTerm: refCityComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == c);
             Cities = result.Item1;
             totalCountCity = result.pageCount;
             PanelVisible = false;
@@ -324,9 +321,9 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadComboboxEdit(HealthCenterDto a)
         {
-            Countries = (await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId))).Item1;
-            Provinces = (await Mediator.Send(new GetProvinceQuery(x => x.Id == a.ProvinceId))).Item1;
-            Cities = (await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId))).Item1;
+            Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
+            Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
+            Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == a.CountryId)).Item1;
         }
 
         private void DeleteItem_Click()
