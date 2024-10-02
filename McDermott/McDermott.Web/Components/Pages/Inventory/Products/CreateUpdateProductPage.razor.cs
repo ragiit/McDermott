@@ -64,6 +64,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private IReadOnlyList<object> SelectedDataStockItems { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
+        #endregion
 
         #region Status Maintainance
         public MarkupString GetIssueStatusIconHtmlMaintainance(EnumStatusMaintainance? status)
@@ -874,7 +875,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             GetMaintainanceScrap = [];
             showMaintaiananaceProduct = false;
             GetMaintainanceHistory = [];
-
+        }
         private async Task RefreshStock_Click()
         {
             await NewTableStock_Item();
