@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 
 using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 
@@ -43,10 +44,16 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<LabTest>().Entities
-                    .Include(x => x.SampleType)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<LabTest>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -55,23 +62,26 @@ namespace McDermott.Application.Features.Queries.Medical
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.SampleType.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.ResultType, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<LabTestDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<LabTestDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

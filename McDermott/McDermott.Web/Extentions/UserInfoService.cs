@@ -58,7 +58,7 @@ namespace McDermott.Web.Extentions
 
                 var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && url.Contains(x.Menu.Url.ToLower()));
 
-                if (!string.IsNullOrWhiteSpace(url) && userAccessCRUID is null && url != _navigationManager.BaseUri)
+                if (!string.IsNullOrWhiteSpace(url) && userAccessCRUID is null && url != _navigationManager.BaseUri && !url.Contains("queue/kiosk/"))
                 {
                     toastService?.ClearErrorToasts();
                     toastService?.ShowError("Unauthorized Access\r\n\r\nYou are not authorized to view this page. If you need access, please contact the administrator.\r\n");

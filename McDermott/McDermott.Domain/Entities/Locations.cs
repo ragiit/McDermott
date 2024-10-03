@@ -1,4 +1,6 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Domain.Entities
 {
     public class Locations : BaseAuditableEntity
     {
@@ -10,6 +12,9 @@
 
         [StringLength(200)]
         public string Type { get; set; } = string.Empty;
+
+        [NotMapped]
+        public string ParentLocationString => ParentLocation is not null ? $"{ParentLocation.Name}/{Name}" : string.Empty;
 
         [SetToNull]
         public virtual List<BuildingLocation>? BuildingLocations { get; set; }

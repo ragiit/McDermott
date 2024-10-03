@@ -2,7 +2,7 @@
 {
     public class UomCommand
     {
-        #region GET 
+        #region GET
 
         public class GetAllUomQuery(Expression<Func<Uom, bool>>? predicate = null, bool removeCache = false) : IRequest<List<UomDto>>
         {
@@ -10,25 +10,29 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class GetUomQuery(Expression<Func<Uom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<UomDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetUomQuery(Expression<Func<Uom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Uom, object>>>? includes = null, Expression<Func<Uom, Uom>>? select = null) : IRequest<(List<UomDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Uom, object>>> Includes { get; } = includes!;
+            public Expression<Func<Uom, Uom>>? Select { get; } = select!;
         }
 
         public class BulkValidateUomQuery(List<UomDto> UomToValidate) : IRequest<List<UomDto>>
         {
             public List<UomDto> UomToValidate { get; } = UomToValidate;
         }
+
         public class ValidateUomQuery(Expression<Func<Uom, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+        #endregion GET
 
         #region CREATE
 

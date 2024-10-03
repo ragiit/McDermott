@@ -10,8 +10,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
     public partial class CreateUpdateProductPage
     {
         #region Relation Data
+
         //List Data
         private List<ProductDto> GetProduct = [];
+
         private List<MedicamentDto> GetMedicaments = [];
         private List<BpjsClassificationDto> GetBPJSCl = [];
         private List<UomDto> GetUoms = [];
@@ -31,6 +33,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         //Post data
         private ProductDto PostProduct = new();
+
         private ProductDto TempProduct = new();
         private MedicamentDto PostMedicaments = new();
         private ProductDetailDto PostProductDetails = new();
@@ -67,9 +70,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private IReadOnlyList<object> SelectedDataStockItems { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private CultureInfo Culture = CultureInfo.GetCultureInfo("id-ID");
-        #endregion
+
+        #endregion Variable Static
 
         #region Status Maintainance
+
         public MarkupString GetIssueStatusIconHtmlMaintainance(EnumStatusMaintainance? status)
         {
             string priorityClass;
@@ -96,16 +101,16 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     priorityClass = "warning";
                     title = "Scrap";
                     break;
+
                 case EnumStatusMaintainance.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
+
                 case EnumStatusMaintainance.Canceled:
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
-
-
 
                 default:
                     return new MarkupString("");
@@ -116,7 +121,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             return new MarkupString(html);
         }
-        #endregion
+
+        #endregion Status Maintainance
 
         #region select data static
 
@@ -200,7 +206,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             //        StateHasChanged();
             //    }
             //    catch { }
-
 
             //    StateHasChanged();
 
@@ -341,7 +346,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             // Fetch additional data
             GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
-            ActiveComponents = await Mediator.Send(new GetActiveComponentQuery());
+            ActiveComponents = (await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>()).Item1;
         }
 
         private void UpdateMedicamentDetails(ProductDetailDto postProductDetails, MedicamentDto medicament)
@@ -394,10 +399,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             SelectedChangeUoM(GetUoms.FirstOrDefault(x => x.Name == "Unit") ?? new());
         }
-        #endregion
 
-        #region async Data
-        #endregion
+        #endregion Load Data
+
+
 
         #region Select Data
 
@@ -848,7 +853,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                         }).ToList();
                         FieldHideStock = false;
                     }
-
                 }
                 else
                 {
@@ -920,6 +924,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         #endregion Smart Button
 
         #region Button
+
         private void onDiscard()
         {
             NavigationManager.NavigateTo("inventory/products");
@@ -934,19 +939,23 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             showMaintaiananaceProduct = false;
             GetMaintainanceHistory = [];
         }
+
         private async Task RefreshStock_Click()
         {
             await NewTableStock_Item();
         }
+
         private async Task RefreshScrap_Click()
         {
             await NewTableEquipment_Scrap();
         }
+
         private async Task RefreshMaintainance_Click()
         {
             await NewTableEquipment_Item();
         }
-        #endregion
+
+        #endregion Button
 
         #region Handler Vaidation
 

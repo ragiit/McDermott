@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Features.Queries.Pharmacy
+﻿using McDermott.Application.Features.Services;
+
+namespace McDermott.Application.Features.Queries.Pharmacy
 {
     public class DrugDosageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDrugDosageQuery, (List<DrugDosageDto>, int pageIndex, int pageSize, int pageCount)>,
@@ -49,10 +51,16 @@
         {
             try
             {
-                var query = _unitOfWork.Repository<DrugDosage>().Entities
-                    .Include(x => x.DrugRoute)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<DrugDosage>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -60,23 +68,27 @@
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Frequency, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Frequency, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.DrugRoute.Route, $"%{request.SearchTerm}%") ||
+                        v.TotalQtyPerDay.Equals(request.SearchTerm) ||
+                        v.Days.Equals(request.SearchTerm)
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Frequency);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Frequency), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<DrugDosageDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<DrugDosageDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -98,7 +110,7 @@
                 .Entities
                 .AsNoTracking()
                 .Where(v => A.Contains(v.Frequency)
-                            && B.Contains(v.TotalQtyPerDay)                            
+                            && B.Contains(v.TotalQtyPerDay)
                             && C.Contains(v.DrugRouteId)
                             && D.Contains(v.Days)
                             )
@@ -106,6 +118,7 @@
 
             return existingLabTests.Adapt<List<DrugDosageDto>>();
         }
+
         public async Task<bool> Handle(ValidateDrugDosageQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<DrugDosage>()

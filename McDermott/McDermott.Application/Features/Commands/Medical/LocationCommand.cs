@@ -2,15 +2,18 @@
 {
     public class LocationCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetLocationQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetLocationQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Locations, object>>>? includes = null, Expression<Func<Locations, Locations>>? select = null) : IRequest<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Locations, object>>> Includes { get; } = includes!;
+            public Expression<Func<Locations, Locations>>? Select { get; } = select!;
         }
 
         public class ValidateLocationQuery(Expression<Func<Locations, bool>>? predicate = null) : IRequest<bool>
@@ -18,7 +21,9 @@
             public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 

@@ -17,11 +17,16 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<BuildingLocation>().Entities
-                    .Include(x => x.Building)
-                    .Include(x => x.Location)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<BuildingLocation>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -29,13 +34,24 @@ namespace McDermott.Application.Features.Queries.Medical
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.BuildingId.ToString(), $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.LocationId.ToString(), $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Building.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Location.Name, $"%{request.SearchTerm}%"));
                 }
 
-                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, null, cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                return (paged.Adapt<List<BuildingLocationDto>>(), request.PageIndex, request.PageSize, totalPages);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Id), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
+
+                return (pagedItems.Adapt<List<BuildingLocationDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

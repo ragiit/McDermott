@@ -17,12 +17,16 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<HealthCenter>().Entities
-                    .Include(x => x.Province)
-                    .Include(x => x.City)
-                    .Include(x => x.Country)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<HealthCenter>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -31,14 +35,30 @@ namespace McDermott.Application.Features.Queries.Medical
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Phone, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Mobile, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Email, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.WebsiteLink, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Street1, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Street2, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var pagedResult = query.OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                return (paged.Adapt<List<HealthCenterDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<HealthCenterDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

@@ -4,13 +4,16 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<LabUom, object>>>? includes = null, Expression<Func<LabUom, LabUom>>? select = null) : IRequest<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<LabUom, object>>> Includes { get; } = includes!;
+            public Expression<Func<LabUom, LabUom>>? Select { get; } = select!;
         }
 
         public class BulkValidateLabUomQuery(List<LabUomDto> LabUomsToValidate) : IRequest<List<LabUomDto>>

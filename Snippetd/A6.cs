@@ -31,8 +31,9 @@
      { 
          PanelVisible = true;
          SelectedDataItems = [];
-         var a = await Mediator.Send(new GetPatientFamilyRelationQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-         PatientFamilyRelations = a.Item1;
+         var a = await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>(pageIndex, pageSize, searchTerm);
+         var a = await Mediator.Send(new GetSignaQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+         Signas = a.Item1;
          totalCount = a.pageCount;
          activePageIndex = pageIndex; 
      }
@@ -46,21 +47,21 @@
 SearchTextChanged="OnSearchBoxChanged"
 try
 {
-    var editModel = (PatientFamilyRelationDto)e.EditModel;
+    var editModel = (SignaDto)e.EditModel;
 
-    bool validate = await Mediator.Send(new ValidatePatientFamilyRelationQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
+    bool validate = await Mediator.Send(new ValidateSignaQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
     if (validate)
     {
-        ToastService.ShowInfo($"PatientFamilyRelation with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
+        ToastService.ShowInfo($"Signa with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
         e.Cancel = true;
         return;
     }
 
     if (editModel.Id == 0)
-        await Mediator.Send(new CreatePatientFamilyRelationRequest(editModel));
+        await Mediator.Send(new CreateSignaRequest(editModel));
     else
-        await Mediator.Send(new UpdatePatientFamilyRelationRequest(editModel));
+        await Mediator.Send(new UpdateSignaRequest(editModel));
 
     SelectedDataItems = [];
     await LoadData();

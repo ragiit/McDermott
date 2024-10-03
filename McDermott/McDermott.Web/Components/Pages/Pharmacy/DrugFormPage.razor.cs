@@ -1,4 +1,6 @@
-﻿using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {
@@ -7,7 +9,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         #region Relation Data
 
         private List<DrugFormDto> DataFormDrugs = [];
-        private DrugFormDto FormDrugs = new();
 
         #endregion Relation Data
 
@@ -76,42 +77,53 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await LoadData();
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            showForm = false;
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            //DataFormDrugs = await Mediator.Send(new GetDrugFormQuery());
-            PanelVisible = false;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var a = await Mediator.QueryGetHelper<DrugForm, DrugFormDto>(pageIndex, pageSize, searchTerm);
+                DataFormDrugs = a.Item1;
+                totalCount = a.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion async Data
 
         #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeFilterRowEditor(GridCustomizeFilterRowEditorEventArgs e)
-        {
-            if (e.FieldName == "CreatedDate" || e.FieldName == "ModifiedDate" || e.FieldName == "FixedDate")
-                ((ITextEditSettings)e.EditSettings).ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Never;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -124,8 +136,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task NewItem_Click()
         {
-            FormDrugs = new();
-            showForm = true;
+            await Grid.StartEditNewRowAsync();
         }
 
         private async Task Refresh_Click()
@@ -135,24 +146,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
 
         private async Task EditItem_Click()
         {
-            var general = SelectedDataItems[0].Adapt<DrugFormDto>();
-            FormDrugs = general;
-            showForm = true;
-        }
-
-        private async Task Back_Click()
-        {
-            showForm = false;
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
-        }
-
-        private async Task onCancle()
-        {
-            await LoadData();
         }
 
         #endregion Click
@@ -163,6 +162,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteDrugFormRequest(((DrugFormDto)e.DataItem).Id));
@@ -172,39 +172,115 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     await Mediator.Send(new DeleteDrugFormRequest(ids: SelectedDataItems.Adapt<List<DrugFormDto>>().Select(x => x.Id).ToList()));
                 }
 
-                await LoadData();
+                await LoadData(activePageIndex, pageSize);
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                ee.HandleException(ToastService);
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         #endregion function Delete
 
         #region function Save
 
-        private async Task onSave()
+        private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
-                if (FormDrugs.Id == 0)
-                {
-                    await Mediator.Send(new CreateDrugFormRequest(FormDrugs));
-                }
-                else
-                {
-                    await Mediator.Send(new UpdateDrugFormRequest(FormDrugs));
-                }
+                PanelVisible = true;
 
-                await LoadData();
+                var editModel = (DrugFormDto)e.EditModel;
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateDrugFormRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateDrugFormRequest(editModel));
+
+                await LoadData(activePageIndex, pageSize);
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         #endregion function Save
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        private List<ExportFileData> ExportTemp =
+        [
+            new() { Column = "Name", Notes = "Mandatory" },
+            new() { Column = "Code" }
+        ];
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "drug_form_template.xlsx", ExportTemp);
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Name", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match the grid.");
+                        return;
+                    }
+
+                    var list = new List<DrugFormDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        list.Add(new DrugFormDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        });
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.Code }).ToList();
+
+                        var existingVillages = await Mediator.Send(new BulkValidateDrugFormQuery(list));
+
+                        list = list.Where(village => !existingVillages.Any(ev => ev.Name == village.Name && ev.Code == village.Code)).ToList();
+
+                        await Mediator.Send(new CreateListDrugFormRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+                finally { PanelVisible = false; }
+            }
+        }
     }
 }

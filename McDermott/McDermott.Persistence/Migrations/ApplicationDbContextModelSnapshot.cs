@@ -412,8 +412,8 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("AmountOfComponent")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AmountOfComponent")
+                        .HasColumnType("int");
 
                     b.Property<long?>("ConcoctionLineId")
                         .HasColumnType("bigint");

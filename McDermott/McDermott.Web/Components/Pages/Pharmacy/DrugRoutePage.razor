@@ -1,106 +1,111 @@
 ﻿@page "/pharmacy/drug-routes"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data Drug Routes</PageTitle>
+<PageTitle>McHealthCare - Drug Routes</PageTitle>
 
-@if (IsAccess)
+
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
-
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Drug Routes" />
+        <BaseHeaderPage Title="Drug Routes" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="true"
-                                                Text="Fetching Data...">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
-                                    <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                            Data="DrugRoutes"
-                                            PageSize="10"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                            KeyFieldName="Id"
-                                            CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                            EditModelSaving="OnSave"
-                                            DataItemDeleting="OnDelete"
-                                            EditorRenderMode="GridEditorRenderMode.Detached"
-                                            EditMode="GridEditMode.PopupEditForm"
-                                            PopupEditFormCssClass="pw-800"
-                                            PagerPosition="GridPagerPosition.Bottom"
-                                            AllowSelectRowByClick="true"
-                                            PageSizeSelectorVisible="true"
-                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                            PageSizeSelectorAllRowsItemVisible="true"
-                                            PagerSwitchToInputBoxButtonCount="10"
-                                            FocusedRowEnabled="true"
-                                            PagerVisibleNumericButtonCount="10"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            ShowGroupPanel="true"
-                                            AutoExpandAllGroupRows="true"
-                                            CssClass="ch-480"
-                                            ShowFilterRow="true"
-                                            TextWrapEnabled="false"
-                                            CustomizeElement="Grid_CustomizeElement"
-                                            ShowSearchBox="true"
-                                            SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                            KeyboardNavigationEnabled="true">
-                                        <ToolbarTemplate>
-                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && DrugRoutes.Count > 0" />
-                                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && DrugRoutes.Count > 0" />
-                                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                                    <Items>
-                                                        <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                                        <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                                        <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                                    </Items>
-                                                </DxToolbarItem>
-                                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                            </DxToolbar>
-                                        </ToolbarTemplate>
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Route" SortIndex="0" />
-                                            <DxGridDataColumn FieldName="Code" />
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
 
-                                        </Columns>
-                                        <EditFormTemplate Context="EditFormContext">
-                                            @{
-                                                var a = (DrugRouteDto)EditFormContext.EditModel;
-                                            }
-                                            <DxFormLayout CssClass="w-100">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="DrugRoutes"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                DataItemDeleting="OnDelete"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                FocusedRowChanged="Grid_FocusedRowChanged">
 
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Route"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Route" />
-                                                    <ValidationMessage For="@(()=> a.Route)"   />
-                                                </DxFormLayoutItem>
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="DrugRouteDto"
+                                                         Items="@DrugRoutes"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="UserAccessCRUID.IsImport"
+                                                         Grid="Grid"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
-                                                    <DxTextBox @bind-Text="@a.Code"
-                                                               ShowValidationIcon="true"
-                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                               NullText="Code" />
-                                                    <ValidationMessage For="@(()=> a.Code)"   />
-                                                </DxFormLayoutItem>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Route" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Code" />
 
-                                            </DxFormLayout>
-                                        </EditFormTemplate>
-                                    </DxGrid>
-                                </DxLoadingPanel>
-                            </div>
+                                    </Columns>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (DrugRouteDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Route"
+                                                           NullText="Route" />
+                                                <ValidationMessage For="@(()=> a.Route)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Code"
+                                                           NullText="Code" />
+                                                <ValidationMessage For="@(()=> a.Code)"   />
+                                            </DxFormLayoutItem>
+
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Route"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
                         </div>
                     </div>
                 </div>
@@ -108,11 +113,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Drug Routes" />
-
-        <LoadingIndicatorLayout></LoadingIndicatorLayout>
-    </div>
+    <LoadingIndicatorLayout />
 }

@@ -1,17 +1,19 @@
-﻿
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class BuildingLocationCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetBuildingLocationQuery(Expression<Func<BuildingLocation, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<BuildingLocationDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetBuildingLocationQuery(Expression<Func<BuildingLocation, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<BuildingLocation, object>>>? includes = null, Expression<Func<BuildingLocation, BuildingLocation>>? select = null) : IRequest<(List<BuildingLocationDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<BuildingLocation, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<BuildingLocation, object>>> Includes { get; } = includes!;
+            public Expression<Func<BuildingLocation, BuildingLocation>>? Select { get; } = select!;
         }
 
         public class ValidateBuildingLocationQuery(Expression<Func<BuildingLocation, bool>>? predicate = null) : IRequest<bool>
@@ -19,7 +21,9 @@ namespace McDermott.Application.Features.Commands.Medical
             public Expression<Func<BuildingLocation, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
+
+
 
         #region CREATE
 

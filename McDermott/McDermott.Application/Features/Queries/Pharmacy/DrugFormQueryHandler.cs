@@ -1,4 +1,5 @@
-﻿using System;
+﻿using McDermott.Application.Features.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,13 +10,14 @@ namespace McDermott.Application.Features.Queries.Pharmacy
 {
     public class DrugFormQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDrugFormQuery, (List<DrugFormDto>, int pageIndex, int pageSize, int pageCount)>,
-         IRequestHandler<GetAllDrugFormQuery, List<DrugFormDto>>,
+        IRequestHandler<GetAllDrugFormQuery, List<DrugFormDto>>,
         IRequestHandler<ValidateDrugFormQuery, bool>,
-         IRequestHandler<CreateDrugFormRequest, DrugFormDto>,
-         IRequestHandler<CreateListDrugFormRequest, List<DrugFormDto>>,
-         IRequestHandler<UpdateDrugFormRequest, DrugFormDto>,
-         IRequestHandler<UpdateListDrugFormRequest, List<DrugFormDto>>,
-         IRequestHandler<DeleteDrugFormRequest, bool>
+        IRequestHandler<BulkValidateDrugFormQuery, List<DrugFormDto>>,
+        IRequestHandler<CreateDrugFormRequest, DrugFormDto>,
+        IRequestHandler<CreateListDrugFormRequest, List<DrugFormDto>>,
+        IRequestHandler<UpdateDrugFormRequest, DrugFormDto>,
+        IRequestHandler<UpdateListDrugFormRequest, List<DrugFormDto>>,
+        IRequestHandler<DeleteDrugFormRequest, bool>
     {
         #region GET
 
@@ -23,7 +25,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                string cacheKey = $"GetDrugFormQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique 
+                string cacheKey = $"GetDrugFormQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
@@ -49,13 +51,38 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             }
         }
 
+        public async Task<List<DrugFormDto>> Handle(BulkValidateDrugFormQuery request, CancellationToken cancellationToken)
+        {
+            var DrugFormDtos = request.DrugFormsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var DrugFormNames = DrugFormDtos.Select(x => x.Name).Distinct().ToList();
+            var a = DrugFormDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingDrugForms = await _unitOfWork.Repository<DrugForm>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => DrugFormNames.Contains(v.Name)
+                            && a.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingDrugForms.Adapt<List<DrugFormDto>>();
+        }
+
         public async Task<(List<DrugFormDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetDrugFormQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<DrugForm>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<DrugForm>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -63,24 +90,25 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<DrugFormDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<DrugFormDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -96,7 +124,6 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
-
 
         #endregion GET
 

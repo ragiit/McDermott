@@ -1,11 +1,12 @@
-﻿
-
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacy.ActiveComponentCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacy
 {
     public class ActiveComponentQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetActiveComponentQuery, List<ActiveComponentDto>>,
+        IRequestHandler<GetActiveComponentQuery, (List<ActiveComponentDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<ValidateActiveComponentQuery, bool>,
+        IRequestHandler<BulkValidateActiveComponentQuery, List<ActiveComponentDto>>,
         IRequestHandler<CreateActiveComponentRequest, ActiveComponentDto>,
         IRequestHandler<CreateListActiveComponentRequest, List<ActiveComponentDto>>,
         IRequestHandler<UpdateActiveComponentRequest, ActiveComponentDto>,
@@ -14,36 +15,82 @@ namespace McDermott.Application.Features.Queries.Pharmacy
     {
         #region GET
 
-        public async Task<List<ActiveComponentDto>> Handle(GetActiveComponentQuery request, CancellationToken cancellationToken)
+        public async Task<List<ActiveComponentDto>> Handle(BulkValidateActiveComponentQuery request, CancellationToken cancellationToken)
+        {
+            var ActiveComponentDtos = request.ActiveComponentsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ActiveComponentNames = ActiveComponentDtos.Select(x => x.Name).Distinct().ToList();
+            var a = ActiveComponentDtos.Select(x => x.AmountOfComponent).Distinct().ToList();
+            var b = ActiveComponentDtos.Select(x => x.UomId).Distinct().ToList();
+
+            var existingActiveComponents = await _unitOfWork.Repository<ActiveComponent>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ActiveComponentNames.Contains(v.Name)
+                            && a.Contains(v.AmountOfComponent)
+                            && b.Contains(v.UomId)
+                            )
+                .ToListAsync(cancellationToken);
+
+            return existingActiveComponents.Adapt<List<ActiveComponentDto>>();
+        }
+
+        public async Task<(List<ActiveComponentDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetActiveComponentQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetActiveComponentQuery_";
+                var query = _unitOfWork.Repository<ActiveComponent>().Entities.AsNoTracking();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<ActiveComponent>? result))
+                // Apply dynamic includes
+                if (request.Includes is not null)
                 {
-                    result = await _unitOfWork.Repository<ActiveComponent>().Entities
-                        .Include(x => x.Uom)
-                      .AsNoTracking()
-                      .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
                 }
 
-                result ??= [];
-
                 if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                    query = query.Where(request.Predicate);
 
-                return result.ToList().Adapt<List<ActiveComponentDto>>();
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        v.AmountOfComponent.Equals(request.SearchTerm) ||
+                        EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
+                        );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
+
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
+
+                return (pagedItems.Adapt<List<ActiveComponentDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        public async Task<bool> Handle(ValidateActiveComponentQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<ActiveComponent>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

@@ -1,5 +1,6 @@
 ﻿using McDermott.Application.Dtos.Pharmacy;
 using McDermott.Application.Dtos.Queue;
+using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacy
@@ -7,37 +8,80 @@ namespace McDermott.Application.Features.Queries.Pharmacy
     //public class SignaQueryHandler
     //{
     public class SignaQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-    IRequestHandler<GetSignaQuery, List<SignaDto>>,
-    IRequestHandler<CreateSignaRequest, SignaDto>,
-    IRequestHandler<UpdateSignaRequest, SignaDto>,
-    IRequestHandler<UpdateListSignaRequest, List<SignaDto>>,
-    IRequestHandler<DeleteSignaRequest, bool>
+        IRequestHandler<GetSignaQuery, (List<SignaDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<CreateSignaRequest, SignaDto>,
+        IRequestHandler<CreateListSignaRequest, List<SignaDto>>,
+        IRequestHandler<UpdateSignaRequest, SignaDto>,
+        IRequestHandler<UpdateListSignaRequest, List<SignaDto>>,
+        IRequestHandler<ValidateSignaQuery, bool>,
+        IRequestHandler<BulkValidateSignaQuery, List<SignaDto>>,
+        IRequestHandler<DeleteSignaRequest, bool>
     {
         #region GET
 
-        public async Task<List<SignaDto>> Handle(GetSignaQuery request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ValidateSignaQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Signa>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<List<SignaDto>> Handle(BulkValidateSignaQuery request, CancellationToken cancellationToken)
+        {
+            var SignaDtos = request.SignasToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var SignaNames = SignaDtos.Select(x => x.Name).Distinct().ToList();
+
+            var existingSignas = await _unitOfWork.Repository<Signa>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => SignaNames.Contains(v.Name))
+                .ToListAsync(cancellationToken);
+
+            return existingSignas.Adapt<List<SignaDto>>();
+        }
+
+        public async Task<(List<SignaDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetSignaQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetSignaQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique 
+                var query = _unitOfWork.Repository<Signa>().Entities.AsNoTracking();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Signa>? result))
+                // Apply dynamic includes
+                if (request.Includes is not null)
                 {
-                    result = await _unitOfWork.Repository<Signa>().Entities
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
                 }
 
-                // Filter result based on request.Predicate if it's not null
                 if (request.Predicate is not null)
-                    result = [.. result?.AsQueryable().Where(request.Predicate)];
+                    query = query.Where(request.Predicate);
 
-                return result.ToList().Adapt<List<SignaDto>>();
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
+
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
+
+                return (pagedItems.Adapt<List<SignaDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -158,4 +202,3 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         #endregion DELETE
     }
 }
-

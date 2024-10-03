@@ -344,6 +344,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             //SelectedDataItemsGroupMenu = new ObservableRangeCollection<object>();
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItemsGroupMenu is null)
                 {
                     await Mediator.Send(new DeleteGroupMenuRequest(((GroupMenuDto)e.DataItem).Id));
@@ -359,6 +360,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private bool FormValidationState = true;
@@ -460,16 +462,16 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                 return;
             }
 
+            var existingName = await Mediator.Send(new ValidateGroupQuery(x => x.Name == Group.Name && x.Id != Group.Id));
+
+            if (existingName)
+            {
+                ToastService.ShowInfo("Group name already exist");
+                return;
+            }
+
             if (Group.Id == 0)
             {
-                var existingName = await Mediator.Send(new ValidateGroupQuery(x => x.Name == GroupName));
-
-                if (existingName)
-                {
-                    ToastService.ShowInfo("Group name already exist");
-                    return;
-                }
-
                 var result = await Mediator.Send(new CreateGroupRequest(Group));
 
                 //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));

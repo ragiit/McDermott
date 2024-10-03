@@ -20,28 +20,28 @@
      </DxFormLayout>
  </EditFormTemplate>
 
-<div class="row">
-    <DxFormLayout>
-        <div class="col-md-9">
-            <DxFormLayoutItem>
-                <DxPager PageCount="totalCount"
-                         ActivePageIndexChanged="OnPageIndexChanged"
-                         ActivePageIndex="activePageIndex"
-                         VisibleNumericButtonCount="10"
-                         SizeMode="SizeMode.Medium"
-                         NavigationMode="PagerNavigationMode.Auto">
-                </DxPager>
-            </DxFormLayoutItem>
-        </div>
-        <div class="col-md-3 d-flex justify-content-end">
-            <DxFormLayoutItem Caption="Page Size:">
-                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                              NullText="Select Page Size"
-                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                              @bind-Value="pageSize">
-                </MyDxComboBox>
-            </DxFormLayoutItem>
-        </div>
-    </DxFormLayout>
-</div>
+    <div class="row">
+        <DxFormLayout>
+            <div class="col-md-9">
+                <DxFormLayoutItem>
+                    <DxPager PageCount="totalCount"
+                            ActivePageIndexChanged="OnPageIndexChanged"
+                            ActivePageIndex="activePageIndex"
+                            VisibleNumericButtonCount="10"
+                            SizeMode="SizeMode.Medium"
+                            NavigationMode="PagerNavigationMode.Auto">
+                    </DxPager>
+                </DxFormLayoutItem>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end">
+                <DxFormLayoutItem Caption="Page Size:">
+                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                NullText="Select Page Size"
+                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                @bind-Value="pageSize">
+                    </MyDxComboBox>
+                </DxFormLayoutItem>
+            </div>
+        </DxFormLayout>
+    </div>

@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Components.Web;
 
-namespace McDermott.Web.Components.Pages.Medical.LabTest
+namespace McDermott.Web.Components.Pages.Medical.LabTests
 {
     public partial class CreateUpdateLabTestPage
     {
@@ -232,8 +233,8 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             await LoadLabTestDetails();
             await LoadDataSampleTypesEdit();
             await LoadDataLabUom();
@@ -257,7 +258,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
         {
             PanelVisible = true;
             SelectedDetailDataItems = [];
-            var result = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.QueryGetHelper<LabTestDetail, LabTestDetailDto>(pageIndex, pageSize, searchTerm ?? "", x => x.LabTestId == LabTest.Id);
             LabTestDetailForms = result.Item1;
             totalCount = result.pageCount;
             activePageIndex = pageIndex;
@@ -266,7 +267,9 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
 
         private async Task LoadData()
         {
-            var result = await Mediator.Send(new GetLabTestQuery(x => x.Id == Id, 0, 1));
+            //var result = await Mediator.Send(new GetLabTestQuery(x => x.Id == Id, 0, 1));
+            var result = await Mediator.QueryGetHelper<LabTest, LabTestDto>(predicate: x => x.Id == Id);
+
             LabTest = new();
             LabTestDetailForms.Clear();
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -452,23 +455,16 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
 
         private async Task EditItemDetail_Click(IGrid context)
         {
-            await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
-            var a = (LabTestDetailDto)context.SelectedDataItem;
+            await GridDetail.StartEditRowAsync(FocusedRowVisibleIndex);
+            var a = (GridDetail.GetDataItem(FocusedRowVisibleIndex) as LabTestDetailDto ?? new());
+
             await LoadComboboxEdit(a);
-
-            // Buat salinan objek yang akan diedit menggunakan Mapster
-            //var copy = selected.Adapt<LabTestDetailDto>(); // GroupMenu adalah objek yang sedang diedit
-
-            //var w = LabTestDetailForms.FirstOrDefault(x => x.Id == copy.Id);
-
-            //if (copy is not null)
-            // Gunakan salinan objek yang diedit
-            //this.GroupMenu = copy;
         }
 
         private async Task LoadComboboxEdit(LabTestDetailDto a)
         {
-            LabUoms = (await Mediator.Send(new GetLabUomQuery(x => x.Id == a.LabUomId))).Item1;
+            LabUoms = (await Mediator.QueryGetHelper<LabUom, LabUomDto>(predicate: x => x.Id == a.LabUomId)).Item1;
+            var aa = "daw";
         }
 
         private async Task RefreshDetail_Click()

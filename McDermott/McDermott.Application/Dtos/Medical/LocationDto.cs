@@ -16,7 +16,7 @@
         {
             get
             {
-                if (ParentLocation is null)
+                if (ParentLocation is null || string.IsNullOrWhiteSpace(ParentLocation.Name))
                     return Name;
 
                 return $"{ParentLocation.Name}/{Name}";

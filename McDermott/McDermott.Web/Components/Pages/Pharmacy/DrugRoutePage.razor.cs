@@ -1,4 +1,7 @@
-﻿namespace McDermott.Web.Components.Pages.Pharmacy
+﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+
+namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class DrugRoutePage
     {
@@ -41,12 +44,17 @@
         {
             try
             {
+                PanelVisible = true;
                 var user = await UserInfoService.GetUserInfo(ToastService);
                 IsAccess = user.Item1;
                 UserAccessCRUID = user.Item2;
                 UserLogin = user.Item3;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion UserLoginAndAccessRole
@@ -70,12 +78,48 @@
             await LoadData();
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            //DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
-            PanelVisible = false;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var a = await Mediator.QueryGetHelper<DrugRoute, DrugRouteDto>(pageIndex, pageSize, searchTerm);
+                DrugRoutes = a.Item1;
+                totalCount = a.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Load
@@ -102,35 +146,6 @@
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            }); ;
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -144,47 +159,124 @@
                     await Mediator.Send(new DeleteDrugRouteRequest(ids: SelectedDataItems.Adapt<List<DrugRouteDto>>().Select(x => x.Id).ToList()));
                 }
 
-                await LoadData();
+                await LoadData(activePageIndex, pageSize);
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                ee.HandleException(ToastService);
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
+
+            PanelVisible = true;
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        private List<ExportFileData> ExportTemp =
+        [
+            new() { Column = "Route", Notes = "Mandatory" },
+            new() { Column = "Code" }
+        ];
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "drug_route_template.xlsx", ExportTemp);
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DrugRouteDto)e.EditModel;
+            try
+            {
+                PanelVisible = true;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateDrugRouteRequest(editModel));
-            else
-                await Mediator.Send(new UpdateDrugRouteRequest(editModel));
+                var editModel = (DrugRouteDto)e.EditModel;
 
-            await LoadData();
+                var checkExistingName = await Mediator.Send(new ValidateDrugRouteQuery(x => x.Route == editModel.Route && x.Code == editModel.Code && x.Id != editModel.Id));
+                if (checkExistingName)
+                {
+                    ToastService.ShowInfo($"Drug Route with Route name '{editModel.Route}' and code '{editModel.Code}' is already exists");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateDrugRouteRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateDrugRouteRequest(editModel));
+
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Click
 
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    var headerNames = new List<string>() { "Route", "Code" };
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
+                    {
+                        ToastService.ShowInfo("The header must match the grid.");
+                        return;
+                    }
+
+                    var list = new List<DrugRouteDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        list.Add(new DrugRouteDto
+                        {
+                            Route = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
+                        });
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Route, x.Code }).ToList();
+
+                        var existingVillages = await Mediator.Send(new BulkValidateDrugRouteQuery(list));
+
+                        list = list.Where(village => !existingVillages.Any(ev => ev.Route == village.Route && ev.Code == village.Code)).ToList();
+
+                        await Mediator.Send(new CreateListDrugRouteRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+                finally { PanelVisible = false; }
+            }
+        }
+
         #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {

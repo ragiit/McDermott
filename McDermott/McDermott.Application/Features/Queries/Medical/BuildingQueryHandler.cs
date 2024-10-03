@@ -1,10 +1,13 @@
-﻿using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class BuildingQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetBuildingQuery, (List<BuildingDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateBuildingRequest, BuildingDto>,
+        IRequestHandler<ValidateBuildingQuery, bool>,
+        IRequestHandler<BulkValidateBuildingQuery, List<BuildingDto>>,
         IRequestHandler<CreateListBuildingRequest, List<BuildingDto>>,
         IRequestHandler<UpdateBuildingRequest, BuildingDto>,
         IRequestHandler<UpdateListBuildingRequest, List<BuildingDto>>,
@@ -12,35 +15,67 @@ namespace McDermott.Application.Features.Queries.Medical
     {
         #region GET
 
+        public async Task<List<BuildingDto>> Handle(BulkValidateBuildingQuery request, CancellationToken cancellationToken)
+        {
+            var BuildingDtos = request.BuildingsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var BuildingNames = BuildingDtos.Select(x => x.Name).Distinct().ToList();
+            var a = BuildingDtos.Select(x => x.Code).Distinct().ToList();
+            var ab = BuildingDtos.Select(x => x.HealthCenterId).Distinct().ToList();
+
+            var existingBuildings = await _unitOfWork.Repository<Building>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => BuildingNames.Contains(v.Name)
+                            && a.Contains(v.Code)
+                            && ab.Contains(v.HealthCenterId))
+                .ToListAsync(cancellationToken);
+
+            return existingBuildings.Adapt<List<BuildingDto>>();
+        }
+
         public async Task<(List<BuildingDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBuildingQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Building>().Entities
-                    .Include(x => x.HealthCenter)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Building>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.HealthCenter.Name, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var skip = (request.PageIndex) * request.PageSize;
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<BuildingDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<BuildingDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

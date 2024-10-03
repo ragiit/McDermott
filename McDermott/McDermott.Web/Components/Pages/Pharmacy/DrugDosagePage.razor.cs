@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Pharmacy
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+
+namespace McDermott.Web.Components.Pages.Pharmacy
 {
     public partial class DrugDosagePage
     {
@@ -13,28 +15,6 @@
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                }
-                catch { }
-
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                    }
-                }
-                catch { }
-            }
         }
 
         private async Task GetUserInfo()
@@ -94,22 +74,79 @@
 
         protected override async Task OnInitializedAsync()
         {
-            IsAccess = false;
-
-            //DrugRoutes = await Mediator.Send(new GetDrugRouteQuery());
-
             await GetUserInfo();
             await LoadData();
         }
 
+        #region ComboboxDrugRoute
+
+        private DxComboBox<DrugRouteDto, long?> refDrugRouteComboBox { get; set; }
+        private int DrugRouteComboBoxIndex { get; set; } = 0;
+        private int totalCountDrugRoute = 0;
+
+        private async Task OnSearchDrugRoute()
+        {
+            await LoadDataDrugRoute();
+        }
+
+        private async Task OnSearchDrugRouteIndexIncrement()
+        {
+            if (DrugRouteComboBoxIndex < (totalCountDrugRoute - 1))
+            {
+                DrugRouteComboBoxIndex++;
+                await LoadDataDrugRoute(DrugRouteComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchDrugRouteIndexDecrement()
+        {
+            if (DrugRouteComboBoxIndex > 0)
+            {
+                DrugRouteComboBoxIndex--;
+                await LoadDataDrugRoute(DrugRouteComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputDrugRouteChanged(string e)
+        {
+            DrugRouteComboBoxIndex = 0;
+            await LoadDataDrugRoute();
+        }
+
+        private async Task LoadDataDrugRoute(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.QueryGetHelper<DrugRoute, DrugRouteDto>(pageIndex, pageSize, refDrugRouteComboBox?.Text ?? "");
+                DrugRoutes = result.Item1;
+                totalCountDrugRoute = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxDrugRoute
+
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            GetDrugDosages = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.QueryGetHelper<DrugDosage, DrugDosageDto>(pageIndex, pageSize, searchTerm);
+                GetDrugDosages = result.Item1;
+                totalCount = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         #endregion Load
@@ -118,7 +155,6 @@
 
         private async Task NewItem_Click()
         {
-            IsAddForm = true;
             await Grid.StartEditNewRowAsync();
         }
 
@@ -129,8 +165,18 @@
 
         private async Task EditItem_Click()
         {
-            IsAddForm = false;
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DrugDosageDto ?? new());
+                DrugRoutes = (await Mediator.QueryGetHelper<DrugRoute, DrugRouteDto>(predicate: x => x.Id == a.DrugRouteId)).Item1;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
@@ -138,19 +184,14 @@
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
         private async Task ExportToExcel()
         {
-            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "DrugDosages_template.xlsx",
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "medicine_dosage_template.xlsx",
             [
                 new() { Column = "Frequency", Notes = "Mandatory" },
+                new() { Column = "Route" },
                 new() { Column = "Total Qty Per Day" },
-                new() { Column = "Days" },
-                new() { Column = "Route"}
+                new() { Column = "Day" },
             ]);
         }
 
@@ -174,7 +215,7 @@
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Frequency", "Total QTy PerDay", "Day", "Route" };
+                    var headerNames = new List<string>() { "Frequency", "Route", "Total Qty Per Day", "Day" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
@@ -186,42 +227,42 @@
 
                     var list = new List<DrugDosageDto>();
 
-                    var sampleTypes = new HashSet<string>();
+                    var dr = new HashSet<string>();
                     var list1 = new List<DrugRouteDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var a = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var a = ws.Cells[row, 2].Value?.ToString()?.Trim();
 
                         if (!string.IsNullOrEmpty(a))
-                            sampleTypes.Add(a.ToLower());
+                            dr.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDrugRouteQuery(x => sampleTypes.Contains(x.Route.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetDrugRouteQuery(x => dr.Contains(x.Route.ToLower()), 0, 0))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         bool isValid = true;
 
-                        var a = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        var a = ws.Cells[row, 2].Value?.ToString()?.Trim();
 
-                        long? sampleTypeId = null;
+                        long? routeId = null;
                         if (!string.IsNullOrEmpty(a))
                         {
                             var cachedParent = list1.FirstOrDefault(x => x.Route.Equals(a, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                                ToastService.ShowErrorImport(row, 2, a ?? string.Empty);
                                 isValid = false;
                             }
                             else
                             {
-                                sampleTypeId = cachedParent.Id;
+                                routeId = cachedParent.Id;
                             }
                         }
                         else
                         {
-                            ToastService.ShowErrorImport(row, 3, a ?? string.Empty);
+                            ToastService.ShowErrorImport(row, 2, a ?? string.Empty);
                             isValid = false;
                         }
 
@@ -231,15 +272,15 @@
                         list.Add(new DrugDosageDto
                         {
                             Frequency = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? string.Empty,
-                            TotalQtyPerDay = float.Parse(ws.Cells[row, 2].Value?.ToString()?.Trim() ?? "0", CultureInfo.InvariantCulture),
-                            Days = float.Parse(ws.Cells[row, 3].Value?.ToString()?.Trim() ?? "0", CultureInfo.InvariantCulture),
-
+                            DrugRouteId = routeId,
+                            TotalQtyPerDay = float.Parse(ws.Cells[row, 3].Value?.ToString()?.Trim() ?? "0", CultureInfo.InvariantCulture),
+                            Days = float.Parse(ws.Cells[row, 4].Value?.ToString()?.Trim() ?? "0", CultureInfo.InvariantCulture),
                         });
                     }
 
                     if (list.Count > 0)
                     {
-                        list = list.DistinctBy(x => new { x.Frequency, x.TotalQtyPerDay,x.Days, }).ToList();
+                        list = list.DistinctBy(x => new { x.Frequency, x.TotalQtyPerDay, x.Days, }).ToList();
 
                         // Panggil BulkValidateLabTestQuery untuk validasi bulk
                         var existingLabTests = await Mediator.Send(new BulkValidateDrugDosageQuery(list));
@@ -248,8 +289,9 @@
                         list = list.Where(DrugDosage =>
                             !existingLabTests.Any(ev =>
                                 ev.Frequency == DrugDosage.Frequency &&
+                                ev.DrugRouteId == DrugDosage.DrugRouteId &&
                                 ev.TotalQtyPerDay == DrugDosage.TotalQtyPerDay &&
-                                ev.Days == DrugDosage.Days 
+                                ev.Days == DrugDosage.Days
                             )
                         ).ToList();
 
@@ -273,6 +315,7 @@
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteDrugDosageRequest(((DrugDosageDto)e.DataItem).Id));
@@ -282,47 +325,40 @@
                     await Mediator.Send(new DeleteDrugDosageRequest(ids: SelectedDataItems.Adapt<List<DrugDosageDto>>().Select(x => x.Id).ToList()));
                 }
 
-                await LoadData();
+                await LoadData(activePageIndex, pageSize);
             }
-            catch (Exception ee)
+            catch (Exception ex)
             {
-                ee.HandleException(ToastService);
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (DrugDosageDto)e.EditModel;
+            try
+            {
+                PanelVisible = true;
 
-            if (editModel.Id == 0)
-                await Mediator.Send(new CreateDrugDosageRequest(editModel));
-            else
-                await Mediator.Send(new UpdateDrugDosageRequest(editModel));
+                var editModel = (DrugDosageDto)e.EditModel;
 
-            await LoadData();
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateDrugDosageRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateDrugDosageRequest(editModel));
+
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Click
 
         #region Grid
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
