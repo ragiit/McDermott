@@ -1,0 +1,212 @@
+﻿@page "/medical/building-and-locations/{PageMode}"
+@using McDermott.Web.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Building and Locations</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Building and Locations" OnClickBack="@(async () => NavigationManager.NavigateTo(baseUrl))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <EditForm Model="@Building" @onkeypress="@KeyPressHandler" Context="EditFormContext22" Enhance OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <AntiforgeryToken />
+
+                                <div class="card sticky">
+                                    <div class="card-body">
+                                        <div class=" row w-100">
+                                            <div class="w-100 row justify-content-end mt-2 mb-2">
+                                                <div class="col-auto align-self-end p-0 m-0">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                    </DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelItemBuilding_Click"></DxButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-body">
+
+                                        <DataAnnotationsValidator />
+                                        <AntiforgeryToken />
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" Caption="Building Name" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@Building.Name"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Building Name" />
+                                                <ValidationMessage For="@(() => Building.Name)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" CaptionCssClass="required-caption normal-caption" Caption="Health Center" ColSpanMd="12">
+                                                <MyDxComboBox Data="@HealthCenters"
+                                                              NullText="Select Health Center"
+                                                              @ref="refHealthCenterComboBox"
+                                                              @bind-Value="@Building.HealthCenterId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputHealthCenterChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchHealthCenterIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchHealthCenter"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchHealthCenterIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="Name" />
+                                                        <DxListEditorColumn FieldName="Type" Caption="Type" />
+                                                        <DxListEditorColumn FieldName="Phone" Caption="Phone" />
+                                                        <DxListEditorColumn FieldName="Mobile" Caption="Mobile" />
+                                                        <DxListEditorColumn FieldName="Email" Caption="Email" />
+                                                        <DxListEditorColumn FieldName="WebsiteLink" Caption="Website Link" />
+                                                        <DxListEditorColumn FieldName="Street1" Caption="Street" />
+                                                        <DxListEditorColumn FieldName="Street2" Caption="Street 2" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>Building.HealthCenterId)" />
+                                            </DxFormLayoutItem>
+
+                                            @if (Building.Id != 0)
+                                            {
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" Caption="Locations" ColSpanMd="12">
+                                                    <Template>
+                                                        <MyGridPaginate @ref="GridBuildingLocations"
+                                                                        Data="BuildingLocations"
+                                                                        @bind-SelectedDataItems="@SelectedDataItemsBuildingLocations"
+                                                                        KeyFieldName="Id"
+                                                                        FocusedRowChanged="GridBuldingLocation_FocusedRowChanged"
+                                                                        EditModelSaving="OnSaveBuildingLocation"
+                                                                        SearchTextChanged="OnSearchBoxChanged"
+                                                                        DataItemDeleting="OnDeleteBuildingLocation">
+
+                                                            <ToolbarTemplate>
+                                                                <MyDxToolbarBase TItem="BuildingLocationDto"
+                                                                                 Items="@BuildingLocations"
+                                                                                 SelectedDataItems="@SelectedDataItemsBuildingLocations"
+                                                                                 NewItem_Click="@NewItemBuildingLocation_Click"
+                                                                                 EditItem_Click="() => EditItemBuildingLocation_Click()"
+                                                                                 DeleteItem_Click="@DeleteItemBuildingLocation_Click"
+                                                                                 Refresh_Click="(async () => await LoadDataBuildingLocation())"
+                                                                                 IsImport="false"
+                                                                                 Grid="GridBuildingLocations"
+                                                                                 VisibleNew="UserAccessCRUID.IsCreate"
+                                                                                 VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                                 VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                            </ToolbarTemplate>
+
+                                                            <Columns>
+                                                                <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
+                                                                <DxGridDataColumn Context="ToolbarContext" FieldName="Location.NameAndParent" Caption="Location" />
+                                                            </Columns>
+
+                                                            <TotalSummary>
+                                                                <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                                   FieldName="Location.NameAndParent"
+                                                                                   Visible="true" />
+                                                            </TotalSummary>
+
+                                                            <EditFormTemplate Context="EditFormContext">
+                                                                @{
+                                                                    var a = (BuildingLocationDto)EditFormContext.EditModel;
+                                                                }
+                                                                <DxFormLayout CssClass="w-100">
+                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Location" ColSpanMd="12">
+                                                                        <MyDxComboBox Data="@Locations"
+                                                                                      NullText="Select Location"
+                                                                                      @ref="refLocationComboBox"
+                                                                                      @bind-Value="@a.LocationId"
+                                                                                      TextFieldName="Name"
+                                                                                      ValueFieldName="Id"
+                                                                                      TextChanged="((string e) => OnInputLocationChanged(e))">
+                                                                            <Buttons>
+                                                                                <DxEditorButton Click="OnSearchLocationIndexDecrement"
+                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                Tooltip="Previous Index" />
+                                                                                <DxEditorButton Click="OnSearchLocation"
+                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                Tooltip="Search" />
+                                                                                <DxEditorButton Click="OnSearchLocationIndexIncrement"
+                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                Tooltip="Next Index" />
+                                                                            </Buttons>
+                                                                            <Columns>
+                                                                                <DxListEditorColumn FieldName="@nameof(LocationDto.NameAndParent)" Caption="Name" />
+                                                                                <DxListEditorColumn FieldName="@nameof(LocationDto.Type)" />
+                                                                                <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
+                                                                            </Columns>
+                                                                        </MyDxComboBox>
+                                                                        <ValidationMessage For="@(()=>a.LocationId)" />
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
+                                                            </EditFormTemplate>
+
+                                                        </MyGridPaginate>
+
+                                                        <div class="row">
+                                                            <DxFormLayout>
+                                                                <div class="col-md-9">
+                                                                    <DxFormLayoutItem>
+                                                                        <DxPager PageCount="totalCount"
+                                                                                 ActivePageIndexChanged="OnPageIndexChanged"
+                                                                                 ActivePageIndex="activePageIndex"
+                                                                                 VisibleNumericButtonCount="10"
+                                                                                 SizeMode="SizeMode.Medium"
+                                                                                 NavigationMode="PagerNavigationMode.Auto">
+                                                                        </DxPager>
+                                                                    </DxFormLayoutItem>
+                                                                </div>
+                                                                <div class="col-md-3 d-flex justify-content-end">
+                                                                    <DxFormLayoutItem Caption="Page Size:">
+                                                                        <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                                      NullText="Select Page Size"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                                      SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                                      @bind-Value="pageSize">
+                                                                        </MyDxComboBox>
+                                                                    </DxFormLayoutItem>
+                                                                </div>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    </Template>
+                                                </DxFormLayoutItem>
+
+                                            }
+                                        </DxFormLayout>
+
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && (!UserAccessCRUID.IsCreate && !UserAccessCRUID.IsUpdate))
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}   

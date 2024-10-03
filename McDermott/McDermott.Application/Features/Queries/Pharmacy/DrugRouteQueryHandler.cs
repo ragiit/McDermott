@@ -1,4 +1,5 @@
-﻿
+﻿using McDermott.Application.Features.Services;
+
 namespace McDermott.Application.Features.Queries.Pharmacy
 {
     public class DrugRouteQueryHandler
@@ -6,6 +7,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
          IRequestHandler<GetDrugRouteQuery, (List<DrugRouteDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetAllDrugRouteQuery, List<DrugRouteDto>>,
         IRequestHandler<ValidateDrugRouteQuery, bool>,
+        IRequestHandler<BulkValidateDrugRouteQuery, List<DrugRouteDto>>,
         IRequestHandler<CreateDrugRouteRequest, DrugRouteDto>,
         IRequestHandler<CreateListDrugRouteRequest, List<DrugRouteDto>>,
         IRequestHandler<UpdateDrugRouteRequest, DrugRouteDto>,
@@ -13,6 +15,33 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         IRequestHandler<DeleteDrugRouteRequest, bool>
     {
         #region GET
+
+        public async Task<bool> Handle(ValidateDrugRouteQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<DrugRoute>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<List<DrugRouteDto>> Handle(BulkValidateDrugRouteQuery request, CancellationToken cancellationToken)
+        {
+            var DrugRouteDtos = request.DrugRoutesToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var DrugRouteNames = DrugRouteDtos.Select(x => x.Route).Distinct().ToList();
+            var a = DrugRouteDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingDrugRoutes = await _unitOfWork.Repository<DrugRoute>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => DrugRouteNames.Contains(v.Route)
+                            && a.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingDrugRoutes.Adapt<List<DrugRouteDto>>();
+        }
 
         public async Task<List<DrugRouteDto>> Handle(GetAllDrugRouteQuery request, CancellationToken cancellationToken)
         {
@@ -50,10 +79,16 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                var query = _unitOfWork.Repository<DrugRoute>().Entities
-                    
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<DrugRoute>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -61,37 +96,30 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Route, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Route, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Route);
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Route), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<DrugRouteDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<DrugRouteDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
                 throw;
             }
-        }
-
-        public async Task<bool> Handle(ValidateDrugRouteQuery request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<DrugRoute>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         #endregion GET

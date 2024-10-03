@@ -1,86 +1,50 @@
-await LoadDataDepartment();
+await LoadDataDrugRoute();
 
- #region ComboboxDepartment
+ #region ComboboxDrugRoute
 
- private DxComboBox<DepartmentDto, long?> refDepartmentComboBox { get; set; }
- private int DepartmentComboBoxIndex { get; set; } = 0;
- private int totalCountDepartment = 0;
+ private DxComboBox<DrugRouteDto, long?> refDrugRouteComboBox { get; set; }
+ private int DrugRouteComboBoxIndex { get; set; } = 0;
+ private int totalCountDrugRoute = 0;
 
- private async Task OnSearchDepartment()
+ private async Task OnSearchDrugRoute()
  {
-     await LoadDataDepartment();
+     await LoadDataDrugRoute();
  }
 
- private async Task OnSearchDepartmentIndexIncrement()
+ private async Task OnSearchDrugRouteIndexIncrement()
  {
-     if (DepartmentComboBoxIndex < (totalCountDepartment - 1))
+     if (DrugRouteComboBoxIndex < (totalCountDrugRoute - 1))
      {
-         DepartmentComboBoxIndex++;
-         await LoadDataDepartment(DepartmentComboBoxIndex, 10);
+         DrugRouteComboBoxIndex++;
+         await LoadDataDrugRoute(DrugRouteComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchDepartmentIndexDecrement()
+ private async Task OnSearchDrugRouteIndexDecrement()
  {
-     if (DepartmentComboBoxIndex > 0)
+     if (DrugRouteComboBoxIndex > 0)
      {
-         DepartmentComboBoxIndex--;
-         await LoadDataDepartment(DepartmentComboBoxIndex, 10);
+         DrugRouteComboBoxIndex--;
+         await LoadDataDrugRoute(DrugRouteComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputDepartmentChanged(string e)
+ private async Task OnInputDrugRouteChanged(string e)
  {
-     DepartmentComboBoxIndex = 0;
-     await LoadDataDepartment();
+     DrugRouteComboBoxIndex = 0;
+     await LoadDataDrugRoute();
  }
 
-private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10)
-{
-    PanelVisible = true;
-    var result = await Mediator.Send(new GetDepartmentQuery(
-        pageIndex: pageIndex,
-        pageSize: pageSize,
-        searchTerm: refDepartmentComboBox?.Text ?? "",
-        includes:
-        [
-            x => x.Manager,
-            x => x.ParentDepartment,
-            x => x.Company,
-        ],
-        select: x => new Department
-        {
-            Id = x.Id,
-            Name = x.Name,
-            ParentDepartment = new Domain.Entities.Department
-            {
-                Name = x.Name
-            },
-            Company = new Domain.Entities.Company
-            {
-                Name = x.Name
-            },
-            Manager = new Domain.Entities.User
-            {
-                Name = x.Name
-            },
-            DepartmentCategory = x.DepartmentCategory
-        }
 
-    ));
-    Departments = result.Item1;
-    totalCountDepartment = result.pageCount;
-    PanelVisible = false;
-}
 
-private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10, long? DepartmentId = null)
+private async Task LoadDataDrugRoute(int pageIndex = 0, int pageSize = 10)
  {
     try
     {
         PanelVisible = true; 
-        var result = await Mediator.Send(new GetDepartmentQuery(DepartmentId == null ? null : x => x.Id == DepartmentId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDepartmentComboBox?.Text ?? ""));
-        Departments = result.Item1;
-        totalCountDepartment = result.pageCount;
+        var result = await Mediator.Send(new GetDrugRouteQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDrugRouteComboBox?.Text ?? ""));
+        DrugRoutes = result.Item1;
+        totalCountDrugRoute = result.pageCount;
         PanelVisible = false;
     }
     catch (Exception ex)
@@ -90,10 +54,46 @@ private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10, long
     finally { PanelVisible = false; }
  }
 
- #endregion ComboboxDepartment
+ #endregion ComboboxDrugRoute
+private async Task LoadDataDrugRoute(int pageIndex = 0, int pageSize = 10)
+{
+    PanelVisible = true;
+    var result = await Mediator.Send(new GetDrugRouteQuery(
+        pageIndex: pageIndex,
+        pageSize: pageSize,
+        searchTerm: refDrugRouteComboBox?.Text ?? "",
+        includes:
+        [
+            x => x.Manager,
+            x => x.ParentDrugRoute,
+            x => x.DrugRoute,
+        ],
+        select: x => new DrugRoute
+        {
+            Id = x.Id,
+            Name = x.Name,
+            ParentDrugRoute = new Domain.Entities.DrugRoute
+            {
+                Name = x.Name
+            },
+            DrugRoute = new Domain.Entities.DrugRoute
+            {
+                Name = x.Name
+            },
+            Manager = new Domain.Entities.User
+            {
+                Name = x.Name
+            },
+            DrugRouteCategory = x.DrugRouteCategory
+        }
 
+    ));
+    DrugRoutes = result.Item1;
+    totalCountDrugRoute = result.pageCount;
+    PanelVisible = false;
+}
 
-await LoadDataDepartment(DepartmentId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).DepartmentId);
+await LoadDataDrugRoute(DrugRouteId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).DrugRouteId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -101,32 +101,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Department" ColSpanMd="12">
-    <MyDxComboBox Data="@Departments"
-                  NullText="Select Department"
-                  @ref="refDepartmentComboBox"
-                  @bind-Value="@a.DepartmentId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="DrugRoute" ColSpanMd="12">
+    <MyDxComboBox Data="@DrugRoutes"
+                  NullText="Select DrugRoute"
+                  @ref="refDrugRouteComboBox"
+                  @bind-Value="@a.DrugRouteId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputDepartmentChanged(e))">
+                  TextChanged="((string e) => OnInputDrugRouteChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchDepartmentIndexDecrement"
+            <DxEditorButton Click="OnSearchDrugRouteIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchDepartment"
+            <DxEditorButton Click="OnSearchDrugRoute"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchDepartmentIndexIncrement"
+            <DxEditorButton Click="OnSearchDrugRouteIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(DepartmentDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Department.Name" Caption="Department" />
-            <DxListEditorColumn FieldName="@nameof(DepartmentDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(DrugRouteDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="DrugRoute.Name" Caption="DrugRoute" />
+            <DxListEditorColumn FieldName="@nameof(DrugRouteDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.DepartmentId)" />
+    <ValidationMessage For="@(()=>a.DrugRouteId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -136,7 +136,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == a.DepartmentId))).Item1;
+     Cronises = (await Mediator.Send(new GetDrugRouteQuery(x => x.Id == a.DrugRouteId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

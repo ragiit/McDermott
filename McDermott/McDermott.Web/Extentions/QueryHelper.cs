@@ -2,6 +2,8 @@
 using MediatR;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
+using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 
 namespace McDermott.Web.Extentions
 {
@@ -51,6 +53,113 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
+            else if (typeof(TDto) == typeof(UomCategoryDto))
+            {
+                var result = await mediator.Send(new GetDrugRouteQuery(
+                    predicate as Expression<Func<DrugRoute, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new DrugRoute
+                    {
+                        Id = x.Id,
+                        Route = x.Route,
+                        Code = x.Code,
+                    } : select as Expression<Func<DrugRoute, DrugRoute>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(DrugDosageDto))
+            {
+                var result = await mediator.Send(new GetDrugDosageQuery(
+                    predicate as Expression<Func<DrugDosage, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.DrugRoute
+                    ] : includes as List<Expression<Func<DrugDosage, object>>>,
+                    select: select is null ? x => new DrugDosage
+                    {
+                        Id = x.Id,
+                        Frequency = x.Frequency,
+                        TotalQtyPerDay = x.TotalQtyPerDay,
+                        Days = x.Days,
+                        DrugRouteId = x.DrugRouteId,
+                        DrugRoute = new DrugRoute
+                        {
+                            Route = x.DrugRoute.Route
+                        }
+                    } : select as Expression<Func<DrugDosage, DrugDosage>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(LabTestDto))
+            {
+                var result = await mediator.Send(new GetLabTestQuery(
+                    predicate as Expression<Func<LabTest, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.SampleType
+                    ] : includes as List<Expression<Func<LabTest, object>>>,
+                    select: select is null ? x => new LabTest
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        ResultType = x.ResultType,
+                        SampleTypeId = x.SampleTypeId,
+                        SampleType = new SampleType
+                        {
+                            Name = x.SampleType.Name
+                        }
+                    } : select as Expression<Func<LabTest, LabTest>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(LabTestDetailDto))
+            {
+                var result = await mediator.Send(new GetLabTestDetailQuery(
+                    predicate as Expression<Func<LabTestDetail, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.LabTest,
+                        x => x.LabUom,
+                    ] : includes as List<Expression<Func<LabTestDetail, object>>>,
+                    select: select is null ? x => new LabTestDetail
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NormalRangeFemale = x.NormalRangeFemale,
+                        NormalRangeMale = x.NormalRangeMale,
+                        LabTestId = x.LabTestId,
+                        LabTest = new LabTest
+                        {
+                            Name = x.LabTest.Name
+                        },
+                        LabUomId = x.LabUomId,
+                        LabUom = new LabUom
+                        {
+                            Name = x.LabUom.Name
+                        },
+                        ResultValueType = x.ResultValueType,
+                        Remark = x.Remark,
+                        ResultType = x.ResultType
+                    } : select as Expression<Func<LabTestDetail, LabTestDetail>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
             else if (typeof(TDto) == typeof(ProductCategoryDto))
             {
                 var result = await mediator.Send(new GetProductCategoryQuery(
@@ -64,6 +173,23 @@ namespace McDermott.Web.Extentions
                         Name = x.Name,
                         Code = x.Code,
                     } : select as Expression<Func<ProductCategory, ProductCategory>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(LabUomDto))
+            {
+                var result = await mediator.Send(new GetLabUomQuery(
+                    predicate as Expression<Func<LabUom, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new LabUom
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    } : select as Expression<Func<LabUom, LabUom>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -141,6 +267,116 @@ namespace McDermott.Web.Extentions
                             Name = x.Parent.Name
                         }
                     } : select as Expression<Func<Menu, Menu>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(ActiveComponentDto))
+            {
+                var result = await mediator.Send(new GetActiveComponentQuery(
+                    predicate as Expression<Func<ActiveComponent, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Uom
+                    ] : includes as List<Expression<Func<ActiveComponent, object>>>,
+                    select: select is null ? x => new ActiveComponent
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        AmountOfComponent = x.AmountOfComponent,
+                        UomId = x.UomId,
+                        Uom = new Uom
+                        {
+                            Name = x.Uom.Name
+                        }
+                    } : select as Expression<Func<ActiveComponent, ActiveComponent>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(LocationDto))
+            {
+                var result = await mediator.Send(new GetLocationQuery(
+                    predicate as Expression<Func<Locations, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.ParentLocation,
+                        x => x.Company,
+                    ] : includes as List<Expression<Func<Locations, object>>>,
+                    select: select is null ? x => new Locations
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Type = x.Type,
+                        ParentLocationId = x.ParentLocationId,
+                        CompanyId = x.CompanyId,
+                        Company = new Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        ParentLocation = new Locations
+                        {
+                            Name = x.ParentLocation.Name
+                        }
+                    } : select as Expression<Func<Locations, Locations>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(BuildingDto))
+            {
+                var result = await mediator.Send(new GetBuildingQuery(
+                    predicate as Expression<Func<Building, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.HealthCenter
+                    ] : includes as List<Expression<Func<Building, object>>>,
+                    select: select is null ? x => new Building
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        HealthCenterId = x.HealthCenterId,
+                        HealthCenter = new HealthCenter
+                        {
+                            Name = x.HealthCenter.Name
+                        }
+                    } : select as Expression<Func<Building, Building>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(BuildingLocationDto))
+            {
+                var result = await mediator.Send(new GetBuildingLocationQuery(
+                    predicate as Expression<Func<BuildingLocation, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    includes: includes is null ?
+                    [
+                        x => x.Building,
+                        x => x.Location,
+                    ] : includes as List<Expression<Func<BuildingLocation, object>>>,
+                    select: select is null ? x => new BuildingLocation
+                    {
+                        Id = x.Id,
+                        LocationId = x.LocationId,
+                        BuildingId = x.BuildingId,
+                        Location = new Locations
+                        {
+                            Name = x.Location.Name
+                        }
+                    } : select as Expression<Func<BuildingLocation, BuildingLocation>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -414,6 +650,56 @@ namespace McDermott.Web.Extentions
                         Name = x.Name,
                         Description = x.Description
                     } : select as Expression<Func<Occupational, Occupational>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(DrugFormDto))
+            {
+                var result = await mediator.Send(new GetDrugFormQuery(
+                    predicate as Expression<Func<DrugForm, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new DrugForm
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code
+                    } : select as Expression<Func<DrugForm, DrugForm>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(DrugRouteDto))
+            {
+                var result = await mediator.Send(new GetDrugRouteQuery(
+                    predicate as Expression<Func<DrugRoute, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new DrugRoute
+                    {
+                        Id = x.Id,
+                        Route = x.Route,
+                        Code = x.Code
+                    } : select as Expression<Func<DrugRoute, DrugRoute>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(SignaDto))
+            {
+                var result = await mediator.Send(new GetSignaQuery(
+                    predicate as Expression<Func<Signa, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new Signa
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    } : select as Expression<Func<Signa, Signa>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

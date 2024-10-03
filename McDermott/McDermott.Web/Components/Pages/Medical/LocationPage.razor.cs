@@ -93,6 +93,7 @@ namespace McDermott.Web.Components.Pages.Medical
             await GetUserInfo();
             await LoadData();
             await LoadDataParentLocations();
+            await LoadDataCompanies();
             PanelVisible = false;
 
             return;
@@ -114,8 +115,7 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                SelectedDataItems = [];
-                var result = await Mediator.Send(new GetLocationQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var result = await Mediator.QueryGetHelper<Locations, LocationDto>(pageIndex, pageSize, searchTerm);
                 Locations = result.Item1;
                 totalCount = result.pageCount;
                 PanelVisible = false;
@@ -223,7 +223,7 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetCompanyQuery(searchTerm: refCompaniesComboBox.Text, pageSize: pageSize, pageIndex: pageIndex));
+                var result = await Mediator.Send(new GetCompanyQuery(searchTerm: refCompaniesComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
                 Companies = result.Item1;
                 totalCountCompanies = result.pageCount;
                 PanelVisible = false;
@@ -301,17 +301,20 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as LocationDto ?? new());
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetLocationQuery(x => x.Id == a.ParentLocationId));
-            ParentLocations = result.Item1.Where(x => x.ParentLocationId is not null).OrderBy(x => x.Name).ToList();
-            totalCountParentLocations = result.pageCount;
-            var ax = await Mediator.Send(new GetCompanyQuery(x => x.Id == a.CompanyId));
-            Companies = ax.Item1;
-            totalCountCompanies = ax.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as LocationDto ?? new());
+                ParentLocations = (await Mediator.QueryGetHelper<Locations, LocationDto>(predicate: x => x.Id == a.ParentLocationId)).Item1;
+                Companies = (await Mediator.QueryGetHelper<Company, CompanyDto>(predicate: x => x.Id == a.ParentLocationId)).Item1;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()

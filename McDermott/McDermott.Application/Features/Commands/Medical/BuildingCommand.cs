@@ -2,15 +2,23 @@
 {
     public class BuildingCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetBuildingQuery(Expression<Func<Building, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<BuildingDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetBuildingQuery(Expression<Func<Building, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Building, object>>>? includes = null, Expression<Func<Building, Building>>? select = null) : IRequest<(List<BuildingDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Building, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Building, object>>> Includes { get; } = includes!;
+            public Expression<Func<Building, Building>>? Select { get; } = select!;
+        }
+
+        public class BulkValidateBuildingQuery(List<BuildingDto> BuildingsToValidate) : IRequest<List<BuildingDto>>
+        {
+            public List<BuildingDto> BuildingsToValidate { get; } = BuildingsToValidate;
         }
 
         public class ValidateBuildingQuery(Expression<Func<Building, bool>>? predicate = null) : IRequest<bool>
@@ -18,7 +26,7 @@
             public Expression<Func<Building, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion  
+        #endregion GET
 
         #region CREATE
 

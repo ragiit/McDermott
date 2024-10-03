@@ -1,23 +1,30 @@
-﻿
-
-namespace McDermott.Application.Features.Commands.Pharmacy
+﻿namespace McDermott.Application.Features.Commands.Pharmacy
 {
     public class DrugRouteCommand
     {
-        #region GET  
+        #region GET
 
         public class GetAllDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DrugRouteDto>>
         {
             public Expression<Func<DrugRoute, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
-        public class GetDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DrugRouteDto>, int pageIndex, int pageSize, int pageCount)>
+
+        public class GetDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<DrugRoute, object>>>? includes = null, Expression<Func<DrugRoute, DrugRoute>>? select = null) : IRequest<(List<DrugRouteDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<DrugRoute, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<DrugRoute, object>>> Includes { get; } = includes!;
+            public Expression<Func<DrugRoute, DrugRoute>>? Select { get; } = select!;
+        }
+
+        public class BulkValidateDrugRouteQuery(List<DrugRouteDto> DrugRoutesToValidate) : IRequest<List<DrugRouteDto>>
+        {
+            public List<DrugRouteDto> DrugRoutesToValidate { get; } = DrugRoutesToValidate;
         }
 
         public class ValidateDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null) : IRequest<bool>
@@ -25,7 +32,7 @@ namespace McDermott.Application.Features.Commands.Pharmacy
             public Expression<Func<DrugRoute, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+        #endregion GET
 
         #region CREATE
 

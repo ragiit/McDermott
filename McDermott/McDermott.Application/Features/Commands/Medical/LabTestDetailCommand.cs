@@ -3,18 +3,23 @@
     public class LabTestDetailCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetAllLabTestDetailQuery(Expression<Func<LabTestDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<LabTestDetailDto>>
         {
             public Expression<Func<LabTestDetail, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
-        public class GetLabTestDetailQuery(Expression<Func<LabTestDetail, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)>
+
+        public class GetLabTestDetailQuery(Expression<Func<LabTestDetail, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<LabTestDetail, object>>>? includes = null, Expression<Func<LabTestDetail, LabTestDetail>>? select = null) : IRequest<(List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<LabTestDetail, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<LabTestDetail, object>>> Includes { get; } = includes!;
+            public Expression<Func<LabTestDetail, LabTestDetail>>? Select { get; } = select!;
         }
 
         public class ValidateLabTestDetailQuery(Expression<Func<LabTestDetail, bool>>? predicate = null) : IRequest<bool>

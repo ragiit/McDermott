@@ -1,4 +1,5 @@
-﻿using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
@@ -50,10 +51,16 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<LabTestDetail>().Entities
-                    .Include(x=>x.LabUom)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<LabTestDetail>().Entities.AsNoTracking();
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -62,22 +69,28 @@ namespace McDermott.Application.Features.Queries.Medical
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ResultType, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.NormalRangeMale, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.NormalRangeFemale, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.LabUom.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.ResultValueType, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Remark, $"%{request.SearchTerm}%")
+                        );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
 
-                var skip = (request.PageIndex) * request.PageSize;
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                                  query,
+                                  request.PageSize,
+                                  request.PageIndex,
+                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
+                                  cancellationToken);
 
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<LabTestDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<LabTestDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {

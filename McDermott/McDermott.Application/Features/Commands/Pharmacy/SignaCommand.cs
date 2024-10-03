@@ -9,13 +9,28 @@ namespace McDermott.Application.Features.Commands.Pharmacy
 {
     public class SignaCommand
     {
-
         #region GET
 
-        public class GetSignaQuery(Expression<Func<Signa, bool>>? predicate = null, bool removeCache = false) : IRequest<List<SignaDto>>
+        public class GetSignaQuery(Expression<Func<Signa, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Signa, object>>>? includes = null, Expression<Func<Signa, Signa>>? select = null) : IRequest<(List<SignaDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Signa, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<Signa, object>>> Includes { get; } = includes!;
+            public Expression<Func<Signa, Signa>>? Select { get; } = select!;
+        }
+
+        public class BulkValidateSignaQuery(List<SignaDto> SignasToValidate) : IRequest<List<SignaDto>>
+        {
+            public List<SignaDto> SignasToValidate { get; } = SignasToValidate;
+        }
+
+        public class ValidateSignaQuery(Expression<Func<Signa, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<Signa, bool>> Predicate { get; } = predicate!;
         }
 
         #endregion GET
@@ -26,6 +41,7 @@ namespace McDermott.Application.Features.Commands.Pharmacy
         {
             public SignaDto SignaDto { get; set; } = SignaDto;
         }
+
         public class CreateListSignaRequest(List<SignaDto> Signas) : IRequest<List<SignaDto>>
         {
             public List<SignaDto> SignaDtos { get; set; } = Signas;

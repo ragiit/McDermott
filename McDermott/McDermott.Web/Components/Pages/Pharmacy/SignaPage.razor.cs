@@ -60,23 +60,55 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             await LoadData();
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            Signas = await Mediator.Send(new GetSignaQuery());
-            PanelVisible = false;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var a = await Mediator.QueryGetHelper<Signa, SignaDto>(pageIndex, pageSize, searchTerm);
+                Signas = a.Item1;
+                totalCount = a.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #region Grid
 
-        protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
-        {
-            InvokeAsync(StateHasChanged);
-        }
-
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
+            PanelVisible = true;
             foreach (var file in e.GetMultipleFiles(1))
             {
                 try
@@ -89,7 +121,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Code" };
+                    var headerNames = new List<string>() { "Name" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString().Trim().ToLower()))
@@ -98,48 +130,42 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         return;
                     }
 
-                    var countries = new List<SignaDto>();
+                    var list = new List<SignaDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var Signa = new SignaDto
+                        list.Add(new SignaDto
                         {
                             Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
-                        };
-
-                        //if (!Countries.Any(x => x.Name.Trim().ToLower() == Signa.Name.Trim().ToLower()) && !countries.Any(x => x.Name.Trim().ToLower() == Signa.Name.Trim().ToLower()))
-                        ////countries.Add(Signa);
+                        });
                     }
 
-                    await Mediator.Send(new CreateListSignaRequest(countries));
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name }).ToList();
 
-                    await LoadData();
+                        var existingVillages = await Mediator.Send(new BulkValidateSignaQuery(list));
+
+                        list = list.Where(village => !existingVillages.Any(ev => ev.Name == village.Name)).ToList();
+
+                        await Mediator.Send(new CreateListSignaRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+                finally { PanelVisible = false; }
             }
         }
 
         private async Task Refresh_Click()
         {
             await LoadData();
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
-        }
-
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -162,35 +188,6 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private void ColumnChooserButton_Click()
-        {
-            Grid.ShowColumnChooser();
-        }
-
-        private async Task ExportXlsxItem_Click()
-        {
-            await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportXlsItem_Click()
-        {
-            await Grid.ExportToXlsAsync("ExportResult", new GridXlExportOptions()
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
-        private async Task ExportCsvItem_Click()
-        {
-            await Grid.ExportToCsvAsync("ExportResult", new GridCsvExportOptions
-            {
-                ExportSelectedRowsOnly = true,
-            });
-        }
-
         private async Task ImportFile()
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
@@ -200,6 +197,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             try
             {
+                PanelVisible = true;
                 if (SelectedDataItems is null)
                 {
                     await Mediator.Send(new DeleteSignaRequest(((SignaDto)e.DataItem).Id));
@@ -212,30 +210,54 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                 SelectedDataItems = [];
                 await LoadData();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                ToastService.ShowError(ex.Message);
             }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
             {
+                PanelVisible = true;
+
                 var editModel = (SignaDto)e.EditModel;
 
-                if (string.IsNullOrWhiteSpace(editModel.Name))
+                var checkExistingName = await Mediator.Send(new ValidateSignaQuery(x => x.Name == editModel.Name && x.Id != editModel.Id));
+                if (checkExistingName)
+                {
+                    ToastService.ShowInfo($"Signa with name '{editModel.Name}' is already exists");
+                    e.Cancel = true;
+
                     return;
+                }
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateSignaRequest(editModel));
                 else
                     await Mediator.Send(new UpdateSignaRequest(editModel));
 
-                await LoadData();
+                await LoadData(activePageIndex, pageSize);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Grid
+
+        private List<ExportFileData> ExportTemp =
+        [
+            new() { Column = "Name", Notes = "Mandatory" }
+        ];
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "signa_template.xlsx", ExportTemp);
+        }
     }
 }

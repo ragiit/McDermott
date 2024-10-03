@@ -1,17 +1,32 @@
-﻿
-namespace McDermott.Application.Features.Commands.Pharmacy
+﻿namespace McDermott.Application.Features.Commands.Pharmacy
 {
     public class ActiveComponentCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetActiveComponentQuery(Expression<Func<ActiveComponent, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ActiveComponentDto>>
+        public class GetActiveComponentQuery(Expression<Func<ActiveComponent, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<ActiveComponent, object>>>? includes = null, Expression<Func<ActiveComponent, ActiveComponent>>? select = null) : IRequest<(List<ActiveComponentDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<ActiveComponent, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+            public string SearchTerm { get; } = searchTerm!;
+            public int PageIndex { get; } = pageIndex;
+            public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<ActiveComponent, object>>> Includes { get; } = includes!;
+            public Expression<Func<ActiveComponent, ActiveComponent>>? Select { get; } = select!;
         }
 
-        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+        public class BulkValidateActiveComponentQuery(List<ActiveComponentDto> ActiveComponentsToValidate) : IRequest<List<ActiveComponentDto>>
+        {
+            public List<ActiveComponentDto> ActiveComponentsToValidate { get; } = ActiveComponentsToValidate;
+        }
+
+        public class ValidateActiveComponentQuery(Expression<Func<ActiveComponent, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<ActiveComponent, bool>> Predicate { get; } = predicate!;
+        }
+
+        #endregion GET
 
         #region CREATE
 

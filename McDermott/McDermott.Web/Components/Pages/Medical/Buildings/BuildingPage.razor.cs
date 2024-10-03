@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 
-namespace McDermott.Web.Components.Pages.Medical
+namespace McDermott.Web.Components.Pages.Medical.Buildings
 {
     public partial class BuildingPage
     {
@@ -63,10 +63,10 @@ namespace McDermott.Web.Components.Pages.Medical
 
         protected override async Task OnInitializedAsync()
         {
-            var HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
-            this.HealthCenters = HealthCenters.Item1;
-            var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            this.Locations = Locations;
+            //var HealthCenters = await Mediator.Send(new GetHealthCenterQuery());
+            //this.HealthCenters = HealthCenters.Item1;
+            //var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
+            //this.Locations = Locations;
 
             await GetUserInfo();
             await LoadData();
@@ -81,19 +81,22 @@ namespace McDermott.Web.Components.Pages.Medical
             ShowForm = false;
         }
 
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var Buildings = await Mediator.Send(new GetBuildingQuery());
-            this.Buildings = Buildings.Item1;
-            ShowForm = false;
-            PanelVisible = false;
-        }
-
-        private void Grid_CustomizeDataRowEditor(GridCustomizeDataRowEditorEventArgs e)
-        {
-            ((ITextEditSettings)e.EditSettings).ShowValidationIcon = true;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var a = await Mediator.QueryGetHelper<Building, BuildingDto>(pageIndex, pageSize, searchTerm);
+                Buildings = a.Item1;
+                totalCount = a.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -164,23 +167,9 @@ namespace McDermott.Web.Components.Pages.Medical
             SelectedBuildingLocationDataItems = new ObservableRangeCollection<object>();
         }
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            EditItemsEnabled = true;
         }
 
         private void GridBuildingLocation_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -218,8 +207,37 @@ namespace McDermott.Web.Components.Pages.Medical
             FormValidationState = false;
         }
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
+
         private void NewItem_Click()
         {
+            NavigationManager.NavigateTo($"medical/building-and-locations/{EnumPageMode.Create.GetDisplayName()}");
+            return;
+
             ShowForm = true;
             BuildingLocations = [];
             Building = new();
@@ -231,6 +249,9 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 Building = SelectedDataItems[0].Adapt<BuildingDto>();
+                NavigationManager.NavigateTo($"medical/building-and-locations/{EnumPageMode.Update.GetDisplayName()}?Id={Building.Id}");
+
+                return;
                 ShowForm = true;
 
                 if (Building != null)

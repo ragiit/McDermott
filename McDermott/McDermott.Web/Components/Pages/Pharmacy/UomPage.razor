@@ -113,6 +113,7 @@
                                             <DxFormLayoutItem Visible="@(!a.Type.Equals("Reference Unit of Measure for this category"))" CaptionCssClass="normal-caption" Caption="Ratio" ColSpanMd="12">
                                                 <DxSpinEdit @bind-Value="@a.BiggerRatio"
                                                             NullText="Bigger Ratio..."
+                                                            MinValue="1"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             BindValueMode="BindValueMode.OnInput" />
                                                 <ValidationMessage For="@(()=> a.BiggerRatio)"   />
@@ -125,6 +126,7 @@
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Rounding Precision" ColSpanMd="12">
                                                 <DxSpinEdit @bind-Value="@a.RoundingPrecision"
+                                                            MinValue="1"
                                                             NullText="Rounding Precision..."
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             BindValueMode="BindValueMode.OnInput" />

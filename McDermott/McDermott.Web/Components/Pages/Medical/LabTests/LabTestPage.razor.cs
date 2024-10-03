@@ -5,7 +5,7 @@ using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 
-namespace McDermott.Web.Components.Pages.Medical.LabTest
+namespace McDermott.Web.Components.Pages.Medical.LabTests
 {
     public partial class LabTestPage
     {
@@ -154,14 +154,20 @@ namespace McDermott.Web.Components.Pages.Medical.LabTest
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            ShowForm = false;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLabTestQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            LabTests = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.QueryGetHelper<LabTest, LabTestDto>(pageIndex, pageSize, searchTerm);
+                LabTests = result.Item1;
+                totalCount = result.pageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion LoadData
