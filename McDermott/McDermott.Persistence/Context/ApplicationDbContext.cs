@@ -143,6 +143,7 @@ namespace McDermott.Persistence.Context
         public DbSet<TransactionStock> TransactionStocks { get; set; }
         public DbSet<Maintainance> Maintainances { get; set; }
         public DbSet<MaintainanceRecord> MaintainanceRecords { get; set; }
+        public DbSet<MaintainanceProduct> MaintainanceProducts { get; set; }
 
         #endregion Pharmacy
 

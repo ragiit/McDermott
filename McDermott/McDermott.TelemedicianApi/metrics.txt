@@ -1,4 +1,4 @@
-# TIMESTAMP: 638635454624241998
+# TIMESTAMP: 638635441190611856
 # MEASUREMENT: [appmetrics.internal] report_success  items
 # TAGS:
                    item = App.Metrics.Reporting.TextFile.TextFileMetricsReporter
@@ -8,7 +8,7 @@
                   total = 1
                 percent = 100
 --------------------------------------------------------------
-# TIMESTAMP: 638635454624241998
+# TIMESTAMP: 638635441190611856
 # MEASUREMENT: [appmetrics.internal] report_success
 # TAGS:
                   mtype = counter
@@ -16,7 +16,7 @@
 # FIELDS:
                   value = 1
 --------------------------------------------------------------
-# TIMESTAMP: 638635454624241998
+# TIMESTAMP: 638635441190611856
 # MEASUREMENT: [Application] Request Duration
 # TAGS:
                   mtype = timer
@@ -24,23 +24,23 @@
                unit_dur = ms
               unit_rate = min
 # FIELDS:
-            count.meter = 12
-                 rate1m = 3.2286928687553736E-08
-                 rate5m = 1.3347534216485202
-                rate15m = 24.96378949411676
-              rate.mean = 0.5416316540920137
-                samples = 12
-                   last = 17.7226
-             count.hist = 12
-                    sum = 927.52
-                    min = 0.6504
-                    max = 251.5212
-                   mean = 67.96781127455016
-                 median = 31.197699999999998
-                 stddev = 72.72187937007529
-                   p999 = 251.5212
-                    p99 = 251.5212
-                    p98 = 251.5212
-                    p95 = 251.5212
-                    p75 = 124.1531
+            count.meter = 3
+                 rate1m = 0.000300779639418704
+                 rate5m = 2.50902757696198
+                rate15m = 11.305568426814318
+              rate.mean = 0.2616808333706236
+                samples = 3
+                   last = 4195.1055
+             count.hist = 3
+                    sum = 4706.8688
+                    min = 150.2282
+                    max = 4195.1055
+                   mean = 1766.1718561373682
+                 median = 361.5351
+                 stddev = 1916.5995806101357
+                   p999 = 4195.1055
+                    p99 = 4195.1055
+                    p98 = 4195.1055
+                    p95 = 4195.1055
+                    p75 = 4195.1055
 --------------------------------------------------------------

@@ -15,8 +15,6 @@ namespace McDermott.Domain.Entities
         public DateTime? RequestDate { get; set; }
         public DateTime? ScheduleDate { get; set; }
         public long? ResponsibleById { get; set; }
-        public long? EquipmentId {  get; set; }
-        public string? SerialNumber { get; set; }
         public bool? isCorrective {  get; set; }
         public bool? isPreventive {  get; set; }
         public bool? isInternal { get; set; }
@@ -26,14 +24,11 @@ namespace McDermott.Domain.Entities
         public int? RepeatNumber {  get; set; }
         public string? RepeatWork {  get; set; }
         public EnumStatusMaintainance? Status {  get; set; }
-        public string? Note {  get; set; }
 
         [SetToNull]
         public virtual User? RequestBy { get; set; }
         [SetToNull]
         public virtual User? ResponsibleBy { get; set; }
-        [SetToNull]
-        public virtual Product? Equipment { get; set; }
         [SetToNull]
         public virtual Locations? Location { get; set; }
 
