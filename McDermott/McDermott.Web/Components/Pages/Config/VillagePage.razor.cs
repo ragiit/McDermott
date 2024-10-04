@@ -44,7 +44,7 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadDataCity(0, 10);
         }
 
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10, long? cityId = null, Expression<Func<Domain.Entities.City, bool>>? predicate = null)
+        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
@@ -433,9 +433,26 @@ namespace McDermott.Web.Components.Pages.Config
                             districtNames.Add(district.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name), 0, 0))).Item1;
-                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name), 0, 0))).Item1;
-                    list3 = (await Mediator.Send(new GetDistrictQuery(x => districtNames.Contains(x.Name), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name.ToLower()), 0, 0,
+                         select: x => new Province
+                         {
+                             Id = x.Id,
+                             Name = x.Name
+                         }))).Item1;
+
+                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new City
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
+
+                    list3 = (await Mediator.Send(new GetDistrictQuery(x => districtNames.Contains(x.Name), 0, 0,
+                        select: x => new District
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

@@ -35,10 +35,29 @@
             public List<UserDto> UsersToValidate { get; } = UsersToValidate;
         }
 
+        public class BulkValidateEmployeeQuery(List<UserDto> UsersToValidate) : IRequest<List<UserDto>>
+        {
+            public List<UserDto> UsersToValidate { get; } = UsersToValidate;
+        }
+
         public class GetUserQuery(Expression<Func<User, bool>>? predicate = null, bool removeCache = false) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
+        }
+
+        //public class GetSingleUserQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<UserDto>
+        //{
+        //    public Expression<Func<User, bool>> Predicate { get; } = predicate!;
+        //}
+
+        public class GetSingleUserQuery : IRequest<UserDto>
+        {
+            public List<Expression<Func<User, object>>> Includes { get; set; }
+            public Expression<Func<User, bool>> Predicate { get; set; }
+            public Expression<Func<User, User>> Select { get; set; }
+            public Expression<Func<User, object>> OrderBy { get; set; }
+            public bool IsDescending { get; set; } = false; // default to ascending
         }
 
         public class GetUserInfoGroupQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>

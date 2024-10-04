@@ -274,7 +274,12 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
                             sampleTypes.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetSampleTypeQuery(x => sampleTypes.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetSampleTypeQuery(x => sampleTypes.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new SampleType
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

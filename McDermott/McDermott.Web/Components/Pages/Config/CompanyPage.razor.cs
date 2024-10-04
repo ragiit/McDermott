@@ -73,13 +73,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var countries = await Mediator.Send(new GetCompanyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Companys = countries.Item1;
-            totalCount = countries.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var countries = await Mediator.Send(new GetCompanyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                Companys = countries.Item1;
+                totalCount = countries.pageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         protected override async Task OnInitializedAsync()
@@ -159,25 +167,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CompanyDto ?? new());
-
-            PanelVisible = true;
-
-            var resultz = await Mediator.Send(new GetCountryQuery(x => x.Id == a.CountryId));
-            Countries = resultz.Item1;
-            totalCountCountry = resultz.pageCount;
-
-            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == a.CountryId && x.Id == a.ProvinceId));
-            Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
-
-            var resultx = await Mediator.Send(new GetCityQuery(x => x.Id == a.CityId && x.ProvinceId == a.ProvinceId));
-            Cities = resultx.Item1;
-            totalCountCity = resultx.pageCount;
-
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CompanyDto ?? new());
+                Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == a.CountryId)).Item1;
+                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
+                Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click()
@@ -272,14 +276,21 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-
-            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
-            var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
+                var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+                Cities = result.Item1;
+                totalCountCity = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxCity
@@ -321,12 +332,20 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
-            Countries = result.Item1;
-            totalCountCountry = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+                Countries = result.Item1;
+                totalCountCountry = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboboxCountry

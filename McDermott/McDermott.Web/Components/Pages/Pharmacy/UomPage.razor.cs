@@ -313,7 +313,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                             uomNames.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetUomCategoryQuery(x => uomNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetUomCategoryQuery(x => uomNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new UomCategory
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

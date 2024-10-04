@@ -5,6 +5,7 @@ using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using McDermott.Persistence.Migrations;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+using Group = McDermott.Domain.Entities.Group;
 
 namespace McDermott.Web.Components.Pages.Config.Users
 {
@@ -111,7 +112,13 @@ namespace McDermott.Web.Components.Pages.Config.Users
                             religionNames.Add(b.ToLower());
                     }
 
-                    groups = (await Mediator.Send(new GetGroupQuery(x => groupNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    groups = (await Mediator.Send(new GetGroupQuery(x => groupNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new Group
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
+
                     religions = (await Mediator.Send(new GetReligionQuery(x => religionNames.Contains(x.Name.ToLower()))));
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)

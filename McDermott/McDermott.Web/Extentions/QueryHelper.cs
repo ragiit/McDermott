@@ -229,6 +229,10 @@ namespace McDermott.Web.Extentions
                         Menu = new Menu
                         {
                             Name = x.Menu.Name,
+                            Parent = new Menu
+                            {
+                                Name = x.Menu.Parent.Name
+                            }
                         },
 
                         IsCreate = x.IsCreate,

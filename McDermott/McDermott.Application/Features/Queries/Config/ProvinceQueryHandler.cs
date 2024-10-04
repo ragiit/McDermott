@@ -7,12 +7,31 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetProvinceQuery, (List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateProvinceQuery, bool>,
         IRequestHandler<CreateProvinceRequest, ProvinceDto>,
+        IRequestHandler<BulkValidateProvinceQuery, List<ProvinceDto>>,
         IRequestHandler<CreateListProvinceRequest, List<ProvinceDto>>,
         IRequestHandler<UpdateProvinceRequest, ProvinceDto>,
         IRequestHandler<UpdateListProvinceRequest, List<ProvinceDto>>,
         IRequestHandler<DeleteProvinceRequest, bool>
     {
         #region GET
+
+        public async Task<List<ProvinceDto>> Handle(BulkValidateProvinceQuery request, CancellationToken cancellationToken)
+        {
+            var ProvinceDtos = request.ProvincesToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ProvinceNames = ProvinceDtos.Select(x => x.Name).Distinct().ToList();
+            var a = ProvinceDtos.Select(x => x.CountryId).Distinct().ToList();
+
+            var existingProvinces = await _unitOfWork.Repository<Province>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ProvinceNames.Contains(v.Name)
+                            && a.Contains(v.CountryId))
+                .ToListAsync(cancellationToken);
+
+            return existingProvinces.Adapt<List<ProvinceDto>>();
+        }
 
         public async Task<bool> Handle(ValidateProvinceQuery request, CancellationToken cancellationToken)
         {

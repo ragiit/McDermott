@@ -114,8 +114,18 @@ namespace McDermott.Web.Components.Pages.Medical
                             b.Add(bb.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDiseaseCategoryQuery(x => a.Contains(x.Name.ToLower()), 0, 0))).Item1;
-                    list2 = (await Mediator.Send(new GetCronisCategoryQuery(x => b.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetDiseaseCategoryQuery(x => a.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new DiseaseCategory
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
+                    list2 = (await Mediator.Send(new GetCronisCategoryQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new CronisCategory
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

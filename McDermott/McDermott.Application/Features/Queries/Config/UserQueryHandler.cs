@@ -12,15 +12,79 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetUserQuerys, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateUserQuery, bool>,
         IRequestHandler<BulkValidateUserQuery, List<UserDto>>,
+        IRequestHandler<BulkValidateEmployeeQuery, List<UserDto>>,
         IRequestHandler<GetUserQuery2, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetUserInfoGroupQuery, List<UserDto>>,
         IRequestHandler<GetDataUserForKioskQuery, List<UserDto>>,
         IRequestHandler<CreateUserRequest, UserDto>,
+        IRequestHandler<GetSingleUserQuery, UserDto>,
         IRequestHandler<CreateListUserRequest, List<UserDto>>,
         IRequestHandler<UpdateUserRequest, UserDto>,
         IRequestHandler<DeleteUserRequest, bool>
     {
         #region Get
+
+        public async Task<List<UserDto>> Handle(BulkValidateEmployeeQuery request, CancellationToken cancellationToken)
+        {
+            var userDtos = request.UsersToValidate;
+
+            // Get distinct values from UserDtos
+            var userNames = userDtos.Select(x => x.Name).Distinct().ToList();
+            var groupIds = userDtos.Select(x => x.GroupId).Distinct().ToList();
+            var identityNumbers = userDtos.Select(x => x.NoId).Distinct().ToList();
+            var religionIds = userDtos.Select(x => x.ReligionId).Distinct().ToList();
+            var datesOfBirth = userDtos.Select(x => x.DateOfBirth).Distinct().ToList();
+            var genders = userDtos.Select(x => x.Gender).Distinct().ToList();
+            var martialStatuses = userDtos.Select(x => x.MartialStatus).Distinct().ToList();
+            var mobilePhones = userDtos.Select(x => x.MobilePhone).Distinct().ToList();
+            var currentMobiles = userDtos.Select(x => x.CurrentMobile).Distinct().ToList();
+            var homePhoneNumbers = userDtos.Select(x => x.HomePhoneNumber).Distinct().ToList();
+            var npwps = userDtos.Select(x => x.Npwp).Distinct().ToList();
+            var emergencyNames = userDtos.Select(x => x.EmergencyName).Distinct().ToList();
+            var emergencyEmails = userDtos.Select(x => x.EmergencyEmail).Distinct().ToList();
+            var emergencyPhones = userDtos.Select(x => x.EmergencyPhone).Distinct().ToList();
+            var isEmployees = userDtos.Select(x => x.IsEmployee).Distinct().ToList();
+            var noBpjsKs = userDtos.Select(x => x.NoBpjsKs).Distinct().ToList();
+            var noBpjsTk = userDtos.Select(x => x.NoBpjsTk).Distinct().ToList();
+            var legacies = userDtos.Select(x => x.Legacy).Distinct().ToList();
+            var saps = userDtos.Select(x => x.SAP).Distinct().ToList();
+            var nips = userDtos.Select(x => x.NIP).Distinct().ToList();
+            var oracles = userDtos.Select(x => x.Oracle).Distinct().ToList();
+            var employeeTypes = userDtos.Select(x => x.EmployeeType).Distinct().ToList();
+            var joinDates = userDtos.Select(x => x.JoinDate).Distinct().ToList();
+
+            // Fetch existing users
+            var existingUsers = await _unitOfWork.Repository<User>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => userNames.Contains(v.Name) &&
+                            groupIds.Contains(v.GroupId) &&
+                            identityNumbers.Contains(v.NoId) &&
+                            religionIds.Contains(v.ReligionId) &&
+                            datesOfBirth.Contains(v.DateOfBirth) &&
+                            genders.Contains(v.Gender) &&
+                            martialStatuses.Contains(v.MartialStatus) &&
+                            mobilePhones.Contains(v.MobilePhone) &&
+                            currentMobiles.Contains(v.CurrentMobile) &&
+                            homePhoneNumbers.Contains(v.HomePhoneNumber) &&
+                            npwps.Contains(v.Npwp) &&
+                            emergencyNames.Contains(v.EmergencyName) &&
+                            emergencyEmails.Contains(v.EmergencyEmail) &&
+                            emergencyPhones.Contains(v.EmergencyPhone) &&
+                            isEmployees.Contains(v.IsEmployee) && // Match by IsEmployee
+                            noBpjsKs.Contains(v.NoBpjsKs) && // Match by NoBpjsKs
+                            noBpjsTk.Contains(v.NoBpjsTk) && // Match by NoBpjsTk
+                            legacies.Contains(v.Legacy) && // Match by Legacy
+                            saps.Contains(v.SAP) && // Match by SAP
+                            nips.Contains(v.NIP) && // Match by NIP
+                            oracles.Contains(v.Oracle) && // Match by Oracle
+                            employeeTypes.Contains(v.EmployeeType) && // Match by EmployeeType
+                            joinDates.Contains(v.JoinDate) // Match by JoinDate
+                )
+                .ToListAsync(cancellationToken);
+
+            return existingUsers.Adapt<List<UserDto>>();
+        }
 
         public async Task<List<UserDto>> Handle(BulkValidateUserQuery request, CancellationToken cancellationToken)
         {
@@ -445,6 +509,48 @@ namespace McDermott.Application.Features.Queries.Config
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+
+        public async Task<UserDto> Handle(GetSingleUserQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<User>().Entities.AsNoTracking();
+
+                // Apply custom order by if provided
+                if (request.OrderBy is not null)
+                {
+                    query = request.IsDescending ?
+                        query.OrderByDescending(request.OrderBy) :
+                        query.OrderBy(request.OrderBy);
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
+
+                // Return the first result as UserDto
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<UserDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
                 throw;
             }
         }

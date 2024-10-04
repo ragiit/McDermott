@@ -292,7 +292,24 @@ namespace McDermott.Web.Components.Pages.Config
                     }
 
                     var list = new List<ProvinceDto>();
-                    var parentCache = new List<CountryDto>();
+
+                    var list1 = new List<CountryDto>();
+                    var countryNames = new HashSet<string>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var prov = ws.Cells[row, 1].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(prov))
+                            countryNames.Add(prov.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetCountryQuery(x => countryNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new Country
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -301,7 +318,7 @@ namespace McDermott.Web.Components.Pages.Config
                         long? parentId = null;
                         if (!string.IsNullOrEmpty(countryName))
                         {
-                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == countryName);
+                            var cachedParent = list1.FirstOrDefault(x => x.Name == countryName);
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 1, countryName ?? string.Empty);
@@ -318,14 +335,24 @@ namespace McDermott.Web.Components.Pages.Config
                             Name = ws.Cells[row, 2].Value?.ToString()?.Trim(),
                         };
 
-                        bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Name == newMenu.Name && x.CountryId == newMenu.CountryId));
-
-                        if (!exists)
-                            list.Add(newMenu);
+                        list.Add(newMenu);
                     }
 
                     if (list.Count > 0)
                     {
+                        list = list.DistinctBy(x => new { x.CountryId, x.Name }).ToList();
+
+                        // Panggil BulkValidateVillageQuery untuk validasi bulk
+                        var existingVillages = await Mediator.Send(new BulkValidateProvinceQuery(list));
+
+                        // Filter village baru yang tidak ada di database
+                        list = list.Where(village =>
+                            !existingVillages.Any(ev =>
+                                ev.Name == village.Name &&
+                                ev.CountryId == village.CountryId
+                            )
+                        ).ToList();
+
                         await Mediator.Send(new CreateListProvinceRequest(list));
                         await LoadData(0, pageSize);
                         SelectedDataItems = [];

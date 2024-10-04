@@ -238,7 +238,12 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                             dr.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDrugRouteQuery(x => dr.Contains(x.Route.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetDrugRouteQuery(x => dr.Contains(x.Route.ToLower()), 0, 0,
+                        select: x => new DrugRoute
+                        {
+                            Id = x.Id,
+                            Route = x.Route
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
