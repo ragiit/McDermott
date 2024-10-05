@@ -644,12 +644,12 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                         list = list.DistinctBy(x => new
                         {
                             x.Name,
-                            x.Email,
-                            x.NoId,
-                            x.ReligionId,
                             x.DateOfBirth,
                             x.Gender,
                             x.MartialStatus,
+                            x.Email,
+                            x.NoId,
+                            x.ReligionId,
                             x.MobilePhone,
                             x.CurrentMobile,
                             x.HomePhoneNumber,
@@ -668,6 +668,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
                         var lastPatient = await Mediator.Send(new GetSingleUserQuery
                         {
+                            Predicate = x => x.IsPatient == true && x.IsAdmin == false,
                             IsDescending = true,
                             OrderBy = x => x.NoRm,
                             Select = x => new User
@@ -689,7 +690,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                         }
 
                         // Panggil BulkValidateProjectQuery untuk validasi bulk
-                        var existingProjects = await Mediator.Send(new BulkValidateEmployeeQuery(list));
+                        var existingProjects = await Mediator.Send(new BulkValidatePatientQuery(list));
 
                         // Filter Project baru yang tidak ada di database
                         list = list.Where(x =>
@@ -708,7 +709,8 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                                 ev.EmergencyName == x.EmergencyName && // Include EmergencyName
                                 ev.EmergencyEmail == x.EmergencyEmail && // Include EmergencyEmail
                                 ev.EmergencyPhone == x.EmergencyPhone && // Include EmergencyPhone
-                                ev.IsPatient == x.IsPatient
+                                ev.IsPatient == x.IsPatient &&
+                                ev.NoRm == x.NoRm
                             )
                         ).ToList();
 
