@@ -9,11 +9,34 @@ namespace McDermott.Application.Features.Commands.Pharmacy
     public class MedicamentCommand
     {
         #region GET 
+        public class GetSingleMedicamentQuery : IRequest<MedicamentDto>
+        {
+            public List<Expression<Func<Medicament, object>>> Includes { get; set; }
+            public Expression<Func<Medicament, bool>> Predicate { get; set; }
+            public Expression<Func<Medicament, Medicament>> Select { get; set; }
+            public Expression<Func<Medicament, object>> OrderBy { get; set; }
+            public bool IsDescending { get; set; } = false; // default to ascending
+        }
+        public class GetMedicamentQuery : IRequest<(List<MedicamentDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Medicament, object>>> Includes { get; set; }
+            public Expression<Func<Medicament, bool>> Predicate { get; set; }
+            public Expression<Func<Medicament, Medicament>> Select { get; set; }
+            public Expression<Func<Medicament, object>> OrderBy { get; set; }
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public string SearchTerm { get; set; }
+        }
 
-        public class GetMedicamentQuery(Expression<Func<Medicament, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MedicamentDto>>
+        public class BulkValidateMedicamentQuery(List<MedicamentDto> MedicamentsToValidate) : IRequest<List<MedicamentDto>>
+        {
+            public List<MedicamentDto> MedicamentsToValidate { get; } = MedicamentsToValidate;
+        }
+
+        public class ValidateMedicamentQuery(Expression<Func<Medicament, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Medicament, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
         }
 
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)

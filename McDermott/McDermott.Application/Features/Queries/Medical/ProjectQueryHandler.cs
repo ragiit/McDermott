@@ -42,9 +42,24 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var query = _unitOfWork.Repository<Project>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Project>().Entities.AsNoTracking();
+
+                // Apply custom order by if provided
+                if (request.OrderBy is not null) 
+                    query = request.IsDescending ?
+                        query.OrderByDescending(request.OrderBy) :
+                        query.OrderBy(request.OrderBy); 
+                else
+                    query = query.OrderBy(x => x.Name);
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -52,21 +67,68 @@ namespace McDermott.Application.Features.Queries.Config
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") 
+                        );
                 }
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null) 
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Project
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    });
 
-                var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+                // Paginate and sort
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                    query,
+                    request.PageSize,
+                    request.PageIndex,
+                    cancellationToken
+                );
 
-                return (paged.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }
+
+        //public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProjectQuery request, CancellationToken cancellationToken)
+        //{
+        //    try
+        //    {
+        //        var query = _unitOfWork.Repository<Project>().Entities
+        //            .AsNoTracking()
+        //            .AsQueryable();
+
+        //        if (request.Predicate is not null)
+        //            query = query.Where(request.Predicate);
+
+        //        if (!string.IsNullOrEmpty(request.SearchTerm))
+        //        {
+        //            query = query.Where(v =>
+        //                EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
+        //        }
+
+        //        var pagedResult = query
+        //                    .OrderBy(x => x.Name);
+
+        //        var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
+
+        //        return (paged.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         public async Task<bool> Handle(ValidateProjectQuery request, CancellationToken cancellationToken)
         {

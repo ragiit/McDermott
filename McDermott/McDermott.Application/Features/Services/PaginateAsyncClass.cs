@@ -50,5 +50,25 @@ namespace McDermott.Application.Features.Services
 
             return (totalCount, pagedItems, totalPages);
         }
+
+        // Paginate and sort helper method
+        public static async Task<(int totalCount, List<T> pagedItems, int totalPages)> PaginateAndSortAsync<T>(
+            IQueryable<T> query,
+            int pageSize,
+            int pageIndex,
+            CancellationToken cancellationToken)
+        {
+            var totalCount = await query.CountAsync(cancellationToken);
+            pageSize = pageSize == 0 ? totalCount : pageSize;
+
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            var pagedItems = await query
+                .Skip((pageIndex) * pageSize) // Adjust to use (pageIndex - 1) for correct pagination
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (totalCount, pagedItems, totalPages);
+        }
     }
 }

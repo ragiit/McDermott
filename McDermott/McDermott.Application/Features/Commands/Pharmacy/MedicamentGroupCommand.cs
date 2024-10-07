@@ -10,11 +10,28 @@ namespace McDermott.Application.Features.Commands.Pharmacy
     {
         #region GET 
 
-        public class GetMedicamentGroupQuery(Expression<Func<MedicamentGroup, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MedicamentGroupDto>>
+        public class GetMedicamentGroupQuery : IRequest<(List<MedicamentGroupDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<MedicamentGroup, object>>> Includes { get; set; }
+            public Expression<Func<MedicamentGroup, bool>> Predicate { get; set; }
+            public Expression<Func<MedicamentGroup, MedicamentGroup>> Select { get; set; }
+            public Expression<Func<MedicamentGroup, object>> OrderBy { get; set; }
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public string SearchTerm { get; set; }
+        }
+
+        public class BulkValidateMedicamentGroupQuery(List<MedicamentGroupDto> MedicamentGroupsToValidate) : IRequest<List<MedicamentGroupDto>>
+        {
+            public List<MedicamentGroupDto> MedicamentGroupsToValidate { get; } = MedicamentGroupsToValidate;
+        }
+
+        public class ValidateMedicamentGroupQuery(Expression<Func<MedicamentGroup, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<MedicamentGroup, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
         }
+
 
         public class GetMedicamentGroupDetailQuery(Expression<Func<MedicamentGroupDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MedicamentGroupDetailDto>>
         {
