@@ -120,6 +120,7 @@ namespace McDermott.Web.Components.Pages.Medical
                             Id = x.Id,
                             Name = x.Name
                         }))).Item1;
+
                     list2 = (await Mediator.Send(new GetCronisCategoryQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
                         select: x => new CronisCategory
                         {

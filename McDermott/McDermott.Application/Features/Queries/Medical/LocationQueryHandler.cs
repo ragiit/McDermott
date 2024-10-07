@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -9,12 +10,36 @@ namespace McDermott.Application.Features.Queries.Medical
     public class LocationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLocationQuery, (List<LocationDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateLocationRequest, LocationDto>,
+        IRequestHandler<ValidateLocationQuery, bool>,
+        IRequestHandler<BulkValidateLocationsQuery, List<LocationDto>>,
         IRequestHandler<CreateListLocationRequest, List<LocationDto>>,
         IRequestHandler<UpdateLocationRequest, LocationDto>,
         IRequestHandler<UpdateListLocationRequest, List<LocationDto>>,
         IRequestHandler<DeleteLocationRequest, bool>
     {
         #region GET
+
+        public async Task<List<LocationDto>> Handle(BulkValidateLocationsQuery request, CancellationToken cancellationToken)
+        {
+            var LocationsDtos = request.LocationssToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var LocationsNames = LocationsDtos.Select(x => x.Name).Distinct().ToList();
+            var a = LocationsDtos.Select(x => x.ParentLocationId).Distinct().ToList();
+            var b = LocationsDtos.Select(x => x.Type).Distinct().ToList();
+            var c = LocationsDtos.Select(x => x.CompanyId).Distinct().ToList();
+
+            var existingLocationss = await _unitOfWork.Repository<Locations>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => LocationsNames.Contains(v.Name)
+                            && a.Contains(v.ParentLocationId)
+                            && c.Contains(v.CompanyId)
+                            && b.Contains(v.Type))
+                .ToListAsync(cancellationToken);
+
+            return existingLocationss.Adapt<List<LocationDto>>();
+        }
 
         public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationQuery request, CancellationToken cancellationToken)
         {

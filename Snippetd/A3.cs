@@ -1,63 +1,63 @@
- public class GetSampleTypeQuery(Expression<Func<SampleType, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCount)>
+ public class GetLocationsQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)>
  {
-     public Expression<Func<SampleType, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
      public bool RemoveCache { get; } = removeCache!;
      public string SearchTerm { get; } = searchTerm!;
      public int PageIndex { get; } = pageIndex;
      public int PageSize { get; set; } = pageSize ?? 10;
  }
 
-public class GetSampleTypeQuery(Expression<Func<SampleType, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<SampleType, object>>>? includes = null, Expression<Func<SampleType, SampleType>>? select = null) : IRequest<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCount)>
+public class GetLocationsQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Locations, object>>>? includes = null, Expression<Func<Locations, Locations>>? select = null) : IRequest<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)>
 {
-    public Expression<Func<SampleType, bool>> Predicate { get; } = predicate!;
+    public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
     public bool RemoveCache { get; } = removeCache!;
     public string SearchTerm { get; } = searchTerm!;
     public int PageIndex { get; } = pageIndex;
     public int PageSize { get; } = pageSize ?? 10;
 
-    public List<Expression<Func<SampleType, object>>> Includes { get; } = includes!;
-    public Expression<Func<SampleType, SampleType>>? Select { get; } = select!;
+    public List<Expression<Func<Locations, object>>> Includes { get; } = includes!;
+    public Expression<Func<Locations, Locations>>? Select { get; } = select!;
 }
 
- public class BulkValidateSampleTypeQuery(List<SampleTypeDto> SampleTypesToValidate) : IRequest<List<SampleTypeDto>>
+ public class BulkValidateLocationsQuery(List<LocationsDto> LocationssToValidate) : IRequest<List<LocationsDto>>
  {
-     public List<SampleTypeDto> SampleTypesToValidate { get; } = SampleTypesToValidate;
+     public List<LocationsDto> LocationssToValidate { get; } = LocationssToValidate;
  }
 
- public class ValidateSampleTypeQuery(Expression<Func<SampleType, bool>>? predicate = null) : IRequest<bool>
+ public class ValidateLocationsQuery(Expression<Func<Locations, bool>>? predicate = null) : IRequest<bool>
  {
-     public Expression<Func<SampleType, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
  }
 
-IRequestHandler<GetSampleTypeQuery, (List<SampleTypeDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidateSampleTypeQuery, bool>,
-IRequestHandler<BulkValidateSampleTypeQuery, List<SampleTypeDto>>,
+IRequestHandler<GetLocationsQuery, (List<LocationsDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidateLocationsQuery, bool>,
+IRequestHandler<BulkValidateLocationsQuery, List<LocationsDto>>,
 
 
-public async Task<List<SampleTypeDto>> Handle(BulkValidateSampleTypeQuery request, CancellationToken cancellationToken)
+public async Task<List<LocationsDto>> Handle(BulkValidateLocationsQuery request, CancellationToken cancellationToken)
 {
-    var SampleTypeDtos = request.SampleTypesToValidate;
+    var LocationsDtos = request.LocationssToValidate;
 
     // Ekstrak semua kombinasi yang akan dicari di database
-    var SampleTypeNames = SampleTypeDtos.Select(x => x.Name).Distinct().ToList();
-    var SampleTypeIds = SampleTypeDtos.Select(x => x.SampleTypeId).Distinct().ToList();
+    var LocationsNames = LocationsDtos.Select(x => x.Name).Distinct().ToList();
+    var LocationsIds = LocationsDtos.Select(x => x.LocationsId).Distinct().ToList();
 
-    var existingSampleTypes = await _unitOfWork.Repository<SampleType>()
+    var existingLocationss = await _unitOfWork.Repository<Locations>()
         .Entities
         .AsNoTracking()
-        .Where(v => SampleTypeNames.Contains(v.Name)
-                    && SampleTypeIds.Contains(v.SampleTypeId))
+        .Where(v => LocationsNames.Contains(v.Name)
+                    && LocationsIds.Contains(v.LocationsId))
         .ToListAsync(cancellationToken);
 
-    return existingSampleTypes.Adapt<List<SampleTypeDto>>();
+    return existingLocationss.Adapt<List<LocationsDto>>();
 }
 
 
-public async Task<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetSampleTypeQuery request, CancellationToken cancellationToken)
+public async Task<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationsQuery request, CancellationToken cancellationToken)
 {
     try
     { 
-        var query = _unitOfWork.Repository<SampleType>().Entities.AsNoTracking();
+        var query = _unitOfWork.Repository<Locations>().Entities.AsNoTracking();
 
         // Apply dynamic includes
         if (request.Includes is not null)
@@ -90,7 +90,7 @@ public async Task<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCou
                           q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
                           cancellationToken);
 
-        return (pagedItems.Adapt<List<SampleTypeDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (pagedItems.Adapt<List<LocationsDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -98,22 +98,22 @@ public async Task<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCou
     }
 }
 
-public async Task<bool> Handle(ValidateSampleTypeQuery request, CancellationToken cancellationToken)
+public async Task<bool> Handle(ValidateLocationsQuery request, CancellationToken cancellationToken)
 {
-    return await _unitOfWork.Repository<SampleType>()
+    return await _unitOfWork.Repository<Locations>()
         .Entities
         .AsNoTracking()
         .Where(request.Predicate)  // Apply the Predicate for filtering
         .AnyAsync(cancellationToken);  // Check if any record matches the condition
 }
 
-public async Task<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetSampleTypeQuery request, CancellationToken cancellationToken)
+public async Task<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationsQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<SampleType>().Entities
+        var query = _unitOfWork.Repository<Locations>().Entities
             .AsNoTracking()
-            .Include(v => v.SampleType)
+            .Include(v => v.Locations)
             .AsQueryable();
 
         if (request.Predicate is not null)
@@ -123,14 +123,14 @@ public async Task<(List<SampleTypeDto>, int pageIndex, int pageSize, int pageCou
         {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.SampleType.Name, $"%{request.SearchTerm}%"));
+                EF.Functions.Like(v.Locations.Name, $"%{request.SearchTerm}%"));
         }
 
         var pagedResult = query.OrderBy(x => x.Name);
 
         var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-        return (paged.Adapt<List<SampleTypeDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (paged.Adapt<List<LocationsDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {

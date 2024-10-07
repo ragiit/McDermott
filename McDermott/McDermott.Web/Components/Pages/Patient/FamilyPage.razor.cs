@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.HttpLogging;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.HttpLogging;
+using NuGet.Frameworks;
 using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Patient
@@ -315,6 +317,163 @@ namespace McDermott.Web.Components.Pages.Patient
                 ex.HandleException(ToastService);
             }
             finally { PanelVisible = false; }
+        }
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                       .Any(i => ExportTemp.Select(x => x.Column).ToList()[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<FamilyDto>();
+
+                    var a = new HashSet<string>();
+                    var list1 = new List<FamilyDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var aa = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(aa))
+                            a.Add(aa.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetFamilyQuery(x => a.Contains(x.Name.ToLower()), 0, 0,
+                      select: x => new Family
+                      {
+                          Id = x.Id,
+                          Name = x.Name
+                      }))).Item1;
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var aaa = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        long? aId = null;
+                        if (!string.IsNullOrEmpty(aaa))
+                        {
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(aaa, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                ToastService.ShowErrorImport(row, 2, aaa ?? string.Empty);
+                                continue;
+                            }
+                            else
+                            {
+                                aId = cachedParent.Id;
+                            }
+                        }
+
+                        var c = new FamilyDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            InverseRelationId = aId,
+                        };
+
+                        list.Add(c);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.InverseRelationId, }).ToList();
+
+                        // Panggil BulkValidateFamilyQuery untuk validasi bulk
+                        var existingFamilys = await Mediator.Send(new BulkValidateFamilyQuery(list));
+
+                        // Filter Family baru yang tidak ada di database
+                        list = list.Where(Family =>
+                            !existingFamilys.Any(ev =>
+                                ev.Name == Family.Name &&
+                                ev.InverseRelationId == Family.InverseRelationId
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListFamilyRequest(list.Where(x => x.InverseRelationId == null).ToList()));
+
+                        var ss = new List<FamilyDto>();
+                        for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                        {
+                            var aab = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                            var aaa = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                            if (list.FirstOrDefault(x => x.Name == aab) is null)
+                                continue;
+
+                            if (string.IsNullOrWhiteSpace(aaa))
+                                continue;
+
+                            long? aId = null;
+                            if (!string.IsNullOrEmpty(aaa))
+                            {
+                                var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(aaa, StringComparison.CurrentCultureIgnoreCase));
+                                if (cachedParent is null)
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    aId = cachedParent.Id;
+                                }
+                            }
+
+                            var f = (await Mediator.Send(new GetFamilyQuery(x => x.Id == aId))).Item1.FirstOrDefault() ?? new();
+                            var fg = (await Mediator.Send(new GetFamilyQuery(x => x.Name == aab))).Item1.FirstOrDefault() ?? new();
+
+                            f.InverseRelationId = fg.Id;
+                            fg.InverseRelationId = f.Id;
+
+                            ss.Add(f);
+                            ss.Add(fg);
+                        }
+
+                        if (ss.Count > 0)
+                            await Mediator.Send(new UpdateListFamilyRequest(ss));
+
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private List<ExportFileData> ExportTemp =
+        [
+            new() { Column = "Name", Notes = "Mandatory" },
+            new() { Column = "Inverse Relation"},
+         ];
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "family_relation_template.xlsx", ExportTemp);
         }
     }
 }

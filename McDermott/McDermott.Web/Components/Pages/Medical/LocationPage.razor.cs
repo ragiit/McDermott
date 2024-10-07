@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -117,6 +118,7 @@ namespace McDermott.Web.Components.Pages.Medical
                 PanelVisible = true;
                 var result = await Mediator.QueryGetHelper<Locations, LocationDto>(pageIndex, pageSize, searchTerm);
                 Locations = result.Item1;
+                activePageIndex = pageIndex;
                 totalCount = result.pageCount;
                 PanelVisible = false;
             }
@@ -323,5 +325,171 @@ namespace McDermott.Web.Components.Pages.Medical
         }
 
         #endregion Default Grid
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    //if (Enumerable.Range(1, ws.Dimension.End.Column)
+                    //    .Any(i => ExportTemp.Select(x => x.Column).ToList()[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    //{
+                    //    PanelVisible = false;
+                    //    ToastService.ShowInfo("The header must match with the template.");
+                    //    return;
+                    //}
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                      .Any(i => ExportTemp.Select(x => x.Column).ToList()[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<LocationDto>();
+
+                    var a = new HashSet<string>();
+                    var b = new HashSet<string>();
+
+                    var list1 = new List<LocationDto>();
+                    var list2 = new List<CompanyDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var aa = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var bb = ws.Cells[row, 4].Value?.ToString()?.Trim();
+
+                        if (!string.IsNullOrEmpty(aa))
+                            a.Add(aa.ToLower());
+
+                        if (!string.IsNullOrEmpty(bb))
+                            b.Add(bb.ToLower());
+                    }
+
+                    list1 = (await Mediator.Send(new GetLocationQuery(x => a.Contains(x.Name.ToLower()), 0, 0,
+                      select: x => new Locations
+                      {
+                          Id = x.Id,
+                          Name = x.Name
+                      }))).Item1;
+
+                    list2 = (await Mediator.Send(new GetCompanyQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
+                      select: x => new Company
+                      {
+                          Id = x.Id,
+                          Name = x.Name
+                      }))).Item1;
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var par = ws.Cells[row, 2].Value?.ToString()?.Trim();
+                        var type = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var com = ws.Cells[row, 4].Value?.ToString()?.Trim();
+
+                        bool isValid = true;
+
+                        long? parId = null;
+                        if (!string.IsNullOrEmpty(par))
+                        {
+                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(par, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                isValid = false;
+                                ToastService.ShowErrorImport(row, 2, par ?? string.Empty);
+                            }
+                            else
+                            {
+                                parId = cachedParent.Id;
+                            }
+                        }
+
+                        long? compId = null;
+                        if (!string.IsNullOrEmpty(com))
+                        {
+                            var cachedParent = list2.FirstOrDefault(x => x.Name.Equals(com, StringComparison.CurrentCultureIgnoreCase));
+                            if (cachedParent is null)
+                            {
+                                isValid = false;
+                                ToastService.ShowErrorImport(row, 4, com ?? string.Empty);
+                            }
+                            else
+                            {
+                                compId = cachedParent.Id;
+                            }
+                        }
+
+                        if (!isValid)
+                            continue;
+
+                        var c = new LocationDto
+                        {
+                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            ParentLocationId = parId,
+                            Type = type,
+                            CompanyId = compId,
+                        };
+
+                        list.Add(c);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new { x.Name, x.ParentLocationId, x.Type, x.CompanyId }).ToList();
+
+                        // Panggil BulkValidateLocationQuery untuk validasi bulk
+                        var existingLocations = await Mediator.Send(new BulkValidateLocationsQuery(list));
+
+                        // Filter Location baru yang tidak ada di database
+                        list = list.Where(Location =>
+                            !existingLocations.Any(ev =>
+                                ev.Name == Location.Name &&
+                                ev.ParentLocationId == Location.ParentLocationId &&
+                                ev.Type == Location.Type &&
+                                ev.CompanyId == Location.CompanyId
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListLocationRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private List<ExportFileData> ExportTemp =
+        [
+            new() { Column = "Name", Notes = "Mandatory" },
+            new() { Column = "Parent"},
+            new() { Column = "Type", Notes = "Internal Location"},
+            new() { Column = "Company"},
+        ];
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "location_template.xlsx", ExportTemp);
+        }
     }
 }

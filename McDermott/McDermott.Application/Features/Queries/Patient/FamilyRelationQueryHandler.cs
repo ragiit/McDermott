@@ -154,7 +154,11 @@ namespace McDermott.Application.Features.Queries.Patient
         {
             try
             {
-                var result = await _unitOfWork.Repository<Family>().UpdateAsync(request.FamilyDtos.Adapt<List<Family>>());
+                //var result = await _unitOfWork.Repository<Family>().UpdateAsync(request.FamilyDtos.Adapt<List<Family>>());
+
+                var createUpdateDtos = request.FamilyDtos.Adapt<List<CreateUpdateFamilyDto>>();
+                var patientFamilyRelations = createUpdateDtos.Adapt<List<Family>>();
+                var result = await _unitOfWork.Repository<Family>().UpdateAsync(patientFamilyRelations);
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
