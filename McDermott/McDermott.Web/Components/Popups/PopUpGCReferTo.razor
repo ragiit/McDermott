@@ -69,16 +69,6 @@
 
                                         <div class="card-body">
                                             <div class="row">
-                                                <div class="col-md-12">
-                                                    <DxFormLayout>
-                                                        @if (GeneralConsultanService.Id != 0)
-                                                        {
-                                                            <DxFormLayoutItem ColSpanMd="12">
-                                                                <h3 class="fw-bolder">@GeneralConsultanService.Reference</h3>
-                                                            </DxFormLayoutItem>
-                                                        }
-                                                    </DxFormLayout>
-                                                </div>
                                                 <div class="col-md-6">
                                                     @{
                                                         if (GeneralConsultanService.Patient is null)
@@ -94,28 +84,7 @@
                                                                           @bind-Value="@GeneralConsultanService.PatientId"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"
-                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                          SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
-                                                                          TextChanged="((string e) => OnInputPatientChanged(e))">
-                                                                <Buttons>
-                                                                    <DxEditorButton Click="OnSearchPatientIndexDecrement"
-                                                                                    IconCssClass="fa-solid fa-caret-left"
-                                                                                    Tooltip="Previous Index" />
-                                                                    <DxEditorButton Click="OnSearchPatient"
-                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                    Tooltip="Search" />
-                                                                    <DxEditorButton Click="OnSearchPatientIndexIncrement"
-                                                                                    IconCssClass="fa-solid fa-caret-right"
-                                                                                    Tooltip="Next Index" />
-                                                                </Buttons>
-                                                                <Columns>
-                                                                    <DxListEditorColumn FieldName="NoRm" Caption="Medical Record" />
-                                                                    <DxListEditorColumn FieldName="Name" />
-                                                                    <DxListEditorColumn FieldName="Email" />
-                                                                    <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
-                                                                    <DxListEditorColumn FieldName="Gender" />
-                                                                    <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
-                                                                </Columns>
+                                                                          ReadOnly="true">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
                                                         </DxFormLayoutItem>
@@ -161,25 +130,25 @@
                                                             </Template>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
-                                                            <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                          Data="@RegisType"
+                                                            <MyDxComboBox Data="@RegisType"
                                                                           NullText="Select Registration..."
                                                                           AllowUserInput="true"
                                                                           @bind-Value="@GeneralConsultanService.TypeRegistration">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
-                                                            <MyDxComboBox Data="@Helper._homeStatusTemps"
-                                                                          NullText="Return Status..."
-                                                                          @bind-Value="@GeneralConsultanService.HomeStatus"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Code">
-                                                            </MyDxComboBox>
-                                                        </DxFormLayoutItem>
+
+                                                        @*   <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Helper._homeStatusTemps"
+                                                NullText="Return Status..."
+                                                @bind-Value="@GeneralConsultanService.HomeStatus"
+                                                TextFieldName="Name"
+                                                ValueFieldName="Code">
+                                                </MyDxComboBox>
+                                                </DxFormLayoutItem> *@
 
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
-                                                            <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
+                                                            <DxCheckBox @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
                                                         </DxFormLayoutItem>
                                                     </DxFormLayout>
                                                 </div>
@@ -188,7 +157,6 @@
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
                                                             <MyDxComboBox Data="@ClassTypes"
                                                                           NullText="Select Patient Type.."
-                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                           @bind-Value="@GeneralConsultanService.ClassType">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.ClassType)" />
@@ -198,7 +166,6 @@
                                                                           NullText="Select Service"
                                                                           @ref="refServiceComboBox"
                                                                           @bind-Value="@GeneralConsultanService.ServiceId"
-                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"
                                                                           TextChanged="((string e) => OnInputServiceChanged(e))">
@@ -225,7 +192,6 @@
                                                                           NullText="Select Physicion"
                                                                           @ref="refPhysicionComboBox"
                                                                           @bind-Value="@GeneralConsultanService.PratitionerId"
-                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"
                                                                           TextChanged="((string e) => OnInputPhysicionChanged(e))">
@@ -255,7 +221,6 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Method" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Payments"
                                                                           NullText="Payment Method.."
-                                                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                           SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
                                                                           @bind-Value="GeneralConsultanService.Payment">
 
@@ -265,8 +230,7 @@
                                                         @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                                                <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                              Data="@InsurancePolicies"
+                                                                <MyDxComboBox Data="@InsurancePolicies"
                                                                               @bind-Value="@SelectedInsurancePolicy"
                                                                               NullText="Select Insurance Policy..."
                                                                               EditFormat="{0} - {1}">
@@ -292,130 +256,171 @@
 
                     </DxLoadingPanel>
                 }
-                else if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[1]))
+                else if (!string.IsNullOrWhiteSpace(SelectedRujukanType) && SelectedRujukanType.Equals(RujukanTypes.ToList()[1]))
                 {
-                    <div class="w-100">
+                    @if (!string.IsNullOrWhiteSpace(SelectedRujukanVertical))
+                    {
                         <div class="w-100">
-                            <div class="card">
-                                <div class="card-header">
-                                    <span class="fw-bolder">Search for Referral Health Facilities</span>
-                                </div>
+                            <div class="w-100">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <span class="fw-bolder">Search for Referral Health Facilities</span>
+                                    </div>
 
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <DxFormLayout CssClass="w-100">
-                                                @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]))
-                                                {
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Category" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@SpesialisRefrensiKhusus"
-                                                                      NullText="Select Category..."
-                                                                      @bind-Value="@GeneralConsultanService.ReferVerticalKhususCategoryCode"
-                                                                      TextFieldName="NmKhusus"
-                                                                      ValueFieldName="KdKhusus">
-                                                        </MyDxComboBox>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12">
-                                                        <DxTextBox @bind-Text="@GeneralConsultanService.ReferReason" NullText="Reason..." InputCssClass="fw-normal" />
-                                                    </DxFormLayoutItem>
-                                                }
-                                                else if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
-                                                {
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Spesialis" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@SpesialisPs"
-                                                                      NullText="Select Spesialis..."
-                                                                      @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode"
-                                                                      SelectedItemChanged="(SpesialisPCare e) => SelectedItemSpesialis(e)"
-                                                                      TextFieldName="NmSpesialis"
-                                                                      ValueFieldName="KdSpesialis">
-                                                        </MyDxComboBox>
-                                                    </DxFormLayoutItem>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <DxFormLayout CssClass="w-100">
 
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sarana" ColSpanMd="12">
-                                                        <DxCheckBox @bind-Checked="@GeneralConsultanService.IsSarana" />
-                                                    </DxFormLayoutItem>
-
-                                                }
-                                            </DxFormLayout>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <DxFormLayout CssClass="w-100">
-                                                @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
-                                                {
-                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sub Spesialis" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@SubSpesialisPs"
-                                                                      NullText="Select Sub Spesialis..."
-                                                                      @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode"
-                                                                      TextFieldName="NmSubSpesialis"
-                                                                      ValueFieldName="KdSubSpesialis">
-                                                        </MyDxComboBox>
-                                                    </DxFormLayoutItem>
-
-                                                    @if (Convert.ToBoolean(GeneralConsultanService.IsSarana))
+                                                    @if (!string.IsNullOrWhiteSpace(SelectedRujukanVertical))
                                                     {
-                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="12">
-                                                            <MyDxComboBox Data="@SpesialisSaranas"
-                                                                          NullText="Select Sarana..."
-                                                                          @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisSaranaCode"
-                                                                          TextFieldName="NmSarana"
-                                                                          ValueFieldName="KdSarana">
-                                                            </MyDxComboBox>
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Visit Date" ColSpanMd="12">
+                                                            <DxDateEdit @bind-Date="@GeneralConsultanService.ReferDateVisit"
+                                                                        Mask="@DateTimeMask.ShortDate"
+                                                                        NullText="Select Visit Date" />
                                                         </DxFormLayoutItem>
                                                     }
-                                                }
 
+                                                    @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]))
+                                                    {
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Category" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@SpesialisRefrensiKhusus"
+                                                                          NullText="Select Category..."
+                                                                          @bind-Value="@GeneralConsultanService.ReferVerticalKhususCategoryCode"
+                                                                          TextFieldName="NmKhusus"
+                                                                          ValueFieldName="KdKhusus">
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@GeneralConsultanService.ReferReason" NullText="Reason..." InputCssClass="fw-normal" />
+                                                        </DxFormLayoutItem>
+                                                    }
+                                                    else if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
+                                                    {
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Spesialis" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@SpesialisPs"
+                                                                          NullText="Select Spesialis..."
+                                                                          @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode"
+                                                                          SelectedItemChanged="(SpesialisPCare e) => SelectedItemSpesialis(e)"
+                                                                          TextFieldName="NmSpesialis"
+                                                                          ValueFieldName="KdSpesialis">
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
+                                                        @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sub Spesialis" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@SubSpesialisPs"
+                                                                              NullText="Select Sub Spesialis..."
+                                                                              @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode"
+                                                                              TextFieldName="NmSubSpesialis"
+                                                                              ValueFieldName="KdSubSpesialis">
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                        }
+
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sarana" ColSpanMd="12">
+                                                            <DxCheckBox @bind-Checked="@GeneralConsultanService.IsSarana" />
+                                                        </DxFormLayoutItem>
+
+                                                    }
+
+                                                    @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
+                                                    {
+                                                        @if (Convert.ToBoolean(GeneralConsultanService.IsSarana))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@SpesialisSaranas"
+                                                                              NullText="Select Sarana..."
+                                                                              @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisSaranaCode"
+                                                                              TextFieldName="NmSarana"
+                                                                              ValueFieldName="KdSarana">
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                    }
+                                                </DxFormLayout>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="w-100">
+                                                    @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
+                                                    {
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sub Spesialis" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@SubSpesialisPs"
+                                                                          NullText="Select Sub Spesialis..."
+                                                                          @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode"
+                                                                          TextFieldName="NmSubSpesialis"
+                                                                          ValueFieldName="KdSubSpesialis">
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
+
+                                                        @if (Convert.ToBoolean(GeneralConsultanService.IsSarana))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@SpesialisSaranas"
+                                                                              NullText="Select Sarana..."
+                                                                              @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisSaranaCode"
+                                                                              TextFieldName="NmSarana"
+                                                                              ValueFieldName="KdSarana">
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                        }
+                                                    }
+                                                </DxFormLayout>
+
+                                            </div>
+
+                                            <div class="col-md-12">
                                                 <div class="w-100 row justify-content-end mt-2 mb-2">
                                                     <div class="col-auto align-self-end p-0 m-0">
-                                                        <DxDateEdit @bind-Date="@GeneralConsultanService.ReferDateVisit"
-                                                                    Mask="@DateTimeMask.ShortDate"
-                                                                    NullText="Select Visit Date" />
+                                                        @*    <DxDateEdit @bind-Date="@GeneralConsultanService.ReferDateVisit"
+                                            Mask="@DateTimeMask.ShortDate"
+                                            NullText="Select Visit Date" /> *@
                                                         <DxButton CssClass="mt-2" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-magnifying-glass" Text="Search Faskes" Click="OnClickSearchFaskes" SubmitFormOnClick="true"></DxButton>
                                                         <DxButton RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Text="Cancel"></DxButton>
 
                                                     </div>
                                                 </div>
-                                            </DxFormLayout>
+                                            </div>
 
-                                        </div>
+                                            <hr />
 
-                                        <hr />
-
-                                        <div class="col-md-12 mt-2">
-                                            <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
-                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                            IsContentBlocked="true"
-                                                            ApplyBackgroundShading="true"
-                                                            IndicatorAreaVisible="false"
-                                                            Text="Fetching Data...">
-                                                <MyGrid @ref="GridRujukanRefer"
-                                                        Data="RujukanSubSpesialis"
-                                                        KeyFieldName="Kdppk">
-                                                    <Columns>
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
-                                                        <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
-                                                        <DxGridDataColumn Caption="Action ">
-                                                            <CellDisplayTemplate>
-                                                                <DxButton RenderStyle="@ButtonRenderStyle.Success" Click="(() => SelectedFaskesRujuk((RujukanFaskesKhususSpesialisPCare)context.DataItem))" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                    </Columns>
-                                                </MyGrid>
-                                            </DxLoadingPanel>
+                                            <div class="col-md-12 mt-2">
+                                                <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+                                                    <MyGrid @ref="GridRujukanRefer"
+                                                            Data="RujukanSubSpesialis"
+                                                            KeyFieldName="Kdppk">
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
+                                                            <DxGridDataColumn Caption="Action ">
+                                                                <CellDisplayTemplate>
+                                                                    <DxButton RenderStyle="@ButtonRenderStyle.Success" Click="(async () => await SelectedFaskesRujuk((RujukanFaskesKhususSpesialisPCare)context.DataItem))" IconCssClass="fa-solid fa-play mr-1" Text="Select"></DxButton>
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                        </Columns>
+                                                    </MyGrid>
+                                                </DxLoadingPanel>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 }
-                else if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[2]))
+                else if (!string.IsNullOrWhiteSpace(SelectedRujukanType) && SelectedRujukanType.Equals(RujukanTypes.ToList()[2]))
                 {
                     <div class="w-100">
                         <div class="w-100">
@@ -517,7 +522,7 @@
 
 @code {
 
-    private bool IsLoading { get; set; } = false; 
+    private bool IsLoading { get; set; } = false;
     private GeneralConsultanServiceDto ReferToGeneralConsultanService { get; set; } = new();
     private bool IsLoadingReferTo { get; set; } = false;
     private string SelectedRujukanType { get; set; } = "Rujuk Internal";
@@ -589,35 +594,26 @@
 
             GeneralConsultanServiceDto res = new();
 
-            switch (GeneralConsultanService.Status)
-            {
-                case EnumStatusGeneralConsultantService.Planned:
-                    var patient = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
-                        {
-                            Includes = [x => x.Patient],
-                            Select = x => new GeneralConsultanService
-                            {
-                                Patient = new User { Name = x.Patient.Name },
-                            },
-                            Predicate = x => x.Id != GeneralConsultanService.Id
-                                          && x.ServiceId == GeneralConsultanService.ServiceId
-                                          && x.PatientId == GeneralConsultanService.PatientId
-                                          && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned)
-                                          && x.RegistrationDate != null
-                                          && x.RegistrationDate.Value.Date <= DateTime.Now.Date
-                        });
-
-                    if (patient is not null)
+            var patient = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Includes = [x => x.Patient],
+                    Select = x => new GeneralConsultanService
                     {
-                        IsLoading = false;
-                        ToastService.ShowInfo($"Patient in the name of \"{patient.Patient?.Name}\" still has a pending transaction.");
-                        return;
-                    }
+                        Patient = new User { Name = x.Patient.Name },
+                    },
+                    Predicate = x => x.Id != GeneralConsultanService.Id
+                                  && x.ServiceId == GeneralConsultanService.ServiceId
+                                  && x.PatientId == GeneralConsultanService.PatientId
+                                  && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned)
+                                  && x.RegistrationDate != null
+                                  && x.RegistrationDate.Value.Date <= DateTime.Now.Date
+                });
 
-                    break;
-
-                default:
-                    break;
+            if (patient is not null)
+            {
+                IsLoading = false;
+                ToastService.ShowInfo($"Patient in the name of \"{patient.Patient?.Name}\" still has a pending transaction.");
+                return;
             }
 
             await HandleGeneralConsultationSaveAsync(GeneralConsultanService, UserForm);
@@ -625,21 +621,29 @@
             // Refactored Save Logic
             async Task HandleGeneralConsultationSaveAsync(GeneralConsultanServiceDto service, UserDto userForm)
             {
-                if (GeneralConsultanService.Id == 0)
-                {
-                    var createRequest = new CreateFormGeneralConsultanServiceNewRequest
+                var createRequest = new CreateFormGeneralConsultanServiceNewRequest
+                    {
+                        GeneralConsultanServiceDto = new GeneralConsultanServiceDto
                         {
-                            GeneralConsultanServiceDto = service,
-                            Status = service.Status,
-                            UserDto = new UserDto
-                            {
-                                Id = service.PatientId.GetValueOrDefault(),
-                                CurrentMobile = userForm.CurrentMobile
-                            }
-                        };
+                            PatientId = service.PatientId,
+                            TypeRegistration = service.TypeRegistration,
+                            IsAlertInformationSpecialCase = service.IsAlertInformationSpecialCase,
+                            ClassType = service.ClassType,
+                            ServiceId = service.ServiceId,
+                            PratitionerId = service.PratitionerId,
+                            Payment = service.Payment,
+                            InsurancePolicyId = service.InsurancePolicyId,
+                            Status = EnumStatusGeneralConsultantService.Planned
+                        },
+                        Status = EnumStatusGeneralConsultantService.Planned,
+                        UserDto = new UserDto
+                        {
+                            Id = service.PatientId.GetValueOrDefault(),
+                            CurrentMobile = userForm.CurrentMobile
+                        }
+                    };
 
-                    res = await Mediator.Send(createRequest);
-                }
+                res = await Mediator.Send(createRequest);
             }
 
             ToastService.ClearSuccessToasts();
@@ -882,7 +886,132 @@
 
         if (TempSelectedInsurancePolicy is not null)
             SelectedInsurancePolicy = TempSelectedInsurancePolicy;
+
+        await SendPCareGetRefrensiKhusus();
+        await SendPcareGetSpesialis();
+        await SendPcareGetSpesialisSarana();
     }
+
+    private async Task SendPCareGetRefrensiKhusus()
+    {
+        if (SpesialisRefrensiKhusus.Count > 0)
+            return;
+
+        try
+        {
+            string cacheKey = $"spesialis/khusus";
+            if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisRefrensiKhususPCare>? r))
+            {
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/khusus", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    r = dynamicList.Select(item => new SpesialisRefrensiKhususPCare
+                        {
+                            KdKhusus = item.kdKhusus,
+                            NmKhusus = item.nmKhusus
+                        }).ToList();
+                    MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+                }
+                else
+                {
+                    MemoryCache.Remove(cacheKey);
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+
+            SpesialisRefrensiKhusus = r ?? [];
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+    private async Task SendPcareGetSpesialis()
+    {
+        if (SpesialisPs.Count > 0)
+            return;
+
+        try
+        {
+            string cacheKey = $"spesialis";
+            if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisPCare>? r))
+            {
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    r = dynamicList.Select(item => new SpesialisPCare
+                        {
+                            KdSpesialis = item.kdSpesialis,
+                            NmSpesialis = item.nmSpesialis
+                        }).ToList();
+
+                    MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+                }
+                else
+                {
+                    MemoryCache.Remove(cacheKey);
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+
+            SpesialisPs = r ?? [];
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+    private async Task SendPcareGetSpesialisSarana()
+    {
+        if (SpesialisSaranas.Count > 0)
+            return;
+
+        try
+        {
+            string cacheKey = $"spesialis/sarana";
+            if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisSaranaPCare>? r))
+            {
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/sarana", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    r = dynamicList.Select(item => new SpesialisSaranaPCare
+                        {
+                            KdSarana = item.kdSarana,
+                            NmSarana = item.nmSarana
+                        }).ToList();
+
+                    MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+                }
+                else
+                {
+                    MemoryCache.Remove(cacheKey);
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+
+            SpesialisSaranas = r ?? [];
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+
 
     private async Task OnInputPatientChanged(string e)
     {
@@ -1180,7 +1309,7 @@
     [Parameter] public EventCallback OnClosePopup { get; set; }
     private bool PanelVisible { get; set; } = false;
     private bool IsLoadingSearchFaskes { get; set; } = false;
-    private void SelectedFaskesRujuk(RujukanFaskesKhususSpesialisPCare e)
+    private async Task SelectedFaskesRujuk(RujukanFaskesKhususSpesialisPCare e)
     {
         try
         {
@@ -1199,6 +1328,16 @@
                 GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName = SpesialisPs.FirstOrDefault(x => x.KdSpesialis == GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode)?.NmSpesialis ?? "-";
                 GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisName = SubSpesialisPs.FirstOrDefault(x => x.KdSubSpesialis == GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode)?.NmSubSpesialis ?? "-";
                 GeneralConsultanService.ReferReason = GeneralConsultanService.ReferReason is null || SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]) ? "-" : GeneralConsultanService.ReferReason;
+
+                var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                {
+                    GeneralConsultanServiceDto = GeneralConsultanService,
+                    Status = EnumStatusGeneralConsultantService.Physician,
+                    IsReferTo = true
+                };
+
+                await Mediator.Send(updateRequest);
+                await OnClosePopupReferTo.InvokeAsync();
             }
         }
         catch { }

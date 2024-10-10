@@ -93,6 +93,7 @@
         {
             public GeneralConsultanServiceDto? GeneralConsultanServiceDto { get; set; }
             public UserDto? UserDto { get; set; }
+            public bool IsReferTo { get; set; } = false;
             public EnumStatusGeneralConsultantService Status { get; set; }
         }
 

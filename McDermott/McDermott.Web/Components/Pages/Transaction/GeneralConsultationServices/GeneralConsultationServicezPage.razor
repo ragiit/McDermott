@@ -103,7 +103,7 @@
                                             <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment Date" />
                                             <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
                                                 <CellDisplayTemplate>
                                                     @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
@@ -117,7 +117,7 @@
                                                                Visible="true" />
                                         </TotalSummary>
                                     </MyGridPaginate>
-                                    <div class="row">r
+                                    <div class="row">
                                         <DxFormLayout>
                                             <div class="col-md-8">
                                                 <DxFormLayoutItem>

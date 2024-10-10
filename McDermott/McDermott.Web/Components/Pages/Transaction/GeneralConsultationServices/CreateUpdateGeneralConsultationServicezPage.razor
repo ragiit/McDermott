@@ -400,6 +400,19 @@
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.RegistrationDate)" />
                                                             </DxFormLayoutItem>
 
+                                                            @if (GeneralConsultanService.AppointmentDate != null)
+                                                            { 
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
+                                                                <DxDateEdit @bind-Date="@GeneralConsultanService.AppointmentDate"
+                                                                            Mask="@DateTimeMask.ShortDate"
+                                                                            ReadOnly
+                                                                            NullText="Select Follow Up Date">
+                                                                </DxDateEdit>
+                                                                <ValidationMessage For="@(() => GeneralConsultanService.AppointmentDate)" />
+                                                            </DxFormLayoutItem>
+                                                            }
+
+
                                                             @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Location" ColSpanMd="12">
                                                         <MyDxComboBox Data="@Locations"
                                                         NullText="Select Location..."

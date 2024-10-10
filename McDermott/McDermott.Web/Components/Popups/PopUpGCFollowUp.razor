@@ -35,16 +35,6 @@
 
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-12">
-                            <DxFormLayout>
-                                @if (GeneralConsultanService.Id != 0)
-                                {
-                                    <DxFormLayoutItem ColSpanMd="12">
-                                        <h3 class="fw-bolder">@GeneralConsultanService.Reference</h3>
-                                    </DxFormLayoutItem>
-                                }
-                            </DxFormLayout>
-                        </div>
                         <div class="col-md-6">
                             @{
                                 if (GeneralConsultanService.Patient is null)
@@ -135,14 +125,14 @@
                                     </MyDxComboBox>
                                     <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                 </DxFormLayoutItem>
-                                <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
-                                    <MyDxComboBox Data="@Helper._homeStatusTemps"
-                                                  NullText="Return Status..."
-                                                  @bind-Value="@GeneralConsultanService.HomeStatus"
-                                                  TextFieldName="Name"
-                                                  ValueFieldName="Code">
-                                    </MyDxComboBox>
-                                </DxFormLayoutItem>
+                                @*  <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
+                                <MyDxComboBox Data="@Helper._homeStatusTemps"
+                                NullText="Return Status..."
+                                @bind-Value="@GeneralConsultanService.HomeStatus"
+                                TextFieldName="Name"
+                                ValueFieldName="Code">
+                                </MyDxComboBox>
+                                </DxFormLayoutItem> *@
 
                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
                                     <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
@@ -281,7 +271,7 @@
     [Parameter] public EventCallback OnClosePopup { get; set; }
 
 
-    private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new(); 
+    private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
 
     private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
     private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
@@ -300,7 +290,10 @@
 
         if (TempSelectedInsurancePolicy is not null)
             SelectedInsurancePolicy = TempSelectedInsurancePolicy;
+
     }
+
+   
 
     private async Task OnCancelBack()
     {
@@ -365,35 +358,26 @@
 
             GeneralConsultanServiceDto res = new();
 
-            switch (GeneralConsultanService.Status)
-            {
-                case EnumStatusGeneralConsultantService.Planned:
-                    var patient = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
-                        {
-                            Includes = [x => x.Patient],
-                            Select = x => new GeneralConsultanService
-                            {
-                                Patient = new User { Name = x.Patient.Name },
-                            },
-                            Predicate = x => x.Id != GeneralConsultanService.Id
-                                          && x.ServiceId == GeneralConsultanService.ServiceId
-                                          && x.PatientId == GeneralConsultanService.PatientId
-                                          && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned)
-                                          && x.RegistrationDate != null
-                                          && x.RegistrationDate.Value.Date <= DateTime.Now.Date
-                        });
-
-                    if (patient is not null)
+            var patient = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Includes = [x => x.Patient],
+                    Select = x => new GeneralConsultanService
                     {
-                        IsLoading = false;
-                        ToastService.ShowInfo($"Patient in the name of \"{patient.Patient?.Name}\" still has a pending transaction.");
-                        return;
-                    }
+                        Patient = new User { Name = x.Patient.Name },
+                    },
+                    Predicate = x => x.Id != GeneralConsultanService.Id
+                                  && x.ServiceId == GeneralConsultanService.ServiceId
+                                  && x.PatientId == GeneralConsultanService.PatientId
+                                  && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned)
+                                  && x.RegistrationDate != null
+                                  && x.RegistrationDate.Value.Date <= DateTime.Now.Date
+                });
 
-                    break;
-
-                default:
-                    break;
+            if (patient is not null)
+            {
+                IsLoading = false;
+                ToastService.ShowInfo($"Patient in the name of \"{patient.Patient?.Name}\" still has a pending transaction.");
+                return;
             }
 
             await HandleGeneralConsultationSaveAsync(GeneralConsultanService, UserForm);
@@ -401,25 +385,34 @@
             // Refactored Save Logic
             async Task HandleGeneralConsultationSaveAsync(GeneralConsultanServiceDto service, UserDto userForm)
             {
-                if (GeneralConsultanService.Id == 0)
-                {
-                    var createRequest = new CreateFormGeneralConsultanServiceNewRequest
+                var createRequest = new CreateFormGeneralConsultanServiceNewRequest
+                    {
+                        GeneralConsultanServiceDto = new GeneralConsultanServiceDto
                         {
-                            GeneralConsultanServiceDto = service,
-                            Status = service.Status,
-                            UserDto = new UserDto
-                            {
-                                Id = service.PatientId.GetValueOrDefault(), 
-                                CurrentMobile = userForm.CurrentMobile
-                            }
-                        };
+                            PatientId = service.PatientId,
+                            TypeRegistration = service.TypeRegistration,
+                            IsAlertInformationSpecialCase = service.IsAlertInformationSpecialCase,
+                            ClassType = service.ClassType,
+                            ServiceId = service.ServiceId,
+                            PratitionerId = service.PratitionerId,
+                            Payment = service.Payment,
+                            InsurancePolicyId = service.InsurancePolicyId,
+                            AppointmentDate = service.AppointmentDate,
+                            Status = EnumStatusGeneralConsultantService.Planned
+                        },
+                        Status = EnumStatusGeneralConsultantService.Planned,
+                        UserDto = new UserDto
+                        {
+                            Id = service.PatientId.GetValueOrDefault(),
+                            CurrentMobile = userForm.CurrentMobile
+                        }
+                    };
 
-                    res = await Mediator.Send(createRequest);
-                }
+                res = await Mediator.Send(createRequest);
             }
 
             ToastService.ClearSuccessToasts();
-            ToastService.ShowSuccess("The patient has been successfully followed up"); 
+            ToastService.ShowSuccess("The patient has been successfully followed up");
             await OnClosePopup.InvokeAsync();
         }
         catch (Exception x)

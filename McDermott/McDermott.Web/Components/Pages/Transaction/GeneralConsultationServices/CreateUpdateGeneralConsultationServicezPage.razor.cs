@@ -355,6 +355,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     IsMaternityLeave = x.IsMaternityLeave,
                     StartMaternityLeave = x.StartMaternityLeave,
                     EndMaternityLeave = x.EndMaternityLeave,
+
+                    PPKRujukanCode = x.PPKRujukanCode,
+                    PPKRujukanName = x.PPKRujukanName,
+                    ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                    ReferVerticalSpesialisParentSubSpesialisName = x.ReferVerticalSpesialisParentSubSpesialisName,
+                    ReferReason = x.ReferReason,
                 }
             });
 

@@ -700,7 +700,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             else if (request.Status == EnumStatusGeneralConsultantService.Physician)
             {
-                UpdatePhysicianFields(entity, request.GeneralConsultanServiceDto);
+                UpdatePhysicianFields(entity, request.GeneralConsultanServiceDto, request.IsReferTo);
             }
 
             if (request.UserDto is not null)
@@ -795,22 +795,46 @@ namespace McDermott.Application.Features.Queries.Transaction
                 nameof(entity.RiskOfFalling), nameof(entity.RiskOfFallingDetail));
         }
 
-        private void UpdatePhysicianFields(GeneralConsultanService entity, GeneralConsultanServiceDto dto)
+        private void UpdatePhysicianFields(GeneralConsultanService entity, GeneralConsultanServiceDto dto, bool isReferTo)
         {
-            entity.PratitionerId = dto.PratitionerId;
-            entity.HomeStatus = dto.HomeStatus;
-            entity.IsSickLeave = dto.IsSickLeave;
-            entity.StartDateSickLeave = dto.StartDateSickLeave;
-            entity.EndDateSickLeave = dto.EndDateSickLeave;
-            entity.IsMaternityLeave = dto.IsMaternityLeave;
-            entity.StartMaternityLeave = dto.StartMaternityLeave;
-            entity.EndMaternityLeave = dto.EndMaternityLeave;
+            if (isReferTo)
+            {
+                entity.PPKRujukanCode = dto.PPKRujukanCode;
+                entity.PPKRujukanName = dto.PPKRujukanName;
+                entity.ReferVerticalSpesialisParentSpesialisName = dto.ReferVerticalSpesialisParentSpesialisName;
+                entity.ReferVerticalSpesialisParentSubSpesialisName = dto.ReferVerticalSpesialisParentSubSpesialisName;
+                entity.ReferReason = dto.ReferReason;
 
-            UpdateNurseStationFields(entity, dto); // Including NurseStation fields
+                SetPropertiesModified(entity,
+                    nameof(entity.PPKRujukanCode),
+                    nameof(entity.PPKRujukanName),
+                    nameof(entity.ReferVerticalSpesialisParentSpesialisName),
+                    nameof(entity.ReferVerticalSpesialisParentSubSpesialisName),
+                    nameof(entity.ReferReason));
+            }
+            else
+            {
+                entity.PratitionerId = dto.PratitionerId;
+                entity.HomeStatus = dto.HomeStatus;
+                entity.IsSickLeave = dto.IsSickLeave;
+                entity.StartDateSickLeave = dto.StartDateSickLeave;
+                entity.EndDateSickLeave = dto.EndDateSickLeave;
+                entity.IsMaternityLeave = dto.IsMaternityLeave;
+                entity.StartMaternityLeave = dto.StartMaternityLeave;
+                entity.EndMaternityLeave = dto.EndMaternityLeave;
 
-            SetPropertiesModified(entity, nameof(entity.PratitionerId), nameof(entity.HomeStatus), nameof(entity.IsSickLeave),
-                nameof(entity.StartDateSickLeave), nameof(entity.EndDateSickLeave), nameof(entity.IsMaternityLeave),
-                nameof(entity.StartMaternityLeave), nameof(entity.EndMaternityLeave));
+                UpdateNurseStationFields(entity, dto); // Including NurseStation fields
+
+                SetPropertiesModified(entity, nameof(entity.PratitionerId), nameof(entity.HomeStatus), nameof(entity.IsSickLeave),
+                    nameof(entity.PPKRujukanCode),
+                    nameof(entity.PPKRujukanName),
+                    nameof(entity.ReferVerticalSpesialisParentSpesialisName),
+                    nameof(entity.ReferVerticalSpesialisParentSubSpesialisName),
+                    nameof(entity.ReferReason),
+                    nameof(entity.StartDateSickLeave),
+                    nameof(entity.EndDateSickLeave), nameof(entity.IsMaternityLeave),
+                    nameof(entity.StartMaternityLeave), nameof(entity.EndMaternityLeave));
+            }
         }
 
         private void SetPropertiesModified(GeneralConsultanService entity, params string[] propertyNames)
@@ -933,6 +957,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         InsurancePolicyId = request.GeneralConsultanServiceDto.InsurancePolicyId,
                         RegistrationDate = request.GeneralConsultanServiceDto.RegistrationDate,
                         Status = request.Status,
+                        AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
                     };
 
