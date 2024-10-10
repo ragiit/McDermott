@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.InkML;
+using MediatR;
 using Microsoft.AspNetCore.Components.Web;
 using System.Linq.Expressions;
 
@@ -56,37 +57,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private List<StatusMcuData> StatusMcus = [];
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            try
-            {
-                //Data = "GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
-
-                PanelVisible = true;
-                SelectedDataItems = [];
-                var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
-                {
-                    OrderByList =
-                    [
-                        (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
-                        (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
-                        (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
-                    ],
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
-                GeneralConsultanServices = a.Item1;
-                totalCount = a.PageCount;
-                activePageIndex = pageIndex;
-                //var a = await Mediator.QueryGetHelper<GeneralConsultanService, GeneralConsultanServiceDto>(pageIndex, pageSize, searchTerm);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -137,6 +107,37 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private async Task OnPageIndexChanged(int newPageIndex)
         {
             await LoadData(newPageIndex, pageSize);
+        }
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                //Data = "GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
+
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+                {
+                    OrderByList =
+                    [
+                        (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
+                        (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
+                        (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
+                    ],
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                GeneralConsultanServices = a.Item1;
+                totalCount = a.PageCount;
+                activePageIndex = pageIndex;
+                //var a = await Mediator.QueryGetHelper<GeneralConsultanService, GeneralConsultanServiceDto>(pageIndex, pageSize, searchTerm);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Searching

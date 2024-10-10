@@ -1,0 +1,192 @@
+﻿<DxLoadingPanel @bind-Visible="PanelVisible"
+                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data..."> 
+    <MyGridPaginate @ref="Grid"
+                    Data="GeneralConsultanServices"
+                    PageSize="10"
+                    KeyFieldName="Id"
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    SearchTextChanged="OnSearchBoxChanged">
+
+        <Columns> 
+            <DxGridDataColumn MinWidth="200"
+                              FieldName="RegistrationDate"
+                              FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                              DisplayFormat="ddd, dd MMM yyyy"
+                              Caption="Registration Date" />
+            <DxGridDataColumn MinWidth="200" FieldName="Reference" Caption="Reference" />
+            <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" Caption="Registration Date" DisplayFormat="@Helper.DefaultFormatDate" />
+            <DxGridDataColumn MinWidth="200" FieldName="SerialNo" Caption="Serial No" />
+            <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+            <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
+            <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+            <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
+            <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment" />
+            <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                <CellDisplayTemplate>
+                    @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        </Columns>
+
+        <TotalSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                               FieldName="Name"
+                               Visible="true" />
+        </TotalSummary>
+    </MyGridPaginate>
+    <div class="row">
+        <DxFormLayout>
+            <div class="col-md-8">
+                <DxFormLayoutItem>
+                    <DxPager PageCount="totalCount"
+                             ActivePageIndexChanged="OnPageIndexChanged"
+                             ActivePageIndex="activePageIndex"
+                             VisibleNumericButtonCount="10"
+                             SizeMode="SizeMode.Medium"
+                             NavigationMode="PagerNavigationMode.Auto">
+                    </DxPager>
+                </DxFormLayoutItem>
+            </div>
+            <div class="col-md-4 d-flex justify-content-end">
+                <DxFormLayoutItem Caption="Page Size:">
+                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                  NullText="Select Page Size"
+                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                  @bind-Value="pageSize">
+                    </MyDxComboBox>
+                </DxFormLayoutItem>
+            </div>
+        </DxFormLayout>
+    </div>
+</DxLoadingPanel>
+@code {
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    private bool PanelVisible { get; set; }
+    private IGrid Grid { get; set; }
+
+    private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
+
+    [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+
+    #region Searching
+
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+    private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+                {
+                    Includes = 
+                    [
+                        x => x.Patient,
+                        x => x.Pratitioner,
+                        x => x.Service,
+                    ],
+                    Select = x => new GeneralConsultanService
+                    {
+                        Id = x.Id,
+                        Reference = x.Reference,
+                        RegistrationDate = x.RegistrationDate,
+                        SerialNo = x.SerialNo,
+                        Status = x.Status,
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                        },
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner.Name,
+                        },
+                        Service = new Service
+                        {
+                            Name = x.Service.Name
+                        },
+                        Payment = x.Payment,
+                        AppointmentDate = x.AppointmentDate,
+                        IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase
+                    },
+                    Predicate = x => x.PatientId == GeneralConsultanService.PatientId && x.Status.Equals(EnumStatusGeneralConsultantService.Planned),
+                    OrderByList =
+                                [
+                                        (x => x.RegistrationDate, false)
+                                ],
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    IsDescending = false,
+                });
+
+            GeneralConsultanServices = a.Item1;
+            totalCount = a.PageCount;
+            activePageIndex = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion Searching
+
+    public MarkupString GetIssuePriorityIconHtml(GeneralConsultanServiceDto priority)
+    {
+        if (priority is not null)
+        {
+            if (!priority.IsAlertInformationSpecialCase && priority.ClassType is null)
+                return new MarkupString("");
+
+            string priorytyClass = "danger";
+            string title = string.Empty;
+
+            if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
+                title = $" Priority, {priority.ClassType}";
+            else
+            {
+                if (priority.ClassType is not null)
+                    title = $"{priority.ClassType}";
+                if (priority.IsAlertInformationSpecialCase)
+                    title = $" Priority ";
+            }
+
+            string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+
+            return new MarkupString(html);
+        }
+        return new MarkupString("");
+    }
+}

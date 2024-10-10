@@ -1,4 +1,4 @@
-﻿@page "/clinic-service/general-consultation-serviceszz/{PageMode}"
+﻿@page "/clinic-service/general-consultation-services/{PageMode}"
 
 @using McDermott.Web.Components.Layout
 @using McDermott.Web.Components.Popups
@@ -58,7 +58,7 @@
                                     bool showButtons = (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.ProcedureRoom || GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Physician)
                                     ? (GeneralConsultanMedicalSupport.Status == EnumStatusGeneralConsultantServiceProcedureRoom.Finish || GeneralConsultanMedicalSupport.Id == 0)
                                     : true;
-
+                                    
                                     if (showButtons)
                                     {
                                         <div class="card sticky">
@@ -1149,8 +1149,24 @@ else
 
 
 <DxPopup HeaderText="Follow Up" @bind-Visible="@IsFollowUp" Closed="( () => IsFollowUp = false)" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="95%">
-    <PopUpGCReferTo GeneralConsultanService="GeneralConsultanService"
-                    OnClosePopup="HandleClosePopup"
+    <PopUpGCFollowUp GeneralConsultanService="GeneralConsultanService"
+                     OnClosePopup="HandleClosePopup"
+                     UserForm="UserForm"
+                     TempInsurancePolicies="InsurancePolicies"
+                     TempSelectedInsurancePolicy="SelectedInsurancePolicy">
+
+    </PopUpGCFollowUp>
+</DxPopup>
+
+<DxPopup HeaderText="Appointment pending in patient alert" @bind-Visible="@IsAppoimentPending" Closed="( () => IsAppoimentPending = false)" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="95%">
+    <PopUpGCPatientAppoimentPendingAlert GeneralConsultanService="GeneralConsultanService">
+
+    </PopUpGCPatientAppoimentPendingAlert>
+</DxPopup>
+
+<DxPopup HeaderText="Refer To" @bind-Visible="@IsReferTo" Closed="( () => IsReferTo = false)" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="95%">
+    <PopUpGCReferTo OnClosePopupReferTo="HandleClosePopupReferTo"
+                    GeneralConsultanService="GeneralConsultanService"
                     UserForm="UserForm"
                     TempInsurancePolicies="InsurancePolicies"
                     TempSelectedInsurancePolicy="SelectedInsurancePolicy">

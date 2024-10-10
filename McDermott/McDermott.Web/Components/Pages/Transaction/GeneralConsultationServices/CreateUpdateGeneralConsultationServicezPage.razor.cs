@@ -9,6 +9,7 @@ using McDermott.Application.Dtos.BpjsIntegration;
 using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
+using McDermott.Extentions;
 using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
@@ -1551,6 +1552,18 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private bool IsFollowUp = false;
+        private bool IsReferTo = false;
+        private bool IsAppoimentPending = false;
+
+        private async Task OnReferToClick()
+        {
+            IsReferTo = true;
+        }
+
+        private void HandleClosePopupReferTo()
+        {
+            IsReferTo = false; // Tutup popup
+        }
 
         private void OnAppoimentPopUpClick()
         {
@@ -1562,19 +1575,22 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             IsFollowUp = false; // Tutup popup
         }
 
+        private void OnClickPopUpAppoimentPending()
+        {
+            IsAppoimentPending = true;
+        }
+
         private async Task OnClickReferralPrescriptionConcoction()
         {
         }
 
-        private async Task OnPrintDocumentMedical()
+        private void OnPrintDocumentMedical()
         {
+            var IdEncrypt = SecureHelper.EncryptIdToBase64(GeneralConsultanService.Id);
+            NavigationManager.NavigateTo($"transaction/print-document-medical/{IdEncrypt}");
         }
 
         private async Task OnClickPopUpPopUpProcedureRoom()
-        {
-        }
-
-        private async Task OnClickPopUpAppoimentPending()
         {
         }
 
@@ -1587,10 +1603,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private async Task OnClickPainScalePopUp()
-        {
-        }
-
-        private async Task OnReferToClick()
         {
         }
 
