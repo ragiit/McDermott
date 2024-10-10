@@ -1,11 +1,11 @@
-var result = await Mediator.Send(new GetMedicamentGroupQuery
+var result = await Mediator.Send(new GetGeneralConsultanServiceQuery
 {
     SearchTerm = searchTerm,
     PageIndex = pageIndex,
     PageSize = pageSize, 
 });
 
-var result1 = await Mediator.Send(new GetMedicamentGroupQuery
+var result1 = await Mediator.Send(new GetGeneralConsultanServiceQuery
 {
     SearchTerm = searchTerm,
     PageIndex = pageIndex,
@@ -14,50 +14,50 @@ var result1 = await Mediator.Send(new GetMedicamentGroupQuery
 
 });
 
-var resul3t = await Mediator.Send(new GetMedicamentGroupQuery
+var resul3t = await Mediator.Send(new GetGeneralConsultanServiceQuery
 {
     SearchTerm = searchTerm,
     PageIndex = pageIndex,
     PageSize = pageSize,
     IsDescending = false,
     OrderBy = x => x.Code,
-    Select = x => new Domain.Entities.MedicamentGroup
+    Select = x => new Domain.Entities.GeneralConsultanService
     {
         Name = x.Name
     }
 });
 
-public class GetMedicamentGroupQuery : IRequest<(List<MedicamentGroupDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetGeneralConsultanServiceQuery : IRequest<(List<GeneralConsultanServiceDto>, int PageIndex, int PageSize, int PageCount)>
 {
-    public List<Expression<Func<MedicamentGroup, object>>> Includes { get; set; }
-    public Expression<Func<MedicamentGroup, bool>> Predicate { get; set; }
-    public Expression<Func<MedicamentGroup, MedicamentGroup>> Select { get; set; }
-    public Expression<Func<MedicamentGroup, object>> OrderBy { get; set; }
+    public List<Expression<Func<GeneralConsultanService, object>>> Includes { get; set; }
+    public Expression<Func<GeneralConsultanService, bool>> Predicate { get; set; }
+    public Expression<Func<GeneralConsultanService, GeneralConsultanService>> Select { get; set; }
+    public Expression<Func<GeneralConsultanService, object>> OrderBy { get; set; }
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
     public int PageSize { get; set; } = 10;
     public string SearchTerm { get; set; }
 }
 
-public class BulkValidateMedicamentGroupQuery(List<MedicamentGroupDto> MedicamentGroupsToValidate) : IRequest<List<MedicamentGroupDto>>
+public class BulkValidateGeneralConsultanServiceQuery(List<GeneralConsultanServiceDto> GeneralConsultanServicesToValidate) : IRequest<List<GeneralConsultanServiceDto>>
 {
-    public List<MedicamentGroupDto> MedicamentGroupsToValidate { get; } = MedicamentGroupsToValidate;
+    public List<GeneralConsultanServiceDto> GeneralConsultanServicesToValidate { get; } = GeneralConsultanServicesToValidate;
 }
 
-public class ValidateMedicamentGroupQuery(Expression<Func<MedicamentGroup, bool>>? predicate = null) : IRequest<bool>
+public class ValidateGeneralConsultanServiceQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null) : IRequest<bool>
 {
-    public Expression<Func<MedicamentGroup, bool>> Predicate { get; } = predicate!;
+    public Expression<Func<GeneralConsultanService, bool>> Predicate { get; } = predicate!;
 }
 
-IRequestHandler<GetMedicamentGroupQuery, (List<MedicamentGroupDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidateMedicamentGroupQuery, bool>,
-IRequestHandler<BulkValidateMedicamentGroupQuery, List<MedicamentGroupDto>>,
+IRequestHandler<GetGeneralConsultanServiceQuery, (List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidateGeneralConsultanServiceQuery, bool>,
+IRequestHandler<BulkValidateGeneralConsultanServiceQuery, List<GeneralConsultanServiceDto>>,
 
-public async Task<(List<MedicamentGroupDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMedicamentGroupQuery request, CancellationToken cancellationToken)
+public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServiceQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<MedicamentGroup>().Entities.AsNoTracking();
+        var query = _unitOfWork.Repository<GeneralConsultanService>().Entities.AsNoTracking();
 
         // Apply custom order by if provided
         if (request.OrderBy is not null) 
@@ -91,7 +91,7 @@ public async Task<(List<MedicamentGroupDto>, int pageIndex, int pageSize, int pa
         if (request.Select is not null) 
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new MedicamentGroup
+            query = query.Select(x => new GeneralConsultanService
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -111,7 +111,7 @@ public async Task<(List<MedicamentGroupDto>, int pageIndex, int pageSize, int pa
             cancellationToken
         );
 
-        return (pagedItems.Adapt<List<MedicamentGroupDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (pagedItems.Adapt<List<GeneralConsultanServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception ex)
     {

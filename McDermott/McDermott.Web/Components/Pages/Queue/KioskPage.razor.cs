@@ -907,7 +907,6 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormGeneral.PatientId = FormKios.PatientId;
                     FormGeneral.ServiceId = FormKios.ServiceId;
                     FormGeneral.KioskQueueId = QueueKioskId.Id;
-                    FormGeneral.ClassTypeId = FormKios.ClassTypeId;
                     FormGeneral.RegistrationDate = DateTime.Now;
                     if (checkId.PhysicianId != null)
                     {

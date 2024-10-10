@@ -414,11 +414,11 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 string title = string.Empty;
 
                 if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
-                    title = $" Priority, {priority.ClassType.Name}";
+                    title = $" Priority, {priority.ClassType}";
                 else
                 {
                     if (priority.ClassType is not null)
-                        title = $"{priority.ClassType.Name}";
+                        title = $"{priority.ClassType}";
                     if (priority.IsAlertInformationSpecialCase)
                         title = $" Priority ";
                 }
@@ -892,16 +892,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             {
                 ToastService.ShowInfo("The Email is already exist");
                 isValid = false;
-            }
-
-            if (UserForm.IsPhysicion)
-            {
-                var b = await Mediator.Send(new ValidateUserQuery(x => x.Id != UserForm.Id && x.PhysicanCode == UserForm.PhysicanCode));
-                if (b)
-                {
-                    ToastService.ShowInfo("The Physician Code is already exist");
-                    isValid = false;
-                }
             }
 
             if (Convert.ToBoolean(UserForm.IsEmployee))

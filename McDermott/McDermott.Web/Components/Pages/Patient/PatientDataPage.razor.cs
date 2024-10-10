@@ -325,11 +325,11 @@ namespace McDermott.Web.Components.Pages.Patient
                 string title = string.Empty;
 
                 if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
-                    title = $" Priority, {priority.ClassType.Name}";
+                    title = $" Priority, {priority.ClassType}";
                 else
                 {
                     if (priority.ClassType is not null)
-                        title = $"{priority.ClassType.Name}";
+                        title = $"{priority.ClassType}";
                     if (priority.IsAlertInformationSpecialCase)
                         title = $" Priority ";
                 }

@@ -171,6 +171,20 @@ namespace McDermott.Application.Dtos.Config
         [NotMapped]
         public string? GroupName { get; set; }
 
+        [NotMapped]
+        public long? Age
+        {
+            get
+            {
+                if (DateOfBirth is null)
+                    return null;
+
+                return DateTime.Now.Year - DateOfBirth.GetValueOrDefault().Year;
+            }
+            set
+            { }
+        }
+
         #endregion NotMapped
 
         //[SetToNull]
@@ -377,6 +391,20 @@ namespace McDermott.Application.Dtos.Config
 
         [NotMapped]
         public string? GroupName { get; set; }
+
+        [NotMapped]
+        public long? Age
+        {
+            get
+            {
+                if (DateOfBirth is null)
+                    return null;
+
+                return DateTime.Now.Year - DateOfBirth.GetValueOrDefault().Year;
+            }
+            set
+            { }
+        }
 
         #endregion NotMapped
     }

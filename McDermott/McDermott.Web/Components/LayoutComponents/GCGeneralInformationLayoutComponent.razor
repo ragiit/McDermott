@@ -114,10 +114,10 @@
                                 <MyDxComboBox Data="@ClassTypes"
                                               NullText="Select Patient Type.."
                                               ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                              TextFieldName="Name" ValueFieldName="Id"
-                                              @bind-Value="@GeneralConsultanService.ClassTypeId">
+                                           
+                                              @bind-Value="@GeneralConsultanService.ClassType">
                                 </MyDxComboBox>
-                                <ValidationMessage For="@(() => GeneralConsultanService.ClassTypeId)" />
+                                <ValidationMessage For="@(() => GeneralConsultanService.ClassType)" />
                             </DxFormLayoutItem>
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                 <MyDxComboBox Data="@Services"
@@ -236,7 +236,7 @@
                                                 <DxGridLayoutItem Row="0" Column="0">
                                                     <Template>
                                                         <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
-                                                                    DateChanged="@((DateTime e) => SelectedMaternityStartDateChanged(e))"
+                                                                    DateChanged="@((DateTime? e) => SelectedMaternityStartDateChanged(e))"
                                                                     Date="@GeneralConsultanService.StartMaternityLeave"
                                                                     DateExpression="@(() => GeneralConsultanService.StartMaternityLeave)"
                                                                     Mask="@DateTimeMask.ShortDate"
@@ -289,7 +289,7 @@
     [Parameter] public EventCallback<ServiceDto> CbSelectedItemServiceChanged { get; set; } 
     [Parameter] public EventCallback<InsurancePolicyDto> CbSelectedItemInsurancePolicyChanged { get; set; }  
     [Parameter] public EventCallback<string> CbSelectedItemPaymentChanged { get; set; }
-    [Parameter] public EventCallback<DateTime> CbSelectedMaternityStartDateChanged { get; set; }
+    [Parameter] public EventCallback<DateTime?> CbSelectedMaternityStartDateChanged { get; set; }
     [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedFoodAllergies { get; set; }
     [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedPharmacologyAllergies { get; set; }
     [Parameter] public EventCallback<IEnumerable<AllergyDto>> CbSelectedWeatherAllergies { get; set; }
@@ -338,7 +338,7 @@
         await CbSelectedItemInsurancePolicyChanged.InvokeAsync(selectedItem);
     }
 
-    protected void SelectedMaternityStartDateChanged(DateTime selectedItem)
+    protected void SelectedMaternityStartDateChanged(DateTime? selectedItem)
     {
         CbSelectedMaternityStartDateChanged.InvokeAsync(selectedItem);
     }

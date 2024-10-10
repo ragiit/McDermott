@@ -31,7 +31,7 @@
      { 
          PanelVisible = true;
          SelectedDataItems = [];
-         var a = await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>(pageIndex, pageSize, searchTerm);
+         var a = await Mediator.QueryGetHelper<GeneralConsultanCPPT, GeneralConsultanCPPTDto>(pageIndex, pageSize, searchTerm);
          var a = await Mediator.Send(new GetSignaQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
          Signas = a.Item1;
          totalCount = a.pageCount;

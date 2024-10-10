@@ -7,7 +7,7 @@
         public long? InsurancePolicyId { get; set; }
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
-        public long? ClassTypeId { get; set; }
+        public string? ClassType { get; set; }
         public string? Reference { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -104,8 +104,10 @@
         #endregion Vaccination
 
         #region Telemedic
-        public string? LinkMeet {  get; set; }
-        #endregion
+
+        public string? LinkMeet { get; set; }
+
+        #endregion Telemedic
 
         public long? ProjectId { get; set; }
 
@@ -151,6 +153,5 @@
         public virtual List<SickLeave>? SickLeaves { get; set; }
 
         //[SetToNull]
-        public virtual ClassType? ClassType { get; set; }
     }
 }

@@ -13,6 +13,36 @@
             public int PageSize { get; } = pageSize ?? 10;
         }
 
+        public class GetGeneralConsultanServicesQuery : IRequest<(List<GeneralConsultanServiceDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<GeneralConsultanService, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanService, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanService, GeneralConsultanService>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultanService, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetSingleGeneralConsultanServicesQuery : IRequest<GeneralConsultanServiceDto>
+        {
+            public List<Expression<Func<GeneralConsultanService, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanService, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanService, GeneralConsultanService>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultanService, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
         public class ValidateGeneralConsultanServiceQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<GeneralConsultanService, bool>> Predicate { get; } = predicate!;
@@ -44,6 +74,33 @@
         public class UpdateGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto) : IRequest<GeneralConsultanServiceDto>
         {
             public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; } = GeneralConsultanServiceDto;
+        }
+
+        public class CancelGeneralConsultanServiceRequest(GeneralConsultanServiceDto GeneralConsultanServiceDto) : IRequest<GeneralConsultanServiceDto>
+        {
+            public GeneralConsultanServiceDto GeneralConsultanServiceDto { get; set; } = GeneralConsultanServiceDto;
+        }
+
+        public class CreateFormGeneralConsultanServiceNewRequest : IRequest<GeneralConsultanServiceDto>
+        {
+            public GeneralConsultanServiceDto? GeneralConsultanServiceDto { get; set; }
+            public UserDto? UserDto { get; set; }
+            public bool IsFollowUpPatient { get; set; } = false;
+            public EnumStatusGeneralConsultantService Status { get; set; }
+        }
+
+        public class UpdateFormGeneralConsultanServiceNewRequest : IRequest<GeneralConsultanServiceDto>
+        {
+            public GeneralConsultanServiceDto? GeneralConsultanServiceDto { get; set; }
+            public UserDto? UserDto { get; set; }
+            public EnumStatusGeneralConsultantService Status { get; set; }
+        }
+
+        public class UpdateConfirmFormGeneralConsultanServiceNewRequest : IRequest<GeneralConsultanServiceDto>
+        {
+            public GeneralConsultanServiceDto? GeneralConsultanServiceDto { get; set; }
+            public UserDto? UserDto { get; set; }
+            public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
         public class UpdateStatusGeneralConsultanServiceRequest(EnumStatusGeneralConsultantService status, long id) : IRequest<GeneralConsultanServiceDto>

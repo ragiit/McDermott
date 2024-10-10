@@ -1,82 +1,82 @@
-await LoadDataDrugRoute();
+await LoadDataDiagnoses();
 
- #region ComboboxDrugRoute
+ #region ComboboxDiagnoses
 
- private DxComboBox<DrugRouteDto, long?> refDrugRouteComboBox { get; set; }
- private int DrugRouteComboBoxIndex { get; set; } = 0;
- private int totalCountDrugRoute = 0;
+ private DxComboBox<DiagnosesDto, long?> refDiagnosesComboBox { get; set; }
+ private int DiagnosesComboBoxIndex { get; set; } = 0;
+ private int totalCountDiagnoses = 0;
 
- private async Task OnSearchDrugRoute()
+ private async Task OnSearchDiagnoses()
  {
-     await LoadDataDrugRoute();
+     await LoadDataDiagnoses();
  }
 
- private async Task OnSearchDrugRouteIndexIncrement()
+ private async Task OnSearchDiagnosesIndexIncrement()
  {
-     if (DrugRouteComboBoxIndex < (totalCountDrugRoute - 1))
+     if (DiagnosesComboBoxIndex < (totalCountDiagnoses - 1))
      {
-         DrugRouteComboBoxIndex++;
-         await LoadDataDrugRoute(DrugRouteComboBoxIndex, 10);
+         DiagnosesComboBoxIndex++;
+         await LoadDataDiagnoses(DiagnosesComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchDrugRouteIndexDecrement()
+ private async Task OnSearchDiagnosesIndexDecrement()
  {
-     if (DrugRouteComboBoxIndex > 0)
+     if (DiagnosesComboBoxIndex > 0)
      {
-         DrugRouteComboBoxIndex--;
-         await LoadDataDrugRoute(DrugRouteComboBoxIndex, 10);
+         DiagnosesComboBoxIndex--;
+         await LoadDataDiagnoses(DiagnosesComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputDrugRouteChanged(string e)
+ private async Task OnInputDiagnosesChanged(string e)
  {
-     DrugRouteComboBoxIndex = 0;
-     await LoadDataDrugRoute();
+     DiagnosesComboBoxIndex = 0;
+     await LoadDataDiagnoses();
  }
 
 
 
-private async Task LoadDataDrugRoute(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataDiagnoses(int pageIndex = 0, int pageSize = 10)
  {
     try
     {
         PanelVisible = true; 
-        var result = await Mediator.Send(new GetDrugRouteQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDrugRouteComboBox?.Text ?? ""));
-        DrugRoutes = result.Item1;
-        totalCountDrugRoute = result.pageCount;
+        var result = await Mediator.Send(new GetDiagnosesQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosesComboBox?.Text ?? ""));
+        Diagnosess = result.Item1;
+        totalCountDiagnoses = result.pageCount;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastService);
+        ex.HandleException(ToastDiagnoses);
     }
     finally { PanelVisible = false; }
  }
 
- #endregion ComboboxDrugRoute
-private async Task LoadDataDrugRoute(int pageIndex = 0, int pageSize = 10)
+ #endregion ComboboxDiagnoses
+private async Task LoadDataDiagnoses(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetDrugRouteQuery(
+    var result = await Mediator.Send(new GetDiagnosesQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refDrugRouteComboBox?.Text ?? "",
+        searchTerm: refDiagnosesComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentDrugRoute,
-            x => x.DrugRoute,
+            x => x.ParentDiagnoses,
+            x => x.Diagnoses,
         ],
-        select: x => new DrugRoute
+        select: x => new Diagnoses
         {
             Id = x.Id,
             Name = x.Name,
-            ParentDrugRoute = new Domain.Entities.DrugRoute
+            ParentDiagnoses = new Domain.Entities.Diagnoses
             {
                 Name = x.Name
             },
-            DrugRoute = new Domain.Entities.DrugRoute
+            Diagnoses = new Domain.Entities.Diagnoses
             {
                 Name = x.Name
             },
@@ -84,16 +84,16 @@ private async Task LoadDataDrugRoute(int pageIndex = 0, int pageSize = 10)
             {
                 Name = x.Name
             },
-            DrugRouteCategory = x.DrugRouteCategory
+            DiagnosesCategory = x.DiagnosesCategory
         }
 
     ));
-    DrugRoutes = result.Item1;
-    totalCountDrugRoute = result.pageCount;
+    Diagnosess = result.Item1;
+    totalCountDiagnoses = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataDrugRoute(DrugRouteId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).DrugRouteId);
+await LoadDataDiagnoses(DiagnosesId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).DiagnosesId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -101,32 +101,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="DrugRoute" ColSpanMd="12">
-    <MyDxComboBox Data="@DrugRoutes"
-                  NullText="Select DrugRoute"
-                  @ref="refDrugRouteComboBox"
-                  @bind-Value="@a.DrugRouteId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnoses" ColSpanMd="12">
+    <MyDxComboBox Data="@Diagnosess"
+                  NullText="Select Diagnoses"
+                  @ref="refDiagnosesComboBox"
+                  @bind-Value="@a.DiagnosesId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputDrugRouteChanged(e))">
+                  TextChanged="((string e) => OnInputDiagnosesChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchDrugRouteIndexDecrement"
+            <DxEditorButton Click="OnSearchDiagnosesIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchDrugRoute"
+            <DxEditorButton Click="OnSearchDiagnoses"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchDrugRouteIndexIncrement"
+            <DxEditorButton Click="OnSearchDiagnosesIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(DrugRouteDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="DrugRoute.Name" Caption="DrugRoute" />
-            <DxListEditorColumn FieldName="@nameof(DrugRouteDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(DiagnosesDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Diagnoses.Name" Caption="Diagnoses" />
+            <DxListEditorColumn FieldName="@nameof(DiagnosesDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.DrugRouteId)" />
+    <ValidationMessage For="@(()=>a.DiagnosesId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -136,7 +136,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetDrugRouteQuery(x => x.Id == a.DrugRouteId))).Item1;
+     Cronises = (await Mediator.Send(new GetDiagnosesQuery(x => x.Id == a.DiagnosesId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

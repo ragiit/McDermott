@@ -947,11 +947,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string title = string.Empty;
 
                 if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
-                    title = $" Priority, {priority.ClassType.Name}";
+                    title = $" Priority, {priority.ClassType}";
                 else
                 {
                     if (priority.ClassType is not null)
-                        title = $"{priority.ClassType.Name}";
+                        title = $"{priority.ClassType}";
                     if (priority.IsAlertInformationSpecialCase)
                         title = $" Priority ";
                 }
@@ -1562,10 +1562,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private void SelectedMaternityStartDateChanged(DateTime e)
+        private void SelectedMaternityStartDateChanged(DateTime? e)
         {
             GeneralConsultanService.StartMaternityLeave = e;
-            GeneralConsultanService.EndMaternityLeave = GeneralConsultanService.StartMaternityLeave.AddMonths(3);
+            GeneralConsultanService.EndMaternityLeave = GeneralConsultanService.StartMaternityLeave.GetValueOrDefault().AddMonths(3);
         }
 
         #endregion Methods

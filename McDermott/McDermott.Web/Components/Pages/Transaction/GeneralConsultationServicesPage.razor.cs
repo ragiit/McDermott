@@ -93,26 +93,19 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             if (e == "Humpty Dumpty")
             {
-                RiskOfFallingDetail = HumptyDumpty.ToList();
+                RiskOfFallingDetail = Helper.HumptyDumpty.ToList();
             }
             else if (e == "Morse")
             {
-                RiskOfFallingDetail = Morse.ToList();
+                RiskOfFallingDetail = Helper.Morse.ToList();
             }
             else
             {
-                RiskOfFallingDetail = Geriati.ToList();
+                RiskOfFallingDetail = Helper.Geriati.ToList();
             }
         }
 
         private List<string> RiskOfFallingDetail = [];
-
-        private List<string> HumptyDumpty =
-        [
-            "Risiko rendah 0-6",
-            "Risiko sedang 7-11",
-            "Risiko Tinggi >= 12"
-        ];
 
         private List<string> InformationFrom =
         [
@@ -126,13 +119,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             "No"
        ];
 
-        private List<string> Morse =
-        [
-            "Risiko rendah 0-24",
-            "Risiko sedang 25-44",
-            "Risiko Tinggi >= 45"
-        ];
-
         private List<string> RiwayatPenyakitKeluarga =
         [
             "DM",
@@ -143,12 +129,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             "Anemia",
             "Other",
         ];
-
-        private List<string> Geriati =
-       [
-           "Risiko rendah 0-3",
-            "Risiko Tinggi >= 4"
-       ];
 
         private List<string> RiskOfFalling =
         [
@@ -611,10 +591,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #region Methods
 
-        private void SelectedMaternityStartDateChanged(DateTime e)
+        private void SelectedMaternityStartDateChanged(DateTime? e)
         {
             GeneralConsultanService.StartMaternityLeave = e;
-            GeneralConsultanService.EndMaternityLeave = GeneralConsultanService.StartMaternityLeave.AddMonths(3);
+            GeneralConsultanService.EndMaternityLeave = GeneralConsultanService.StartMaternityLeave.GetValueOrDefault().AddMonths(3);
         }
 
         private BPJSIntegrationDto SelectedBPJSIntegration { get; set; } = new();
@@ -2397,11 +2377,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string title = string.Empty;
 
                 if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
-                    title = $" Priority, {priority.ClassType.Name}";
+                    title = $" Priority, {priority.ClassType}";
                 else
                 {
                     if (priority.ClassType is not null)
-                        title = $"{priority.ClassType.Name}";
+                        title = $"{priority.ClassType}";
                     if (priority.IsAlertInformationSpecialCase)
                         title = $" Priority ";
                 }

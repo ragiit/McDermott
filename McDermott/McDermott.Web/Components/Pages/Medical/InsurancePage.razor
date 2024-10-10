@@ -28,6 +28,7 @@
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 EditModelSaving="OnSave"
                                                 DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
                                                 SearchTextChanged="OnSearchBoxChanged"
                                                 KeyFieldName="Id">
                                     <ToolbarTemplate>
@@ -113,14 +114,22 @@
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption"
-                                                              Caption="BPJS Kesehatan" ColSpanMd="3">
-                                                <DxCheckBox @bind-Checked="a.IsBPJSKesehatan" />
+                                                              Caption="Is BPJS?" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="a.IsBPJS" />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption"
-                                                              Caption="BPJS TK" ColSpanMd="3">
-                                                <DxCheckBox @bind-Checked="a.IsBPJSTK" />
-                                            </DxFormLayoutItem>
+                                            @if (a.IsBPJS)
+                                            {
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption"
+                                                                  Caption="BPJS Kesehatan" ColSpanMd="3">
+                                                    <DxCheckBox @bind-Checked="a.IsBPJSKesehatan" />
+                                                </DxFormLayoutItem>
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption"
+                                                                  Caption="BPJS TK" ColSpanMd="3">
+                                                    <DxCheckBox @bind-Checked="a.IsBPJSTK" />
+                                                </DxFormLayoutItem>
+                                            }
                                         </DxFormLayout>
                                     </EditFormTemplate>
                                     <TotalSummary>

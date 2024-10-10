@@ -25,11 +25,11 @@ namespace McDermott.Web.Extentions
         }
 
         public static List<string> HumptyDumpty =
-[
-"Risiko rendah 0-6",
+        [
+            "Risiko rendah 0-6",
             "Risiko sedang 7-11",
             "Risiko Tinggi >= 12"
-];
+        ];
 
         public static List<string> InformationFrom =
         [
@@ -91,6 +91,26 @@ namespace McDermott.Web.Extentions
             "SIM",
             "VISA",
         ];
+
+        public static List<string> RegisType = new List<string>
+        {
+            "General Consultation",
+            "Emergency",
+            //"MCU"
+        };
+
+        public static List<string> ClinicVisitTypes = new List<string>
+        {
+            "Healthy",
+            "Sick"
+        };
+
+        public static List<string> Payments = new List<string>
+        {
+            "Personal",
+            "Insurance",
+            "BPJS"
+        };
 
         public static readonly List<string> Genders =
         [
@@ -252,6 +272,10 @@ namespace McDermott.Web.Extentions
                 Code = "6",
                 Name = "Rujuk Horizontal",
             },
+        ];
+
+        public static List<string> ClassTypes = [
+            "VIP",
         ];
 
         public static string DefaultFormatDate => "dd MMMM yyyy";
