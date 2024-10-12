@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using McDermott.Application.Extentions;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -40,14 +41,6 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
-
-                //// Apply custom order by if provided
-                //if (request.OrderBy is not null)
-                //    query = request.IsDescending ?
-                //        query.OrderByDescending(request.OrderBy) :
-                //        query.OrderBy(request.OrderBy);
-                //else
-                //    query = query.OrderBy(x => x.Id);
 
                 // Apply ordering
                 if (request.OrderByList.Count != 0)
@@ -129,13 +122,8 @@ namespace McDermott.Application.Features.Queries.Transaction
             {
                 var query = _unitOfWork.Repository<GeneralConsultanService>().Entities.AsNoTracking();
 
-                //// Apply custom order by if provided
-                //if (request.OrderBy is not null)
-                //    query = request.IsDescending ?
-                //        query.OrderByDescending(request.OrderBy) :
-                //        query.OrderBy(request.OrderBy);
-                //else
-                //    query = query.OrderBy(x => x.Id);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
                 // Apply ordering
                 if (request.OrderByList.Count != 0)
@@ -162,17 +150,44 @@ namespace McDermott.Application.Features.Queries.Transaction
                     }
                 }
 
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
-
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     //query = query.Where(v =>
-                    //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.Phycisian.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.UoM.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.FormDrug.Name, $"%{request.SearchTerm}%")
-                    //    );
+                    //    EF.Functions.Like(v.Reference, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.SerialNo, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Status.GetDisplayName(), $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.StatusMCU.GetDisplayName(), $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Pratitioner.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.RegistrationDate.Value.ToString("dd-MM-yyyy"), $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.AppointmentDate.Value.ToString("dd-MM-yyyy"), $"%{request.SearchTerm}%"));
+
+                    var result = EnumHelper.GetEnumByDisplayName<EnumStatusGeneralConsultantService>(request.SearchTerm);
+                    var resultMcu = EnumHelper.GetEnumByDisplayName<EnumStatusMCU>(request.SearchTerm);
+
+                    DateTime parsedDate;
+                    bool isDate = DateTime.TryParseExact(request.SearchTerm, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out parsedDate);
+
+                    query = query
+                        .Where(v =>
+                            EF.Functions.Like(v.Reference, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.SerialNo, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Pratitioner.Name, $"%{request.SearchTerm}%") ||
+                            (result != null && v.Status == result) ||
+                            (resultMcu != null && v.StatusMCU == resultMcu) ||
+                                (isDate && v.RegistrationDate.HasValue && v.RegistrationDate.Value.Date == parsedDate.Date)
+
+                            //v.AppointmentDate.HasValue && v.AppointmentDate.Value.ToString("dd-MM-yyyy").Contains(request.SearchTerm
+                            );
+
+                    //.AsEnumerable()  // Evaluasi di memori mulai dari sini
+                    //.Where(v =>
+                    //    v.Status.GetDisplayName().ToLower().Contains(request.SearchTerm) ||
+                    //    v.StatusMCU.GetDisplayName().ToLower().Contains(request.SearchTerm) ||
+                    //    v.RegistrationDate.HasValue && v.RegistrationDate.Value.ToString("dd-MM-yyyy").Contains(request.SearchTerm) ||
+                    //    v.AppointmentDate.HasValue && v.AppointmentDate.Value.ToString("dd-MM-yyyy").Contains(request.SearchTerm))
+                    //.AsQueryable();
                 }
 
                 // Apply dynamic select if provided
@@ -202,6 +217,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         AppointmentDate = x.AppointmentDate,
                         IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
                         RegistrationDate = x.RegistrationDate,
+                        TypeRegistration = x.TypeRegistration,
                         ClassType = x.ClassType,
                         SerialNo = x.SerialNo,
                         Reference = x.Reference,

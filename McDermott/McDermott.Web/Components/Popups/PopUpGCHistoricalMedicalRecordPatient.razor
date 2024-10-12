@@ -1,0 +1,325 @@
+﻿@using static McDermott.Application.Features.Commands.Transaction.AccidentCommand
+<DxLoadingPanel @bind-Visible="PanelVisible"
+                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+    <MyGridPaginate @ref="Grid"
+                    Data="GeneralConsultanServices"
+                    KeyFieldName="Id"
+                    AllowSelectRowByClick="false"
+                    FocusedRowEnabled="false"
+                    @bind-SelectedDataItems="@SelectedDataItems"
+                    SearchTextChanged="OnSearchBoxChanged">
+
+        <Columns>
+            <DxGridDataColumn FieldName="TypeRegistration" Caption="Type Registration" GroupIndex="0" />
+
+            <DxGridDataColumn MinWidth="200"
+                              FieldName="RegistrationDate"
+                              FilterRowOperatorType="GridFilterRowOperatorType.Contains"
+                              DisplayFormat="ddd, dd MMM yyyy"
+                              Caption="Registration Date" />
+            <DxGridDataColumn MinWidth="200" FieldName="Reference" Caption="Reference" />
+            <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" Caption="Registration Date" DisplayFormat="@Helper.DefaultFormatDate" />
+            <DxGridDataColumn MinWidth="200" FieldName="SerialNo" Caption="Serial No" />
+            <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+            <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
+            <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
+            <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
+            <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment Date" />
+            <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
+                <CellDisplayTemplate>
+                    @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName="PatientId" AllowSort="false" Width="10px" MinWidth="100" TextAlignment="GridTextAlignment.Center">
+                <CellDisplayTemplate>
+                    <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                              Attributes="@(new Dictionary<string, object> {  ["title"] = "Print" })"
+                              IconCssClass="fa-solid fa-circle-info"
+                              Click="@(()=> OnClickDetailHistoricalRecordPatient((context.DataItem as GeneralConsultanServiceDto)))"
+                              CssClass="me-1" />
+                </CellDisplayTemplate>
+                <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+            </DxGridDataColumn>
+        </Columns>
+
+        <GroupSummary>
+            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count" FieldName="TypeRegistration" />
+        </GroupSummary>
+    </MyGridPaginate>
+    <div class="row">
+        <DxFormLayout>
+            <div class="col-md-8">
+                <DxFormLayoutItem>
+                    <DxPager PageCount="totalCount"
+                             ActivePageIndexChanged="OnPageIndexChanged"
+                             ActivePageIndex="activePageIndex"
+                             VisibleNumericButtonCount="10"
+                             SizeMode="SizeMode.Medium"
+                             NavigationMode="PagerNavigationMode.Auto">
+                    </DxPager>
+                </DxFormLayoutItem>
+            </div>
+            <div class="col-md-4 d-flex justify-content-end">
+                <DxFormLayoutItem Caption="Page Size:">
+                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                  NullText="Select Page Size"
+                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                  @bind-Value="pageSize">
+                    </MyDxComboBox>
+                </DxFormLayoutItem>
+            </div>
+        </DxFormLayout>
+    </div>
+</DxLoadingPanel>
+
+<DxPopup HeaderText="Historical Medical Record Patient Detail" @bind-Visible="@IsHistoricalRecordPatientDetailGC" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <_PopUpDetailGeneralConsultationService GeneralConsultanService="SelectedDetailHistorical" GeneralConsultanCPPTs="SelectedDetailHistoricalGeneralConsultanCPPTs" />
+</DxPopup>
+
+<DxPopup HeaderText="Historical Medical Record Patient Detail" @bind-Visible="@IsHistoricalRecordPatientDetailAccident" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <_PopUpDetailAccident Accident="SelectedAccidentHistorical" GeneralConsultanService="SelectedDetailHistorical" GeneralConsultanCPPTs="SelectedDetailHistoricalGeneralConsultanCPPTs" />
+</DxPopup>
+
+@code {
+    private IGrid? Grid { get; set; }
+    private bool PanelVisible { get; set; } = false;
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+    private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
+
+
+    [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+
+
+    public MarkupString GetIssuePriorityIconHtml(GeneralConsultanServiceDto priority)
+    {
+        if (priority is not null)
+        {
+            if (!priority.IsAlertInformationSpecialCase && priority.ClassType is null)
+                return new MarkupString("");
+
+            string priorytyClass = "danger";
+            string title = string.Empty;
+
+            if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
+                title = $" Priority, {priority.ClassType}";
+            else
+            {
+                if (priority.ClassType is not null)
+                    title = $"{priority.ClassType}";
+                if (priority.IsAlertInformationSpecialCase)
+                    title = $" Priority ";
+            }
+
+            string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+
+            return new MarkupString(html);
+        }
+        return new MarkupString("");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PanelVisible = true;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+    #region Searching
+
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+    private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.PatientId == GeneralConsultanService.PatientId,
+                    OrderByList =
+                                    [
+                                        (x => x.RegistrationDate, true),
+                    (x => x.IsAlertInformationSpecialCase, true),
+                    (x => x.ClassType != null, true)
+                                    ],
+                    SearchTerm = searchTerm,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+            GeneralConsultanServices = a.Item1;
+            totalCount = a.PageCount;
+            activePageIndex = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion Searching
+
+
+    private bool IsHistoricalRecordPatientDetailGC { get; set; } = false;
+    private bool IsHistoricalRecordPatientDetailAccident { get; set; } = false;
+    private GeneralConsultanServiceDto SelectedDetailHistorical { get; set; } = new();
+    private List<GeneralConsultanCPPTDto> SelectedDetailHistoricalGeneralConsultanCPPTs { get; set; } = new();
+    private AccidentDto SelectedAccidentHistorical { get; set; } = new();
+    private async Task OnClickDetailHistoricalRecordPatient(GeneralConsultanServiceDto e)
+    {
+        IsHistoricalRecordPatientDetailGC = false;
+        IsHistoricalRecordPatientDetailAccident = false;
+        SelectedDetailHistorical = new();
+
+        if (e is null)
+            return;
+
+        SelectedDetailHistorical = e;
+
+        // SelectedDetailHistoricalGeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+        // SelectedDetailHistoricalGeneralConsultanCPPTs = (await Mediator.Send(new GetGeneralConsultanCPPTsQuery
+        //     {
+        //         Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id
+        //     })).Item1;
+
+        if (e.TypeRegistration == "General Consultation" || e.TypeRegistration == "Emergency")
+        {
+            SelectedDetailHistorical = await GetGeneralConsultanServiceById();
+            IsHistoricalRecordPatientDetailGC = true;
+        }
+        else if (e.TypeRegistration == "Accident")
+        {
+            SelectedAccidentHistorical = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == e.Id))).FirstOrDefault() ?? new();
+            IsHistoricalRecordPatientDetailAccident = true;
+        }
+    }
+
+    private async Task<GeneralConsultanServiceDto> GetGeneralConsultanServiceById()
+    {
+        var result = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+        {
+            Predicate = x => x.Id == GeneralConsultanService.Id,
+
+            Select = x => new GeneralConsultanService
+            {
+                Id = x.Id,
+                Status = x.Status,
+                PatientId = x.PatientId,
+                Patient = new User
+                {
+                    Id = x.PatientId.GetValueOrDefault(),
+                    Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                    NoRm = x.Patient == null ? string.Empty : x.Patient.NoRm,
+                    NoId = x.Patient == null ? string.Empty : x.Patient.NoId,
+                    CurrentMobile = x.Patient == null ? string.Empty : x.Patient.CurrentMobile,
+                    DateOfBirth = x.Patient == null ? null : x.Patient.DateOfBirth,
+
+                    IsWeatherPatientAllergyIds = x.Patient != null && x.Patient.IsWeatherPatientAllergyIds,
+                    IsFoodPatientAllergyIds = x.Patient != null && x.Patient.IsFoodPatientAllergyIds,
+                    IsPharmacologyPatientAllergyIds = x.Patient == null ? false : x.Patient.IsPharmacologyPatientAllergyIds,
+                    WeatherPatientAllergyIds = x.Patient == null ? new() : x.Patient.WeatherPatientAllergyIds,
+                    FoodPatientAllergyIds = x.Patient == null ? new() : x.Patient.FoodPatientAllergyIds,
+                    PharmacologyPatientAllergyIds = x.Patient == null ? new() : x.Patient.PharmacologyPatientAllergyIds,
+
+                    IsFamilyMedicalHistory = x.Patient == null ? string.Empty : x.Patient.IsFamilyMedicalHistory,
+                    FamilyMedicalHistory = x.Patient == null ? string.Empty : x.Patient.FamilyMedicalHistory,
+                    FamilyMedicalHistoryOther = x.Patient == null ? string.Empty : x.Patient.FamilyMedicalHistoryOther,
+
+                    IsMedicationHistory = x.Patient == null ? string.Empty : x.Patient.IsMedicationHistory,
+                    MedicationHistory = x.Patient == null ? string.Empty : x.Patient.MedicationHistory,
+                    PastMedicalHistory = x.Patient == null ? string.Empty : x.Patient.PastMedicalHistory,
+
+                    Gender = x.Patient == null ? string.Empty : x.Patient.Gender
+                },
+                PratitionerId = x.PratitionerId,
+                Pratitioner = new User
+                {
+                    Name = x.Pratitioner == null ? string.Empty : x.Pratitioner.Name,
+                },
+                ServiceId = x.ServiceId,
+                Service = new Service
+                {
+                    Name = x.Service == null ? string.Empty : x.Service.Name,
+                },
+                Payment = x.Payment,
+                InsurancePolicyId = x.InsurancePolicyId,
+                AppointmentDate = x.AppointmentDate,
+                IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
+                RegistrationDate = x.RegistrationDate,
+                ClassType = x.ClassType,
+                TypeRegistration = x.TypeRegistration,
+
+                InformationFrom = x.InformationFrom,
+                AwarenessId = x.AwarenessId,
+                Weight = x.Weight,
+                Height = x.Height,
+                RR = x.RR,
+                SpO2 = x.SpO2,
+                WaistCircumference = x.WaistCircumference,
+                BMIIndex = x.BMIIndex,
+                BMIIndexString = x.BMIIndexString,
+                ScrinningTriageScale = x.ScrinningTriageScale,
+                E = x.E,
+                V = x.V,
+                M = x.M,
+                Temp = x.Temp,
+                HR = x.HR,
+                Systolic = x.Systolic,
+                DiastolicBP = x.DiastolicBP,
+                PainScale = x.PainScale,
+                BMIState = x.BMIState,
+                RiskOfFalling = x.RiskOfFalling,
+                RiskOfFallingDetail = x.RiskOfFallingDetail,
+                Reference = x.Reference,
+                HomeStatus = x.HomeStatus,
+                IsSickLeave = x.IsSickLeave,
+                StartDateSickLeave = x.StartDateSickLeave,
+                EndDateSickLeave = x.EndDateSickLeave,
+                IsMaternityLeave = x.IsMaternityLeave,
+                StartMaternityLeave = x.StartMaternityLeave,
+                EndMaternityLeave = x.EndMaternityLeave,
+
+                PPKRujukanCode = x.PPKRujukanCode,
+                PPKRujukanName = x.PPKRujukanName,
+                ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                ReferVerticalSpesialisParentSubSpesialisName = x.ReferVerticalSpesialisParentSubSpesialisName,
+                ReferReason = x.ReferReason,
+            }
+        });
+
+        return result;
+    }
+}

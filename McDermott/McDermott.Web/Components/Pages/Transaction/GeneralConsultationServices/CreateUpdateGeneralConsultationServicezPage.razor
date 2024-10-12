@@ -58,7 +58,7 @@
                                     bool showButtons = (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.ProcedureRoom || GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Physician)
                                     ? (GeneralConsultanMedicalSupport.Status == EnumStatusGeneralConsultantServiceProcedureRoom.Finish || GeneralConsultanMedicalSupport.Id == 0)
                                     : true;
-                                    
+
                                     if (showButtons)
                                     {
                                         <div class="card sticky">
@@ -401,15 +401,15 @@
                                                             </DxFormLayoutItem>
 
                                                             @if (GeneralConsultanService.AppointmentDate != null)
-                                                            { 
-                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
-                                                                <DxDateEdit @bind-Date="@GeneralConsultanService.AppointmentDate"
-                                                                            Mask="@DateTimeMask.ShortDate"
-                                                                            ReadOnly
-                                                                            NullText="Select Follow Up Date">
-                                                                </DxDateEdit>
-                                                                <ValidationMessage For="@(() => GeneralConsultanService.AppointmentDate)" />
-                                                            </DxFormLayoutItem>
+                                                            {
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
+                                                                    <DxDateEdit @bind-Date="@GeneralConsultanService.AppointmentDate"
+                                                                                Mask="@DateTimeMask.ShortDate"
+                                                                                ReadOnly
+                                                                                NullText="Select Follow Up Date">
+                                                                    </DxDateEdit>
+                                                                    <ValidationMessage For="@(() => GeneralConsultanService.AppointmentDate)" />
+                                                                </DxFormLayoutItem>
                                                             }
 
 
@@ -1085,6 +1085,32 @@
                                                                                         </DxFormLayout>
                                                                                     </EditFormTemplate>
                                                                                 </MyGridPaginate>
+
+                                                                                <div class="row">
+                                                                                    <DxFormLayout>
+                                                                                        <div class="col-md-9">
+                                                                                            <DxFormLayoutItem>
+                                                                                                <DxPager PageCount="totalCountGridCPPT"
+                                                                                                         ActivePageIndexChanged="OnPageIndexChangedGridCPPT"
+                                                                                                         ActivePageIndex="activePageIndexTotalCountGridCPPT"
+                                                                                                         VisibleNumericButtonCount="10"
+                                                                                                         SizeMode="SizeMode.Medium"
+                                                                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                                                                </DxPager>
+                                                                                            </DxFormLayoutItem>
+                                                                                        </div>
+                                                                                        <div class="col-md-3 d-flex justify-content-end">
+                                                                                            <DxFormLayoutItem Caption="Page Size:">
+                                                                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                                                              NullText="Select Page Size"
+                                                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                                                              SelectedItemChanged="((int e ) => OnpageSizeGridCPPTIndexChangedGridCPPT(e))"
+                                                                                                              @bind-Value="pageSizeGridCPPT">
+                                                                                                </MyDxComboBox>
+                                                                                            </DxFormLayoutItem>
+                                                                                        </div>
+                                                                                    </DxFormLayout>
+                                                                                </div>
                                                                             </DxLoadingPanel>
                                                                         </DxFormLayout>
                                                                     </div>
@@ -1185,4 +1211,19 @@ else
                     TempSelectedInsurancePolicy="SelectedInsurancePolicy">
 
     </PopUpGCReferTo>
+</DxPopup>
+
+
+<DxPopup Visible="isPrint" Width="874px">
+    <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">
+        <MailMergeSettings>
+            <DxMailMergeSettings ViewMergedData="true"></DxMailMergeSettings>
+        </MailMergeSettings>
+    </DxRichEdit>
+</DxPopup>
+
+<DxPopup HeaderText="Historical Medical Record Patient" @bind-Visible="@IsHistoricalRecordPatient" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <PopUpGCHistoricalMedicalRecordPatient GeneralConsultanService="GeneralConsultanService">
+
+    </PopUpGCHistoricalMedicalRecordPatient>
 </DxPopup>

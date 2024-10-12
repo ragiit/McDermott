@@ -127,6 +127,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ],
                     PageIndex = pageIndex,
                     PageSize = pageSize,
+                    SearchTerm = searchTerm,
                 });
                 GeneralConsultanServices = a.Item1;
                 totalCount = a.PageCount;

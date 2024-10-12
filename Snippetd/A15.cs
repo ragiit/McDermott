@@ -28,10 +28,8 @@ public class GetSingleGeneralConsultanCPPTsQuery : IRequest<GeneralConsultanCPPT
     public string SearchTerm { get; set; }
 }
 
-
 IRequestHandler<GetGeneralConsultanCPPTsQuery, (List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)>,
 IRequestHandler<GetSingleGeneralConsultanCPPTsQuery, GeneralConsultanCPPTDto>,
-
 
 public async Task<(List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanCPPTsQuery request, CancellationToken cancellationToken)
 {

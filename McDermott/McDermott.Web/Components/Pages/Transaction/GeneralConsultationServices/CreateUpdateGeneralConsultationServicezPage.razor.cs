@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraPrinting;
+﻿using DevExpress.Blazor.RichEdit;
+using DevExpress.XtraPrinting;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -12,6 +13,7 @@ using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Components.Web;
+using QuestPDF.Fluent;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
@@ -1547,21 +1549,19 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
         }
 
-        private async Task OnClickDetailHistoricalRecordPatient(GeneralConsultanServiceDto e)
-        {
-        }
-
         private bool IsLoadingHistoricalRecordPatient { get; set; } = false;
 
-        private async Task OnClickPopUpHistoricalMedical()
+        private void OnClickPopUpHistoricalMedical()
         {
+            IsHistoricalRecordPatient = true;
         }
 
         private bool IsFollowUp = false;
         private bool IsReferTo = false;
         private bool IsAppoimentPending = false;
+        private bool IsHistoricalRecordPatient = false;
 
-        private async Task OnReferToClick()
+        private void OnReferToClick()
         {
             IsReferTo = true;
         }
@@ -1600,12 +1600,194 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
         }
 
+        private bool isPrint { get; set; } = false;
+        private DxRichEdit richEdit;
+        private DevExpress.Blazor.RichEdit.Document documentAPI;
+        public byte[]? DocumentContent;
+
         private async Task SendToPrint(long id)
         {
+            try
+            {
+                PanelVisible = true;
+
+                DateTime? startSickLeave = null;
+                DateTime? endSickLeave = null;
+
+                var culture = new System.Globalization.CultureInfo("id-ID");
+
+                var data = (await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == id,
+                    Includes =
+                    [
+                        x => x.Pratitioner,
+                        x => x.Patient
+                    ],
+                    Select = x => new GeneralConsultanService
+                    {
+                        Id = x.Id,
+                        PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            DateOfBirth = x.Patient.DateOfBirth
+                        },
+                        RegistrationDate = x.RegistrationDate,
+                        PratitionerId = x.PratitionerId,
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner.Name,
+                            SipNo = x.Pratitioner.SipNo
+                        },
+                        StartMaternityLeave = x.StartMaternityLeave,
+                        EndMaternityLeave = x.EndMaternityLeave,
+                        StartDateSickLeave = x.StartDateSickLeave,
+                        EndDateSickLeave = x.EndDateSickLeave,
+                    }
+                })) ?? new();
+                var patienss = (await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.Id == data.PatientId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        IsEmployee = x.IsEmployee,
+                        Name = x.Name,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth
+                    },
+                })) ?? new();
+
+                var age = 0;
+
+                data = data == null ? new GeneralConsultanServiceDto() : data;
+
+                if (data is not null && data.Patient is not null && data.Patient.DateOfBirth == null)
+                {
+                    age = 0;
+                }
+                else
+                {
+                    age = DateTime.Now.Year - patienss.DateOfBirth.GetValueOrDefault().Year;
+                }
+                if (data is not null && data.IsSickLeave)
+                {
+                    startSickLeave = data.StartDateSickLeave;
+                    endSickLeave = data.EndDateSickLeave;
+                }
+                else if (data.IsMaternityLeave)
+                {
+                    startSickLeave = data.StartMaternityLeave;
+                    endSickLeave = data.EndMaternityLeave;
+                }
+
+                int TotalDays = endSickLeave.GetValueOrDefault().Day - startSickLeave.GetValueOrDefault().Day;
+
+                string WordDays = ConvertNumberHelper.ConvertNumberToWord(TotalDays);
+
+                string todays = data.RegistrationDate.ToString("dddd", culture);
+
+                //Gender
+                string Gender = "";
+                string OppositeSex = "";
+                if (patienss.Gender != null)
+                {
+                    Gender = patienss.Gender == "Male" ? "MALE (L)" : "FEMALE (P)";
+                    OppositeSex = patienss.Gender == "Male" ? "<strike>F(P)</strike>" : "<strike>M(L)</strike>";
+                }
+
+                isPrint = true;
+                string GetDefaultValue(string value, string defaultValue = "-")
+                {
+                    return value ?? defaultValue;
+                }
+
+                var mergeFields = new Dictionary<string, string>
+                {
+                    {"<<NamePatient>>", GetDefaultValue(patienss.Name)},
+                    {"<<startDate>>", GetDefaultValue(startSickLeave.GetValueOrDefault().ToString("dd MMMM yyyy"))},
+                    {"<<endDate>>", GetDefaultValue(endSickLeave.GetValueOrDefault().ToString("dd MMMM yyyy"))},
+                    {"<<NameDoctor>>", GetDefaultValue(data?.Pratitioner?.Name)},
+                    {"<<SIPDoctor>>", GetDefaultValue(data?.Pratitioner?.SipNo)},
+                    {"<<AddressPatient>>", GetDefaultValue(patienss.DomicileAddress1) + GetDefaultValue(patienss.DomicileAddress2)},
+                    {"<<AgePatient>>", GetDefaultValue(age.ToString())},
+                    {"<<WordDays>>", GetDefaultValue(WordDays)},
+                    {"<<Days>>", GetDefaultValue(todays)},
+                    {"<<TotalDays>>", GetDefaultValue(TotalDays.ToString())},
+                    {"<<Dates>>", GetDefaultValue(data.RegistrationDate.ToString("dd MMMM yyyy"))},
+                    {"<<Times>>", GetDefaultValue(data.RegistrationDate.ToString("H:MM"))},
+                    {"<<Date>>", DateTime.Now.ToString("dd MMMM yyyy")},  // Still no null check needed
+                    {"<<Genders>>", GetDefaultValue(Gender)},
+                    {"<<OppositeSex>>", GetDefaultValue(OppositeSex, "")} // Use empty string if null
+                };
+
+                if (patienss.IsEmployee == false)
+                {
+                    DocumentContent = await DocumentProvider.GetDocumentAsync("SuratIzin.docx", mergeFields);
+                }
+                else if (patienss.IsEmployee == true)
+                {
+                    DocumentContent = await DocumentProvider.GetDocumentAsync("Employee.docx", mergeFields);
+                }
+                // Konversi byte array menjadi base64 string
+                //var base64String = Convert.ToBase64String(DocumentContent);
+
+                //// Panggil JavaScript untuk membuka dan mencetak dokumen
+                //await JsRuntime.InvokeVoidAsync("printDocument", base64String);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnPrint()
         {
+            try
+            {
+                if (GeneralConsultanService.Id == 0)
+                    return;
+
+                QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+                var image = System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\mcdermott_logo.png");
+                var file = System.IO.Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\files\Slip_Registration.pdf");
+                QuestPDF.Fluent.Document
+                    .Create(x =>
+                    {
+                        x.Page(page =>
+                        {
+                            page.Margin(2, QuestPDF.Infrastructure.Unit.Centimetre);
+
+                            page.Header().Row(row =>
+                            {
+                                row.ConstantItem(150).Image(File.ReadAllBytes(image));
+                                row.RelativeItem().Column(c =>
+                                {
+                                    c.Item().Text("Slip Registration").FontSize(36).SemiBold();
+                                    c.Item().Text($"MedRec: {GeneralConsultanService.Patient?.NoRm}");
+                                    c.Item().Text($"Patient: {GeneralConsultanService.Patient?.Name}");
+                                    c.Item().Text($"Identity Number: {GeneralConsultanService.Patient?.NoId}");
+                                    c.Item().Text($"Reg Type: {GeneralConsultanService.TypeRegistration}");
+                                    c.Item().Text($"Service: {GeneralConsultanService.Service?.Name}");
+                                    c.Item().Text($"Physicion: {GeneralConsultanService.Pratitioner?.Name}");
+                                    c.Item().Text($"Payment: {GeneralConsultanService.Payment}");
+                                    c.Item().Text($"Registration Date: {GeneralConsultanService.RegistrationDate}");
+                                    c.Item().Text($"Schedule Time: {GeneralConsultanService.ScheduleTime}");
+                                });
+                            });
+                            //page.Header().Text("Slip Registration").SemiBold().FontSize(30);
+                        });
+                    })
+                .GeneratePdf(file);
+
+                await Helper.DownloadFile("Slip_Registration.pdf", HttpContextAccessor, HttpClient, JsRuntime);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task OnClickPainScalePopUp()

@@ -1,4 +1,6 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Domain.Entities
 {
     public partial class GeneralConsultanService : BaseAuditableEntity
     {
@@ -24,6 +26,8 @@
         public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        [NotMapped]
+        public string RegistrationDateString => RegistrationDate.GetValueOrDefault().ToString("dd-MM-yyyy");
         public DateTime? AppointmentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
