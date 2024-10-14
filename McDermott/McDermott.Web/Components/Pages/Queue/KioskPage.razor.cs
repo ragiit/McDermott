@@ -514,7 +514,7 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
             var group = result2.Item1;
-            var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+            //var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             var InputSearch = FormKios.NumberType ?? string.Empty;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));
 
@@ -563,10 +563,10 @@ namespace McDermott.Web.Components.Pages.Queue
                 statBPJS = "no BPJS number";
             }
 
-            if (new[] { "Nurse", "Perawat", "Nursing" }.Contains(NameGroup.Name))
-            {
-                showClass = true;
-            }
+            //if (new[] { "Nurse", "Perawat", "Nursing" }.Contains(NameGroup.Name))
+            //{
+            //    showClass = true;
+            //}
 
             foreach (var kiosk in KioskConf)
             {

@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Service\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\McDermott.Application\McDermott.Application.csproj" />
     <ProjectReference Include="..\McDermott.Persistence\McDermott.Persistence.csproj" />
   </ItemGroup>

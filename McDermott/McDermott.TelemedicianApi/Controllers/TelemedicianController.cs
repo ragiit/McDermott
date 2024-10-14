@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using McDermott.Persistence.Context;
+using McDermott.Domain.Entities; // Import the ViewModel namespace
 using System.Linq;
-using McDermott.Domain.Entities;
+using System.Collections.Generic;
+using MediatR;
+using static McDermott.Application.Features.Commands.Config.UserCommand;
+using McDermott.TelemedicianApi.ViewModel;
+using McDermott.Application.Dtos.Config;
 
 namespace McDermott.TelemedicianApi.Controllers
 {
@@ -11,72 +16,53 @@ namespace McDermott.TelemedicianApi.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        private bool IsValidToken(string token, string username)
-        {
-            // Implementasikan logika validasi token dan username di sini
-            // Misalnya: cek di database atau sistem lain untuk memastikan token dan username valid
-            ////Header
-            //var xSignature = Request.Headers["X-signature"].FirstOrDefault();
-            //var userKey = Request.Headers["user_key"].FirstOrDefault();
+        private readonly IMediator _mediator;
 
-            //// Nilai X-signature dan user_key yang valid (bisa berasal dari database atau konfigurasi)
-            //string validXSignature = "QXJnaSBQdXJ3YW50byBXYWh5dSBzYW5ha2kgRHdpIEx1Y2t5";
-            //string validUserKey = "s3l3m84R<4!|V<3H!DLip4N";
-            return true; // Asumsikan valid untuk sementara
-        }
 
-        // Constructor to inject ApplicationDbContext
-        public TelemedicianController(ApplicationDbContext context)
+        public TelemedicianController(ApplicationDbContext context, IMediator mediator)
         {
             _context = context;
+            _mediator = mediator;
         }
 
         [HttpGet("{number}/{serviceId}")]
-        public IActionResult GetDataPatient(string number, long serviceId)
+        public async Task<IActionResult> GetDataPatient(string number, long serviceId)
         {
-            
+            // Query untuk mendapatkan user berdasarkan identifier (Legacy, NIP, Oracle, SAP)
+            var user = await _mediator.Send(new GetDataUserForKioskQuery(number));
+            var doctorIds = _context.Users
+                .Where(u => u.DoctorServiceIds.Contains(serviceId)) // Filter dokter berdasarkan serviceId
+                .Select(u => u.Id)
+                .ToList();
 
-            // Query to fetch user based on number (SipNo or Legacy)
-            var result = _context.Users.Where(
-                    x => x.Legacy!.Equals(number) ||
-                         x.NIP!.Equals(number) ||
-                         x.Oracle!.Equals(number) ||
-                         x.SAP!.Equals(number));
-
-
-            // If no user found, return 404 Not Found
-            if (user == null)
+            // Dapatkan dokter yang sesuai dengan daftar ID dokter yang ditemukan
+            var filteredDoctors = _context.Users
+                .Where(u => doctorIds.Contains(u.Id))
+                .ToList();
+            // Jika user tidak ditemukan, kembalikan status 404 dengan pesan khusus
+            if (user == null && filteredDoctors == null)
             {
                 return NotFound(new
                 {
                     metadata = new
                     {
-                        code = 201,
-                        message = "Data peserta tidak boleh kosong"
+                        code = 404,
+                        message = "Data peserta tidak ditemukan"
                     }
                 });
             }
 
-            // If user is found, return success response
+
+            // Ambil daftar dokter, misalnya berdasarkan serviceId jika diperlukan
+
+
+            // Kembalikan data user dan dokter dalam response API
             return Ok(new
             {
-                metadata = new
-                {
-                    code = 200,
-                    message = "Sukses"
-                },
-                data = new
-                {
-                    User = new
-                    {
-                        user.Name,
-                        user.SipNo,
-                        user.Legacy,
-                        user.DateOfBirth,
-                        user.Gender,
-                        // Tambahkan field user lain yang relevan
-                    },
-                }
+
+                User = user,
+                Docter = filteredDoctors,
+
             });
         }
     }
