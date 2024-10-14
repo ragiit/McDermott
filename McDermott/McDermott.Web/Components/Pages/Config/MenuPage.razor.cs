@@ -322,7 +322,12 @@ namespace McDermott.Web.Components.Pages.Config
                             parentNames.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetMenuQuery(x => parentNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetMenuQuery(x => parentNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new Menu
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                     {

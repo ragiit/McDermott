@@ -27,6 +27,7 @@
             }
         }
 
+        public bool IsBPJS { get; set; }
         public bool IsMcu { get; set; } = false;
 
         private bool _isBPJSTK;

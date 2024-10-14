@@ -20,6 +20,20 @@ namespace McDermott.Application.Extentions
                             ?.GetName() ?? enumValue.ToString();
         }
 
+        public static TEnum? GetEnumByDisplayName<TEnum>(string displayName) where TEnum : struct, Enum
+        {
+            var type = typeof(TEnum);
+            foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                var attribute = field.GetCustomAttribute<DisplayAttribute>();
+                if (attribute != null && attribute.Name == displayName)
+                {
+                    return (TEnum)field.GetValue(null);
+                }
+            }
+            return null;
+        }
+
         public enum EnumPageMode
         {
             [Display(Name = "create")]

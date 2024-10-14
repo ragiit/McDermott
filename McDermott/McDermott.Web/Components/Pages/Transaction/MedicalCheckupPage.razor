@@ -533,9 +533,9 @@ else
                                                           NullText="Select Patient Type.."
                                                           ReadOnly="@(!FollowUpGeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                           TextFieldName="Name" ValueFieldName="Id"
-                                                          @bind-Value="@FollowUpGeneralConsultanService.ClassTypeId">
+                                                          @bind-Value="@FollowUpGeneralConsultanService.ClassType">
                                             </MyDxComboBox>
-                                            <ValidationMessage For="@(() => FollowUpGeneralConsultanService.ClassTypeId)" />
+                                            <ValidationMessage For="@(() => FollowUpGeneralConsultanService.ClassType)" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                             <MyDxComboBox Data="@Services"
@@ -775,10 +775,10 @@ else
                                                                     <MyDxComboBox Data="@ClassTypes"
                                                                                   NullText="Select Patient Type.."
                                                                                   ReadOnly="@(!ReferToGeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                                  TextFieldName="Name" ValueFieldName="Id"
-                                                                                  @bind-Value="@ReferToGeneralConsultanService.ClassTypeId">
+                                                                                 
+                                                                                  @bind-Value="@ReferToGeneralConsultanService.ClassType">
                                                                     </MyDxComboBox>
-                                                                    <ValidationMessage For="@(() => ReferToGeneralConsultanService.ClassTypeId)" />
+                                                                    <ValidationMessage For="@(() => ReferToGeneralConsultanService.ClassType)" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                                                     <MyDxComboBox Data="@ServicesReferTo"

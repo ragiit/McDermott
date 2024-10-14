@@ -350,9 +350,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (product is null)
                     return;
-
-                var a = await Mediator.Send(new GetMedicamentQuery());
-                var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
+                 
+                var ChekMedicament = await Mediator.Send(new GetSingleMedicamentQuery
+                {
+                    Predicate = x => x.ProductId == product.Id
+                }); 
                 var checkUom = Uoms.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
 
                 ConcoctionLine.Dosage = ChekMedicament?.Dosage ?? 0;
@@ -1262,12 +1264,15 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     return;
 
                 Prescription.ProductId = e.Id;
-
-                var medicament = await Mediator.Send(new GetMedicamentQuery(x => x.ProductId == e.Id));
-                if (medicament.Count > 0)
+                 
+                var medicament = await Mediator.Send(new GetSingleMedicamentQuery
                 {
-                    Prescription.DrugFromId = medicament[0].FormId;
-                    Prescription.DrugRouteId = medicament[0].RouteId;
+                    Predicate = x => x.ProductId == e.Id
+                });
+                if (medicament != null)
+                {
+                    Prescription.DrugFromId = medicament.FormId;
+                    Prescription.DrugRouteId = medicament.RouteId;
                     //Prescription.DrugRouteId = medicament[0].Dosage;
                 }
 

@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
 using McDermott.Domain.Entities;
+using static McDermott.Web.Components.Pages.TestPage;
 
 namespace McDermott.Web.Components.Pages.Employee
 {
@@ -273,9 +274,24 @@ namespace McDermott.Web.Components.Pages.Employee
                             managerNames.Add(c.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDepartmentQuery(x => parentNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
-                    list2 = (await Mediator.Send(new GetCompanyQuery(x => companyNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
-                    list3 = (await Mediator.Send(new GetUserQuery2(x => managerNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
+                    list1 = (await Mediator.Send(new GetDepartmentQuery(x => parentNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new Department
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
+                    list2 = (await Mediator.Send(new GetCompanyQuery(x => companyNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new Company
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
+                    list3 = (await Mediator.Send(new GetUserQuery2(x => managerNames.Contains(x.Name.ToLower()), 0, 0,
+                        select: x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

@@ -40,9 +40,11 @@
                                                              EditItem_Click="@EditItem_Click"
                                                              DeleteItem_Click="@DeleteItem_Click"
                                                              Refresh_Click="@Refresh_Click"
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
                                                              EnableDelete="!IsDeleted"
-                                                             IsImport="false"
                                                              Grid="Grid"
+                                                             IsImport="UserAccessCRUID.IsImport"
                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
                                                              VisibleDelete="UserAccessCRUID.IsDelete" />

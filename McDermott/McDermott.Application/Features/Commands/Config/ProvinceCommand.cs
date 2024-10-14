@@ -16,6 +16,11 @@
             public Expression<Func<Province, Province>>? Select { get; } = select!;
         }
 
+        public class BulkValidateProvinceQuery(List<ProvinceDto> ProvincesToValidate) : IRequest<List<ProvinceDto>>
+        {
+            public List<ProvinceDto> ProvincesToValidate { get; } = ProvincesToValidate;
+        }
+
         public class ValidateProvinceQuery(Expression<Func<Province, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Province, bool>> Predicate { get; } = predicate!;

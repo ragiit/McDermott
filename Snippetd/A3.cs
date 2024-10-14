@@ -1,63 +1,63 @@
- public class GetLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
+ public class GetLocationsQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)>
  {
-     public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
      public bool RemoveCache { get; } = removeCache!;
      public string SearchTerm { get; } = searchTerm!;
      public int PageIndex { get; } = pageIndex;
      public int PageSize { get; set; } = pageSize ?? 10;
  }
 
-public class GetLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<LabUom, object>>>? includes = null, Expression<Func<LabUom, LabUom>>? select = null) : IRequest<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
+public class GetLocationsQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Locations, object>>>? includes = null, Expression<Func<Locations, Locations>>? select = null) : IRequest<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)>
 {
-    public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
+    public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
     public bool RemoveCache { get; } = removeCache!;
     public string SearchTerm { get; } = searchTerm!;
     public int PageIndex { get; } = pageIndex;
     public int PageSize { get; } = pageSize ?? 10;
 
-    public List<Expression<Func<LabUom, object>>> Includes { get; } = includes!;
-    public Expression<Func<LabUom, LabUom>>? Select { get; } = select!;
+    public List<Expression<Func<Locations, object>>> Includes { get; } = includes!;
+    public Expression<Func<Locations, Locations>>? Select { get; } = select!;
 }
 
- public class BulkValidateLabUomQuery(List<LabUomDto> LabUomsToValidate) : IRequest<List<LabUomDto>>
+ public class BulkValidateLocationsQuery(List<LocationsDto> LocationssToValidate) : IRequest<List<LocationsDto>>
  {
-     public List<LabUomDto> LabUomsToValidate { get; } = LabUomsToValidate;
+     public List<LocationsDto> LocationssToValidate { get; } = LocationssToValidate;
  }
 
- public class ValidateLabUomQuery(Expression<Func<LabUom, bool>>? predicate = null) : IRequest<bool>
+ public class ValidateLocationsQuery(Expression<Func<Locations, bool>>? predicate = null) : IRequest<bool>
  {
-     public Expression<Func<LabUom, bool>> Predicate { get; } = predicate!;
+     public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
  }
 
-IRequestHandler<GetLabUomQuery, (List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidateLabUomQuery, bool>,
-IRequestHandler<BulkValidateLabUomQuery, List<LabUomDto>>,
+IRequestHandler<GetLocationsQuery, (List<LocationsDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<ValidateLocationsQuery, bool>,
+IRequestHandler<BulkValidateLocationsQuery, List<LocationsDto>>,
 
 
-public async Task<List<LabUomDto>> Handle(BulkValidateLabUomQuery request, CancellationToken cancellationToken)
+public async Task<List<LocationsDto>> Handle(BulkValidateLocationsQuery request, CancellationToken cancellationToken)
 {
-    var LabUomDtos = request.LabUomsToValidate;
+    var LocationsDtos = request.LocationssToValidate;
 
     // Ekstrak semua kombinasi yang akan dicari di database
-    var LabUomNames = LabUomDtos.Select(x => x.Name).Distinct().ToList();
-    var provinceIds = LabUomDtos.Select(x => x.ProvinceId).Distinct().ToList();
+    var LocationsNames = LocationsDtos.Select(x => x.Name).Distinct().ToList();
+    var LocationsIds = LocationsDtos.Select(x => x.LocationsId).Distinct().ToList();
 
-    var existingLabUoms = await _unitOfWork.Repository<LabUom>()
+    var existingLocationss = await _unitOfWork.Repository<Locations>()
         .Entities
         .AsNoTracking()
-        .Where(v => LabUomNames.Contains(v.Name)
-                    && provinceIds.Contains(v.ProvinceId))
+        .Where(v => LocationsNames.Contains(v.Name)
+                    && LocationsIds.Contains(v.LocationsId))
         .ToListAsync(cancellationToken);
 
-    return existingLabUoms.Adapt<List<LabUomDto>>();
+    return existingLocationss.Adapt<List<LocationsDto>>();
 }
 
 
-public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabUomQuery request, CancellationToken cancellationToken)
+public async Task<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationsQuery request, CancellationToken cancellationToken)
 {
     try
     { 
-        var query = _unitOfWork.Repository<LabUom>().Entities.AsNoTracking();
+        var query = _unitOfWork.Repository<Locations>().Entities.AsNoTracking();
 
         // Apply dynamic includes
         if (request.Includes is not null)
@@ -90,7 +90,7 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
                           q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
                           cancellationToken);
 
-        return (pagedItems.Adapt<List<LabUomDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (pagedItems.Adapt<List<LocationsDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {
@@ -98,22 +98,22 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
     }
 }
 
-public async Task<bool> Handle(ValidateLabUomQuery request, CancellationToken cancellationToken)
+public async Task<bool> Handle(ValidateLocationsQuery request, CancellationToken cancellationToken)
 {
-    return await _unitOfWork.Repository<LabUom>()
+    return await _unitOfWork.Repository<Locations>()
         .Entities
         .AsNoTracking()
         .Where(request.Predicate)  // Apply the Predicate for filtering
         .AnyAsync(cancellationToken);  // Check if any record matches the condition
 }
 
-public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabUomQuery request, CancellationToken cancellationToken)
+public async Task<(List<LocationsDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationsQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<LabUom>().Entities
+        var query = _unitOfWork.Repository<Locations>().Entities
             .AsNoTracking()
-            .Include(v => v.Province)
+            .Include(v => v.Locations)
             .AsQueryable();
 
         if (request.Predicate is not null)
@@ -123,14 +123,14 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
         {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%"));
+                EF.Functions.Like(v.Locations.Name, $"%{request.SearchTerm}%"));
         }
 
         var pagedResult = query.OrderBy(x => x.Name);
 
         var (totalCount, paged, totalPages) = await PaginateAsyncClass.PaginateAsync(request.PageSize, request.PageIndex, query, pagedResult, cancellationToken);
 
-        return (paged.Adapt<List<LabUomDto>>(), request.PageIndex, request.PageSize, totalPages);
+        return (paged.Adapt<List<LocationsDto>>(), request.PageIndex, request.PageSize, totalPages);
     }
     catch (Exception)
     {

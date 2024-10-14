@@ -1,4 +1,6 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Domain.Entities
 {
     public partial class GeneralConsultanService : BaseAuditableEntity
     {
@@ -7,7 +9,7 @@
         public long? InsurancePolicyId { get; set; }
         public long? ServiceId { get; set; }
         public long? PratitionerId { get; set; }
-        public long? ClassTypeId { get; set; }
+        public string? ClassType { get; set; }
         public string? Reference { get; set; }
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
@@ -24,6 +26,8 @@
         public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        [NotMapped]
+        public string RegistrationDateString => RegistrationDate.GetValueOrDefault().ToString("dd-MM-yyyy");
         public DateTime? AppointmentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
@@ -104,8 +108,10 @@
         #endregion Vaccination
 
         #region Telemedic
-        public string? LinkMeet {  get; set; }
-        #endregion
+
+        public string? LinkMeet { get; set; }
+
+        #endregion Telemedic
 
         public long? ProjectId { get; set; }
 
@@ -151,6 +157,5 @@
         public virtual List<SickLeave>? SickLeaves { get; set; }
 
         //[SetToNull]
-        public virtual ClassType? ClassType { get; set; }
     }
 }

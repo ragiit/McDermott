@@ -267,8 +267,8 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
 
         private async Task LoadData()
         {
-            //var result = await Mediator.Send(new GetLabTestQuery(x => x.Id == Id, 0, 1));
-            var result = await Mediator.QueryGetHelper<LabTest, LabTestDto>(predicate: x => x.Id == Id);
+            var result = await Mediator.Send(new GetLabTestQuery(x => x.Id == Id, 0, 1));
+            //var result = await Mediator.QueryGetHelper<LabTest, LabTestDto>(predicate: x => x.Id == Id);
 
             LabTest = new();
             LabTestDetailForms.Clear();

@@ -25,11 +25,17 @@ namespace McDermott.Web.Extentions
         }
 
         public static List<string> HumptyDumpty =
-[
-"Risiko rendah 0-6",
+        [
+            "Risiko rendah 0-6",
             "Risiko sedang 7-11",
             "Risiko Tinggi >= 12"
-];
+        ];
+
+        public static List<string> Hospitals { get; set; } = new List<string> { "RSBK", "RSE", "RSHB", "RSBP", "RSAB", "RSGH", "RSMA", "RSHBH", "RSSD" };
+        public static List<string> ExaminationPurposes { get; set; } = new List<string> { "Dentist", "Internist", "Pulmonologist", "Cardiologist", "Eye", "ENT", "Paediatric", "Surgeon", "Obstetrician", "Neurologist", "Urologist", "Neurosurgeon", "Orthopaedic", "Physiotherapist", "Dermatologist", "Psychiatrist", "Laboratorium" };
+        public static List<string> Categories { get; set; } = new List<string> { "KANKER", "ACCIDENT Inside", "EMPLOYEE", "KELAINAN BAWAAN", "ACCIDENT Outside", "DEPENDENT" };
+        public static List<string> ExamFor { get; set; } = new List<string> { "Pemeriksaan / penanganan lebih lanjut", "Pembedahan", "Perawatan", "Bersalin" };
+        public static List<string> InpatientClasses { get; set; } = new List<string> { "VIP Class", "Class 1 B", "Class 2" };
 
         public static List<string> InformationFrom =
         [
@@ -91,6 +97,26 @@ namespace McDermott.Web.Extentions
             "SIM",
             "VISA",
         ];
+
+        public static List<string> RegisType = new List<string>
+        {
+            "General Consultation",
+            "Emergency",
+            //"MCU"
+        };
+
+        public static List<string> ClinicVisitTypes = new List<string>
+        {
+            "Healthy",
+            "Sick"
+        };
+
+        public static List<string> Payments = new List<string>
+        {
+            "Personal",
+            "Insurance",
+            "BPJS"
+        };
 
         public static readonly List<string> Genders =
         [
@@ -252,6 +278,10 @@ namespace McDermott.Web.Extentions
                 Code = "6",
                 Name = "Rujuk Horizontal",
             },
+        ];
+
+        public static List<string> ClassTypes = [
+            "VIP",
         ];
 
         public static string DefaultFormatDate => "dd MMMM yyyy";
@@ -604,5 +634,29 @@ namespace McDermott.Web.Extentions
                 Console.WriteLine($"Terjadi kesalahan saat menghapus file: {ex.Message}");
             }
         }
+
+        public static DateTime CalculateNewExpiryDate(DateTime? expired, int? number, string unit)
+        {
+            if (expired == null || number == null)
+            {
+                // Tangani jika salah satu parameter null
+                throw new ArgumentNullException("Expired date and number must not be null.");
+            }
+
+            switch (unit?.ToLower())
+            {
+                case "days":
+                    return expired.Value.AddDays(number.Value);
+                case "weeks":
+                    return expired.Value.AddDays(number.Value * 7);
+                case "months":
+                    return expired.Value.AddMonths(number.Value);
+                case "years":
+                    return expired.Value.AddYears(number.Value);
+                default:
+                    throw new ArgumentException("Unit not recognized.", nameof(unit));
+            }
+        }
+
     }
 }

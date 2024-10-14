@@ -8,6 +8,7 @@
         public string? Code { get; set; }
 
         public string? Type { get; set; }
+        public bool IsBPJS { get; set; }
         public bool IsBPJSKesehatan { get; set; }
         public bool IsBPJSTK { get; set; }
         public long? AdminFee { get; set; }

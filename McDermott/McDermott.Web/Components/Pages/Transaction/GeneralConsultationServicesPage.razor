@@ -1,12 +1,10 @@
-﻿@page "/clinic-service/general-consultation-services"
+﻿@page "/clinic-service/general-consultation-servicessz"
 @using McDermott.Web.Components.LayoutComponents
 @using FluentValidation
 @using FluentValidation.Results
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Transaction General Consultation Service</PageTitle>
-
-
 
 @if (IsAccess)
 {
@@ -1383,10 +1381,9 @@ else
                                             <MyDxComboBox Data="@ClassTypes"
                                                           NullText="Select Patient Type.."
                                                           ReadOnly="@(!FollowUpGeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                          TextFieldName="Name" ValueFieldName="Id"
-                                                          @bind-Value="@FollowUpGeneralConsultanService.ClassTypeId">
+                                                          @bind-Value="@FollowUpGeneralConsultanService.ClassType">
                                             </MyDxComboBox>
-                                            <ValidationMessage For="@(() => FollowUpGeneralConsultanService.ClassTypeId)" />
+                                            <ValidationMessage For="@(() => FollowUpGeneralConsultanService.ClassType)" />
                                         </DxFormLayoutItem>
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                             <MyDxComboBox Data="@Services"
@@ -1748,11 +1745,10 @@ else
                                                             <DxFormLayout>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
                                                                     <MyDxComboBox Data="@ClassTypes"
-                                                                                  NullText="Select Patient Type.."
-                                                                                  TextFieldName="Name" ValueFieldName="Id"
-                                                                                  @bind-Value="@ReferToGeneralConsultanService.ClassTypeId">
+                                                                                  NullText="Select Patient Type.." 
+                                                                                  @bind-Value="@ReferToGeneralConsultanService.ClassType">
                                                                     </MyDxComboBox>
-                                                                    <ValidationMessage For="@(() => ReferToGeneralConsultanService.ClassTypeId)" />
+                                                                    <ValidationMessage For="@(() => ReferToGeneralConsultanService.ClassType)" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                                                     <MyDxComboBox Data="@Services"

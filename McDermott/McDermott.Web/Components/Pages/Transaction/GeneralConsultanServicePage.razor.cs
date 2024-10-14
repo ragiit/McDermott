@@ -1101,11 +1101,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 string title = string.Empty;
 
                 if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
-                    title = $" Priority, {priority.ClassType.Name}";
+                    title = $" Priority, {priority.ClassType}";
                 else
                 {
                     if (priority.ClassType is not null)
-                        title = $"{priority.ClassType.Name}";
+                        title = $"{priority.ClassType}";
                     if (priority.IsAlertInformationSpecialCase)
                         title = $" Priority ";
                 }
@@ -2960,10 +2960,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             await SetTimeSchedule();
         }
 
-        private void SelectedMaternityStartDateChanged(DateTime e)
+        private void SelectedMaternityStartDateChanged(DateTime? e)
         {
             FormRegis.StartMaternityLeave = e;
-            FormRegis.EndMaternityLeave = FormRegis.StartMaternityLeave.AddMonths(3);
+            FormRegis.EndMaternityLeave = FormRegis.StartMaternityLeave.GetValueOrDefault().AddMonths(3);
         }
 
         private void SelectedItemPaymentChanged(string e)

@@ -58,11 +58,16 @@ namespace McDermott.Web.Extentions
 
                 var userAccessCRUID = groups?.FirstOrDefault(x => x.Menu?.Url != null && url.Contains(x.Menu.Url.ToLower()));
 
-                if (!string.IsNullOrWhiteSpace(url) && userAccessCRUID is null && url != _navigationManager.BaseUri && !url.Contains("queue/kiosk/"))
+                if (!string.IsNullOrWhiteSpace(url) &&
+                    userAccessCRUID is null &&
+                    url != _navigationManager.BaseUri &&
+                    !url.Contains("queue/kiosk/") &&
+                    !url.Contains("transaction/print-document-medical")
+                    )
                 {
+                    _navigationManager.NavigateTo("/unauthorized", true);
                     toastService?.ClearErrorToasts();
                     toastService?.ShowError("Unauthorized Access\r\n\r\nYou are not authorized to view this page. If you need access, please contact the administrator.\r\n");
-                    _navigationManager.NavigateTo("/unauthorized", true);
                     //return (false, null!, null!);
                 }
 

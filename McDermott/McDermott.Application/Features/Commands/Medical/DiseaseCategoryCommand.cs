@@ -4,13 +4,16 @@
     {
         #region GET
 
-        public class GetDiseaseCategoryQuery(Expression<Func<DiseaseCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetDiseaseCategoryQuery(Expression<Func<DiseaseCategory, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<DiseaseCategory, object>>>? includes = null, Expression<Func<DiseaseCategory, DiseaseCategory>>? select = null) : IRequest<(List<DiseaseCategoryDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<DiseaseCategory, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
             public string SearchTerm { get; } = searchTerm!;
             public int PageIndex { get; } = pageIndex;
             public int PageSize { get; } = pageSize ?? 10;
+
+            public List<Expression<Func<DiseaseCategory, object>>> Includes { get; } = includes!;
+            public Expression<Func<DiseaseCategory, DiseaseCategory>>? Select { get; } = select!;
         }
 
         public class BulkValidateDiseaseCategoryQuery(List<DiseaseCategoryDto> DiseaseCategorysToValidate) : IRequest<List<DiseaseCategoryDto>>
@@ -24,8 +27,6 @@
         }
 
         #endregion GET
-
-
 
         #region CREATE
 

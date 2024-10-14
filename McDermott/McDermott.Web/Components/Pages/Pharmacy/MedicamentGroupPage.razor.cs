@@ -50,8 +50,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (product is not null)
                 {
-                    var a = await Mediator.Send(new GetMedicamentQuery());
-                    var ChekMedicament = a.Where(m => m.ProductId == product.Id).FirstOrDefault();
+                    var ChekMedicament = await Mediator.Send(new GetSingleMedicamentQuery
+                    {
+                        Predicate = x => x.ProductId == product.Id
+                    });
                     var checkUom = UoMs.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
                     FormMedicamenDetails.MedicaneUnitDosage = checkUom?.Name;
                     FormMedicamenDetails.FrequencyId = ChekMedicament?.FrequencyId;
@@ -191,14 +193,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             showForm = false;
             SelectedDataItems = new ObservableRangeCollection<object>();
             SelectedMedicamentGroupDetailDataItems = new ObservableRangeCollection<object>();
-            medicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
+            //medicamentGroups = await Mediator.Send(new GetMedicamentGroupQuery());
             PanelVisible = false;
         }
 
         private async Task LoadMedicamentGroupDetail()
         {
             PanelVisible = true;
-            SelectedMedicamentGroupDetailDataItems =[];
+            SelectedMedicamentGroupDetailDataItems = [];
             medicamentGroupDetails = await Mediator.Send(new GetMedicamentGroupDetailQuery());
             PanelVisible = false;
         }
@@ -505,8 +507,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         }
                     }
                     getMedicament = await Mediator.Send(new UpdateMedicamentGroupRequest(MGForm));
-
-                    var medicament_group = await Mediator.Send(new GetMedicamentGroupQuery(x => x.Id == MGForm.Id));
+                     
+                    var medicament_group = await Mediator.Send(new GetMedicamentGroupQuery
+                    {
+                        Predicate = x => x.Id == MGForm.Id
+                    });
 
                     await Mediator.Send(new DeleteMedicamentGroupDetailRequest(ids: TempMedicamentGroupDetails.Select(x => x.Id).ToList()));
 
@@ -517,7 +522,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         medicamentGroupDetails.ForEach(x =>
                         {
                             x.Id = 0;
-                            x.MedicamentGroupId = medicament_group[0].Id;
+                            //x.MedicamentGroupId = medicament_group[0].Id;
                         });
 
                         for (int i = 0; i < medicamentGroupDetails.Count; i++)
@@ -528,7 +533,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                                 medicamentGroupDetails.Add(new MedicamentGroupDetailDto
                                 {
                                     Id = 0,
-                                    MedicamentGroupId = medicament_group[0].Id
+                                    //MedicamentGroupId = medicament_group[0].Id
                                 });
                             }
                         }

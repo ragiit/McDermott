@@ -17,6 +17,8 @@
                         <div class="card">
                             @if (!ShowForm)
                             {
+                                <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                 IsContentBlocked="true"
@@ -39,8 +41,10 @@
                                                              EditItem_Click="@EditItem_Click"
                                                              DeleteItem_Click="@DeleteItem_Click"
                                                              Refresh_Click="@Refresh_Click"
+                                                             ImportFile="ImportFile"
+                                                             ExportToExcel="ExportToExcel"
                                                              EnableDelete="!IsDeleted"
-                                                             IsImport="false"
+                                                             IsImport="UserAccessCRUID.IsImport"
                                                              Grid="Grid"
                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                              VisibleEdit="UserAccessCRUID.IsUpdate"

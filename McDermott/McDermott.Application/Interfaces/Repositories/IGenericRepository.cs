@@ -20,6 +20,10 @@ namespace McDermott.Application.Interfaces.Repositories
 
         Task<T> AddAsync(T entity);
 
+        void Attach(T entity);
+
+        void SetPropertyModified(T entity, string propertyName);
+
         Task<List<T>> AddAsync(List<T> entity);
 
         Task<T> UpdateAsync(T entity);

@@ -9,16 +9,21 @@ using System.Reflection;
 
 namespace McDermott.Persistence.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : BaseAuditableEntity
+    public class GenericRepository<T>(ApplicationDbContext dbContext) : IGenericRepository<T> where T : BaseAuditableEntity
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public GenericRepository(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        private readonly ApplicationDbContext _dbContext = dbContext;
 
         public IQueryable<T> Entities => _dbContext.Set<T>();
+
+        public void Attach(T entity)
+        {
+            _dbContext.Set<T>().Attach(entity);
+        }
+
+        public void SetPropertyModified(T entity, string propertyName)
+        {
+            _dbContext.Entry(entity).Property(propertyName).IsModified = true;
+        }
 
         public async Task<T> AddAsync(T entity)
         {

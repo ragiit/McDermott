@@ -14,11 +14,6 @@
                                 GeneralConsultanService.Patient = new();
                             }
 
-                            if (GeneralConsultanService.ClassType is null)
-                            {
-                                GeneralConsultanService.ClassType = new();
-                            }
-
                             if (GeneralConsultanService.Service is null)
                             {
                                 GeneralConsultanService.Service = new();
@@ -112,7 +107,7 @@
                     <div class="col-md-6">
                         <DxFormLayout>
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
-                                <MyTextBox @bind-Text="@GeneralConsultanService.ClassType.Name"
+                                <MyTextBox @bind-Text="@GeneralConsultanService.ClassType"
                                            ReadOnly
                                            NullText="Class Type" />
                             </DxFormLayoutItem>
@@ -137,6 +132,94 @@
                                     <MyTextBox @bind-Text="@GeneralConsultanService.InsurancePolicy.InsuranceName"
                                                ReadOnly
                                                NullText="Insurance Policy" />
+                                </DxFormLayoutItem>
+                            }
+                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                            @bind-Date="@GeneralConsultanService.RegistrationDate"
+                                            Mask="@DateTimeMask.ShortDate"
+                                            NullText="Select Registration Date">
+                                </DxDateEdit>
+                            </DxFormLayoutItem>
+
+                            @if (GeneralConsultanService.AppointmentDate != null)
+                            {
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
+                                    <DxDateEdit @bind-Date="@GeneralConsultanService.AppointmentDate"
+                                                Mask="@DateTimeMask.ShortDate"
+                                                ReadOnly
+                                                NullText="Select Follow Up Date">
+                                    </DxDateEdit>
+                                </DxFormLayoutItem>
+                            }
+
+                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
+                                <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.IsSickLeave" />
+                            </DxFormLayoutItem>
+
+                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Start-End Date" ColSpanMd="12">
+                                <Template>
+                                    <DxGridLayout ColumnSpacing="8px">
+                                        <Rows>
+                                            <DxGridLayoutRow />
+                                        </Rows>
+                                        <Columns>
+                                            <DxGridLayoutColumn />
+                                            <DxGridLayoutColumn />
+                                        </Columns>
+                                        <Items>
+                                            <DxGridLayoutItem Row="0" Column="0">
+                                                <Template>
+                                                    <DxDateEdit ReadOnly @bind-Date="@GeneralConsultanService.StartDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select Start Date" />
+                                                </Template>
+                                            </DxGridLayoutItem>
+                                            <DxGridLayoutItem Row="0" Column="1">
+                                                <Template>
+                                                    <DxDateEdit ReadOnly @bind-Date="@GeneralConsultanService.EndDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select End Date" />
+                                                </Template>
+                                            </DxGridLayoutItem>
+                                        </Items>
+                                    </DxGridLayout>
+                                </Template>
+                            </DxFormLayoutItem>
+
+                            @if (GeneralConsultanService.Patient is not null && GeneralConsultanService.Patient.Gender is not null && GeneralConsultanService.Patient.Gender.Trim().Equals("Female"))
+                            {
+                                @if (GeneralConsultanService != null && GeneralConsultanService.StartMaternityLeave == null)
+                                {
+                                    GeneralConsultanService.StartMaternityLeave = DateTime.Now;
+                                }
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Maternity Leave" ColSpanMd="12">
+                                    <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.IsMaternityLeave" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Start-End Date" ColSpanMd="12">
+                                    <Template>
+                                        <DxGridLayout ColumnSpacing="8px">
+                                            <Rows>
+                                                <DxGridLayoutRow />
+                                            </Rows>
+                                            <Columns>
+                                                <DxGridLayoutColumn />
+                                                <DxGridLayoutColumn />
+                                            </Columns>
+                                            <Items>
+                                                <DxGridLayoutItem Row="0" Column="0">
+                                                    <Template>
+                                                        <DxDateEdit ReadOnly
+                                                                    @bind-Date="@GeneralConsultanService.StartMaternityLeave"
+                                                                    NullText="Select Start Date">
+                                                        </DxDateEdit>
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                                <DxGridLayoutItem Row="0" Column="1">
+                                                    <Template>
+                                                        <DxDateEdit ReadOnly @bind-Date="@GeneralConsultanService.EndMaternityLeave" Mask="@DateTimeMask.ShortDate" NullText="Select End Date" />
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                            </Items>
+                                        </DxGridLayout>
+                                    </Template>
                                 </DxFormLayoutItem>
                             }
                         </DxFormLayout>
@@ -165,10 +248,10 @@
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weather" ColSpanMd="12">
                                 <div class="row w-100">
                                     <div class="col-md-1">
-                                        <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.IsWeather" />
+                                        <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.Patient.IsWeatherPatientAllergyIds" />
                                     </div>
                                     <div class="col-md-11">
-                                        @if (GeneralConsultanService.IsWeather)
+                                        @if (GeneralConsultanService.Patient.IsWeatherPatientAllergyIds)
                                         {
                                             <DxTagBox Data="@WeatherAllergies"
                                                       NullText="Select Allergy..."
@@ -192,10 +275,10 @@
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pharmacology" ColSpanMd="12">
                                 <div class="row w-100">
                                     <div class="col-md-1">
-                                        <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.IsPharmacology" />
+                                        <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.Patient.IsPharmacologyPatientAllergyIds" />
                                     </div>
                                     <div class="col">
-                                        @if (GeneralConsultanService.IsPharmacology)
+                                        @if (GeneralConsultanService.Patient.IsWeatherPatientAllergyIds)
                                         {
                                             <DxTagBox Data="@PharmacologyAllergies"
                                                       ReadOnly
@@ -219,10 +302,10 @@
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Food" ColSpanMd="12">
                                 <div class="row w-100">
                                     <div class="col-md-1">
-                                        <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.IsFood" />
+                                        <DxCheckBox ReadOnly @bind-Checked="@GeneralConsultanService.Patient.IsFoodPatientAllergyIds" />
                                     </div>
                                     <div class="col-md-11">
-                                        @if (GeneralConsultanService.IsFood)
+                                        @if (GeneralConsultanService.Patient.IsWeatherPatientAllergyIds)
                                         {
                                             <DxTagBox Data="@FoodAllergies"
                                                       NullText="Select Allergy..."
@@ -555,20 +638,56 @@
                             <div class="row w-100">
                                 <div class="col-md-12 w-100">
                                     <DxFormLayout CssClass="w-100">
-                                        <MyGrid @ref="GridCppt"
-                                                Data="GeneralConsultanCPPTs"
-                                                AllowSelectRowByClick="false"
-                                                FocusedRowEnabled="false"
-                                                @bind-SelectedDataItems="@SelectedDataItemsCPPT">
-                                            <Columns>
-                                                <DxGridDataColumn FieldName="Title" />
-                                                <DxGridDataColumn FieldName="Body" />
-                                                @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
-                                                {
-                                                    <DxGridCommandColumn NewButtonVisible="false" EditButtonVisible="false" Width="160px" />
-                                                }
-                                            </Columns>
-                                        </MyGrid>
+                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                        IsContentBlocked="true"
+                                                        ApplyBackgroundShading="true"
+                                                        IndicatorAreaVisible="false"
+                                                        Text="Fetching Data...">
+                                            <MyGridPaginate @ref="GridCppt"
+                                                            AllowSelectRowByClick="false"
+                                                            FocusedRowEnabled="false"
+                                                            Data="GeneralConsultanCPPTs"
+                                                            @bind-SelectedDataItems="@SelectedDataItemsCPPT"
+                                                            KeyFieldName="Id">
+
+                                                <Columns>
+                                                    <DxGridDataColumn FieldName="DateTime" Caption="Date" DisplayFormat="@Helper.DefaultFormatDateTime" />
+                                                    <DxGridDataColumn FieldName="User.Name" Caption="User" />
+                                                    <DxGridDataColumn FieldName="Subjective" />
+                                                    <DxGridDataColumn FieldName="Objective" />
+                                                    <DxGridDataColumn FieldName="NursingDiagnoses.Problem" Caption="Nursing Diagnoses" />
+                                                    <DxGridDataColumn FieldName="Diagnosis.Name" Caption="Diagnosis" />
+                                                    <DxGridDataColumn FieldName="Planning" />
+                                                </Columns>
+
+                                            </MyGridPaginate>
+                                            <div class="row">
+                                                <DxFormLayout>
+                                                    <div class="col-md-9">
+                                                        <DxFormLayoutItem>
+                                                            <DxPager PageCount="totalCountGridCPPT"
+                                                                     ActivePageIndexChanged="OnPageIndexChangedGridCPPT"
+                                                                     ActivePageIndex="activePageIndexTotalCountGridCPPT"
+                                                                     VisibleNumericButtonCount="10"
+                                                                     SizeMode="SizeMode.Medium"
+                                                                     NavigationMode="PagerNavigationMode.Auto">
+                                                            </DxPager>
+                                                        </DxFormLayoutItem>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex justify-content-end">
+                                                        <DxFormLayoutItem Caption="Page Size:">
+                                                            <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                          NullText="Select Page Size"
+                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                          SelectedItemChanged="((int e ) => OnpageSizeGridCPPTIndexChangedGridCPPT(e))"
+                                                                          @bind-Value="pageSizeGridCPPT">
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
+                                                    </div>
+                                                </DxFormLayout>
+                                            </div>
+                                        </DxLoadingPanel>
                                     </DxFormLayout>
                                 </div>
                             </div>
@@ -701,45 +820,79 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await GetPatientAllergy();
+        try
+        {
+            await GetPatientAllergy();
+            await LoadDataCPPT();
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #region Searching
+
+    private int pageSizeGridCPPT { get; set; } = 10;
+    private int totalCountGridCPPT = 0;
+    private int activePageIndexTotalCountGridCPPT { get; set; } = 0;
+    private string searchTermGridCPPT { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChangedGridCPPT(string searchText)
+    {
+        searchTermGridCPPT = searchText;
+        await LoadDataCPPT(0, pageSizeGridCPPT);
+    }
+
+    private async Task OnpageSizeGridCPPTIndexChangedGridCPPT(int newpageSizeGridCPPT)
+    {
+        pageSizeGridCPPT = newpageSizeGridCPPT;
+        await LoadDataCPPT(0, newpageSizeGridCPPT);
+    }
+
+    private bool PanelVisible = false;
+    private async Task OnPageIndexChangedGridCPPT(int newPageIndex)
+    {
+        await LoadDataCPPT(newPageIndex, pageSizeGridCPPT);
+    }
+
+    #endregion Searching
+
+    private async Task LoadDataCPPT(int pageIndex = 0, int pageSizeGridCPPT = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            SelectedDataItemsCPPT = [];
+            var ab = await Mediator.Send(new GetGeneralConsultanCPPTsQuery
+                {
+                    SearchTerm = searchTermGridCPPT ?? "",
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id
+                });
+            GeneralConsultanCPPTs = ab.Item1;
+            totalCountGridCPPT = ab.PageCount;
+            activePageIndexTotalCountGridCPPT = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
     }
 
     private async Task GetPatientAllergy()
     {
-        FoodAllergies.Clear();
-        WeatherAllergies.Clear();
-        PharmacologyAllergies.Clear();
-        SelectedFoodAllergies = [];
-        SelectedWeatherAllergies = [];
-        SelectedPharmacologyAllergies = [];
+        var alergy = (await Mediator.Send(new GetAllergyQuery()));
+        FoodAllergies = alergy.Where(x => x.Type == "01").ToList();
+        WeatherAllergies = alergy.Where(x => x.Type == "02").ToList();
+        PharmacologyAllergies = alergy.Where(x => x.Type == "03").ToList();
 
-        var Allergies = await Mediator.Send(new GetAllergyQuery());
+        if (GeneralConsultanService.Patient is null)
+            GeneralConsultanService.Patient = new();
 
-        // Filter allergies by type
-        FoodAllergies = Allergies.Where(x => x.Type == "01").ToList();
-        WeatherAllergies = Allergies.Where(x => x.Type == "02").ToList();
-        PharmacologyAllergies = Allergies.Where(x => x.Type == "03").ToList();
-
-        var p = (await Mediator.Send(new GetUserQuery(x => x.Id == GeneralConsultanService.PatientId))).FirstOrDefault();
-
-        if (p is null || p.PatientAllergyIds is null)
-            return;
-
-        var allergies = await Mediator.Send(new GetAllergyQuery(x => p.PatientAllergyIds.Contains(x.Id)));
-        if (allergies is not null && allergies.Count > 0)
-        {
-            var selectedAllergyIds = allergies.Where(x => x.Type == "01" || x.Type == "02" || x.Type == "03").Select(x => x.Id).ToList();
-
-            SelectedFoodAllergies = FoodAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
-            SelectedWeatherAllergies = WeatherAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
-            SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
-
-            if (SelectedFoodAllergies.Count() > 0)
-                GeneralConsultanService.IsFood = true;
-            if (SelectedWeatherAllergies.Count() > 0)
-                GeneralConsultanService.IsWeather = true;
-            if (SelectedPharmacologyAllergies.Count() > 0)
-                GeneralConsultanService.IsPharmacology = true;
-        }
+        SelectedFoodAllergies = FoodAllergies.Where(x => GeneralConsultanService.Patient.FoodPatientAllergyIds.Contains(x.Id));
+        SelectedWeatherAllergies = WeatherAllergies.Where(x => GeneralConsultanService.Patient.WeatherPatientAllergyIds.Contains(x.Id));
+        SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => GeneralConsultanService.Patient.PharmacologyPatientAllergyIds.Contains(x.Id));
     }
 }

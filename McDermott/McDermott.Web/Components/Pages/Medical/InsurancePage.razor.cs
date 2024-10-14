@@ -247,7 +247,6 @@
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-            EditItemsEnabled = true;
         }
 
         private async Task NewItem_Click()

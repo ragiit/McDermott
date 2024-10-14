@@ -22,7 +22,7 @@ namespace McDermott.Application.Dtos.Transaction
 
         public long? PratitionerId { get; set; }
 
-        public long? ClassTypeId { get; set; }
+        public string? ClassType { get; set; }
         public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
 
         [NotMapped]
@@ -37,9 +37,9 @@ namespace McDermott.Application.Dtos.Transaction
         public string? AdmissionQueue { get; set; }
 
         [Required]
-        public string? Payment { get; set; } = "BPJS";
+        public string Payment { get; set; } = "BPJS";
 
-        public string? TypeRegistration { get; set; } = "General Consultation";
+        public string TypeRegistration { get; set; } = "General Consultation";
 
         public string? MedexType { get; set; }
         public string? HomeStatus { get; set; }
@@ -120,7 +120,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsMaternityLeave { get; set; } = false;
         public DateTime? StartDateSickLeave { get; set; }
         public DateTime? EndDateSickLeave { get; set; }
-        public DateTime StartMaternityLeave { get; set; }
+        public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
@@ -261,7 +261,6 @@ namespace McDermott.Application.Dtos.Transaction
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
         public virtual KioskQueueDto? KioskQueue { get; set; }
-        public virtual ClassTypeDto? ClassType { get; set; }
         public virtual UserDto? Patient { get; set; } = new();
         public virtual UserDto? Pratitioner { get; set; }
         public virtual ServiceDto? Service { get; set; }
@@ -341,8 +340,7 @@ namespace McDermott.Application.Dtos.Transaction
         public long? ServiceId { get; set; }
 
         public long? PratitionerId { get; set; }
-
-        public long? ClassTypeId { get; set; }
+        public string? ClassType { get; set; }
         public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
 
         [NotMapped]

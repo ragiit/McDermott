@@ -1836,8 +1836,23 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<long?>("DiagnosisId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("GeneralConsultanServiceId")
                         .HasColumnType("bigint");
+
+                    b.Property<long?>("NursingDiagnosesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Objective")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Planning")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subjective")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1849,9 +1864,18 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("DiagnosisId");
+
                     b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("NursingDiagnosesId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("GeneralConsultanCPPTs");
                 });
@@ -2215,8 +2239,8 @@ namespace McDermott.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("ClassTypeId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("ClassType")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClinicVisitTypes")
                         .IsRequired()
@@ -2441,8 +2465,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AwarenessId");
-
-                    b.HasIndex("ClassTypeId");
 
                     b.HasIndex("InsurancePolicyId");
 
@@ -2778,6 +2800,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsBPJS")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsBPJSKesehatan")
                         .HasColumnType("bit");
@@ -6365,13 +6390,34 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>
                 {
+                    b.HasOne("McDermott.Domain.Entities.Diagnosis", "Diagnosis")
+                        .WithMany()
+                        .HasForeignKey("DiagnosisId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
                         .WithMany("GeneralConsultanCPPTs")
                         .HasForeignKey("GeneralConsultanServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("McDermott.Domain.Entities.NursingDiagnoses", "NursingDiagnoses")
+                        .WithMany()
+                        .HasForeignKey("NursingDiagnosesId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Diagnosis");
+
                     b.Navigation("GeneralConsultanService");
+
+                    b.Navigation("NursingDiagnoses");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", b =>
@@ -6447,11 +6493,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("AwarenessId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.ClassType", "ClassType")
-                        .WithMany()
-                        .HasForeignKey("ClassTypeId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
                         .WithMany()
                         .HasForeignKey("InsurancePolicyId")
@@ -6488,8 +6529,6 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AwarenessDto");
-
-                    b.Navigation("ClassType");
 
                     b.Navigation("InsurancePolicy");
 

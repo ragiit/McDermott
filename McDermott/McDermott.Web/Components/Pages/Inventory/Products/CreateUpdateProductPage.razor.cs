@@ -298,8 +298,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
                 _SmartButton = true;
 
-                // Fetch related data
-                GetMedicaments = await Mediator.Send(new GetMedicamentQuery(x => x.ProductId == PostProduct.Id));
+                // Fetch related data 
+                GetMedicaments = (await Mediator.Send(new GetMedicamentQuery
+                {
+                    Predicate = x => x.ProductId == PostProduct.Id
+                })).Item1;
                 PostMedicaments = GetMedicaments.FirstOrDefault() ?? new();
                 var maintainanceResult = await Mediator.Send(new GetMaintainanceQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
                 GetMaintainance = maintainanceResult.Item1;

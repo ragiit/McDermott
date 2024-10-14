@@ -424,6 +424,15 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
             new() { Column = "Emergency Name"},
             new() { Column = "Emergency Email"},
             new() { Column = "Emergency Phone"},
+
+            new() { Column = "BPJS KS Number"},
+            new() { Column = "BPJS TK Number"},
+            new() { Column = "Legacy Number"},
+            new() { Column = "SAP Number"},
+            new() { Column = "NIP Number"},
+            new() { Column = "Oracle Number"},
+            new() { Column = "Employee Type", Notes = "Select one: Employee/Pre Employee/Nurse/Doctor"},
+            new() { Column = "Join Date"},
         ];
 
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
@@ -451,7 +460,6 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
 
                     var list = new List<UserDto>();
 
-                    var groupNames = new HashSet<string>();
                     var religionNames = new HashSet<string>();
 
                     var groups = new List<GroupDto>();
@@ -459,55 +467,40 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var a = ws.Cells[row, 4].Value?.ToString()?.Trim();
-                        var b = ws.Cells[row, 6].Value?.ToString()?.Trim();
-                        var c = ws.Cells[row, 9].Value?.ToString()?.Trim();
-
-                        if (!string.IsNullOrEmpty(a))
-                            groupNames.Add(a.ToLower());
+                        var b = ws.Cells[row, 4].Value?.ToString()?.Trim();
 
                         if (!string.IsNullOrEmpty(b))
                             religionNames.Add(b.ToLower());
                     }
 
-                    groups = (await Mediator.Send(new GetGroupQuery(x => groupNames.Contains(x.Name.ToLower()), 0, 0))).Item1;
                     religions = (await Mediator.Send(new GetReligionQuery(x => religionNames.Contains(x.Name.ToLower()))));
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
                         var name = ws.Cells[row, 1].Value?.ToString()?.Trim();
                         var email = ws.Cells[row, 2].Value?.ToString()?.Trim();
-                        var password = ws.Cells[row, 3].Value?.ToString()?.Trim();
-                        var group = ws.Cells[row, 4].Value?.ToString()?.Trim();
-                        var identityNum = ws.Cells[row, 5].Value?.ToString()?.Trim();
-                        var religion = ws.Cells[row, 6].Value?.ToString()?.Trim();
-                        var dateOfBirth = ws.Cells[row, 7].Value?.ToString()?.Trim();
-                        var gender = ws.Cells[row, 8].Value?.ToString()?.Trim();
-                        var marital = ws.Cells[row, 9].Value?.ToString()?.Trim();
-                        var mobile = ws.Cells[row, 10].Value?.ToString()?.Trim();
-                        var currentMobile = ws.Cells[row, 11].Value?.ToString()?.Trim();
-                        var phone = ws.Cells[row, 12].Value?.ToString()?.Trim();
-                        var npwp = ws.Cells[row, 13].Value?.ToString()?.Trim();
-                        var emergencyName = ws.Cells[row, 14].Value?.ToString()?.Trim();
-                        var emergencyEmail = ws.Cells[row, 15].Value?.ToString()?.Trim();
-                        var emergencyPhone = ws.Cells[row, 16].Value?.ToString()?.Trim();
+                        var identityNum = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        var religion = ws.Cells[row, 4].Value?.ToString()?.Trim();
+                        var dateOfBirth = ws.Cells[row, 5].Value?.ToString()?.Trim();
+                        var gender = ws.Cells[row, 6].Value?.ToString()?.Trim();
+                        var marital = ws.Cells[row, 7].Value?.ToString()?.Trim();
+                        var mobile = ws.Cells[row, 8].Value?.ToString()?.Trim();
+                        var currentMobile = ws.Cells[row, 9].Value?.ToString()?.Trim();
+                        var phone = ws.Cells[row, 10].Value?.ToString()?.Trim();
+                        var npwp = ws.Cells[row, 11].Value?.ToString()?.Trim();
+                        var emergencyName = ws.Cells[row, 12].Value?.ToString()?.Trim();
+                        var emergencyEmail = ws.Cells[row, 13].Value?.ToString()?.Trim();
+                        var emergencyPhone = ws.Cells[row, 14].Value?.ToString()?.Trim();
+                        var bpjsks = ws.Cells[row, 15].Value?.ToString()?.Trim();
+                        var bpjstk = ws.Cells[row, 16].Value?.ToString()?.Trim();
+                        var legacy = ws.Cells[row, 17].Value?.ToString()?.Trim();
+                        var sap = ws.Cells[row, 18].Value?.ToString()?.Trim();
+                        var nip = ws.Cells[row, 19].Value?.ToString()?.Trim();
+                        var oracle = ws.Cells[row, 20].Value?.ToString()?.Trim();
+                        var empType = ws.Cells[row, 21].Value?.ToString()?.Trim();
+                        var joinDate = ws.Cells[row, 22].Value?.ToString()?.Trim();
 
                         bool isValid = true;
-
-                        long? groupId = null;
-                        if (!string.IsNullOrEmpty(group))
-                        {
-                            var cachedParent = groups.FirstOrDefault(x => x.Name.Equals(group, StringComparison.CurrentCultureIgnoreCase));
-                            if (cachedParent is null)
-                            {
-                                ToastService.ShowErrorImport(row, 4, group ?? string.Empty);
-                                isValid = false;
-                            }
-                            else
-                            {
-                                groupId = cachedParent.Id;
-                            }
-                        }
 
                         long? religionId = null;
                         if (!string.IsNullOrEmpty(religion))
@@ -515,7 +508,7 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                             var cachedParent = religions.FirstOrDefault(x => x.Name.Equals(religion, StringComparison.CurrentCultureIgnoreCase));
                             if (cachedParent is null)
                             {
-                                ToastService.ShowErrorImport(row, 6, religion ?? string.Empty);
+                                ToastService.ShowErrorImport(row, 4, religion ?? string.Empty);
                                 isValid = false;
                             }
                             else
@@ -528,7 +521,16 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         {
                             if (!Helper.Genders.Contains(gender) && !string.IsNullOrEmpty(gender))
                             {
-                                ToastService.ShowErrorImport(row, 8, gender ?? string.Empty);
+                                ToastService.ShowErrorImport(row, 6, gender ?? string.Empty);
+                                isValid = false;
+                            }
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(empType))
+                        {
+                            if (!Helper.EmployeeTypes.Contains(empType) && !string.IsNullOrEmpty(empType))
+                            {
+                                ToastService.ShowErrorImport(row, 21, empType ?? string.Empty);
                                 isValid = false;
                             }
                         }
@@ -537,7 +539,7 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         {
                             if (!Helper.MartialStatuss.Contains(marital) && !string.IsNullOrEmpty(marital))
                             {
-                                ToastService.ShowErrorImport(row, 9, marital ?? string.Empty);
+                                ToastService.ShowErrorImport(row, 7, marital ?? string.Empty);
                                 isValid = false;
                             }
                         }
@@ -554,18 +556,12 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                             isValid = false;
                         }
 
-                        if (string.IsNullOrWhiteSpace(password))
-                        {
-                            ToastService.ShowErrorImport(row, 3, password ?? string.Empty);
-                            isValid = false;
-                        }
-
                         if (!string.IsNullOrWhiteSpace(identityNum))
                         {
                             var a = await Mediator.Send(new ValidateUserQuery(x => x.NoId == identityNum));
                             if (a)
                             {
-                                ToastService.ShowErrorImport(row, 5, identityNum ?? string.Empty);
+                                ToastService.ShowErrorImport(row, 3, identityNum ?? string.Empty);
                                 isValid = false;
                             }
                         }
@@ -580,6 +576,10 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                             }
                         }
 
+                        var isOk = await CheckUserFormAsync();
+                        if (!isOk)
+                            isValid = false;
+
                         if (!isValid)
                             continue;
 
@@ -587,8 +587,6 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         {
                             Name = name,
                             Email = email,
-                            Password = password,
-                            GroupId = groupId,
                             NoId = identityNum,
                             ReligionId = religionId,
                             DateOfBirth = Convert.ToDateTime(dateOfBirth),
@@ -602,6 +600,15 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                             EmergencyEmail = emergencyEmail,
                             EmergencyPhone = emergencyPhone,
                             IsEmployee = true,
+
+                            NoBpjsKs = bpjsks,
+                            NoBpjsTk = bpjstk,
+                            Legacy = legacy,
+                            SAP = sap,
+                            NIP = nip,
+                            Oracle = oracle,
+                            EmployeeType = empType,
+                            JoinDate = Convert.ToDateTime(joinDate)
                         };
 
                         list.Add(c);
@@ -613,8 +620,6 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         {
                             x.Name,
                             x.Email,
-                            x.Password,
-                            x.GroupId,
                             x.NoId,
                             x.ReligionId,
                             x.DateOfBirth,
@@ -626,11 +631,20 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                             x.Npwp,
                             x.EmergencyName,
                             x.EmergencyEmail,
-                            x.EmergencyPhone
+                            x.EmergencyPhone,
+                            x.IsEmployee,
+                            x.NoBpjsKs,
+                            x.NoBpjsTk,
+                            x.Legacy,
+                            x.SAP,
+                            x.NIP,
+                            x.Oracle,
+                            x.EmployeeType,
+                            x.JoinDate
                         }).ToList();
 
                         // Panggil BulkValidateProjectQuery untuk validasi bulk
-                        var existingProjects = await Mediator.Send(new BulkValidateUserQuery(list));
+                        var existingProjects = await Mediator.Send(new BulkValidateEmployeeQuery(list));
 
                         // Filter Project baru yang tidak ada di database
                         list = list.Where(x =>
@@ -650,7 +664,17 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                                 ev.Npwp == x.Npwp && // Include Npwp
                                 ev.EmergencyName == x.EmergencyName && // Include EmergencyName
                                 ev.EmergencyEmail == x.EmergencyEmail && // Include EmergencyEmail
-                                ev.EmergencyPhone == x.EmergencyPhone // Include EmergencyPhone
+                                ev.EmergencyPhone == x.EmergencyPhone && // Include EmergencyPhone
+
+                                ev.IsEmployee == x.IsEmployee &&
+                                ev.NoBpjsKs == x.NoBpjsKs &&
+                                ev.NoBpjsTk == x.NoBpjsTk &&
+                                ev.Legacy == x.Legacy &&
+                                ev.SAP == x.SAP &&
+                                ev.NIP == x.NIP &&
+                                ev.Oracle == x.Oracle &&
+                                ev.EmployeeType == x.EmployeeType &&
+                                ev.JoinDate == x.JoinDate
                             )
                         ).ToList();
 

@@ -26,11 +26,7 @@
                             {
                                 GeneralConsultanService.Patient = new();
                             }
-
-                            if (GeneralConsultanService.ClassType is null)
-                            {
-                                GeneralConsultanService.ClassType = new();
-                            }
+                             
 
                             if (GeneralConsultanService.Service is null)
                             {
@@ -143,7 +139,7 @@
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
                                 <DxTextBox ReadOnly
                                            NullText="Patient..."
-                                           @bind-Text="@GeneralConsultanService.ClassType.Name">
+                                           @bind-Text="@GeneralConsultanService.ClassType">
                                 </DxTextBox>
                             </DxFormLayoutItem>
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">

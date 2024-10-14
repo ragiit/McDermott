@@ -289,12 +289,18 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
-            {
-                Medicaments = await Mediator.Send(new GetMedicamentQuery());
+            { 
                 var products = (ProductDto)e.DataItem;
                 if (SelectedDataItems is null)
-                {
-                    var idProduct = Medicaments.Where(m => m.ProductId == products.Id).FirstOrDefault();
+                { 
+                    var idProduct = await Mediator.Send(new GetSingleMedicamentQuery
+                    {
+                        Predicate = x => x.ProductId == products.Id,
+                        Select = x => new Medicament
+                        {
+                            Id = x.Id
+                        }
+                    }); 
                     if (idProduct != null)
                     {
                         await Mediator.Send(new DeleteMedicamentRequest(idProduct.Id));
@@ -304,12 +310,20 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 else
                 {
                     List<long> MProductId = SelectedDataItems.Adapt<List<ProductDto>>().Select(x => x.Id).ToList();
+                    var idProduct = (await Mediator.Send(new GetMedicamentQuery
+                    {
+                        Predicate = x => MProductId.Contains(x.Id),
+                        Select = x => new Medicament
+                        {
+                            Id = x.Id
+                        }
+                    })).Item1;
                     foreach (var data in MProductId)
                     {
                         // Jika ada item yang dipilih, hapus medicament dan stok produk yang sesuai dengan produk yang dipilih
                         
 
-                        var checkData = Medicaments.Where(m => m.ProductId == data).FirstOrDefault();
+                        var checkData = idProduct.Where(m => m.ProductId == data).FirstOrDefault();
                         if (checkData != null)
                         {
                             await Mediator.Send(new DeleteMedicamentRequest(checkData.Id));

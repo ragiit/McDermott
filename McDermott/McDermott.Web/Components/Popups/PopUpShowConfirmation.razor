@@ -1,0 +1,32 @@
+﻿@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> OnConfirmed { get; set; }
+    [Parameter] public string ConfirmationMessage { get; set; } = "Are you sure?";
+    [Parameter] public string ConfirmButtonText { get; set; } = "Yes";
+    [Parameter] public string CancelButtonText { get; set; } = "No";
+    [Parameter] public string HeaderText { get; set; } = "Validation Required";
+
+    private void Confirm(bool result)
+    {
+        OnConfirmed.InvokeAsync(result);
+    }
+}
+
+<DxPopup Visible="Visible"
+         HeaderText="@HeaderText"
+         CloseOnOutsideClick="false"
+         CloseOnEscape="false"
+         ShowFooter="true"
+         ShowCloseButton="false"
+         Width="350"
+         MinWidth="100">
+    <BodyContentTemplate>
+        <div class="text-wrap">
+            <p class="fw-4">@ConfirmationMessage</p>
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton Enabled="true" CssClass="popup-button my-1 ms-2" Click="(() => Confirm(true))" RenderStyle="ButtonRenderStyle.Primary" Text="@ConfirmButtonText" />
+        <DxButton CssClass="popup-button my-1 ms-2" Click="(() => Confirm(false))" RenderStyle="ButtonRenderStyle.Danger" Text="@CancelButtonText" />
+    </FooterContentTemplate>
+</DxPopup>

@@ -161,7 +161,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
                         bool isValid = true;
 
-                        // Validasi URL
                         if (!Classification.Contains(a) && !string.IsNullOrEmpty(a))
                         {
                             isValid = false;

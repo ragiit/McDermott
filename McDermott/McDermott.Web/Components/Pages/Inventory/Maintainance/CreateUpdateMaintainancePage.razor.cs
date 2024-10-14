@@ -14,7 +14,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private List<MaintainanceProductDto> getMaintainanceProduct = [];
         private List<UserDto> getResponsibleBy = [];
         private List<UserDto> getRequestBy = [];
-        private List<ProductDto> getEquipment = [];
+        private List<ProductDto> getProduct = [];
         private List<LocationDto> getLocation = [];
         private List<TransactionStockDto> TransactionStocks = [];
         private MaintainanceDto postMaintainance = new();
@@ -40,6 +40,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowDetailVisibleIndex { get; set; }
+        private DateTime? currentExpiryDate {  get; set; }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -102,18 +103,74 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
         private List<string> Batch = [];
 
-        private async Task selectByProduct(ProductDto value)
+        private async Task selectByProduct(ProductDto e)
         {
-            if (postMaintainance.LocationId != 0 || postMaintainance.LocationId != null)
+
+            try
             {
-                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id && s.LocationId == postMaintainance.LocationId));
-                Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
-                Batch = Batch.Distinct().ToList();
-            }
-            else
-            {
-                ToastService.ShowInfo("Select Location Or Location Not Null..");
+                Batch.Clear();
+                ResetFormProductDetail();
+
+                if (e == null) return;
+
+                postMaintainanceProduct.ProductId = e.Id;
+
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == postMaintainance.LocationId));
+                if (e.TraceAbility)
+                {
+                    var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.Batch != null && x.Batch == postMaintainanceProduct.SerialNumber));
+                    Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
+                    Batch = Batch.Distinct().ToList();
+
+                    var firstStockProduct = stockProducts.Where(x => x.Batch == postMaintainanceProduct.SerialNumber);
+
+                    UpdateFormProductDetail(firstStockProduct.FirstOrDefault() ?? new(), e);
+                }
+                else
+                {
+                    var s = (await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.LocationId == postMaintainance.LocationId)));
+
+                    var firstStockProduct = stockProducts.FirstOrDefault();
+                    postMaintainanceProduct.MaintainanceId = firstStockProduct?.Id ?? null;
+                    UpdateFormProductDetail(firstStockProduct ?? new(), e);
+                }
+
                 return;
+                var stockProducts2 = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == postMaintainance.LocationId));
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+
+            //if (postMaintainance.LocationId != 0 || postMaintainance.LocationId != null)
+            //{
+            //    var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id && s.LocationId == postMaintainance.LocationId));
+            //    Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
+            //    Batch = Batch.Distinct().ToList();
+            //    currentExpiryDate = stockProducts?.Select(x=>x.ExpiredDate).FirstOrDefault();
+            //}
+            //else
+            //{
+            //    ToastService.ShowInfo("Select Location Or Location Not Null..");
+            //    return;
+            //}
+        }
+
+
+        private void ResetFormProductDetail()
+        {
+            currentExpiryDate = null;
+            postMaintainanceProduct.ProductId = null;
+            postMaintainanceProduct.SerialNumber = null;
+        }
+
+        private void UpdateFormProductDetail(TransactionStockDto stockProduct, ProductDto items)
+        {
+            if (stockProduct != null)
+            {
+                currentExpiryDate = stockProduct.ExpiredDate;
+                postMaintainanceProduct.Expired =  Helper.CalculateNewExpiryDate(currentExpiryDate, postMaintainance.RepeatNumber, postMaintainance.RepeatWork);
             }
         }
 
@@ -192,21 +249,22 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
         #endregion UserLoginAndAccessRole
 
+      
         #region Load data
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadDataLocation();
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             await LoadDataProducts();
+            await LoadDataLocation();
             await LoadDataRequestBy();
             await LoadDataResponsibleBy();
             PanelVisible = false;
         }
         private async Task LoadData()
         {
-            var result = await Mediator.Send(new GetMaintainanceQuery(x => x.Id == Id, pageSize: 0, pageIndex: 1));
+            var result = await Mediator.Send(new GetMaintainanceQuery(x => x.Id == Id, pageSize: 1, pageIndex: 0));
             postMaintainance = new();
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -217,9 +275,18 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 }
 
                 postMaintainance = result.Item1.FirstOrDefault() ?? new();
-
-
+                await LoadDataDetail();
             }
+        }
+
+
+        private async Task LoadDataDetail(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetMaintainanceProductQuery(x=>x.MaintainanceId == postMaintainance.Id, pageIndex: pageIndex, pageSize: pageSize));
+            getMaintainanceProduct = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
         }
         #endregion
 
@@ -289,7 +356,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             PanelVisible = true;
             SelectedDataItems = [];
             var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getEquipment = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
+            getProduct = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
             totalCount = result.pageCount;
             PanelVisible = false;
         }
@@ -483,7 +550,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
                 foreach (var items in getMaintainanceProduct)
                 {
-                    var cekUom = getEquipment.Where(x => x.Id == postMaintainanceProduct.ProductId).Select(x => x.UomId).FirstOrDefault();
+                    var cekUom = getProduct.Where(x => x.Id == postMaintainanceProduct.ProductId).Select(x => x.UomId).FirstOrDefault();
 
                     postTransactionStock.SourceTable = nameof(Maintainance);
                     postTransactionStock.SourcTableId = postMaintainance.Id;
@@ -552,7 +619,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         }
         private async Task RefreshDetail_Click()
         {
-
+            await LoadDataDetail();
         }
         #endregion
 
@@ -586,15 +653,16 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
                     getMaintainanceById = await Mediator.Send(new CreateMaintainanceRequest(postMaintainance));
                     ToastService.ShowSuccess("Save Data Success..");
+                    NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}", true);
                 }
                 else
                 {
                     getMaintainanceById = await Mediator.Send(new UpdateMaintainanceRequest(postMaintainance));
                     ToastService.ShowSuccess("Update Data Success..");
+                    NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}", true);
                 }
 
                 PanelVisible = false;
-                NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={getMaintainanceById.Id}");
             }
             catch (Exception ex)
             {

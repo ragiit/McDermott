@@ -11,7 +11,7 @@
         public long? InverseRelationId { get; set; }
 
         [NotMapped]
-        public string? InverseRelationString => InverseRelation is null ? "" : $"{InverseRelation.Name}-{Name}";
+        public string? InverseRelationString => InverseRelation is null || string.IsNullOrWhiteSpace(InverseRelation.Name) ? "" : $"{InverseRelation.Name}-{Name}";
 
         public FamilyDto? InverseRelation { get; set; }
     }

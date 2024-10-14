@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Features.Commands.Medical
+﻿using McDermott.Application.Dtos.Medical;
+
+namespace McDermott.Application.Features.Commands.Medical
 {
     public class LocationCommand
     {
@@ -21,9 +23,12 @@
             public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
         }
 
+        public class BulkValidateLocationsQuery(List<LocationDto> LocationssToValidate) : IRequest<List<LocationDto>>
+        {
+            public List<LocationDto> LocationssToValidate { get; } = LocationssToValidate;
+        }
+
         #endregion GET
-
-
 
         #region CREATE
 

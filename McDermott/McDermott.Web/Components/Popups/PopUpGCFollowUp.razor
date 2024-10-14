@@ -1,0 +1,695 @@
+﻿@using FluentValidation.Results
+<EditForm Model="@GeneralConsultanService"
+          @onkeypress="@KeyPressHandler"
+          Context="EditFormContext22" Enhance
+          OnValidSubmit="HandleValidSubmit"
+          OnInvalidSubmit="@HandleInvalidSubmit">
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <AntiforgeryToken />
+
+    <div class="card sticky">
+        <div class="card-body">
+            <div class=" row w-100">
+                <div class="col-sm align-self-end">
+                    <div class="row justify-content-end">
+                        <div class="col-auto">
+                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Close" Click="OnCancelBack"></DxButton>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @* General Information Services *@
+    <div class="w-100">
+        <div class="w-100">
+            <div class="card">
+                <div class="card-header">
+                    <span class="fw-bolder">General Consultation Service Information</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @{
+                                if (GeneralConsultanService.Patient is null)
+                                {
+                                    GeneralConsultanService.Patient = new();
+                                }
+                            }
+                            <DxFormLayout>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Patients"
+                                                  NullText="Select Patient"
+                                                  @ref="refPatientComboBox"
+                                                  @bind-Value="@GeneralConsultanService.PatientId"
+                                                  TextFieldName="Name"
+                                                  ValueFieldName="Id"
+                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                  SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
+                                                  TextChanged="((string e) => OnInputPatientChanged(e))">
+                                        <Buttons>
+                                            <DxEditorButton Click="OnSearchPatientIndexDecrement"
+                                                            IconCssClass="fa-solid fa-caret-left"
+                                                            Tooltip="Previous Index" />
+                                            <DxEditorButton Click="OnSearchPatient"
+                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                            Tooltip="Search" />
+                                            <DxEditorButton Click="OnSearchPatientIndexIncrement"
+                                                            IconCssClass="fa-solid fa-caret-right"
+                                                            Tooltip="Next Index" />
+                                        </Buttons>
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="NoRm" Caption="Medical Record" />
+                                            <DxListEditorColumn FieldName="Name" />
+                                            <DxListEditorColumn FieldName="Email" />
+                                            <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                            <DxListEditorColumn FieldName="Gender" />
+                                            <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                        </Columns>
+                                    </MyDxComboBox>
+                                    <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoRm)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoId)" NullText="Identity Number" ReadOnly InputCssClass="fw-normal" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
+                                    <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                   NullText="Current Mobile"
+                                                   ShowValidationIcon="true">
+                                    </DxMaskedInput>
+                                    <ValidationMessage For="@(() => UserForm.CurrentMobile)"   />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
+                                    <Template>
+                                        <DxGridLayout>
+                                            <Rows>
+                                                <DxGridLayoutRow />
+                                            </Rows>
+                                            <Columns>
+                                                <DxGridLayoutColumn Width="90%" />
+                                                <DxGridLayoutColumn Width="30%" />
+                                            </Columns>
+                                            <Items>
+                                                <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                    <Template>
+                                                        <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Patient.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                                <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                    <Template>
+                                                        <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+                                                    </Template>
+                                                </DxGridLayoutItem>
+                                            </Items>
+                                        </DxGridLayout>
+
+                                    </Template>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+                                    <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                  Data="@RegisType"
+                                                  NullText="Select Registration..."
+                                                  AllowUserInput="true"
+                                                  @bind-Value="@GeneralConsultanService.TypeRegistration">
+                                    </MyDxComboBox>
+                                    <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
+                                </DxFormLayoutItem>
+                                @*  <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
+                                <MyDxComboBox Data="@Helper._homeStatusTemps"
+                                NullText="Return Status..."
+                                @bind-Value="@GeneralConsultanService.HomeStatus"
+                                TextFieldName="Name"
+                                ValueFieldName="Code">
+                                </MyDxComboBox>
+                                </DxFormLayoutItem> *@
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Alert Information Special Case" ColSpanMd="12">
+                                    <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+                        <div class="col-md-6">
+                            <DxFormLayout>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
+                                    <MyDxComboBox Data="@ClassTypes"
+                                                  NullText="Select Patient Type.."
+                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                  @bind-Value="@GeneralConsultanService.ClassType">
+                                    </MyDxComboBox>
+                                    <ValidationMessage For="@(() => GeneralConsultanService.ClassType)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Services"
+                                                  NullText="Select Service"
+                                                  @ref="refServiceComboBox"
+                                                  @bind-Value="@GeneralConsultanService.ServiceId"
+                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                  TextFieldName="Name"
+                                                  ValueFieldName="Id"
+                                                  TextChanged="((string e) => OnInputServiceChanged(e))">
+                                        <Buttons>
+                                            <DxEditorButton Click="OnSearchServiceIndexDecrement"
+                                                            IconCssClass="fa-solid fa-caret-left"
+                                                            Tooltip="Previous Index" />
+                                            <DxEditorButton Click="OnSearchService"
+                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                            Tooltip="Search" />
+                                            <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                            IconCssClass="fa-solid fa-caret-right"
+                                                            Tooltip="Next Index" />
+                                        </Buttons>
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                                        </Columns>
+                                    </MyDxComboBox>
+                                    <ValidationMessage For="@(()=>GeneralConsultanService.ServiceId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Physicions"
+                                                  NullText="Select Physicion"
+                                                  @ref="refPhysicionComboBox"
+                                                  @bind-Value="@GeneralConsultanService.PratitionerId"
+                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                  TextFieldName="Name"
+                                                  ValueFieldName="Id"
+                                                  TextChanged="((string e) => OnInputPhysicionChanged(e))">
+                                        <Buttons>
+                                            <DxEditorButton Click="OnSearchPhysicionIndexDecrement"
+                                                            IconCssClass="fa-solid fa-caret-left"
+                                                            Tooltip="Previous Index" />
+                                            <DxEditorButton Click="OnSearchPhysicion"
+                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                            Tooltip="Search" />
+                                            <DxEditorButton Click="OnSearchPhysicionIndexIncrement"
+                                                            IconCssClass="fa-solid fa-caret-right"
+                                                            Tooltip="Next Index" />
+                                        </Buttons>
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="Name" />
+                                            <DxListEditorColumn FieldName="Email" />
+                                            <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                            <DxListEditorColumn FieldName="Gender" />
+                                            <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                            <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                            <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                        </Columns>
+                                    </MyDxComboBox>
+                                    <ValidationMessage For="@(()=>GeneralConsultanService.PratitionerId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Method" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Payments"
+                                                  NullText="Payment Method.."
+                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                  SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
+                                                  @bind-Value="GeneralConsultanService.Payment">
+
+                                    </MyDxComboBox>
+                                    <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
+                                </DxFormLayoutItem>
+                                @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
+                                {
+                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                      Data="@InsurancePolicies"
+                                                      @bind-Value="@SelectedInsurancePolicy"
+                                                      NullText="Select Insurance Policy..."
+                                                      EditFormat="{0} - {1}">
+                                            <Columns>
+                                                <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
+                                                                    Caption="No Card" />
+
+                                                <DxListEditorColumn FieldName="Insurance.Name"
+                                                                    Caption="Insurance Company" />
+                                            </Columns>
+                                        </MyDxComboBox>
+                                    </DxFormLayoutItem>
+                                }
+
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
+                                    <DxDateEdit @bind-Date="@GeneralConsultanService.AppointmentDate"
+                                                Mask="@DateTimeMask.ShortDate"
+                                                NullText="Select Follow Up Date">
+                                    </DxDateEdit>
+                                    <ValidationMessage For="@(() => GeneralConsultanService.AppointmentDate)" />
+                                </DxFormLayoutItem>
+
+                            </DxFormLayout>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+
+
+@code {
+
+    private List<UserDto> Physicions { get; set; } = [];
+    private List<UserDto> Patients { get; set; } = [];
+    private List<ServiceDto> Services { get; set; } = [];
+    private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
+
+    [Parameter] public UserDto UserForm { get; set; } = new();
+    [Parameter] public List<InsurancePolicyDto> TempInsurancePolicies { get; set; } = new();
+    [Parameter] public InsurancePolicyDto TempSelectedInsurancePolicy { get; set; } = new();
+    [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+    [Parameter] public EventCallback OnClosePopup { get; set; }
+
+
+    private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
+
+    private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
+    private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
+    private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+
+    private bool IsLoading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataPatient();
+        await LoadDataService();
+        await LoadDataPhysicion();
+
+        if (TempInsurancePolicies.Count > 0)
+            InsurancePolicies = TempInsurancePolicies;
+
+        if (TempSelectedInsurancePolicy is not null)
+            SelectedInsurancePolicy = TempSelectedInsurancePolicy;
+
+    }
+
+   
+
+    private async Task OnCancelBack()
+    {
+        // NavigationManager.NavigateTo(FormUrl);
+        await OnClosePopup.InvokeAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        IsLoading = true;
+
+        try
+        {
+            GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
+
+            // Execute the validator
+            ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
+
+            // Inspect any validation failures.
+            bool success = results.IsValid;
+            List<ValidationFailure> failures = results.Errors;
+
+            ToastService.ClearInfoToasts();
+            if (!success)
+            {
+                foreach (var f in failures)
+                {
+                    ToastService.ShowInfo(f.ErrorMessage);
+                }
+            }
+
+            if (GeneralConsultanService.AppointmentDate is null)
+            {
+                success = false;
+                ToastService.ShowInfo("Appointment Date is required");
+            }
+
+            // Execute the validator
+            ValidationResult results2 = new GCGUserFormValidator().Validate(UserForm);
+
+            // Inspect any validation failures.
+            bool success2 = results2.IsValid;
+            List<ValidationFailure> failures2 = results2.Errors;
+
+            if (!success2)
+            {
+                foreach (var f in failures2)
+                {
+                    ToastService.ShowInfo(f.ErrorMessage);
+                }
+            }
+
+            if (!success2 || !success)
+                return;
+
+            if (!GeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicy is null || SelectedInsurancePolicy.Id == 0))
+            {
+                IsLoading = false;
+                ToastService.ShowInfoSubmittingForm();
+                return;
+            }
+
+            GeneralConsultanServiceDto res = new();
+
+            var patient = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Includes = [x => x.Patient],
+                    Select = x => new GeneralConsultanService
+                    {
+                        Patient = new User { Name = x.Patient.Name },
+                    },
+                    Predicate = x => x.Id != GeneralConsultanService.Id
+                                  && x.ServiceId == GeneralConsultanService.ServiceId
+                                  && x.PatientId == GeneralConsultanService.PatientId
+                                  && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned)
+                                  && x.RegistrationDate != null
+                                  && x.RegistrationDate.Value.Date <= DateTime.Now.Date
+                });
+
+            if (patient is not null)
+            {
+                IsLoading = false;
+                ToastService.ShowInfo($"Patient in the name of \"{patient.Patient?.Name}\" still has a pending transaction.");
+                return;
+            }
+
+            await HandleGeneralConsultationSaveAsync(GeneralConsultanService, UserForm);
+
+            // Refactored Save Logic
+            async Task HandleGeneralConsultationSaveAsync(GeneralConsultanServiceDto service, UserDto userForm)
+            {
+                var createRequest = new CreateFormGeneralConsultanServiceNewRequest
+                    {
+                        GeneralConsultanServiceDto = new GeneralConsultanServiceDto
+                        {
+                            PatientId = service.PatientId,
+                            TypeRegistration = service.TypeRegistration,
+                            IsAlertInformationSpecialCase = service.IsAlertInformationSpecialCase,
+                            ClassType = service.ClassType,
+                            ServiceId = service.ServiceId,
+                            PratitionerId = service.PratitionerId,
+                            Payment = service.Payment,
+                            InsurancePolicyId = service.InsurancePolicyId,
+                            AppointmentDate = service.AppointmentDate,
+                            Status = EnumStatusGeneralConsultantService.Planned
+                        },
+                        Status = EnumStatusGeneralConsultantService.Planned,
+                        UserDto = new UserDto
+                        {
+                            Id = service.PatientId.GetValueOrDefault(),
+                            CurrentMobile = userForm.CurrentMobile
+                        }
+                    };
+
+                res = await Mediator.Send(createRequest);
+            }
+
+            ToastService.ClearSuccessToasts();
+            ToastService.ShowSuccess("The patient has been successfully followed up");
+            await OnClosePopup.InvokeAsync();
+        }
+        catch (Exception x)
+        {
+            x.HandleException(ToastService);
+            throw;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        ToastService.ShowInfoSubmittingForm();
+    }
+
+
+    private void KeyPressHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            return;
+        }
+    }
+
+
+    #region ComboboxPatient
+
+    private DxComboBox<UserDto, long?> refPatientComboBox { get; set; }
+    private int PatientComboBoxIndex { get; set; } = 0;
+    private int totalCountPatient = 0;
+
+    private async Task OnSearchPatient()
+    {
+        await LoadDataPatient();
+    }
+
+    private async Task OnSearchPatientIndexIncrement()
+    {
+        if (PatientComboBoxIndex < (totalCountPatient - 1))
+        {
+            PatientComboBoxIndex++;
+            await LoadDataPatient(PatientComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchPatientIndexDecrement()
+    {
+        if (PatientComboBoxIndex > 0)
+        {
+            PatientComboBoxIndex--;
+            await LoadDataPatient(PatientComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputPatientChanged(string e)
+    {
+        PatientComboBoxIndex = 0;
+        await LoadDataPatient();
+    }
+
+    private async Task LoadDataPatient(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            IsLoading = true;
+            var result = await Mediator.Send(new GetUserQuery2(
+                    x => x.IsPatient == true,
+                    searchTerm: refPatientComboBox?.Text ?? "",
+                    pageSize: pageSize,
+                    pageIndex:
+                    pageIndex,
+                    includes: [],
+                    select: x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile,
+
+                            IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                            IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                            IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                            WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                            FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                            PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+
+                            IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                            FamilyMedicalHistory = x.FamilyMedicalHistory,
+                            FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+
+                            IsMedicationHistory = x.IsMedicationHistory,
+                            MedicationHistory = x.MedicationHistory,
+                            PastMedicalHistory = x.PastMedicalHistory
+                        }
+            ));
+            Patients = result.Item1;
+            totalCountPatient = result.pageCount;
+            IsLoading = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { IsLoading = false; }
+    }
+
+    private async Task SelectedItemPatientChanged(UserDto e)
+    {
+        GeneralConsultanService.InsurancePolicyId = null;
+        InsurancePolicies.Clear();
+        GeneralConsultanService.Patient = new();
+        SelectedInsurancePolicy = new();
+
+        if (e is null)
+            return;
+
+        GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
+        GeneralConsultanService.PatientId = e.Id;
+        UserForm = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
+
+        if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
+        {
+            if (GeneralConsultanService.Payment.Equals("BPJS"))
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == true && x.Active == true));
+            else
+                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == false && x.Active == true));
+        }
+    }
+
+    #endregion ComboboxPatient
+
+
+    #region ComboboxService
+
+    private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
+    private int ServiceComboBoxIndex { get; set; } = 0;
+    private int totalCountService = 0;
+
+    private async Task OnSearchService()
+    {
+        await LoadDataService();
+    }
+
+    private async Task OnSearchServiceIndexIncrement()
+    {
+        if (ServiceComboBoxIndex < (totalCountService - 1))
+        {
+            ServiceComboBoxIndex++;
+            await LoadDataService(ServiceComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchServiceIndexDecrement()
+    {
+        if (ServiceComboBoxIndex > 0)
+        {
+            ServiceComboBoxIndex--;
+            await LoadDataService(ServiceComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputServiceChanged(string e)
+    {
+        ServiceComboBoxIndex = 0;
+        await LoadDataService();
+    }
+
+    private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            IsLoading = true;
+            var result = await Mediator.Send(new GetServiceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+            Services = result.Item1;
+            totalCountService = result.pageCount;
+            IsLoading = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { IsLoading = false; }
+    }
+
+    #endregion ComboboxService
+
+    #region ComboboxPhysicion
+
+    private DxComboBox<UserDto, long?> refPhysicionComboBox { get; set; }
+    private int PhysicionComboBoxIndex { get; set; } = 0;
+    private int totalCountPhysicion = 0;
+
+    private async Task OnSearchPhysicion()
+    {
+        await LoadDataPhysicion();
+    }
+
+    private async Task OnSearchPhysicionIndexIncrement()
+    {
+        if (PhysicionComboBoxIndex < (totalCountPhysicion - 1))
+        {
+            PhysicionComboBoxIndex++;
+            await LoadDataPhysicion(PhysicionComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchPhysicionIndexDecrement()
+    {
+        if (PhysicionComboBoxIndex > 0)
+        {
+            PhysicionComboBoxIndex--;
+            await LoadDataPhysicion(PhysicionComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputPhysicionChanged(string e)
+    {
+        PhysicionComboBoxIndex = 0;
+        await LoadDataPhysicion();
+    }
+
+    private async Task LoadDataPhysicion(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            IsLoading = true;
+            var result = await Mediator.Send(new GetUserQuery2(
+                           x => x.IsDoctor == true,
+                           searchTerm: refPhysicionComboBox?.Text ?? "",
+                           pageSize: pageSize,
+                           pageIndex:
+                           pageIndex,
+                           includes: [],
+                           select: x => new User
+                               {
+                                   Id = x.Id,
+                                   Name = x.Name,
+                                   Email = x.Email,
+                                   MobilePhone = x.MobilePhone,
+                                   Gender = x.Gender,
+                                   DateOfBirth = x.DateOfBirth,
+                                   IsPhysicion = x.IsPhysicion,
+                                   IsNurse = x.IsNurse,
+                               }
+                       )); Physicions = result.Item1;
+            totalCountPhysicion = result.pageCount;
+            IsLoading = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { IsLoading = false; }
+    }
+
+    #endregion ComboboxPhysicion
+
+    private async Task SelectedItemPaymentChanged(string e)
+    {
+        GeneralConsultanService.Payment = null;
+        GeneralConsultanService.InsurancePolicyId = null;
+        SelectedInsurancePolicy = new();
+
+        if (e is null)
+            return;
+
+        if (e.Equals("BPJS"))
+            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == true && x.Active == true));
+        else
+            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == false && x.Active == true));
+    }
+}

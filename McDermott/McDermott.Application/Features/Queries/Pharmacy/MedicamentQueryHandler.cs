@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using McDermott.Application.Features.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,49 +10,183 @@ using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 namespace McDermott.Application.Features.Queries.Pharmacy
 {
     public class MedicamentQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-         IRequestHandler<GetMedicamentQuery, List<MedicamentDto>>,
-         IRequestHandler<CreateMedicamentRequest, MedicamentDto>,
-         IRequestHandler<CreateListMedicamentRequest, List<MedicamentDto>>,
-         IRequestHandler<UpdateMedicamentRequest, MedicamentDto>,
-         IRequestHandler<UpdateListMedicamentRequest, List<MedicamentDto>>,
-         IRequestHandler<DeleteMedicamentRequest, bool>
+        IRequestHandler<GetMedicamentQuery, (List<MedicamentDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleMedicamentQuery, MedicamentDto>,
+        IRequestHandler<ValidateMedicamentQuery, bool>,
+        IRequestHandler<BulkValidateMedicamentQuery, List<MedicamentDto>>, IRequestHandler<CreateMedicamentRequest, MedicamentDto>,
+        IRequestHandler<CreateListMedicamentRequest, List<MedicamentDto>>,
+        IRequestHandler<UpdateMedicamentRequest, MedicamentDto>,
+        IRequestHandler<UpdateListMedicamentRequest, List<MedicamentDto>>,
+        IRequestHandler<DeleteMedicamentRequest, bool>
     {
         #region GET
 
-        public async Task<List<MedicamentDto>> Handle(GetMedicamentQuery request, CancellationToken cancellationToken)
+        public async Task<MedicamentDto> Handle(GetSingleMedicamentQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetMedicamentQuery_";
+                var query = _unitOfWork.Repository<Medicament>().Entities.AsNoTracking();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<Medicament>? result))
+                // Apply custom order by if provided
+                if (request.OrderBy is not null)
                 {
-                    result = await _unitOfWork.Repository<Medicament>().Entities
-                        .Include(x => x.Uom)
-                        .Include(x => x.Product)
-                        .Include(x => x.Frequency)
-                        .Include(x => x.Route)
-                        .Include(x => x.ActiveComponent)
-                      .AsNoTracking()
-                      .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    query = request.IsDescending ?
+                        query.OrderByDescending(request.OrderBy) :
+                        query.OrderBy(request.OrderBy);
                 }
 
-                result ??= [];
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                    query = query.Where(request.Predicate);
 
-                return result.ToList().Adapt<List<MedicamentDto>>();
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                {
+                    query = query.Select(request.Select);
+                }
+
+                // Return the first result as MedicamentDto
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<MedicamentDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
+        }
+
+
+        public async Task<(List<MedicamentDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMedicamentQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Medicament>().Entities.AsNoTracking();
+
+                // Apply custom order by if provided
+                if (request.OrderBy is not null)
+                    query = request.IsDescending ?
+                        query.OrderByDescending(request.OrderBy) :
+                        query.OrderBy(request.OrderBy);
+                //else
+                //    query = query.OrderBy(x => x.Name);
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    //query = query.Where(v =>
+                    //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                    //    );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Medicament
+                    {
+                        Id = x.Id,
+                        ProductId = x.ProductId,
+                        FrequencyId = x.FrequencyId,
+                        RouteId = x.RouteId,
+                        FormId = x.FormId,
+                        UomId = x.UomId,
+                        ActiveComponentId = x.ActiveComponentId,
+                        PregnancyWarning = x.PregnancyWarning,
+                        Pharmacologi = x.Pharmacologi,
+                        Weather = x.Weather,
+                        Food = x.Food,
+                        Cronies = x.Cronies,
+                        MontlyMax = x.MontlyMax,
+                        Dosage = x.Dosage,
+
+                        //Uom = new Uom
+                        //{ 
+                        //    Name = x.Uom is null ? string.Empty : x.Uom.Name,   
+                        //},
+                        //Form = new DrugForm
+                        //{
+                        //    Name = x.Form is null ? string.Empty : x.Form.Name,
+                        //},
+                        //Frequency = new DrugDosage
+                        //{
+                        //    Frequency = x.Frequency is null ? string.Empty : x.Frequency.Frequency,
+                        //},
+                        //Product = new Product
+                        //{
+                        //    Name = x.Product is null ? string.Empty : x.Product.Name,
+                        //},
+                        //Route = new DrugRoute
+                        //{
+                        //    Route = x.Route is null ? string.Empty : x.Route.Route,
+                        //},
+                    });
+
+
+                // Paginate and sort
+                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                    query,
+                    request.PageSize,
+                    request.PageIndex,
+                    cancellationToken
+                );
+
+                return (pagedItems.Adapt<List<MedicamentDto>>(), request.PageIndex, request.PageSize, totalPages);
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+
+        public async Task<bool> Handle(ValidateMedicamentQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Medicament>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<List<MedicamentDto>> Handle(BulkValidateMedicamentQuery request, CancellationToken cancellationToken)
+        {
+            var MedicamentDtos = request.MedicamentsToValidate;
+
+            //// Ekstrak semua kombinasi yang akan dicari di database
+            //var MedicamentNames = MedicamentDtos.Select(x => x.Name).Distinct().ToList();
+            //var MedicamentIds = MedicamentDtos.Select(x => x.MedicamentId).Distinct().ToList();
+
+            //var existingMedicaments = await _unitOfWork.Repository<Medicament>()
+            //    .Entities
+            //    .AsNoTracking()
+            //    .Where(v => MedicamentNames.Contains(v.Name)
+            //                && MedicamentIds.Contains(v.MedicamentId))
+            //    .ToListAsync(cancellationToken);
+
+            //return existingMedicaments.Adapt<List<MedicamentDto>>();
+
+            return [];
         }
 
         #endregion GET

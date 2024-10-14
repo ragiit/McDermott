@@ -351,21 +351,21 @@
 
             // Optionally add content to your request
 
-            var jsonContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(LoginForm), Encoding.UTF8, "application/json");
+            // var jsonContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(LoginForm), Encoding.UTF8, "application/json");
 
-            // request.Content = new StringContent(jsonContent);
-            request.Content = jsonContent;
+            // // request.Content = new StringContent(jsonContent);
+            // request.Content = jsonContent;
 
-            // Send the request
-            var response = await HttpClient.SendAsync(request);
+            // // Send the request
+            // var response = await HttpClient.SendAsync(request);
 
-            // Handle response
-            if (response.IsSuccessStatusCode)
-            {
-                // Success logic
-            }
+            // // Handle response
+            // if (response.IsSuccessStatusCode)
+            // {
+            //     // Success logic
+            // }
 
-            ToastService.ClearErrorToasts();
+            // ToastService.ClearErrorToasts();
 
             // var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
             var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == Helper.HashMD5(LoginForm.Password)));
