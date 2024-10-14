@@ -1,0 +1,669 @@
+﻿@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <EditForm Model="@InsurancePolicy" @onkeypress="@KeyPressHandler" Context="EditFormContext22" Enhance OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <AntiforgeryToken />
+
+                                <div class="card sticky">
+                                    <div class="card-body">
+                                        <div class=" row w-100">
+                                            <div class="w-100 row justify-content-end mt-2 mb-2">
+                                                <div class="col-auto align-self-end p-0 m-0">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                    </DxButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Users"
+                                                              NullText="Select User..."
+                                                              @ref="refUserComboBox"
+                                                              @bind-Value="@InsurancePolicy.UserId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              ReadOnly>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>InsurancePolicy.UserId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Insurances"
+                                                              NullText="Select Insurance"
+                                                              @ref="refInsuranceComboBox"
+                                                              @bind-Value="@InsurancePolicy.InsuranceId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              SelectedItemChanged="((InsuranceDto e) => SelectedItemInsuranceChanged(e))"
+                                                              TextChanged="((string e) => OnInputInsuranceChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchInsuranceIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchInsurance"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchInsuranceIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.Type)" Caption="Code" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.Presentase)" Caption="Presentase" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.AdminFee)" Caption="Admin Fee" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.AdminFeeMax)" Caption="Admin Fee Max" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.IsBPJS)" Caption="IsBPJS" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.IsBPJSKesehatan)" Caption="IsBPJSKesehatan" />
+                                                        <DxListEditorColumn FieldName="@nameof(InsuranceDto.IsBPJSTK)" Caption="IsBPJSTK" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>InsurancePolicy.InsuranceId)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Policy Number" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@InsurancePolicy.PolicyNumber"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Policy Number" />
+                                                <ValidationMessage For="@(()=>InsurancePolicy.PolicyNumber)"   />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem Visible="IsBPJS" Caption=" " ColSpanMd="12">
+                                                <DxButton Text="Get BPJS"
+                                                          Click="OnClickGetBPJS"
+                                                          RenderStyle="ButtonRenderStyle.Primary" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Active" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@InsurancePolicy.Active" />
+                                            </DxFormLayoutItem>
+
+                                        </DxFormLayout>
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutGroup Caption="BPJS Integration" ColSpanMd="12" CssClass="mt-3" Visible="IsBPJS" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
+                                                <div class="row w-100">
+
+                                                    @if (IsLoadingGetBPJS)
+                                                    {
+                                                        <div class="col-md-12 text-center">
+                                                            <DxLoadingPanel IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                            CssClass="loading-panel"
+                                                                            IndicatorVisible="true"
+                                                                            IndicatorAreaVisible="true"
+                                                                            Visible="true"
+                                                                            Text="Processing..."
+                                                                            TextAlignment="LoadingPanelTextAlignment.Right">
+                                                            </DxLoadingPanel>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Card Number" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.NoKartu"
+                                                                               NullText="Card Number"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.Nama"
+                                                                               NullText="Name"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Family Relation" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.HubunganKeluarga"
+                                                                               NullText="Family Relation"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sex" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.Sex"
+                                                                               NullText="Sex"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date of Birth" ColSpanMd="12">
+                                                                    <DxDateEdit NullText="Date of Birth" @bind-Date="@InsurancePolicy.TglLahir" Mask="@DateTimeMask.ShortDate" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Active Date" ColSpanMd="12">
+                                                                    <DxDateEdit NullText="Date of Birth" @bind-Date="@InsurancePolicy.TglMulaiAktif" Mask="@DateTimeMask.ShortDate" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start End Date" ColSpanMd="12">
+                                                                    <DxDateEdit NullText="Date of Birth" @bind-Date="@InsurancePolicy.TglAkhirBerlaku" Mask="@DateTimeMask.ShortDate" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Blood Type" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.GolDarah"
+                                                                               NullText="Blood Type"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Phone Number" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.NoHP"
+                                                                               NullText="Phone Number"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Identity Number" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.NoKTP"
+                                                                               NullText="Identity Number"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pst Prol" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.PstProl"
+                                                                               NullText="Pst Prol"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pst Prb" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.PstPrb"
+                                                                               NullText="Pst Prb"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Active" ColSpanMd="12">
+                                                                    <DxCheckBox @bind-Checked="@InsurancePolicy.Aktif" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Ket Active" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.KetAktif"
+                                                                               NullText="Ket Active"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <DxFormLayout>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PST Kd Provider" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.KdProviderPstKdProvider"
+                                                                               NullText="PST Kd Provider"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PST Nm Provider" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.KdProviderPstNmProvider"
+                                                                               NullText="PST Nm Provider"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dental Kd Provider" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.KdProviderGigiKdProvider"
+                                                                               NullText="Dental Kd Provider"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Dental Nm Provider" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.KdProviderGigiNmProvider"
+                                                                               NullText="Dental Nm Provider"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Class Name" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.JnsKelasNama"
+                                                                               NullText="Jns Class"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Class Code" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.JnsKelasKode"
+                                                                               NullText="Jns Class Code"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Participant Name" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.JnsPesertaNama"
+                                                                               NullText="Jns Participant Name"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Jns Participant Code" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.JnsPesertaKode"
+                                                                               NullText="Jns Participant Code"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Kd Insurance" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.AsuransiKdAsuransi"
+                                                                               NullText="Kd Insurance"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Nm Insurance" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.AsuransiNmAsuransi"
+                                                                               NullText="Nm Insurance"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="No Insurance" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@InsurancePolicy.AsuransiNoAsuransi"
+                                                                               NullText="No Insurance"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Cob Insurance" ColSpanMd="12">
+                                                                    <DxCheckBox @bind-Checked="@InsurancePolicy.AsuransiCob" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Arrears" ColSpanMd="12">
+                                                                    <DxSpinEdit @bind-Value="@InsurancePolicy.Tunggakan"
+                                                                                NullText="Arrears"
+                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </div>
+                                                    }
+
+                                                </div>
+                                            </DxFormLayoutGroup>
+
+                                        </DxFormLayout>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && (!UserAccessCRUID.IsCreate && !UserAccessCRUID.IsUpdate))
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+@code {
+    #region UserLoginAndAccessRole
+
+    [Inject]
+    public UserInfoService UserInfoService { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private User UserLogin { get; set; } = new();
+    private bool IsAccess = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        //await base.OnAfterRenderAsync(firstRender);
+
+        //if (firstRender)
+        //{
+        //}
+    }
+
+    private async Task GetUserInfo()
+    {
+        try
+        {
+            var user = await UserInfoService.GetUserInfo(ToastService);
+            IsAccess = user.Item1;
+            UserAccessCRUID = user.Item2;
+            UserLogin = user.Item3;
+        }
+        catch { }
+    }
+
+    #endregion UserLoginAndAccessRole
+
+    private bool PanelVisible { get; set; } = true;
+
+
+    [Parameter] public long Id { get; set; }
+    [Parameter] public long PatientId { get; set; }
+
+    private InsurancePolicyDto InsurancePolicy { get; set; } = new();
+    private List<InsuranceDto> Insurances { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        PanelVisible = true;
+        await GetUserInfo();
+        await LoadData();
+        InsurancePolicy.UserId = PatientId;
+        await LoadDataInsurance();
+        await LoadDataUser();
+
+        IsBPJS = Insurances.Any(x => x.Id == InsurancePolicy.InsuranceId && x.IsBPJS == true);
+        PanelVisible = false;
+    }
+
+    #region ComboboxInsurance
+
+    private DxComboBox<InsuranceDto, long> refInsuranceComboBox { get; set; }
+    private int InsuranceComboBoxIndex { get; set; } = 0;
+    private int totalCountInsurance = 0;
+
+    private async Task OnSearchInsurance()
+    {
+        await LoadDataInsurance();
+    }
+
+    private async Task OnSearchInsuranceIndexIncrement()
+    {
+        if (InsuranceComboBoxIndex < (totalCountInsurance - 1))
+        {
+            InsuranceComboBoxIndex++;
+            await LoadDataInsurance(InsuranceComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchInsuranceIndexDecrement()
+    {
+        if (InsuranceComboBoxIndex > 0)
+        {
+            InsuranceComboBoxIndex--;
+            await LoadDataInsurance(InsuranceComboBoxIndex, 10);
+        }
+    }
+
+    private async Task SelectedItemInsuranceChanged(InsuranceDto e)
+    {
+        IsBPJS = false;
+        if (e is null)
+            return;
+
+        IsBPJS = e.IsBPJS;
+    }
+
+    private async Task OnInputInsuranceChanged(string e)
+    {
+        InsuranceComboBoxIndex = 0;
+        await LoadDataInsurance();
+    }
+
+    private async Task LoadDataInsurance(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetInsuranceQuery
+                {
+                    SearchTerm = refInsuranceComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+            Insurances = result.Item1;
+            totalCountInsurance = result.PageCount;
+            PanelVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion ComboboxInsurance
+
+    #region ComboboxUser
+
+    private DxComboBox<UserDto, long> refUserComboBox { get; set; }
+    private int UserComboBoxIndex { get; set; } = 0;
+    private int totalCountUser = 0;
+
+    private async Task OnSearchUser()
+    {
+        await LoadDataUser();
+    }
+
+    private async Task OnSearchUserIndexIncrement()
+    {
+        if (UserComboBoxIndex < (totalCountUser - 1))
+        {
+            UserComboBoxIndex++;
+            await LoadDataUser(UserComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchUserndexDecrement()
+    {
+        if (UserComboBoxIndex > 0)
+        {
+            UserComboBoxIndex--;
+            await LoadDataUser(UserComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputUserChanged(string e)
+    {
+        UserComboBoxIndex = 0;
+        await LoadDataUser();
+    }
+
+    private List<UserDto> Users = [];
+
+    private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10)
+    {
+        PanelVisible = true;
+        var result = await Mediator.Send(new GetUserQuery2(
+             predicate: x => x.Id == InsurancePolicy.UserId,
+             pageIndex: pageIndex,
+             pageSize: pageSize,
+             searchTerm: refUserComboBox?.Text ?? "",
+             select: x => new User
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Email = x.Email
+                 }
+
+        ));
+        Users = result.Item1;
+        totalCountUser = result.pageCount;
+        PanelVisible = false;
+    }
+
+    #endregion ComboboxUser
+
+    private async Task LoadData()
+    {
+        var result = await Mediator.Send(new GetSingleInsurancePolicyQuery
+        {
+            Predicate = x => x.Id == Id
+        });
+
+        InsurancePolicy = result ?? new(); 
+    }
+
+    private bool IsLoading { get; set; } = false;
+
+    private void KeyPressHandler(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            return;
+        }
+    }
+
+    private async Task HandleInvalidSubmit()
+    {
+        ToastService.ShowInfoSubmittingForm();
+    }
+
+    private bool IsBPJS = false;
+    private ResponseAPIBPJSIntegrationGetPeserta ResponseAPIBPJSIntegrationGetPeserta { get; set; } = new();
+
+    private async Task OnClickGetBPJS()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(InsurancePolicy.PolicyNumber))
+            {
+                ToastService.ShowInfo("Please insert the Policy Number!");
+                return;
+            }
+
+            IsLoadingGetBPJS = true;
+
+            var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"peserta/{InsurancePolicy.PolicyNumber}", HttpMethod.Get);
+            if (result.Item2 == 200)
+            {
+                if (result.Item1 == null)
+                {
+                    ResponseAPIBPJSIntegrationGetPeserta = new();
+                    InsurancePolicy = new();
+                    IsLoadingGetBPJS = false;
+                    return;
+                }
+
+                var tempInsurancePolicy = InsurancePolicy;
+
+                ResponseAPIBPJSIntegrationGetPeserta = System.Text.Json.JsonSerializer.Deserialize<ResponseAPIBPJSIntegrationGetPeserta>(result.Item1);
+                InsurancePolicy = ResponseAPIBPJSIntegrationGetPeserta.Adapt<InsurancePolicyDto>();
+
+                InsurancePolicy.Id = tempInsurancePolicy.Id;
+                InsurancePolicy.PolicyNumber = tempInsurancePolicy.PolicyNumber;
+                InsurancePolicy.UserId = tempInsurancePolicy.UserId;
+                InsurancePolicy.InsuranceId = tempInsurancePolicy.InsuranceId;
+                InsurancePolicy.Active = tempInsurancePolicy.Active;
+
+                InsurancePolicy.AsuransiNoAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.NoAsuransi;
+                InsurancePolicy.AsuransiNmAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.NmAsuransi;
+                InsurancePolicy.AsuransiCob = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.Cob;
+                InsurancePolicy.AsuransiKdAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.KdAsuransi;
+
+                InsurancePolicy.JnsKelasNama = ResponseAPIBPJSIntegrationGetPeserta.JnsKelass.Nama;
+                InsurancePolicy.JnsKelasKode = ResponseAPIBPJSIntegrationGetPeserta.JnsKelass.Kode;
+
+                InsurancePolicy.JnsPesertaNama = ResponseAPIBPJSIntegrationGetPeserta.JnsPesertaa.Nama;
+                InsurancePolicy.JnsPesertaKode = ResponseAPIBPJSIntegrationGetPeserta.JnsPesertaa.Kode;
+
+                InsurancePolicy.KdProviderGigiKdProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderGigii.KdProvider;
+                InsurancePolicy.KdProviderGigiNmProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderGigii.NmProvider;
+
+                InsurancePolicy.KdProviderPstKdProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderPstt.KdProvider;
+                InsurancePolicy.KdProviderPstNmProvider = ResponseAPIBPJSIntegrationGetPeserta.KdProviderPstt.NmProvider;
+            }
+            else
+            {
+                ResponseAPIBPJSIntegrationGetPeserta = new();
+                InsurancePolicy = new();
+
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+            }
+
+            IsLoadingGetBPJS = false;
+        }
+        catch (Exception ex)
+        {
+            IsLoadingGetBPJS = false;
+            ex.HandleException(ToastService);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            PanelVisible = true;
+            if (IsBPJS)
+            {
+                if (InsurancePolicy.NoKartu != InsurancePolicy.PolicyNumber)
+                {
+                    ToastService.ShowInfo("Card Number & Policy Number must be same");
+                    return;
+                }
+            }
+
+            if (InsurancePolicy.UserId == 0)
+            {
+                ToastService.ShowInfo("Please select the Patient first.");
+                return;
+            }
+
+            var existNumber = await Mediator.Send(new ValidateInsurancePolicyQuery(x => x.Id != InsurancePolicy.Id && x.PolicyNumber == InsurancePolicy.PolicyNumber));
+
+            if (existNumber)
+            {
+                ToastService.ShowInfo("Card Number already exist.");
+                return;
+            }
+
+            if (!IsBPJS)
+            {
+                InsurancePolicy.Nama = null;
+                InsurancePolicy.HubunganKeluarga = null;
+                InsurancePolicy.Sex = null;
+                InsurancePolicy.TglLahir = null;
+                InsurancePolicy.TglMulaiAktif = null;
+                InsurancePolicy.TglAkhirBerlaku = null;
+                InsurancePolicy.GolDarah = null;
+                InsurancePolicy.NoHP = null;
+                InsurancePolicy.NoKTP = null;
+                InsurancePolicy.PstProl = null;
+                InsurancePolicy.PstPrb = null;
+                InsurancePolicy.Aktif = false;
+                InsurancePolicy.KetAktif = null;
+                InsurancePolicy.Tunggakan = 0;
+
+                InsurancePolicy.KdProviderPstKdProvider = null;
+                InsurancePolicy.KdProviderPstNmProvider = null;
+                InsurancePolicy.KdProviderGigiKdProvider = null;
+                InsurancePolicy.KdProviderGigiNmProvider = null;
+                InsurancePolicy.JnsKelasNama = null;
+                InsurancePolicy.JnsKelasKode = null;
+                InsurancePolicy.JnsPesertaNama = null;
+                InsurancePolicy.JnsPesertaKode = null;
+
+                InsurancePolicy.AsuransiKdAsuransi = null;
+                InsurancePolicy.AsuransiNmAsuransi = null;
+                InsurancePolicy.AsuransiNoAsuransi = null;
+                InsurancePolicy.AsuransiCob = false;
+            }
+
+            if (InsurancePolicy.Id == 0)
+                InsurancePolicy= await Mediator.Send(new CreateInsurancePolicyRequest(InsurancePolicy));
+            else
+                await Mediator.Send(new UpdateInsurancePolicyRequest(InsurancePolicy));
+
+            var res = await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.Id == InsurancePolicy.Id
+            });
+
+            InsurancePolicy = res;
+        }
+        catch (Exception ex)
+        {
+            PanelVisible = false;
+            ex.HandleException(ToastService);
+        }
+        finally
+        {
+            PanelVisible = false;
+        }
+    }
+
+    private bool IsLoadingGetBPJS { get; set; } = false;
+}

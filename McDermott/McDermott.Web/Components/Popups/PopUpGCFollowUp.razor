@@ -543,10 +543,10 @@
 
         if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
         {
-            if (GeneralConsultanService.Payment.Equals("BPJS"))
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == true && x.Active == true));
-            else
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == false && x.Active == true));
+            InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+            {
+                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+            })).Item1;
         }
     }
 
@@ -687,9 +687,9 @@
         if (e is null)
             return;
 
-        if (e.Equals("BPJS"))
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == true && x.Active == true));
-        else
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == false && x.Active == true));
+        InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+        {
+            Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+        })).Item1;
     }
 }

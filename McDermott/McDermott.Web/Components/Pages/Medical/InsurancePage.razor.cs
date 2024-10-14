@@ -1,4 +1,8 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using McDermott.Application.Dtos.Medical;
+using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class InsurancePage
     {
@@ -164,6 +168,30 @@
             await LoadData(newPageIndex, pageSize);
         }
 
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = new ObservableRangeCollection<object>();
+                var result = await Mediator.Send(new GetInsuranceQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+                Insurances = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
         #endregion Searching
 
         #region UserLoginAndAccessRole
@@ -288,16 +316,6 @@
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            var result = await Mediator.Send(new GetInsuranceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Insurances = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
         }
 
         #endregion Default Grid

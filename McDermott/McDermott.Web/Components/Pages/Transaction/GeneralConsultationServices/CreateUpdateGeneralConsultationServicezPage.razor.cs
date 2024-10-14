@@ -81,10 +81,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport { get; set; } = new();
         private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
 
-        private BPJSIntegrationDto SelectedBPJSIntegration { get; set; } = new();
-        private BPJSIntegrationDto SelectedBPJSIntegrationFollowUp { get; set; } = new();
-        private BPJSIntegrationDto SelectedBPJSIntegrationReferTo { get; set; } = new();
-
         #endregion Binding
 
         #region CPPT
@@ -502,7 +498,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
                 {
-                    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.Id == GeneralConsultanService.InsurancePolicyId));
+                    InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+                    {
+                        Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId
+                    })).Item1;
                     SelectedInsurancePolicy = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId) ?? new();
                 }
 
@@ -782,10 +781,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
             if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
             {
-                if (GeneralConsultanService.Payment.Equals("BPJS"))
-                    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == true && x.Active == true));
-                else
-                    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == false && x.Active == true));
+                InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+                {
+                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+                })).Item1;
             }
         }
 
@@ -936,10 +935,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             if (e is null)
                 return;
 
-            if (e.Equals("BPJS"))
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == true && x.Active == true));
-            else
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == false && x.Active == true));
+            InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+            {
+                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true
+            })).Item1;
         }
 
         #region OnClick
@@ -955,7 +954,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if (GeneralConsultanService.Id != 0)
                 {
-                    if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                    if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0)
                     {
                         //var isSuccess = await SendPCareRequestUpdateStatusPanggilAntrean(2);
                         //if (!isSuccess)
@@ -1323,7 +1322,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ? SelectedFoodAllergies.Select(x => x.Id).ToList()
                     : [];
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
+                if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
                 {
                     //var isSuccess = await SendPcareRequestRegistration();
                     //if (!isSuccess)
@@ -1337,7 +1336,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     //}
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
                 {
                     //var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
@@ -1578,7 +1577,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private void HandleClosePopup()
         {
-            IsFollowUp = false; // Tutup popup
+            IsFollowUp = false;
         }
 
         private void OnClickPopUpAppoimentPending()
@@ -1586,8 +1585,9 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             IsAppoimentPending = true;
         }
 
-        private async Task OnClickReferralPrescriptionConcoction()
+        private void OnClickReferralPrescriptionConcoction()
         {
+            NavigationManager.NavigateTo($"/pharmacy/prescription/{GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()
@@ -1596,8 +1596,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             NavigationManager.NavigateTo($"transaction/print-document-medical/{IdEncrypt}");
         }
 
-        private async Task OnClickPopUpPopUpProcedureRoom()
+        private void OnClickPopUpPopUpProcedureRoom()
         {
+            var targetUrl = NavigationManager.ToAbsoluteUri("/clinic-service/procedure-room");
+            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(targetUrl.ToString(), "genserv", GeneralConsultanService.Id.ToString());
+            NavigationManager.NavigateTo(query);
         }
 
         private bool isPrint { get; set; } = false;

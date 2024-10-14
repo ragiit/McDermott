@@ -219,12 +219,11 @@ namespace McDermott.Web.Components.Pages.Config
                             provinceNames.Add(prov.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetProvinceQuery(x => provinceNames.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new Province
-                        {
-                            Id = x.Id,
-                            Name = x.Name
-                        }))).Item1;
+                    list1 = (await Mediator.Send(new GetProvinceQuery
+                    {
+                        Predicate = x => provinceNames.Contains(x.Name.ToLower()),
+                        IsGetAll = true
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

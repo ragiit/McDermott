@@ -162,12 +162,12 @@
                             </DxFormLayoutItem>
                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                             {
-                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                    <DxTextBox ReadOnly
-                                               NullText="Insurance Policy..."
-                                               @bind-Text="@GeneralConsultanService.InsurancePolicy.InsuranceName">
-                                    </DxTextBox>
-                                </DxFormLayoutItem>
+                               @*   <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+                                     <DxTextBox ReadOnly
+                                                NullText="Insurance Policy..."
+                                                @bind-Text="@GeneralConsultanService.InsurancePolicy.InsuranceName">
+                                     </DxTextBox>
+                                 </DxFormLayoutItem> *@
                             }
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
                                 <DxDateEdit ReadOnly

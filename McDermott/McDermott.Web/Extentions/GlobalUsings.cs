@@ -42,7 +42,6 @@ global using static McDermott.Application.Features.Commands.Medical.DoctorSchedu
 global using static McDermott.Application.Features.Commands.BpjsIntegration.AllergyCommand;
 global using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
-global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;
 global using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanClinicalAssesmentCommand;

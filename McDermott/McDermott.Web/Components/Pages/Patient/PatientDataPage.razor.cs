@@ -388,8 +388,8 @@ namespace McDermott.Web.Components.Pages.Patient
         {
             if (UserForm.Id != 0)
             {
-                var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
-                InsurancePoliciesCount = count.Count;
+                //var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
+                //InsurancePoliciesCount = count.Count;
             }
         }
 
@@ -687,9 +687,9 @@ namespace McDermott.Web.Components.Pages.Patient
                 VaccinationCount = await Mediator.Send(new GetGeneralConsultanServiceCountQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"));
                 PatientFamilyRelations = await Mediator.Send(new GetPatientFamilyByPatientQuery(x => x.PatientId == UserForm.Id));
                 AllPatientFamilyRelations = [.. PatientFamilyRelations];
-                var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
-                SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds is not null && UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
-                InsurancePoliciesCount = count.Count;
+                //var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
+                //SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds is not null && UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
+                //InsurancePoliciesCount = count.Count;
                 var counts = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == UserForm.Id));
                 PrescriptionCount = counts.Count;
                 var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));

@@ -1,0 +1,103 @@
+﻿@page "/patient/insurance-policies"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Insurance Policy</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Insurance Policy" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                              
+                                <MyGridPaginate @ref="Grid"
+                                                Data="InsurancePolicys"
+                                                PageSize="10"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                DataItemDeleting="OnDelete"
+                                                RowDoubleClick="EditItem_Click"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                SearchTextChanged="OnSearchBoxChanged">
+
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="InsurancePolicyDto"
+                                                         Items="@InsurancePolicys"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         Grid="Grid"
+                                                         VisibleNew="false"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate> 
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="User.Name" Caption="Patient" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Insurance.Name" Caption="Insurance Company" />
+                                        <DxGridDataColumn FieldName="PolicyNumber" Caption="Policy Number" />
+                                        <DxGridDataColumn FieldName="Active" />
+                                    </Columns>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-8">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-4 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

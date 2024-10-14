@@ -2,15 +2,44 @@
 {
     public class InsurancePolicyCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null, bool removeCache = false) : IRequest<List<InsurancePolicyDto>>
+        public class GetInsurancePolicyQuery : IRequest<(List<InsurancePolicyDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
+            public List<Expression<Func<InsurancePolicy, object>>> Includes { get; set; }
+            public Expression<Func<InsurancePolicy, bool>> Predicate { get; set; }
+            public Expression<Func<InsurancePolicy, InsurancePolicy>> Select { get; set; }
+
+            public List<(Expression<Func<InsurancePolicy, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        #endregion  
+        public class GetSingleInsurancePolicyQuery : IRequest<InsurancePolicyDto>
+        {
+            public List<Expression<Func<InsurancePolicy, object>>> Includes { get; set; }
+            public Expression<Func<InsurancePolicy, bool>> Predicate { get; set; }
+            public Expression<Func<InsurancePolicy, InsurancePolicy>> Select { get; set; }
+
+            public List<(Expression<Func<InsurancePolicy, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class ValidateInsurancePolicyQuery(Expression<Func<InsurancePolicy, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<InsurancePolicy, bool>> Predicate { get; } = predicate!;
+        }
+
+        #endregion GET
 
         #region CREATE
 

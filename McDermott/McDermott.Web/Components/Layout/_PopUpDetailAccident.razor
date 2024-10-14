@@ -137,11 +137,11 @@
                             </DxFormLayoutItem>
                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                             {
-                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+                             @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Insurance Policy" ColSpanMd="12">
                                     <MyTextBox @bind-Text="@GeneralConsultanService.InsurancePolicy.InsuranceName"
                                                ReadOnly
                                                NullText="Insurance Policy" />
-                                </DxFormLayoutItem>
+                                </DxFormLayoutItem> *@
                             }
 
                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Registration Date" ColSpanMd="12">

@@ -81,9 +81,14 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetProvinceQuery
+                {
+                    SearchTerm = searchTerm,
+                    PageSize = pageSize,
+                    PageIndex = pageIndex,
+                });
                 Provinces = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
                 PanelVisible = false;
             }

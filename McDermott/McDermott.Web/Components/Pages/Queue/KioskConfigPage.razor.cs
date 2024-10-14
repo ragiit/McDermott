@@ -101,6 +101,9 @@ namespace McDermott.Web.Components.Pages.Queue
             await LoadData();
         }
 
+        private List<CountryDto> Countries { get; set; }
+        private long aaa { get; set; }
+
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -111,6 +114,7 @@ namespace McDermott.Web.Components.Pages.Queue
             //Services = [.. service.Where(x => x.IsPatient == true)];
             a.ForEach(x => x.ServiceName = string.Join(", ", Services.Where(z => x.ServiceIds != null && x.ServiceIds.Contains(z.Id)).Select(x => x.Name).ToList()));
             kioskConfigs = a;
+            Countries = (await Mediator.Send(new GetCountryQuery())).Item1;
             PanelVisible = false;
         }
 

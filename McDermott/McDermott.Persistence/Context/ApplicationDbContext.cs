@@ -24,7 +24,8 @@ namespace McDermott.Persistence.Context
         #region BPJS
 
         public DbSet<BpjsClassification> BpjsClassifications { get; set; }
-        public DbSet<BPJSIntegration> BPJSIntegrations { get; set; }
+
+        //public DbSet<BPJSIntegration> BPJSIntegrations { get; set; }
         public DbSet<SystemParameter> SystemParameters { get; set; }
 
         #endregion BPJS
@@ -198,7 +199,7 @@ namespace McDermott.Persistence.Context
                   .IsUnique();
 
             modelBuilder.Entity<InsurancePolicy>()
-                  .HasIndex(e => e.NoCard)
+                  .HasIndex(e => e.NoKartu)
                   .IsUnique();
 
             modelBuilder.Entity<ReceivingStockProduct>()
@@ -342,11 +343,6 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<GeneralConsultanService>()
                 .HasMany(m => m.SickLeaves)
                 .WithOne(c => c.GeneralConsultans)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<InsurancePolicy>()
-                .HasMany(m => m.BPJSIntegrations)
-                .WithOne(c => c.InsurancePolicy)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<InventoryAdjusment>()

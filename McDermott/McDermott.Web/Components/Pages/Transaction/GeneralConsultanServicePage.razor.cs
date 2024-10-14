@@ -132,30 +132,30 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.Status.Equals("Planned"))
-                {
-                    var isSuccess = await SendPcareRequestRegistration();
-                    if (!isSuccess)
-                    {
-                        IsLoading = false;
-                        return;
-                    }
-                    else
-                    {
-                        await SendPCareRequestUpdateStatusPanggilAntrean(1);
-                    }
-                }
+                //if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.Status.Equals("Planned"))
+                //{
+                //    var isSuccess = await SendPcareRequestRegistration();
+                //    if (!isSuccess)
+                //    {
+                //        IsLoading = false;
+                //        return;
+                //    }
+                //    else
+                //    {
+                //        await SendPCareRequestUpdateStatusPanggilAntrean(1);
+                //    }
+                //}
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.Status.Equals("Physician"))
-                {
-                    var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+                //if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && FormRegis.Status.Equals("Physician"))
+                //{
+                //    var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
-                    if (!isSuccessAddKunjungan)
-                    {
-                        IsLoading = false;
-                        return;
-                    }
-                }
+                //    if (!isSuccessAddKunjungan)
+                //    {
+                //        IsLoading = false;
+                //        return;
+                //    }
+                //}
 
                 if (FormRegis.Id != 0)
                 {
@@ -304,113 +304,113 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task<bool> SendPcareRequestKunjungan()
         {
-            if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
-            {
-                var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
+            //if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            //{
+            //    var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
 
-                string diag1 = null!;
+            //    string diag1 = null!;
 
-                if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))
-                {
-                    if (GeneralConsultanCPPTs.Count > 0)
-                    {
-                        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
-                        if (g is not null)
-                        {
-                            diag1 = NursingDiagnoses.FirstOrDefault(x => x.Problem.Equals(g.Body))!.Code ?? null!;
-                        }
-                    }
-                }
+            //    if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))
+            //    {
+            //        if (GeneralConsultanCPPTs.Count > 0)
+            //        {
+            //            var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
+            //            if (g is not null)
+            //            {
+            //                diag1 = NursingDiagnoses.FirstOrDefault(x => x.Problem.Equals(g.Body))!.Code ?? null!;
+            //            }
+            //        }
+            //    }
 
-                if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.Physician))
-                {
-                    if (GeneralConsultanCPPTs.Count > 0)
-                    {
-                        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
-                        if (g is not null)
-                        {
-                            diag1 = Diagnoses.FirstOrDefault(x => x.Name.Equals(g.Body))!.Code ?? null!;
-                        }
-                    }
-                }
+            //    if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+            //    {
+            //        if (GeneralConsultanCPPTs.Count > 0)
+            //        {
+            //            var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
+            //            if (g is not null)
+            //            {
+            //                diag1 = Diagnoses.FirstOrDefault(x => x.Name.Equals(g.Body))!.Code ?? null!;
+            //            }
+            //        }
+            //    }
 
-                var kunj = new KunjunganRequest
-                {
-                    NoKunjungan = FormRegis.SerialNo ?? string.Empty,
-                    NoKartu = SelectedBPJSIntegration.NoKartu ?? "",
-                    TglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
-                    KdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
-                    KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultantClinical.AwarenessId)!.KdSadar,
-                    Sistole = GeneralConsultantClinical.Sistole.ToInt32(),
-                    Diastole = GeneralConsultantClinical.Diastole.ToInt32(),
-                    BeratBadan = GeneralConsultantClinical.Weight.ToInt32(),
-                    TinggiBadan = GeneralConsultantClinical.Height.ToInt32(),
-                    RespRate = GeneralConsultantClinical.RR.ToInt32(),
-                    HeartRate = GeneralConsultantClinical.HR.ToInt32(),
-                    LingkarPerut = GeneralConsultantClinical.WaistCircumference.ToInt32(),
-                    KdStatusPulang = "4",
-                    TglPulang = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
-                    KdDokter = IsPratition.FirstOrDefault(x => x.Id == FormRegis.PratitionerId)!.PhysicanCode,
-                    KdDiag1 = diag1,
-                    KdDiag2 = null,
-                    KdDiag3 = null,
-                    Suhu = GeneralConsultantClinical.Temp.ToString(),
-                };
+            //    var kunj = new KunjunganRequest
+            //    {
+            //        NoKunjungan = FormRegis.SerialNo ?? string.Empty,
+            //        NoKartu = SelectedBPJSIntegration.NoKartu ?? "",
+            //        TglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
+            //        KdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
+            //        KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultantClinical.AwarenessId)!.KdSadar,
+            //        Sistole = GeneralConsultantClinical.Sistole.ToInt32(),
+            //        Diastole = GeneralConsultantClinical.Diastole.ToInt32(),
+            //        BeratBadan = GeneralConsultantClinical.Weight.ToInt32(),
+            //        TinggiBadan = GeneralConsultantClinical.Height.ToInt32(),
+            //        RespRate = GeneralConsultantClinical.RR.ToInt32(),
+            //        HeartRate = GeneralConsultantClinical.HR.ToInt32(),
+            //        LingkarPerut = GeneralConsultantClinical.WaistCircumference.ToInt32(),
+            //        KdStatusPulang = "4",
+            //        TglPulang = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
+            //        KdDokter = IsPratition.FirstOrDefault(x => x.Id == FormRegis.PratitionerId)!.PhysicanCode,
+            //        KdDiag1 = diag1,
+            //        KdDiag2 = null,
+            //        KdDiag3 = null,
+            //        Suhu = GeneralConsultantClinical.Temp.ToString(),
+            //    };
 
-                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
+            //    var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
 
-                if (responseApi.Item2 != 200)
-                {
-                    ToastService.ShowError($"{responseApi.Item1}");
+            //    if (responseApi.Item2 != 200)
+            //    {
+            //        ToastService.ShowError($"{responseApi.Item1}");
 
-                    IsLoading = false;
-                    return false;
-                }
-                else
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                    if (!string.IsNullOrWhiteSpace(FormRegis.SerialNo)) // Check if the serial no is not getting from kiosk
-                        FormRegis.SerialNo = data.response.message;
-                }
-            }
+            //        IsLoading = false;
+            //        return false;
+            //    }
+            //    else
+            //    {
+            //        dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+            //        if (!string.IsNullOrWhiteSpace(FormRegis.SerialNo)) // Check if the serial no is not getting from kiosk
+            //            FormRegis.SerialNo = data.response.message;
+            //    }
+            //}
 
             return true;
         }
 
         private async Task<bool> SendPcareRequestRegistration()
         {
-            if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.Planned) && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            //if (FormRegis.Status.Equals(EnumStatusGeneralConsultantService.Planned) && FormRegis.Payment is not null && FormRegis.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
             {
-                var regis = new PendaftaranRequest
-                {
-                    kdProviderPeserta = SelectedBPJSIntegration.KdProviderPstKdProvider ?? "",
-                    tglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
-                    noKartu = SelectedBPJSIntegration.NoKartu ?? "",
-                    kdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
-                    keluhan = null,
-                    kunjSakit = true,
-                    kdTkp = "10"
-                };
+                //var regis = new PendaftaranRequest
+                //{
+                //    kdProviderPeserta = SelectedBPJSIntegration.KdProviderPstKdProvider ?? "",
+                //    tglDaftar = FormRegis.RegistrationDate.ToString("dd-MM-yyyy"),
+                //    noKartu = SelectedBPJSIntegration.NoKartu ?? "",
+                //    kdPoli = Services.FirstOrDefault(x => x.Id == FormRegis.ServiceId)!.Code,
+                //    keluhan = null,
+                //    kunjSakit = true,
+                //    kdTkp = "10"
+                //};
 
-                Console.WriteLine("Sending pendaftaran...");
-                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"pendaftaran", HttpMethod.Post, regis);
+                //Console.WriteLine("Sending pendaftaran...");
+                //var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"pendaftaran", HttpMethod.Post, regis);
 
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                //dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
 
-                if (responseApi.Item2 != 201)
-                {
-                    if (responseApi.Item2 == 412)
-                        ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
-                    else
-                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                //if (responseApi.Item2 != 201)
+                //{
+                //    if (responseApi.Item2 == 412)
+                //        ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
+                //    else
+                //        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
 
-                    Console.WriteLine(JsonConvert.SerializeObject(regis, Formatting.Indented));
+                //    Console.WriteLine(JsonConvert.SerializeObject(regis, Formatting.Indented));
 
-                    IsLoading = false;
-                    return false;
-                }
-                else
-                    FormRegis.SerialNo = data.message;
+                //    IsLoading = false;
+                //    return false;
+                //}
+                //else
+                //    FormRegis.SerialNo = data.message;
             }
             return true;
         }
@@ -1725,7 +1725,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             //        x.TypeString = a.Name;
             //});
 
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
+            //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
             NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery())).Item1;
             //LabTests = (await Mediator.Send(new GetLabTestQuery())).Item1;
 
@@ -2011,15 +2011,15 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = true;
             if (FormRegis.Id != 0)
             {
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
-                {
-                    var isSuccess = await SendPCareRequestUpdateStatusPanggilAntrean(2);
-                    if (!isSuccess)
-                    {
-                        IsLoading = false;
-                        return;
-                    }
-                }
+                //if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                //{
+                //    var isSuccess = await SendPCareRequestUpdateStatusPanggilAntrean(2);
+                //    if (!isSuccess)
+                //    {
+                //        IsLoading = false;
+                //        return;
+                //    }
+                //}
 
                 FormRegis.Status = EnumStatusGeneralConsultantService.Canceled;
 
@@ -2043,7 +2043,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
                     Kodepoli = service!.Code ?? string.Empty,
-                    Nomorkartu = SelectedBPJSIntegration.NoKartu ?? string.Empty,
+                    //Nomorkartu = SelectedBPJSIntegration.NoKartu ?? string.Empty,
                     Status = status, // 1 -> Hadir, 2 -> Tidak Hadir
                     Waktu = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
@@ -2237,27 +2237,27 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }).ToList();
                 }
 
-                SelectedBPJSIntegration = new();
+                //SelectedBPJSIntegration = new();
 
-                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == FormRegis.InsurancePolicyId));
-                if (bpjs.Count > 0)
-                {
-                    var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
-                    if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
-                    {
-                        var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
-                        if (parameter is not null)
-                        {
-                            if (!parameter.Equals(bpjs[0].KdProviderPstKdProvider))
-                            {
-                            }
-                            else
-                            {
-                                SelectedBPJSIntegration = bpjs[0];
-                            }
-                        }
-                    }
-                }
+                //var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == FormRegis.InsurancePolicyId));
+                //if (bpjs.Count > 0)
+                //{
+                //    var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
+                //    if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
+                //    {
+                //        var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+                //        if (parameter is not null)
+                //        {
+                //            if (!parameter.Equals(bpjs[0].KdProviderPstKdProvider))
+                //            {
+                //            }
+                //            else
+                //            {
+                //                SelectedBPJSIntegration = bpjs[0];
+                //            }
+                //        }
+                //    }
+                //}
 
                 if (FormRegis.Status != EnumStatusGeneralConsultantService.Finished)
                 {
@@ -2533,84 +2533,84 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (FormRegis.ReferVerticalKhususCategoryCode is not null && (FormRegis.ReferVerticalKhususCategoryCode.Equals("THA") || FormRegis.ReferVerticalKhususCategoryCode.Equals("HEM")))
                 {
-                    Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+                    //Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
 
-                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    //var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/subspesialis/{FormRegis.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
-                    if (result.Item2 == 200)
-                    {
-                        if (result.Item1 is null)
-                        {
-                            RujukanSubSpesialis.Clear();
-                        }
-                        else
-                        {
-                            dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    //if (result.Item2 == 200)
+                    //{
+                    //    if (result.Item1 is null)
+                    //    {
+                    //        RujukanSubSpesialis.Clear();
+                    //    }
+                    //    else
+                    //    {
+                    //        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                            var dynamicList = (IEnumerable<dynamic>)data.list;
+                    //        var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                            var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
-                            {
-                                Kdppk = item.kdppk,
-                                Nmppk = item.nmppk,
-                                AlamatPpk = item.alamatPpk,
-                                TelpPpk = item.telpPpk,
-                                Kelas = item.kelas,
-                                Nmkc = item.nmkc,
-                                Distance = item.distance,
-                                Jadwal = item.jadwal,
-                                JmlRujuk = item.jmlRujuk,
-                                Kapasitas = item.kapasitas,
-                                Persentase = item.persentase,
-                            }).ToList();
+                    //        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                    //        {
+                    //            Kdppk = item.kdppk,
+                    //            Nmppk = item.nmppk,
+                    //            AlamatPpk = item.alamatPpk,
+                    //            TelpPpk = item.telpPpk,
+                    //            Kelas = item.kelas,
+                    //            Nmkc = item.nmkc,
+                    //            Distance = item.distance,
+                    //            Jadwal = item.jadwal,
+                    //            JmlRujuk = item.jmlRujuk,
+                    //            Kapasitas = item.kapasitas,
+                    //            Persentase = item.persentase,
+                    //        }).ToList();
 
-                            RujukanSubSpesialis.Clear();
-                            RujukanSubSpesialis = a;
-                        }
-                    }
-                    else
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    //        RujukanSubSpesialis.Clear();
+                    //        RujukanSubSpesialis = a;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-                    }
+                    //    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    //}
                 }
                 else
                 {
-                    Console.WriteLine($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
+                    //Console.WriteLine($"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
 
-                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    //var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{FormRegis.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{FormRegis.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
-                    if (result.Item2 == 200)
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    //if (result.Item2 == 200)
+                    //{
+                    //    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        var dynamicList = (IEnumerable<dynamic>)data.list;
+                    //    var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
-                        {
-                            Kdppk = item.kdppk,
-                            Nmppk = item.nmppk,
-                            AlamatPpk = item.alamatPpk,
-                            TelpPpk = item.telpPpk,
-                            Kelas = item.kelas,
-                            Nmkc = item.nmkc,
-                            Distance = item.distance,
-                            Jadwal = item.jadwal,
-                            JmlRujuk = item.jmlRujuk,
-                            Kapasitas = item.kapasitas,
-                            Persentase = item.persentase,
-                        }).ToList();
+                    //    var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                    //    {
+                    //        Kdppk = item.kdppk,
+                    //        Nmppk = item.nmppk,
+                    //        AlamatPpk = item.alamatPpk,
+                    //        TelpPpk = item.telpPpk,
+                    //        Kelas = item.kelas,
+                    //        Nmkc = item.nmkc,
+                    //        Distance = item.distance,
+                    //        Jadwal = item.jadwal,
+                    //        JmlRujuk = item.jmlRujuk,
+                    //        Kapasitas = item.kapasitas,
+                    //        Persentase = item.persentase,
+                    //    }).ToList();
 
-                        RujukanSubSpesialis.Clear();
-                        RujukanSubSpesialis = a;
-                    }
-                    else
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    //    RujukanSubSpesialis.Clear();
+                    //    RujukanSubSpesialis = a;
+                    //}
+                    //else
+                    //{
+                    //    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-                    }
+                    //    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                    //}
                 }
             }
             catch (Exception ex)
@@ -3001,44 +3001,44 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private BPJSIntegrationDto SelectedBPJSIntegration { get; set; } = new();
+        //private BPJSIntegrationDto SelectedBPJSIntegration { get; set; } = new();
 
         private async Task SelectedItemInsurancePolicyChanged(InsuranceTemp result)
         {
             ToastService.ClearInfoToasts();
 
-            SelectedBPJSIntegration = new();
+            //SelectedBPJSIntegration = new();
 
             if (result is null)
                 return;
 
             ToastService.ClearWarningToasts();
 
-            var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.InsurancePolicyId));
-            if (bpjs.Count > 0)
-            {
-                var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
-                if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
-                {
-                    //var parameter = await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")));
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
-                    if (parameter is not null)
-                    {
-                        if (!parameter.Equals(bpjs[0].KdProviderPstKdProvider))
-                        {
-                            ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
-                        }
-                        else
-                        {
-                            SelectedBPJSIntegration = bpjs[0];
-                        }
-                    }
-                }
-                else
-                {
-                    ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
-                }
-            }
+            //var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.InsurancePolicyId));
+            //if (bpjs.Count > 0)
+            //{
+            //    var count = GeneralConsultanServices.Where(x => x.PatientId == FormRegis.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
+            //    if (!string.IsNullOrWhiteSpace(bpjs[0].KdProviderPstKdProvider))
+            //    {
+            //        //var parameter = await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")));
+            //        var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+            //        if (parameter is not null)
+            //        {
+            //            if (!parameter.Equals(bpjs[0].KdProviderPstKdProvider))
+            //            {
+            //                ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+            //            }
+            //            else
+            //            {
+            //                SelectedBPJSIntegration = bpjs[0];
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+            //    }
+            //}
         }
 
         private async Task SelectedItemSpesialis(SpesialisPCare e)

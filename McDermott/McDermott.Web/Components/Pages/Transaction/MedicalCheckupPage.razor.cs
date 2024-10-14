@@ -73,7 +73,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             FollowUpGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             FollowUpGeneralConsultanService.PatientId = e.Id;
 
-            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            //FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
 
         private List<string> Method = new List<string>
@@ -298,9 +298,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<SpesialisPCare> SpesialisPs = [];
         private List<SpesialisSaranaPCare> SpesialisSaranas = [];
         private List<SubSpesialisPCare> SubSpesialisPs = [];
-        private BPJSIntegrationDto SelectedBPJSIntegrationReferTo { get; set; } = new();
         private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
-        private BPJSIntegrationDto SelectedBPJSIntegration { get; set; } = new();
         private List<InsurancePolicyDto> ReferToInsurancePolicies { get; set; } = [];
         private InsurancePolicyDto SelectedInsurancePolicyReferTo { get; set; } = new();
 
@@ -317,7 +315,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ReferToGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             ReferToGeneralConsultanService.PatientId = e.Id;
 
-            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            //ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
 
         private async Task OnClickSearchFaskes()
@@ -354,87 +352,87 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             try
             {
-                if (GeneralConsultanService.ReferVerticalKhususCategoryCode is not null && (GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("THA") || GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("HEM")))
-                {
-                    Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+                //if (GeneralConsultanService.ReferVerticalKhususCategoryCode is not null && (GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("THA") || GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("HEM")))
+                //{
+                //    Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
 
-                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                //    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
-                    if (result.Item2 == 200)
-                    {
-                        if (result.Item1 is null)
-                        {
-                            RujukanSubSpesialis.Clear();
-                        }
-                        else
-                        {
-                            dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                //    if (result.Item2 == 200)
+                //    {
+                //        if (result.Item1 is null)
+                //        {
+                //            RujukanSubSpesialis.Clear();
+                //        }
+                //        else
+                //        {
+                //            dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                            var dynamicList = (IEnumerable<dynamic>)data.list;
+                //            var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                            var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
-                            {
-                                Kdppk = item.kdppk,
-                                Nmppk = item.nmppk,
-                                AlamatPpk = item.alamatPpk,
-                                TelpPpk = item.telpPpk,
-                                Kelas = item.kelas,
-                                Nmkc = item.nmkc,
-                                Distance = item.distance,
-                                Jadwal = item.jadwal,
-                                JmlRujuk = item.jmlRujuk,
-                                Kapasitas = item.kapasitas,
-                                Persentase = item.persentase,
-                            }).ToList();
+                //            var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                //            {
+                //                Kdppk = item.kdppk,
+                //                Nmppk = item.nmppk,
+                //                AlamatPpk = item.alamatPpk,
+                //                TelpPpk = item.telpPpk,
+                //                Kelas = item.kelas,
+                //                Nmkc = item.nmkc,
+                //                Distance = item.distance,
+                //                Jadwal = item.jadwal,
+                //                JmlRujuk = item.jmlRujuk,
+                //                Kapasitas = item.kapasitas,
+                //                Persentase = item.persentase,
+                //            }).ToList();
 
-                            RujukanSubSpesialis.Clear();
-                            RujukanSubSpesialis = a;
-                        }
-                    }
-                    else
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                //            RujukanSubSpesialis.Clear();
+                //            RujukanSubSpesialis = a;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
+                //        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                //    }
+                //}
+                //else
+                //{
+                //    Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedInsurancePolicyFollowUp.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
 
-                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                //    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedInsurancePolicyFollowUp.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
-                    if (result.Item2 == 200)
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                //    if (result.Item2 == 200)
+                //    {
+                //        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        var dynamicList = (IEnumerable<dynamic>)data.list;
+                //        var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
-                        {
-                            Kdppk = item.kdppk,
-                            Nmppk = item.nmppk,
-                            AlamatPpk = item.alamatPpk,
-                            TelpPpk = item.telpPpk,
-                            Kelas = item.kelas,
-                            Nmkc = item.nmkc,
-                            Distance = item.distance,
-                            Jadwal = item.jadwal,
-                            JmlRujuk = item.jmlRujuk,
-                            Kapasitas = item.kapasitas,
-                            Persentase = item.persentase,
-                        }).ToList();
+                //        var a = dynamicList.Select(item => new RujukanFaskesKhususSpesialisPCare
+                //        {
+                //            Kdppk = item.kdppk,
+                //            Nmppk = item.nmppk,
+                //            AlamatPpk = item.alamatPpk,
+                //            TelpPpk = item.telpPpk,
+                //            Kelas = item.kelas,
+                //            Nmkc = item.nmkc,
+                //            Distance = item.distance,
+                //            Jadwal = item.jadwal,
+                //            JmlRujuk = item.jmlRujuk,
+                //            Kapasitas = item.kapasitas,
+                //            Persentase = item.persentase,
+                //        }).ToList();
 
-                        RujukanSubSpesialis.Clear();
-                        RujukanSubSpesialis = a;
-                    }
-                    else
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                //        RujukanSubSpesialis.Clear();
+                //        RujukanSubSpesialis = a;
+                //    }
+                //    else
+                //    {
+                //        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-                    }
-                }
+                //        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -565,7 +563,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            //ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemInsurancePolicyChangedReferTo(InsurancePolicyDto result)
@@ -574,7 +572,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedInsurancePolicyReferTo = new();
             ReferToGeneralConsultanService.InsurancePolicyId = null;
 
-            SelectedBPJSIntegrationReferTo = new();
+            //SelectedBPJSIntegrationReferTo = new();
 
             if (result is null)
                 return;
@@ -583,31 +581,31 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ToastService.ClearWarningToasts();
 
-            var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
-            if (bpjs is not null)
-            {
-                var count = GeneralConsultanServices.Where(x => x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
-                if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
-                {
-                    //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
-                    if (parameter is not null)
-                    {
-                        if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
-                        {
-                            ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
-                        }
-                        else
-                        {
-                            SelectedBPJSIntegrationReferTo = bpjs;
-                        }
-                    }
-                }
-                else
-                {
-                    ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
-                }
-            }
+            //var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
+            //if (bpjs is not null)
+            //{
+            //    var count = GeneralConsultanServices.Where(x => x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
+            //    if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
+            //    {
+            //        //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+            //        var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+            //        if (parameter is not null)
+            //        {
+            //            if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
+            //            {
+            //                ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+            //            }
+            //            else
+            //            {
+            //                SelectedBPJSIntegrationReferTo = bpjs;
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+            //    }
+            //}
         }
 
         private async Task SelectedItemSpesialis(SpesialisPCare e)
@@ -1050,7 +1048,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             "BPJS"
         };
 
-        private BPJSIntegrationDto SelectedBPJSIntegrationFollowUp { get; set; } = new();
+        //private BPJSIntegrationDto SelectedBPJSIntegrationFollowUp { get; set; } = new();
 
         private async Task SelectedItemInsurancePolicyChangedFollowUp(InsurancePolicyDto result)
         {
@@ -1058,7 +1056,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedInsurancePolicyFollowUp = new();
             FollowUpGeneralConsultanService.InsurancePolicyId = null;
 
-            SelectedBPJSIntegrationFollowUp = new();
+            //SelectedBPJSIntegrationFollowUp = new();
 
             if (result is null)
                 return;
@@ -1067,32 +1065,32 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ToastService.ClearWarningToasts();
 
-            var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
-            if (bpjs is not null)
-            {
-                var count = GeneralConsultanServices.Where(x => x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
-                if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
-                {
-                    //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
-                    var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
+            //var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
+            //if (bpjs is not null)
+            //{
+            //    var count = GeneralConsultanServices.Where(x => x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
+            //    if (!string.IsNullOrWhiteSpace(bpjs.KdProviderPstKdProvider))
+            //    {
+            //        //var parameter = (await Mediator.Send(new GetSystemParameterQuery(x => x.Key.Contains("pcare_code_provider")))).FirstOrDefault();
+            //        var parameter = (await Mediator.Send(new GetSystemParameterQuery())).FirstOrDefault()?.PCareCodeProvider ?? null;
 
-                    if (parameter is not null)
-                    {
-                        if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
-                        {
-                            ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
-                        }
-                        else
-                        {
-                            SelectedBPJSIntegrationFollowUp = bpjs;
-                        }
-                    }
-                }
-                else
-                {
-                    ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
-                }
-            }
+            //        if (parameter is not null)
+            //        {
+            //            if (!Convert.ToBoolean(parameter.Equals(bpjs.KdProviderPstKdProvider)))
+            //            {
+            //                ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+            //            }
+            //            else
+            //            {
+            //                SelectedBPJSIntegrationFollowUp = bpjs;
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ToastService.ShowWarning($"Participants are not registered as your Participants. Participants have visited your FKTP {count} times.");
+            //    }
+            //}
         }
 
         private async Task SelectedItemPaymentChangedFollowUp(string e)
@@ -1104,7 +1102,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            //FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private List<ClassTypeDto> ClassTypes = [];

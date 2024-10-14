@@ -1213,10 +1213,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task OnChangeInsuracePolicies(UserDto d, string ee)
         {
-            if (ee.Equals("BPJS"))
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == d.Id && x.Insurance != null && x.Insurance.IsBPJSTK == ee.Equals("BPJS") && x.Active == true));
-            else if (ee.Equals("Insurance"))
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == d.Id && x.Insurance != null && (x.Insurance.IsBPJSTK == false || x.Insurance.IsBPJSKesehatan == false) && x.Active == true));
+            InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+            {
+                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+            })).Item1;
         }
 
         private string supName = string.Empty;

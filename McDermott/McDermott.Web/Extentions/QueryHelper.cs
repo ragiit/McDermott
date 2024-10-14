@@ -497,31 +497,6 @@ namespace McDermott.Web.Extentions
             }
             else if (typeof(TDto) == typeof(ProvinceDto))
             {
-                var result = await mediator.Send(new GetProvinceQuery(
-                    predicate as Expression<Func<Province, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Country
-                    ] : includes as List<Expression<Func<Province, object>>>,
-                    select: select is null ? x => new Province
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        CountryId = x.CountryId,
-                        Country = new Domain.Entities.Country
-                        {
-                            Name = x.Country.Name
-                        },
-                    } : select as Expression<Func<Province, Province>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(ProvinceDto))
-            {
                 var result = await mediator.Send(new GetMenuQuery(
                     predicate as Expression<Func<Menu, bool>>,
                     pageIndex: pageIndex,
@@ -882,32 +857,6 @@ namespace McDermott.Web.Extentions
                    Name = x.Name,
                }
            ));
-            return (result.Item1, result.pageCount);
-        }
-
-        public static async Task<(List<ProvinceDto>, int pageCount)> QueryGetProvinces(this IMediator mediator, Expression<Func<Province, bool>>? predicate = null, int pageIndex = 0, int pageSize = 10, string? searchTerm = "")
-        {
-            var result = await mediator.Send(new GetProvinceQuery(
-                predicate,
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                searchTerm: searchTerm ?? "",
-                includes:
-                [
-                    x => x.Country
-                ],
-                select: x => new Province
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    CountryId = x.CountryId,
-                    Country = new Domain.Entities.Country
-                    {
-                        Name = x.Country.Name
-                    },
-                }
-            ));
-
             return (result.Item1, result.pageCount);
         }
     }

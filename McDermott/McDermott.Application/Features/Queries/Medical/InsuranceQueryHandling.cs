@@ -1,9 +1,11 @@
-﻿using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.InsuranceCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class InsuranceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetInsuranceQuery, (List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleInsuranceQuery, InsuranceDto>,
         IRequestHandler<CreateInsuranceRequest, InsuranceDto>,
         IRequestHandler<BulkValidateInsuranceQuery, List<InsuranceDto>>,
         IRequestHandler<CreateListInsuranceRequest, List<InsuranceDto>>,
@@ -39,41 +41,159 @@ namespace McDermott.Application.Features.Queries.Medical
             return existingInsurances.Adapt<List<InsuranceDto>>();
         }
 
+        public async Task<InsuranceDto> Handle(GetSingleInsuranceQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Insurance>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Insurance>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Insurance>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                       EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.Type, $"%{request.SearchTerm}%") ||
+                       v.AdminFee.Equals(request.SearchTerm) ||
+                       v.AdminFeeMax.Equals(request.SearchTerm) |
+                       v.Presentase.Equals(request.SearchTerm));
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Insurance
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        Type = x.Type,
+                        IsBPJS = x.IsBPJS,
+                        IsBPJSKesehatan = x.IsBPJSKesehatan,
+                        IsBPJSTK = x.IsBPJSTK,
+                        AdminFee = x.AdminFee,
+                        AdminFeeMax = x.AdminFeeMax,
+                        Presentase = x.Presentase,
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<InsuranceDto>();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<(List<InsuranceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetInsuranceQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Insurance>().Entities
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Insurance>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Insurance>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Insurance>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%") ||
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.AdminFee.ToString(), $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Presentase.ToString(), $"%{request.SearchTerm}%"));
+                        EF.Functions.Like(v.Type, $"%{request.SearchTerm}%") ||
+                        v.AdminFee.Equals(request.SearchTerm) ||
+                        v.AdminFeeMax.Equals(request.SearchTerm) |
+                        v.Presentase.Equals(request.SearchTerm));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Insurance
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        Type = x.Type,
+                        IsBPJS = x.IsBPJS,
+                        IsBPJSKesehatan = x.IsBPJSKesehatan,
+                        IsBPJSTK = x.IsBPJSTK,
+                        AdminFee = x.AdminFee,
+                        AdminFeeMax = x.AdminFeeMax,
+                        Presentase = x.Presentase,
+                    });
 
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<InsuranceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                    return (pagedItems.Adapt<List<InsuranceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<InsuranceDto>>(), 0, 1, 1);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

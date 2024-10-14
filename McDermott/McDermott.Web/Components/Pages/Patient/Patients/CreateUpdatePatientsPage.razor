@@ -924,7 +924,10 @@ else
 
 
 <DxPopup HeaderText="Insurance Policy" @bind-Visible="@PopUpVisible" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="auto" Closed="OnClickCloseInsurancePolicyPopUp">
-    <InsurancePolicyPage User="UserForm" IsPopUpForm="true"></InsurancePolicyPage>
+     @* <InsurancePolicyPage User="UserForm" IsPopUpForm="true"></InsurancePolicyPage> *@
+     <McDermott.Web.Components.Popups.PopUpInsurancePolicyPatientPage PatientId="UserForm.Id">
+
+     </McDermott.Web.Components.Popups.PopUpInsurancePolicyPatientPage>
 </DxPopup>
 
 

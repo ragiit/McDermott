@@ -21,28 +21,33 @@
     {
         await LoadData(newPageIndex, pageSize);
     }
-
+ private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+{
+    try
+    {
+        PanelVisible = true;
+        SelectedDataItems = new ObservableRangeCollection<object>();
+        var result = await Mediator.Send(new GetInsuranceQuery
+        {
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            SearchTerm = searchTerm,
+        });
+        Insurances = result.Item1;
+        totalCount = result.PageCount;
+        activePageIndex = pageIndex;
+        PanelVisible = false;
+    }
+    catch (Exception ex)
+    {
+        ex.HandleException(ToastService);
+    }
+    finally { PanelVisible = false; }
+}
     #endregion Searching
 
 
- private async Task LoadData(int pageIndex = 0, int pageSize = 10)
- {
-     try
-     { 
-         PanelVisible = true;
-         SelectedDataItems = [];
-         var a = await Mediator.QueryGetHelper<GeneralConsultanCPPT, GeneralConsultanCPPTDto>(pageIndex, pageSize, searchTerm);
-         var a = await Mediator.Send(new GetSignaQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-         Signas = a.Item1;
-         totalCount = a.pageCount;
-         activePageIndex = pageIndex; 
-     }
-     catch (Exception ex)
-     {
-         ex.HandleException(ToastService);
-     }
-     finally { PanelVisible = false; }
- }
+
 
 SearchTextChanged="OnSearchBoxChanged"
 try
