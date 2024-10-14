@@ -42,6 +42,7 @@ namespace McDermott.Web.Extentions
                     select: x => new GroupMenu
                     {
                         Id = x.Id,
+                        GroupId = x.GroupId,
                         IsCreate = x.IsCreate,
                         IsDelete = x.IsDelete,
                         IsDefaultData = x.IsDefaultData,

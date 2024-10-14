@@ -284,11 +284,6 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
-            try
-            {
-                await GetUserInfo();
-            }
-            catch { }
 
             var NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
             if (NameGroup == null)
@@ -299,6 +294,13 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 ActiveBack = true;
             }
+
+            try
+            {
+                await GetUserInfo();
+            }
+            catch { }
+
             await LoadData();
             foreach (var i in KioskConf)
             {
@@ -514,6 +516,7 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
             var group = result2.Item1;
+            var aa = UserAccessCRUID;
             var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             var InputSearch = FormKios.NumberType ?? string.Empty;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));

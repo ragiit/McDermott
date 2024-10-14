@@ -153,7 +153,6 @@ namespace McDermott.Web.Extentions
         [
             // Clinic Services
             "clinic-service/general-consultation-services",
-            "clinic-service/general-consultation-services",
             "clinic-service/medical-checkups",
             "clinic-service/procedure-rooms",
             "clinic-service/acccidents",
@@ -166,6 +165,7 @@ namespace McDermott.Web.Extentions
             "queue/queue-displays",
             "queue/kiosk-departments",
             "queue/kiosk-configurations",
+            "queue/kiosk",
 
             // BPJS
             "bpjs/bpjs-classifications",
