@@ -91,3 +91,5 @@ global using static McDermott.Application.Features.Commands.Config.GroupMenuComm
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanCPPTCommand;
 global using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanMedicalSupportCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientAllergyCommand;
+global using static McDermott.Application.Features.Commands.Medical.DoctorScheduledCommand;
+global using static McDermott.Application.Features.Commands.Medical.DoctorScheduleDetailCommand;

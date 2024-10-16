@@ -374,13 +374,27 @@
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
                                                             </DxFormLayoutItem>
                                                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
-                                                            {
+                                                            { 
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                                                    <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                                  Data="@InsurancePolicies"
-                                                                                  @bind-Value="@SelectedInsurancePolicy"
-                                                                                  NullText="Select Insurance Policy..."
-                                                                                  EditFormat="{0} - {1}">
+                                                                    <MyDxComboBox Data="@InsurancePolicies"
+                                                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                                  NullText="Select InsurancePolicy"
+                                                                                  @ref="refInsurancePolicyComboBox"
+                                                                                  @bind-Value="GeneralConsultanService.InsurancePolicyId"
+                                                                                  EditFormat="{0} - {1}"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputInsurancePolicyChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchInsurancePolicyIndexDecrement"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchInsurancePolicy"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchInsurancePolicyIndexIncrement"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons>
                                                                         <Columns>
                                                                             <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
                                                                                                 Caption="No Card" />
@@ -1191,8 +1205,7 @@ else
     <PopUpGCFollowUp GeneralConsultanService="GeneralConsultanService"
                      OnClosePopup="HandleClosePopup"
                      UserForm="UserForm"
-                     TempInsurancePolicies="InsurancePolicies"
-                     TempSelectedInsurancePolicy="SelectedInsurancePolicy">
+                     TempInsurancePolicies="InsurancePolicies">
 
     </PopUpGCFollowUp>
 </DxPopup>
@@ -1207,8 +1220,7 @@ else
     <PopUpGCReferTo OnClosePopupReferTo="HandleClosePopupReferTo"
                     GeneralConsultanService="GeneralConsultanService"
                     UserForm="UserForm"
-                    TempInsurancePolicies="InsurancePolicies"
-                    TempSelectedInsurancePolicy="SelectedInsurancePolicy">
+                    TempInsurancePolicies="InsurancePolicies">
 
     </PopUpGCReferTo>
 </DxPopup>

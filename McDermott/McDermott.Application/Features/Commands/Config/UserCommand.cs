@@ -65,6 +65,21 @@
             public bool IsDescending { get; set; } = false; // default to ascending
         }
 
+        public class GetUserQueryNew : IRequest<(List<UserDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<User, object>>> Includes { get; set; }
+            public Expression<Func<User, bool>> Predicate { get; set; }
+            public Expression<Func<User, User>> Select { get; set; }
+
+            public List<(Expression<Func<User, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
         public class GetUserInfoGroupQuery(Expression<Func<User, bool>>? predicate = null) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;

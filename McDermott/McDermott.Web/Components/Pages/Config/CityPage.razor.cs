@@ -1,4 +1,5 @@
-﻿using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -44,9 +45,14 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+                var result = await Mediator.Send(new GetProvinceQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refProvinceComboBox?.Text ?? ""
+                });
                 Provinces = result.Item1;
-                totalCountProvince = result.pageCount;
+                totalCountProvince = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -107,7 +113,7 @@ namespace McDermott.Web.Components.Pages.Config
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
 
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
@@ -153,9 +159,13 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetCityQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Cities = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
                 PanelVisible = false;
             }
@@ -326,7 +336,10 @@ namespace McDermott.Web.Components.Pages.Config
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
-                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
+                Provinces = (await Mediator.Send(new GetProvinceQuery
+                {
+                    Predicate = x => x.Id == a.ProvinceId,
+                })).Item1;
                 PanelVisible = false;
             }
             catch (Exception ex)

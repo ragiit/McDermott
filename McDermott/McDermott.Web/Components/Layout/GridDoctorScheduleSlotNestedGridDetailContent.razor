@@ -35,7 +35,7 @@
                 var doctorSchedule = await Mediator.Send(new GetDoctorScheduleByIdQuery(id));
                 if (doctorSchedule.Id == id && doctorSchedule.PhysicionIds!.Contains(PhysicianId))
                 {
-                    doctorSchedule.Physicions = PhysicianId.ToString();
+                    // doctorSchedule.Physicions = PhysicianId.ToString();
 
                     result.Add(doctorSchedule);
                 }

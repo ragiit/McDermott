@@ -287,9 +287,17 @@ namespace McDermott.Web.Components.Pages.Config
                 PanelVisible = true;
                 SelectedDataItems = [];
                 var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
-                var result = await Mediator.Send(new GetCityQuery(x => x.ProvinceId == provinceId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+
+                var result = await Mediator.Send(new GetCityQuery
+                {
+                    Predicate = x => x.ProvinceId == provinceId,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refCityComboBox?.Text ?? ""
+                });
                 Cities = result.Item1;
-                totalCountCity = result.pageCount;
+                totalCountCity = result.PageCount;
+
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -342,9 +350,14 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetCountryQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refCountryComboBox?.Text ?? ""
+                });
                 Countries = result.Item1;
-                totalCountCountry = result.pageCount;
+                totalCount = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)

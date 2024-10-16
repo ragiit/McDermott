@@ -1,31 +1,31 @@
-public async Task<List<ProductCategoryDto>> Handle(BulkValidateProductCategoryQuery request, CancellationToken cancellationToken)
+public async Task<List<DoctorScheduleSlotDto>> Handle(BulkValidateDoctorScheduleSlotQuery request, CancellationToken cancellationToken)
 {
-    var ProductCategoryDtos = request.ProductCategorysToValidate;
+    var DoctorScheduleSlotDtos = request.DoctorScheduleSlotsToValidate;
 
     // Ekstrak semua kombinasi yang akan dicari di database
-    var ProductCategoryNames = ProductCategoryDtos.Select(x => x.Name).Distinct().ToList();
-    var postalCodes = ProductCategoryDtos.Select(x => x.PostalCode).Distinct().ToList();
-    var provinceIds = ProductCategoryDtos.Select(x => x.ProvinceId).Distinct().ToList();
-    var cityIds = ProductCategoryDtos.Select(x => x.CityId).Distinct().ToList();
-    var ProductCategoryIds = ProductCategoryDtos.Select(x => x.ProductCategoryId).Distinct().ToList();
+    var DoctorScheduleSlotNames = DoctorScheduleSlotDtos.Select(x => x.Name).Distinct().ToList();
+    var postalCodes = DoctorScheduleSlotDtos.Select(x => x.PostalCode).Distinct().ToList();
+    var provinceIds = DoctorScheduleSlotDtos.Select(x => x.ProvinceId).Distinct().ToList();
+    var cityIds = DoctorScheduleSlotDtos.Select(x => x.CityId).Distinct().ToList();
+    var DoctorScheduleSlotIds = DoctorScheduleSlotDtos.Select(x => x.DoctorScheduleSlotId).Distinct().ToList();
 
-    var existingProductCategorys = await _unitOfWork.Repository<ProductCategory>()
+    var existingDoctorScheduleSlots = await _unitOfWork.Repository<DoctorScheduleSlot>()
         .Entities
         .AsNoTracking()
-        .Where(v => ProductCategoryNames.Contains(v.Name)
+        .Where(v => DoctorScheduleSlotNames.Contains(v.Name)
                     && postalCodes.Contains(v.PostalCode)
                     && provinceIds.Contains(v.ProvinceId)
                     && cityIds.Contains(v.CityId)
-                    && ProductCategoryIds.Contains(v.ProductCategoryId))
+                    && DoctorScheduleSlotIds.Contains(v.DoctorScheduleSlotId))
         .ToListAsync(cancellationToken);
 
-    return existingProductCategorys.Adapt<List<ProductCategoryDto>>();
+    return existingDoctorScheduleSlots.Adapt<List<DoctorScheduleSlotDto>>();
 }
 
-public class BulkValidateProductCategoryQuery(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
+public class BulkValidateDoctorScheduleSlotQuery(List<DoctorScheduleSlotDto> DoctorScheduleSlotsToValidate) : IRequest<List<DoctorScheduleSlotDto>>
 {
-    public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
+    public List<DoctorScheduleSlotDto> DoctorScheduleSlotsToValidate { get; } = DoctorScheduleSlotsToValidate;
 }
 
 
-IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
+IRequestHandler<BulkValidateDoctorScheduleSlotQuery, List<DoctorScheduleSlotDto>>,

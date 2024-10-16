@@ -1,4 +1,8 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using McDermott.Application.Dtos.Queue;
+using McDermott.Domain.Entities;
+using System.Linq;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 
@@ -83,15 +87,74 @@ namespace McDermott.Web.Components.Pages.Queue
             await LoadData();
         }
 
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadDataQueueDisplay(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadDataQueueDisplay(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadDataQueueDisplay(newPageIndex, pageSize);
+        }
+
+        private async Task LoadDataQueueDisplay(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetQueueDisplayQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+                QueueDisplay = result.Item1;
+
+                foreach (var q in QueueDisplay)
+                {
+                    var s = Counters = (await Mediator.Send(new GetCounterQuery
+                    {
+                        Predicate = x => q.CounterIds != null && q.CounterIds.Contains(x.Id) && x.Status == "on process"
+                    })).Item1;
+
+                    q.NameCounter = string.Join(", ", s.Select(z => z.Name).ToList());
+                }
+
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion Searching
+
         private async Task LoadData()
         {
             showPopUp = false;
             PanelVisible = true;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            QueueDisplay = await Mediator.Send(new GetQueueDisplayQuery());
-            Counters = await Mediator.Send(new GetCounterQuery());
-            counteres = [.. Counters.Where(x => x.Status == "on process")];
-            QueueDisplay.ForEach(x => x.NameCounter = string.Join(", ", counteres.Where(z => x.CounterIds != null && x.CounterIds.Contains(z.Id)).Select(z => z.Name).ToList()));
+            SelectedDataItems = [];
+            await LoadDataQueueDisplay();
+
             PanelVisible = false;
         }
 
@@ -190,7 +253,15 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             FormDisplays = SelectedDataItems[0].Adapt<QueueDisplayDto>();
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            selectedCounter = counteres.Where(x => FormDisplays.CounterIds.Contains(x.Id)).ToList();
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as QueueDisplayDto ?? new());
+
+            var selectedCounter = (await Mediator.Send(new GetCounterQuery
+            {
+                Predicate = x => a.CounterIds != null && a.CounterIds.Contains(x.Id),
+            })).Item1;
+            Counters = selectedCounter;
+            this.selectedCounter = selectedCounter;
 
             //showPopUp = true;
         }
@@ -265,7 +336,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<QueueDisplayDto>>();
-                    await Mediator.Send(new DeleteListQueueDisplayRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteQueueDisplayRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
             }
@@ -322,5 +393,73 @@ namespace McDermott.Web.Components.Pages.Queue
             public string? Name { get; set; } = string.Empty;
             public string? CounterNames { get; set; } = string.Empty;
         }
+
+        #region ComboboxCounter
+
+        private DxComboBox<CounterDto?, long?> refCounterComboBox { get; set; }
+        private int CounterComboBoxIndex { get; set; } = 0;
+        private int totalCountCounter = 0;
+
+        public string SearchTextCounter { get; set; }
+
+        private async Task OnSearchCounter(string e)
+        {
+            SearchTextCounter = e;
+            await LoadDataCounter();
+        }
+
+        private async Task OnSearchCounterClick()
+        {
+            await LoadDataCounter();
+        }
+
+        private async Task OnSearchCounterIndexIncrement()
+        {
+            if (CounterComboBoxIndex < (totalCountCounter - 1))
+            {
+                CounterComboBoxIndex++;
+                await LoadDataCounter(CounterComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchCounterndexDecrement()
+        {
+            if (CounterComboBoxIndex > 0)
+            {
+                CounterComboBoxIndex--;
+                await LoadDataCounter(CounterComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputCounterChanged(string e)
+        {
+            CounterComboBoxIndex = 0;
+            await LoadDataCounter();
+        }
+
+        private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetCounterQuery
+                {
+                    Predicate = x => x.Status == "on process",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refCounterComboBox?.Text ?? ""
+                });
+                Counters = result.Item1;
+                totalCountCounter = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxCounter
     }
 }

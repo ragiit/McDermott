@@ -221,11 +221,25 @@
                                 @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                 {
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                        <MyDxComboBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                      Data="@InsurancePolicies"
-                                                      @bind-Value="@SelectedInsurancePolicy"
-                                                      NullText="Select Insurance Policy..."
-                                                      EditFormat="{0} - {1}">
+                                        <MyDxComboBox Data="@InsurancePolicies"
+                                                      ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                      NullText="Select InsurancePolicy"
+                                                      @ref="refInsurancePolicyComboBox"
+                                                      @bind-Value="GeneralConsultanService.InsurancePolicyId"
+                                                      EditFormat="{0} - {1}"
+                                                      ValueFieldName="Id"
+                                                      TextChanged="((string e) => OnInputInsurancePolicyChanged(e))">
+                                            <Buttons>
+                                                <DxEditorButton Click="OnSearchInsurancePolicyIndexDecrement"
+                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                Tooltip="Previous Index" />
+                                                <DxEditorButton Click="OnSearchInsurancePolicy"
+                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                Tooltip="Search" />
+                                                <DxEditorButton Click="OnSearchInsurancePolicyIndexIncrement"
+                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                Tooltip="Next Index" />
+                                            </Buttons>
                                             <Columns>
                                                 <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
                                                                     Caption="No Card" />
@@ -266,12 +280,8 @@
 
     [Parameter] public UserDto UserForm { get; set; } = new();
     [Parameter] public List<InsurancePolicyDto> TempInsurancePolicies { get; set; } = new();
-    [Parameter] public InsurancePolicyDto TempSelectedInsurancePolicy { get; set; } = new();
     [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
     [Parameter] public EventCallback OnClosePopup { get; set; }
-
-
-    private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
 
     private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
     private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
@@ -287,13 +297,80 @@
 
         if (TempInsurancePolicies.Count > 0)
             InsurancePolicies = TempInsurancePolicies;
+    }
+    #region ComboboxInsurancePolicy
 
-        if (TempSelectedInsurancePolicy is not null)
-            SelectedInsurancePolicy = TempSelectedInsurancePolicy;
+    private DxComboBox<InsurancePolicyDto, long?> refInsurancePolicyComboBox { get; set; }
+    private int InsurancePolicyComboBoxIndex { get; set; } = 0;
+    private int totalCountInsurancePolicy = 0;
 
+    private async Task OnSearchInsurancePolicy()
+    {
+        await LoadDataInsurancePolicy();
     }
 
-   
+    private async Task OnSearchInsurancePolicyIndexIncrement()
+    {
+        if (InsurancePolicyComboBoxIndex < (totalCountInsurancePolicy - 1))
+        {
+            InsurancePolicyComboBoxIndex++;
+            await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchInsurancePolicyIndexDecrement()
+    {
+        if (InsurancePolicyComboBoxIndex > 0)
+        {
+            InsurancePolicyComboBoxIndex--;
+            await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputInsurancePolicyChanged(string e)
+    {
+        InsurancePolicyComboBoxIndex = 0;
+        await LoadDataInsurancePolicy();
+    }
+
+    private async Task LoadDataInsurancePolicy(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            string input = refInsurancePolicyComboBox?.Text ?? "";
+            string b = input.Split('-')[0].Trim();
+
+            var result = await Mediator.Send(new GetInsurancePolicyQuery
+                {
+                    SearchTerm = b,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Includes =
+                    [
+                        x => x.Insurance
+                    ],
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        PolicyNumber = x.PolicyNumber,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                    }
+                });
+            InsurancePolicies = result.Item1;
+            totalCountInsurancePolicy = result.PageCount;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { }
+    }
+
+    #endregion ComboboxInsurancePolicy
+
 
     private async Task OnCancelBack()
     {
@@ -307,8 +384,6 @@
 
         try
         {
-            GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
-
             // Execute the validator
             ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
 
@@ -349,7 +424,7 @@
             if (!success2 || !success)
                 return;
 
-            if (!GeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicy is null || SelectedInsurancePolicy.Id == 0))
+            if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
             {
                 IsLoading = false;
                 ToastService.ShowInfoSubmittingForm();
@@ -532,7 +607,6 @@
         GeneralConsultanService.InsurancePolicyId = null;
         InsurancePolicies.Clear();
         GeneralConsultanService.Patient = new();
-        SelectedInsurancePolicy = new();
 
         if (e is null)
             return;
@@ -544,9 +618,18 @@
         if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
         {
             InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-            {
-                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
-            })).Item1;
+                {
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                        PolicyNumber = x.PolicyNumber,
+                    },
+                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+                })).Item1;
         }
     }
 
@@ -593,9 +676,14 @@
         try
         {
             IsLoading = true;
-            var result = await Mediator.Send(new GetServiceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetServiceQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refServiceComboBox?.Text ?? ""
+                });
             Services = result.Item1;
-            totalCountService = result.pageCount;
+            totalCountService = result.PageCount;
             IsLoading = false;
         }
         catch (Exception ex)
@@ -682,14 +770,22 @@
     {
         GeneralConsultanService.Payment = null;
         GeneralConsultanService.InsurancePolicyId = null;
-        SelectedInsurancePolicy = new();
 
         if (e is null)
             return;
 
         InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-        {
-            Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
-        })).Item1;
+            {
+                Select = x => new InsurancePolicy
+                {
+                    Id = x.Id,
+                    Insurance = new Insurance
+                    {
+                        Name = x.Insurance == null ? "" : x.Insurance.Name,
+                    },
+                    PolicyNumber = x.PolicyNumber,
+                },
+                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+            })).Item1;
     }
 }

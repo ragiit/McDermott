@@ -1299,10 +1299,13 @@ namespace McDermott.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<long>("PhysicionId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("PhysicionIds")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("ServiceId")
+                    b.Property<long?>("ServiceId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("UpdatedBy")
@@ -1312,6 +1315,8 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PhysicionId");
 
                     b.HasIndex("ServiceId");
 
@@ -1349,6 +1354,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("Quota")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("ServiceId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("UpdateToBpjs")
                         .HasColumnType("bit");
 
@@ -1368,6 +1376,8 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DoctorScheduleId");
 
+                    b.HasIndex("ServiceId");
+
                     b.ToTable("DoctorScheduleDetails");
                 });
 
@@ -1386,10 +1396,20 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DoctorScheduleId")
+                    b.Property<string>("DayOfWeek")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("DoctorScheduleId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("PhysicianId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Quota")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ServiceId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("StartDate")
@@ -6125,11 +6145,18 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.DoctorSchedule", b =>
                 {
+                    b.HasOne("McDermott.Domain.Entities.User", "Physicion")
+                        .WithMany()
+                        .HasForeignKey("PhysicionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("McDermott.Domain.Entities.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Physicion");
 
                     b.Navigation("Service");
                 });
@@ -6142,7 +6169,15 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("McDermott.Domain.Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("DoctorSchedule");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DoctorScheduleSlot", b =>
@@ -6150,8 +6185,7 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.DoctorSchedule", "DoctorSchedule")
                         .WithMany()
                         .HasForeignKey("DoctorScheduleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.User", "Physician")
                         .WithMany()

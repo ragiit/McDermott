@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Dtos.Queue
+﻿using FluentValidation;
+
+namespace McDermott.Application.Dtos.Queue
 {
     public class CounterDto : IMapFrom<Counter>
     {
@@ -15,5 +17,13 @@
         public string? Status { get; set; } = string.Empty;
 
         public virtual ServiceDto? Service { get; set; }
+    }
+
+    public class AddCounterPopUp : AbstractValidator<CounterDto>
+    {
+        public AddCounterPopUp()
+        {
+            RuleFor(x => x.Name).NotEmpty().WithMessage("The Name field is required");
+        }
     }
 }

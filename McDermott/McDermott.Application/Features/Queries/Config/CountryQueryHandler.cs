@@ -1,4 +1,6 @@
 ﻿using McDermott.Application.Features.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Config.VillageCommand;
 
@@ -6,6 +8,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class CountryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleCountryQuery, CountryDto>,
         IRequestHandler<ValidateCountryQuery, bool>,
         IRequestHandler<CreateCountryRequest, CountryDto>,
         IRequestHandler<BulkValidateCountryQuery, List<CountryDto>>,
@@ -124,52 +127,6 @@ namespace McDermott.Application.Features.Queries.Config
 
         #endregion DELETE
 
-        public async Task<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCountryQuery request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var query = _unitOfWork.Repository<Country>().Entities.AsNoTracking();
-
-                // Apply dynamic includes
-                if (request.Includes is not null)
-                {
-                    foreach (var includeExpression in request.Includes)
-                    {
-                        query = query.Include(includeExpression);
-                    }
-                }
-
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
-
-                if (!string.IsNullOrEmpty(request.SearchTerm))
-                {
-                    query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
-                }
-
-                // Apply dynamic select if provided
-                if (request.Select is not null)
-                {
-                    query = query.Select(request.Select);
-                }
-
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
-
-                return (pagedItems.Adapt<List<CountryDto>>(), request.PageIndex, request.PageSize, totalPages);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
         public async Task<List<CountryDto>> Handle(BulkValidateCountryQuery request, CancellationToken cancellationToken)
         {
             var CountryDtos = request.CountrysToValidate;
@@ -194,6 +151,142 @@ namespace McDermott.Application.Features.Queries.Config
                 .AsNoTracking()
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCountryQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Country>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Country>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Country>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Country
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<CountryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<CountryDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<CountryDto> Handle(GetSingleCountryQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Country>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Country>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Country>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                        );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Country
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CountryDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
         }
     }
 }

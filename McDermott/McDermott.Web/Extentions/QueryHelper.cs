@@ -19,24 +19,7 @@ namespace McDermott.Web.Extentions
              List<Expression<Func<T, object>>>? includes = null,
              Expression<Func<T, T>>? select = null)
         {
-            if (typeof(TDto) == typeof(CountryDto))
-            {
-                var result = await mediator.Send(new GetCountryQuery(
-                    predicate as Expression<Func<Country, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new Country
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                    } : select as Expression<Func<Country, Country>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(UomCategoryDto))
+            if (typeof(TDto) == typeof(UomCategoryDto))
             {
                 var result = await mediator.Send(new GetUomCategoryQuery(
                     predicate as Expression<Func<UomCategory, bool>>,
@@ -522,31 +505,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(CityDto))
-            {
-                var result = await mediator.Send(new GetCityQuery(
-                    predicate as Expression<Func<City, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Province
-                    ] : includes as List<Expression<Func<City, object>>>,
-                    select: select is null ? x => new City
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        ProvinceId = x.ProvinceId,
-                        Province = new Domain.Entities.Province
-                        {
-                            Name = x.Province.Name
-                        },
-                    } : select as Expression<Func<City, City>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(DistrictDto))
             {
                 var result = await mediator.Send(new GetDistrictQuery(
@@ -700,38 +658,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(ServiceDto))
-            {
-                var result = await mediator.Send(new GetServiceQuery(
-                    predicate as Expression<Func<Service, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Serviced,
-                    ] : includes as List<Expression<Func<Service, object>>>,
-                    select: select is null ? x => new Service
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                        Quota = x.Quota,
-                        IsKiosk = x.IsKiosk,
-                        IsMcu = x.IsMcu,
-                        IsPatient = x.IsPatient,
-                        IsTelemedicine = x.IsTelemedicine,
-                        IsVaccination = x.IsVaccination,
-                        ServicedId = x.ServicedId,
-                        Serviced = new Service
-                        {
-                            Name = x.Serviced.Name
-                        }
-                    } : select as Expression<Func<Service, Service>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(JobPositionDto))
             {
                 var result = await mediator.Send(new GetJobPositionQuery(
@@ -843,21 +769,6 @@ namespace McDermott.Web.Extentions
             }
 
             throw new NotSupportedException($"Query for type {typeof(T)} is not supported.");
-        }
-
-        public static async Task<(List<CountryDto>, int pageCount)> QueryGetCountries(this IMediator mediator, Expression<Func<Province, bool>>? predicate = null, int pageIndex = 0, int pageSize = 10, string? searchTerm = "")
-        {
-            var result = await mediator.Send(new GetCountryQuery(
-               pageIndex: pageIndex,
-               pageSize: pageSize,
-               searchTerm: searchTerm ?? "",
-               select: x => new Country
-               {
-                   Id = x.Id,
-                   Name = x.Name,
-               }
-           ));
-            return (result.Item1, result.pageCount);
         }
     }
 }

@@ -79,7 +79,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
         private UserDto UserForm { get; set; } = new();
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport { get; set; } = new();
-        private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
 
         #endregion Binding
 
@@ -474,7 +473,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 ));
                 Patients = p.Item1;
 
-                Services = (await Mediator.Send(new GetServiceQuery(x => x.Id == GeneralConsultanService.ServiceId))).Item1;
+                Services = (await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.Id == GeneralConsultanService.ServiceId,
+                })).Item1;
 
                 var ph = await Mediator.Send(new GetUserQuery2(
                                         x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
@@ -500,22 +502,30 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
                     {
-                        Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId
+                        Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId,
+                        Select = x => new InsurancePolicy
+                        {
+                            Id = x.Id,
+                            Insurance = new Insurance
+                            {
+                                Name = x.Insurance == null ? "" : x.Insurance.Name,
+                            },
+                            PolicyNumber = x.PolicyNumber,
+                        }
                     })).Item1;
-                    SelectedInsurancePolicy = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId) ?? new();
                 }
 
                 if (GeneralConsultanService.RiskOfFalling == "Humpty Dumpty")
                 {
-                    RiskOfFallingDetail = Helper.HumptyDumpty.ToList();
+                    RiskOfFallingDetail = [.. Helper.HumptyDumpty];
                 }
                 else if (GeneralConsultanService.RiskOfFalling == "Morse")
                 {
-                    RiskOfFallingDetail = Helper.Morse.ToList();
+                    RiskOfFallingDetail = [.. Helper.Morse];
                 }
                 else
                 {
-                    RiskOfFallingDetail = Helper.Geriati.ToList();
+                    RiskOfFallingDetail = [.. Helper.Geriati];
                 }
             }
             else
@@ -525,6 +535,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 await LoadDataPhysicion();
             }
 
+            #region Get Patient Allergies
+
             var alergy = (await Mediator.Send(new GetAllergyQuery()));
             FoodAllergies = alergy.Where(x => x.Type == "01").ToList();
             WeatherAllergies = alergy.Where(x => x.Type == "02").ToList();
@@ -533,6 +545,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             SelectedFoodAllergies = FoodAllergies.Where(x => UserForm.FoodPatientAllergyIds.Contains(x.Id));
             SelectedWeatherAllergies = WeatherAllergies.Where(x => UserForm.WeatherPatientAllergyIds.Contains(x.Id));
             SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => UserForm.PharmacologyPatientAllergyIds.Contains(x.Id));
+
+            #endregion Get Patient Allergies
 
             Awareness = await Mediator.Send(new GetAwarenessQuery());
         }
@@ -601,6 +615,82 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         #endregion ComboboxNursingDiagnoses
+
+        #region ComboboxInsurancePolicy
+
+        private DxComboBox<InsurancePolicyDto, long?> refInsurancePolicyComboBox { get; set; }
+        private int InsurancePolicyComboBoxIndex { get; set; } = 0;
+        private int totalCountInsurancePolicy = 0;
+
+        private async Task OnSearchInsurancePolicy()
+        {
+            await LoadDataInsurancePolicy();
+        }
+
+        private async Task OnSearchInsurancePolicyIndexIncrement()
+        {
+            if (InsurancePolicyComboBoxIndex < (totalCountInsurancePolicy - 1))
+            {
+                InsurancePolicyComboBoxIndex++;
+                await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchInsurancePolicyIndexDecrement()
+        {
+            if (InsurancePolicyComboBoxIndex > 0)
+            {
+                InsurancePolicyComboBoxIndex--;
+                await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputInsurancePolicyChanged(string e)
+        {
+            InsurancePolicyComboBoxIndex = 0;
+            await LoadDataInsurancePolicy();
+        }
+
+        private async Task LoadDataInsurancePolicy(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                string input = refInsurancePolicyComboBox?.Text ?? "";
+                string b = input.Split('-')[0].Trim();
+
+                var result = await Mediator.Send(new GetInsurancePolicyQuery
+                {
+                    SearchTerm = b,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Includes =
+                    [
+                        x => x.Insurance
+                    ],
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        PolicyNumber = x.PolicyNumber,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                    }
+                });
+                InsurancePolicies = result.Item1;
+                totalCountInsurancePolicy = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxInsurancePolicy
 
         #region ComboboxDiagnoses
 
@@ -770,7 +860,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             GeneralConsultanService.InsurancePolicyId = null;
             InsurancePolicies.Clear();
             GeneralConsultanService.Patient = new();
-            SelectedInsurancePolicy = new();
 
             if (e is null)
                 return;
@@ -783,7 +872,16 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             {
                 InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
                 {
-                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true,
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                        PolicyNumber = x.PolicyNumber,
+                    }
                 })).Item1;
             }
         }
@@ -841,9 +939,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetServiceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetServiceQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refServiceComboBox?.Text ?? ""
+                });
                 Services = result.Item1;
-                totalCountService = result.pageCount;
+                totalCountService = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -930,14 +1033,22 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             GeneralConsultanService.Payment = null;
             GeneralConsultanService.InsurancePolicyId = null;
-            SelectedInsurancePolicy = new();
 
             if (e is null)
                 return;
 
             InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
             {
-                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true
+                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true,
+                Select = x => new InsurancePolicy
+                {
+                    Id = x.Id,
+                    Insurance = new Insurance
+                    {
+                        Name = x.Insurance == null ? "" : x.Insurance.Name,
+                    },
+                    PolicyNumber = x.PolicyNumber,
+                }
             })).Item1;
         }
 
@@ -954,7 +1065,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if (GeneralConsultanService.Id != 0)
                 {
-                    if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0)
+                    if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0)
                     {
                         //var isSuccess = await SendPCareRequestUpdateStatusPanggilAntrean(2);
                         //if (!isSuccess)
@@ -987,8 +1098,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
             try
             {
-                GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
-
                 // Execute the validator
                 ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
 
@@ -1023,7 +1132,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 if (!success2 || !success)
                     return;
 
-                if (!GeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicy is null || SelectedInsurancePolicy.Id == 0))
+                if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
                 {
                     IsLoading = false;
                     ToastService.ShowInfoSubmittingForm();
@@ -1267,8 +1376,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             IsLoading = true;
             try
             {
-                GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
-
                 // Execute the validator
                 ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
 
@@ -1303,7 +1410,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 if (!success2 || !success)
                     return;
 
-                if (!GeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicy is null || SelectedInsurancePolicy.Id == 0))
+                if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
                 {
                     IsLoading = false;
                     ToastService.ShowInfoSubmittingForm();
@@ -1322,7 +1429,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ? SelectedFoodAllergies.Select(x => x.Id).ToList()
                     : [];
 
-                if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
+                if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
                 {
                     //var isSuccess = await SendPcareRequestRegistration();
                     //if (!isSuccess)
@@ -1336,7 +1443,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     //}
                 }
 
-                if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
                 {
                     //var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 

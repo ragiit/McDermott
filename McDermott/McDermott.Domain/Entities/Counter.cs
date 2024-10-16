@@ -18,4 +18,14 @@
         [SetToNull]
         public virtual User? Physician { get; set; }
     }
+
+    public class CreateUpdateCounterDto
+    {
+        public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public long? ServiceId { get; set; }
+        public long? ServiceKId { get; set; }
+        public long? PhysicianId { get; set; }
+        public string? Status { get; set; }
+    }
 }

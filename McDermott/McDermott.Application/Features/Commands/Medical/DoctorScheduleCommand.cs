@@ -58,17 +58,15 @@
 
         #region Create
 
-        public class CreateDoctorScheduleDetailRequest : IRequest<bool>
-        {
-            public List<DoctorScheduleDetailDto> DoctorScheduleDetailDtos { get; set; }
+        //public class CreateDoctorScheduleDetailRequest : IRequest<bool>
+        //{
+        //    public List<DoctorScheduleDetailDto> DoctorScheduleDetailDtos { get; set; }
 
-            public CreateDoctorScheduleDetailRequest(List<DoctorScheduleDetailDto> DoctorScheduleDetailDtos)
-            {
-                this.DoctorScheduleDetailDtos = DoctorScheduleDetailDtos;
-            }
-        }
-
-
+        //    public CreateDoctorScheduleDetailRequest(List<DoctorScheduleDetailDto> DoctorScheduleDetailDtos)
+        //    {
+        //        this.DoctorScheduleDetailDtos = DoctorScheduleDetailDtos;
+        //    }
+        //}
 
         public class CreateDoctorScheduleRequest : IRequest<DoctorScheduleDto>
         {

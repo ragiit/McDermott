@@ -141,18 +141,11 @@ namespace McDermott.Web.Components.Pages.Config
                         Predicate = x => provinceNames.Contains(x.Name.ToLower()),
                     })).Item1;
 
-                    list1 = (await Mediator.Send(new GetProvinceQuery
+                    list2 = (await Mediator.Send(new GetCityQuery
                     {
-                        Predicate = x => provinceNames.Contains(x.Name.ToLower()),
+                        Predicate = x => cityNames.Contains(x.Name.ToLower()),
                         IsGetAll = true
                     })).Item1;
-
-                    list2 = (await Mediator.Send(new GetCityQuery(x => cityNames.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new City
-                        {
-                            Id = x.Id,
-                            Name = x.Name
-                        }))).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -338,9 +331,14 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 Cities.Clear();
-                var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "");
+                var result = await Mediator.Send(new GetProvinceQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refProvinceComboBox?.Text ?? ""
+                });
                 Provinces = result.Item1;
-                totalCountProvince = result.pageCount;
+                totalCountProvince = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -393,9 +391,16 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 var provId = refProvinceComboBox?.Value;
-                var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == provId);
+
+                var result = await Mediator.Send(new GetCityQuery
+                {
+                    Predicate = x => x.ProvinceId == provId,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refCityComboBox?.Text ?? ""
+                });
                 Cities = result.Item1;
-                totalCountCity = result.pageCount;
+                totalCountCity = result.PageCount;
             }
             catch (Exception ex)
             {
@@ -429,8 +434,14 @@ namespace McDermott.Web.Components.Pages.Config
 
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DistrictDto ?? new());
-                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
-                Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
+                Provinces = (await Mediator.Send(new GetProvinceQuery
+                {
+                    Predicate = x => x.Id == a.ProvinceId,
+                })).Item1;
+                Cities = (await Mediator.Send(new GetCityQuery
+                {
+                    Predicate = x => x.Id == a.CityId,
+                })).Item1;
             }
             catch (Exception ex)
             {

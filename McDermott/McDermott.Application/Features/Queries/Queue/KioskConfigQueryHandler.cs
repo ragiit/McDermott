@@ -1,116 +1,294 @@
 ﻿using McDermott.Application.Dtos.Queue;
+using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Application.Features.Queries.Queue
 {
-    public class KioskConfigQueryHandler
+    public class KioskConfigHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+      IRequestHandler<GetKioskConfigQuery, (List<KioskConfigDto>, int pageIndex, int pageSize, int pageCount)>,
+      IRequestHandler<GetSingleKioskConfigQuery, KioskConfigDto>, IRequestHandler<ValidateKioskConfig, bool>,
+      IRequestHandler<CreateKioskConfigRequest, KioskConfigDto>,
+      IRequestHandler<BulkValidateKioskConfig, List<KioskConfigDto>>,
+      IRequestHandler<CreateListKioskConfigRequest, List<KioskConfigDto>>,
+      IRequestHandler<UpdateKioskConfigRequest, KioskConfigDto>,
+      IRequestHandler<UpdateListKioskConfigRequest, List<KioskConfigDto>>,
+      IRequestHandler<DeleteKioskConfigRequest, bool>
     {
-        internal class GetAllKioskConfigQueryHandler : IRequestHandler<GetKioskConfigQuery, List<KioskConfigDto>>
+        #region GET
+
+        public async Task<List<KioskConfigDto>> Handle(BulkValidateKioskConfig request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
+            var KioskConfigDtos = request.KioskConfigsToValidate;
 
-            public GetAllKioskConfigQueryHandler(IUnitOfWork unitOfWork)
+            // Ekstrak semua kombinasi yang akan dicari di database
+            //var KioskConfigNames = KioskConfigDtos.Select(x => x.Name).Distinct().ToList();
+            //var a = KioskConfigDtos.Select(x => x.CountryId).Distinct().ToList();
+
+            //var existingKioskConfigs = await _unitOfWork.Repository<KioskConfig>()
+            //    .Entities
+            //    .AsNoTracking()
+            //    .Where(v => KioskConfigNames.Contains(v.Name)
+            //                && a.Contains(v.CountryId))
+            //    .ToListAsync(cancellationToken);
+
+            //return existingKioskConfigs.Adapt<List<KioskConfigDto>>();
+
+            return [];
+        }
+
+        public async Task<bool> Handle(ValidateKioskConfig request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<KioskConfig>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<(List<KioskConfigDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetKioskConfigQuery request, CancellationToken cancellationToken)
+        {
+            try
             {
-                _unitOfWork = unitOfWork;
+                var query = _unitOfWork.Repository<KioskConfig>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<KioskConfig>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<KioskConfig>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new KioskConfig
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ServiceIds = x.ServiceIds
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<KioskConfigDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<KioskConfigDto>>(), 0, 1, 1);
+                }
             }
-
-            public async Task<List<KioskConfigDto>> Handle(GetKioskConfigQuery query, CancellationToken cancellationToken)
+            catch (Exception ex)
             {
-                return await _unitOfWork.Repository<KioskConfig>().Entities
-                        .Select(KioskConfig => KioskConfig.Adapt<KioskConfigDto>())
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                // Consider logging the exception
+                throw;
             }
         }
 
-        internal class GetKioskConfigByIdQueryHandler : IRequestHandler<GetKioskConfigByIdQuery, KioskConfigDto>
+        public async Task<KioskConfigDto> Handle(GetSingleKioskConfigQuery request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public GetKioskConfigByIdQueryHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
+                var query = _unitOfWork.Repository<KioskConfig>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<KioskConfig>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<KioskConfig>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                        );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new KioskConfig
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ServiceIds = x.ServiceIds
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<KioskConfigDto>();
             }
-
-            public async Task<KioskConfigDto> Handle(GetKioskConfigByIdQuery request, CancellationToken cancellationToken)
+            catch (Exception ex)
             {
-                var result = await _unitOfWork.Repository<KioskConfig>().GetByIdAsync(request.Id);
-
-                return result.Adapt<KioskConfigDto>();
+                // Consider logging the exception
+                throw;
             }
         }
 
-        internal class CreateKioskConfigHandler : IRequestHandler<CreateKioskConfigRequest, KioskConfigDto>
+        #endregion GET
+
+        #region CREATE
+
+        public async Task<KioskConfigDto> Handle(CreateKioskConfigRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public CreateKioskConfigHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<KioskConfigDto> Handle(CreateKioskConfigRequest request, CancellationToken cancellationToken)
+            try
             {
                 var result = await _unitOfWork.Repository<KioskConfig>().AddAsync(request.KioskConfigDto.Adapt<KioskConfig>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+                _cache.Remove("GetKioskConfig_"); // Ganti dengan key yang sesuai
+
                 return result.Adapt<KioskConfigDto>();
             }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        internal class UpdateKioskConfigHandler : IRequestHandler<UpdateKioskConfigRequest, bool>
+        public async Task<List<KioskConfigDto>> Handle(CreateListKioskConfigRequest request, CancellationToken cancellationToken)
         {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public UpdateKioskConfigHandler(IUnitOfWork unitOfWork)
+            try
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(UpdateKioskConfigRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<KioskConfig>().UpdateAsync(request.KioskConfigDto.Adapt<KioskConfig>());
+                var result = await _unitOfWork.Repository<KioskConfig>().AddAsync(request.KioskConfigDtos.Adapt<List<KioskConfig>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetKioskConfig_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<KioskConfigDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion CREATE
+
+        #region UPDATE
+
+        public async Task<KioskConfigDto> Handle(UpdateKioskConfigRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<KioskConfig>().UpdateAsync(request.KioskConfigDto.Adapt<KioskConfigDto>().Adapt<KioskConfig>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetKioskConfig_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<KioskConfigDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<KioskConfigDto>> Handle(UpdateListKioskConfigRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<KioskConfig>().UpdateAsync(request.KioskConfigDtos.Adapt<List<KioskConfig>>());
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetKioskConfig_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<KioskConfigDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        #endregion UPDATE
+
+        #region DELETE
+
+        public async Task<bool> Handle(DeleteKioskConfigRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.Id > 0)
+                {
+                    await _unitOfWork.Repository<KioskConfig>().DeleteAsync(request.Id);
+                }
+
+                if (request.Ids.Count > 0)
+                {
+                    await _unitOfWork.Repository<KioskConfig>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                }
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetKioskConfig_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
-        }
-
-        internal class DeleteKioskConfigHandler : IRequestHandler<DeleteKioskConfigRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteKioskConfigHandler(IUnitOfWork unitOfWork)
+            catch (Exception)
             {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteKioskConfigRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<KioskConfig>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
+                throw;
             }
         }
 
-        internal class DeleteListKioskConfigHandler : IRequestHandler<DeleteListKioskConfigRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
-
-            public DeleteListKioskConfigHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
-
-            public async Task<bool> Handle(DeleteListKioskConfigRequest request, CancellationToken cancellationToken)
-            {
-                await _unitOfWork.Repository<KioskConfig>().DeleteAsync(request.Id);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                return true;
-            }
-        }
+        #endregion DELETE
     }
 }

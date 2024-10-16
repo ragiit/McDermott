@@ -2,17 +2,20 @@
 {
     public partial class DoctorScheduleSlot : BaseAuditableEntity
     {
-        public long DoctorScheduleId { get; set; }
         public long? PhysicianId { get; set; }
+        public string DayOfWeek { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
         public TimeSpan WorkFrom { get; set; }
-
         public TimeSpan WorkTo { get; set; }
+        public long Quota { get; set; } = 0;
+        public long ServiceId { get; set; }
 
-        [SetToNull]
+        // Deprecated
+        public long? DoctorScheduleId { get; set; }
+
         public virtual DoctorSchedule? DoctorSchedule { get; set; }
 
-        [SetToNull]
         public virtual User? Physician { get; set; }
+        public virtual Service? Service { get; set; }
     }
 }

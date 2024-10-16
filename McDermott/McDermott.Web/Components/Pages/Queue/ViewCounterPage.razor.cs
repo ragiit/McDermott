@@ -94,7 +94,10 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 ShowPresent = false;
                 PanelVisible = true;
-                var general = await Mediator.Send(new GetCounterByIdQuery(CounterId));
+                var general = await Mediator.Send(new GetSingleCounterQuery
+                {
+                    Predicate = x => x.Id == CounterId
+                });
                 //Services = await Mediator.Send(new GetServiceQuery());
                 var physician = await Mediator.Send(new GetUserQuery());
                 DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());

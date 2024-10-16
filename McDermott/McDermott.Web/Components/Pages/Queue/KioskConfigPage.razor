@@ -2,13 +2,12 @@
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Queue Kiosk Config</PageTitle>
-@if (IsAccess)
+
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        @* <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Configuration Kiosk" /> *@
-
-        <BaseHeaderPage Title="Configuration Kiosk" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+        <BaseHeaderPage Title="Configuration Kiosk" OnClickBack="@(async () => await LoadDataKioskConfig())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -37,7 +36,7 @@
                                                          NewItem_Click="(() => NewItem_Click(context.Grid))"
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@LoadData"
+                                                         Refresh_Click="(async () => await LoadDataKioskConfig())"
                                                          IsImport="false"
                                                          Grid="Grid"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
@@ -84,11 +83,45 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Name" NullText="Kiosk Name" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem Caption="Service Patient" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <DxTagBox Data="@Services" @bind-Values="@SelectedServices"
-                                                          TextFieldName="Name"
-                                                          NullText="Select Service"
-                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Service Patient">
+                                                <Template>
+                                                    <div class="row w-100">
+                                                        <div class="col-md-12">
+                                                            <DxMaskedInput NullText="Search Service"
+                                                                           ValueExpression="@(() => SearchTextService)"
+                                                                           Value="SearchTextService"
+                                                                           ValueChanged="@((string s) => OnSearchService(s))"
+                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                <Buttons>
+                                                                    <DxEditorButton Click="OnSearchServicendexDecrement"
+                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                    Tooltip="Previous Index" />
+                                                                    <DxEditorButton Click="OnSearchServiceClick"
+                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                    Tooltip="Search" />
+                                                                    <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                    Tooltip="Next Index" />
+                                                                </Buttons>
+                                                            </DxMaskedInput>
+                                                        </div>
+                                                        <div class="col-md-12 mt-2">
+                                                            <DxTagBox Data="@Services"
+                                                                      FilteringMode="@DataGridFilteringMode.Contains"
+                                                                      @bind-Values="@SelectedServices"
+                                                                      TextFieldName="Name"
+                                                                      CssClass="w-100"
+                                                                      NullText="Select Service"
+                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                <Columns>
+                                                                    <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
+                                                                    <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
+                                                                    <DxListEditorColumn FieldName="@nameof(Service.Quota)" Caption="Quota" />
+                                                                </Columns>
+                                                            </DxTagBox>
+                                                        </div>
+                                                    </div>
+                                                </Template>
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
@@ -134,7 +167,11 @@
         </section>
     </div>
 }
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
 else
 {
-    <BaseHeaderPage Title="Configuration Kiosk" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+    <LoadingIndicatorLayout />
 }

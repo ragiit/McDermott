@@ -3,7 +3,7 @@
 
 <PageTitle>McHealthCare - Master data Queue Display </PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
         <BaseHeaderPage Title="Queue Display" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
@@ -84,49 +84,92 @@
                                                     <DxTextBox @bind-Text="@a.Name" NullText="Name Display.."></DxTextBox>
                                                 </div>
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Counter">
-                                                <DxTagBox Data="@counteres" FilteringMode="@DataGridFilteringMode.Contains"
+                                          @*   <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Counter">
+                                                <DxTagBox Data="@Counters" FilteringMode="@DataGridFilteringMode.Contains"
                                                           @bind-Values="@selectedCounter"
                                                           NullText="Select Counter.."
                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                           TextFieldName="Name" />
-                                            </DxFormLayoutItem> 
+                                            </DxFormLayoutItem> *@
+
+                                            <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Counters">
+                                                <Template>
+                                                    <div class="row w-100">
+                                                        <div class="col-md-12">
+                                                            <DxMaskedInput NullText="Search Counter"
+                                                                           ValueExpression="@(() => SearchTextCounter)"
+                                                                           Value="SearchTextCounter"
+                                                                           ValueChanged="@((string s) => OnSearchCounter(s))"
+                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                <Buttons>
+                                                                    <DxEditorButton Click="OnSearchCounterndexDecrement"
+                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                    Tooltip="Previous Index" />
+                                                                    <DxEditorButton Click="OnSearchCounterClick"
+                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                    Tooltip="Search" />
+                                                                    <DxEditorButton Click="OnSearchCounterIndexIncrement"
+                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                    Tooltip="Next Index" />
+                                                                </Buttons>
+                                                            </DxMaskedInput>
+                                                        </div>
+                                                        <div class="col-md-12 mt-2">
+                                                            <DxTagBox Data="@Counters"
+                                                                      FilteringMode="@DataGridFilteringMode.Contains"
+                                                                      @bind-Values="@selectedCounter"
+                                                                      TextFieldName="Name"
+                                                                      CssClass="w-100"
+                                                                      NullText="Select Service"
+                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                                                <Columns>
+                                                                    <DxListEditorColumn FieldName="@nameof(Counter.Name)" Caption="Name"/>
+                                                                </Columns>
+                                                            </DxTagBox>
+                                                        </div>
+                                                    </div>
+                                                </Template>
+                                            </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
                                 </MyGrid>
                             </DxLoadingPanel>
-                           @*  <DxPopup @bind-Visible="@showPopUp" HeaderText="Set Display">
-                                <EditForm Model="@FormDisplays" Context="EditFormContext">
-                                    <DxFormLayout CssClass="w-100">
-                                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
-                                            <div class="pop-warning">
-                                                <DxTextBox @bind-Text="@FormDisplays.Name" NullText="Name Display.."></DxTextBox>
-                                            </div>
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem ColSpanMd="12" Caption="Counter">
-                                            <DxTagBox Data="@counteres" FilteringMode="@DataGridFilteringMode.Contains"
-                                                      @bind-Values="@selectedCounter"
-                                                      NullText="Select Counter.."
-                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                      TextFieldName="Name" />
-                                        </DxFormLayoutItem>
-                                        <DxFormLayoutItem ColSpanMd="12">
-                                            <div class="row justify-content-end">
-                                                <div class="col-5 align-self-end">
-                                                    <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
-                                                    <DxButton Text="Discard" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
-                                                </div>
-                                            </div>
-                                        </DxFormLayoutItem>
-                                    </DxFormLayout>
-                                </EditForm>
-                            </DxPopup> *@
+                            @*  <DxPopup @bind-Visible="@showPopUp" HeaderText="Set Display">
+                        <EditForm Model="@FormDisplays" Context="EditFormContext">
+                        <DxFormLayout CssClass="w-100">
+                        <DxFormLayoutItem CaptionCssClass="required-caption" Caption="Name:" ColSpanMd="12">
+                        <div class="pop-warning">
+                        <DxTextBox @bind-Text="@FormDisplays.Name" NullText="Name Display.."></DxTextBox>
+                        </div>
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem ColSpanMd="12" Caption="Counter">
+                        <DxTagBox Data="@counteres" FilteringMode="@DataGridFilteringMode.Contains"
+                        @bind-Values="@selectedCounter"
+                        NullText="Select Counter.."
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        TextFieldName="Name" />
+                        </DxFormLayoutItem>
+                        <DxFormLayoutItem ColSpanMd="12">
+                        <div class="row justify-content-end">
+                        <div class="col-5 align-self-end">
+                        <DxButton Text="Save" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" Click="OnSave"></DxButton>
+                        <DxButton Text="Discard" RenderStyleMode="ButtonRenderStyleMode.Outline" RenderStyle="ButtonRenderStyle.Danger" SubmitFormOnClick="true" Click="OnCancel"></DxButton>
+                        </div>
+                        </div>
+                        </DxFormLayoutItem>
+                        </DxFormLayout>
+                        </EditForm>
+                        </DxPopup> *@
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
 }
 else
 {

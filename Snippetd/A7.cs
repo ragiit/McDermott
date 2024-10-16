@@ -1,104 +1,105 @@
-await LoadDataInsurance();
+await LoadDataCounter();
 
- #region ComboboxInsurance
+ #region ComboboxCounter
 
- private DxComboBox<InsuranceDto, long?> refInsuranceComboBox { get; set; }
- private int InsuranceComboBoxIndex { get; set; } = 0;
- private int totalCountInsurance = 0;
+ private DxComboBox<CounterDto, long?> refCounterComboBox { get; set; }
+ private int CounterComboBoxIndex { get; set; } = 0;
+ private int totalCountCounter = 0;
 
- private async Task OnSearchInsurance()
+ private async Task OnSearchCounter()
  {
-     await LoadDataInsurance();
+     await LoadDataCounter();
  }
 
- private async Task OnSearchInsuranceIndexIncrement()
+ private async Task OnSearchCounterIndexIncrement()
  {
-     if (InsuranceComboBoxIndex < (totalCountInsurance - 1))
+     if (CounterComboBoxIndex < (totalCountCounter - 1))
      {
-         InsuranceComboBoxIndex++;
-         await LoadDataInsurance(InsuranceComboBoxIndex, 10);
+         CounterComboBoxIndex++;
+         await LoadDataCounter(CounterComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchInsuranceIndexDecrement()
+ private async Task OnSearchCounterIndexDecrement()
  {
-     if (InsuranceComboBoxIndex > 0)
+     if (CounterComboBoxIndex > 0)
      {
-         InsuranceComboBoxIndex--;
-         await LoadDataInsurance(InsuranceComboBoxIndex, 10);
+         CounterComboBoxIndex--;
+         await LoadDataCounter(CounterComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputInsuranceChanged(string e)
+ private async Task OnInputCounterChanged(string e)
  {
-     InsuranceComboBoxIndex = 0;
-     await LoadDataInsurance();
+     CounterComboBoxIndex = 0;
+     await LoadDataCounter();
  }
 
 
 
-  private async Task LoadDataInsurance(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetInsuranceQuery
+          var result = await Mediator.Send(new GetCounterQuery
           {
-              SearchTerm = refInsuranceComboBox?.Text ?? "",
+              SearchTerm = refCounterComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Insurances = result.Item1;
-          totalCountInsurance = result.PageCount;
+          Counters = result.Item1;
+          totalCountCounter = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastService);
+          ex.HandleException(ToastCounter);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxInsurance
-private async Task LoadDataInsurance(int pageIndex = 0, int pageSize = 10)
+ #endregion ComboboxCounter
+
+private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetInsuranceQuery(
+    var result = await Mediator.Send(new GetCounterQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refInsuranceComboBox?.Text ?? "",
+        searchTerm: refCounterComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentInsurance,
-            x => x.Insurance,
+            x => x.ParentCounter,
+            x => x.Counter,
         ],
-        select: x => new Insurance
+        select: x => new Counter
         {
             Id = x.Id,
             Name = x.Name,
-            ParentInsurance = new Domain.Entities.Insurance
+            ParentCounter = new Domain.Entities.Counter
             {
                 Name = x.Name
             },
-            Insurance = new Domain.Entities.Insurance
+            Counter = new Domain.Entities.Counter
             {
                 Name = x.Name
             },
-            Manager = new Domain.Entities.User
+            Manager = new Domain.Entities.Counter
             {
                 Name = x.Name
             },
-            InsuranceCategory = x.InsuranceCategory
+            CounterCategory = x.CounterCategory
         }
 
     ));
-    Insurances = result.Item1;
-    totalCountInsurance = result.pageCount;
+    Counters = result.Item1;
+    totalCountCounter = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataInsurance(InsuranceId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).InsuranceId);
+await LoadDataCounter(CounterId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).CounterId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -106,32 +107,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance" ColSpanMd="12">
-    <MyDxComboBox Data="@Insurances"
-                  NullText="Select Insurance"
-                  @ref="refInsuranceComboBox"
-                  @bind-Value="@a.InsuranceId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Counter" ColSpanMd="12">
+    <MyDxComboBox Data="@Counters"
+                  NullText="Select Counter"
+                  @ref="refCounterComboBox"
+                  @bind-Value="@a.CounterId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputInsuranceChanged(e))">
+                  TextChanged="((string e) => OnInputCounterChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchInsuranceIndexDecrement"
+            <DxEditorButton Click="OnSearchCounterIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchInsurance"
+            <DxEditorButton Click="OnSearchCounter"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchInsuranceIndexIncrement"
+            <DxEditorButton Click="OnSearchCounterIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(InsuranceDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Insurance.Name" Caption="Insurance" />
-            <DxListEditorColumn FieldName="@nameof(InsuranceDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(CounterDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Counter.Name" Caption="Counter" />
+            <DxListEditorColumn FieldName="@nameof(CounterDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.InsuranceId)" />
+    <ValidationMessage For="@(()=>a.CounterId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -141,7 +142,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetInsuranceQuery(x => x.Id == a.InsuranceId))).Item1;
+     Cronises = (await Mediator.Send(new GetCounterQuery(x => x.Id == a.CounterId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

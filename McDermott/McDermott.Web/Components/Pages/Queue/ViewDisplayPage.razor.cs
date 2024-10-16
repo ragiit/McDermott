@@ -89,10 +89,16 @@ namespace McDermott.Web.Components.Pages.Queue
             //    InvokeAsync(StateHasChanged);
             //});
             //await hubConnection.StartAsync();
-            var queues = await Mediator.Send(new GetQueueDisplayByIdQuery(DisplayId));
+            var queues = await Mediator.Send(new GetSingleQueueDisplayQuery
+            {
+                Predicate = x => x.Id == DisplayId
+            });
             foreach (var i in queues.CounterIds)
             {
-                var DataCounter = await Mediator.Send(new GetCounterByIdQuery(i));
+                var DataCounter = await Mediator.Send(new GetSingleCounterQuery
+                {
+                    Predicate = x => x.Id == i
+                });
                 var card = new CounterDto
                 {
                     Id = i,
