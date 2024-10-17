@@ -3,7 +3,6 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using MailKit.Search;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
-using McDermott.Persistence.Migrations;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using Group = McDermott.Domain.Entities.Group;
 
@@ -1020,9 +1019,14 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProvinceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetProvinceQuery
+            {
+                SearchTerm = refProvinceComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
+            totalCountProvince = result.PageCount;
             PanelVisible = false;
         }
 

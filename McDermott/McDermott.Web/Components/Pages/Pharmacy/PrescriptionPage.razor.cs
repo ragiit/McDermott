@@ -1,6 +1,7 @@
 ﻿using DevExpress.Blazor.RichEdit;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
+using MailKit.Search;
 using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.Identity.Client.Extensions.Msal;
@@ -235,7 +236,10 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (Id == 0)
                 return;
 
-            generalConsultantService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == Id))).Item1;
+            generalConsultantService = (await Mediator.Send(new GetGeneralConsultanServicesQuery
+            {
+                Predicate = x => x.Id == Id
+            })).Item1;
             if (generalConsultantService.Count == 0 || generalConsultantService is null)
                 return;
 
@@ -247,7 +251,22 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             Pharmacy.PractitionerId = generalConsultantService.FirstOrDefault()!.PratitionerId;
             Pharmacy.ServiceId = generalConsultantService.FirstOrDefault()!.ServiceId;
             Pharmacy.PaymentMethod = generalConsultantService.FirstOrDefault()!.Payment;
-            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true));
+            var result = await Mediator.Send(new GetUserQuery2(
+              x => x.IsPatient == true,
+              searchTerm: "",
+              includes: [],
+              select: x => new User
+              {
+                  Id = x.Id,
+                  Name = x.Name,
+                  NoRm = x.NoRm,
+                  Email = x.Email,
+                  MobilePhone = x.MobilePhone,
+                  Gender = x.Gender,
+                  DateOfBirth = x.DateOfBirth,
+              }
+          ));
+            Patients = result.Item1;
             allergies = await Mediator.Send(new GetAllergyQuery());
             //allergies.ForEach(x =>
             //{
@@ -350,11 +369,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 if (product is null)
                     return;
-                 
+
                 var ChekMedicament = await Mediator.Send(new GetSingleMedicamentQuery
                 {
                     Predicate = x => x.ProductId == product.Id
-                }); 
+                });
                 var checkUom = Uoms.Where(x => x.Id == ChekMedicament?.UomId).FirstOrDefault();
 
                 ConcoctionLine.Dosage = ChekMedicament?.Dosage ?? 0;
@@ -1264,7 +1283,7 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                     return;
 
                 Prescription.ProductId = e.Id;
-                 
+
                 var medicament = await Mediator.Send(new GetSingleMedicamentQuery
                 {
                     Predicate = x => x.ProductId == e.Id

@@ -105,7 +105,7 @@
 
             var countries = await Mediator.Send(new GetCountryQuery());
             Countries = countries.Item1;
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery());
+            InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery())).Item1;
 
             if (User != null && User.Id != 0)
             {
@@ -214,13 +214,13 @@
                     {
                         var insurance = Insurances.FirstOrDefault(x => x.Name.Contains("BPJS Kesehatan"));
 
-                        await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+                        //await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
 
-                        if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
-                        {
-                            BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
-                            await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
-                        }
+                        //if (insurance is not null && InsurancePoliciyForm.InsuranceId == insurance.Id)
+                        //{
+                        //    BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
+                        //    await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
+                        //}
                     }
                 }
                 else
@@ -231,23 +231,23 @@
                     {
                         var insurance = Insurances.FirstOrDefault(x => x.Name.Contains("BPJS Kesehatan"));
 
-                        var cek = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
+                        //var cek = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
 
-                        if (insurance is not null && cek is not null && cek.Count > 0)
-                        {
-                            //BPJSIntegration = cek.Adapt<BPJSIntegrationDto>();
-                            cek.Adapt(BPJSIntegration); // Adapt cek to BPJSIntegration
-                            var aa = BPJSIntegration;
-                            BPJSIntegration.Id = cek[0].Id;
-                            BPJSIntegration.InsurancePolicyId = cek[0].InsurancePolicyId;
-                            await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
-                        }
-                        else
-                        {
-                            await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
-                            BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
-                            await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
-                        }
+                        //if (insurance is not null && cek is not null && cek.Count > 0)
+                        //{
+                        //    //BPJSIntegration = cek.Adapt<BPJSIntegrationDto>();
+                        //    cek.Adapt(BPJSIntegration); // Adapt cek to BPJSIntegration
+                        //    var aa = BPJSIntegration;
+                        //    BPJSIntegration.Id = cek[0].Id;
+                        //    BPJSIntegration.InsurancePolicyId = cek[0].InsurancePolicyId;
+                        //    await Mediator.Send(new UpdateBPJSIntegrationRequest(BPJSIntegration));
+                        //}
+                        //else
+                        //{
+                        //    await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
+                        //    BPJSIntegration.InsurancePolicyId = InsurancePoliciyForm.Id;
+                        //    await Mediator.Send(new CreateBPJSIntegrationRequest(BPJSIntegration));
+                        //}
                     }//if (DeletedBPJSID != 0 && !IsBPJS)
                     //{
                     //    await Mediator.Send(new DeleteBPJSIntegrationRequest(DeletedBPJSID));
@@ -343,16 +343,16 @@
                 BPJSIntegration = new();
                 DeletedBPJSID = 0;
                 InsurancePoliciyForm = SelectedDataItems[0].Adapt<InsurancePolicyDto>();
-                IsBPJS = Insurances.Any(x => x.IsBPJSKesehatan == true && x.Id == InsurancePoliciyForm.InsuranceId);
-                if (IsBPJS)
-                {
-                    var BPJSIntegration = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
-                    if (BPJSIntegration.Count > 0)
-                    {
-                        this.BPJSIntegration = BPJSIntegration[0];
-                        DeletedBPJSID = BPJSIntegration[0].Id;
-                    }
-                }
+                //IsBPJS = Insurances.Any(x => x.IsBPJSKesehatan == true && x.Id == InsurancePoliciyForm.InsuranceId);
+                //if (IsBPJS)
+                //{
+                //    var BPJSIntegration = await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == InsurancePoliciyForm.Id));
+                //    if (BPJSIntegration.Count > 0)
+                //    {
+                //        this.BPJSIntegration = BPJSIntegration[0];
+                //        DeletedBPJSID = BPJSIntegration[0].Id;
+                //    }
+                //}
                 User = InsurancePoliciyForm.User.Adapt<UserDto>();
                 ShowForm = true;
             }
@@ -413,7 +413,7 @@
 
         private bool IsLoadingGetBPJS { get; set; } = false;
         private ResponseAPIBPJSIntegrationGetPeserta ResponseAPIBPJSIntegrationGetPeserta { get; set; } = new();
-        private BPJSIntegrationDto BPJSIntegration { get; set; } = new();
+        private InsurancePolicyDto BPJSIntegration { get; set; } = new();
 
         private async Task OnClickGetBPJS()
         {
@@ -439,7 +439,7 @@
                     }
 
                     ResponseAPIBPJSIntegrationGetPeserta = System.Text.Json.JsonSerializer.Deserialize<ResponseAPIBPJSIntegrationGetPeserta>(result.Item1);
-                    BPJSIntegration = ResponseAPIBPJSIntegrationGetPeserta.Adapt<BPJSIntegrationDto>();
+                    BPJSIntegration = ResponseAPIBPJSIntegrationGetPeserta.Adapt<InsurancePolicyDto>();
 
                     BPJSIntegration.AsuransiNoAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.NoAsuransi;
                     BPJSIntegration.AsuransiNmAsuransi = ResponseAPIBPJSIntegrationGetPeserta.Asuransii.NmAsuransi;

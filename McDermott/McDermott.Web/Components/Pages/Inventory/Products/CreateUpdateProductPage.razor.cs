@@ -405,8 +405,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         #endregion Load Data
 
-
-
         #region Select Data
 
         private void SelectedChangeUoM(UomDto selectedUom)

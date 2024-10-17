@@ -31,7 +31,7 @@ namespace McDermott.Domain.Entities
         [SetToNull]
         public List<TransferStock>? TransactionStocks { get; set; }
         [SetToNull]
-        public List<ReceivingStockProduct>? ReceivingStockProduct { get; set; }
+        public List<GoodsReceiptDetail>? GoodsReceiptDetail { get; set; }
         [SetToNull]
         public List<StockOutPrescription>? StockOutPrescriptions {  get; set; }
     }

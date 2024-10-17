@@ -1,10 +1,25 @@
-public class GetGeneralConsultanServicesQuery : IRequest<(List<GeneralConsultanServiceDto>, int PageIndex, int PageSize, int PageCount)>
-{
-    public List<Expression<Func<GeneralConsultanService, object>>> Includes { get; set; }
-    public Expression<Func<GeneralConsultanService, bool>> Predicate { get; set; }
-    public Expression<Func<GeneralConsultanService, GeneralConsultanService>> Select { get; set; }
+ public class GetSingleProvinceQuery : IRequest<ProvinceDto>
+ {
+     public List<Expression<Func<Province, object>>> Includes { get; set; }
+     public Expression<Func<Province, bool>> Predicate { get; set; }
+     public Expression<Func<Province, Province>> Select { get; set; }
 
-    public List<(Expression<Func<GeneralConsultanService, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+     public List<(Expression<Func<Province, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+     public bool IsDescending { get; set; } = false; // default to ascending
+     public int PageIndex { get; set; } = 0;
+     public int PageSize { get; set; } = 10;
+     public bool IsGetAll { get; set; } = false;
+     public string SearchTerm { get; set; }
+ }
+
+public class GetProvinceQuery : IRequest<(List<ProvinceDto>, int PageIndex, int PageSize, int PageCount)>
+{
+    public List<Expression<Func<Province, object>>> Includes { get; set; }
+    public Expression<Func<Province, bool>> Predicate { get; set; }
+    public Expression<Func<Province, Province>> Select { get; set; }
+
+    public List<(Expression<Func<Province, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
@@ -13,13 +28,14 @@ public class GetGeneralConsultanServicesQuery : IRequest<(List<GeneralConsultanS
     public string SearchTerm { get; set; }
 }
   
-IRequestHandler<GetGeneralConsultanServicesQuery, (List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetProvinceQuery, (List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleProvinceQuery, ProvinceDto>,
 
-public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServicesQuery request, CancellationToken cancellationToken)
+public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProvinceQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<GeneralConsultanService>().Entities.AsNoTracking(); 
+        var query = _unitOfWork.Repository<Province>().Entities.AsNoTracking(); 
 
         if (request.Predicate is not null)
             query = query.Where(request.Predicate);
@@ -35,8 +51,8 @@ public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize
             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
             {
                 query = additionalOrderBy.IsDescending
-                    ? ((IOrderedQueryable<GeneralConsultanService>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                    : ((IOrderedQueryable<GeneralConsultanService>)query).ThenBy(additionalOrderBy.OrderBy);
+                    ? ((IOrderedQueryable<Province>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                    : ((IOrderedQueryable<Province>)query).ThenBy(additionalOrderBy.OrderBy);
             }
         }
 
@@ -51,44 +67,19 @@ public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize
  
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
-            //query = query.Where(v =>
-            //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-            //    EF.Functions.Like(v.Phycisian.Name, $"%{request.SearchTerm}%") ||
-            //    EF.Functions.Like(v.UoM.Name, $"%{request.SearchTerm}%") ||
-            //    EF.Functions.Like(v.FormDrug.Name, $"%{request.SearchTerm}%")
-            //    );
+            query = query.Where(v =>
+                    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                    EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%")
+                    );
         }
 
         // Apply dynamic select if provided
         if (request.Select is not null)
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new GeneralConsultanService
+            query = query.Select(x => new Province
             {
-                Id = x.Id,
-                Status = x.Status,
-                PatientId = x.PatientId,
-                Patient = new User
-                {
-                    Name = x.Patient == null ? string.Empty : x.Patient.Name,
-                },
-                PratitionerId = x.PratitionerId,
-                Pratitioner = new User
-                {
-                    Name = x.Pratitioner == null ? string.Empty : x.Pratitioner.Name,
-                },
-                ServiceId = x.ServiceId,
-                Service = new Service
-                {
-                    Name = x.Service == null ? string.Empty : x.Service.Name,
-                },
-                Payment = x.Payment,
-                AppointmentDate = x.AppointmentDate,
-                IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
-                RegistrationDate = x.RegistrationDate,
-                ClassType = x.ClassType,
-                SerialNo = x.SerialNo,
-                Reference = x.Reference,
+                Id = x.Id, 
             });
 
         if (!request.IsGetAll)
@@ -100,11 +91,11 @@ public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize
                 cancellationToken
             );
 
-            return (pagedItems.Adapt<List<GeneralConsultanServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
+            return (pagedItems.Adapt<List<ProvinceDto>>(), request.PageIndex, request.PageSize, totalPages);
         }
         else
         {
-            return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralConsultanServiceDto>>(), 0, 1, 1);
+            return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProvinceDto>>(), 0, 1, 1);
         }
     }
     catch (Exception ex)
@@ -114,7 +105,71 @@ public async Task<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize
     }
 }
 
- var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+
+  public async Task<ProvinceDto> Handle(GetSingleProvinceQuery request, CancellationToken cancellationToken)
+ {
+     try
+     {
+         var query = _unitOfWork.Repository<Province>().Entities.AsNoTracking();
+
+         if (request.Predicate is not null)
+             query = query.Where(request.Predicate);
+           
+         // Apply ordering
+         if (request.OrderByList.Count != 0)
+         {
+             var firstOrderBy = request.OrderByList.First();
+             query = firstOrderBy.IsDescending
+                 ? query.OrderByDescending(firstOrderBy.OrderBy)
+                 : query.OrderBy(firstOrderBy.OrderBy);
+
+             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+             {
+                 query = additionalOrderBy.IsDescending
+                     ? ((IOrderedQueryable<Province>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                     : ((IOrderedQueryable<Province>)query).ThenBy(additionalOrderBy.OrderBy);
+             }
+         }
+
+         // Apply dynamic includes
+         if (request.Includes is not null)
+         {
+             foreach (var includeExpression in request.Includes)
+             {
+                 query = query.Include(includeExpression);
+             }
+         }
+
+         if (!string.IsNullOrEmpty(request.SearchTerm))
+         {
+            query = query.Where(v =>
+                EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%")
+                );
+         }
+
+         // Apply dynamic select if provided
+         if (request.Select is not null)
+             query = query.Select(request.Select);
+         else
+             query = query.Select(x => new Province
+             {
+                 Id = x.Id, 
+             });
+
+         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProvinceDto>();
+     }
+     catch (Exception ex)
+     {
+         // Consider logging the exception
+         throw;
+     }
+ }
+
+
+
+
+ var a = await Mediator.Send(new GetProvincesQuery
  {
      OrderByList =
      [
@@ -141,109 +196,10 @@ var patienss = (await Mediator.Send(new GetSingleUserQuery
 
 
 
- public class GetSingleGeneralConsultanServicesQuery : IRequest<GeneralConsultanServiceDto>
- {
-     public List<Expression<Func<GeneralConsultanService, object>>> Includes { get; set; }
-     public Expression<Func<GeneralConsultanService, bool>> Predicate { get; set; }
-     public Expression<Func<GeneralConsultanService, GeneralConsultanService>> Select { get; set; }
-
-     public List<(Expression<Func<GeneralConsultanService, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
-
-     public bool IsDescending { get; set; } = false; // default to ascending
-     public int PageIndex { get; set; } = 0;
-     public int PageSize { get; set; } = 10;
-     public bool IsGetAll { get; set; } = false;
-     public string SearchTerm { get; set; }
- }
-
-  IRequestHandler<GetSingleGeneralConsultanServicesQuery, GeneralConsultanServiceDto>,
-
-  public async Task<GeneralConsultanServiceDto> Handle(GetSingleGeneralConsultanServicesQuery request, CancellationToken cancellationToken)
- {
-     try
-     {
-         var query = _unitOfWork.Repository<GeneralConsultanService>().Entities.AsNoTracking();
-
-         if (request.Predicate is not null)
-             query = query.Where(request.Predicate);
-           
-         // Apply ordering
-         if (request.OrderByList.Count != 0)
-         {
-             var firstOrderBy = request.OrderByList.First();
-             query = firstOrderBy.IsDescending
-                 ? query.OrderByDescending(firstOrderBy.OrderBy)
-                 : query.OrderBy(firstOrderBy.OrderBy);
-
-             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
-             {
-                 query = additionalOrderBy.IsDescending
-                     ? ((IOrderedQueryable<GeneralConsultanService>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                     : ((IOrderedQueryable<GeneralConsultanService>)query).ThenBy(additionalOrderBy.OrderBy);
-             }
-         }
-
-         // Apply dynamic includes
-         if (request.Includes is not null)
-         {
-             foreach (var includeExpression in request.Includes)
-             {
-                 query = query.Include(includeExpression);
-             }
-         }
-
-         if (!string.IsNullOrEmpty(request.SearchTerm))
-         {
-             //query = query.Where(v =>
-             //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-             //    EF.Functions.Like(v.Phycisian.Name, $"%{request.SearchTerm}%") ||
-             //    EF.Functions.Like(v.UoM.Name, $"%{request.SearchTerm}%") ||
-             //    EF.Functions.Like(v.FormDrug.Name, $"%{request.SearchTerm}%")
-             //    );
-         }
-
-         // Apply dynamic select if provided
-         if (request.Select is not null)
-             query = query.Select(request.Select);
-         else
-             query = query.Select(x => new GeneralConsultanService
-             {
-                 Id = x.Id,
-                 Status = x.Status,
-                 PatientId = x.PatientId,
-                 Patient = new User
-                 {
-                     Name = x.Patient == null ? string.Empty : x.Patient.Name,
-                 },
-                 PratitionerId = x.PratitionerId,
-                 Pratitioner = new User
-                 {
-                     Name = x.Pratitioner == null ? string.Empty : x.Pratitioner.Name,
-                 },
-                 ServiceId = x.ServiceId,
-                 Service = new Service
-                 {
-                     Name = x.Service == null ? string.Empty : x.Service.Name,
-                 },
-                 Payment = x.Payment,
-                 AppointmentDate = x.AppointmentDate,
-                 IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
-                 RegistrationDate = x.RegistrationDate,
-                 ClassType = x.ClassType,
-             });
-
-         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceDto>();
-     }
-     catch (Exception ex)
-     {
-         // Consider logging the exception
-         throw;
-     }
- }
 
 
 
-var data = (await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+var data = (await Mediator.Send(new GetSingleProvincesQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -251,7 +207,7 @@ var data = (await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new GeneralConsultanService
+    Select = x => new Province
     {
         Id = x.Id,
         PatientId = x.PatientId,

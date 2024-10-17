@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Api", "McDermott.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.TelemedicianApi", "McDermott.TelemedicianApi\McDermott.TelemedicianApi.csproj", "{258CD201-EB26-4526-BACA-0FA337680C89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McDermott.Telemedic", "McDermott.Telemedic\McDermott.Telemedic.csproj", "{226A5CD2-2D7E-4BC3-BF45-EDA92DDA5E56}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "McDermott.Telemedic", "McDermott.Telemedic\McDermott.Telemedic.csproj", "{226A5CD2-2D7E-4BC3-BF45-EDA92DDA5E56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

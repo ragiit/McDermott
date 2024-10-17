@@ -1,6 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
-using McDermott.Persistence.Migrations;
 
 namespace McDermott.Web.Components.Pages.Pharmacy
 {

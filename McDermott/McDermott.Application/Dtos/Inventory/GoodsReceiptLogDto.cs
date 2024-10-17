@@ -1,10 +1,12 @@
-﻿namespace McDermott.Application.Dtos.Inventory
+﻿using McDermott.Domain.Common;
+namespace McDermott.Application.Dtos.Inventory
 {
-    public class ReceivingLogDto : IMapFrom<ReceivingLog>
+    public class GoodsReceiptLogDto : IMapFrom<GoodsReceiptLog>
     {
         public long Id { get; set; }
-        public long? ReceivingId { get; set; }
+        public long? GoodsReceiptId { get; set; }
         public long? SourceId { get; set; }
+        public long? DestinationId { get; set; }
         public long? UserById { get; set; }
         public EnumStatusReceiving? Status { get; set; }
 
@@ -12,8 +14,9 @@
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
 
-        public ReceivingStockDto? Receiving { get; set; }
+        public GoodsReceiptDto? GoodsReceipt { get; set; }
         public UserDto? UserBy { get; set; }
+        public LocationDto? Destination { get; set; }
         public LocationDto? Source { get; set; }
     }
 }

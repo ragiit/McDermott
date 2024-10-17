@@ -24,7 +24,8 @@ namespace McDermott.Persistence.Context
         #region BPJS
 
         public DbSet<BpjsClassification> BpjsClassifications { get; set; }
-        public DbSet<BPJSIntegration> BPJSIntegrations { get; set; }
+
+        //public DbSet<BPJSIntegration> BPJSIntegrations { get; set; }
         public DbSet<SystemParameter> SystemParameters { get; set; }
 
         #endregion BPJS
@@ -131,9 +132,9 @@ namespace McDermott.Persistence.Context
         public DbSet<Product> Products { get; set; }
         public DbSet<Medicament> Medicaments { get; set; }
         public DbSet<StockProduct> StockProducts { get; set; }
-        public DbSet<ReceivingStockProduct> ReceivingStockDetails { get; set; }
-        public DbSet<ReceivingStock> ReceivingStocks { get; set; }
-        public DbSet<ReceivingLog> ReceivingLogs { get; set; }
+        public DbSet<GoodsReceiptDetail> GoodsReceiptDetails { get; set; }
+        public DbSet<GoodsReceipt> GoodsReceipts { get; set; }
+        public DbSet<GoodsReceiptLog> GoodsReceiptLogs { get; set; }
         public DbSet<TransferStock> TransferStocks { get; set; }
         public DbSet<TransferStockLog> TransferStockLogs { get; set; }
         public DbSet<PharmacyLog> PharmacyLogs { get; set; }
@@ -199,16 +200,16 @@ namespace McDermott.Persistence.Context
                   .IsUnique();
 
             modelBuilder.Entity<InsurancePolicy>()
-                  .HasIndex(e => e.NoCard)
+                  .HasIndex(e => e.NoKartu)
                   .IsUnique();
 
-            modelBuilder.Entity<ReceivingStockProduct>()
+            modelBuilder.Entity<GoodsReceiptDetail>()
               .HasOne(h => h.Product)
-              .WithMany(m => m.ReceivingStockProduct)
+              .WithMany(m => m.GoodsReceiptDetail)
               .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<ReceivingStockProduct>()
+            modelBuilder.Entity<GoodsReceiptDetail>()
               .HasOne(h => h.Stock)
-              .WithMany(m => m.ReceivingStockProduct)
+              .WithMany(m => m.GoodsReceiptDetail)
               .OnDelete(DeleteBehavior.SetNull);
 
             // Contoh: Aturan cascade delete untuk hubungan many-to-many
@@ -343,11 +344,6 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<GeneralConsultanService>()
                 .HasMany(m => m.SickLeaves)
                 .WithOne(c => c.GeneralConsultans)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<InsurancePolicy>()
-                .HasMany(m => m.BPJSIntegrations)
-                .WithOne(c => c.InsurancePolicy)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<InventoryAdjusment>()

@@ -284,11 +284,6 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
-            try
-            {
-                await GetUserInfo();
-            }
-            catch { }
 
             var NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
             if (NameGroup == null)
@@ -299,6 +294,13 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 ActiveBack = true;
             }
+
+            try
+            {
+                await GetUserInfo();
+            }
+            catch { }
+
             await LoadData();
             foreach (var i in KioskConf)
             {
@@ -331,7 +333,7 @@ namespace McDermott.Web.Components.Pages.Queue
             Physician = await Mediator.Send(new GetUserQuery());
             KioskQueues = await Mediator.Send(new GetKioskQueueQuery());
             ViewQueue = KioskQueues.OrderByDescending(x => x.CreatedDate).FirstOrDefault() ?? new();
-            InsurancePolices = await Mediator.Send(new GetInsurancePolicyQuery());
+            //InsurancePolices = await Mediator.Send(new GetInsurancePolicyQuery());
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
             Services = (await Mediator.Send(new GetServiceQuery())).Item1;
@@ -514,7 +516,8 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
             var group = result2.Item1;
-            //var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
+            var aa = UserAccessCRUID;
+            var NameGroup = group.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();
             var InputSearch = FormKios.NumberType ?? string.Empty;
             Patients = await Mediator.Send(new GetDataUserForKioskQuery(InputSearch));
 
@@ -529,7 +532,10 @@ namespace McDermott.Web.Components.Pages.Queue
             NamePatient = Patients.Select(x => x.Name).FirstOrDefault();
             FormKios.PatientId = Patients.Select(x => x.Id).FirstOrDefault();
             //BPJS = InsurancePolices.FirstOrDefault(x => x.UserId == FormKios.PatientId);
-            BPJS = (await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FormKios.PatientId))).FirstOrDefault();
+            BPJS = (await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.UserId == FormKios.PatientId
+            }));
             if (BPJS != null)
             {
                 var isActive = await OnClickGetBPJS(BPJS.PolicyNumber);
@@ -807,10 +813,11 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Methode Save And Update
 
         private bool IsLoading { get; set; } = false;
-        private BPJSIntegrationDto BPJSIntegration { get; set; }
 
         [Inject]
         public GoogleMeetService GoogleMeetService { get; set; }
+
+        public InsurancePolicyDto BPJSIntegration { get; set; } = new();
 
         private async Task OnSave()
         {
@@ -823,12 +830,16 @@ namespace McDermott.Web.Components.Pages.Queue
                 FormGeneral.InsurancePolicyId = null;
 
                 // Save BPJS Insurance Policy
-                var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.BPJS != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.BPJS.ToLower().Trim())));
-                if (bpjs is not null && bpjs.Count > 0)
+                //var bpjs = await Mediator.Send(new GetBPJSIntegrationQuery(x => FormKios != null && FormKios.BPJS != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.BPJS.ToLower().Trim())));
+                var bpjs = await Mediator.Send(new GetSingleInsurancePolicyQuery
+                {
+                    Predicate = x => FormKios != null && FormKios.BPJS != null && x.NoKartu != null && x.NoKartu.ToLower().Trim().Equals(FormKios.BPJS.ToLower().Trim())
+                });
+                if (bpjs is not null)
                 {
                     FormGeneral.Method = "BPJS";
-                    BPJSIntegration = bpjs[0];
-                    FormGeneral.InsurancePolicyId = bpjs[0].InsurancePolicyId;
+                    BPJSIntegration = bpjs;
+                    FormGeneral.InsurancePolicyId = bpjs.Id;
                 }
 
                 if (FormKios.Id == 0)
@@ -890,9 +901,9 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
-                    if (bpjs is not null && bpjs.Count > 0 && !string.IsNullOrWhiteSpace(FormKios.BPJS))
+                    if (bpjs is not null && !string.IsNullOrWhiteSpace(FormKios.BPJS))
                     {
-                        var isSuccess = await SendPCareRequestAntrean(bpjs[0] ?? new());
+                        var isSuccess = await SendPCareRequestAntrean(bpjs ?? new());
                         if (!isSuccess)
                         {
                             BPJSIntegration = new();
@@ -1002,7 +1013,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task<bool> SendPCareRequestAntrean(BPJSIntegrationDto bpjs)
+        private async Task<bool> SendPCareRequestAntrean(InsurancePolicyDto bpjs)
         {
             try
             {

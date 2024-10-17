@@ -355,9 +355,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             {
                 if (GeneralConsultanService.ReferVerticalKhususCategoryCode is not null && (GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("THA") || GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("HEM")))
                 {
-                    Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+                    Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
 
-                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                     if (result.Item2 == 200)
                     {
@@ -399,9 +399,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                 }
                 else
                 {
-                    Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
+                    Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
 
-                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedBPJSIntegration.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                     if (result.Item2 == 200)
                     {
@@ -616,17 +616,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanService.EndMaternityLeave = GeneralConsultanService.StartMaternityLeave.GetValueOrDefault().AddMonths(3);
         }
 
-        private BPJSIntegrationDto SelectedBPJSIntegration { get; set; } = new();
-        private BPJSIntegrationDto SelectedBPJSIntegrationFollowUp { get; set; } = new();
-        private BPJSIntegrationDto SelectedBPJSIntegrationReferTo { get; set; } = new();
-
         private async Task SelectedItemInsurancePolicyChangedReferTo(InsurancePolicyDto? result)
         {
             ToastService.ClearInfoToasts();
             SelectedInsurancePolicyReferTo = new();
             ReferToGeneralConsultanService.InsurancePolicyId = null;
-
-            SelectedBPJSIntegrationReferTo = new();
 
             if (result is null)
                 return;
@@ -635,7 +629,11 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ToastService.ClearWarningToasts();
 
-            var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
+            var bpjs = (await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId
+            }));
+
             if (bpjs is not null)
             {
                 var count = GeneralConsultanServices.Where(x => x.PatientId == ReferToGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
@@ -651,7 +649,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         }
                         else
                         {
-                            SelectedBPJSIntegrationReferTo = bpjs;
+                            SelectedInsurancePolicyReferTo = bpjs;
                         }
                     }
                 }
@@ -668,7 +666,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             SelectedInsurancePolicyFollowUp = new();
             FollowUpGeneralConsultanService.InsurancePolicyId = null;
 
-            SelectedBPJSIntegrationFollowUp = new();
+            SelectedInsurancePolicyFollowUp = new();
 
             if (result is null)
                 return;
@@ -677,7 +675,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             ToastService.ClearWarningToasts();
 
-            var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
+            var bpjs = (await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId
+            }));
             if (bpjs is not null)
             {
                 var count = GeneralConsultanServices.Where(x => x.PatientId == FollowUpGeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
@@ -694,7 +695,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         }
                         else
                         {
-                            SelectedBPJSIntegrationFollowUp = bpjs;
+                            SelectedInsurancePolicyFollowUp = bpjs;
                         }
                     }
                 }
@@ -708,7 +709,7 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task SelectedItemInsurancePolicyChanged(InsurancePolicyDto? result)
         {
             ToastService.ClearInfoToasts();
-            SelectedBPJSIntegration = new();
+            SelectedInsurancePolicy = new();
             FollowUpGeneralConsultanService.InsurancePolicyId = null;
 
             SelectedInsurancePolicy = result;
@@ -717,7 +718,11 @@ namespace McDermott.Web.Components.Pages.Transaction
                 return;
             ToastService.ClearWarningToasts();
 
-            var bpjs = (await Mediator.Send(new GetBPJSIntegrationQuery(x => x.InsurancePolicyId == result.Id))).FirstOrDefault();
+            var bpjs = (await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId
+            }));
+
             if (bpjs is not null)
             {
                 var count = GeneralConsultanServices.Where(x => x.PatientId == GeneralConsultanService.PatientId && x.Status == EnumStatusGeneralConsultantService.Planned).Count();
@@ -734,7 +739,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                         }
                         else
                         {
-                            SelectedBPJSIntegration = bpjs;
+                            SelectedInsurancePolicy = bpjs;
                         }
                     }
                 }
@@ -989,7 +994,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            //ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == ReferToGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPaymentChangedFollowUp(string e)
@@ -1001,7 +1006,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            //FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == FollowUpGeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPaymentChanged(string e)
@@ -1013,10 +1018,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             if (e is null)
                 return;
 
-            if (e.Equals("BPJS"))
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
-            else
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && (x.Insurance.IsBPJSKesehatan == false || x.Insurance.IsBPJSTK == false) && x.Active == true));
+            //if (e.Equals("BPJS"))
+            //    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJSKesehatan == e.Equals("BPJS") && x.Active == true));
+            //else
+            //    InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && (x.Insurance.IsBPJSKesehatan == false || x.Insurance.IsBPJSTK == false) && x.Active == true));
         }
 
         //private void SelectedItemRegisTypeChangedReferTo(String e)
@@ -1137,7 +1142,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             ReferToGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             ReferToGeneralConsultanService.PatientId = e.Id;
 
-            ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            //ReferToInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && ReferToGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == ReferToGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
 
         private List<InsurancePolicyDto> FollowUpInsurancePolicies { get; set; } = [];
@@ -1155,7 +1160,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             FollowUpGeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
             FollowUpGeneralConsultanService.PatientId = e.Id;
 
-            FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            //FollowUpInsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && FollowUpGeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == FollowUpGeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
         }
 
         private async Task SelectedItemPatientChanged(UserDto e)
@@ -1172,7 +1177,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanService.PatientId = e.Id;
             UserForm = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
 
-            InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+            //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == e.Id && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
 
             await GetPatientAllergy();
         }
@@ -1425,13 +1430,13 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task<bool> SendPcareRequestRegistration()
         {
-            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && SelectedInsurancePolicy is not null)
             {
                 var regis = new PendaftaranRequest
                 {
-                    kdProviderPeserta = SelectedBPJSIntegration.KdProviderPstKdProvider ?? "",
+                    kdProviderPeserta = SelectedInsurancePolicy.KdProviderPstKdProvider ?? "",
                     tglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
-                    noKartu = SelectedBPJSIntegration.NoKartu ?? "",
+                    noKartu = SelectedInsurancePolicy.NoKartu ?? "",
                     kdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
                     keluhan = null,
                     kunjSakit = true,
@@ -1463,7 +1468,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task<bool> SendPcareRequestKunjungan()
         {
-            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && SelectedBPJSIntegration is not null)
+            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && SelectedInsurancePolicy is not null)
             {
                 var ll = GeneralConsultanCPPTs.Where(x => x.Title == "Diagnosis").Select(x => x.Body).ToList();
 
@@ -1496,7 +1501,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 var kunj = new KunjunganRequest
                 {
                     NoKunjungan = GeneralConsultanService.SerialNo ?? string.Empty,
-                    NoKartu = SelectedBPJSIntegration.NoKartu ?? "",
+                    NoKartu = SelectedInsurancePolicy.NoKartu ?? "",
                     TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
                     KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
                     KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultanService.AwarenessId)!.KdSadar,
@@ -1545,7 +1550,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 {
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
                     Kodepoli = service!.Code ?? string.Empty,
-                    Nomorkartu = SelectedBPJSIntegration.NoKartu ?? string.Empty,
+                    Nomorkartu = SelectedInsurancePolicy.NoKartu ?? string.Empty,
                     Status = status, // 1 -> Hadir, 2 -> Tidak Hadir
                     Waktu = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
@@ -1589,7 +1594,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
+                if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
                 {
                     var isSuccess = await SendPcareRequestRegistration();
                     if (!isSuccess)
@@ -1603,7 +1608,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                     }
                 }
 
-                if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
                 {
                     var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
@@ -1747,7 +1752,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 if (GeneralConsultanService.Id != 0)
                 {
-                    if (SelectedBPJSIntegration is not null && SelectedBPJSIntegration.Id != 0)
+                    if (SelectedInsurancePolicy is not null && SelectedInsurancePolicy.Id != 0)
                     {
                         var isSuccess = await SendPCareRequestUpdateStatusPanggilAntrean(2);
                         if (!isSuccess)
@@ -2467,7 +2472,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
                 await GetPatientAllergy();
 
-                SelectedInsurancePolicy = (await Mediator.Send(new GetInsurancePolicyQuery(x => x.Id == GeneralConsultanService.InsurancePolicyId))).FirstOrDefault() ?? new();
+                //SelectedInsurancePolicy = (await Mediator.Send(new GetInsurancePolicyQuery(x => x.Id == GeneralConsultanService.InsurancePolicyId))).FirstOrDefault() ?? new();
 
                 switch (GeneralConsultanService.Status)
                 {
@@ -2553,7 +2558,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 if (!isFromQuery)
                     GeneralConsultanService = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
 
-                InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
+                //InsurancePolicies = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && GeneralConsultanService.Payment != null && x.Insurance.IsBPJSKesehatan == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true));
             }
             catch (Exception exx)
             {

@@ -231,9 +231,15 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             SelectedDataItems = [];
             var countryId = refCountryComboBox?.Value.GetValueOrDefault();
-            var result = await Mediator.Send(new GetProvinceQuery(x => x.CountryId == countryId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refProvinceComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.CountryId == countryId,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refProvinceComboBox?.Text ?? ""
+            });
             Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
+            totalCountProvince = result.PageCount;
             PanelVisible = false;
         }
 

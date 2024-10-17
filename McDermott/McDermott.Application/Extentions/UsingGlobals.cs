@@ -23,7 +23,6 @@ global using static McDermott.Application.Features.Commands.Inventory.InventoryA
 global using static McDermott.Application.Features.Commands.BpjsIntegration.AllergyCommand;
 global using static McDermott.Application.Features.Commands.BpjsIntegration.AwarenessCommand;
 global using static McDermott.Application.Features.Commands.Bpjs.SystemParameterCommand;
-global using static McDermott.Application.Features.Commands.Bpjs.BPJSIntegrationCommand;
 global using static McDermott.Application.Features.Commands.Patient.PatientAllergyCommand;
 global using static McDermott.Application.Extentions.EnumHelper;
 global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificationCommand;

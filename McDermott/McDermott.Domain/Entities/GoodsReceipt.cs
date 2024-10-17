@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class ReceivingStock : BaseAuditableEntity
+    public class GoodsReceipt : BaseAuditableEntity
     {
+        public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public DateTime? SchenduleDate { get; set; }
-
-        public string? KodeReceiving { get; set; }
+        public string? ReceiptNumber { get; set; }
         public string? NumberPurchase { get; set; }
         public string? Reference { get; set; }
 
@@ -21,6 +21,9 @@ namespace McDermott.Domain.Entities
         public Locations? Destination { get; set; }
 
         [SetToNull]
-        public List<ReceivingStockProduct>? receivingStockProduct { get; set; }
+        public Locations? Source { get; set; }
+
+        [SetToNull]
+        public List<GoodsReceiptDetail>? goodsReceiptDetails { get; set; }
     }
 }

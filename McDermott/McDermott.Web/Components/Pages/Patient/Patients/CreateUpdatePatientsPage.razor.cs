@@ -449,8 +449,8 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             if (UserForm.Id != 0)
             {
-                var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
-                InsurancePoliciesCount = count.Count;
+                var count = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
+                InsurancePoliciesCount = count;
             }
         }
 
@@ -667,7 +667,10 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             #region KTP Address
 
             Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == UserForm.IdCardCountryId)).Item1;
-            Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == UserForm.IdCardProvinceId)).Item1;
+            Provinces = (await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.Id == UserForm.IdCardProvinceId
+            })).Item1;
             Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == UserForm.IdCardCityId)).Item1;
             Districts = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == UserForm.IdCardDistrictId)).Item1;
             Villages = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.IdCardVillageId)).Item1;
@@ -677,7 +680,10 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             #region Residence  Address
 
             CountriesResidence = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == UserForm.DomicileCountryId)).Item1;
-            ProvincesResidence = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == UserForm.DomicileProvinceId)).Item1;
+            Provinces = (await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.Id == UserForm.DomicileProvinceId
+            })).Item1;
             CitiesResidence = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == UserForm.DomicileCityId)).Item1;
             DistrictsResidence = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == UserForm.DomicileDistrictId)).Item1;
             VillagesResidence = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.DomicileVillageId)).Item1;

@@ -128,11 +128,11 @@
                             </DxFormLayoutItem>
                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                             {
-                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+                               @*  <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
                                     <MyTextBox @bind-Text="@GeneralConsultanService.InsurancePolicy.InsuranceName"
                                                ReadOnly
                                                NullText="Insurance Policy" />
-                                </DxFormLayoutItem>
+                                </DxFormLayoutItem> *@
                             }
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
                                 <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"

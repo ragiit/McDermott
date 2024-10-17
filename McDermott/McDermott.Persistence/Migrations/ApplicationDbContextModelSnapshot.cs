@@ -531,133 +531,6 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Awarenesses");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.BPJSIntegration", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Aktif")
-                        .HasColumnType("bit")
-                        .HasAnnotation("Relational:JsonPropertyName", "aktif");
-
-                    b.Property<bool>("AsuransiCob")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("AsuransiKdAsuransi")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AsuransiNmAsuransi")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AsuransiNoAsuransi")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GolDarah")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "golDarah");
-
-                    b.Property<string>("HubunganKeluarga")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "hubunganKeluarga");
-
-                    b.Property<long?>("InsurancePolicyId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("JnsKelasKode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("JnsKelasNama")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("JnsPesertaKode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("JnsPesertaNama")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("KdProviderGigiKdProvider")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("KdProviderGigiNmProvider")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("KdProviderPstKdProvider")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("KdProviderPstNmProvider")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("KetAktif")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "ketAktif");
-
-                    b.Property<string>("Nama")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "nama");
-
-                    b.Property<string>("NoHP")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "noHP");
-
-                    b.Property<string>("NoKTP")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "noKTP");
-
-                    b.Property<string>("NoKartu")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "noKartu");
-
-                    b.Property<string>("PstPrb")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "pstPrb");
-
-                    b.Property<string>("PstProl")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "pstProl");
-
-                    b.Property<string>("Sex")
-                        .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "sex");
-
-                    b.Property<DateTime?>("TglAkhirBerlaku")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "tglAkhirBerlaku");
-
-                    b.Property<DateTime?>("TglLahir")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "tglLahir");
-
-                    b.Property<DateTime?>("TglMulaiAktif")
-                        .HasColumnType("datetime2")
-                        .HasAnnotation("Relational:JsonPropertyName", "tglMulaiAktif");
-
-                    b.Property<int>("Tunggakan")
-                        .HasColumnType("int")
-                        .HasAnnotation("Relational:JsonPropertyName", "tunggakan");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InsurancePolicyId");
-
-                    b.ToTable("BPJSIntegrations");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.BpjsClassification", b =>
                 {
                     b.Property<long>("Id")
@@ -2622,6 +2495,156 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("GeneralConsultationLogs");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceipt", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DestinationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("NumberPurchase")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReceiptNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SchenduleDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("SourceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("SourceId");
+
+                    b.ToTable("GoodsReceipts");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceiptDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Batch")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("GoodsReceiptId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("Qty")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("StockId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GoodsReceiptId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("GoodsReceiptDetails");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceiptLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("DestinationId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("GoodsReceiptId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SourceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("UserById")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("GoodsReceiptId");
+
+                    b.HasIndex("SourceId");
+
+                    b.HasIndex("UserById");
+
+                    b.ToTable("GoodsReceiptLogs");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>
                 {
                     b.Property<long>("Id")
@@ -2844,15 +2867,21 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("AgeAtTimeOfService")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("Aktif")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "aktif");
 
-                    b.Property<DateTime?>("CardPrintDate")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("AsuransiCob")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Class")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("AsuransiKdAsuransi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AsuransiNmAsuransi")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AsuransiNoAsuransi")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2860,111 +2889,91 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CurrentAge")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("GolDarah")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "golDarah");
 
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Diagnosa")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("DinSos")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Doctor")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("HubunganKeluarga")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "hubunganKeluarga");
 
                     b.Property<long>("InsuranceId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("InsuranceName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("JnsKelasKode")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InsuranceNo")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("JnsKelasNama")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MedicalRecordNo")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("JnsPesertaKode")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NoCard")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("JnsPesertaNama")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NoId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("KdProviderGigiKdProvider")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NoSKTM")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("KdProviderGigiNmProvider")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NursingClass")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("KdProviderPstKdProvider")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ParticipantName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("KdProviderPstNmProvider")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ParticipantStatus")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("KetAktif")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "ketAktif");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("Nama")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "nama");
+
+                    b.Property<string>("NoHP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "noHP");
+
+                    b.Property<string>("NoKTP")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "noKTP");
+
+                    b.Property<string>("NoKartu")
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "noKartu");
 
                     b.Property<string>("PolicyNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Poly")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("PstPrb")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "pstPrb");
 
-                    b.Property<string>("Prolanis")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PronalisPBR")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ProviderName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServicePPKCode")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServicePPKName")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServiceParticipant")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ServiceType")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("PstProl")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "pstProl");
 
                     b.Property<string>("Sex")
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "sex");
 
-                    b.Property<DateTime?>("TatDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("TglAkhirBerlaku")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "tglAkhirBerlaku");
 
-                    b.Property<DateTime?>("TmtDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTime?>("TglLahir")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "tglLahir");
+
+                    b.Property<DateTime?>("TglMulaiAktif")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "tglMulaiAktif");
+
+                    b.Property<int>("Tunggakan")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "tunggakan");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2979,9 +2988,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("InsuranceId");
 
-                    b.HasIndex("NoCard")
+                    b.HasIndex("NoKartu")
                         .IsUnique()
-                        .HasFilter("[NoCard] IS NOT NULL");
+                        .HasFilter("[NoKartu] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -4587,146 +4596,6 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("QueueDisplays");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingLog", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ReceivingId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("SourceId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("UserById")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceivingId");
-
-                    b.HasIndex("SourceId");
-
-                    b.HasIndex("UserById");
-
-                    b.ToTable("ReceivingLogs");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStock", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("DestinationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("KodeReceiving")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumberPurchase")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Reference")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("SchenduleDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DestinationId");
-
-                    b.ToTable("ReceivingStocks");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStockProduct", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnOrder(0);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Batch")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ExpiredDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("Qty")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ReceivingStockId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("StockId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ReceivingStockId");
-
-                    b.HasIndex("StockId");
-
-                    b.ToTable("ReceivingStockDetails");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.Religion", b =>
                 {
                     b.Property<long>("Id")
@@ -6069,16 +5938,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Uom");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.BPJSIntegration", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.InsurancePolicy", "InsurancePolicy")
-                        .WithMany("BPJSIntegrations")
-                        .HasForeignKey("InsurancePolicyId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("InsurancePolicy");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.Building", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.HealthCenter", "HealthCenter")
@@ -6582,6 +6441,78 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("GeneralConsultanService");
 
                     b.Navigation("ProcedureRoom");
+
+                    b.Navigation("UserBy");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceipt", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.Locations", "Destination")
+                        .WithMany()
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Locations", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("Source");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceiptDetail", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.GoodsReceipt", "GoodsReceipt")
+                        .WithMany("goodsReceiptDetails")
+                        .HasForeignKey("GoodsReceiptId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Product", "Product")
+                        .WithMany("GoodsReceiptDetail")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("McDermott.Domain.Entities.StockProduct", "Stock")
+                        .WithMany("GoodsReceiptDetail")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("GoodsReceipt");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Stock");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceiptLog", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.Locations", "Destination")
+                        .WithMany()
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.GoodsReceipt", "GoodsReceipt")
+                        .WithMany()
+                        .HasForeignKey("GoodsReceiptId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Locations", "Source")
+                        .WithMany()
+                        .HasForeignKey("SourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.User", "UserBy")
+                        .WithMany()
+                        .HasForeignKey("UserById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("GoodsReceipt");
+
+                    b.Navigation("Source");
 
                     b.Navigation("UserBy");
                 });
@@ -7191,64 +7122,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingLog", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.ReceivingStock", "Receiving")
-                        .WithMany()
-                        .HasForeignKey("ReceivingId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McDermott.Domain.Entities.Locations", "Source")
-                        .WithMany()
-                        .HasForeignKey("SourceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McDermott.Domain.Entities.User", "UserBy")
-                        .WithMany()
-                        .HasForeignKey("UserById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Receiving");
-
-                    b.Navigation("Source");
-
-                    b.Navigation("UserBy");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStock", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Locations", "Destination")
-                        .WithMany()
-                        .HasForeignKey("DestinationId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Destination");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStockProduct", b =>
-                {
-                    b.HasOne("McDermott.Domain.Entities.Product", "Product")
-                        .WithMany("ReceivingStockProduct")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("McDermott.Domain.Entities.ReceivingStock", "ReceivingStock")
-                        .WithMany("receivingStockProduct")
-                        .HasForeignKey("ReceivingStockId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("McDermott.Domain.Entities.StockProduct", "Stock")
-                        .WithMany("ReceivingStockProduct")
-                        .HasForeignKey("StockId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ReceivingStock");
-
-                    b.Navigation("Stock");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.ReorderingRule", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Company", "Company")
@@ -7741,6 +7614,11 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("SickLeaves");
                 });
 
+            modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceipt", b =>
+                {
+                    b.Navigation("goodsReceiptDetails");
+                });
+
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>
                 {
                     b.Navigation("GroupMenus");
@@ -7751,11 +7629,6 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.HealthCenter", b =>
                 {
                     b.Navigation("Buildings");
-                });
-
-            modelBuilder.Entity("McDermott.Domain.Entities.InsurancePolicy", b =>
-                {
-                    b.Navigation("BPJSIntegrations");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.InventoryAdjusment", b =>
@@ -7808,9 +7681,9 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("Medicaments");
+                    b.Navigation("GoodsReceiptDetail");
 
-                    b.Navigation("ReceivingStockProduct");
+                    b.Navigation("Medicaments");
 
                     b.Navigation("StockProduct");
                 });
@@ -7829,11 +7702,6 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Counter");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.ReceivingStock", b =>
-                {
-                    b.Navigation("receivingStockProduct");
-                });
-
             modelBuilder.Entity("McDermott.Domain.Entities.SampleType", b =>
                 {
                     b.Navigation("LabTests");
@@ -7846,7 +7714,7 @@ namespace McDermott.Persistence.Migrations
 
             modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
                 {
-                    b.Navigation("ReceivingStockProduct");
+                    b.Navigation("GoodsReceiptDetail");
 
                     b.Navigation("StockOutPrescriptions");
 

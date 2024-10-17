@@ -1,15 +1,17 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System;
+using System.Collections.Generic;
+namespace McDermott.Domain.Entities
 {
-    public class ReceivingStockProduct : BaseAuditableEntity
+    public class GoodsReceiptDetail : BaseAuditableEntity
     {
-        public long? ReceivingStockId { get; set; }
+        public long? GoodsReceiptId { get; set; }
         public long? ProductId { get; set; }
         public long? Qty { get; set; }
         public string? Batch { get; set; }
         public DateTime? ExpiredDate { get; set; }
 
         [SetToNull]
-        public ReceivingStock? ReceivingStock { get; set; }
+        public GoodsReceipt? GoodsReceipt { get; set; }
 
         [SetToNull]
         public Product? Product { get; set; }

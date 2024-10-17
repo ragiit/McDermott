@@ -2,6 +2,7 @@
 using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components.Web;
 using Serilog;
 using Path = System.IO.Path;
 
@@ -152,10 +153,11 @@ namespace McDermott.Web.Extentions
         [
             // Clinic Services
             "clinic-service/general-consultation-services",
-            "clinic-service/general-consultation-services",
             "clinic-service/medical-checkups",
             "clinic-service/procedure-rooms",
             "clinic-service/acccidents",
+            "clinic-service/telemedicines",
+            "clinic-service/vaccinations",
             "clinic-service/reporting-and-analytics",
 
             // Queues
@@ -163,6 +165,7 @@ namespace McDermott.Web.Extentions
             "queue/queue-displays",
             "queue/kiosk-departments",
             "queue/kiosk-configurations",
+            "queue/kiosk",
 
             // BPJS
             "bpjs/bpjs-classifications",
