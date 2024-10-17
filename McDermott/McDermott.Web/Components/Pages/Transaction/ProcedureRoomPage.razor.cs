@@ -178,7 +178,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion Searching
 
-
         private void OnSelectEmployee(UserDto e)
         {
             if (e is null)
@@ -229,16 +228,16 @@ namespace McDermott.Web.Components.Pages.Transaction
             GeneralConsultanService = new();
             GeneralConsultanMedicalSupport = new();
             SelectedDataItems = [];
-            var sets = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
-            foreach (var item in sets)
-            {
-                if (item.IsConfinedSpace)
-                {
-                    item.GeneralConsultanService = new();
-                    item.GeneralConsultanService.Patient = item.Employee;
-                }
-            }
-            GeneralConsultanMedicalSupports = sets;
+            //var sets = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery());
+            //foreach (var item in sets)
+            //{
+            //    if (item.IsConfinedSpace)
+            //    {
+            //        item.GeneralConsultanService = new();
+            //        item.GeneralConsultanService.Patient = item.Employee;
+            //    }
+            //}
+            //GeneralConsultanMedicalSupports = sets;
             PanelVisible = false;
         }
 

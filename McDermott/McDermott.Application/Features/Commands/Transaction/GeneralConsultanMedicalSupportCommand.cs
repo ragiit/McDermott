@@ -2,21 +2,55 @@
 {
     public class GeneralConsultanMedicalSupportCommand
     {
-        #region Get
+        #region GET
 
-        public class GetGeneralConsultanMedicalSupportQuery(Expression<Func<GeneralConsultanMedicalSupport, bool>>? predicate = null, bool RemoveCache = false) : IRequest<List<GeneralConsultanMedicalSupportDto>>
+        public class GetGeneralConsultanMedicalSupportQuery : IRequest<(List<GeneralConsultanMedicalSupportDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = RemoveCache;
+            public List<Expression<Func<GeneralConsultanMedicalSupport, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupport, GeneralConsultanMedicalSupport>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultanMedicalSupport, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        #endregion Get
+        public class GetSingleGeneralConsultanMedicalSupportQuery : IRequest<GeneralConsultanMedicalSupportDto>
+        {
+            public List<Expression<Func<GeneralConsultanMedicalSupport, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupport, GeneralConsultanMedicalSupport>> Select { get; set; }
 
-        #region Create
+            public List<(Expression<Func<GeneralConsultanMedicalSupport, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class ValidateGeneralConsultanMedicalSupport(Expression<Func<GeneralConsultanMedicalSupport, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; } = predicate!;
+        }
+
+        #endregion GET
+
+        #region CREATE
 
         public class CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto) : IRequest<GeneralConsultanMedicalSupportDto>
         {
             public GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto { get; set; } = GeneralConsultanMedicalSupportDto;
+        }
+
+        public class BulkValidateGeneralConsultanMedicalSupport(List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportsToValidate) : IRequest<List<GeneralConsultanMedicalSupportDto>>
+        {
+            public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportsToValidate { get; } = GeneralConsultanMedicalSupportsToValidate;
         }
 
         public class CreateListGeneralConsultanMedicalSupportRequest(List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos) : IRequest<List<GeneralConsultanMedicalSupportDto>>
@@ -24,7 +58,7 @@
             public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos { get; set; } = GeneralConsultanMedicalSupportDtos;
         }
 
-        #endregion Create
+        #endregion CREATE
 
         #region Update
 
@@ -37,9 +71,10 @@
         {
             public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos { get; set; } = GeneralConsultanMedicalSupportDtos;
         }
+
         #endregion Update
 
-        #region Delete
+        #region DELETE
 
         public class DeleteGeneralConsultanMedicalSupportRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
@@ -47,6 +82,6 @@
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion Delete
+        #endregion DELETE
     }
 }

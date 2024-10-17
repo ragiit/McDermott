@@ -148,13 +148,21 @@
                                         </div> *@
                                                 </div>
 
-                                                @* <div class="row mt-3">
+                                                <div class="row mt-3">
                                                     <div class="col-12">
                                                         @if (i.Status == "open")
                                                         {
                                                             <div class="row justify-content-end">
                                                                 <div class="col-md-12 d-flex justify-content-end">
                                                                     <DxButton IconCssClass="fa-solid fa-gears" RenderStyle="ButtonRenderStyle.Primary" Text="Start Configuration" Click="@(()=>ShowOnProcess(i.Id))"></DxButton>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else if (i.Status == "stop")
+                                                        {
+                                                            <div class="row justify-content-end">
+                                                                <div class="col-md-5 d-flex justify-content-end">
+                                                                    <DxButton IconCssClass="fa-solid fa-circle-play" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Resume" Click="@(() => ResumeProcess(i.Id))" />
                                                                 </div>
                                                             </div>
                                                         }
@@ -167,18 +175,10 @@
                                                                 </div>
                                                             </div>
                                                         }
-                                                        else if (i.Status == "stop")
-                                                        {
-                                                            <div class="row justify-content-end">
-                                                                <div class="col-md-5 d-flex justify-content-end">
-                                                                    <DxButton IconCssClass="fa-solid fa-circle-play" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Resume" Click="@(() => ResumeProcess(i.Id))" />
-                                                                </div>
-                                                            </div>
-                                                        }
                                                     </div>
-                                                </div> *@
+                                                </div>
                                             </div>
-                                            <div class="card-footer ">
+                                           @*  <div class="card-footer ">
                                                 <div class="row">
                                                     <div class="col-12">
                                                         @if (i.Status == "open")
@@ -208,7 +208,7 @@
                                                         }
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> *@
                                         </div>
                                     </div>
 

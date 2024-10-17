@@ -2307,9 +2307,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                         break;
 
                     case EnumStatusGeneralConsultantService.ProcedureRoom:
-                        var supportP = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                        if (supportP.Count > 0)
-                            GeneralConsultanMedicalSupport = supportP[0];
+                        //var supportP = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        //if (supportP.Count > 0)
+                        //    GeneralConsultanMedicalSupport = supportP[0];
                         break;
 
                     case EnumStatusGeneralConsultantService.Physician:
@@ -2320,9 +2320,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                         GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         AllGeneralConsultanCPPTs = GeneralConsultanCPPTs.Select(item => item).ToList();
 
-                        var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                        if (support.Count > 0)
-                            GeneralConsultanMedicalSupport = support[0];
+                        //var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        //if (support.Count > 0)
+                        //    GeneralConsultanMedicalSupport = support[0];
 
                         SelectedLabTests = LabTestDetails.Where(x => GeneralConsultanMedicalSupport.LabResulLabExaminationtIds != null && GeneralConsultanMedicalSupport.LabResulLabExaminationtIds.Contains(x.Id)).ToList();
 
@@ -2339,9 +2339,9 @@ namespace McDermott.Web.Components.Pages.Transaction
                         break;
 
                     case EnumStatusGeneralConsultantService.Waiting:
-                        var support1 = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
-                        if (support1.Count > 0)
-                            GeneralConsultanMedicalSupport = support1[0];
+                        //var support1 = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+                        //if (support1.Count > 0)
+                        //    GeneralConsultanMedicalSupport = support1[0];
 
                         var clinicals1 = await Mediator.Send(new GetGeneralConsultantClinicalAssesmentQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
                         if (clinicals1.Count > 0)
@@ -2887,10 +2887,10 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
 
-            var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
+            //var support = await Mediator.Send(new GetGeneralConsultanMedicalSupportQuery(x => x.GeneralConsultanServiceId == FormRegis.Id));
 
-            if (support.Count > 0)
-                GeneralConsultanMedicalSupport = support[0];
+            //if (support.Count > 0)
+            //    GeneralConsultanMedicalSupport = support[0];
 
             DeletedLabTestIds.Clear();
 
