@@ -3,3 +3,5 @@
     <ValidationMessage For="@(() => a.Name)"   />
 </DxFormLayoutItem>
 
+var a = request.GeneralConsultanMedicalSupportDto.Adapt<CreateUpdateConfinedSpace>().Adapt<GeneralConsultanMedicalSupport>();
+    result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().AddAsync(a);

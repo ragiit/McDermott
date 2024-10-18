@@ -104,10 +104,10 @@
             public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
-        public class UpdateStatusGeneralConsultanServiceRequest(EnumStatusGeneralConsultantService status, long id) : IRequest<GeneralConsultanServiceDto>
+        public class UpdateStatusGeneralConsultanServiceRequest : IRequest<GeneralConsultanServiceDto>
         {
-            public long Id { get; set; } = id;
-            public EnumStatusGeneralConsultantService Status { get; set; } = status;
+            public long Id { get; set; }
+            public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
         public class UpdateListGeneralConsultanServiceRequest(List<GeneralConsultanServiceDto> GeneralConsultanServiceDtos) : IRequest<List<GeneralConsultanServiceDto>>

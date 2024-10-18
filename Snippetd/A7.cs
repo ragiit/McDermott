@@ -1,105 +1,105 @@
-await LoadDataCounter();
+await LoadDataUser();
 
- #region ComboboxCounter
+ #region ComboboxUser
 
- private DxComboBox<CounterDto, long?> refCounterComboBox { get; set; }
- private int CounterComboBoxIndex { get; set; } = 0;
- private int totalCountCounter = 0;
+ private DxComboBox<UserDto, long?> refUserComboBox { get; set; }
+ private int UserComboBoxIndex { get; set; } = 0;
+ private int totalCountUser = 0;
 
- private async Task OnSearchCounter()
+ private async Task OnSearchUser()
  {
-     await LoadDataCounter();
+     await LoadDataUser();
  }
 
- private async Task OnSearchCounterIndexIncrement()
+ private async Task OnSearchUserIndexIncrement()
  {
-     if (CounterComboBoxIndex < (totalCountCounter - 1))
+     if (UserComboBoxIndex < (totalCountUser - 1))
      {
-         CounterComboBoxIndex++;
-         await LoadDataCounter(CounterComboBoxIndex, 10);
+         UserComboBoxIndex++;
+         await LoadDataUser(UserComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchCounterIndexDecrement()
+ private async Task OnSearchUserIndexDecrement()
  {
-     if (CounterComboBoxIndex > 0)
+     if (UserComboBoxIndex > 0)
      {
-         CounterComboBoxIndex--;
-         await LoadDataCounter(CounterComboBoxIndex, 10);
+         UserComboBoxIndex--;
+         await LoadDataUser(UserComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputCounterChanged(string e)
+ private async Task OnInputUserChanged(string e)
  {
-     CounterComboBoxIndex = 0;
-     await LoadDataCounter();
+     UserComboBoxIndex = 0;
+     await LoadDataUser();
  }
 
 
 
-  private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetCounterQuery
+          var result = await Mediator.Send(new GetUserQuery
           {
-              SearchTerm = refCounterComboBox?.Text ?? "",
+              SearchTerm = refUserComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Counters = result.Item1;
-          totalCountCounter = result.PageCount;
+          Users = result.Item1;
+          totalCountUser = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastCounter);
+          ex.HandleException(ToastService);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxCounter
+ #endregion ComboboxUser
 
-private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetCounterQuery(
+    var result = await Mediator.Send(new GetUserQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refCounterComboBox?.Text ?? "",
+        searchTerm: refUserComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentCounter,
-            x => x.Counter,
+            x => x.ParentUser,
+            x => x.User,
         ],
-        select: x => new Counter
+        select: x => new User
         {
             Id = x.Id,
             Name = x.Name,
-            ParentCounter = new Domain.Entities.Counter
+            ParentUser = new Domain.Entities.User
             {
                 Name = x.Name
             },
-            Counter = new Domain.Entities.Counter
+            User = new Domain.Entities.User
             {
                 Name = x.Name
             },
-            Manager = new Domain.Entities.Counter
+            Manager = new Domain.Entities.User
             {
                 Name = x.Name
             },
-            CounterCategory = x.CounterCategory
+            UserCategory = x.UserCategory
         }
 
     ));
-    Counters = result.Item1;
-    totalCountCounter = result.pageCount;
+    Users = result.Item1;
+    totalCountUser = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataCounter(CounterId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).CounterId);
+await LoadDataUser(UserId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).UserId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -107,32 +107,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Counter" ColSpanMd="12">
-    <MyDxComboBox Data="@Counters"
-                  NullText="Select Counter"
-                  @ref="refCounterComboBox"
-                  @bind-Value="@a.CounterId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="User" ColSpanMd="12">
+    <MyDxComboBox Data="@Users"
+                  NullText="Select User"
+                  @ref="refUserComboBox"
+                  @bind-Value="@a.UserId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputCounterChanged(e))">
+                  TextChanged="((string e) => OnInputUserChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchCounterIndexDecrement"
+            <DxEditorButton Click="OnSearchUserIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchCounter"
+            <DxEditorButton Click="OnSearchUser"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchCounterIndexIncrement"
+            <DxEditorButton Click="OnSearchUserIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(CounterDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Counter.Name" Caption="Counter" />
-            <DxListEditorColumn FieldName="@nameof(CounterDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(UserDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="User.Name" Caption="User" />
+            <DxListEditorColumn FieldName="@nameof(UserDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.CounterId)" />
+    <ValidationMessage For="@(()=>a.UserId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -142,7 +142,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetCounterQuery(x => x.Id == a.CounterId))).Item1;
+     Cronises = (await Mediator.Send(new GetUserQuery(x => x.Id == a.UserId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

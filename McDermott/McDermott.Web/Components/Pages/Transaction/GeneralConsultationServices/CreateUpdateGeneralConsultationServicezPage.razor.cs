@@ -437,40 +437,37 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     default:
                         break;
                 }
+                var p = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsPatient == true && x.Id == GeneralConsultanService.PatientId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile,
 
-                var p = await Mediator.Send(new GetUserQuery2(
-                                       x => x.IsPatient == true && x.Id == GeneralConsultanService.PatientId,
-                                       searchTerm: "",
-                                       pageSize: 1,
-                                       pageIndex: 0,
-                                       select: x => new User
-                                       {
-                                           Id = x.Id,
-                                           Name = x.Name,
-                                           NoRm = x.NoRm,
-                                           Email = x.Email,
-                                           MobilePhone = x.MobilePhone,
-                                           Gender = x.Gender,
-                                           DateOfBirth = x.DateOfBirth,
-                                           NoId = x.NoId,
-                                           CurrentMobile = x.CurrentMobile,
+                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
 
-                                           IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
-                                           IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
-                                           IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
-                                           WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
-                                           FoodPatientAllergyIds = x.FoodPatientAllergyIds,
-                                           PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                        FamilyMedicalHistory = x.FamilyMedicalHistory,
+                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
 
-                                           IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
-                                           FamilyMedicalHistory = x.FamilyMedicalHistory,
-                                           FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
-
-                                           IsMedicationHistory = x.IsMedicationHistory,
-                                           MedicationHistory = x.MedicationHistory,
-                                           PastMedicalHistory = x.PastMedicalHistory
-                                       }
-                ));
+                        IsMedicationHistory = x.IsMedicationHistory,
+                        MedicationHistory = x.MedicationHistory,
+                        PastMedicalHistory = x.PastMedicalHistory
+                    }
+                });
                 Patients = p.Item1;
 
                 Services = (await Mediator.Send(new GetServiceQuery
@@ -478,24 +475,22 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     Predicate = x => x.Id == GeneralConsultanService.ServiceId,
                 })).Item1;
 
-                var ph = await Mediator.Send(new GetUserQuery2(
-                                        x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
-                                        searchTerm: "",
-                                        pageSize: 1,
-                                        pageIndex: 0,
-                                        select: x => new User
-                                        {
-                                            Id = x.Id,
-                                            Name = x.Name,
-                                            NoRm = x.NoRm,
-                                            Email = x.Email,
-                                            MobilePhone = x.MobilePhone,
-                                            Gender = x.Gender,
-                                            DateOfBirth = x.DateOfBirth,
-                                            NoId = x.NoId,
-                                            CurrentMobile = x.CurrentMobile
-                                        }
-                ));
+                var ph = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                });
                 Physicions = ph.Item1;
 
                 if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
@@ -809,43 +804,42 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetUserQuery2(
-                        x => x.IsPatient == true,
-                        searchTerm: refPatientComboBox?.Text ?? "",
-                        pageSize: pageSize,
-                        pageIndex:
-                        pageIndex,
-                        includes: [],
-                        select: x => new User
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            NoRm = x.NoRm,
-                            Email = x.Email,
-                            MobilePhone = x.MobilePhone,
-                            Gender = x.Gender,
-                            DateOfBirth = x.DateOfBirth,
-                            NoId = x.NoId,
-                            CurrentMobile = x.CurrentMobile,
+                var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsPatient == true,
+                    SearchTerm = refPatientComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile,
 
-                            IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
-                            IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
-                            IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
-                            WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
-                            FoodPatientAllergyIds = x.FoodPatientAllergyIds,
-                            PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
 
-                            IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
-                            FamilyMedicalHistory = x.FamilyMedicalHistory,
-                            FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                        FamilyMedicalHistory = x.FamilyMedicalHistory,
+                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
 
-                            IsMedicationHistory = x.IsMedicationHistory,
-                            MedicationHistory = x.MedicationHistory,
-                            PastMedicalHistory = x.PastMedicalHistory
-                        }
-                ));
+                        IsMedicationHistory = x.IsMedicationHistory,
+                        MedicationHistory = x.MedicationHistory,
+                        PastMedicalHistory = x.PastMedicalHistory
+                    }
+                });
                 Patients = result.Item1;
-                totalCountPatient = result.pageCount;
+                totalCountPatient = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -998,26 +992,24 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetUserQuery2(
-                               x => x.IsDoctor == true,
-                               searchTerm: refPhysicionComboBox?.Text ?? "",
-                               pageSize: pageSize,
-                               pageIndex:
-                               pageIndex,
-                               includes: [],
-                               select: x => new User
-                               {
-                                   Id = x.Id,
-                                   Name = x.Name,
-                                   Email = x.Email,
-                                   MobilePhone = x.MobilePhone,
-                                   Gender = x.Gender,
-                                   DateOfBirth = x.DateOfBirth,
-                                   IsPhysicion = x.IsPhysicion,
-                                   IsNurse = x.IsNurse,
-                               }
-                           )); Physicions = result.Item1;
-                totalCountPhysicion = result.pageCount;
+                var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsDoctor == true && x.IsPhysicion == true,
+                    SearchTerm = refPhysicionComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth
+                    }
+                });
+                Physicions = result.Item1;
+                totalCountPhysicion = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -1705,9 +1697,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private void OnClickPopUpPopUpProcedureRoom()
         {
-            var targetUrl = NavigationManager.ToAbsoluteUri("/clinic-service/procedure-room");
-            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(targetUrl.ToString(), "genserv", GeneralConsultanService.Id.ToString());
-            NavigationManager.NavigateTo(query);
+            NavigationManager.NavigateTo($"clinic-service/procedure-rooms/{EnumPageMode.Update.GetDisplayName()}?GcId={GeneralConsultanService.Id}");
         }
 
         private bool isPrint { get; set; } = false;

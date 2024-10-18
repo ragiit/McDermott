@@ -396,7 +396,12 @@ namespace McDermott.Application.Features.Queries.Transaction
             {
                 var result = await _unitOfWork.Repository<GeneralConsultanService>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id) ?? new();
 
+                _unitOfWork.Repository<GeneralConsultanService>().Attach(result);
+
                 result.Status = request.Status;
+
+                // Mark specific properties as modified
+                _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(result, nameof(result.Status));
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

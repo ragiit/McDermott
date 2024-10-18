@@ -425,18 +425,7 @@
                                                                     <ValidationMessage For="@(() => GeneralConsultanService.AppointmentDate)" />
                                                                 </DxFormLayoutItem>
                                                             }
-
-
-                                                            @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Location" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@Locations"
-                                                        NullText="Select Location..."
-                                                        TextFieldName="NameAndParent"
-                                                        ValueFieldName="Id"
-                                                        @bind-Value="GeneralConsultanService.LocationId">
-                                                        </MyDxComboBox>
-                                                        <ValidationMessage For="@(() => GeneralConsultanService.LocationId)" />
-                                                        </DxFormLayoutItem> *@
-
+                                                              
                                                             <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
                                                                 <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsSickLeave" />
                                                             </DxFormLayoutItem>

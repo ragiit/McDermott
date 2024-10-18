@@ -34,6 +34,21 @@
             public string SearchTerm { get; set; }
         }
 
+        public class GetSingleConfinedSpaceOrProcedureRoomQuery : IRequest<GeneralConsultanMedicalSupportDto>
+        {
+            public List<Expression<Func<GeneralConsultanMedicalSupport, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupport, GeneralConsultanMedicalSupport>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultanMedicalSupport, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
         public class ValidateGeneralConsultanMedicalSupport(Expression<Func<GeneralConsultanMedicalSupport, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; } = predicate!;
