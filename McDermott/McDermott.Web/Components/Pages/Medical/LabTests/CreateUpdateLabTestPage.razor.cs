@@ -47,7 +47,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
 
         private bool PanelVisible { get; set; } = true;
         private Timer _timer;
-        public IGrid GridDetail;
+        public IGrid GridDetail { get; set; }
         private bool FormValidationState { get; set; } = true;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
@@ -258,29 +258,37 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
         {
             PanelVisible = true;
             SelectedDetailDataItems = [];
-            var result = await Mediator.QueryGetHelper<LabTestDetail, LabTestDetailDto>(pageIndex, pageSize, searchTerm ?? "", x => x.LabTestId == LabTest.Id);
+            var result = await Mediator.Send(new GetLabTestDetailQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Predicate = x => x.LabTestId == LabTest.Id,
+                SearchTerm = searchTerm ?? ""
+            });
             LabTestDetailForms = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
 
         private async Task LoadData()
         {
-            //var result = await Mediator.Send(new GetLabTestQuery(x => x.Id == Id, 0, 1));
-            var result = await Mediator.QueryGetHelper<LabTest, LabTestDto>(predicate: x => x.Id == Id);
+            var result = await Mediator.Send(new GetSingleLabTestQuery
+            {
+                Predicate = x => x.Id == Id
+            });
 
             LabTest = new();
             LabTestDetailForms.Clear();
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
-                if (result.Item1.Count == 0 || !Id.HasValue)
+                if (result is null || !Id.HasValue)
                 {
                     NavigationManager.NavigateTo("medical/lab-tests");
                     return;
                 }
 
-                LabTest = result.Item1.FirstOrDefault() ?? new();
+                LabTest = result ?? new();
                 await LoadLabTestDetails();
             }
         }

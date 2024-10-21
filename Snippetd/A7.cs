@@ -1,55 +1,55 @@
-await LoadDataUser();
+await LoadDataLabTest();
 
- #region ComboboxUser
+ #region ComboboxLabTest
 
- private DxComboBox<UserDto, long?> refUserComboBox { get; set; }
- private int UserComboBoxIndex { get; set; } = 0;
- private int totalCountUser = 0;
+ private DxComboBox<LabTestDto, long?> refLabTestComboBox { get; set; }
+ private int LabTestComboBoxIndex { get; set; } = 0;
+ private int totalCountLabTest = 0;
 
- private async Task OnSearchUser()
+ private async Task OnSearchLabTest()
  {
-     await LoadDataUser();
+     await LoadDataLabTest();
  }
 
- private async Task OnSearchUserIndexIncrement()
+ private async Task OnSearchLabTestIndexIncrement()
  {
-     if (UserComboBoxIndex < (totalCountUser - 1))
+     if (LabTestComboBoxIndex < (totalCountLabTest - 1))
      {
-         UserComboBoxIndex++;
-         await LoadDataUser(UserComboBoxIndex, 10);
+         LabTestComboBoxIndex++;
+         await LoadDataLabTest(LabTestComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchUserIndexDecrement()
+ private async Task OnSearchLabTestIndexDecrement()
  {
-     if (UserComboBoxIndex > 0)
+     if (LabTestComboBoxIndex > 0)
      {
-         UserComboBoxIndex--;
-         await LoadDataUser(UserComboBoxIndex, 10);
+         LabTestComboBoxIndex--;
+         await LoadDataLabTest(LabTestComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputUserChanged(string e)
+ private async Task OnInputLabTestChanged(string e)
  {
-     UserComboBoxIndex = 0;
-     await LoadDataUser();
+     LabTestComboBoxIndex = 0;
+     await LoadDataLabTest();
  }
 
 
 
-  private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataLabTest(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetUserQuery
+          var result = await Mediator.Send(new GetLabTestQuery
           {
-              SearchTerm = refUserComboBox?.Text ?? "",
+              SearchTerm = refLabTestComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Users = result.Item1;
-          totalCountUser = result.PageCount;
+          LabTests = result.Item1;
+          totalCountLabTest = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -59,47 +59,47 @@ await LoadDataUser();
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxUser
+ #endregion ComboboxLabTest
 
-private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataLabTest(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetUserQuery(
+    var result = await Mediator.Send(new GetLabTestQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refUserComboBox?.Text ?? "",
+        searchTerm: refLabTestComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentUser,
-            x => x.User,
+            x => x.ParentLabTest,
+            x => x.LabTest,
         ],
-        select: x => new User
+        select: x => new LabTest
         {
             Id = x.Id,
             Name = x.Name,
-            ParentUser = new Domain.Entities.User
+            ParentLabTest = new Domain.Entities.LabTest
             {
                 Name = x.Name
             },
-            User = new Domain.Entities.User
+            LabTest = new Domain.Entities.LabTest
             {
                 Name = x.Name
             },
-            Manager = new Domain.Entities.User
+            Manager = new Domain.Entities.LabTest
             {
                 Name = x.Name
             },
-            UserCategory = x.UserCategory
+            LabTestCategory = x.LabTestCategory
         }
 
     ));
-    Users = result.Item1;
-    totalCountUser = result.pageCount;
+    LabTests = result.Item1;
+    totalCountLabTest = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataUser(UserId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).UserId);
+await LoadDataLabTest(LabTestId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).LabTestId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -107,32 +107,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="User" ColSpanMd="12">
-    <MyDxComboBox Data="@Users"
-                  NullText="Select User"
-                  @ref="refUserComboBox"
-                  @bind-Value="@a.UserId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="LabTest" ColSpanMd="12">
+    <MyDxComboBox Data="@LabTests"
+                  NullText="Select LabTest"
+                  @ref="refLabTestComboBox"
+                  @bind-Value="@a.LabTestId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputUserChanged(e))">
+                  TextChanged="((string e) => OnInputLabTestChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchUserIndexDecrement"
+            <DxEditorButton Click="OnSearchLabTestIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchUser"
+            <DxEditorButton Click="OnSearchLabTest"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchUserIndexIncrement"
+            <DxEditorButton Click="OnSearchLabTestIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(UserDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="User.Name" Caption="User" />
-            <DxListEditorColumn FieldName="@nameof(UserDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(LabTestDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="LabTest.Name" Caption="LabTest" />
+            <DxListEditorColumn FieldName="@nameof(LabTestDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.UserId)" />
+    <ValidationMessage For="@(()=>a.LabTestId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -142,7 +142,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetUserQuery(x => x.Id == a.UserId))).Item1;
+     Cronises = (await Mediator.Send(new GetLabTestQuery(x => x.Id == a.LabTestId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

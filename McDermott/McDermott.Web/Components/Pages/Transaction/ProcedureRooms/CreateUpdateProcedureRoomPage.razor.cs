@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using SignaturePad;
 
@@ -481,6 +482,175 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
         }
 
         #endregion ComboboxUser
+
+        #region Lab Test
+
+        #region ComboboxLabTest
+
+        private DxComboBox<LabTestDto, long?> refLabTestComboBox { get; set; }
+        private int LabTestComboBoxIndex { get; set; } = 0;
+        private int totalCountLabTest = 0;
+
+        private async Task OnSearchLabTest()
+        {
+            await LoadDataLabTest();
+        }
+
+        private async Task OnSearchLabTestIndexIncrement()
+        {
+            if (LabTestComboBoxIndex < (totalCountLabTest - 1))
+            {
+                LabTestComboBoxIndex++;
+                await LoadDataLabTest(LabTestComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchLabTestIndexDecrement()
+        {
+            if (LabTestComboBoxIndex > 0)
+            {
+                LabTestComboBoxIndex--;
+                await LoadDataLabTest(LabTestComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputLabTestChanged(string e)
+        {
+            LabTestComboBoxIndex = 0;
+            await LoadDataLabTest();
+        }
+
+        private List<LabTestDto> LabTests { get; set; } = [];
+
+        private async Task LoadDataLabTest(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                IsLoading = true;
+                var result = await Mediator.Send(new GetLabTestQuery
+                {
+                    SearchTerm = refLabTestComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                LabTests = result.Item1;
+                totalCountLabTest = result.PageCount;
+                IsLoading = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { IsLoading = false; }
+        }
+
+        #endregion ComboboxLabTest
+
+        #region Lab Test Detail
+
+        private List<LabTestDetailDto> LabTestsDetails { get; set; } = [];
+
+        #endregion Lab Test Detail
+
+        private bool IsLoadingLabTest = false;
+        public IGrid GridDetail { get; set; }
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private int FocusedRowVisibleIndex { get; set; }
+        private List<LabTestDetailDto> LabTestDetailForms = [];
+
+        private async Task OnDeleteLabTestDetail(GridDataItemDeletingEventArgs e)
+        {
+        }
+
+        private async Task NewItemDetail_Click()
+        {
+            await GridDetail.StartEditNewRowAsync();
+        }
+
+        private void DeleteItemDetail_Click()
+        {
+            GridDetail.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+        }
+
+        private async Task RefreshDetail_Click()
+        {
+            await LoadLabTestDetails();
+        }
+
+        private async Task OnSave(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                if (e is null)
+                    return;
+
+                var labTestDetail = (LabTestDetailDto)e.EditModel;
+
+                if (labTestDetail.Id == 0)
+                {
+                    //labTestDetail.LabTestId = LabTest.Id;
+                    await Mediator.Send(new CreateLabTestDetailRequest(labTestDetail));
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateLabTestDetailRequest(labTestDetail));
+                }
+                await LoadLabTestDetails();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadLabTestDetails(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadLabTestDetails(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadLabTestDetails(newPageIndex, pageSize);
+        }
+
+        private async Task LoadLabTestDetails(int pageIndex = 0, int pageSize = 10)
+        {
+            IsLoadingLabTest = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetLabTestDetailQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                //Predicate = x => x.LabTestId == LabTest.Id,
+                SearchTerm = searchTerm ?? ""
+            });
+            LabTestDetailForms = result.Item1;
+            totalCount = result.PageCount;
+            activePageIndex = pageIndex;
+            IsLoadingLabTest = false;
+        }
+
+        #endregion Searching
+
+        #endregion Lab Test
 
         public class YesNoOptions
         {

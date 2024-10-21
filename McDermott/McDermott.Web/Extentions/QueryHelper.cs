@@ -80,69 +80,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(LabTestDto))
-            {
-                var result = await mediator.Send(new GetLabTestQuery(
-                    predicate as Expression<Func<LabTest, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.SampleType
-                    ] : includes as List<Expression<Func<LabTest, object>>>,
-                    select: select is null ? x => new LabTest
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                        ResultType = x.ResultType,
-                        SampleTypeId = x.SampleTypeId,
-                        SampleType = new SampleType
-                        {
-                            Name = x.SampleType.Name
-                        }
-                    } : select as Expression<Func<LabTest, LabTest>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(LabTestDetailDto))
-            {
-                var result = await mediator.Send(new GetLabTestDetailQuery(
-                    predicate as Expression<Func<LabTestDetail, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.LabTest,
-                        x => x.LabUom,
-                    ] : includes as List<Expression<Func<LabTestDetail, object>>>,
-                    select: select is null ? x => new LabTestDetail
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NormalRangeFemale = x.NormalRangeFemale,
-                        NormalRangeMale = x.NormalRangeMale,
-                        LabTestId = x.LabTestId,
-                        LabTest = new LabTest
-                        {
-                            Name = x.LabTest.Name
-                        },
-                        LabUomId = x.LabUomId,
-                        LabUom = new LabUom
-                        {
-                            Name = x.LabUom.Name
-                        },
-                        ResultValueType = x.ResultValueType,
-                        Remark = x.Remark,
-                        ResultType = x.ResultType
-                    } : select as Expression<Func<LabTestDetail, LabTestDetail>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(ProductCategoryDto))
             {
                 var result = await mediator.Send(new GetProductCategoryQuery(

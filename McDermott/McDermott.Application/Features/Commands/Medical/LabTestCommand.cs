@@ -4,16 +4,34 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetLabTestQuery(Expression<Func<LabTest, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<LabTest, object>>>? includes = null, Expression<Func<LabTest, LabTest>>? select = null) : IRequest<(List<LabTestDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleLabTestQuery : IRequest<LabTestDto>
         {
-            public Expression<Func<LabTest, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<LabTest, object>>> Includes { get; set; }
+            public Expression<Func<LabTest, bool>> Predicate { get; set; }
+            public Expression<Func<LabTest, LabTest>> Select { get; set; }
 
-            public List<Expression<Func<LabTest, object>>> Includes { get; } = includes!;
-            public Expression<Func<LabTest, LabTest>>? Select { get; } = select!;
+            public List<(Expression<Func<LabTest, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetLabTestQuery : IRequest<(List<LabTestDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<LabTest, object>>> Includes { get; set; }
+            public Expression<Func<LabTest, bool>> Predicate { get; set; }
+            public Expression<Func<LabTest, LabTest>> Select { get; set; }
+
+            public List<(Expression<Func<LabTest, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateLabTestQuery(List<LabTestDto> LabTestsToValidate) : IRequest<List<LabTestDto>>

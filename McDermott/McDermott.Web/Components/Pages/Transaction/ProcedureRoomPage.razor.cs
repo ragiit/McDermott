@@ -262,7 +262,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             //    return;
             //}
 
-            var details = await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == e.Id));
+            var details = await Mediator.Send(new GetLabTestDetailQuery
+            {
+                Predicate = x => x.LabTestId == e.Id
+            });
             foreach (var item in details.Item1)
             {
                 LabResultDetails.Add(new LabResultDetailDto

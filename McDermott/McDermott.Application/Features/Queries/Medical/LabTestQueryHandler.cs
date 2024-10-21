@@ -7,6 +7,7 @@ namespace McDermott.Application.Features.Queries.Medical
 {
     public class LabTestQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLabTestQuery, (List<LabTestDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleLabTestQuery, LabTestDto>,
         IRequestHandler<ValidateLabTestQuery, bool>,
         IRequestHandler<BulkValidateLabTestQuery, List<LabTestDto>>,
         IRequestHandler<CreateLabTestRequest, LabTestDto>,
@@ -46,6 +47,25 @@ namespace McDermott.Application.Features.Queries.Medical
             {
                 var query = _unitOfWork.Repository<LabTest>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<LabTest>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<LabTest>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -55,36 +75,122 @@ namespace McDermott.Application.Features.Queries.Medical
                     }
                 }
 
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
-
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.SampleType.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ResultType, $"%{request.SearchTerm}%")
-                        );
+                             EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.SampleType.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.ResultType, $"%{request.SearchTerm}%")
+                            );
                 }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new LabTest
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        ResultType = x.ResultType,
+                        SampleTypeId = x.SampleTypeId,
+                        SampleType = new SampleType
+                        {
+                            Name = x.SampleType.Name
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<LabTestDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<LabTestDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<LabTestDto> Handle(GetSingleLabTestQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<LabTest>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<LabTest>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<LabTest>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                return (pagedItems.Adapt<List<LabTestDto>>(), request.PageIndex, request.PageSize, totalPages);
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                             EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                             EF.Functions.Like(v.Code, $"%{request.SearchTerm}%") ||
+                             EF.Functions.Like(v.SampleType.Name, $"%{request.SearchTerm}%") ||
+                             EF.Functions.Like(v.ResultType, $"%{request.SearchTerm}%")
+                             );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new LabTest
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        ResultType = x.ResultType,
+                        SampleTypeId = x.SampleTypeId,
+                        SampleType = new SampleType
+                        {
+                            Name = x.SampleType.Name
+                        }
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<LabTestDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

@@ -1,10 +1,10 @@
- public class GetSingleServiceQuery : IRequest<ServiceDto>
+ public class GetSingleLabTestDetailQuery : IRequest<LabTestDetailDto>
  {
-     public List<Expression<Func<Service, object>>> Includes { get; set; }
-     public Expression<Func<Service, bool>> Predicate { get; set; }
-     public Expression<Func<Service, Service>> Select { get; set; }
+     public List<Expression<Func<LabTestDetail, object>>> Includes { get; set; }
+     public Expression<Func<LabTestDetail, bool>> Predicate { get; set; }
+     public Expression<Func<LabTestDetail, LabTestDetail>> Select { get; set; }
 
-     public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+     public List<(Expression<Func<LabTestDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
      public bool IsDescending { get; set; } = false; // default to ascending
      public int PageIndex { get; set; } = 0;
@@ -13,13 +13,13 @@
      public string SearchTerm { get; set; }
  }
 
-public class GetServiceQuery : IRequest<(List<ServiceDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetLabTestDetailQuery : IRequest<(List<LabTestDetailDto>, int PageIndex, int PageSize, int PageCount)>
 {
-    public List<Expression<Func<Service, object>>> Includes { get; set; }
-    public Expression<Func<Service, bool>> Predicate { get; set; }
-    public Expression<Func<Service, Service>> Select { get; set; }
+    public List<Expression<Func<LabTestDetail, object>>> Includes { get; set; }
+    public Expression<Func<LabTestDetail, bool>> Predicate { get; set; }
+    public Expression<Func<LabTestDetail, LabTestDetail>> Select { get; set; }
 
-    public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+    public List<(Expression<Func<LabTestDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
@@ -28,14 +28,14 @@ public class GetServiceQuery : IRequest<(List<ServiceDto>, int PageIndex, int Pa
     public string SearchTerm { get; set; }
 }
   
-IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleServiceQuery, ServiceDto>,
+IRequestHandler<GetLabTestDetailQuery, (List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleLabTestDetailQuery, LabTestDetailDto>,
 
-public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetServiceQuery request, CancellationToken cancellationToken)
+public async Task<(List<LabTestDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabTestDetailQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking(); 
+        var query = _unitOfWork.Repository<LabTestDetail>().Entities.AsNoTracking(); 
 
         if (request.Predicate is not null)
             query = query.Where(request.Predicate);
@@ -51,8 +51,8 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
             {
                 query = additionalOrderBy.IsDescending
-                    ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                    : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
+                    ? ((IOrderedQueryable<LabTestDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                    : ((IOrderedQueryable<LabTestDetail>)query).ThenBy(additionalOrderBy.OrderBy);
             }
         }
 
@@ -69,7 +69,7 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
         {
             query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.LabTestDetail.Name, $"%{request.SearchTerm}%")
                     );
         }
 
@@ -77,7 +77,7 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
         if (request.Select is not null)
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new Service
+            query = query.Select(x => new LabTestDetail
             {
                 Id = x.Id, 
             });
@@ -91,11 +91,11 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
                 cancellationToken
             );
 
-            return (pagedItems.Adapt<List<ServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
+            return (pagedItems.Adapt<List<LabTestDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
         }
         else
         {
-            return ((await query.ToListAsync(cancellationToken)).Adapt<List<ServiceDto>>(), 0, 1, 1);
+            return ((await query.ToListAsync(cancellationToken)).Adapt<List<LabTestDetailDto>>(), 0, 1, 1);
         }
     }
     catch (Exception ex)
@@ -106,11 +106,11 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
 }
 
 
-  public async Task<ServiceDto> Handle(GetSingleServiceQuery request, CancellationToken cancellationToken)
+  public async Task<LabTestDetailDto> Handle(GetSingleLabTestDetailQuery request, CancellationToken cancellationToken)
  {
      try
      {
-         var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking();
+         var query = _unitOfWork.Repository<LabTestDetail>().Entities.AsNoTracking();
 
          if (request.Predicate is not null)
              query = query.Where(request.Predicate);
@@ -126,8 +126,8 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
              foreach (var additionalOrderBy in request.OrderByList.Skip(1))
              {
                  query = additionalOrderBy.IsDescending
-                     ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                     : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
+                     ? ((IOrderedQueryable<LabTestDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                     : ((IOrderedQueryable<LabTestDetail>)query).ThenBy(additionalOrderBy.OrderBy);
              }
          }
 
@@ -144,7 +144,7 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
          {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
+                EF.Functions.Like(v.LabTestDetail.Name, $"%{request.SearchTerm}%")
                 );
          }
 
@@ -152,12 +152,12 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
          if (request.Select is not null)
              query = query.Select(request.Select);
          else
-             query = query.Select(x => new Service
+             query = query.Select(x => new LabTestDetail
              {
                  Id = x.Id, 
              });
 
-         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ServiceDto>();
+         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<LabTestDetailDto>();
      }
      catch (Exception ex)
      {
@@ -169,7 +169,7 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
 
 
 
- var a = await Mediator.Send(new GetServicesQuery
+ var a = await Mediator.Send(new GetLabTestDetailsQuery
  {
      OrderByList =
      [
@@ -181,10 +181,10 @@ public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleServiceQuery
+var patienss = (await Mediator.Send(new GetSingleLabTestDetailQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Service
+    Select = x => new LabTestDetail
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -199,7 +199,7 @@ var patienss = (await Mediator.Send(new GetSingleServiceQuery
 
 
 
-var data = (await Mediator.Send(new GetSingleServicesQuery
+var data = (await Mediator.Send(new GetSingleLabTestDetailsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -207,17 +207,17 @@ var data = (await Mediator.Send(new GetSingleServicesQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Service
+    Select = x => new LabTestDetail
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Service
+        Patient = new LabTestDetail
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Service
+        Pratitioner = new LabTestDetail
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo

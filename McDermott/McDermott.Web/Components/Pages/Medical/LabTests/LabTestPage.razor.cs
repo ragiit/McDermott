@@ -134,8 +134,8 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             PanelVisible = false;
 
             return;
@@ -158,9 +158,14 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.QueryGetHelper<LabTest, LabTestDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetLabTestQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm ?? ""
+                });
                 LabTests = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
             }
             catch (Exception ex)
