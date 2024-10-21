@@ -1,11 +1,6 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using MediatR;
-using Microsoft.AspNetCore.Components.Web;
-using System.Linq.Expressions;
-
-namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
+﻿namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 {
-    public partial class GeneralConsultationServicezPage
+    public partial class VaccinationsPage
     {
         private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
 
@@ -34,7 +29,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         #endregion UserLoginAndAccessRole
 
-        private string FormUrl = "clinic-service/general-consultation-services";
+        private string FormUrl = "clinic-service/vaccinations";
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -54,8 +49,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
             finally { PanelVisible = false; }
         }
-
-        private List<StatusMcuData> StatusMcus = [];
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -113,8 +106,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             try
             {
-                //Data = "GeneralConsultanServices.OrderByDescending(x => x.RegistrationDate).ThenByDescending(x => x.IsAlertInformationSpecialCase).ThenByDescending(x => x.ClassType is not null)"
-
                 PanelVisible = true;
                 SelectedDataItems = [];
                 var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
@@ -125,7 +116,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
                     ],
-                    Predicate = x => x.IsGC == true,
+                    Predicate = x => x.IsVaccination == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,
@@ -133,7 +124,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 GeneralConsultanServices = a.Item1;
                 totalCount = a.PageCount;
                 activePageIndex = pageIndex;
-                //var a = await Mediator.QueryGetHelper<GeneralConsultanService, GeneralConsultanServiceDto>(pageIndex, pageSize, searchTerm);
             }
             catch (Exception ex)
             {
@@ -204,46 +194,5 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private bool IsDashboard { get; set; } = false;
-
-        #region Chart
-
-        private async Task LoadDashboard(bool f)
-        {
-            if (f)
-            {
-                IsDashboard = true;
-                var ser = await Mediator.Send(new GetGeneralConsultanServicesQuery
-                {
-                    IsGetAll = true,
-                    Select = x => new GeneralConsultanService
-                    {
-                        Status = x.Status
-                    }
-                });
-
-                StatusMcus = GetStatusMcuCounts(ser.Item1);
-            }
-            else
-                IsDashboard = false;
-        }
-
-        public class StatusMcuData
-        {
-            public string Status { get; set; }
-            public int Count { get; set; }
-        }
-
-        public List<StatusMcuData> GetStatusMcuCounts(List<GeneralConsultanServiceDto> services)
-        {
-            var aa = services.GroupBy(s => s.Status)
-                            .Select(g => new StatusMcuData
-                            {
-                                Status = g.Key.GetDisplayName(),
-                                Count = g.Count()
-                            }).ToList();
-            return aa;
-        }
-
-        #endregion Chart
     }
 }

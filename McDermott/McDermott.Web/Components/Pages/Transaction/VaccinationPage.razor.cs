@@ -773,7 +773,11 @@ namespace McDermott.Web.Components.Pages.Transaction
             this.Locations = Locations;
             Products = (await Mediator.Send(new GetProductQuery(x => x.HospitalType != null && x.HospitalType.Equals("Vactination")))).Item1;
             Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            //Services = await Mediator.Send(new GetServiceQuery(x => x.Name.Equals("Vaccination")));
+            Services = (await Mediator.Send(new GetServiceQuery
+            {
+                Predicate = x => x.Name.Equals("Vaccination"),
+                IsGetAll = true
+            })).Item1;
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
             Awareness = await Mediator.Send(new GetAwarenessQuery());
             Physicions = await Mediator.Send(new GetUserQuery(x => x.IsDoctor == true && x.IsPhysicion == true));
@@ -1083,7 +1087,7 @@ namespace McDermott.Web.Components.Pages.Transaction
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
-                        var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate.GetValueOrDefault().Date <= DateTime.Now.Date))).Item1;
+                        var patient = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id != GeneralConsultanService.Id && x.ServiceId == GeneralConsultanService.ServiceId && x.PatientId == GeneralConsultanService.PatientId && x.Status!.Equals(EnumStatusGeneralConsultantService.Planned) && x.RegistrationDate != null && x.RegistrationDate.Value.Date <= DateTime.Now.Date))).Item1;
 
                         if (patient.Count > 0)
                         {

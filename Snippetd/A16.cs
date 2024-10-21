@@ -1,10 +1,10 @@
- public class GetSingleLabUomQuery : IRequest<LabUomDto>
+ public class GetSingleLocationQuery : IRequest<LocationDto>
  {
-     public List<Expression<Func<LabUom, object>>> Includes { get; set; }
-     public Expression<Func<LabUom, bool>> Predicate { get; set; }
-     public Expression<Func<LabUom, LabUom>> Select { get; set; }
+     public List<Expression<Func<Location, object>>> Includes { get; set; }
+     public Expression<Func<Location, bool>> Predicate { get; set; }
+     public Expression<Func<Location, Location>> Select { get; set; }
 
-     public List<(Expression<Func<LabUom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+     public List<(Expression<Func<Location, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
      public bool IsDescending { get; set; } = false; // default to ascending
      public int PageIndex { get; set; } = 0;
@@ -13,13 +13,13 @@
      public string SearchTerm { get; set; }
  }
 
-public class GetLabUomQuery : IRequest<(List<LabUomDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetLocationQuery : IRequest<(List<LocationDto>, int PageIndex, int PageSize, int PageCount)>
 {
-    public List<Expression<Func<LabUom, object>>> Includes { get; set; }
-    public Expression<Func<LabUom, bool>> Predicate { get; set; }
-    public Expression<Func<LabUom, LabUom>> Select { get; set; }
+    public List<Expression<Func<Location, object>>> Includes { get; set; }
+    public Expression<Func<Location, bool>> Predicate { get; set; }
+    public Expression<Func<Location, Location>> Select { get; set; }
 
-    public List<(Expression<Func<LabUom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+    public List<(Expression<Func<Location, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
@@ -28,14 +28,14 @@ public class GetLabUomQuery : IRequest<(List<LabUomDto>, int PageIndex, int Page
     public string SearchTerm { get; set; }
 }
   
-IRequestHandler<GetLabUomQuery, (List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleLabUomQuery, LabUomDto>,
+IRequestHandler<GetLocationQuery, (List<LocationDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleLocationQuery, LocationDto>,
 
-public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLabUomQuery request, CancellationToken cancellationToken)
+public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<LabUom>().Entities.AsNoTracking(); 
+        var query = _unitOfWork.Repository<Location>().Entities.AsNoTracking(); 
 
         if (request.Predicate is not null)
             query = query.Where(request.Predicate);
@@ -51,8 +51,8 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
             {
                 query = additionalOrderBy.IsDescending
-                    ? ((IOrderedQueryable<LabUom>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                    : ((IOrderedQueryable<LabUom>)query).ThenBy(additionalOrderBy.OrderBy);
+                    ? ((IOrderedQueryable<Location>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                    : ((IOrderedQueryable<Location>)query).ThenBy(additionalOrderBy.OrderBy);
             }
         }
 
@@ -69,7 +69,7 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
         {
             query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.LabUom.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Location.Name, $"%{request.SearchTerm}%")
                     );
         }
 
@@ -77,7 +77,7 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
         if (request.Select is not null)
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new LabUom
+            query = query.Select(x => new Location
             {
                 Id = x.Id, 
             });
@@ -91,11 +91,11 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
                 cancellationToken
             );
 
-            return (pagedItems.Adapt<List<LabUomDto>>(), request.PageIndex, request.PageSize, totalPages);
+            return (pagedItems.Adapt<List<LocationDto>>(), request.PageIndex, request.PageSize, totalPages);
         }
         else
         {
-            return ((await query.ToListAsync(cancellationToken)).Adapt<List<LabUomDto>>(), 0, 1, 1);
+            return ((await query.ToListAsync(cancellationToken)).Adapt<List<LocationDto>>(), 0, 1, 1);
         }
     }
     catch (Exception ex)
@@ -106,11 +106,11 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
 }
 
 
-  public async Task<LabUomDto> Handle(GetSingleLabUomQuery request, CancellationToken cancellationToken)
+  public async Task<LocationDto> Handle(GetSingleLocationQuery request, CancellationToken cancellationToken)
  {
      try
      {
-         var query = _unitOfWork.Repository<LabUom>().Entities.AsNoTracking();
+         var query = _unitOfWork.Repository<Location>().Entities.AsNoTracking();
 
          if (request.Predicate is not null)
              query = query.Where(request.Predicate);
@@ -126,8 +126,8 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
              foreach (var additionalOrderBy in request.OrderByList.Skip(1))
              {
                  query = additionalOrderBy.IsDescending
-                     ? ((IOrderedQueryable<LabUom>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                     : ((IOrderedQueryable<LabUom>)query).ThenBy(additionalOrderBy.OrderBy);
+                     ? ((IOrderedQueryable<Location>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                     : ((IOrderedQueryable<Location>)query).ThenBy(additionalOrderBy.OrderBy);
              }
          }
 
@@ -144,7 +144,7 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
          {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.LabUom.Name, $"%{request.SearchTerm}%")
+                EF.Functions.Like(v.Location.Name, $"%{request.SearchTerm}%")
                 );
          }
 
@@ -152,12 +152,12 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
          if (request.Select is not null)
              query = query.Select(request.Select);
          else
-             query = query.Select(x => new LabUom
+             query = query.Select(x => new Location
              {
                  Id = x.Id, 
              });
 
-         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<LabUomDto>();
+         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<LocationDto>();
      }
      catch (Exception ex)
      {
@@ -169,7 +169,7 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
 
 
 
- var a = await Mediator.Send(new GetLabUomsQuery
+ var a = await Mediator.Send(new GetLocationsQuery
  {
      OrderByList =
      [
@@ -181,10 +181,10 @@ public async Task<(List<LabUomDto>, int pageIndex, int pageSize, int pageCount)>
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleLabUomQuery
+var patienss = (await Mediator.Send(new GetSingleLocationQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new LabUom
+    Select = x => new Location
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -194,12 +194,22 @@ var patienss = (await Mediator.Send(new GetSingleLabUomQuery
     },
 })) ?? new();
 
+ var result = await Mediator.Send(new GetLocationQuery
+ { 
+     SearchTerm = searchTerm,
+     PageIndex = pageIndex,
+     PageSize = pageSize,
+ }); 
+ Locations = result.Item1;
+ activePageIndex = pageIndex;
+ totalCount = result.PageCount;
 
 
 
 
 
-var data = (await Mediator.Send(new GetSingleLabUomsQuery
+
+var data = (await Mediator.Send(new GetSingleLocationsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -207,17 +217,17 @@ var data = (await Mediator.Send(new GetSingleLabUomsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new LabUom
+    Select = x => new Location
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new LabUom
+        Patient = new Location
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new LabUom
+        Pratitioner = new Location
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo

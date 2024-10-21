@@ -204,38 +204,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(LocationDto))
-            {
-                var result = await mediator.Send(new GetLocationQuery(
-                    predicate as Expression<Func<Locations, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.ParentLocation,
-                        x => x.Company,
-                    ] : includes as List<Expression<Func<Locations, object>>>,
-                    select: select is null ? x => new Locations
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Type = x.Type,
-                        ParentLocationId = x.ParentLocationId,
-                        CompanyId = x.CompanyId,
-                        Company = new Company
-                        {
-                            Name = x.Company.Name
-                        },
-                        ParentLocation = new Locations
-                        {
-                            Name = x.ParentLocation.Name
-                        }
-                    } : select as Expression<Func<Locations, Locations>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(BuildingDto))
             {
                 var result = await mediator.Send(new GetBuildingQuery(

@@ -1,55 +1,55 @@
-await LoadDataLabUom();
+await LoadDataLocation();
 
- #region ComboboxLabUom
+ #region ComboboxLocation
 
- private DxComboBox<LabUomDto, long?> refLabUomComboBox { get; set; }
- private int LabUomComboBoxIndex { get; set; } = 0;
- private int totalCountLabUom = 0;
+ private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
+ private int LocationComboBoxIndex { get; set; } = 0;
+ private int totalCountLocation = 0;
 
- private async Task OnSearchLabUom()
+ private async Task OnSearchLocation()
  {
-     await LoadDataLabUom();
+     await LoadDataLocation();
  }
 
- private async Task OnSearchLabUomIndexIncrement()
+ private async Task OnSearchLocationIndexIncrement()
  {
-     if (LabUomComboBoxIndex < (totalCountLabUom - 1))
+     if (LocationComboBoxIndex < (totalCountLocation - 1))
      {
-         LabUomComboBoxIndex++;
-         await LoadDataLabUom(LabUomComboBoxIndex, 10);
+         LocationComboBoxIndex++;
+         await LoadDataLocation(LocationComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchLabUomIndexDecrement()
+ private async Task OnSearchLocationIndexDecrement()
  {
-     if (LabUomComboBoxIndex > 0)
+     if (LocationComboBoxIndex > 0)
      {
-         LabUomComboBoxIndex--;
-         await LoadDataLabUom(LabUomComboBoxIndex, 10);
+         LocationComboBoxIndex--;
+         await LoadDataLocation(LocationComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputLabUomChanged(string e)
+ private async Task OnInputLocationChanged(string e)
  {
-     LabUomComboBoxIndex = 0;
-     await LoadDataLabUom();
+     LocationComboBoxIndex = 0;
+     await LoadDataLocation();
  }
 
 
 
-  private async Task LoadDataLabUom(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetLabUomQuery
+          var result = await Mediator.Send(new GetLocationQuery
           {
-              SearchTerm = refLabUomComboBox?.Text ?? "",
+              SearchTerm = refLocationComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          LabUoms = result.Item1;
-          totalCountLabUom = result.PageCount;
+          Locations = result.Item1;
+          totalCountLocation = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -59,47 +59,47 @@ await LoadDataLabUom();
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxLabUom
+ #endregion ComboboxLocation
 
-private async Task LoadDataLabUom(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetLabUomQuery(
+    var result = await Mediator.Send(new GetLocationQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refLabUomComboBox?.Text ?? "",
+        searchTerm: refLocationComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentLabUom,
-            x => x.LabUom,
+            x => x.ParentLocation,
+            x => x.Location,
         ],
-        select: x => new LabUom
+        select: x => new Location
         {
             Id = x.Id,
             Name = x.Name,
-            ParentLabUom = new Domain.Entities.LabUom
+            ParentLocation = new Domain.Entities.Location
             {
                 Name = x.Name
             },
-            LabUom = new Domain.Entities.LabUom
+            Location = new Domain.Entities.Location
             {
                 Name = x.Name
             },
-            Manager = new Domain.Entities.LabUom
+            Manager = new Domain.Entities.Location
             {
                 Name = x.Name
             },
-            LabUomCategory = x.LabUomCategory
+            LocationCategory = x.LocationCategory
         }
 
     ));
-    LabUoms = result.Item1;
-    totalCountLabUom = result.pageCount;
+    Locations = result.Item1;
+    totalCountLocation = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataLabUom(LabUomId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).LabUomId);
+await LoadDataLocation(LocationId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).LocationId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -107,32 +107,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="LabUom" ColSpanMd="12">
-    <MyDxComboBox Data="@LabUoms"
-                  NullText="Select LabUom"
-                  @ref="refLabUomComboBox"
-                  @bind-Value="@a.LabUomId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Location" ColSpanMd="12">
+    <MyDxComboBox Data="@Locations"
+                  NullText="Select Location"
+                  @ref="refLocationComboBox"
+                  @bind-Value="@a.LocationId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputLabUomChanged(e))">
+                  TextChanged="((string e) => OnInputLocationChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchLabUomIndexDecrement"
+            <DxEditorButton Click="OnSearchLocationIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchLabUom"
+            <DxEditorButton Click="OnSearchLocation"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchLabUomIndexIncrement"
+            <DxEditorButton Click="OnSearchLocationIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(LabUomDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="LabUom.Name" Caption="LabUom" />
-            <DxListEditorColumn FieldName="@nameof(LabUomDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(LocationDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Location.Name" Caption="Location" />
+            <DxListEditorColumn FieldName="@nameof(LocationDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.LabUomId)" />
+    <ValidationMessage For="@(()=>a.LocationId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -142,7 +142,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetLabUomQuery(x => x.Id == a.LabUomId))).Item1;
+     Cronises = (await Mediator.Send(new GetLocationQuery(x => x.Id == a.LocationId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

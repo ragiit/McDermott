@@ -1,30 +1,400 @@
 ﻿using DevExpress.Blazor.RichEdit;
-using DevExpress.XtraPrinting;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
-using GreenDonut;
-using MailKit.Search;
-using McDermott.Application.Dtos.BpjsIntegration;
-using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
 using McDermott.Extentions;
-using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
-using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
-using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
-using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
-using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;
 
-namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
+namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 {
-    public partial class CreateUpdateGeneralConsultationServicezPage
+    public partial class CreateUpdateVaccinationsPage
     {
+        #region Vaccination Tabs
+
+        private async Task OnClickCancelGiveVaccine(VaccinationPlanDto e)
+        {
+            var s = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == e.Id))).FirstOrDefault();
+            if (s is not null)
+            {
+                s.Status = EnumStatusVaccination.Scheduled;
+                s.GeneralConsultanServiceId = null;
+                await Mediator.Send(new UpdateVaccinationPlanRequest(s));
+                await LoadVaccinationGivens();
+            }
+        }
+
+        private async Task OnClickGiveVaccine(VaccinationPlanDto e)
+        {
+            var s = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == e.Id))).FirstOrDefault();
+            if (s is not null)
+            {
+                s.Status = EnumStatusVaccination.InProgress;
+                s.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                await Mediator.Send(new UpdateVaccinationPlanRequest(s));
+                await LoadVaccinationPlans();
+            }
+        }
+
+        private List<ProductDto> Products = [];
+        private VaccinationPlanDto VaccinationPlan { get; set; } = new();
+        private VaccinationPlanDto VaccinationGiven { get; set; } = new();
+        private List<VaccinationPlanDto> VaccinationPlans { get; set; } = [];
+        private List<VaccinationPlanDto> VaccinationGivens { get; set; } = [];
+        private List<VaccinationPlanDto> VaccinationHistoryGivens { get; set; } = [];
+        private IGrid GridVaccinationPlan { get; set; }
+        private IGrid GridVaccinationGiven { get; set; }
+        private IGrid GridVaccinationHistoryGiven { get; set; }
+        private IReadOnlyList<object> SelectedDataVaccinationPlanItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataVaccinationGivenItems { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataVaccinationHistoryGivenItems { get; set; } = [];
+        private List<string> Batch = [];
+
+        private async Task SelectedBatchGiven(string stockProduct)
+        {
+            VaccinationGiven.TeoriticalQty = 0;
+
+            if (stockProduct is null)
+            {
+                return;
+            }
+
+            VaccinationGiven.Batch = stockProduct;
+
+            if (VaccinationGiven.ProductId != 0)
+            {
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                    s.ProductId == VaccinationGiven.ProductId &&
+                    s.LocationId == GeneralConsultanService.LocationId &&
+                    s.Validate == true
+                ));
+
+                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == VaccinationGiven.ProductId
+                && x.LocationId == GeneralConsultanService.LocationId && x.Batch == VaccinationGiven.Batch));
+
+                VaccinationGiven.TeoriticalQty = aa.Sum(x => x.Quantity);
+            }
+        }
+
+        private async Task SelectedBatchPlan(string stockProduct)
+        {
+            VaccinationPlan.TeoriticalQty = 0;
+
+            if (stockProduct is null)
+            {
+                return;
+            }
+
+            VaccinationPlan.Batch = stockProduct;
+
+            if (VaccinationPlan.ProductId != 0)
+            {
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                    s.ProductId == VaccinationPlan.ProductId &&
+                    s.LocationId == GeneralConsultanService.LocationId &&
+                    s.Validate == true
+                ));
+
+                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == VaccinationPlan.ProductId
+                && x.LocationId == GeneralConsultanService.LocationId && x.Batch == VaccinationPlan.Batch));
+
+                VaccinationPlan.TeoriticalQty = aa.Sum(x => x.Quantity);
+            }
+        }
+
+        private async Task OnSelectProduct(ProductDto e)
+        {
+            try
+            {
+                Batch.Clear();
+
+                if (e == null) return;
+
+                var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == GeneralConsultanService.LocationId)) ?? []);
+                if (e.TraceAbility)
+                {
+                    Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                    Batch = Batch.Distinct().ToList();
+                }
+                else
+                {
+                }
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SaveVaccinationPlan(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                if (GeneralConsultanService.PatientId is null)
+                {
+                    ToastService.ShowInfo("Please select the Patient");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (GeneralConsultanService.LocationId is null)
+                {
+                    ToastService.ShowInfo("Please select the Location");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationPlan.TeoriticalQty <= 0)
+                {
+                    ToastService.ShowInfo("The Theoretical quantity must be greater than zero. Please adjust the quantity and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationPlan.Quantity > VaccinationPlan.TeoriticalQty)
+                {
+                    ToastService.ShowInfo("The quantity cannot exceed the theoretical quantity. Please enter a valid amount and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                VaccinationPlan.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
+
+                if (VaccinationPlan.Id == 0)
+                    await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationPlan));
+                else
+                    await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationPlan));
+
+                await LoadVaccinationPlans();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task SaveVaccinationGiven(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                if (GeneralConsultanService.PatientId is null)
+                {
+                    ToastService.ShowInfo("Please select the Patient");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (GeneralConsultanService.LocationId is null)
+                {
+                    ToastService.ShowInfo("Please select the Location");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationGiven.TeoriticalQty <= 0)
+                {
+                    ToastService.ShowInfo("The Theoretical quantity must be greater than zero. Please adjust the quantity and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (VaccinationGiven.Quantity > VaccinationGiven.TeoriticalQty)
+                {
+                    ToastService.ShowInfo("The quantity cannot exceed the theoretical quantity. Please enter a valid amount and try again.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                VaccinationGiven.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
+                VaccinationGiven.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                VaccinationGiven.Status = EnumStatusVaccination.InProgress;
+
+                if (VaccinationGiven.Id == 0)
+                    await Mediator.Send(new CreateVaccinationPlanRequest(VaccinationGiven));
+                else
+                    await Mediator.Send(new UpdateVaccinationPlanRequest(VaccinationGiven));
+
+                await LoadVaccinationGivens();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task NewItemDetailVaccinationGiven_Click()
+        {
+            if (GeneralConsultanService.PatientId == null || GeneralConsultanService.PatientId == 0)
+            {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please select the Patient first");
+                return;
+            }
+
+            await GridVaccinationGiven.StartEditNewRowAsync();
+        }
+
+        private async Task NewItemDetailVaccinationPlan_Click()
+        {
+            if (GeneralConsultanService.PatientId == null || GeneralConsultanService.PatientId == 0)
+            {
+                ToastService.ClearInfoToasts();
+                ToastService.ShowInfo("Please select the Patient first");
+                return;
+            }
+
+            await GridVaccinationPlan.StartEditNewRowAsync();
+        }
+
+        private async Task EditItemDetailVaccinationGiven_Click(IGrid context)
+        {
+            // Ensure the context is not null and has selected data item
+            if (context.SelectedDataItem != null)
+            {
+                VaccinationGiven = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
+                try
+                {
+                    var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == VaccinationGiven.ProductId)) ?? []);
+                    if (VaccinationGiven.Product?.TraceAbility ?? false)
+                    {
+                        Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                        Batch = Batch.Distinct().ToList();
+                    }
+
+                    await SelectedBatchGiven(VaccinationGiven.Batch);
+                }
+                catch (Exception ex)
+                {
+                    ex.HandleException(ToastService);
+                }
+                StateHasChanged();
+            }
+
+            await GridVaccinationGiven.StartEditRowAsync(FocusedRowVisibleIndexVaccinationGiven);
+        }
+
+        private async Task EditItemDetailVaccinationPlan_Click(IGrid context)
+        {
+            // Ensure the context is not null and has selected data item
+            if (context.SelectedDataItem != null)
+            {
+                VaccinationPlan = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
+
+                await SelectedBatchPlan(VaccinationGiven.Batch);
+
+                StateHasChanged();
+            }
+
+            await GridVaccinationPlan.StartEditRowAsync(FocusedRowVisibleIndexVaccinationPlan);
+        }
+
+        private async Task NewItemDetailGiven_Click()
+        {
+            //if (InventoryAdjusment.LocationId is null || InventoryAdjusment.LocationId == 0)
+            //{
+            //    ToastService.ClearInfoToasts();
+            //    ToastService.ShowInfo("Please select the Location first.");
+            //    return;
+            //}
+
+            //Products = await Mediator.Send(new GetProductQuery());
+            //AllProducts = Products.Select(x => x).ToList();
+
+            //FormInventoryAdjusmentDetail = new();
+            //TotalQty = 0;
+            //LotSerialNumber = "-";
+            //UomId = null;
+
+            //await GridDetail.StartEditNewRowAsync();
+        }
+
+        private int FocusedRowVisibleIndexVaccinationPlan { get; set; }
+        private int FocusedRowVisibleIndexVaccinationGiven { get; set; }
+
+        private void GridDetailVaccinationPlan_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexVaccinationPlan = args.VisibleIndex;
+        }
+
+        private void GridDetailVaccinationGiven_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexVaccinationGiven = args.VisibleIndex;
+        }
+
+        private bool IsLoadingVaccinationPlan = false;
+        private bool IsLoadingVaccinationGiven = false;
+        private bool IsLoadingVaccinationHistoryGiven = false;
+
+        private async Task LoadVaccinationHistoryGivens()
+        {
+            IsLoadingVaccinationHistoryGiven = true;
+            VaccinationHistoryGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.Status == EnumStatusVaccination.Done && (x.GeneralConsultanServiceId != 0 || x.GeneralConsultanServiceId != null)));
+            IsLoadingVaccinationHistoryGiven = false;
+        }
+
+        private async Task LoadVaccinationPlans()
+        {
+            IsLoadingVaccinationPlan = true;
+            VaccinationPlans = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && (x.GeneralConsultanServiceId == 0 || x.GeneralConsultanServiceId == null)));
+            IsLoadingVaccinationPlan = false;
+        }
+
+        private async Task LoadVaccinationGivens()
+        {
+            IsLoadingVaccinationGiven = true;
+            VaccinationGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.GeneralConsultanServiceId != null && x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+            IsLoadingVaccinationGiven = false;
+        }
+
+        private async Task OnDeleteVaccinationGiven(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataVaccinationGivenItems is null || SelectedDataVaccinationGivenItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(((VaccinationPlanDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataVaccinationGivenItems.Adapt<List<VaccinationPlanDto>>();
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                SelectedDataVaccinationGivenItems = [];
+                await LoadVaccinationGivens();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private async Task OnDeleteVaccinationPlan(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                if (SelectedDataVaccinationPlanItems is null || SelectedDataVaccinationPlanItems.Count == 1)
+                {
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(((VaccinationPlanDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var a = SelectedDataVaccinationPlanItems.Adapt<List<VaccinationPlanDto>>();
+                    await Mediator.Send(new DeleteVaccinationPlanRequest(ids: a.Select(x => x.Id).ToList()));
+                }
+                SelectedDataVaccinationPlanItems = [];
+                await LoadVaccinationPlans();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        #endregion Vaccination Tabs
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -68,7 +438,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
 
-        private string FormUrl = "clinic-service/general-consultation-services";
+        private string FormUrl = "clinic-service/vaccinations";
         private bool PanelVisible = false;
         private bool IsLoading = false;
         [Parameter] public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
@@ -472,7 +842,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 Services = (await Mediator.Send(new GetServiceQuery
                 {
-                    Predicate = x => x.Id == GeneralConsultanService.ServiceId,
+                    Predicate = x => x.Id == GeneralConsultanService.ServiceId && x.IsVaccination == true,
                 })).Item1;
 
                 var ph = await Mediator.Send(new GetUserQueryNew
@@ -1124,7 +1494,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 if (!success2 || !success)
                     return;
 
-                GeneralConsultanService.IsGC = true;
+                GeneralConsultanService.IsVaccination = true;
 
                 if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
                 {
@@ -1404,6 +1774,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if (!success2 || !success)
                     return;
+
+                GeneralConsultanService.IsVaccination = true;
 
                 if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
                 {
@@ -1898,5 +2270,68 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         #endregion OnClick
+
+        #region ComboboxLocation
+
+        private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
+        private int LocationComboBoxIndex { get; set; } = 0;
+        private int totalCountLocation = 0;
+
+        private async Task OnSearchLocation()
+        {
+            await LoadDataLocation();
+        }
+
+        private async Task OnSearchLocationIndexIncrement()
+        {
+            if (LocationComboBoxIndex < (totalCountLocation - 1))
+            {
+                LocationComboBoxIndex++;
+                await LoadDataLocation(LocationComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchLocationIndexDecrement()
+        {
+            if (LocationComboBoxIndex > 0)
+            {
+                LocationComboBoxIndex--;
+                await LoadDataLocation(LocationComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputLocationChanged(string e)
+        {
+            LocationComboBoxIndex = 0;
+            await LoadDataLocation();
+        }
+
+        private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetLocationQuery
+                {
+                    Includes =
+                    [
+                        x => x.ParentLocation
+                    ],
+                    SearchTerm = refLocationComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                Locations = result.Item1;
+                totalCountLocation = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxLocation
     }
 }

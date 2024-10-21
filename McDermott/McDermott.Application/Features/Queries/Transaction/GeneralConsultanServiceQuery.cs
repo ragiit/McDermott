@@ -263,7 +263,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                     .AsNoTracking()
                     .Include(z => z.Service)
                     .Include(z => z.Pratitioner)
-                    .Include(z => z.ClassType)
                     .Include(z => z.InsurancePolicy)
                     .Include(z => z.Patient)
                     .Include(z => z.Patient.Department)
