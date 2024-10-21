@@ -56,10 +56,26 @@
             {
                 if (SelectedDataItems.Count == 1)
                 {
+                    await Mediator.Send(new UpdateStatusGeneralConsultanServiceRequest
+                    {
+                        Id = ((GeneralConsultanMedicalSupportDto)e.DataItem).GeneralConsultanServiceId.GetValueOrDefault(),
+                        Status = EnumStatusGeneralConsultantService.Physician,
+                    });
+
                     await Mediator.Send(new DeleteGeneralConsultanMedicalSupportRequest(SelectedDataItems[0].Adapt<GeneralConsultanMedicalSupportDto>().Id));
                 }
                 else
                 {
+                    var selectedItems = SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>();
+                    foreach (var item in selectedItems)
+                    {
+                        await Mediator.Send(new UpdateStatusGeneralConsultanServiceRequest
+                        {
+                            Id = item.GeneralConsultanServiceId.GetValueOrDefault(),
+                            Status = EnumStatusGeneralConsultantService.Physician,
+                        });
+                    }
+
                     var a = SelectedDataItems.Adapt<List<GeneralConsultanMedicalSupportDto>>();
                     await Mediator.Send(new DeleteGeneralConsultanMedicalSupportRequest(ids: a.Select(x => x.Id).ToList()));
                 }

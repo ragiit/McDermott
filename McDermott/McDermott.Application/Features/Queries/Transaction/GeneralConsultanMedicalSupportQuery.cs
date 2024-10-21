@@ -92,6 +92,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     {
                         Id = x.Id,
                         EmployeeId = x.EmployeeId,
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
                         Employee = new User
                         {
                             Name = x.Employee == null ? "" : x.Employee.Name,
@@ -292,6 +293,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Id = x.Id,
                         IsConfinedSpace = x.IsConfinedSpace,
                         EmployeeId = x.EmployeeId,
+                        Employee = new User
+                        {
+                            Gender = x.Employee == null ? "" : x.Employee.Gender,
+                        },
+                        LabTestId = x.LabTestId,
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
                         PractitionerLabEximinationId = x.PractitionerLabEximinationId,
                         LabEximinationName = x.LabEximinationName,

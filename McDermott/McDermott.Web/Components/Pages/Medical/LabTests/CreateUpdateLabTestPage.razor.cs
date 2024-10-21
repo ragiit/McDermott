@@ -218,9 +218,14 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLabUomQuery(searchTerm: refLabUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetLabUomQuery
+            {
+                SearchTerm = refLabUomComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             LabUoms = result.Item1;
-            totalCountLabUom = result.pageCount;
+            totalCountLabUom = result.PageCount;
             PanelVisible = false;
         }
 

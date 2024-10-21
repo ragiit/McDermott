@@ -674,9 +674,10 @@
                                                                                   NullText="Select Lab Test"
                                                                                   @ref="refLabTestComboBox"
                                                                                   @bind-Value="@GeneralConsultanMedicalSupport.LabTestId"
-                                                                                  ReadOnly="GeneralConsultanMedicalSupport.Id == 0"
+                                                                                  ReadOnly="GeneralConsultanMedicalSupport.Id == 0 || (GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
+                                                                                  SelectedItemChanged="@((LabTestDto e) => SelectedItemLabTest(e))"
                                                                                   TextChanged="((string e) => OnInputLabTestChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchLabTestIndexDecrement"
@@ -693,7 +694,7 @@
                                                                                             Tooltip="Next Index" />
                                                                         </Buttons>
                                                                         <Columns>
-                                                                            <DxListEditorColumn FieldName="@nameof(LabTestDto.Name)" Caption="Name" /> 
+                                                                            <DxListEditorColumn FieldName="@nameof(LabTestDto.Name)" Caption="Name" />
                                                                             <DxListEditorColumn FieldName="@nameof(LabTestDto.Code)" Caption="Code" />
                                                                             <DxListEditorColumn FieldName="SampleType.Name" Caption="Sample Type" />
                                                                             <DxListEditorColumn FieldName="ResultType" Caption="Result Type" />
@@ -710,62 +711,50 @@
                                                                                         ApplyBackgroundShading="true"
                                                                                         IndicatorAreaVisible="false"
                                                                                         Text="Fetching Data...">
-                                                                            <MyGridPaginate @ref="GridDetail"
-                                                                                            Data="LabTestDetailForms"
-                                                                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                                                                            EditModelSaving="OnSave"
-                                                                                            DataItemDeleting="OnDeleteLabTestDetail"
-                                                                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                                                                            SearchTextChanged="OnSearchBoxChanged"
-                                                                                            KeyFieldName="Id">
-                                                                                <ToolbarTemplate>
-                                                                                    <MyDxToolbarBase TItem="LabTestDetailDto"
-                                                                                                     Items="@LabTestDetailForms"
-                                                                                                     SelectedDataItems="@SelectedDataItems"
-                                                                                                     NewItem_Click="@NewItemDetail_Click"
-                                                                                                     EditItem_Click="@(()=>EditItemDetail_Click(context.Grid))"
-                                                                                                     DeleteItem_Click="@DeleteItemDetail_Click"
-                                                                                                     Refresh_Click="@RefreshDetail_Click"
-                                                                                                     IsImport="false" 
-                                                                                                     VisibleNew="UserAccessCRUID.IsCreate"
-                                                                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
-                                                                                </ToolbarTemplate>
+                                                                            <MyGrid @ref="GridLabTest"
+                                                                                    @bind-SelectedDataItems="@SelectedLabTestDataItems"
+                                                                                    Data="LabResultDetails"
+                                                                                    KeyFieldName="Id"
+                                                                                    EditModelSaving="OnSaveLabTest"
+                                                                                    DataItemDeleting="OnDeleteLabTest"
+                                                                                    FocusedRowChanged="GridLabTest_FocusedRowChanged">
                                                                                 <Columns>
-                                                                                    <DxGridSelectionColumn Width="15px" />
-                                                                                    <DxGridDataColumn FieldName="Name" Caption="Parameter" SortIndex="0" />
-                                                                                    <DxGridDataColumn FieldName="LabUom.Name" Caption="UoM" />
-                                                                                    <DxGridDataColumn FieldName="NormalRangeMale" Caption="Normal Range (Male)" />
-                                                                                    <DxGridDataColumn FieldName="NormalRangeFemale" Caption="Normal Range (Female)" />
-                                                                                    <DxGridDataColumn FieldName="ResultValueType" Caption="Result Value Type" />
-                                                                                    <DxGridDataColumn FieldName="Remark" Caption="Remark" />
-                                                                                </Columns>
-                                                                                <EditFormTemplate Context="EditFormContext">
-                                                                                    @{
-                                                                                        var a = (LabTestDetailDto)EditFormContext.EditModel;
-                                                                                        
+                                                                                    <DxGridDataColumn MinWidth="200" FieldName="Parameter" Caption="Parameter" />
+                                                                                    <DxGridDataColumn MinWidth="200" FieldName="NormalRange" Caption="Normal Range" />
+                                                                                    <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
+                                                                                    <DxGridDataColumn MinWidth="200" FieldName="Result" Caption="Result" />
+                                                                                    <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="Result Type" />
+                                                                                    <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
+
+                                                                                    @if (GeneralConsultanMedicalSupport.Status is not null && !GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))
+                                                                                    {  
+                                                                                    <DxGridCommandColumn MinWidth="100" FixedPosition="GridColumnFixedPosition.Right">
+                                                                                        <HeaderTemplate>
+                                                                                            <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                                        </HeaderTemplate>
+                                                                                        <CellDisplayTemplate>
+                                                                                            <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await EditLabResult(context))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                                            <a class="ml-1 fa-solid fa-trash text-danger" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                                                                                        </CellDisplayTemplate>
+                                                                                    </DxGridCommandColumn>
                                                                                     }
+                                                                                </Columns>
+                                                                                <EditFormTemplate Context="EditFormContext232">
                                                                                     <DxFormLayout CssClass="w-100">
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Parameter" ColSpanMd="12">
-                                                                                            <DxTextBox @bind-Text="@a.Name" NullText="Parameter" InputCssClass="fw-normal" ShowValidationIcon="true" />
-                                                                                            <ValidationMessage For="@(() => a.Name)" />
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parameter" ColSpanMd="12">
+                                                                                            <DxTextBox ReadOnly="LabResultDetail.IsFromDB" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Parameter" NullText="Parameter" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Male)" ColSpanMd="12">
-                                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeMale" NullText="Normal Range (Male)" InputCssClass="fw-normal" />
-                                                                                            <ValidationMessage For="@(() => a.NormalRangeMale)" />
-                                                                                        </DxFormLayoutItem>
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range" ColSpanMd="12">
+                                                                                            <DxTextBox ReadOnly="LabResultDetail.IsFromDB" ShowValidationIcon="true" @bind-Text="@LabResultDetail.NormalRange" NullText="Normal Range" InputCssClass="fw-normal" />
+                                                                                        </DxFormLayoutItem> 
 
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range (Female)" ColSpanMd="12">
-                                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@a.NormalRangeFemale" NullText="Normal Range (Female)" InputCssClass="fw-normal" />
-                                                                                            <ValidationMessage For="@(() => a.NormalRangeFemale)" />
-                                                                                        </DxFormLayoutItem>
-
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
+                                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="UoM" ColSpanMd="12">
                                                                                             <MyDxComboBox Data="@LabUoms"
-                                                                                                          NullText="Select Lab Uom..."
+                                                                                                          NullText="Select LabUom"
                                                                                                           @ref="refLabUomComboBox"
-                                                                                                          @bind-Value="@a.LabUomId"
+                                                                                                          ReadOnly="LabResultDetail.Id != 0"
+                                                                                                          @bind-Value="@LabResultDetail.LabUomId"
                                                                                                           TextFieldName="Name"
                                                                                                           ValueFieldName="Id"
                                                                                                           TextChanged="((string e) => OnInputLabUomChanged(e))">
@@ -782,194 +771,55 @@
                                                                                                 </Buttons>
                                                                                                 <Columns>
                                                                                                     <DxListEditorColumn FieldName="@nameof(LabUomDto.Name)" Caption="Name" />
+                                                                                                    <DxListEditorColumn FieldName="LabUom.Name" Caption="LabUom" />
                                                                                                     <DxListEditorColumn FieldName="@nameof(LabUomDto.Code)" Caption="Code" />
                                                                                                 </Columns>
                                                                                             </MyDxComboBox>
-                                                                                            <ValidationMessage For="@(()=> a.LabUomId)"   />
+                                                                                            <ValidationMessage For="@(()=>LabResultDetail.LabUomId)" />
                                                                                         </DxFormLayoutItem>
 
-                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Value Type" ColSpanMd="12">
+                                                                                        @{
+                                                                                            var showResult = true;
+
+                                                                                            ResultValueTypes = ["Low", "Normal", "High"];
+
+                                                                                            if (LabResultDetail.ResultValueType is not null && LabResultDetail.ResultValueType.Equals("Qualitative"))
+                                                                                            {
+                                                                                                showResult = false;
+                                                                                                ResultValueTypes = ["Positive", "Negative"];
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                showResult = true;
+                                                                                            }
+                                                                                        }
+
+                                                                                        <DxFormLayoutItem Visible="showResult" CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
+                                                                                            <DxTextBox InputDelay="1000" @oninput="OnResultTextChanged" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
+                                                                                            <ValidationMessage For="@(() => LabResultDetail.Result)" />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
                                                                                             <DxComboBox ShowValidationIcon="true"
                                                                                                         Data="@ResultValueTypes"
-                                                                                                        NullText="Select Result Value Type..."
+                                                                                                        NullText="Select Result Type..."
                                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                         FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                                        @bind-Value="@a.ResultValueType">
+                                                                                                        @bind-Value="@LabResultDetail.ResultType">
                                                                                             </DxComboBox>
-                                                                                            <ValidationMessage For="@(()=> a.ResultValueType)"   />
+                                                                                            <ValidationMessage For="@(()=> LabResultDetail.ResultType)"   />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Remark" ColSpanMd="12">
-                                                                                            <DxTextBox ShowValidationIcon="true" @bind-Text="@a.Remark" NullText="Remark" InputCssClass="fw-normal" />
-                                                                                            <ValidationMessage For="@(() => a.Remark)" />
+                                                                                            <DxTextBox ReadOnly="LabResultDetail.IsFromDB" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Remark" NullText="Remark" InputCssClass="fw-normal" />
+                                                                                            <ValidationMessage For="@(() => LabResultDetail.Remark)" />
                                                                                         </DxFormLayoutItem>
                                                                                     </DxFormLayout>
                                                                                 </EditFormTemplate>
-                                                                            </MyGridPaginate>
-                                                                            <div class="row">
-                                                                                <DxFormLayout>
-                                                                                    <div class="col-md-9">
-                                                                                        <DxFormLayoutItem>
-                                                                                            <DxPager PageCount="totalCount"
-                                                                                                     ActivePageIndexChanged="OnPageIndexChanged"
-                                                                                                     ActivePageIndex="activePageIndex"
-                                                                                                     VisibleNumericButtonCount="10"
-                                                                                                     SizeMode="SizeMode.Medium"
-                                                                                                     NavigationMode="PagerNavigationMode.Auto">
-                                                                                            </DxPager>
-                                                                                        </DxFormLayoutItem>
-                                                                                    </div>
-                                                                                    <div class="col-md-3 d-flex justify-content-end">
-                                                                                        <DxFormLayoutItem Caption="Page Size:">
-                                                                                            <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                                                                          NullText="Select Page Size"
-                                                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                                                          SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                                                                          @bind-Value="pageSize">
-                                                                                            </MyDxComboBox>
-                                                                                        </DxFormLayoutItem>
-                                                                                    </div>
-                                                                                </DxFormLayout>
-                                                                            </div>
+                                                                            </MyGrid>
                                                                         </DxLoadingPanel>
                                                                     </Template>
-                                                                </DxFormLayoutItem>
-
-                                                               
-                                                                @*    <DxFormLayoutItem ColSpanMd="12">
-                                                        <hr />
-                                                        </DxFormLayoutItem> *@
-
-                                                                @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Test" ColSpanMd="12">
-                                                        <DxComboBox ShowValidationIcon="true"
-                                                        Data="@LabTests"
-                                                        NullText="Select Test..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                        @bind-Value="@GeneralConsultanMedicalSupport.LabTestId"
-                                                        TextFieldName="Name"
-                                                        SelectedItemChanged="@((LabTestDto e) => SelectedItemLabTest(e))"
-                                                        ValueFieldName="Id">
-                                                        </DxComboBox>
-                                                        <ValidationMessage For="@(() => GeneralConsultanMedicalSupport.LabTestId)" />
-                                                        </DxFormLayoutItem> *@
-
-                                                                @* <DxFormLayoutGroup ColSpanMd="12" Caption="Lab Test" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
-                                                        <Items>
-                                                        <DxLoadingPanel @bind-Visible="IsLoading"
-                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                        IsContentBlocked="true"
-                                                        ApplyBackgroundShading="true"
-                                                        IndicatorAreaVisible="false"
-                                                        Text="Fetching Data...">
-                                                        <DxGrid @ref="GridLabTest" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                                        PageSize="12"
-                                                        TextWrapEnabled="false"
-                                                        @bind-SelectedDataItems="@SelectedLabTestDataItems"
-                                                        Data="LabResultDetails"
-                                                        KeyFieldName="Id"
-                                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                                        AllowSelectRowByClick="true"
-                                                        EditModelSaving="OnSaveLabTest"
-                                                        DataItemDeleting="OnDeleteLabTest"
-                                                        EditMode="GridEditMode.PopupEditForm"
-                                                        PopupEditFormCssClass="pw-800"
-                                                        PagerPosition="GridPagerPosition.Bottom"
-                                                        PageSizeSelectorVisible="true"
-                                                        CustomizeElement="Grid_CustomizeElement"
-                                                        PageSizeSelectorItems="@(new int[] { 12, 24, 68, 100 })"
-                                                        PageSizeSelectorAllRowsItemVisible="true"
-                                                        PagerSwitchToInputBoxButtonCount="10"
-                                                        FocusedRowChanged="GridLabTest_FocusedRowChanged"
-                                                        FocusedRowEnabled="true"
-                                                        PagerVisibleNumericButtonCount="10"
-                                                        AutoExpandAllGroupRows="true"
-                                                        ShowSearchBox="true"
-                                                        KeyboardNavigationEnabled="true">
-                                                        <Columns>
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Parameter" Caption="Parameter" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="NormalRange" Caption="Normal Range" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="LabUom.Name" Caption="UoM" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Result" Caption="Result" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="Result Type" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Remark" Caption="Remark" />
-                                                        <DxGridCommandColumn MinWidth="100" FixedPosition="GridColumnFixedPosition.Right">
-                                                        <HeaderTemplate>
-                                                        <a class="fa-solid fa-plus" @onclick="@(async () => await AddNewLabResult())" style="text-decoration: none;" href="javascript:void(0);"></a>
-                                                        </HeaderTemplate>
-                                                        <CellDisplayTemplate>
-                                                        <a class="fa-solid fa-pen-to-square text-warning" @onclick="@(async () => await EditLabResult(context))" style="text-decoration: none;" href="javascript:void(0);"></a>
-                                                        <a class="ml-1 fa-solid fa-trash text-danger" @onclick="@(() => GridLabTest.ShowDataItemDeleteConfirmation(context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
-                                                        </CellDisplayTemplate>
-                                                        </DxGridCommandColumn>
-                                                        </Columns>
-                                                        <EditFormTemplate Context="EditFormContext22">
-                                                        <DxFormLayout CssClass="w-100">
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parameter" ColSpanMd="12">
-                                                        <DxTextBox ReadOnly="LabResultDetail.IsFromDB" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Parameter" NullText="Parameter" InputCssClass="fw-normal" />
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Range" ColSpanMd="12">
-                                                        <DxTextBox ReadOnly="LabResultDetail.IsFromDB" ShowValidationIcon="true" @bind-Text="@LabResultDetail.NormalRange" NullText="Normal Range" InputCssClass="fw-normal" />
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM" ColSpanMd="12">
-                                                        <DxComboBox ShowValidationIcon="true"
-                                                        Data="@LabUoms"
-                                                        ReadOnly="LabResultDetail.Id != 0"
-                                                        NullText="Select UoM..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                        @bind-Value="@LabResultDetail.LabUomId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id">
-                                                        </DxComboBox>
-                                                        <ValidationMessage For="@(()=> LabResultDetail.LabUomId)"   />
-                                                        </DxFormLayoutItem>
-
-                                                        @{
-                                                        var showResult = true;
-
-                                                        ResultValueTypes = ["Low", "Normal", "High"];
-
-                                                        if (LabResultDetail.ResultValueType is not null && LabResultDetail.ResultValueType.Equals("Qualitative"))
-                                                        {
-                                                        showResult = false;
-                                                        ResultValueTypes = ["Positive", "Negative"];
-                                                        }
-                                                        else
-                                                        {
-                                                        showResult = true;
-                                                        }
-                                                        }
-
-                                                        <DxFormLayoutItem Visible="showResult" CaptionCssClass="normal-caption" Caption="Result" ColSpanMd="12">
-                                                        <DxTextBox InputDelay="1000" @oninput="OnResultTextChanged" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Result" NullText="Result" InputCssClass="fw-normal" />
-                                                        <ValidationMessage For="@(() => LabResultDetail.Result)" />
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Result Type" ColSpanMd="12">
-                                                        <DxComboBox ShowValidationIcon="true"
-                                                        Data="@ResultValueTypes"
-                                                        NullText="Select Result Type..."
-                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                        FilteringMode="@DataGridFilteringMode.Contains"
-                                                        @bind-Value="@LabResultDetail.ResultType">
-                                                        </DxComboBox>
-                                                        <ValidationMessage For="@(()=> LabResultDetail.ResultType)"   />
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Remark" ColSpanMd="12">
-                                                        <DxTextBox ReadOnly="LabResultDetail.IsFromDB" ShowValidationIcon="true" @bind-Text="@LabResultDetail.Remark" NullText="Remark" InputCssClass="fw-normal" />
-                                                        <ValidationMessage For="@(() => LabResultDetail.Remark)" />
-                                                        </DxFormLayoutItem>
-                                                        </DxFormLayout>
-                                                        </EditFormTemplate>
-                                                        </DxGrid>
-                                                        </DxLoadingPanel>
-                                                        </Items>
-                                                        </DxFormLayoutGroup> *@
+                                                                </DxFormLayoutItem> 
                                                             </Items>
                                                         </DxFormLayoutGroup>
 
@@ -986,15 +836,15 @@
                                                                                   TextChanged="((string e) => OnInputPractitionerRadiologyResultChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchPractitionerRadiologyResultIndexDecrement"
-                                                                                            Visible="VisibleBtn"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-left"
                                                                                             Tooltip="Previous Index" />
                                                                             <DxEditorButton Click="OnSearchPractitionerRadiologyResult"
-                                                                                            Visible="VisibleBtn"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                                                             Tooltip="Search" />
                                                                             <DxEditorButton Click="OnSearchPractitionerRadiologyResultIndexIncrement"
-                                                                                            Visible="VisibleBtn"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-right"
                                                                                             Tooltip="Next Index" />
                                                                         </Buttons>
@@ -1041,12 +891,15 @@
                                                                                   TextChanged="((string e) => OnInputPractitionerAlcoholResultChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchPractitionerAlcoholResultIndexDecrement"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-left"
                                                                                             Tooltip="Previous Index" />
                                                                             <DxEditorButton Click="OnSearchPractitionerAlcoholResult"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                                                             Tooltip="Search" />
                                                                             <DxEditorButton Click="OnSearchPractitionerAlcoholResultIndexIncrement"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-right"
                                                                                             Tooltip="Next Index" />
                                                                         </Buttons>
@@ -1062,7 +915,7 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.AlcoholEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    <DxTextBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" @bind-Text="@GeneralConsultanMedicalSupport.AlcoholEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                                                                     <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.AlcoholEximinationAttachment"
@@ -1078,10 +931,12 @@
                                                                     </DxMaskedInput>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Negative">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholNegative" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholNegative"  
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"/>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Positive">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholPositive" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AlcoholPositive" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                 </DxFormLayoutItem>
                                                             </Items>
                                                         </DxFormLayoutGroup>
@@ -1099,12 +954,15 @@
                                                                                   TextChanged="((string e) => OnInputPractitionerDrugResultChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchPractitionerDrugResultIndexDecrement"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-left"
                                                                                             Tooltip="Previous Index" />
                                                                             <DxEditorButton Click="OnSearchPractitionerDrugResult"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                                                             Tooltip="Search" />
                                                                             <DxEditorButton Click="OnSearchPractitionerDrugResultIndexIncrement"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-right"
                                                                                             Tooltip="Next Index" />
                                                                         </Buttons>
@@ -1120,7 +978,7 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Name" ColSpanMd="12">
-                                                                    <DxTextBox @bind-Text="@GeneralConsultanMedicalSupport.DrugEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                    <DxTextBox ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" @bind-Text="@GeneralConsultanMedicalSupport.DrugEximinationName" NullText="Examination Name" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attachment" ColSpanMd="12">
                                                                     <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.DrugEximinationAttachment"
@@ -1157,7 +1015,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AmphetaminesPositive" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AmphetaminesPositive" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
@@ -1167,7 +1026,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AmphetaminesNegative" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.AmphetaminesNegative"
+                                                                                                    ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
@@ -1201,7 +1061,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.BenzodiazepinesPositive" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.BenzodiazepinesPositive" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"/>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
@@ -1211,7 +1072,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.BenzodiazepinesNegative" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.BenzodiazepinesNegative" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"/>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
@@ -1245,7 +1107,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.CocaineMetabolitesPositive" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.CocaineMetabolitesPositive" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
@@ -1255,7 +1118,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.CocaineMetabolitesNegative" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.CocaineMetabolitesNegative" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
@@ -1289,7 +1153,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.OpiatesPositive" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.OpiatesPositive" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
@@ -1299,7 +1164,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.OpiatesNegative" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.OpiatesNegative" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
@@ -1333,7 +1199,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.MethamphetaminesPositive" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.MethamphetaminesPositive"  
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"/>
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
@@ -1343,7 +1210,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.MethamphetaminesNegative" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.MethamphetaminesNegative" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
@@ -1377,7 +1245,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="1">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.THCCannabinoidMarijuanaPositive" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.THCCannabinoidMarijuanaPositive" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="2">
@@ -1387,7 +1256,8 @@
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="3">
                                                                                     <Template>
-                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.THCCannabinoidMarijuanaNegative" />
+                                                                                        <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.THCCannabinoidMarijuanaNegative" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem ColumnSpan="2" Row="0" Column="4">
@@ -1416,12 +1286,15 @@
                                                                                   TextChanged="((string e) => OnInputPractitionerECGResultChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchPractitionerECGResultIndexDecrement"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-left"
                                                                                             Tooltip="Previous Index" />
                                                                             <DxEditorButton Click="OnSearchPractitionerECGResult"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                                                             Tooltip="Search" />
                                                                             <DxEditorButton Click="OnSearchPractitionerECGResultIndexIncrement"
+                                                                                            Visible="VisibleBtn && GeneralConsultanMedicalSupport.Id != 0"
                                                                                             IconCssClass="fa-solid fa-caret-right"
                                                                                             Tooltip="Next Index" />
                                                                         </Buttons>
@@ -1436,16 +1309,20 @@
                                                                     <ValidationMessage For="@(()=>GeneralConsultanMedicalSupport.PractitionerECGId)" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Normal Resting ECG" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsNormalRestingECG" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsNormalRestingECG"
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Rhythm" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusRhythm" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusRhythm"
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Bradycardia" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusBradycardia" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusBradycardia"
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sinus Tachycardia" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusTachycardia" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsSinusTachycardia"
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR" ColSpanMd="12">
                                                                     <Template>
@@ -1460,7 +1337,8 @@
                                                                             <Items>
                                                                                 <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
                                                                                     <Template>
-                                                                                        <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@GeneralConsultanMedicalSupport.HR" NullText="HR" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                                        <DxSpinEdit ShowValidationIcon="true"
+                                                                                                    ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))" MinValue="0" @bind-Value="@GeneralConsultanMedicalSupport.HR" NullText="HR" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                                     </Template>
                                                                                 </DxGridLayoutItem>
                                                                                 <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
@@ -1474,10 +1352,12 @@
                                                                     </Template>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherECG" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"/>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem ColSpanMd="12" Caption=" " Visible="@Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherECG)">
                                                                     <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherDesc"
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                             NullText="Other Description..."
                                                                             ShowValidationIcon="true"
                                                                             Rows="1" />
@@ -1501,13 +1381,15 @@
                                                         <DxFormLayoutGroup ColSpanMd="12" Caption="Other Examination" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start" AnimationType="LayoutAnimationType.Slide">
                                                             <Items>
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Other Examination" ColSpanMd="12">
-                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherExaminationECG" />
+                                                                    <DxCheckBox @bind-Checked="@GeneralConsultanMedicalSupport.IsOtherExaminationECG" 
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"/>
                                                                 </DxFormLayoutItem>
                                                                 @if (Convert.ToBoolean(GeneralConsultanMedicalSupport.IsOtherExaminationECG))
                                                                 {
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
                                                                         <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationTypeECG"
                                                                                 NullText="Examination Type..."
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                                 ShowValidationIcon="true"
                                                                                 Rows="1" />
                                                                     </DxFormLayoutItem>
@@ -1518,6 +1400,7 @@
                                                                         <DxMemo @bind-Text="GeneralConsultanMedicalSupport.OtherExaminationRemarkECG"
                                                                                 NullText="Remark..."
                                                                                 ShowValidationIcon="true"
+                                                                                  ReadOnly="@(GeneralConsultanMedicalSupport.Status is not null && GeneralConsultanMedicalSupport.Status.Equals(EnumStatusGeneralConsultantServiceProcedureRoom.Finish))"
                                                                                 Rows="1" />
                                                                     </DxFormLayoutItem>
 
@@ -1527,7 +1410,7 @@
                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
                                                                         <DxMaskedInput @bind-Value="@GeneralConsultanMedicalSupport.OtherExaminationAttachment"
                                                                                        ShowValidationIcon="true"
-                                                                                       ReadOnly="true"
+                                                                                       ReadOnly="true" 
                                                                                        MaskMode="MaskMode.RegEx">
                                                                             @*  <Buttons>
                                                                 <InputFile id="drugFile" OnChange="@SelectFilesDrug" multiple="false" style="display:none" />

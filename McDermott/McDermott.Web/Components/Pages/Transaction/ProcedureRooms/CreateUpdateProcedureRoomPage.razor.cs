@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using SignaturePad;
+using System.Text.RegularExpressions;
 
 namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
 {
@@ -245,6 +246,14 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                             }
                         })).Item1;
 
+                        LabTests = (await Mediator.Send(new GetLabTestQuery
+                        {
+                            Predicate = x => x.Id == GeneralConsultanMedicalSupport.LabTestId
+                        })).Item1;
+
+                        LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+                        DeletedLabTestIds = LabResultDetails.Select(x => x.Id).ToList();
+
                         switch (GeneralConsultanMedicalSupport.Status)
                         {
                             case EnumStatusGeneralConsultantServiceProcedureRoom.Draft:
@@ -312,6 +321,8 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
             ToastService.ShowInfoSubmittingForm();
         }
 
+        private List<long> DeletedLabTestIds = [];
+
         private async Task HandleValidSubmit(int state)
         {
             IsLoading = true;
@@ -339,27 +350,28 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                 // Save with Confirmation
                 else
                 {
-                    switch (StagingText)
+                    switch (GeneralConsultanMedicalSupport.Status)
                     {
-                        case EnumStatusGeneralConsultantServiceProcedureRoom.InProgress:
+                        case EnumStatusGeneralConsultantServiceProcedureRoom.Draft:
+
+                            StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish;
+                            GeneralConsultanMedicalSupport.Status = EnumStatusGeneralConsultantServiceProcedureRoom.InProgress;
 
                             if (GeneralConsultanMedicalSupport.Id == 0)
                             {
-                                StagingText = EnumStatusGeneralConsultantServiceProcedureRoom.Finish;
-
                                 await Mediator.Send(new UpdateStatusGeneralConsultanServiceRequest
                                 {
                                     Id = GcId.GetValueOrDefault(),
                                     Status = EnumStatusGeneralConsultantService.ProcedureRoom
                                 });
-
                                 GeneralConsultanMedicalSupport.GeneralConsultanServiceId = GcId;
-                                GeneralConsultanMedicalSupport.Status = EnumStatusGeneralConsultantServiceProcedureRoom.InProgress;
                                 GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                             }
+                            else
+                                GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
                             break;
 
-                        case EnumStatusGeneralConsultantServiceProcedureRoom.Finish:
+                        case EnumStatusGeneralConsultantServiceProcedureRoom.InProgress:
                             await Mediator.Send(new UpdateStatusGeneralConsultanServiceRequest
                             {
                                 Id = GeneralConsultanMedicalSupport.GeneralConsultanServiceId.GetValueOrDefault(),
@@ -374,6 +386,30 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                             break;
                     }
                 }
+
+                if (!GeneralConsultanMedicalSupport.IsConfinedSpace)
+                {
+                    if ((GeneralConsultanMedicalSupport.LabTestId is not null && GeneralConsultanMedicalSupport.LabTestId != 0))
+                    {
+                        await Mediator.Send(new DeleteLabResultDetailRequest(ids: DeletedLabTestIds));
+
+                        LabResultDetails.ForEach(x =>
+                        {
+                            x.Id = 0;
+                            x.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                        });
+                        await Mediator.Send(new CreateListLabResultDetailRequest(LabResultDetails));
+
+                        LabResultDetails.Clear();
+
+                        LabResultDetails = await Mediator.Send(new GetLabResultDetailQuery(x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id));
+
+                        DeletedLabTestIds = LabResultDetails.Select(x => x.Id).ToList();
+
+                        IsAddOrUpdateOrDeleteLabResult = false;
+                    }
+                }
+
                 IsLoading = true;
 
                 NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={GeneralConsultanMedicalSupport.Id}");
@@ -553,8 +589,9 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
         #endregion Lab Test Detail
 
         private bool IsLoadingLabTest = false;
-        public IGrid GridDetail { get; set; }
-        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private List<LabResultDetailDto> LabResultDetails = [];
+        private IGrid GridLabTest { get; set; }
+        private IReadOnlyList<object> SelectedLabTestDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private List<LabTestDetailDto> LabTestDetailForms = [];
 
@@ -562,19 +599,199 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
         {
         }
 
-        private async Task NewItemDetail_Click()
+        private async Task AddNewLabResult()
         {
-            await GridDetail.StartEditNewRowAsync();
+            LabResultDetail = new();
+            await GridLabTest.StartEditNewRowAsync();
         }
 
-        private void DeleteItemDetail_Click()
+        #region ComboboxLabUom
+
+        private DxComboBox<LabUomDto, long?> refLabUomComboBox { get; set; }
+        private int LabUomComboBoxIndex { get; set; } = 0;
+        private int totalCountLabUom = 0;
+
+        private async Task OnSearchLabUom()
         {
-            GridDetail.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
+            await LoadDataLabUom();
         }
 
-        private async Task RefreshDetail_Click()
+        private async Task OnSearchLabUomIndexIncrement()
         {
-            await LoadLabTestDetails();
+            if (LabUomComboBoxIndex < (totalCountLabUom - 1))
+            {
+                LabUomComboBoxIndex++;
+                await LoadDataLabUom(LabUomComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchLabUomIndexDecrement()
+        {
+            if (LabUomComboBoxIndex > 0)
+            {
+                LabUomComboBoxIndex--;
+                await LoadDataLabUom(LabUomComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputLabUomChanged(string e)
+        {
+            LabUomComboBoxIndex = 0;
+            await LoadDataLabUom();
+        }
+
+        private async Task LoadDataLabUom(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                IsLoadingLabTest = true;
+                var result = await Mediator.Send(new GetLabUomQuery
+                {
+                    SearchTerm = refLabUomComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                LabUoms = result.Item1;
+                totalCountLabUom = result.PageCount;
+                IsLoadingLabTest = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { IsLoadingLabTest = false; }
+        }
+
+        #endregion ComboboxLabUom
+
+        private async Task EditLabResult(GridCommandColumnCellDisplayTemplateContext context)
+        {
+            var selected = (LabResultDetailDto)context.DataItem;
+
+            var copy = selected.Adapt<LabResultDetailDto>();
+
+            await GridLabTest.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var w = LabResultDetails.FirstOrDefault(x => x.Id == copy.Id);
+
+            this.LabResultDetail = w;
+
+            LabUoms = (await Mediator.Send(new GetLabUomQuery
+            {
+                Predicate = x => x.Id == LabResultDetail.LabUomId,
+            })).Item1;
+        }
+
+        private async Task SelectedItemLabTest(LabTestDto e)
+        {
+            if (e is null)
+            {
+                GeneralConsultanMedicalSupport.LabTestId = null;
+                LabResultDetails.Clear();
+                return;
+            }
+
+            var details = await Mediator.Send(new GetLabTestDetailQuery
+            {
+                Predicate = x => x.LabTestId == e.Id,
+                IsGetAll = true
+            });
+
+            foreach (var item in details.Item1)
+            {
+                LabResultDetails.Add(new LabResultDetailDto
+                {
+                    IsFromDB = true,
+                    Id = Helper.RandomNumber,
+                    NormalRange = GeneralConsultanMedicalSupport.Employee != null && GeneralConsultanMedicalSupport.Employee.Gender != null && GeneralConsultanMedicalSupport.Employee.Gender.Equals("Male") ? item.NormalRangeMale : item.NormalRangeFemale,
+                    Parameter = item.Name,
+                    Remark = item.Remark,
+                    LabUomId = item.LabUomId,
+                    LabUom = item.LabUom,
+                    ResultValueType = item.ResultValueType
+                });
+            }
+            GridLabTest.Reload();
+        }
+
+        private List<LabUomDto> LabUoms = [];
+
+        private void OnResultTextChanged(ChangeEventArgs v)
+        {
+            if (v.Value is null)
+                return;
+
+            var value = v.Value.ToString();
+
+            if (long.TryParse(value, out _))
+            {
+                if (!Regex.IsMatch(LabResultDetail.NormalRange, @"^\d+-\d+$"))
+                    LabResultDetail.ResultType = "Negative";
+                else
+                {
+                    var splits = LabResultDetail.NormalRange.Split("-");
+                    if (value.ToLong() < splits[0].ToLong())
+                    {
+                        LabResultDetail.ResultType = "Low";
+                    }
+                    else
+                    {
+                        LabResultDetail.ResultType = "Normal";
+
+                        if (value.ToLong() > splits[1].ToLong())
+                        {
+                            LabResultDetail.ResultType = "High";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                LabResultDetail.ResultType = "Negative";
+            }
+        }
+
+        private async Task OnDeleteLabTest()
+        {
+            IsAddOrUpdateOrDeleteLabResult = true;
+            var aaa = SelectedLabTestDataItems.Adapt<List<LabResultDetailDto>>();
+
+            LabResultDetails.Remove(LabResultDetails.FirstOrDefault(x => x.Id == SelectedLabTestDataItems[0].Adapt<LabResultDetailDto>().Id));
+
+            SelectedLabTestDataItems = [];
+        }
+
+        private LabResultDetailDto LabResultDetail = new();
+
+        private void GridLabTest_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            if (args.DataItem is not null)
+                LabResultDetail = args.DataItem as LabResultDetailDto;
+            else
+                LabResultDetail = new();
+
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
+
+        private bool IsAddOrUpdateOrDeleteLabResult = false;
+
+        private void OnSaveLabTest(GridEditModelSavingEventArgs e)
+        {
+            IsAddOrUpdateOrDeleteLabResult = true;
+            var editModel = LabResultDetail;
+
+            //editModel.LabTestDetail = LabTests.FirstOrDefault(l => l.Id == selectedLabTestId);
+
+            if (editModel.Id == 0)
+            {
+                editModel.Id = Helper.RandomNumber;
+                editModel.GeneralConsultanMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                LabResultDetails.Add(editModel);
+            }
+            else
+                LabResultDetails[FocusedRowVisibleIndex] = editModel;
+
+            IsAddOrUpdateOrDeleteLabResult = true;
         }
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
@@ -595,7 +812,6 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                 {
                     await Mediator.Send(new UpdateLabTestDetailRequest(labTestDetail));
                 }
-                await LoadLabTestDetails();
             }
             catch (Exception ex)
             {
@@ -606,49 +822,6 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadLabTestDetails(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadLabTestDetails(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadLabTestDetails(newPageIndex, pageSize);
-        }
-
-        private async Task LoadLabTestDetails(int pageIndex = 0, int pageSize = 10)
-        {
-            IsLoadingLabTest = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLabTestDetailQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                //Predicate = x => x.LabTestId == LabTest.Id,
-                SearchTerm = searchTerm ?? ""
-            });
-            LabTestDetailForms = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            IsLoadingLabTest = false;
-        }
-
-        #endregion Searching
 
         #endregion Lab Test
 

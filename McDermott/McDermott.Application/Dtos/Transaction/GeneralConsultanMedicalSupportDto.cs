@@ -277,6 +277,7 @@
         public string StatusName => Status.GetDisplayName();
 
         public long? LabTestId { get; set; }
+        public bool IsReadOnlyLabTest { get; set; } = false;
 
         #region Confined Space
 
@@ -672,5 +673,6 @@
         public string? OtherExaminationRemarkECG { get; set; }
         public EnumStatusGeneralConsultantServiceProcedureRoom? Status { get; set; } = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
         public long? LabTestId { get; set; }
+        public bool? IsReadOnlyLabTest { get; set; } = false;
     }
 }

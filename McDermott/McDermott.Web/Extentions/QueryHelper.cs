@@ -97,23 +97,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(LabUomDto))
-            {
-                var result = await mediator.Send(new GetLabUomQuery(
-                    predicate as Expression<Func<LabUom, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new LabUom
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                    } : select as Expression<Func<LabUom, LabUom>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(GroupDto))
             {
                 var result = await mediator.Send(new GetGroupQuery(

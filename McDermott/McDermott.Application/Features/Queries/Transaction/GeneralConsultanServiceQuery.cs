@@ -396,6 +396,9 @@ namespace McDermott.Application.Features.Queries.Transaction
             {
                 var result = await _unitOfWork.Repository<GeneralConsultanService>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id) ?? new();
 
+                if (result is null)
+                    return new();
+
                 _unitOfWork.Repository<GeneralConsultanService>().Attach(result);
 
                 result.Status = request.Status;
