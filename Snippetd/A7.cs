@@ -1,55 +1,55 @@
-await LoadDataLocation();
+await LoadDataProject();
 
- #region ComboboxLocation
+ #region ComboboxProject
 
- private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
- private int LocationComboBoxIndex { get; set; } = 0;
- private int totalCountLocation = 0;
+ private DxComboBox<ProjectDto, long?> refProjectComboBox { get; set; }
+ private int ProjectComboBoxIndex { get; set; } = 0;
+ private int totalCountProject = 0;
 
- private async Task OnSearchLocation()
+ private async Task OnSearchProject()
  {
-     await LoadDataLocation();
+     await LoadDataProject();
  }
 
- private async Task OnSearchLocationIndexIncrement()
+ private async Task OnSearchProjectIndexIncrement()
  {
-     if (LocationComboBoxIndex < (totalCountLocation - 1))
+     if (ProjectComboBoxIndex < (totalCountProject - 1))
      {
-         LocationComboBoxIndex++;
-         await LoadDataLocation(LocationComboBoxIndex, 10);
+         ProjectComboBoxIndex++;
+         await LoadDataProject(ProjectComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchLocationIndexDecrement()
+ private async Task OnSearchProjectIndexDecrement()
  {
-     if (LocationComboBoxIndex > 0)
+     if (ProjectComboBoxIndex > 0)
      {
-         LocationComboBoxIndex--;
-         await LoadDataLocation(LocationComboBoxIndex, 10);
+         ProjectComboBoxIndex--;
+         await LoadDataProject(ProjectComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputLocationChanged(string e)
+ private async Task OnInputProjectChanged(string e)
  {
-     LocationComboBoxIndex = 0;
-     await LoadDataLocation();
+     ProjectComboBoxIndex = 0;
+     await LoadDataProject();
  }
 
 
 
-  private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataProject(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetLocationQuery
+          var result = await Mediator.Send(new GetProjectQuery
           {
-              SearchTerm = refLocationComboBox?.Text ?? "",
+              SearchTerm = refProjectComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Locations = result.Item1;
-          totalCountLocation = result.PageCount;
+          Projects = result.Item1;
+          totalCountProject = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -59,47 +59,47 @@ await LoadDataLocation();
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxLocation
+ #endregion ComboboxProject
 
-private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataProject(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetLocationQuery(
+    var result = await Mediator.Send(new GetProjectQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refLocationComboBox?.Text ?? "",
+        searchTerm: refProjectComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentLocation,
-            x => x.Location,
+            x => x.ParentProject,
+            x => x.Project,
         ],
-        select: x => new Location
+        select: x => new Project
         {
             Id = x.Id,
             Name = x.Name,
-            ParentLocation = new Domain.Entities.Location
+            ParentProject = new Domain.Entities.Project
             {
                 Name = x.Name
             },
-            Location = new Domain.Entities.Location
+            Project = new Domain.Entities.Project
             {
                 Name = x.Name
             },
-            Manager = new Domain.Entities.Location
+            Manager = new Domain.Entities.Project
             {
                 Name = x.Name
             },
-            LocationCategory = x.LocationCategory
+            ProjectCategory = x.ProjectCategory
         }
 
     ));
-    Locations = result.Item1;
-    totalCountLocation = result.pageCount;
+    Projects = result.Item1;
+    totalCountProject = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataLocation(LocationId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).LocationId);
+await LoadDataProject(ProjectId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).ProjectId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -107,32 +107,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Location" ColSpanMd="12">
-    <MyDxComboBox Data="@Locations"
-                  NullText="Select Location"
-                  @ref="refLocationComboBox"
-                  @bind-Value="@a.LocationId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Project" ColSpanMd="12">
+    <MyDxComboBox Data="@Projects"
+                  NullText="Select Project"
+                  @ref="refProjectComboBox"
+                  @bind-Value="@a.ProjectId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputLocationChanged(e))">
+                  TextChanged="((string e) => OnInputProjectChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchLocationIndexDecrement"
+            <DxEditorButton Click="OnSearchProjectIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchLocation"
+            <DxEditorButton Click="OnSearchProject"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchLocationIndexIncrement"
+            <DxEditorButton Click="OnSearchProjectIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(LocationDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Location.Name" Caption="Location" />
-            <DxListEditorColumn FieldName="@nameof(LocationDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProjectDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Project.Name" Caption="Project" />
+            <DxListEditorColumn FieldName="@nameof(ProjectDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.LocationId)" />
+    <ValidationMessage For="@(()=>a.ProjectId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -142,7 +142,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetLocationQuery(x => x.Id == a.LocationId))).Item1;
+     Cronises = (await Mediator.Send(new GetProjectQuery(x => x.Id == a.ProjectId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 

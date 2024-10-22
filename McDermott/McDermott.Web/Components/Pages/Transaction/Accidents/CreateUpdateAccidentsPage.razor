@@ -1,0 +1,1854 @@
+﻿@page "/clinic-service/accidents/{PageMode}"
+
+@using McDermott.Web.Components.Layout
+@using McDermott.Web.Components.Popups
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Accidents</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Accidents" OnClickBack="@(async () => NavigationManager.NavigateTo(FormUrl))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <DxLoadingPanel @bind-Visible="IsLoading"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <EditForm Model="@GeneralConsultanService"
+                                      @onkeypress="@KeyPressHandler"
+                                      Context="EditFormContext22" Enhance
+                                      OnValidSubmit="(async () => await HandleValidSubmit(1))"
+                                      OnInvalidSubmit="@HandleInvalidSubmit">
+
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <AntiforgeryToken />
+
+                                @if (Accident.Id > 0)
+                                {
+                                    <div class="row justify-content-end mb-3">
+                                        <div class="col-auto align-self-end">
+                                            <DxTabs>
+                                                <DxTab Text="@EnumStatusAccident.Draft.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.Draft)"></DxTab>
+                                                @if (Accident.AccidentLocation.Equals("Inside"))
+                                                {
+                                                    <DxTab Text="@EnumStatusAccident.MedicalTreatment.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.MedicalTreatment)"></DxTab>
+                                                }
+                                                @if (Accident.Sent is not null && Accident.Sent.Equals("Hospital"))
+                                                {
+                                                    <DxTab Text="@EnumStatusAccident.HospitalizationReferral.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.HospitalizationReferral)"></DxTab>
+                                                }
+                                                @if (GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS"))
+                                                {
+                                                    <DxTab Text="@EnumStatusAccident.PatientControlMonitoring.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.PatientControlMonitoring)"></DxTab>
+                                                }
+                                                <DxTab Text="@EnumStatusAccident.Done.GetDisplayName()" Enabled="@IsStatus(EnumStatusAccident.Done)"></DxTab>
+                                            </DxTabs>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="card sticky">
+                                    <div class="card-body">
+                                        <div class=" row w-100">
+
+                                            @if (Accident.Id > 0)
+                                            {
+                                                <div class="col-auto pe-0 ">
+                                                    <DxButton Enabled="!IsLoading"
+                                                              IconCssClass="fa-solid fa-check"
+                                                              Text="@StagingText.GetDisplayName()"
+                                                              Visible="@(!IsStatus(EnumStatusAccident.Done))"
+                                                              Click="(async () => await HandleValidSubmit(2))"
+                                                              RenderStyle="ButtonRenderStyle.Primary">
+                                                    </DxButton>
+                                                    <DxButton IconCssClass="fa-solid fa-print"
+                                                              Text="Print"
+                                                              Visible="GeneralConsultanService.Id > 0"
+                                                              Click="PrintAccident"
+                                                              RenderStyleMode="ButtonRenderStyleMode.Outline"
+                                                              RenderStyle=" ButtonRenderStyle.Success">
+                                                    </DxButton>
+                                                </div>
+                                            }
+
+                                            @if (!IsStatus(EnumStatusAccident.Done))
+                                            {
+                                                <div class="col-sm align-self-end">
+                                                    <div class="row justify-content-end">
+                                                        <div class="col-auto">
+                                                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Close" Click="OnCancelBack"></DxButton>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="w-100">
+                                            <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                                                <Items>
+                                                    <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                                   IconCssClass="fa-solid fa-notes-medical"
+                                                                   Click="OnClickPopUpHistoricalMedical"
+                                                                   Text="Historical Medical Record Patient" />
+                                                </Items>
+                                            </DxToolbar>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @* Accident Information *@
+                                <div class="w-100">
+                                    <div class="w-100">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-bolder">Accident Information</span>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <DxFormLayout>
+                                                            @if (GeneralConsultanService.Id != 0)
+                                                            {
+                                                                <DxFormLayoutItem ColSpanMd="12">
+                                                                    <h3 class="fw-bolder">@GeneralConsultanService.Reference</h3>
+                                                                </DxFormLayoutItem>
+                                                            }
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        @{
+                                                            if (GeneralConsultanService.Patient is null)
+                                                            {
+                                                                GeneralConsultanService.Patient = new();
+                                                            }
+
+                                                            if (GeneralConsultanService.Patient.Department is null)
+                                                            {
+                                                                GeneralConsultanService.Patient.Department = new();
+                                                            }
+
+                                                            if (GeneralConsultanService.Patient.Supervisor is null)
+                                                            {
+                                                                GeneralConsultanService.Patient.Supervisor = new();
+                                                            }
+                                                        }
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Employee" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Patients"
+                                                                              NullText="Select Employee"
+                                                                              @ref="refPatientComboBox"
+                                                                              @bind-Value="@GeneralConsultanService.PatientId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
+                                                                              TextChanged="((string e) => OnInputPatientChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchPatientIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchPatient"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchPatientIndexIncrement"
+                                                                                        Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="NIP" />
+                                                                        <DxListEditorColumn FieldName="Name" />
+                                                                        <DxListEditorColumn FieldName="Email" />
+                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                        <DxListEditorColumn FieldName="Gender" />
+                                                                        <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
+                                                                <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                               NullText="Current Mobile"
+                                                                               ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                               ShowValidationIcon="true">
+                                                                </DxMaskedInput>
+                                                                <ValidationMessage For="@(() => UserForm.CurrentMobile)"   />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Employee Number" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NIP)" NullText="Employee Number" ReadOnly InputCssClass="fw-normal" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="(GeneralConsultanService.Patient.Department.Name)" NullText="Department" ReadOnly InputCssClass="fw-normal" />
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Supervisor" ColSpanMd="12">
+                                                                <DxTextBox @bind-Text="(GeneralConsultanService.Patient.Supervisor.Name)" NullText="Supervisor" ReadOnly InputCssClass="fw-normal" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Age" ColSpanMd="12">
+                                                                <Template>
+                                                                    <DxGridLayout>
+                                                                        <Rows>
+                                                                            <DxGridLayoutRow />
+                                                                        </Rows>
+                                                                        <Columns>
+                                                                            <DxGridLayoutColumn Width="90%" />
+                                                                            <DxGridLayoutColumn Width="30%" />
+                                                                        </Columns>
+                                                                        <Items>
+                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                                                <Template>
+                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Patient.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
+                                                                                </Template>
+                                                                            </DxGridLayoutItem>
+                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                                <Template>
+                                                                                    <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+                                                                                </Template>
+                                                                            </DxGridLayoutItem>
+                                                                        </Items>
+                                                                    </DxGridLayout>
+
+                                                                </Template>
+                                                            </DxFormLayoutItem>
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
+                                                                <MyDxComboBox ReadOnly
+                                                                              Data="@RegisType"
+                                                                              NullText="Select Registration..."
+                                                                              AllowUserInput="true"
+                                                                              @bind-Value="@GeneralConsultanService.TypeRegistration">
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
+                                                            </DxFormLayoutItem>
+
+
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Method" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Payments"
+                                                                              NullText="Payment Method.."
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
+                                                                              @bind-Value="GeneralConsultanService.Payment">
+
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
+                                                            </DxFormLayoutItem>
+                                                            @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
+                                                            {
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@InsurancePolicies"
+                                                                                  ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                  NullText="Select InsurancePolicy"
+                                                                                  @ref="refInsurancePolicyComboBox"
+                                                                                  @bind-Value="GeneralConsultanService.InsurancePolicyId"
+                                                                                  EditFormat="{0} - {1}"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputInsurancePolicyChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchInsurancePolicyIndexDecrement"
+                                                                                            Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchInsurancePolicy"
+                                                                                            Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchInsurancePolicyIndexIncrement"
+                                                                                            Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons>
+                                                                        <Columns>
+                                                                            <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
+                                                                                                Caption="No Card" />
+
+                                                                            <DxListEditorColumn FieldName="Insurance.Name"
+                                                                                                Caption="Insurance Company" />
+                                                                        </Columns>
+                                                                    </MyDxComboBox>
+                                                                </DxFormLayoutItem>
+                                                            }
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
+                                                                <DxDateEdit ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                            @bind-Date="@GeneralConsultanService.RegistrationDate"
+                                                                            Mask="@DateTimeMask.ShortDate"
+                                                                            NullText="Select Registration Date">
+                                                                </DxDateEdit>
+                                                                <ValidationMessage For="@(() => GeneralConsultanService.RegistrationDate)" />
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <DxFormLayout>
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Physicions"
+                                                                              NullText="Select Physicion"
+                                                                              @ref="refPhysicionComboBox"
+                                                                              @bind-Value="@GeneralConsultanService.PratitionerId"
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputPhysicionChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Click="OnSearchPhysicionIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Click="OnSearchPhysicion"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Click="OnSearchPhysicionIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="Name" />
+                                                                        <DxListEditorColumn FieldName="Email" />
+                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                        <DxListEditorColumn FieldName="Gender" />
+                                                                        <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                        <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                        <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>GeneralConsultanService.PratitionerId)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Safety Personel" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@SafetyPersonels"
+                                                                              NullText="Select Safety Personel Name"
+                                                                              @ref="refSafetyPersonelComboBox"
+                                                                              @bind-Value="@Accident.SafetyPersonnelId"
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputSafetyPersonelChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Click="OnSearchSafetyPersonelIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Click="OnSearchSafetyPersonel"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Click="OnSearchSafetyPersonelIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="Name" />
+                                                                        <DxListEditorColumn FieldName="Email" />
+                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                        <DxListEditorColumn FieldName="Gender" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>Accident.SafetyPersonnelId)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Class" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@ClassType"
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              NullText="Select Class..."
+                                                                              @bind-Value="Accident.EmployeeClass">
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sent" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@SentType"
+                                                                              NullText="Select Type..."
+                                                                              SelectedItemChanged="@((string e)=>OnSelectSent(e))"
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              @bind-Value="Accident.Sent">
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(() => Accident.Sent)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Accident Location" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@AccidentLocations"
+                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                              NullText="Select Accident Location..."
+                                                                              SelectedItemChanged="@((string e)=>OnSelectAccidentLocation(e))"
+                                                                              ReadOnly="IsStatus(EnumStatusAccident.Done)"
+                                                                              @bind-Value="Accident.AccidentLocation">
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(() => Accident.AccidentLocation)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date Of Occurrence" ColSpanMd="12">
+                                                                <DxDateEdit ShowValidationIcon="true"
+                                                                            @bind-Date="Accident.DateOfOccurrence"
+                                                                            TimeSectionVisible="true"
+                                                                            ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                            NullText="Select Date Of Occurrence">
+                                                                </DxDateEdit>
+                                                                <ValidationMessage For="@(() => Accident.DateOfOccurrence)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date Of First Treatment" ColSpanMd="12">
+                                                                <DxDateEdit ShowValidationIcon="true"
+                                                                            @bind-Date="Accident.DateOfFirstTreatment"
+                                                                            TimeSectionVisible="true"
+                                                                            ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                            NullText="Select Date Of First Treatment">
+                                                                </DxDateEdit>
+                                                                <ValidationMessage For="@(() => Accident.DateOfFirstTreatment)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Caption="Area Of Yard" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxTextBox ShowValidationIcon="true"
+                                                                           @bind-Text="Accident.AreaOfYard"
+                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                           NullText="Area Of Yard" />
+                                                                <ValidationMessage For="@(() => Accident.AreaOfYard)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Project" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@Projects"
+                                                                              NullText="Select Project"
+                                                                              @ref="refProjectComboBox"
+                                                                              ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                              @bind-Value="@Accident.ProjectId"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputProjectChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchProjectIndexDecrement" 
+                                                                             Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchProject"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                         Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchProjectIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="@nameof(ProjectDto.Name)" Caption="Name" />
+                                                                        <DxListEditorColumn FieldName="@nameof(ProjectDto.Code)" Caption="Code" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>Accident.DateOfFirstTreatment)" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
+                                                                <DxCheckBox @bind-Checked="@GeneralConsultanService.IsSickLeave"
+                                                                            ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                            </DxFormLayoutItem>
+
+                                                            <DxFormLayoutItem Visible="@GeneralConsultanService.IsSickLeave" CaptionCssClass="normal-caption" Caption="Start-End Date" ColSpanMd="12">
+                                                                <Template>
+                                                                    <DxGridLayout ColumnSpacing="8px">
+                                                                        <Rows>
+                                                                            <DxGridLayoutRow />
+                                                                        </Rows>
+                                                                        <Columns>
+                                                                            <DxGridLayoutColumn />
+                                                                            <DxGridLayoutColumn />
+                                                                        </Columns>
+                                                                        <Items>
+                                                                            <DxGridLayoutItem Row="0" Column="0">
+                                                                                <Template>
+                                                                                    <DxDateEdit ReadOnly="@(IsStatus(EnumStatusAccident.Done))" @bind-Date="@GeneralConsultanService.StartDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select Start Date" />
+                                                                                </Template>
+                                                                            </DxGridLayoutItem>
+                                                                            <DxGridLayoutItem Row="0" Column="1">
+                                                                                <Template>
+                                                                                    <DxDateEdit ReadOnly="@(IsStatus(EnumStatusAccident.Done))" @bind-Date="@GeneralConsultanService.EndDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select End Date" />
+                                                                                </Template>
+                                                                            </DxGridLayoutItem>
+                                                                        </Items>
+                                                                    </DxGridLayout>
+                                                                </Template>
+                                                            </DxFormLayoutItem>
+                                                        </DxFormLayout>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="w-100">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <DxTabs>
+                                                <DxTabPage CssClass="w-100" Text="Clinical Assesment">
+                                                    <div class="w-100 mt-2">
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">Clinical Assesment</span>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div class="row w-100">
+                                                                    <div class="col-md-6">
+                                                                        <DxFormLayout CssClass="w-100">
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Information From" ColSpanMd="12">
+                                                                                <MyDxComboBox ReadOnly="ReadOnlyForm()"
+                                                                                              Data="@InformationFrom"
+                                                                                              NullText="Select Information From..."
+                                                                                              @bind-Value="@GeneralConsultanService.InformationFrom">
+                                                                                </MyDxComboBox>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Clinic Visit Types" ColSpanMd="12">
+                                                                                <MyDxComboBox ReadOnly="ReadOnlyForm()" Data="@ClinicVisitTypes"
+                                                                                              NullText="Select Clinic Visit Type..."
+                                                                                              @bind-Value="@GeneralConsultanService.ClinicVisitTypes">
+                                                                                </MyDxComboBox>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Weight" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.Weight" NullText="Weight" />
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Height" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.Height" NullText="Height" />
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="RR" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.RR" NullText="RR" />
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="SpO2" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.SpO2" />
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Waist Circumference" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.WaistCircumference" />
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CssClass="mt-3" CaptionCssClass="normal-caption" Caption="Body Max Index" ColSpanMd="12">
+                                                                                <h3>@GeneralConsultanService.BMIIndexString</h3>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Scrinning Triage Scale" ColSpanMd="12">
+                                                                                <MyDxComboBox Data="@Colors"
+                                                                                              Context="oeee"
+                                                                                              NullText="Scrinning Triage Scale..."
+                                                                                              ReadOnly="ReadOnlyForm()"
+                                                                                              @bind-Value="@GeneralConsultanService.ScrinningTriageScale">
+                                                                                    <ItemTemplate>
+                                                                                        @{
+                                                                                            var item = oeee as string;
+                                                                                        }
+                                                                                        <div style="display: flex; align-items: center;">
+                                                                                            <div style="width: 15px; height: 15px; background-color: @(item?.ToLower()); margin-right: 10px;"></div>
+                                                                                            <span>@item</span>
+                                                                                        </div>
+                                                                                    </ItemTemplate>
+                                                                                    <EditBoxTemplate>
+                                                                                        <div style="display: flex; align-items: center;">
+                                                                                            <div style="width: 15px; height: 15px; background-color: @(GeneralConsultanService.ScrinningTriageScale?.ToLower()); margin-right: 10px;"></div>
+                                                                                            <span>@GeneralConsultanService.ScrinningTriageScale</span>
+                                                                                        </div>
+                                                                                    </EditBoxTemplate>
+                                                                                </MyDxComboBox>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="text-bold" BeginRow="true" Caption="GCS">
+                                                                                <p></p>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" BeginRow="true" Caption="E" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.E" NullText="E" />
+                                                                            </DxFormLayoutItem>
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="V" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.V" NullText="V" />
+                                                                            </DxFormLayoutItem>
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="M" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.M" NullText="M" />
+                                                                            </DxFormLayoutItem>
+                                                                        </DxFormLayout>
+                                                                    </div>
+
+                                                                    <div class="col-md-6">
+                                                                        <DxFormLayout CssClass="w-100">
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Awareness" ColSpanMd="12">
+                                                                                <MyDxComboBox ReadOnly="ReadOnlyForm()" Data="@Awareness"
+                                                                                              NullText="Select Awareness..."
+                                                                                              TextFieldName="NmSadar"
+                                                                                              ValueFieldName="Id"
+                                                                                              @bind-Value="@GeneralConsultanService.AwarenessId">
+                                                                                </MyDxComboBox>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temp" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.Temp" NullText="Temp" />
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR" ColSpanMd="12">
+                                                                                <Template>
+                                                                                    <DxGridLayout>
+                                                                                        <Rows>
+                                                                                            <DxGridLayoutRow />
+                                                                                        </Rows>
+                                                                                        <Columns>
+                                                                                            <DxGridLayoutColumn Width="90%" />
+                                                                                            <DxGridLayoutColumn Width="10%" />
+                                                                                        </Columns>
+                                                                                        <Items>
+                                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
+                                                                                                <Template>
+                                                                                                    <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.HR" NullText="HR" />
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                                                <Template>
+                                                                                                    <h6 class="pl-1 pt-2">BPM</h6>
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                        </Items>
+                                                                                    </DxGridLayout>
+
+                                                                                </Template>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Systolic/Diastolic BP" ColSpanMd="12">
+                                                                                <Template>
+                                                                                    <DxGridLayout ColumnSpacing="8px">
+                                                                                        <Rows>
+                                                                                            <DxGridLayoutRow />
+                                                                                        </Rows>
+                                                                                        <Columns>
+                                                                                            <DxGridLayoutColumn />
+                                                                                            <DxGridLayoutColumn />
+                                                                                        </Columns>
+                                                                                        <Items>
+                                                                                            <DxGridLayoutItem Row="0" Column="0">
+                                                                                                <Template>
+                                                                                                    <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.Systolic" />
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                            <DxGridLayoutItem Row="0" Column="2">
+                                                                                                <Template>
+                                                                                                    <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.DiastolicBP" />
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                        </Items>
+                                                                                    </DxGridLayout>
+                                                                                </Template>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pain Scale" ColSpanMd="12">
+                                                                                <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" MaxValue="10" @bind-Value="@GeneralConsultanService.PainScale">
+                                                                                    <Buttons>
+                                                                                        <DxEditorButton IconCssClass="fa-regular fa-face-smile" Click="OnClickPainScalePopUp" />
+                                                                                    </Buttons>
+                                                                                </DxSpinEdit>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem CssClass="mt-3" CaptionCssClass="normal-caption" Caption="BMI State" ColSpanMd="12">
+                                                                                <h3>@GeneralConsultanService.BMIState</h3>
+                                                                            </DxFormLayoutItem>
+
+                                                                            <DxFormLayoutItem Caption="Risk of Falling" CaptionCssClass=" normal-caption" ColSpanMd="12">
+                                                                                <Template>
+                                                                                    <DxGridLayout ColumnSpacing="8px">
+                                                                                        <Rows>
+                                                                                            <DxGridLayoutRow />
+                                                                                        </Rows>
+                                                                                        <Columns>
+                                                                                            <DxGridLayoutColumn />
+                                                                                            <DxGridLayoutColumn />
+                                                                                        </Columns>
+                                                                                        <Items>
+                                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="normal-caption" ColumnSpan="1">
+                                                                                                <Template>
+                                                                                                    <MyDxComboBox Data="@RiskOfFalling"
+                                                                                                                  ReadOnly="ReadOnlyForm()"
+                                                                                                                  NullText="Risk of Falling..."
+                                                                                                                  SelectedItemChanged="@((string e) => OnSelectRiskOfFalling(e))"
+                                                                                                                  @bind-Value="@GeneralConsultanService.RiskOfFalling">
+                                                                                                    </MyDxComboBox>
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass=" normal-caption" ColumnSpan="6">
+                                                                                                <Template>
+                                                                                                    <MyDxComboBox Data="@RiskOfFallingDetail"
+                                                                                                                  ReadOnly="ReadOnlyForm()"
+                                                                                                                  NullText="@(GeneralConsultanService.RiskOfFalling)"
+                                                                                                                  @bind-Value="@GeneralConsultanService.RiskOfFallingDetail">
+                                                                                                    </MyDxComboBox>
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                        </Items>
+                                                                                    </DxGridLayout>
+                                                                                </Template>
+                                                                            </DxFormLayoutItem>
+                                                                        </DxFormLayout>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </DxTabPage>
+
+                                                <DxTabPage CssClass="w-100" Click="OnClickTabCPPT" Text="CPPT">
+                                                    <div class="w-100 mt-2">
+                                                        <div class="card w-100">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">CPPT</span>
+                                                            </div>
+
+                                                            <div class="row w-100">
+                                                                <div class="col-md-12 w-100">
+                                                                    <DxFormLayout CssClass="w-100">
+                                                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                        IsContentBlocked="true"
+                                                                                        ApplyBackgroundShading="true"
+                                                                                        IndicatorAreaVisible="false"
+                                                                                        Text="Fetching Data...">
+                                                                            <MyGridPaginate @ref="GridCppt"
+                                                                                            Data="GeneralConsultanCPPTs"
+                                                                                            @bind-SelectedDataItems="@SelectedDataItemsCPPT"
+                                                                                            EditModelSaving="OnSaveCPPT"
+                                                                                            DataItemDeleting="OnDeleteCPPT"
+                                                                                            FocusedRowChanged="GridTabCPPT_FocusedRowChanged"
+                                                                                            SearchTextChanged="OnSearchBoxChangedGridCPPT"
+                                                                                            KeyFieldName="Id">
+
+                                                                                <Columns>
+                                                                                    <DxGridDataColumn FieldName="DateTime" Caption="Date" DisplayFormat="@Helper.DefaultFormatDateTime" />
+                                                                                    <DxGridDataColumn FieldName="User.Name" Caption="User" />
+                                                                                    <DxGridDataColumn FieldName="Subjective" />
+                                                                                    <DxGridDataColumn FieldName="Objective" />
+                                                                                    <DxGridDataColumn FieldName="NursingDiagnoses.Problem" Caption="Nursing Diagnoses" />
+                                                                                    <DxGridDataColumn FieldName="Diagnosis.Name" Caption="Diagnosis" />
+                                                                                    <DxGridDataColumn FieldName="Planning" />
+                                                                                </Columns>
+
+                                                                                <ToolbarTemplate>
+                                                                                    <MyDxToolbarBase TItem="GeneralConsultanCPPTDto"
+                                                                                                     Items="@GeneralConsultanCPPTs"
+                                                                                                     SelectedDataItems="@SelectedDataItemsCPPT"
+                                                                                                     NewItem_Click="@NewItemCPPT_Click"
+                                                                                                     EditItem_Click="@EditItemCPPT_Click"
+                                                                                                     DeleteItem_Click="@DeleteItemCPPT_Click"
+                                                                                                     Refresh_Click="@RefreshCPPT_Click"
+                                                                                                     Grid="GridCppt"
+                                                                                                     IsImport="false"
+                                                                                                     VisibleNew="@(!IsStatus(EnumStatusAccident.Done) && GeneralConsultanService.Id > 0)"
+                                                                                                     VisibleEdit="@(!IsStatus(EnumStatusAccident.Done) && GeneralConsultanService.Id > 0)"
+                                                                                                     VisibleDelete="@(!IsStatus(EnumStatusAccident.Done) && GeneralConsultanService.Id > 0)" />
+                                                                                </ToolbarTemplate>
+
+                                                                                <EditFormTemplate Context="EditFormContext">
+                                                                                    @{
+                                                                                        var a = (GeneralConsultanCPPTDto)EditFormContext.EditModel;
+                                                                                        var userName = string.Empty;
+                                                                                        @if (UserLogin is not null && a.Id == 0)
+                                                                                        {
+                                                                                            a.UserId = UserLogin.Id;
+                                                                                            userName = UserLogin.Name;
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            userName = a.User is not null ? a.User.Name : "-";
+                                                                                        }
+
+                                                                                        void OnClickGetObjectives()
+                                                                                        {
+                                                                                            a.Objective = $"Weight: {GeneralConsultanService.Weight}, Height: {GeneralConsultanService.Height}, RR: {GeneralConsultanService.RR}, SpO2: {GeneralConsultanService.SpO2}, BMIIndex: {Math.Round(GeneralConsultanService.BMIIndex, 2).ToString()}, BMIState: {GeneralConsultanService.BMIState}, Temp: {GeneralConsultanService.Temp}, HR: {GeneralConsultanService.HR}, Systolic: {GeneralConsultanService.Systolic}, DiastolicBP: {GeneralConsultanService.DiastolicBP}, E: {GeneralConsultanService.E}, V: {GeneralConsultanService.V}, M: {GeneralConsultanService.M}";
+                                                                                        }
+                                                                                    }
+                                                                                    <DxFormLayout CssClass="w-100">
+                                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                                                            <DxTextBox @bind-Text="@userName" ReadOnly="true" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Subjective" ColSpanMd="12">
+                                                                                            <DxTextBox @bind-Text="@a.Subjective" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Objective" ColSpanMd="12">
+                                                                                            <DxMaskedInput @bind-Value="@a.Objective"
+                                                                                                           NullText="Objective">
+                                                                                                <Buttons>
+                                                                                                    <DxEditorButton CssClass="text-bold btn-primary" Text="Get Objectives" Click="OnClickGetObjectives" />
+                                                                                                </Buttons>
+                                                                                            </DxMaskedInput>
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        @*   @if (IsStatus(EnumStatusGeneralConsultantService.NurseStation))
+                                                                                    { *@
+                                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Nursing Diagnoses" ColSpanMd="12">
+                                                                                            <MyDxComboBox Data="@NursingDiagnoses"
+                                                                                                          NullText="Select Nursing Diagnoses"
+                                                                                                          @ref="refNursingDiagnosesComboBox"
+                                                                                                          @bind-Value="@a.NursingDiagnosesId"
+                                                                                                          TextFieldName="Problem"
+                                                                                                          ValueFieldName="Id"
+                                                                                                          TextChanged="((string e) => OnInputNursingDiagnosesChanged(e))">
+                                                                                                <Buttons>
+                                                                                                    <DxEditorButton Click="OnSearchNursingDiagnosesIndexDecrement"
+                                                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                                                    Tooltip="Previous Index" />
+                                                                                                    <DxEditorButton Click="OnSearchNursingDiagnoses"
+                                                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                    Tooltip="Search" />
+                                                                                                    <DxEditorButton Click="OnSearchNursingDiagnosesIndexIncrement"
+                                                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                                                    Tooltip="Next Index" />
+                                                                                                </Buttons>
+                                                                                                <Columns>
+                                                                                                    <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Problem)" Caption="Name" />
+                                                                                                    <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Code)" Caption="Code" />
+                                                                                                </Columns>
+                                                                                            </MyDxComboBox>
+                                                                                            <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        @*  }
+                                                                                    else if (IsStatus(EnumStatusGeneralConsultantService.Physician))
+                                                                                    { *@
+                                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnoses" ColSpanMd="12">
+                                                                                            <MyDxComboBox Data="@Diagnoses"
+                                                                                                          NullText="Select Diagnoses"
+                                                                                                          @ref="refDiagnosesComboBox"
+                                                                                                          @bind-Value="@a.DiagnosisId"
+                                                                                                          TextFieldName="Name"
+                                                                                                          ValueFieldName="Id"
+                                                                                                          TextChanged="((string e) => OnInputDiagnosesChanged(e))">
+                                                                                                <Buttons>
+                                                                                                    <DxEditorButton Click="OnSearchDiagnosesIndexDecrement"
+                                                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                                                    Tooltip="Previous Index" />
+                                                                                                    <DxEditorButton Click="OnSearchDiagnoses"
+                                                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                    Tooltip="Search" />
+                                                                                                    <DxEditorButton Click="OnSearchDiagnosesIndexIncrement"
+                                                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                                                    Tooltip="Next Index" />
+                                                                                                </Buttons>
+                                                                                                <Columns>
+                                                                                                    <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)" Caption="Name" />
+                                                                                                    <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)" Caption="Code" />
+                                                                                                    <DxListEditorColumn FieldName="DiseaseCategory.Name" Caption="Disease Category" />
+                                                                                                    <DxListEditorColumn FieldName="CronisCategory.Name" Caption="Cronis Category" />
+                                                                                                </Columns>
+                                                                                            </MyDxComboBox>
+                                                                                            <ValidationMessage For="@(()=>a.DiagnosisId)" />
+                                                                                        </DxFormLayoutItem>
+                                                                                        @* } *@
+                                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
+                                                                                            <DxTextBox @bind-Text="@a.Planning" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                                                        </DxFormLayoutItem>
+                                                                                    </DxFormLayout>
+                                                                                </EditFormTemplate>
+                                                                            </MyGridPaginate>
+
+                                                                            <div class="row">
+                                                                                <DxFormLayout>
+                                                                                    <div class="col-md-9">
+                                                                                        <DxFormLayoutItem>
+                                                                                            <DxPager PageCount="totalCountGridCPPT"
+                                                                                                     ActivePageIndexChanged="OnPageIndexChangedGridCPPT"
+                                                                                                     ActivePageIndex="activePageIndexTotalCountGridCPPT"
+                                                                                                     VisibleNumericButtonCount="10"
+                                                                                                     SizeMode="SizeMode.Medium"
+                                                                                                     NavigationMode="PagerNavigationMode.Auto">
+                                                                                            </DxPager>
+                                                                                        </DxFormLayoutItem>
+                                                                                    </div>
+                                                                                    <div class="col-md-3 d-flex justify-content-end">
+                                                                                        <DxFormLayoutItem Caption="Page Size:">
+                                                                                            <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                                                          NullText="Select Page Size"
+                                                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                                                          SelectedItemChanged="((int e ) => OnpageSizeGridCPPTIndexChangedGridCPPT(e))"
+                                                                                                          @bind-Value="pageSizeGridCPPT">
+                                                                                            </MyDxComboBox>
+                                                                                        </DxFormLayoutItem>
+                                                                                    </div>
+                                                                                </DxFormLayout>
+                                                                            </div>
+                                                                        </DxLoadingPanel>
+                                                                    </DxFormLayout>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </DxTabPage>
+
+                                                <DxTabPage CssClass="w-100" Text="Assesment of Injury">
+                                                    <div class="w-100 mt-2">
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">Nature Of Injury</span>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div class="w-100">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury1"
+                                                                                      NullText="@GetNullText(NatureOfInjury1)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury1"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury1.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury1"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury2"
+                                                                                      NullText="@GetNullText(NatureOfInjury2)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury2"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury2.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury2"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury3"
+                                                                                      NullText="@GetNullText(NatureOfInjury3)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury3"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury3.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury3"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury4"
+                                                                                      NullText="@GetNullText(NatureOfInjury4)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury4"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury4.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury4"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury5"
+                                                                                      NullText="@GetNullText(NatureOfInjury5)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury5"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury5.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury5"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury6"
+                                                                                      NullText="@GetNullText(NatureOfInjury6)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury6"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury6.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury6"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury7"
+                                                                                      NullText="@GetNullText(NatureOfInjury7)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury7"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury7.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury7"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@NatureOfInjury8"
+                                                                                      NullText="@GetNullText(NatureOfInjury8)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedNatureOfInjury8"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedNatureOfInjury8.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.NatureOfInjury8"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">Part Of Body</span>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div class="w-100">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody1"
+                                                                                      NullText="@GetNullText(PartOfBody1)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody1"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody1.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody1"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody2"
+                                                                                      NullText="@GetNullText(PartOfBody2)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody2"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody2.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody2"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody3"
+                                                                                      NullText="@GetNullText(PartOfBody3)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody3"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody3.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody3"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody4"
+                                                                                      NullText="@GetNullText(PartOfBody4)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody4"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody4.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody4"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody5"
+                                                                                      NullText="@GetNullText(PartOfBody5)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody5"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody5.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody5"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody6"
+                                                                                      NullText="@GetNullText(PartOfBody6)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody6"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody6.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody6"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody7"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      NullText="@GetNullText(PartOfBody7)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody7"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody7.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody7"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody8"
+                                                                                      NullText="@GetNullText(PartOfBody8)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody8"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody8.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody8"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody9"
+                                                                                      NullText="@GetNullText(PartOfBody9)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody9"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody9.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody9"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody10"
+                                                                                      NullText="@GetNullText(PartOfBody10)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody10"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody10.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody10"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody11"
+                                                                                      NullText="@GetNullText(PartOfBody11)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody11"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody11.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody11"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@PartOfBody12"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      NullText="@GetNullText(PartOfBody12)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedPartOfBody12"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedPartOfBody12.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.PartOfBody12"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">Cause Of Injury</span>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div class="w-100">
+                                                                    @*  <div class="row w-100">
+                                                                <div class="col-md-6">
+                                                                <DxComboBox Data="@EmployeeClass"
+                                                                NullText="Select Class..."
+                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                FilteringMode="DataGridFilteringMode.Contains"
+                                                                ListRenderMode="ListRenderMode.Virtual"
+                                                                @bind-Value="Accident.EmployeeClass">
+                                                                </DxComboBox>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                <MyTextBox NullText="Estimated Disability (days)..."
+                                                                ShowValidationIcon="true"
+                                                                @bind-Text="Accident.EstimatedDisability">
+                                                                </MyTextBox>
+                                                                <ValidationMessage For="@(() => Accident.EstimatedDisability)" />
+                                                                </div>
+                                                                </div> *@
+
+                                                                    <!-- Employee Cause of Injury 1 -->
+                                                                    <div class=" row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury1"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury1)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury1"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury1.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury1"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Repeat for other Employee Cause of Injury DxTagBox components -->
+                                                                    <!-- Employee Cause of Injury 2 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury2"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury2)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury2"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury2.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury2"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 3 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury3"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury3)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury3"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury3.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury3"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 4 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury4"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury4)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury4"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury4.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury4"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 5 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury5"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury5)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury5"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury5.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury5"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 6 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury6"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury6)"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury6"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury6.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury6"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 7 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury7"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury7)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury7"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury7.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury7"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 8 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury8"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury8)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury8"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury8.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury8"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 9 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury9"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury9)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury9"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury9.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury9"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 10 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury10"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury10)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury10"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury10.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury10"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 11 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury11"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury11)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury11"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury11.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury11"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 12 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury12"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury12)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury12"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury12.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury12"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 13 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury13"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury13)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury13"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury13.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury13"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <!-- Employee Cause of Injury 14 -->
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@EmployeeCauseOfInjury14"
+                                                                                      NullText="@GetNullText(EmployeeCauseOfInjury14)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedEmployeeCauseOfInjury14"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedEmployeeCauseOfInjury14.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.EmployeeCauseOfInjury14"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">Treatment</span>
+                                                            </div>
+
+                                                            <div class="card-body">
+                                                                <div class="w-100">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment1"
+                                                                                      NullText="@GetNullText(Treatment1)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedTreatment1"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment1.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment1"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment2"
+                                                                                      NullText="@GetNullText(Treatment2)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedTreatment2"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment2.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment2"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment3"
+                                                                                      NullText="@GetNullText(Treatment3)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedTreatment3"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment3.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment3"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment4"
+                                                                                      NullText="@GetNullText(Treatment4)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedTreatment4"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment4.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment4"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment5"
+                                                                                      NullText="@GetNullText(Treatment5)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedTreatment5"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment5.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment5"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment6"
+                                                                                      NullText="@GetNullText(Treatment6)"
+                                                                                      TData="string"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      @bind-Values="@Accident.SelectedTreatment6"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment6.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment6"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+
+                                                                    <div class="row w-100 mt-2">
+                                                                        <div class="col-md-6">
+                                                                            <DxTagBox Data="@Treatment7"
+                                                                                      NullText="@GetNullText(Treatment7)"
+                                                                                      TData="string"
+                                                                                      TValue="string"
+                                                                                      AllowCustomTags="true"
+                                                                                      ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                      @bind-Values="@Accident.SelectedTreatment7"
+                                                                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                                        </div>
+                                                                        @if (Accident.SelectedTreatment7.Count() > 0)
+                                                                        {
+                                                                            <div class="col-md-6">
+                                                                                <MyTextBox @bind-Text="@Accident.Treatment7"
+                                                                                           ReadOnly="@(IsStatus(EnumStatusAccident.Done))" />
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="card-header">
+                                                                <span class="fw-bolder">Employee's Description</span>
+                                                            </div>
+
+                                                            <div class="card-body w-100">
+                                                                <div class="w-100">
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-12 w-100">
+                                                                            <DxMemo @bind-Text="Accident.EmployeeDescription"
+                                                                                    Rows="5"
+                                                                                    TextAreaCssClass="w-100"
+                                                                                    CssClass="w-100"
+                                                                                    ReadOnly="@(IsStatus(EnumStatusAccident.Done))"
+                                                                                    NullText="Employee's Description" />
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </DxTabPage>
+                                            </DxTabs>
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && (!UserAccessCRUID.IsCreate && !UserAccessCRUID.IsUpdate))
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+<DxPopup HeaderText="Historical Medical Record Patient" @bind-Visible="@IsHistoricalRecordPatient" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="90%">
+    <PopUpGCHistoricalMedicalRecordPatient GeneralConsultanService="GeneralConsultanService">
+
+    </PopUpGCHistoricalMedicalRecordPatient>
+</DxPopup>

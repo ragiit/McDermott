@@ -10,24 +10,27 @@ namespace McDermott.Domain.Entities
     {
         public long GeneralConsultanServiceId { get; set; }
         public long SafetyPersonnelId { get; set; }
+
         [Display(Name = "Date Of Occurrence")]
-        [Required]
-        public DateTime? DateOfOccurrence { get; set; }
-        [Required]
-        public DateTime? DateOfFirstTreatment { get; set; }
+        public DateTime DateOfOccurrence { get; set; }
+
+        public DateTime DateOfFirstTreatment { get; set; }
+
         public bool RibbonSpecialCase { get; set; } = false;
         public string? Sent { get; set; }
         public string? EmployeeClass { get; set; }
+
         [RegularExpression(@"^\d+$", ErrorMessage = "The {0} field must contain only numbers.")]
         public string? EstimatedDisability { get; set; }
+
         public string? AreaOfYard { get; set; }
+        public long? ProjectId { get; set; }
         public EnumStatusAccident Status { get; set; } = EnumStatusAccident.Draft;
         public string? EmployeeDescription { get; set; }
         public string AccidentLocation { get; set; } = "Inside";
 
-       
-
         #region Employee Cause Of Injury
+
         public List<string> SelectedEmployeeCauseOfInjury1 { get; set; } = [];
         public List<string> SelectedEmployeeCauseOfInjury2 { get; set; } = [];
         public List<string> SelectedEmployeeCauseOfInjury3 { get; set; } = [];
@@ -58,7 +61,7 @@ namespace McDermott.Domain.Entities
         public string? EmployeeCauseOfInjury13 { get; set; }
         public string? EmployeeCauseOfInjury14 { get; set; }
 
-        #endregion
+        #endregion Employee Cause Of Injury
 
         #region Nature Of Injury
 
@@ -79,7 +82,7 @@ namespace McDermott.Domain.Entities
         public string? NatureOfInjury7 { get; set; }
         public string? NatureOfInjury8 { get; set; }
 
-        #endregion
+        #endregion Nature Of Injury
 
         #region Part Of Body
 
@@ -96,7 +99,6 @@ namespace McDermott.Domain.Entities
         public List<string> SelectedPartOfBody11 { get; set; } = [];
         public List<string> SelectedPartOfBody12 { get; set; } = [];
 
-
         public string? PartOfBody1 { get; set; }
         public string? PartOfBody2 { get; set; }
         public string? PartOfBody3 { get; set; }
@@ -110,9 +112,10 @@ namespace McDermott.Domain.Entities
         public string? PartOfBody11 { get; set; }
         public string? PartOfBody12 { get; set; }
 
-        #endregion
+        #endregion Part Of Body
 
         #region Treatment
+
         public List<string> SelectedTreatment1 { get; set; } = [];
         public List<string> SelectedTreatment2 { get; set; } = [];
         public List<string> SelectedTreatment3 { get; set; } = [];
@@ -127,17 +130,13 @@ namespace McDermott.Domain.Entities
         public string? Treatment5 { get; set; }
         public string? Treatment6 { get; set; }
         public string? Treatment7 { get; set; }
-        #endregion
 
-        [SetToNull]
+        #endregion Treatment
+
         public virtual GeneralConsultanService? GeneralConsultanService { get; set; }
-
-        [SetToNull]
         public virtual User? Employee { get; set; }
-        [SetToNull]
         public virtual Department? Department { get; set; }
-
-        [SetToNull]
         public virtual User? SafetyPersonnel { get; set; }
+        public virtual Project? Project { get; set; }
     }
 }

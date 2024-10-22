@@ -1,8 +1,9 @@
-﻿using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
-namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
+namespace McDermott.Web.Components.Pages.Transaction.Accidents
 {
-    public partial class VaccinationsPage
+    public partial class AccidentsPage
     {
         private List<GeneralConsultanServiceDto> GeneralConsultanServices { get; set; } = [];
 
@@ -31,7 +32,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
         #endregion UserLoginAndAccessRole
 
-        private string FormUrl = "clinic-service/vaccinations";
+        private string FormUrl = "clinic-service/accidents";
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
@@ -58,16 +59,30 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             {
                 if (SelectedDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id));
+                    var id = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id;
+
+                    await Mediator.Send(new DeleteGeneralConsultanServiceRequest(id: id));
+                    await Mediator.Send(new DeleteAccidentByGcIdRequest
+                    {
+                        Id = id,
+                    });
                 }
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<GeneralConsultanServiceDto>>();
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteAccidentByGcIdRequest
+                    {
+                        Ids = a.Select(x => x.Id).ToList()
+                    });
                 }
                 await LoadData();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -118,13 +133,51 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
                     ],
-                    Predicate = x => x.IsVaccination == true,
+                    Select = x => new GeneralConsultanService
+                    {
+                        Id = x.Id,
+                        Patient = new User
+                        {
+                            Name = x.Patient == null ? "" : x.Patient.Name,
+                        },
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner == null ? "" : x.Pratitioner.Name
+                        }
+                    },
+                    Predicate = x => x.IsAccident == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,
                 });
-
                 GeneralConsultanServices = a.Item1;
+
+                foreach (var service in GeneralConsultanServices)
+                {
+                    service.Accident = await Mediator.Send(new GetSingleAccidentQuery
+                    {
+                        Predicate = x => x.GeneralConsultanServiceId == service.Id,
+                        Select = x => new Accident
+                        {
+                            Id = x.Id,
+                            SafetyPersonnel = new User
+                            {
+                                Name = x.SafetyPersonnel == null ? "" : x.SafetyPersonnel.Name
+                            },
+                            DateOfOccurrence = x.DateOfOccurrence,
+                            DateOfFirstTreatment = x.DateOfFirstTreatment,
+                            RibbonSpecialCase = x.RibbonSpecialCase,
+                            Sent = x.Sent,
+                            EmployeeClass = x.EmployeeClass,
+                            EstimatedDisability = x.EstimatedDisability,
+                            AreaOfYard = x.AreaOfYard,
+                            Status = x.Status,
+                            EmployeeDescription = x.EmployeeDescription,
+                            AccidentLocation = x.AccidentLocation,
+                        }
+                    });
+                }
+
                 totalCount = a.PageCount;
                 activePageIndex = pageIndex;
             }
@@ -148,7 +201,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             try
             {
                 var GeneralConsultanService = SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>();
-                NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={GeneralConsultanService.Id}");
+                NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={GeneralConsultanService.Accident?.Id}");
             }
             catch (Exception ex)
             {
@@ -195,7 +248,5 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             }
             return new MarkupString("");
         }
-
-        private bool IsDashboard { get; set; } = false;
     }
 }

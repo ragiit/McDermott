@@ -1,13 +1,13 @@
-﻿@page "/clinic-service/vaccinations"
+﻿@page "/clinic-service/accidents"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Vaccinations</PageTitle>
+<PageTitle>McHealthCare - Accidents</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Vaccinations" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+        <BaseHeaderPage Title="Accidents" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -20,7 +20,7 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
- 
+
                                 <MyGridPaginate @ref="Grid"
                                                 Data="GeneralConsultanServices"
                                                 PageSize="10"
@@ -49,25 +49,19 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200"
-                                                          FieldName="RegistrationDate"
-                                                          FilterRowOperatorType="GridFilterRowOperatorType.Contains"
-                                                          DisplayFormat="ddd, dd MMM yyyy"
-                                                          Caption="Registration Date" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Reference" Caption="Reference" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="RegistrationDate" Caption="Registration Date" DisplayFormat="@Helper.DefaultFormatDate" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="SerialNo" Caption="Serial No" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.SafetyPersonnel.Name" Caption="Safety Personnel" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="AppointmentDate" Caption="Appoiment Date" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="IsAlertInformationSpecialCase" Caption="Special Case">
-                                            <CellDisplayTemplate>
-                                                @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
-                                            </CellDisplayTemplate>
-                                        </DxGridDataColumn>
+                                        <DxGridDataColumn MinWidth="200" DisplayFormat="dd MMM yyyy HH:mm:ss" FieldName="Accident.DateOfOccurrence" Caption="Date Of Occurrence" />
+                                        <DxGridDataColumn MinWidth="200" DisplayFormat="dd MMM yyyy HH:mm:ss" FieldName="Accident.DateOfFirstTreatment" Caption="Date Of First Treatment" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.RibbonSpecialCase" Caption="Ribbon Special Case" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.Sent" Caption="Sent" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.EmployeeClass" Caption="Employee Class" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.EstimatedDisability" Caption="Estimated Disability" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.AreaOfYard" Caption="Area Of Yard" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.StatusName" Caption="Accident Status" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.EmployeeDescription" Caption="Employee Description" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Accident.AccidentLocation" Caption="Accident Location" />
                                     </Columns>
 
                                     <TotalSummary>

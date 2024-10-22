@@ -102,9 +102,7 @@ namespace McDermott.Web.Extentions
 
         public static List<string> RegisType = new List<string>
         {
-            "General Consultation",
-            "Emergency",
-            //"MCU"
+            "Accident"
         };
 
         public static List<string> ClinicVisitTypes = new List<string>
@@ -156,7 +154,7 @@ namespace McDermott.Web.Extentions
             "clinic-service/general-consultation-services",
             "clinic-service/medical-checkups",
             "clinic-service/procedure-rooms",
-            "clinic-service/acccidents",
+            "clinic-service/accidents",
             "clinic-service/telemedicines",
             "clinic-service/vaccinations",
             "clinic-service/reporting-and-analytics",
@@ -287,6 +285,31 @@ namespace McDermott.Web.Extentions
         public static List<string> ClassTypes = [
             "VIP",
         ];
+
+        public static List<string> ClassType = new List<string>
+        {
+            "FA",
+            "MTC",
+            "RWC",
+            "LTA",
+            "FATALITY",
+            "OCCUPATIONAL ILLNESS"
+        };
+
+        public static List<string> SentType = new List<string>
+        {
+            "Back to Work",
+            "Main Clinic",
+            "Home",
+            "Hospital",
+            //"MCU"
+        };
+
+        public static List<string> AccidentLocations = new List<string>
+        {
+            "Inside",
+            "Outside"
+        };
 
         public static string DefaultFormatDate => "dd MMMM yyyy";
 

@@ -1,10 +1,10 @@
- public class GetSingleLocationQuery : IRequest<LocationDto>
+ public class GetSingleProjectQuery : IRequest<ProjectDto>
  {
-     public List<Expression<Func<Location, object>>> Includes { get; set; }
-     public Expression<Func<Location, bool>> Predicate { get; set; }
-     public Expression<Func<Location, Location>> Select { get; set; }
+     public List<Expression<Func<Project, object>>> Includes { get; set; }
+     public Expression<Func<Project, bool>> Predicate { get; set; }
+     public Expression<Func<Project, Project>> Select { get; set; }
 
-     public List<(Expression<Func<Location, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+     public List<(Expression<Func<Project, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
      public bool IsDescending { get; set; } = false; // default to ascending
      public int PageIndex { get; set; } = 0;
@@ -13,13 +13,13 @@
      public string SearchTerm { get; set; }
  }
 
-public class GetLocationQuery : IRequest<(List<LocationDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetProjectQuery : IRequest<(List<ProjectDto>, int PageIndex, int PageSize, int PageCount)>
 {
-    public List<Expression<Func<Location, object>>> Includes { get; set; }
-    public Expression<Func<Location, bool>> Predicate { get; set; }
-    public Expression<Func<Location, Location>> Select { get; set; }
+    public List<Expression<Func<Project, object>>> Includes { get; set; }
+    public Expression<Func<Project, bool>> Predicate { get; set; }
+    public Expression<Func<Project, Project>> Select { get; set; }
 
-    public List<(Expression<Func<Location, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+    public List<(Expression<Func<Project, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
@@ -28,14 +28,14 @@ public class GetLocationQuery : IRequest<(List<LocationDto>, int PageIndex, int 
     public string SearchTerm { get; set; }
 }
   
-IRequestHandler<GetLocationQuery, (List<LocationDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleLocationQuery, LocationDto>,
+IRequestHandler<GetProjectQuery, (List<ProjectDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleProjectQuery, ProjectDto>,
 
-public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetLocationQuery request, CancellationToken cancellationToken)
+public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProjectQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<Location>().Entities.AsNoTracking(); 
+        var query = _unitOfWork.Repository<Project>().Entities.AsNoTracking(); 
 
         if (request.Predicate is not null)
             query = query.Where(request.Predicate);
@@ -51,8 +51,8 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
             {
                 query = additionalOrderBy.IsDescending
-                    ? ((IOrderedQueryable<Location>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                    : ((IOrderedQueryable<Location>)query).ThenBy(additionalOrderBy.OrderBy);
+                    ? ((IOrderedQueryable<Project>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                    : ((IOrderedQueryable<Project>)query).ThenBy(additionalOrderBy.OrderBy);
             }
         }
 
@@ -69,7 +69,7 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
         {
             query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Location.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Project.Name, $"%{request.SearchTerm}%")
                     );
         }
 
@@ -77,7 +77,7 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
         if (request.Select is not null)
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new Location
+            query = query.Select(x => new Project
             {
                 Id = x.Id, 
             });
@@ -91,11 +91,11 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
                 cancellationToken
             );
 
-            return (pagedItems.Adapt<List<LocationDto>>(), request.PageIndex, request.PageSize, totalPages);
+            return (pagedItems.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
         }
         else
         {
-            return ((await query.ToListAsync(cancellationToken)).Adapt<List<LocationDto>>(), 0, 1, 1);
+            return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProjectDto>>(), 0, 1, 1);
         }
     }
     catch (Exception ex)
@@ -106,11 +106,11 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
 }
 
 
-  public async Task<LocationDto> Handle(GetSingleLocationQuery request, CancellationToken cancellationToken)
+  public async Task<ProjectDto> Handle(GetSingleProjectQuery request, CancellationToken cancellationToken)
  {
      try
      {
-         var query = _unitOfWork.Repository<Location>().Entities.AsNoTracking();
+         var query = _unitOfWork.Repository<Project>().Entities.AsNoTracking();
 
          if (request.Predicate is not null)
              query = query.Where(request.Predicate);
@@ -126,8 +126,8 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
              foreach (var additionalOrderBy in request.OrderByList.Skip(1))
              {
                  query = additionalOrderBy.IsDescending
-                     ? ((IOrderedQueryable<Location>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                     : ((IOrderedQueryable<Location>)query).ThenBy(additionalOrderBy.OrderBy);
+                     ? ((IOrderedQueryable<Project>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                     : ((IOrderedQueryable<Project>)query).ThenBy(additionalOrderBy.OrderBy);
              }
          }
 
@@ -144,7 +144,7 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
          {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.Location.Name, $"%{request.SearchTerm}%")
+                EF.Functions.Like(v.Project.Name, $"%{request.SearchTerm}%")
                 );
          }
 
@@ -152,12 +152,12 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
          if (request.Select is not null)
              query = query.Select(request.Select);
          else
-             query = query.Select(x => new Location
+             query = query.Select(x => new Project
              {
                  Id = x.Id, 
              });
 
-         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<LocationDto>();
+         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProjectDto>();
      }
      catch (Exception ex)
      {
@@ -169,7 +169,7 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
 
 
 
- var a = await Mediator.Send(new GetLocationsQuery
+ var a = await Mediator.Send(new GetProjectsQuery
  {
      OrderByList =
      [
@@ -181,10 +181,10 @@ public async Task<(List<LocationDto>, int pageIndex, int pageSize, int pageCount
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleLocationQuery
+var patienss = (await Mediator.Send(new GetSingleProjectQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Location
+    Select = x => new Project
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -194,22 +194,34 @@ var patienss = (await Mediator.Send(new GetSingleLocationQuery
     },
 })) ?? new();
 
- var result = await Mediator.Send(new GetLocationQuery
- { 
-     SearchTerm = searchTerm,
-     PageIndex = pageIndex,
-     PageSize = pageSize,
- }); 
- Locations = result.Item1;
- activePageIndex = pageIndex;
- totalCount = result.PageCount;
+try
+{
+    PanelVisible = true;
+    var result = await Mediator.Send(new GetProjectQuery
+    {
+        SearchTerm = searchTerm,
+        PageIndex = pageIndex,
+        PageSize = pageSize,
+    });
+    Projects = result.Item1;
+    totalCount = result.PageCount;
+    activePageIndex = pageIndex;
+}
+catch (Exception ex)
+{
+    ex.HandleException(ToastService);
+}
+finally
+{ 
+    PanelVisible = false;
+}
 
 
 
 
 
 
-var data = (await Mediator.Send(new GetSingleLocationsQuery
+var data = (await Mediator.Send(new GetSingleProjectsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -217,17 +229,17 @@ var data = (await Mediator.Send(new GetSingleLocationsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Location
+    Select = x => new Project
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Location
+        Patient = new Project
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Location
+        Pratitioner = new Project
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -238,3 +250,100 @@ var data = (await Mediator.Send(new GetSingleLocationsQuery
         EndDateSickLeave = x.EndDateSickLeave,
     }
 })) ?? new();
+
+
+#region ComboboxProject
+
+ private DxComboBox<ProjectDto, long?> refProjectComboBox { get; set; }
+ private int ProjectComboBoxIndex { get; set; } = 0;
+ private int totalCountProject = 0;
+
+ private async Task OnSearchProject()
+ {
+     await LoadDataProject();
+ }
+
+ private async Task OnSearchProjectIndexIncrement()
+ {
+     if (ProjectComboBoxIndex < (totalCountProject - 1))
+     {
+         ProjectComboBoxIndex++;
+         await LoadDataProject(ProjectComboBoxIndex, 10);
+     }
+ }
+
+ private async Task OnSearchProjectIndexDecrement()
+ {
+     if (ProjectComboBoxIndex > 0)
+     {
+         ProjectComboBoxIndex--;
+         await LoadDataProject(ProjectComboBoxIndex, 10);
+     }
+ }
+
+ private async Task OnInputProjectChanged(string e)
+ {
+     ProjectComboBoxIndex = 0;
+     await LoadDataProject();
+ }
+
+
+
+  private async Task LoadDataProject(int pageIndex = 0, int pageSize = 10)
+  {
+      try
+      {
+          PanelVisible = true;
+          var result = await Mediator.Send(new GetProjectQuery
+          {
+              SearchTerm = refProjectComboBox?.Text ?? "",
+              PageIndex = pageIndex,
+              PageSize = pageSize,
+          });
+          Projects = result.Item1;
+          totalCountProject = result.PageCount;
+          PanelVisible = false;
+      }
+      catch (Exception ex)
+      {
+          ex.HandleException(ToastService);
+      }
+      finally { PanelVisible = false; }
+  }
+
+ #endregion ComboboxProject
+
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Project" ColSpanMd="12">
+    <MyDxComboBox Data="@Projects"
+                  NullText="Select Project"
+                  @ref="refProjectComboBox"
+                  @bind-Value="@a.ProjectId"
+                  TextFieldName="Name"
+                  ValueFieldName="Id"
+                  TextChanged="((string e) => OnInputProjectChanged(e))">
+        <Buttons>
+            <DxEditorButton Click="OnSearchProjectIndexDecrement"
+                            IconCssClass="fa-solid fa-caret-left"
+                            Tooltip="Previous Index" />
+            <DxEditorButton Click="OnSearchProject"
+                            IconCssClass="fa-solid fa-magnifying-glass"
+                            Tooltip="Search" />
+            <DxEditorButton Click="OnSearchProjectIndexIncrement"
+                            IconCssClass="fa-solid fa-caret-right"
+                            Tooltip="Next Index" />
+        </Buttons>
+        <Columns>
+            <DxListEditorColumn FieldName="@nameof(ProjectDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Project.Name" Caption="Project" />
+            <DxListEditorColumn FieldName="@nameof(ProjectDto.Code)" Caption="Code" />
+        </Columns>
+    </MyDxComboBox>
+    <ValidationMessage For="@(()=>a.ProjectId)" />
+</DxFormLayoutItem>
+
+var result = await _unitOfWork.Repository<Accident>().AddAsync(request.AccidentDto.Adapt<CreateUpdateAccidentDto>().Adapt<Accident>());
+var result = await _unitOfWork.Repository<Accident>().AddAsync(request.AccidentDtos.Adapt<List<CreateUpdateAccidentDto>>().Adapt<List<Accident>>()); 
+
+var result = await _unitOfWork.Repository<Accident>().UpdateAsync(request.AccidentDto.Adapt<CreateUpdateAccidentDto>().Adapt<Accident>());  
+var result = await _unitOfWork.Repository<Accident>().UpdateAsync(request.AccidentDtos.Adapt<List<CreateUpdateAccidentDto>>().Adapt<List<Accident>>());
+
