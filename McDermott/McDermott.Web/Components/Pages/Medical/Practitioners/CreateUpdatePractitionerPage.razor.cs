@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Features.Services;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
@@ -195,25 +196,17 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
             #endregion Residence  Address
 
             Specialities = (await Mediator.QueryGetHelper<Speciality, SpecialityDto>(predicate: x => x.Id == UserForm.SpecialityId)).Item1;
-            Services = (await Mediator.QueryGetHelper<Service, ServiceDto>(predicate: x => UserForm.DoctorServiceIds != null && UserForm.DoctorServiceIds.Contains(x.Id), includes: [],
-                    select: x => new Service
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Quota = x.Quota
-                    })).Item1;
 
-            SelectedServices = (await Mediator.Send(new GetServiceQuery
+            var result = await Mediator.Send(new GetServiceQuery
             {
                 Predicate = x => UserForm.DoctorServiceIds != null && UserForm.DoctorServiceIds.Contains(x.Id),
-                Select = x => new Service
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Code = x.Code,
-                    Quota = x.Quota
-                }
-            })).Item1;
+                PageSize = pageSize,
+                SearchTerm = searchTerm ?? ""
+            });
+            Services = result.Item1;
+
+            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
+
             PanelVisible = false;
         }
 
@@ -562,6 +555,8 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
 
             var ax = SelectedServices.Select(x => x.Id).ToList();
             UserForm.DoctorServiceIds?.AddRange(ax);
+
+            UserForm.DoctorServiceIds.Distinct();
 
             if (UserForm.Id == 0)
             {

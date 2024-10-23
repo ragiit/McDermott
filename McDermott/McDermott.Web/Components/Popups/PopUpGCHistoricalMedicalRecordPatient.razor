@@ -167,18 +167,18 @@
             PanelVisible = true;
             SelectedDataItems = [];
             var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
-                {
-                    Predicate = x => x.PatientId == GeneralConsultanService.PatientId,
-                    OrderByList =
-                                    [
-                                        (x => x.RegistrationDate, true),
+            {
+                Predicate = x => x.PatientId == GeneralConsultanService.PatientId,
+                OrderByList =
+                [
+                    (x => x.RegistrationDate, true),
                     (x => x.IsAlertInformationSpecialCase, true),
                     (x => x.ClassType != null, true)
-                                    ],
-                    SearchTerm = searchTerm,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
+                ],
+                SearchTerm = searchTerm,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             GeneralConsultanServices = a.Item1;
             totalCount = a.PageCount;
             activePageIndex = pageIndex;
@@ -222,7 +222,11 @@
         }
         else if (e.TypeRegistration == "Accident")
         {
-            SelectedAccidentHistorical = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == e.Id))).FirstOrDefault() ?? new();
+            // SelectedAccidentHistorical = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == e.Id))).FirstOrDefault() ?? new();
+            SelectedAccidentHistorical = await Mediator.Send(new GetSingleAccidentQuery
+            {
+                    Predicate = x => x.GeneralConsultanServiceId == e.Id
+            });
             IsHistoricalRecordPatientDetailAccident = true;
         }
     }

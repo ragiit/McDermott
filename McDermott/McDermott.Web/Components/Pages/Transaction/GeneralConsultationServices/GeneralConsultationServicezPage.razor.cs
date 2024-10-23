@@ -125,6 +125,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
                     ],
+                    Predicate = x => x.IsGC == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,

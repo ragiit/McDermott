@@ -230,7 +230,6 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
                         Gender = x.Gender,
                         DateOfBirth = x.DateOfBirth,
                         IsPhysicion = x.IsPhysicion,
-                        IsNurse = x.IsNurse,
                     }
                 });
                 Physicians = result.Item1;

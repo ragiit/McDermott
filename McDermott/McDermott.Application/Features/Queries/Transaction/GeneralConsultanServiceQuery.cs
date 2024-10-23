@@ -263,7 +263,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                     .AsNoTracking()
                     .Include(z => z.Service)
                     .Include(z => z.Pratitioner)
-                    .Include(z => z.ClassType)
                     .Include(z => z.InsurancePolicy)
                     .Include(z => z.Patient)
                     .Include(z => z.Patient.Department)
@@ -396,7 +395,15 @@ namespace McDermott.Application.Features.Queries.Transaction
             {
                 var result = await _unitOfWork.Repository<GeneralConsultanService>().Entities.FirstOrDefaultAsync(x => x.Id == request.Id) ?? new();
 
+                if (result is null)
+                    return new();
+
+                _unitOfWork.Repository<GeneralConsultanService>().Attach(result);
+
                 result.Status = request.Status;
+
+                // Mark specific properties as modified
+                _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(result, nameof(result.Status));
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

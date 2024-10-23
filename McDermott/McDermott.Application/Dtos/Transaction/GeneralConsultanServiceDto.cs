@@ -126,6 +126,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
+        public bool IsGC { get; set; }
         public string? SerialNo { get; set; } // NoUrut
 
         /// <BPJS Rujukan>
@@ -237,6 +238,7 @@ namespace McDermott.Application.Dtos.Transaction
 
         #region Vaccination
 
+        public bool IsVaccination { get; set; } = false;
         public long? LocationId { get; set; }
 
         #endregion Vaccination
@@ -257,6 +259,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Description { get; set; }
         public string? Markers { get; set; }
         public string? LinkMeet { get; set; }
+        public bool IsTelemedicine { get; set; } = false;
+        public bool IsAccident { get; set; }
 
         public virtual LocationDto? Location { get; set; }
         public virtual AwarenessDto? Awareness { get; set; }
@@ -329,6 +333,7 @@ namespace McDermott.Application.Dtos.Transaction
         public long Id { get; set; }
         public string? Reference { get; set; }
 
+        public bool IsGC { get; set; }
         public long? KioskQueueId { get; set; }
 
         //[Required(ErrorMessage = "The Patient field is required.")]
@@ -339,6 +344,7 @@ namespace McDermott.Application.Dtos.Transaction
         //[Required(ErrorMessage = "The Service field is required.")]
         public long? ServiceId { get; set; }
 
+        public bool IsVaccination { get; set; } = false;
         public long? PratitionerId { get; set; }
         public string? ClassType { get; set; }
         public EnumStatusGeneralConsultantService Status { get; set; } = EnumStatusGeneralConsultantService.Planned;
@@ -453,6 +459,8 @@ namespace McDermott.Application.Dtos.Transaction
         ///
         public string? LinkMeet { get; set; } //telemedic
 
+        public bool IsTelemedicine { get; set; } = false;
+
         #region Clinical Assesment
 
         public string? ScrinningTriageScale { get; set; }
@@ -536,6 +544,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? InformationFrom { get; set; }
         public long? ProjectId { get; set; }
         public long? AwarenessId { get; set; }
+        public bool IsAccident { get; set; }
 
         public long E { get; set; } = 4;
         public long V { get; set; } = 5;

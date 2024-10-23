@@ -1171,7 +1171,7 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                 SearchTerm = refCountryComboBox?.Text ?? ""
             });
             Countries = result.Item1;
-            totalCount = result.PageCount;
+            totalCountCountry = result.PageCount;
             PanelVisible = false;
         }
 

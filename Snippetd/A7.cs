@@ -1,105 +1,105 @@
-await LoadDataCounter();
+await LoadDataProject();
 
- #region ComboboxCounter
+ #region ComboboxProject
 
- private DxComboBox<CounterDto, long?> refCounterComboBox { get; set; }
- private int CounterComboBoxIndex { get; set; } = 0;
- private int totalCountCounter = 0;
+ private DxComboBox<ProjectDto, long?> refProjectComboBox { get; set; }
+ private int ProjectComboBoxIndex { get; set; } = 0;
+ private int totalCountProject = 0;
 
- private async Task OnSearchCounter()
+ private async Task OnSearchProject()
  {
-     await LoadDataCounter();
+     await LoadDataProject();
  }
 
- private async Task OnSearchCounterIndexIncrement()
+ private async Task OnSearchProjectIndexIncrement()
  {
-     if (CounterComboBoxIndex < (totalCountCounter - 1))
+     if (ProjectComboBoxIndex < (totalCountProject - 1))
      {
-         CounterComboBoxIndex++;
-         await LoadDataCounter(CounterComboBoxIndex, 10);
+         ProjectComboBoxIndex++;
+         await LoadDataProject(ProjectComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchCounterIndexDecrement()
+ private async Task OnSearchProjectIndexDecrement()
  {
-     if (CounterComboBoxIndex > 0)
+     if (ProjectComboBoxIndex > 0)
      {
-         CounterComboBoxIndex--;
-         await LoadDataCounter(CounterComboBoxIndex, 10);
+         ProjectComboBoxIndex--;
+         await LoadDataProject(ProjectComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputCounterChanged(string e)
+ private async Task OnInputProjectChanged(string e)
  {
-     CounterComboBoxIndex = 0;
-     await LoadDataCounter();
+     ProjectComboBoxIndex = 0;
+     await LoadDataProject();
  }
 
 
 
-  private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataProject(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetCounterQuery
+          var result = await Mediator.Send(new GetProjectQuery
           {
-              SearchTerm = refCounterComboBox?.Text ?? "",
+              SearchTerm = refProjectComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Counters = result.Item1;
-          totalCountCounter = result.PageCount;
+          Projects = result.Item1;
+          totalCountProject = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastCounter);
+          ex.HandleException(ToastService);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxCounter
+ #endregion ComboboxProject
 
-private async Task LoadDataCounter(int pageIndex = 0, int pageSize = 10)
+private async Task LoadDataProject(int pageIndex = 0, int pageSize = 10)
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetCounterQuery(
+    var result = await Mediator.Send(new GetProjectQuery(
         pageIndex: pageIndex,
         pageSize: pageSize,
-        searchTerm: refCounterComboBox?.Text ?? "",
+        searchTerm: refProjectComboBox?.Text ?? "",
         includes:
         [
             x => x.Manager,
-            x => x.ParentCounter,
-            x => x.Counter,
+            x => x.ParentProject,
+            x => x.Project,
         ],
-        select: x => new Counter
+        select: x => new Project
         {
             Id = x.Id,
             Name = x.Name,
-            ParentCounter = new Domain.Entities.Counter
+            ParentProject = new Domain.Entities.Project
             {
                 Name = x.Name
             },
-            Counter = new Domain.Entities.Counter
+            Project = new Domain.Entities.Project
             {
                 Name = x.Name
             },
-            Manager = new Domain.Entities.Counter
+            Manager = new Domain.Entities.Project
             {
                 Name = x.Name
             },
-            CounterCategory = x.CounterCategory
+            ProjectCategory = x.ProjectCategory
         }
 
     ));
-    Counters = result.Item1;
-    totalCountCounter = result.pageCount;
+    Projects = result.Item1;
+    totalCountProject = result.pageCount;
     PanelVisible = false;
 }
 
-await LoadDataCounter(CounterId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).CounterId);
+await LoadDataProject(ProjectId: (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()).ProjectId);
 
 
 var id = refDistrictComboBox?.Value ?? null;
@@ -107,32 +107,32 @@ var id = refDistrictComboBox?.Value ?? null;
 
    var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Counter" ColSpanMd="12">
-    <MyDxComboBox Data="@Counters"
-                  NullText="Select Counter"
-                  @ref="refCounterComboBox"
-                  @bind-Value="@a.CounterId"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Project" ColSpanMd="12">
+    <MyDxComboBox Data="@Projects"
+                  NullText="Select Project"
+                  @ref="refProjectComboBox"
+                  @bind-Value="@a.ProjectId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputCounterChanged(e))">
+                  TextChanged="((string e) => OnInputProjectChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchCounterIndexDecrement"
+            <DxEditorButton Click="OnSearchProjectIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchCounter"
+            <DxEditorButton Click="OnSearchProject"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchCounterIndexIncrement"
+            <DxEditorButton Click="OnSearchProjectIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(CounterDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Counter.Name" Caption="Counter" />
-            <DxListEditorColumn FieldName="@nameof(CounterDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProjectDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Project.Name" Caption="Project" />
+            <DxListEditorColumn FieldName="@nameof(ProjectDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.CounterId)" />
+    <ValidationMessage For="@(()=>a.ProjectId)" />
 </DxFormLayoutItem>
 
 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -142,7 +142,7 @@ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as DiseaseCategoryDto ?? new()
 
   private async Task LoadComboboxEdit(DiagnosisDto a)
  {
-     Cronises = (await Mediator.Send(new GetCounterQuery(x => x.Id == a.CounterId))).Item1;
+     Cronises = (await Mediator.Send(new GetProjectQuery(x => x.Id == a.ProjectId))).Item1;
      Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
  }
 
@@ -155,3 +155,9 @@ Countries = resultz.Item1;
 totalCountCountry = resultz.pageCount;  
 
 PanelVisible = false;
+
+ var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
+ Countries = (await Mediator.Send(new GetCountryQuery
+ {
+     Predicate = x => x.Id == a.CountryId,
+ })).Item1;

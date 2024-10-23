@@ -26,8 +26,11 @@ namespace McDermott.Domain.Entities
         public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        public bool IsGC { get; set; }
+
         [NotMapped]
         public string RegistrationDateString => RegistrationDate.GetValueOrDefault().ToString("dd-MM-yyyy");
+
         public DateTime? AppointmentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
@@ -105,15 +108,19 @@ namespace McDermott.Domain.Entities
 
         public long? LocationId { get; set; }
 
+        public bool IsVaccination { get; set; } = false;
+
         #endregion Vaccination
 
         #region Telemedic
 
+        public bool IsTelemedicine { get; set; } = false;
         public string? LinkMeet { get; set; }
 
         #endregion Telemedic
 
         public long? ProjectId { get; set; }
+        public bool IsAccident { get; set; }
 
         public virtual Locations? Location { get; set; }
 

@@ -4,6 +4,7 @@
     {
         #region GET
 
+        // Deprecated
         public class GetGeneralConsultanServiceQuery(Expression<Func<GeneralConsultanService, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<GeneralConsultanServiceDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<GeneralConsultanService, bool>> Predicate { get; } = predicate!;
@@ -104,10 +105,10 @@
             public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
-        public class UpdateStatusGeneralConsultanServiceRequest(EnumStatusGeneralConsultantService status, long id) : IRequest<GeneralConsultanServiceDto>
+        public class UpdateStatusGeneralConsultanServiceRequest : IRequest<GeneralConsultanServiceDto>
         {
-            public long Id { get; set; } = id;
-            public EnumStatusGeneralConsultantService Status { get; set; } = status;
+            public long Id { get; set; }
+            public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
         public class UpdateListGeneralConsultanServiceRequest(List<GeneralConsultanServiceDto> GeneralConsultanServiceDtos) : IRequest<List<GeneralConsultanServiceDto>>

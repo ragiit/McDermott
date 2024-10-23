@@ -187,6 +187,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("PartOfBody9")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long?>("ProjectId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("RibbonSpecialCase")
                         .HasColumnType("bit");
 
@@ -397,6 +400,8 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("ProjectId");
 
                     b.HasIndex("SafetyPersonnelId");
 
@@ -1433,6 +1438,8 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("PhysicianId");
 
+                    b.HasIndex("ServiceId");
+
                     b.ToTable("DoctorScheduleSlots");
                 });
 
@@ -2181,10 +2188,16 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("InsurancePolicyId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsAccident")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsAlertInformationSpecialCase")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsBatam")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsGC")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsMaternityLeave")
@@ -2200,6 +2213,12 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsSickLeave")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTelemedicine")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVaccination")
                         .HasColumnType("bit");
 
                     b.Property<long?>("KioskQueueId")
@@ -5918,6 +5937,11 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("McDermott.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("McDermott.Domain.Entities.User", "SafetyPersonnel")
                         .WithMany()
                         .HasForeignKey("SafetyPersonnelId")
@@ -5929,6 +5953,8 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("GeneralConsultanService");
+
+                    b.Navigation("Project");
 
                     b.Navigation("SafetyPersonnel");
                 });
@@ -6239,9 +6265,17 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("PhysicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("McDermott.Domain.Entities.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("DoctorSchedule");
 
                     b.Navigation("Physician");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DrugDosage", b =>

@@ -10,6 +10,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
     public partial class CreateUpdateMaintainancePage
     {
         #region Relation data
+
         private List<MaintainanceDto> getMaintainance = [];
         private List<MaintainanceProductDto> getMaintainanceProduct = [];
         private List<UserDto> getResponsibleBy = [];
@@ -22,15 +23,18 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private MaintainanceProductDto getMaintainanceProductById = new();
         private MaintainanceProductDto postMaintainanceProduct = new();
         private TransactionStockDto postTransactionStock = new();
-        #endregion
+
+        #endregion Relation data
 
         #region variable Static
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
 
+        private IGrid Grid { get; set; }
         private IGrid Grid { get; set; }
         private IGrid GridDetail { get; set; }
         private Timer _timer;
@@ -42,6 +46,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private int FocusedRowDetailVisibleIndex { get; set; }
         private DateTime? currentExpiryDate {  get; set; }
 
+        #endregion variable Static
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -50,6 +55,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         #endregion
 
         #region Boolean Data
+
         private void unCheckIN(bool newValue)
         {
             postMaintainance.isInternal = true;
@@ -187,7 +193,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             "Months",
             "Years"
         };
-        #endregion
+
+        #endregion Boolean Data
 
         #region UserLoginAndAccessRole
 
@@ -251,6 +258,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
       
         #region Load data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -264,6 +272,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         }
         private async Task LoadData()
         {
+            var result = await Mediator.Send(new GetMaintainanceQuery(x => x.Id == Id, pageSize: 0, pageIndex: 1));
             var result = await Mediator.Send(new GetMaintainanceQuery(x => x.Id == Id, pageSize: 1, pageIndex: 0));
             postMaintainance = new();
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -275,6 +284,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 }
 
                 postMaintainance = result.Item1.FirstOrDefault() ?? new();
+            }
                 await LoadDataDetail();
             }
         }
@@ -288,7 +298,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Load data
 
         #region Searching
 
@@ -317,7 +328,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         #endregion Searching
 
         #region Load ComboBox
+
         #region ComboBox Product
+
         private DxComboBox<ProductDto, long?> refProductsComboBox { get; set; }
         private int ProductsComboBoxIndex { get; set; } = 0;
         private int totalCountProducts = 0;
@@ -356,12 +369,16 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             PanelVisible = true;
             SelectedDataItems = [];
             var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            getEquipment = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
             getProduct = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion ComboBox Product
+
         #region Combo Box Request By
+
         private DxComboBox<UserDto, long?> refRequestByComboBox { get; set; }
         private int RequestByComboBoxIndex { get; set; } = 0;
         private int totalCountRequestBy = 0;
@@ -404,8 +421,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Combo Box Request By
+
         #region Combo Box Location
+
         private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
         private int LocationComboBoxIndex { get; set; } = 0;
         private int totalCountLocation = 0;
@@ -443,13 +463,22 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery(searchTerm: refLocationComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetLocationQuery
+            {
+                SearchTerm = refLocationComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
+            activePageIndex = pageIndex;
+            totalCount = result.PageCount;
             getLocation = result.Item1;
-            totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Combo Box Location
+
         #region Combo Box Responsible
+
         private DxComboBox<UserDto, long?> refResponsibleByComboBox { get; set; }
         private int ResponsibleByComboBoxIndex { get; set; } = 0;
         private int totalCountResponsibleBy = 0;
@@ -492,12 +521,15 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Combo Box Responsible
+
+        #endregion Load ComboBox
 
 
-        #endregion
 
         #region function step
+
         private async Task InProgress_Click()
         {
             try
@@ -600,7 +632,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             NavigationManager.NavigateTo($"inventory/maintainance/");
             StateHasChanged();
         }
-        #endregion
+
+        #endregion function step
 
         #region Click Button
         private async Task NewItemDetail_Click()
@@ -683,6 +716,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         #endregion
 
         #region Handler Vaidation
+
         private async Task HandleValidSubmit()
         {
             //IsLoading = true;
@@ -697,6 +731,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             FormValidationState = false;
         }
 
-        #endregion
+        #endregion Handler Vaidation
     }
 }

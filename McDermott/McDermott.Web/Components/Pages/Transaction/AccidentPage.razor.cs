@@ -365,22 +365,26 @@ namespace McDermott.Web.Components.Pages.Transaction
                     return;
 
                 var gen = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == GeneralConsultanService.Id))).Item1.FirstOrDefault() ?? new();
-                var accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == gen.Id))).FirstOrDefault() ?? new();
+                //var accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == gen.Id))).FirstOrDefault() ?? new();
+                var accident = await Mediator.Send(new GetSingleAccidentQuery
+                {
+                    Predicate = x => x.GeneralConsultanServiceId == gen.Id
+                });
                 isPrint = true;
                 var mergeFields = new Dictionary<string, string>
                 {
                     {"<<EmployeeName>>", gen?.Patient?.Name.GetDefaultValue() },
                     {"<<EmployeeNIP>>", gen?.Patient?.NIP?.GetDefaultValue() ?? "-"},
                     {"<<EmployeeDepartment>>", gen?.Patient?.Department?.Name.GetDefaultValue() ?? "-"},
-                    {"<<DateOfOccurence>>", accident.DateOfOccurrence.GetValueOrDefault().ToString("dd MMMM yyyy")},
-                    {"<<TimeOccurence>>", accident.DateOfOccurrence.GetValueOrDefault().ToString("HH:mm:ss")},
-                    {"<<DateTreatment>>", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("dd MMMM yyyy")},
-                    {"<<TimeTreatment>>", accident.DateOfFirstTreatment.GetValueOrDefault().ToString("HH:mm:ss")},
+                    {"<<DateOfOccurence>>", accident.DateOfOccurrence.ToString("dd MMMM yyyy")},
+                    {"<<TimeOccurence>>", accident.DateOfOccurrence.ToString("HH:mm:ss")},
+                    {"<<DateTreatment>>", accident.DateOfFirstTreatment.ToString("dd MMMM yyyy")},
+                    {"<<TimeTreatment>>", accident.DateOfFirstTreatment.ToString("HH:mm:ss")},
                     {"<<AreaOfYard>>", accident.AreaOfYard?.GetDefaultValue() ?? "-"},
                     {"<<SupervisorName>>", gen?.Patient?.Supervisor?.Name.GetDefaultValue() ?? "-"},
                 };
 
-                //Field dateField = await documentAPI.Fields.Cr(, "DATE");
+                //Field dateField = await documentAPI.Fields.Create(, "DATE");
 
                 //await documentAPI.Fields.UpdateAsync(dateField);
 
@@ -1312,7 +1316,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             // Populate the Accident property
             foreach (var service in GeneralConsultanServices)
             {
-                service.Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == service.Id))).FirstOrDefault() ?? new();
+                //service.Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == service.Id))).FirstOrDefault() ?? new();
             }
 
             GeneralConsultanService = new();
@@ -1514,7 +1518,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task LoadSelectedData()
         {
-            Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
+            //Accident = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id))).FirstOrDefault() ?? new();
 
             GeneralConsultanCPPTs.Clear();
             GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));

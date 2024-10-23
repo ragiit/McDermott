@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using DocumentFormat.OpenXml.Spreadsheet;
 using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -116,10 +117,15 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.QueryGetHelper<Locations, LocationDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetLocationQuery
+                {
+                    SearchTerm = searchTerm,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Locations = result.Item1;
                 activePageIndex = pageIndex;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -171,11 +177,18 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetLocationQuery(x => x.ParentLocationId != null, searchTerm: refParentLocationsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+                var result = await Mediator.Send(new GetLocationQuery
+                {
+                    Predicate = x => x.ParentLocationId != null,
+                    SearchTerm = refParentLocationsComboBox?.Text ?? "",
+                    PageSize = pageSize,
+                    PageIndex = pageIndex
+                });
+
                 if (result.Item1 != null)
                 {
                     ParentLocations = [.. result.Item1.Where(x => x.ParentLocationId is not null).OrderBy(x => x.Name)];
-                    totalCountParentLocations = result.pageCount;
+                    totalCountParentLocations = result.PageCount;
                 }
                 PanelVisible = false;
             }
@@ -309,6 +322,12 @@ namespace McDermott.Web.Components.Pages.Medical
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as LocationDto ?? new());
                 ParentLocations = (await Mediator.QueryGetHelper<Locations, LocationDto>(predicate: x => x.Id == a.ParentLocationId)).Item1;
+
+                ParentLocations = (await Mediator.Send(new GetLocationQuery
+                {
+                    Predicate = x => x.Id == a.ParentLocationId
+                })).Item1;
+
                 Companies = (await Mediator.QueryGetHelper<Company, CompanyDto>(predicate: x => x.Id == a.ParentLocationId)).Item1;
                 PanelVisible = false;
             }
@@ -381,12 +400,11 @@ namespace McDermott.Web.Components.Pages.Medical
                             b.Add(bb.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetLocationQuery(x => a.Contains(x.Name.ToLower()), 0, 0,
-                      select: x => new Locations
-                      {
-                          Id = x.Id,
-                          Name = x.Name
-                      }))).Item1;
+                    list1 = (await Mediator.Send(new GetLocationQuery
+                    {
+                        Predicate = x => a.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                    })).Item1;
 
                     list2 = (await Mediator.Send(new GetCompanyQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
                       select: x => new Company

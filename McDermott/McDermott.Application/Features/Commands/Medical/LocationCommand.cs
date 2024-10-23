@@ -6,16 +6,34 @@ namespace McDermott.Application.Features.Commands.Medical
     {
         #region GET
 
-        public class GetLocationQuery(Expression<Func<Locations, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Locations, object>>>? includes = null, Expression<Func<Locations, Locations>>? select = null) : IRequest<(List<LocationDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleLocationQuery : IRequest<LocationDto>
         {
-            public Expression<Func<Locations, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Locations, object>>> Includes { get; set; }
+            public Expression<Func<Locations, bool>> Predicate { get; set; }
+            public Expression<Func<Locations, Locations>> Select { get; set; }
 
-            public List<Expression<Func<Locations, object>>> Includes { get; } = includes!;
-            public Expression<Func<Locations, Locations>>? Select { get; } = select!;
+            public List<(Expression<Func<Locations, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetLocationQuery : IRequest<(List<LocationDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Locations, object>>> Includes { get; set; }
+            public Expression<Func<Locations, bool>> Predicate { get; set; }
+            public Expression<Func<Locations, Locations>> Select { get; set; }
+
+            public List<(Expression<Func<Locations, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class ValidateLocationQuery(Expression<Func<Locations, bool>>? predicate = null) : IRequest<bool>

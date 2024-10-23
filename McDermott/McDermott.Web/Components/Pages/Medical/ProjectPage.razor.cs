@@ -1,5 +1,4 @@
-﻿ 
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using MediatR;
 using Microsoft.JSInterop;
 
@@ -109,41 +108,27 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            //var result = await Mediator.Send(new GetProjectQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            var result = await Mediator.Send(new GetProjectQuery
+            try
             {
-                SearchTerm = searchTerm,
-                PageIndex = pageIndex,
-                PageSize = pageSize, 
-            });
-
-            var result1 = await Mediator.Send(new GetProjectQuery
-            {
-                SearchTerm = searchTerm,
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                IsDescending = true,
-
-            });
-
-            var resul3t = await Mediator.Send(new GetProjectQuery
-            {
-                SearchTerm = searchTerm,
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                IsDescending = false,
-                OrderBy = x => x.Code,
-                Select = x => new Domain.Entities.Project
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetProjectQuery
                 {
-                    Name = x.Name
-                }
-            });
-
-            Projects = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+                    SearchTerm = searchTerm,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                Projects = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)

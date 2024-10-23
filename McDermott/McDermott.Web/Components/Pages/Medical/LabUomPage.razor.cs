@@ -113,9 +113,14 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             LabUom = new();
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLabUomQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetLabUomQuery
+            {
+                SearchTerm = searchTerm ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             LabUoms = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }

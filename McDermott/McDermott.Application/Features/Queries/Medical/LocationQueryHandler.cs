@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Application.Dtos.Medical;
+﻿using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -9,6 +8,7 @@ namespace McDermott.Application.Features.Queries.Medical
 {
     public class LocationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLocationQuery, (List<LocationDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleLocationQuery, LocationDto>,
         IRequestHandler<CreateLocationRequest, LocationDto>,
         IRequestHandler<ValidateLocationQuery, bool>,
         IRequestHandler<BulkValidateLocationsQuery, List<LocationDto>>,
@@ -47,6 +47,25 @@ namespace McDermott.Application.Features.Queries.Medical
             {
                 var query = _unitOfWork.Repository<Locations>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Locations>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Locations>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -55,9 +74,6 @@ namespace McDermott.Application.Features.Queries.Medical
                         query = query.Include(includeExpression);
                     }
                 }
-
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
@@ -71,21 +87,118 @@ namespace McDermott.Application.Features.Queries.Medical
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Locations
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Type = x.Type,
+                        ParentLocationId = x.ParentLocationId,
+                        CompanyId = x.CompanyId,
+                        Company = new Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        ParentLocation = new Locations
+                        {
+                            Name = x.ParentLocation.Name
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<LocationDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<LocationDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<LocationDto> Handle(GetSingleLocationQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Locations>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Locations>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Locations>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                return (pagedItems.Adapt<List<LocationDto>>(), request.PageIndex, request.PageSize, totalPages);
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.ParentLocation.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Type, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
+                         );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Locations
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Type = x.Type,
+                        ParentLocationId = x.ParentLocationId,
+                        CompanyId = x.CompanyId,
+                        Company = new Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        ParentLocation = new Locations
+                        {
+                            Name = x.ParentLocation.Name
+                        }
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<LocationDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

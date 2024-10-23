@@ -1821,7 +1821,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             else if (e.TypeRegistration == "Accident")
             {
-                SelectedAccidentHistorical = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == e.Id))).FirstOrDefault() ?? new();
+                //SelectedAccidentHistorical = (await Mediator.Send(new GetAccidentQuery(x => x.GeneralConsultanServiceId == e.Id))).FirstOrDefault() ?? new();
                 IsHistoricalRecordPatientDetailAccident = true;
             }
         }

@@ -80,69 +80,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(LabTestDto))
-            {
-                var result = await mediator.Send(new GetLabTestQuery(
-                    predicate as Expression<Func<LabTest, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.SampleType
-                    ] : includes as List<Expression<Func<LabTest, object>>>,
-                    select: select is null ? x => new LabTest
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                        ResultType = x.ResultType,
-                        SampleTypeId = x.SampleTypeId,
-                        SampleType = new SampleType
-                        {
-                            Name = x.SampleType.Name
-                        }
-                    } : select as Expression<Func<LabTest, LabTest>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(LabTestDetailDto))
-            {
-                var result = await mediator.Send(new GetLabTestDetailQuery(
-                    predicate as Expression<Func<LabTestDetail, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.LabTest,
-                        x => x.LabUom,
-                    ] : includes as List<Expression<Func<LabTestDetail, object>>>,
-                    select: select is null ? x => new LabTestDetail
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NormalRangeFemale = x.NormalRangeFemale,
-                        NormalRangeMale = x.NormalRangeMale,
-                        LabTestId = x.LabTestId,
-                        LabTest = new LabTest
-                        {
-                            Name = x.LabTest.Name
-                        },
-                        LabUomId = x.LabUomId,
-                        LabUom = new LabUom
-                        {
-                            Name = x.LabUom.Name
-                        },
-                        ResultValueType = x.ResultValueType,
-                        Remark = x.Remark,
-                        ResultType = x.ResultType
-                    } : select as Expression<Func<LabTestDetail, LabTestDetail>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(ProductCategoryDto))
             {
                 var result = await mediator.Send(new GetProductCategoryQuery(
@@ -156,23 +93,6 @@ namespace McDermott.Web.Extentions
                         Name = x.Name,
                         Code = x.Code,
                     } : select as Expression<Func<ProductCategory, ProductCategory>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(LabUomDto))
-            {
-                var result = await mediator.Send(new GetLabUomQuery(
-                    predicate as Expression<Func<LabUom, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new LabUom
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                    } : select as Expression<Func<LabUom, LabUom>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
@@ -280,38 +200,6 @@ namespace McDermott.Web.Extentions
                             Name = x.Uom.Name
                         }
                     } : select as Expression<Func<ActiveComponent, ActiveComponent>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(LocationDto))
-            {
-                var result = await mediator.Send(new GetLocationQuery(
-                    predicate as Expression<Func<Locations, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.ParentLocation,
-                        x => x.Company,
-                    ] : includes as List<Expression<Func<Locations, object>>>,
-                    select: select is null ? x => new Locations
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Type = x.Type,
-                        ParentLocationId = x.ParentLocationId,
-                        CompanyId = x.CompanyId,
-                        Company = new Company
-                        {
-                            Name = x.Company.Name
-                        },
-                        ParentLocation = new Locations
-                        {
-                            Name = x.ParentLocation.Name
-                        }
-                    } : select as Expression<Func<Locations, Locations>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

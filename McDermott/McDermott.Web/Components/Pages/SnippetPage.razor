@@ -290,7 +290,11 @@
     private async Task EditItem_Click()
     {
         ShowForm = true;
-        var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
+        var labTest = await Mediator.Send(new GetLabTestQuery
+            {
+                Predicate = x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id
+            });
+        // var labTest = await Mediator.Send(new GetLabTestQuery(x => x.Id == SelectedDataItems[0].Adapt<GroupDto>().Id));
 
         // if (labTest.Count > 0)
         // {
@@ -509,7 +513,10 @@
     private async Task LoadLabTestDetails()
     {
         SelectedDetailDataItems = [];
-        LabTestDetailForms = (await Mediator.Send(new GetLabTestDetailQuery(x => x.LabTestId == LabTest.Id))).Item1;
+        LabTestDetailForms = (await Mediator.Send(new GetLabTestDetailQuery
+        {
+            Predicate = x => x.LabTestId == LabTest.Id
+        })).Item1;
     }
 
     private async Task SaveItemLabTest()
