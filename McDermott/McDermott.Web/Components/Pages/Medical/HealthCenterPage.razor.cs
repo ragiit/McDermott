@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -153,9 +154,14 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetCountryQuery
+            {
+                SearchTerm = refCountryComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             Countries = result.Item1;
-            totalCountCountry = result.pageCount;
+            totalCountCountry = result.PageCount;
             PanelVisible = false;
         }
 
@@ -201,9 +207,15 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             SelectedDataItems = [];
             var c = refCountryComboBox?.Value;
-            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "", x => x.CountryId == c);
+            var result = await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.CountryId == c,
+                SearchTerm = refProvinceComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
+            totalCountProvince = result.PageCount;
             PanelVisible = false;
         }
 
@@ -249,9 +261,15 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             SelectedDataItems = [];
             var c = refProvinceComboBox?.Value;
-            var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == c);
+            var result = await Mediator.Send(new GetCityQuery
+            {
+                Predicate = x => x.ProvinceId == c,
+                SearchTerm = refCityComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             Cities = result.Item1;
-            totalCountCity = result.pageCount;
+            totalCountCity = result.PageCount;
             PanelVisible = false;
         }
 
@@ -321,9 +339,20 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadComboboxEdit(HealthCenterDto a)
         {
-            Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
-            Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
-            Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == a.CountryId)).Item1;
+            Provinces = (await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.Id == a.ProvinceId,
+            })).Item1;
+
+            Cities = (await Mediator.Send(new GetCityQuery
+            {
+                Predicate = x => x.Id == a.CityId,
+            })).Item1;
+
+            Countries = (await Mediator.Send(new GetCountryQuery
+            {
+                Predicate = x => x.Id == a.CountryId,
+            })).Item1;
         }
 
         private void DeleteItem_Click()

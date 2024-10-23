@@ -1,9 +1,9 @@
 ﻿@page "/bpjs/bpjs-classifications"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Master Data BPJS Classification</PageTitle>
+<PageTitle>McHealthCare - BPJS Classification</PageTitle>
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
 
@@ -14,53 +14,40 @@
                 <div class="row">
                     <div class="col">
                         <div class="card">
+                            <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+
+
                             <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="true"
-                                            Text="Fetching Data...">
-
-                                <MyGrid @ref="Grid"
-                                        Data="BpjsClassifications"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        KeyFieldName="Id"
-                                        EditModelSaving="OnSave"
-                                        DataItemDeleting="OnDelete"
-                                        FocusedRowChanged="Grid_FocusedRowChanged">
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="BpjsClassifications"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                EditModelSaving="OnSave"
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                DataItemDeleting="OnDelete"
+                                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="BpjsClassificationDto"
-                                                         Items="@BpjsClassifications"
                                                          Grid="Grid"
+                                                         Items="@BpjsClassifications"
                                                          SelectedDataItems="@SelectedDataItems"
                                                          NewItem_Click="@NewItem_Click"
                                                          EditItem_Click="@EditItem_Click"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="false"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         IsImport="UserAccessCRUID.IsImport"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
-
-                                    @*    <ToolbarTemplate>
-                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && BpjsClassifications.Count > 0" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && BpjsClassifications.Count > 0" />
-                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                <Items>
-                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                </Items>
-                                </DxToolbarItem>
-                                <DxToolbarItem Visible="false" Text="Import" id="upload" IconCssClass="fa-solid fa-file-import" />
-                                </DxToolbar>
-                                </ToolbarTemplate> *@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
@@ -68,6 +55,7 @@
                                         <DxGridDataColumn FieldName="Code" />
 
                                     </Columns>
+
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
                                             var a = (BpjsClassificationDto)EditFormContext.EditModel;
@@ -88,7 +76,41 @@
 
                                         </DxFormLayout>
                                     </EditFormTemplate>
-                                </MyGrid>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+
+
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+
                             </DxLoadingPanel>
                         </div>
                     </div>
@@ -99,5 +121,5 @@
 }
 else
 {
-    <LoadingIndicatorLayout /> 
+    <LoadingIndicatorLayout />
 }

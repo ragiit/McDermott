@@ -45,6 +45,11 @@
             public List<UserDto> UsersToValidate { get; } = UsersToValidate;
         }
 
+        public class BulkValidatePractitionerQuery(List<UserDto> UsersToValidate) : IRequest<List<UserDto>>
+        {
+            public List<UserDto> UsersToValidate { get; } = UsersToValidate;
+        }
+
         public class GetUserQuery(Expression<Func<User, bool>>? predicate = null, bool removeCache = false) : IRequest<List<UserDto>>
         {
             public Expression<Func<User, bool>> Predicate { get; } = predicate!;

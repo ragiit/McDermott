@@ -117,10 +117,10 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task ExportToExcel()
         {
             await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "country_template.xlsx", new List<ExportFileData>
-        {
-            new() { Column = "Name", Notes = "Mandatory" },
-            new() { Column = "Code"},
-        });
+            {
+                new() { Column = "Name", Notes = "Mandatory" },
+                new() { Column = "Code"},
+            });
         }
 
         public async Task GenerateColumnImportTemplateExcelFileAsync(IJSRuntime jsRuntime, IFileExportService file, string fileName, DotNetStreamReference streamReference, List<ExportFileData> data, string name = "downloadFileFromStream")

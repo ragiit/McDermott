@@ -232,7 +232,12 @@ namespace McDermott.Web.Components.Pages.Config
                     list1 = (await Mediator.Send(new GetProvinceQuery
                     {
                         Predicate = x => provinceNames.Contains(x.Name.ToLower()),
-                        IsGetAll = true
+                        IsGetAll = true,
+                        Select = x => new Province
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }
                     })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)

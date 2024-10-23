@@ -139,12 +139,23 @@ namespace McDermott.Web.Components.Pages.Config
                     list1 = (await Mediator.Send(new GetProvinceQuery
                     {
                         Predicate = x => provinceNames.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                        Select = x => new Province
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }
                     })).Item1;
 
                     list2 = (await Mediator.Send(new GetCityQuery
                     {
                         Predicate = x => cityNames.Contains(x.Name.ToLower()),
-                        IsGetAll = true
+                        IsGetAll = true,
+                        Select = x => new City
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }
                     })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
@@ -277,17 +288,24 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetDistrictQuery
+                {
+                    SearchTerm = searchTerm,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Districts = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-            finally { PanelVisible = false; }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         #region ComboboxProvince

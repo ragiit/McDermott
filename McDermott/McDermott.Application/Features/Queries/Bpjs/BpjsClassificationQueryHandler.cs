@@ -1,8 +1,11 @@
-﻿namespace McDermott.Application.Features.Queries.Bpjs
+﻿using McDermott.Application.Features.Services;
+
+namespace McDermott.Application.Features.Queries.Bpjs
 {
     public class BpjsClassificationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetBpjsClassificationQuery, List<BpjsClassificationDto>>,
-        IRequestHandler<CreateBpjsClassificationRequest, BpjsClassificationDto>,
+        IRequestHandler<GetBpjsClassificationQuery, (List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<BulkValidateBpjsClassificationQuery, List<BpjsClassificationDto>>,
+        IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>, IRequestHandler<CreateBpjsClassificationRequest, BpjsClassificationDto>,
         IRequestHandler<CreateListBpjsClassificationRequest, List<BpjsClassificationDto>>,
         IRequestHandler<UpdateBpjsClassificationRequest, BpjsClassificationDto>,
         IRequestHandler<UpdateListBpjsClassificationRequest, List<BpjsClassificationDto>>,
@@ -10,34 +13,158 @@
     {
         #region GET
 
-        public async Task<List<BpjsClassificationDto>> Handle(GetBpjsClassificationQuery request, CancellationToken cancellationToken)
+        public async Task<List<BpjsClassificationDto>> Handle(BulkValidateBpjsClassificationQuery request, CancellationToken cancellationToken)
+        {
+            var BpjsClassificationDtos = request.BpjsClassificationsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var BpjsClassificationNames = BpjsClassificationDtos.Select(x => x.Name).Distinct().ToList();
+            var Codes = BpjsClassificationDtos.Select(x => x.Code).Distinct().ToList();
+
+            var existingBpjsClassifications = await _unitOfWork.Repository<BpjsClassification>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => BpjsClassificationNames.Contains(v.Name)
+                            && Codes.Contains(v.Code))
+                .ToListAsync(cancellationToken);
+
+            return existingBpjsClassifications.Adapt<List<BpjsClassificationDto>>();
+        }
+
+        public async Task<(List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBpjsClassificationQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetBpjsClassificationQuery_";
+                var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<BpjsClassification>? result))
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
                 {
-                    result = await _unitOfWork.Repository<BpjsClassification>().Entities
-                       .AsNoTracking()
-                       .ToListAsync(cancellationToken);
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
 
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                result ??= [];
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                            );
+                }
 
-                return result.ToList().Adapt<List<BpjsClassificationDto>>();
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new BpjsClassification
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<BpjsClassificationDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<BpjsClassificationDto>>(), 0, 1, 1);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<BpjsClassificationDto> Handle(GetSingleBpjsClassificationQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
+                        );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new BpjsClassification
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BpjsClassificationDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
                 throw;
             }
         }

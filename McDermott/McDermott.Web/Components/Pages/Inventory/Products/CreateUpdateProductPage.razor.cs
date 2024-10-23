@@ -299,7 +299,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
                 _SmartButton = true;
 
-                // Fetch related data 
+                // Fetch related data
                 GetMedicaments = (await Mediator.Send(new GetMedicamentQuery
                 {
                     Predicate = x => x.ProductId == PostProduct.Id
@@ -349,7 +349,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             }
 
             // Fetch additional data
-            GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
+            //GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
             ActiveComponents = (await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>()).Item1;
         }
 

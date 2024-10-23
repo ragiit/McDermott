@@ -122,9 +122,15 @@ namespace McDermott.Web.Components.Pages.Config
 
                 var cityId = refCityComboBox?.Value.GetValueOrDefault();
                 var provId = refProvinceComboBox?.Value.GetValueOrDefault();
-                var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, refDistrictComboBox?.Text ?? "", x => x.CityId == cityId && x.ProvinceId == provId);
+                var result = await Mediator.Send(new GetDistrictQuery
+                {
+                    Predicate = x => x.CityId == cityId && x.ProvinceId == provId,
+                    SearchTerm = refDistrictComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Districts = result.Item1;
-                totalCountDistrict = result.pageCount;
+                totalCountDistrict = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -340,7 +346,10 @@ namespace McDermott.Web.Components.Pages.Config
                 {
                     Predicate = x => x.Id == a.CityId,
                 })).Item1;
-                Districts = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == a.DistrictId)).Item1;
+                Districts = (await Mediator.Send(new GetDistrictQuery
+                {
+                    Predicate = x => x.Id == a.DistrictId,
+                })).Item1;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -453,21 +462,35 @@ namespace McDermott.Web.Components.Pages.Config
                     list1 = (await Mediator.Send(new GetProvinceQuery
                     {
                         Predicate = x => provinceNames.Contains(x.Name.ToLower()),
-                        IsGetAll = true
+                        IsGetAll = true,
+                        Select = x => new Province
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }
                     })).Item1;
 
                     list2 = (await Mediator.Send(new GetCityQuery
                     {
                         Predicate = x => cityNames.Contains(x.Name.ToLower()),
-                        IsGetAll = true
-                    })).Item1;
-
-                    list3 = (await Mediator.Send(new GetDistrictQuery(x => districtNames.Contains(x.Name), 0, 0,
-                        select: x => new District
+                        IsGetAll = true,
+                        Select = x => new City
                         {
                             Id = x.Id,
                             Name = x.Name
-                        }))).Item1;
+                        }
+                    })).Item1;
+
+                    list3 = (await Mediator.Send(new GetDistrictQuery
+                    {
+                        Predicate = x => districtNames.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                        Select = x => new District
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

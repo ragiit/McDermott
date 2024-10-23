@@ -234,7 +234,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                         {
                             Name = name,
                             Email = email,
-                            Password = password,
+                            Password = Helper.HashMD5(password),
                             GroupId = groupId,
                             NoId = identityNum,
                             ReligionId = religionId,
@@ -1074,12 +1074,27 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDistrictQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDistrictComboBox?.Text ?? ""));
-            Districts = result.Item1;
-            totalCountDistrict = result.pageCount;
-            PanelVisible = false;
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetDistrictQuery
+                {
+                    SearchTerm = refDistrictComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                Districts = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         #endregion ComboboxDistrict

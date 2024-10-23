@@ -1,10 +1,10 @@
- public class GetSingleProjectQuery : IRequest<ProjectDto>
+ public class GetSingleBpjsClassificationQuery : IRequest<BpjsClassificationDto>
  {
-     public List<Expression<Func<Project, object>>> Includes { get; set; }
-     public Expression<Func<Project, bool>> Predicate { get; set; }
-     public Expression<Func<Project, Project>> Select { get; set; }
+     public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
+     public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
+     public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
 
-     public List<(Expression<Func<Project, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+     public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
      public bool IsDescending { get; set; } = false; // default to ascending
      public int PageIndex { get; set; } = 0;
@@ -13,13 +13,13 @@
      public string SearchTerm { get; set; }
  }
 
-public class GetProjectQuery : IRequest<(List<ProjectDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetBpjsClassificationQuery : IRequest<(List<BpjsClassificationDto>, int PageIndex, int PageSize, int PageCount)>
 {
-    public List<Expression<Func<Project, object>>> Includes { get; set; }
-    public Expression<Func<Project, bool>> Predicate { get; set; }
-    public Expression<Func<Project, Project>> Select { get; set; }
+    public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
+    public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
+    public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
 
-    public List<(Expression<Func<Project, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+    public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
@@ -27,15 +27,48 @@ public class GetProjectQuery : IRequest<(List<ProjectDto>, int PageIndex, int Pa
     public bool IsGetAll { get; set; } = false;
     public string SearchTerm { get; set; }
 }
-  
-IRequestHandler<GetProjectQuery, (List<ProjectDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleProjectQuery, ProjectDto>,
 
-public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProjectQuery request, CancellationToken cancellationToken)
+public async Task<List<BpjsClassificationDto>> Handle(BulkValidateBpjsClassificationQuery request, CancellationToken cancellationToken)
+{
+    var BpjsClassificationDtos = request.BpjsClassificationsToValidate;
+
+    // Ekstrak semua kombinasi yang akan dicari di database
+    var BpjsClassificationNames = BpjsClassificationDtos.Select(x => x.Name).Distinct().ToList();
+    var postalCodes = BpjsClassificationDtos.Select(x => x.PostalCode).Distinct().ToList();
+    var provinceIds = BpjsClassificationDtos.Select(x => x.ProvinceId).Distinct().ToList();
+    var cityIds = BpjsClassificationDtos.Select(x => x.CityId).Distinct().ToList();
+    var BpjsClassificationIds = BpjsClassificationDtos.Select(x => x.BpjsClassificationId).Distinct().ToList();
+
+    var existingBpjsClassifications = await _unitOfWork.Repository<BpjsClassification>()
+        .Entities
+        .AsNoTracking()
+        .Where(v => BpjsClassificationNames.Contains(v.Name)
+                    && postalCodes.Contains(v.PostalCode)
+                    && provinceIds.Contains(v.ProvinceId)
+                    && cityIds.Contains(v.CityId)
+                    && BpjsClassificationIds.Contains(v.BpjsClassificationId))
+        .ToListAsync(cancellationToken);
+
+    return existingBpjsClassifications.Adapt<List<BpjsClassificationDto>>();
+}
+
+
+        public class BulkValidateBpjsClassificationQuery(List<BpjsClassificationDto> BpjsClassificationsToValidate) : IRequest<List<BpjsClassificationDto>>
+        {
+            public List<BpjsClassificationDto> BpjsClassificationsToValidate { get; } = BpjsClassificationsToValidate;
+        }
+
+
+IRequestHandler<BulkValidateBpjsClassificationQuery, List<BpjsClassificationDto>>,
+  
+IRequestHandler<GetBpjsClassificationQuery, (List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>,
+
+public async Task<(List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBpjsClassificationQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<Project>().Entities.AsNoTracking(); 
+        var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking(); 
 
         if (request.Predicate is not null)
             query = query.Where(request.Predicate);
@@ -51,8 +84,8 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
             {
                 query = additionalOrderBy.IsDescending
-                    ? ((IOrderedQueryable<Project>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                    : ((IOrderedQueryable<Project>)query).ThenBy(additionalOrderBy.OrderBy);
+                    ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                    : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
             }
         }
 
@@ -69,7 +102,7 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
         {
             query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Project.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.BpjsClassification.Name, $"%{request.SearchTerm}%")
                     );
         }
 
@@ -77,7 +110,7 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
         if (request.Select is not null)
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new Project
+            query = query.Select(x => new BpjsClassification
             {
                 Id = x.Id, 
             });
@@ -91,11 +124,11 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
                 cancellationToken
             );
 
-            return (pagedItems.Adapt<List<ProjectDto>>(), request.PageIndex, request.PageSize, totalPages);
+            return (pagedItems.Adapt<List<BpjsClassificationDto>>(), request.PageIndex, request.PageSize, totalPages);
         }
         else
         {
-            return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProjectDto>>(), 0, 1, 1);
+            return ((await query.ToListAsync(cancellationToken)).Adapt<List<BpjsClassificationDto>>(), 0, 1, 1);
         }
     }
     catch (Exception ex)
@@ -106,11 +139,11 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
 }
 
 
-  public async Task<ProjectDto> Handle(GetSingleProjectQuery request, CancellationToken cancellationToken)
+  public async Task<BpjsClassificationDto> Handle(GetSingleBpjsClassificationQuery request, CancellationToken cancellationToken)
  {
      try
      {
-         var query = _unitOfWork.Repository<Project>().Entities.AsNoTracking();
+         var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking();
 
          if (request.Predicate is not null)
              query = query.Where(request.Predicate);
@@ -126,8 +159,8 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
              foreach (var additionalOrderBy in request.OrderByList.Skip(1))
              {
                  query = additionalOrderBy.IsDescending
-                     ? ((IOrderedQueryable<Project>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                     : ((IOrderedQueryable<Project>)query).ThenBy(additionalOrderBy.OrderBy);
+                     ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                     : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
              }
          }
 
@@ -144,7 +177,7 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
          {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.Project.Name, $"%{request.SearchTerm}%")
+                EF.Functions.Like(v.BpjsClassification.Name, $"%{request.SearchTerm}%")
                 );
          }
 
@@ -152,12 +185,12 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
          if (request.Select is not null)
              query = query.Select(request.Select);
          else
-             query = query.Select(x => new Project
+             query = query.Select(x => new BpjsClassification
              {
                  Id = x.Id, 
              });
 
-         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProjectDto>();
+         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BpjsClassificationDto>();
      }
      catch (Exception ex)
      {
@@ -166,10 +199,7 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
      }
  }
 
-
-
-
- var a = await Mediator.Send(new GetProjectsQuery
+ var a = await Mediator.Send(new GetBpjsClassificationsQuery
  {
      OrderByList =
      [
@@ -181,10 +211,10 @@ public async Task<(List<ProjectDto>, int pageIndex, int pageSize, int pageCount)
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleProjectQuery
+var patienss = (await Mediator.Send(new GetSingleBpjsClassificationQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Project
+    Select = x => new BpjsClassification
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -197,13 +227,13 @@ var patienss = (await Mediator.Send(new GetSingleProjectQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetProjectQuery
+    var result = await Mediator.Send(new GetBpjsClassificationQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Projects = result.Item1;
+    BpjsClassifications = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -216,12 +246,22 @@ finally
     PanelVisible = false;
 }
 
+ var result = await Mediator.Send(new GetBpjsClassificationQuery
+ {
+     Predicate = x => x.CityId == cityId,
+     SearchTerm = refBpjsClassificationComboBox?.Text ?? "",
+     PageIndex = pageIndex,
+     PageSize = pageSize,
+ });
+ BpjsClassifications = result.Item1;
+ totalCountBpjsClassification = result.PageCount;
 
+ BpjsClassifications = (await Mediator.Send(new GetBpjsClassificationQuery
+ {
+     Predicate = x => x.Id == UserForm.IdCardBpjsClassificationId,
+ })).Item1;
 
-
-
-
-var data = (await Mediator.Send(new GetSingleProjectsQuery
+var data = (await Mediator.Send(new GetSingleBpjsClassificationsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -229,17 +269,17 @@ var data = (await Mediator.Send(new GetSingleProjectsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Project
+    Select = x => new BpjsClassification
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Project
+        Patient = new BpjsClassification
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Project
+        Pratitioner = new BpjsClassification
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -252,56 +292,55 @@ var data = (await Mediator.Send(new GetSingleProjectsQuery
 })) ?? new();
 
 
-#region ComboboxProject
+#region ComboboxBpjsClassification
 
- private DxComboBox<ProjectDto, long?> refProjectComboBox { get; set; }
- private int ProjectComboBoxIndex { get; set; } = 0;
- private int totalCountProject = 0;
+ private DxComboBox<BpjsClassificationDto, long?> refBpjsClassificationComboBox { get; set; }
+ private int BpjsClassificationComboBoxIndex { get; set; } = 0;
+ private int totalCountBpjsClassification = 0;
 
- private async Task OnSearchProject()
+ private async Task OnSearchBpjsClassification()
  {
-     await LoadDataProject();
+     await LoadDataBpjsClassification();
  }
 
- private async Task OnSearchProjectIndexIncrement()
+ private async Task OnSearchBpjsClassificationIndexIncrement()
  {
-     if (ProjectComboBoxIndex < (totalCountProject - 1))
+     if (BpjsClassificationComboBoxIndex < (totalCountBpjsClassification - 1))
      {
-         ProjectComboBoxIndex++;
-         await LoadDataProject(ProjectComboBoxIndex, 10);
+         BpjsClassificationComboBoxIndex++;
+         await LoadDataBpjsClassification(BpjsClassificationComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchProjectIndexDecrement()
+ private async Task OnSearchBpjsClassificationIndexDecrement()
  {
-     if (ProjectComboBoxIndex > 0)
+     if (BpjsClassificationComboBoxIndex > 0)
      {
-         ProjectComboBoxIndex--;
-         await LoadDataProject(ProjectComboBoxIndex, 10);
+         BpjsClassificationComboBoxIndex--;
+         await LoadDataBpjsClassification(BpjsClassificationComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputProjectChanged(string e)
+ private async Task OnInputBpjsClassificationChanged(string e)
  {
-     ProjectComboBoxIndex = 0;
-     await LoadDataProject();
+     BpjsClassificationComboBoxIndex = 0;
+     await LoadDataBpjsClassification();
  }
 
-
-
-  private async Task LoadDataProject(int pageIndex = 0, int pageSize = 10)
+ 
+  private async Task LoadDataBpjsClassification(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetProjectQuery
+          var result = await Mediator.Send(new GetBpjsClassificationQuery
           {
-              SearchTerm = refProjectComboBox?.Text ?? "",
+              SearchTerm = refBpjsClassificationComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Projects = result.Item1;
-          totalCountProject = result.PageCount;
+          BpjsClassifications = result.Item1;
+          totalCountBpjsClassification = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -311,39 +350,98 @@ var data = (await Mediator.Send(new GetSingleProjectsQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxProject
+ #endregion ComboboxBpjsClassification
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Project" ColSpanMd="12">
-    <MyDxComboBox Data="@Projects"
-                  NullText="Select Project"
-                  @ref="refProjectComboBox"
-                  @bind-Value="@a.ProjectId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="BpjsClassification" ColSpanMd="12">
+    <MyDxComboBox Data="@BpjsClassifications"
+                  NullText="Select BpjsClassification"
+                  @ref="refBpjsClassificationComboBox"
+                  @bind-Value="@a.BpjsClassificationId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputProjectChanged(e))">
+                  TextChanged="((string e) => OnInputBpjsClassificationChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchProjectIndexDecrement"
+            <DxEditorButton Click="OnSearchBpjsClassificationIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchProject"
+            <DxEditorButton Click="OnSearchBpjsClassification"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchProjectIndexIncrement"
+            <DxEditorButton Click="OnSearchBpjsClassificationIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(ProjectDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Project.Name" Caption="Project" />
-            <DxListEditorColumn FieldName="@nameof(ProjectDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(BpjsClassificationDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="BpjsClassification.Name" Caption="BpjsClassification" />
+            <DxListEditorColumn FieldName="@nameof(BpjsClassificationDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.ProjectId)" />
+    <ValidationMessage For="@(()=>a.BpjsClassificationId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Accident>().AddAsync(request.AccidentDto.Adapt<CreateUpdateAccidentDto>().Adapt<Accident>());
-var result = await _unitOfWork.Repository<Accident>().AddAsync(request.AccidentDtos.Adapt<List<CreateUpdateAccidentDto>>().Adapt<List<Accident>>()); 
+var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDto.Adapt<CreateUpdateBpjsClassificationDto>().Adapt<BpjsClassification>());
+var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDtos.Adapt<List<CreateUpdateBpjsClassificationDto>>().Adapt<List<BpjsClassification>>()); 
 
-var result = await _unitOfWork.Repository<Accident>().UpdateAsync(request.AccidentDto.Adapt<CreateUpdateAccidentDto>().Adapt<Accident>());  
-var result = await _unitOfWork.Repository<Accident>().UpdateAsync(request.AccidentDtos.Adapt<List<CreateUpdateAccidentDto>>().Adapt<List<Accident>>());
+var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDto.Adapt<CreateUpdateBpjsClassificationDto>().Adapt<BpjsClassification>());  
+var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDtos.Adapt<List<CreateUpdateBpjsClassificationDto>>().Adapt<List<BpjsClassification>>());
 
+list3 = (await Mediator.Send(new GetBpjsClassificationQuery
+{
+    Predicate = x => BpjsClassificationNames.Contains(x.Name.ToLower()),
+    IsGetAll = true,
+    Select = x => new BpjsClassification
+    {
+        Id = x.Id,
+        Name = x.Name
+    }
+})).Item1;
+
+
+#region Searching
+
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+ private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+{
+    try
+    {
+        PanelVisible = true;
+        SelectedDataItems = new ObservableRangeCollection<object>();
+        var result = await Mediator.Send(new GetBpjsClassificationQuery
+        {
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            SearchTerm = searchTerm,
+        });
+        BpjsClassifications = result.Item1;
+        totalCount = result.PageCount;
+        activePageIndex = pageIndex;
+        PanelVisible = false;
+    }
+    catch (Exception ex)
+    {
+        ex.HandleException(ToastService);
+    }
+    finally { PanelVisible = false; }
+}
+    #endregion Searching

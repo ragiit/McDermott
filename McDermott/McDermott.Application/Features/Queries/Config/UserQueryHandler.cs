@@ -170,6 +170,7 @@ namespace McDermott.Application.Features.Queries.Config
 
             // Get distinct values from UserDtos
             var userNames = userDtos.Select(x => x.Name).Distinct().ToList();
+            var emails = userDtos.Select(x => x.Email).Distinct().ToList();
             var religionIds = userDtos.Select(x => x.ReligionId).Distinct().ToList();
             var datesOfBirth = userDtos.Select(x => x.DateOfBirth).Distinct().ToList();
             var genders = userDtos.Select(x => x.Gender).Distinct().ToList();
@@ -181,13 +182,16 @@ namespace McDermott.Application.Features.Queries.Config
             var emergencyNames = userDtos.Select(x => x.EmergencyName).Distinct().ToList();
             var emergencyEmails = userDtos.Select(x => x.EmergencyEmail).Distinct().ToList();
             var emergencyPhones = userDtos.Select(x => x.EmergencyPhone).Distinct().ToList();
-            var isPatient = userDtos.Select(x => x.IsEmployee).Distinct().ToList();
+            var isPatient = userDtos.Select(x => x.IsPatient).Distinct().ToList();
+            var noIds = userDtos.Select(x => x.NoId).Distinct().ToList();
 
             // Fetch existing users
             var existingUsers = await _unitOfWork.Repository<User>()
                 .Entities
                 .AsNoTracking()
                 .Where(v => userNames.Contains(v.Name) &&
+                            emails.Contains(v.Email) &&
+                            noIds.Contains(v.NoId) &&
                             religionIds.Contains(v.ReligionId) &&
                             datesOfBirth.Contains(v.DateOfBirth) &&
                             genders.Contains(v.Gender) &&
@@ -200,6 +204,62 @@ namespace McDermott.Application.Features.Queries.Config
                             emergencyEmails.Contains(v.EmergencyEmail) &&
                             emergencyPhones.Contains(v.EmergencyPhone) &&
                             isPatient.Contains(v.IsPatient)
+                )
+                .ToListAsync(cancellationToken);
+
+            return existingUsers.Adapt<List<UserDto>>();
+        }
+
+        public async Task<List<UserDto>> Handle(BulkValidatePractitionerQuery request, CancellationToken cancellationToken)
+        {
+            var userDtos = request.UsersToValidate;
+
+            // Get distinct values from UserDtos
+            var userNames = userDtos.Select(x => x.Name).Distinct().ToList();
+            var emails = userDtos.Select(x => x.Email).Distinct().ToList();
+            var religionIds = userDtos.Select(x => x.ReligionId).Distinct().ToList();
+            var datesOfBirth = userDtos.Select(x => x.DateOfBirth).Distinct().ToList();
+            var genders = userDtos.Select(x => x.Gender).Distinct().ToList();
+            var martialStatuses = userDtos.Select(x => x.MartialStatus).Distinct().ToList();
+            var mobilePhones = userDtos.Select(x => x.MobilePhone).Distinct().ToList();
+            var currentMobiles = userDtos.Select(x => x.CurrentMobile).Distinct().ToList();
+            var homePhoneNumbers = userDtos.Select(x => x.HomePhoneNumber).Distinct().ToList();
+            var npwps = userDtos.Select(x => x.Npwp).Distinct().ToList();
+            var emergencyNames = userDtos.Select(x => x.EmergencyName).Distinct().ToList();
+            var emergencyEmails = userDtos.Select(x => x.EmergencyEmail).Distinct().ToList();
+            var emergencyPhones = userDtos.Select(x => x.EmergencyPhone).Distinct().ToList();
+            var isPhysicion = userDtos.Select(x => x.IsPhysicion).Distinct().ToList();
+            var isNurse = userDtos.Select(x => x.IsNurse).Distinct().ToList();
+            var sips = userDtos.Select(x => x.SipNo).Distinct().ToList();
+            var sipExps = userDtos.Select(x => x.SipExp).Distinct().ToList();
+            var strs = userDtos.Select(x => x.StrNo).Distinct().ToList();
+            var strExps = userDtos.Select(x => x.StrExp).Distinct().ToList();
+            var noIds = userDtos.Select(x => x.NoId).Distinct().ToList();
+
+            // Fetch existing users
+            var existingUsers = await _unitOfWork.Repository<User>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => userNames.Contains(v.Name) &&
+                            emails.Contains(v.Email) &&
+                            noIds.Contains(v.NoId) &&
+                            religionIds.Contains(v.ReligionId) &&
+                            datesOfBirth.Contains(v.DateOfBirth) &&
+                            genders.Contains(v.Gender) &&
+                            martialStatuses.Contains(v.MartialStatus) &&
+                            mobilePhones.Contains(v.MobilePhone) &&
+                            currentMobiles.Contains(v.CurrentMobile) &&
+                            homePhoneNumbers.Contains(v.HomePhoneNumber) &&
+                            npwps.Contains(v.Npwp) &&
+                            emergencyNames.Contains(v.EmergencyName) &&
+                            emergencyEmails.Contains(v.EmergencyEmail) &&
+                            emergencyPhones.Contains(v.EmergencyPhone) &&
+                            isPhysicion.Contains(v.IsPatient) &&
+                            isNurse.Contains(v.IsPatient) &&
+                            sips.Contains(v.SipNo) &&
+                            sipExps.Contains(v.SipExp) &&
+                            strs.Contains(v.StrNo) &&
+                            strExps.Contains(v.StrExp)
                 )
                 .ToListAsync(cancellationToken);
 
@@ -617,9 +677,7 @@ namespace McDermott.Application.Features.Queries.Config
         {
             try
             {
-                var createUpdateDtos = request.UserDtos.Adapt<List<CreateUpdateUserDto>>();
-                var Users = createUpdateDtos.Adapt<List<User>>();
-                var result = await _unitOfWork.Repository<User>().AddAsync(Users);
+                var result = await _unitOfWork.Repository<User>().AddAsync(request.UserDtos.Adapt<List<CreateUpdateUserDto>>().Adapt<List<User>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

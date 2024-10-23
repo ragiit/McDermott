@@ -170,7 +170,10 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
             {
                 Predicate = x => x.Id == UserForm.IdCardProvinceId,
             })).Item1;
-            Districts = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == UserForm.IdCardDistrictId)).Item1;
+            Districts = (await Mediator.Send(new GetDistrictQuery
+            {
+                Predicate = x => x.Id == UserForm.IdCardDistrictId,
+            })).Item1;
             Villages = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.IdCardVillageId)).Item1;
 
             #endregion KTP Address
@@ -189,7 +192,10 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
             {
                 Predicate = x => x.Id == UserForm.DomicileCityId,
             })).Item1;
-            DistrictsResidence = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == UserForm.DomicileDistrictId)).Item1;
+            DistrictsResidence = (await Mediator.Send(new GetDistrictQuery
+            {
+                Predicate = x => x.Id == UserForm.DomicileDistrictId,
+            })).Item1;
             VillagesResidence = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.DomicileVillageId)).Item1;
 
             #endregion Residence  Address
@@ -1335,9 +1341,15 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
             var cityId = refCityComboBox?.Value.GetValueOrDefault();
             UserForm.IdCardVillageId = null;
             var id = refDistrictComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, refDistrictComboBox?.Text ?? "", x => x.CityId == cityId);
+            var result = await Mediator.Send(new GetDistrictQuery
+            {
+                Predicate = x => x.CityId == cityId,
+                SearchTerm = refDistrictComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             Districts = result.Item1;
-            totalCountDistrict = result.pageCount;
+            totalCountDistrict = result.PageCount;
             PanelVisible = false;
         }
 
@@ -2014,9 +2026,15 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
         {
             PanelVisible = true;
             var CityResidenceId = refCityResidenceComboBox?.Value.GetValueOrDefault();
-            var result = await Mediator.QueryGetHelper<District, DistrictDto>(pageIndex, pageSize, refDistrictResidenceComboBox?.Text ?? "", x => x.CityId == CityResidenceId);
-            DistrictsResidence = result.Item1;
-            totalCountDistrictResidence = result.pageCount;
+            var result = await Mediator.Send(new GetDistrictQuery
+            {
+                Predicate = x => x.CityId == CityResidenceId,
+                SearchTerm = refDistrictResidenceComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
+            Districts = result.Item1;
+            totalCountDistrict = result.PageCount;
             PanelVisible = false;
         }
 

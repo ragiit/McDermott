@@ -6,6 +6,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class DistrictQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDistrictQuery, (List<DistrictDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleDistrictQuery, DistrictDto>,
         IRequestHandler<ValidateDistrictQuery, bool>,
         IRequestHandler<BulkValidateDistrictQuery, List<DistrictDto>>,
         IRequestHandler<CreateDistrictRequest, DistrictDto>,
@@ -42,6 +43,25 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 var query = _unitOfWork.Repository<District>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<District>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<District>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -51,35 +71,122 @@ namespace McDermott.Application.Features.Queries.Config
                     }
                 }
 
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new District
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ProvinceId = x.ProvinceId,
+                        CityId = x.CityId,
+                        Province = new Domain.Entities.Province
+                        {
+                            Name = x.Province.Name
+                        },
+                        City = new Domain.Entities.City
+                        {
+                            Name = x.City.Name
+                        },
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<DistrictDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<DistrictDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<DistrictDto> Handle(GetSingleDistrictQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<District>().Entities.AsNoTracking();
+
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<District>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<District>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
                         );
                 }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
-                }
+                else
+                    query = query.Select(x => new District
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ProvinceId = x.ProvinceId,
+                        CityId = x.CityId,
+                        Province = new Domain.Entities.Province
+                        {
+                            Name = x.Province.Name
+                        },
+                        City = new Domain.Entities.City
+                        {
+                            Name = x.City.Name
+                        },
+                    });
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
-
-                return (pagedItems.Adapt<List<DistrictDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<DistrictDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }
