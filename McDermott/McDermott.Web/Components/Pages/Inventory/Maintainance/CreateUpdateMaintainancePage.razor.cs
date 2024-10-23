@@ -35,15 +35,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
 
         private IGrid Grid { get; set; }
-        private IGrid Grid { get; set; }
-        private IGrid GridDetail { get; set; }
         private Timer _timer;
         private bool PanelVisible { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
-        private int FocusedRowDetailVisibleIndex { get; set; }
         private DateTime? currentExpiryDate {  get; set; }
 
         #endregion variable Static
@@ -51,8 +47,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-
-        #endregion
 
         #region Boolean Data
 
@@ -272,7 +266,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         }
         private async Task LoadData()
         {
-            var result = await Mediator.Send(new GetMaintainanceQuery(x => x.Id == Id, pageSize: 0, pageIndex: 1));
             var result = await Mediator.Send(new GetMaintainanceQuery(x => x.Id == Id, pageSize: 1, pageIndex: 0));
             postMaintainance = new();
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -285,8 +278,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
                 postMaintainance = result.Item1.FirstOrDefault() ?? new();
             }
-                await LoadDataDetail();
-            }
+             
         }
 
 
@@ -369,7 +361,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             PanelVisible = true;
             SelectedDataItems = [];
             var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getEquipment = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
+           
             getProduct = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
             totalCount = result.pageCount;
             PanelVisible = false;
@@ -636,21 +628,21 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         #endregion function step
 
         #region Click Button
-        private async Task NewItemDetail_Click()
+        private async Task NewItem_Click()
         {
-            await GridDetail.StartEditNewRowAsync();
+            await Grid.StartEditNewRowAsync();
         }
-        private async Task EditItemDetail_Click(IGrid context)
+        private async Task EditItem_Click(IGrid context)
         {
-            await GridDetail.StartEditRowAsync(FocusedRowDetailVisibleIndex);
+            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
             postMaintainanceProduct = (MaintainanceProductDto)context.SelectedDataItem;
 
         }
-        private void DeleteItemDetail_Click()
+        private void DeleteItem_Click()
         {
-            GridDetail.ShowRowDeleteConfirmation(FocusedRowDetailVisibleIndex);
+            Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-        private async Task RefreshDetail_Click()
+        private async Task Refresh_Click()
         {
             await LoadDataDetail();
         }

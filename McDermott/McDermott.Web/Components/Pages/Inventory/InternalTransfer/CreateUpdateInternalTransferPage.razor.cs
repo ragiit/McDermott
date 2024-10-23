@@ -207,9 +207,18 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery(searchTerm: refDestinationComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getDestination = result.Item1;
-            totalCount = result.pageCount;
+            var result = await Mediator.Send(new GetLocationQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refDestinationComboBox?.Text ?? "",
+                Select = x => new Locations
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                }
+            }); getDestination = result.Item1;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -302,9 +311,18 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery(searchTerm: refSourceComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getSource = result.Item1;
-            totalCount = result.pageCount;
+            var result = await Mediator.Send(new GetLocationQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refSourceComboBox?.Text ?? "",
+                Select = x => new Locations
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                }
+            }); getSource = result.Item1;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
