@@ -1,6 +1,7 @@
 ﻿using MailKit.Search;
 using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintainanceProductCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 
@@ -16,6 +17,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<MedicamentDto> GetMedicaments = [];
         private List<BpjsClassificationDto> GetBPJSCl = [];
         private List<UomDto> GetUoms = [];
+        private List<UomDto> GetUomPurchases = [];
         private List<DrugFormDto> GetDrugForms = [];
         private List<DrugRouteDto> GetDrugRoutes = [];
         private List<ProductCategoryDto> GetProductCategories = [];
@@ -25,8 +27,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<StockProductDto> StockProducts = [];
         private List<TransactionStockDto> TransactionStocks = [];
         private List<MaintainanceDto> GetMaintainance = [];
-        private List<MaintainanceDto> GetMaintainanceScrap = [];
-        private List<MaintainanceDto> GetMaintainanceHistory = [];
+        private List<MaintainanceProductDto> GetMaintainanceProduct = [];
+        private List<MaintainanceProductDto> GetMaintainanceScrap = [];
+        private List<MaintainanceProductDto> GetMaintainanceHistory = [];
 
         //Post data
         private ProductDto PostProduct = new();
@@ -62,7 +65,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private int FocusedRowVisibleIndex { get; set; }
         private string? NameUom { get; set; }
         private string? NameProduct { get; set; }
-        private bool FormValidationState { get; set; } = false;
+        private bool FormValidationState { get; set; } = true;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataStockItems { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
@@ -267,9 +270,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             PanelVisible = true;
             await GetUserInfo();
             await LoadDataUom();
+            await LoadDataUomPurchase();
             await LoadData();
             await LoadDataDrugForm();
             await LoadDataDrugRoute();
+            await LoadDataDrugDosage();
             //await LoadDataBPJSCl();
             //await LoadDataLocation();
             await LoadDataProductCategory();
@@ -302,6 +307,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 PostMedicaments = GetMedicaments.FirstOrDefault() ?? new();
                 var maintainanceResult = await Mediator.Send(new GetMaintainanceQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
                 GetMaintainance = maintainanceResult.Item1;
+                var maintainanceProduct = await Mediator.Send(new GetMaintainanceProductQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
+                GetMaintainanceProduct = maintainanceProduct.Item1;
                 // Map product details
                 PostProductDetails = PostProduct.Adapt<ProductDetailDto>();
                 NameProduct = PostProductDetails.Name;
@@ -346,8 +353,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             ActiveComponents = (await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>()).Item1;
         }
 
-        // Maps medicament-specific details to PostProductDetails
-        // Updates only medicament-specific fields without overwriting the entire PostProductDetails object
         private void UpdateMedicamentDetails(ProductDetailDto postProductDetails, MedicamentDto medicament)
         {
             postProductDetails.MedicamentId = medicament.Id;
@@ -367,11 +372,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         // Handles stock and maintenance for medical equipment
         private void HandleMedicalEquipmentStock()
         {
-            TotalScrapQty = GetMaintainance
-                .Count(x => x.EquipmentId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap);
+            TotalScrapQty = GetMaintainanceProduct
+                .Count(x => x.ProductId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap);
 
-            TotalMaintainanceQty = GetMaintainance
-                .Count(x => x.EquipmentId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap);
+            TotalMaintainanceQty = GetMaintainanceProduct
+                .Count(x => x.ProductId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap);
 
             TotalQty = TransactionStocks
                 .Where(x => x.ProductId == PostProduct.Id && x.Validate)
@@ -403,14 +408,20 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         #region Select Data
 
-        private void SelectedChangeUoM(UomDto UomId)
+        private void SelectedChangeUoM(UomDto selectedUom)
         {
-            if (UomId != null)
+            if (selectedUom != null)
             {
-                var UoMId = GetUoms.Where(u => u.Id == UomId.Id).FirstOrDefault() ?? new();
-                if (UoMId.Id != 0)
+                var dataUoM = GetUoms.FirstOrDefault(u => u.Id == selectedUom.Id) ?? new();
+                if (dataUoM.Id != 0)
                 {
-                    PostProductDetails.PurchaseUomId = UoMId.Id;
+                    PostProductDetails.UomId = dataUoM.Id;
+
+                    // Only set PurchaseUomId if it's not manually changed
+                    
+                        PostProductDetails.PurchaseUomId = dataUoM.Id;
+                    
+                    StateHasChanged();
                 }
             }
         }
@@ -460,6 +471,54 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             SelectedDataItems = [];
             var result = await Mediator.Send(new GetUomQuery(searchTerm: refUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             GetUoms = result.Item1;
+            totalCount = result.pageCount;
+            PanelVisible = false;
+        }
+
+        #endregion ComboBox Uom
+
+        #region ComboBox UomPurchase
+
+        private DxComboBox<UomDto, long?> refUomPurchaseComboBox { get; set; }
+        private int UomPurchaseComboBoxIndex { get; set; } = 0;
+        private int totalCountUomPurchase = 0;
+
+        private async Task OnSearchUomPurchase()
+        {
+            await LoadDataUomPurchase(0, 10);
+        }
+
+        private async Task OnSearchUomPurchaseIndexIncrement()
+        {
+            if (UomPurchaseComboBoxIndex < (totalCountUom - 1))
+            {
+                UomPurchaseComboBoxIndex++;
+                await LoadDataUomPurchase(UomPurchaseComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchUomPurchaseIndexDecrement()
+        {
+            if (UomPurchaseComboBoxIndex > 0)
+            {
+                UomPurchaseComboBoxIndex--;
+                await LoadDataUomPurchase(UomPurchaseComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputUomPurchaseChanged(string e)
+        {
+            // Reset UomPurchaseComboBoxIndex and load new data based on user input
+            UomPurchaseComboBoxIndex = 0;
+            await LoadDataUomPurchase(0, 10);
+        }
+
+        private async Task LoadDataUomPurchase(int pageIndex = 0, int pageSize = 10)
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var result = await Mediator.Send(new GetUomQuery(searchTerm: refUomPurchaseComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            GetUomPurchases = result.Item1;
             totalCount = result.pageCount;
             PanelVisible = false;
         }
@@ -652,7 +711,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         #endregion Combo Box Product Category
 
-        #region ComboBox Uom
+        #region ComboBox Drug Dosage
 
         private DxComboBox<DrugDosageDto, long?> refDrugDosageComboBox { get; set; }
         private int DrugDosageComboBoxIndex { get; set; } = 0;
@@ -665,9 +724,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private async Task OnSearchDrugDosageIndexIncrement()
         {
-            if (UomComboBoxIndex < (totalCountUom - 1))
+            if (DrugDosageComboBoxIndex < (totalCountDrugDosage - 1))
             {
-                UomComboBoxIndex++;
+                DrugDosageComboBoxIndex++;
                 await LoadDataDrugDosage(DrugDosageComboBoxIndex, 10);
             }
         }
@@ -676,7 +735,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             if (DrugDosageComboBoxIndex > 0)
             {
-                UomComboBoxIndex--;
+                DrugDosageComboBoxIndex--;
                 await LoadDataDrugDosage(DrugDosageComboBoxIndex, 10);
             }
         }
@@ -691,7 +750,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: refUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: refDrugDosageComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             GetDrugDosage = result.Item1;
             totalCount = result.pageCount;
             PanelVisible = false;
@@ -840,7 +899,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 showScrapProduct = true;
                 PanelVisible = true;
-                GetMaintainanceScrap = GetMaintainance.Where(x => x.EquipmentId == Id && x.Status == EnumStatusMaintainance.Scrap).ToList();
+                GetMaintainanceScrap = GetMaintainanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintainance.Scrap).ToList();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -855,7 +914,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 showMaintaiananaceProduct = true;
                 PanelVisible = true;
-                GetMaintainanceHistory = GetMaintainance.Where(x => x.EquipmentId == Id && x.Status != EnumStatusMaintainance.Scrap).ToList();
+                GetMaintainanceHistory = GetMaintainanceProduct.Where(x => x.ProductId == Id && x.Status != EnumStatusMaintainance.Scrap).ToList();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -908,6 +967,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 await OnSave();
             else
                 FormValidationState = true;
+            
         }
 
         private async Task HandleInvalidSubmit()
@@ -937,6 +997,12 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 SetPostProductDetails();
                 if (PostProductDetails.HospitalType == "Medicament")
                 {
+                    // Validasi jika SetFormMedicamentDetails() tidak memiliki data
+                    if (!ValidateMedicamentDetails())
+                    {
+                        ToastService.ShowError("Medicament details are incomplete or invalid.");
+                        return;
+                    }
                     SetFormMedicamentDetails();
                 }
 
@@ -988,7 +1054,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private void SetFormMedicamentDetails()
         {
             PostMedicaments.Id = PostProductDetails.MedicamentId ?? 0;
-            PostMedicaments.ProductId = TempProduct?.Id ?? 0;
             PostMedicaments.FormId = PostProductDetails.FormId;
             PostMedicaments.RouteId = PostProductDetails.RouteId;
             PostMedicaments.Dosage = PostProductDetails.Dosage;
@@ -1007,6 +1072,21 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 PostMedicaments.ActiveComponentId?.AddRange(selectedActiveComponents.Select(x => x.Id));
             }
+
+        }
+
+        private bool ValidateMedicamentDetails()
+        {
+            // Validasi jika data dalam PostMedicaments kosong atau tidak valid
+            if (PostProductDetails.FormId == null ||
+                PostProductDetails.RouteId == null ||
+                PostProductDetails.Dosage == 0 ||
+                PostProductDetails.UomMId == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private async Task CreateNewProductAndMedicament()
@@ -1015,7 +1095,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             if (PostProductDetails.HospitalType == "Medicament")
             {
-                PostMedicaments.ProductId = PostProduct.Id;
+                PostMedicaments.ProductId = TempProduct.Id;
 
                 if (PostMedicaments.Id == 0)
                 {

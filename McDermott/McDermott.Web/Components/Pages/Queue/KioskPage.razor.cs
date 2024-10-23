@@ -575,10 +575,10 @@ namespace McDermott.Web.Components.Pages.Queue
                 statBPJS = "no BPJS number";
             }
 
-            if (new[] { "Nurse", "Perawat", "Nursing" }.Contains(NameGroup.Name))
-            {
-                showClass = true;
-            }
+            //if (new[] { "Nurse", "Perawat", "Nursing" }.Contains(NameGroup.Name))
+            //{
+            //    showClass = true;
+            //}
 
             foreach (var kiosk in KioskConf)
             {

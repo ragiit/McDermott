@@ -66,26 +66,47 @@
                                         <AntiforgeryToken />
                                         <div class="row w-100">
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem ColSpanMd="12" Caption="Sequence Kode">
+                                                <DxFormLayoutItem ColSpanMd="12" CssClass="ml-2" Caption="Sequence Kode">
                                                     <h5>@postMaintainance.Sequence</h5>
+                                                </DxFormLayoutItem>
+                                            </DxFormLayout>
+                                            <DxFormLayout CssClass="w-100">
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" CssClass="ml-2" ColSpanMd="12" Caption="Title">
+                                                    <MyTextBox @bind-Text="@postMaintainance.Title"
+                                                               NullText="Input Title..."
+                                                               ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                               ShowValidationIcon="true" />
+                                                    <ValidationMessage For="@(()=>postMaintainance.Title)"></ValidationMessage>
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                             <div class="col-md-6">
                                                 <DxFormLayout CssClass="mt w-100">
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Title">
-                                                        <MyTextBox @bind-Text="@postMaintainance.Title"
-                                                                   NullText="Input Title..."
-                                                                   ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
-                                                                   ShowValidationIcon="true" />
-                                                        <ValidationMessage For="@(()=>postMaintainance.Title)"></ValidationMessage>
-                                                    </DxFormLayoutItem>
+
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Request By">
                                                         <MyDxComboBox Data="@getRequestBy"
-                                                                      NullText="select request..."
-                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                      NullText="Select Request By.."
+                                                                      @ref="refRequestByComboBox"
                                                                       @bind-Value="@postMaintainance.RequestById"
                                                                       TextFieldName="Name"
-                                                                      ValueFieldName="Id"></MyDxComboBox>
+                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                      ValueFieldName="Id"
+                                                                      TextChanged="((string e) => OnInputRequestByChanged(e))">
+                                                            <Buttons>
+                                                                <DxEditorButton Click="OnSearchRequestByIndexDecrement"
+                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                Tooltip="Previous Index" />
+                                                                <DxEditorButton Click="OnSearchRequestBy"
+                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                Tooltip="Search" />
+                                                                <DxEditorButton Click="OnSearchRequestByIndexIncrement"
+                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                Tooltip="Next Index" />
+                                                            </Buttons>
+                                                            <Columns>
+                                                                <DxListEditorColumn FieldName="@nameof(User.Name)" Caption="Name" />
+                                                                @* <DxListEditorColumn FieldName="@nameof(Locations.Type)" Caption="Code" /> *@
+                                                            </Columns>
+                                                        </MyDxComboBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Request Date">
                                                         <DxDateEdit @bind-Date="@postMaintainance.RequestDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxDateEdit>
@@ -116,52 +137,6 @@
                                                             </Columns>
                                                         </MyDxComboBox>
                                                     </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Equipment">
-                                                        <MyDxComboBox Data="@getEquipment"
-                                                                      NullText="Select Product.."
-                                                                      @ref="refProductsComboBox"
-                                                                      @bind-Value="@postMaintainance.LocationId"
-                                                                      TextFieldName="Name"
-                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
-                                                                      SelectedItemChanged="@((ProductDto value)=>selectByProduct(value))"
-                                                                      ValueFieldName="Id"
-                                                                      TextChanged="((string e) => OnInputProductsChanged(e))">
-                                                            <Buttons>
-                                                                <DxEditorButton Click="OnSearchProductsIndexDecrement"
-                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                Tooltip="Previous Index" />
-                                                                <DxEditorButton Click="OnSearchProducts"
-                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                Tooltip="Search" />
-                                                                <DxEditorButton Click="OnSearchProductsIndexIncrement"
-                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                Tooltip="Next Index" />
-                                                            </Buttons>
-                                                            <Columns>
-                                                                <DxListEditorColumn FieldName="@nameof(Product.Name)" Caption="Name" />
-                                                                <DxListEditorColumn FieldName="@nameof(Product.Brand)" Caption="Brand" />
-                                                            </Columns>
-                                                        </MyDxComboBox>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Serial Number/Batch">
-                                                        <MyDxComboBox Data="@Batch" @bind-Value="@postMaintainance.SerialNumber" NullText="Serial Number" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></MyDxComboBox>
-                                                    </DxFormLayoutItem>
-
-                                                </DxFormLayout>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <DxFormLayout CssClass="mt w-100">
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Responsible">
-                                                        <MyDxComboBox Data="@getResponsibleBy"
-                                                                      NullText="select Responsible..."
-                                                                      @bind-Value="@postMaintainance.ResponsibleById"
-                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
-                                                                      TextFieldName="Name"
-                                                                      ValueFieldName="Id"></MyDxComboBox>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Schedule Date">
-                                                        <DxDateEdit @bind-Date="@postMaintainance.ScheduleDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxDateEdit>
-                                                    </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Maintainance By">
                                                         <DxCheckBox Checked="postMaintainance.isInternal"
                                                                     CheckedExpression="@(()=>postMaintainance.isInternal)"
@@ -191,6 +166,22 @@
                                                                 </div>
                                                             }
                                                         </div>
+                                                    </DxFormLayoutItem>
+
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <DxFormLayout CssClass="mt w-100">
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Responsible">
+                                                        <MyDxComboBox Data="@getResponsibleBy"
+                                                                      NullText="select Responsible..."
+                                                                      @bind-Value="@postMaintainance.ResponsibleById"
+                                                                      ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"
+                                                                      TextFieldName="Name"
+                                                                      ValueFieldName="Id"></MyDxComboBox>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Schedule Date">
+                                                        <DxDateEdit @bind-Date="@postMaintainance.ScheduleDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxDateEdit>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Maintainance Type">
                                                         <DxCheckBox Checked="postMaintainance.isCorrective"
@@ -239,12 +230,108 @@
                                                     }
                                                 </DxFormLayout>
                                             </div>
+                                        </div>
+                                        @if (postMaintainance.Id != 0)
+                                        {
                                             <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Note" CaptionPosition="CaptionPosition.Vertical">
-                                                    <DxMemo @bind-Text="@postMaintainance.Note" NullText="Input Note.." ReadOnly="@(postMaintainance.Id != 0 && postMaintainance.Status != EnumStatusMaintainance.Request)"></DxMemo>
+                                                <DxFormLayoutItem CaptionCssClass=" required-caption" Context="ItemContext" CaptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                    <Template>
+                                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                        IsContentBlocked="true"
+                                                                        ApplyBackgroundShading="true"
+                                                                        IndicatorAreaVisible="true"
+                                                                        Text="Fetching Data...">
+                                                            <MyGridPaginate @ref="Grid"
+                                                                            Data="getMaintainanceProduct"
+                                                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                                                            EditModelSaving="OnSaveProduct"
+                                                                            DataItemDeleting="DeleteProduct"
+                                                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                                                            SearchTextChanged="OnSearchBoxChanged"
+                                                                            KeyFieldName="Id">
+                                                                <ToolbarTemplate>
+                                                                    <MyDxToolbarBase TItem="MaintainanceProductDto"
+                                                                                     Items="@getMaintainanceProduct"
+                                                                                     SelectedDataItems="@SelectedDataItems"
+                                                                                     NewItem_Click="@NewItem_Click"
+                                                                                     EditItem_Click="@(()=>EditItem_Click(context.Grid))"
+                                                                                     DeleteItem_Click="@DeleteItem_Click"
+                                                                                     Refresh_Click="@Refresh_Click"
+                                                                                     IsImport="false"
+                                                                                     VisibleNew="UserAccessCRUID.IsCreate"
+                                                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                                </ToolbarTemplate>
+                                                                <Columns>
+                                                                    <DxGridSelectionColumn Width="15px" />
+                                                                    <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" SortIndex="0" />
+                                                                    <DxGridDataColumn FieldName="SerialNumber" Caption="Serial Number" />
+                                                                    <DxGridDataColumn FieldName="expired" Caption="Expired" />
+                                                                    <DxGridDataColumn FieldName="Note" Caption="note" />
+                                                                </Columns>
+                                                                <EditFormTemplate Context="EditFormContextt">
+                                                                    @{
+                                                                        var a = (MaintainanceProductDto)EditFormContextt.EditModel;
+                                                                    }
+                                                                    <div class="row">
+                                                                        <div class="col-6">
+                                                                            <DxFormLayout CssClass="w-100">
+                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Product Name">
+                                                                                    <MyDxComboBox Data="@getProduct"
+                                                                                                  NullText="Select Product..."
+                                                                                                  @ref="refProductsComboBox"
+                                                                                                  @bind-Value="@postMaintainanceProduct.ProductId"
+                                                                                                  TextFieldName="Name"
+                                                                                                  ValueFieldName="Id"
+                                                                                                  SelectedItemChanged="((ProductDto value)=>selectByProduct(value))"
+                                                                                                  TextChanged="((string e) => OnInputProductsChanged(e))">
+                                                                                        <Buttons>
+                                                                                            <DxEditorButton Click="OnSearchProductsIndexDecrement"
+                                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                                            Tooltip="Previous Index" />
+                                                                                            <DxEditorButton Click="OnSearchProducts"
+                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                            Tooltip="Search" />
+                                                                                            <DxEditorButton Click="OnSearchProductsIndexIncrement"
+                                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                                            Tooltip="Next Index" />
+                                                                                        </Buttons>
+                                                                                        <Columns>
+                                                                                            <DxListEditorColumn FieldName="@nameof(ProductDto.Name)" Caption="Name" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(ProductDto.Brand)" Caption="Brand" />
+                                                                                        </Columns>
+                                                                                    </MyDxComboBox>
+                                                                                </DxFormLayoutItem>
+                                                                                <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                    <MyDxComboBox Data="@Batch"
+                                                                                                  NullText="Select Batch..."
+                                                                                                  @bind-Value="@postMaintainanceProduct.SerialNumber"></MyDxComboBox>
+                                                                                </DxFormLayoutItem>
+                                                                                <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                    <DxDateEdit @bind-Date="@currentExpiryDate" ReadOnly></DxDateEdit>
+                                                                                </DxFormLayoutItem>
+                                                                            </DxFormLayout>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <DxFormLayout CssClass="w-100">
+                                                                                <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                    <DxDateEdit @bind-Date="@postMaintainanceProduct.Expired" ReadOnly></DxDateEdit>
+                                                                                </DxFormLayoutItem>
+                                                                                <DxFormLayoutItem Caption="Note" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                    <DxMemo @bind-Text="@postMaintainanceProduct.Note" NullText="Entri Note Here..."></DxMemo>
+                                                                                </DxFormLayoutItem>
+
+                                                                            </DxFormLayout>
+                                                                        </div>
+                                                                    </div>
+                                                                </EditFormTemplate>
+                                                            </MyGridPaginate>
+                                                        </DxLoadingPanel>
+                                                    </Template>
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
-                                        </div>
+                                        }
+
                                     </EditForm>
                                 </div>
                             </div>
@@ -254,4 +341,12 @@
             </div>
         </div>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
 }

@@ -7,7 +7,7 @@
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Product" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
+        <BaseHeaderPage Title="Product" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/products"))" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">

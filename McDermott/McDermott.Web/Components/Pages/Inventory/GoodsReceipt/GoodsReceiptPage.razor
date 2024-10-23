@@ -1,0 +1,70 @@
+﻿@page "/inventory/goods-receipts"
+@rendermode InteractiveServer
+
+<PageTitle>@Helper.APP_NAME - Goods Receipt</PageTitle>
+
+<style>
+    .my-style {
+        min-width: 800px;
+    }
+
+</style>
+@if (IsAccess)
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Good Receipt" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/goods-receipts"))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="true"
+                                            Text="Fetching Data...">
+                                <MyGrid @ref="Grid"
+                                        Data="getGoodsReceipts"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        RowDoubleClick="OnRowDoubleClick"
+                                        KeyFieldName="Id">
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="GoodsReceiptDto"
+                                                         Items="@getGoodsReceipts"
+                                                         Grid="Grid"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@(async () => await EditItem_Click())"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         EnableDelete="isActiveButton"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
+                                        <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" DisplayFormat="dd MMMM yyyy" />
+                                        <DxGridDataColumn FieldName="NumberPurchase" Caption="Purchase Number" />
+                                        <DxGridDataColumn FieldName="Status" Caption="Status">
+                                            <CellDisplayTemplate>
+                                                @GetIssueStatusIconHtml((context.DataItem as GoodsReceiptDto).Status)
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
+                                    </Columns>
+                                </MyGrid>
+                            </DxLoadingPanel>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

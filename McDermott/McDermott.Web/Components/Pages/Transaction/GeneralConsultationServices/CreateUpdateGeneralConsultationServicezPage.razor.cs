@@ -11,7 +11,6 @@ using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using McDermott.Extentions;
-using McDermott.Persistence.Migrations;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;

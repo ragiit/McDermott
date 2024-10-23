@@ -11,7 +11,7 @@
         text-decoration: none;
         display: flex;
         align-items: center;
-        cursor:pointer;
+        cursor: pointer;
     }
 
         .toolbar-item:hover {
@@ -73,13 +73,13 @@
                                                     <span>Scrap</span>
                                                     <span class="ms-2 badge bg-secondary">@TotalScrapQty Unit</span>
                                                 </a>
-                                                <div class="divider border-start"></div> 
+                                                <div class="divider border-start"></div>
                                                 <a @onclick="NewTableStock_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-boxes-stacked"></i></span>
                                                     <span>On Hand</span>
                                                     <span class="ms-2 badge bg-secondary">@TotalScrapQty Unit</span>
                                                 </a>
-                                                <div class="divider border-start"></div> 
+                                                <div class="divider border-start"></div>
                                                 <a @onclick="NewTableEquipment_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-trash"></i></span>
                                                     <span>Maintenance</span>
@@ -98,7 +98,7 @@
                                                 Text="Fetching Data...">
                                     <div class="card-body">
                                         <DxFormLayout CssClass="mt w-100">
-                                            <DxFormLayoutItem Caption="Name" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxFormLayoutItem Caption="Name Product" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@PostProductDetails.Name"
                                                            NullText="Name Product"
                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
@@ -203,7 +203,7 @@
                                                                                   @bind-Value="@PostProductDetails.UomId"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
-                                                                                  SelectedItemChanged="@((UomDto uomId)=>SelectedChangeUoM(uomId))"
+                                                                                  SelectedItemChanged="@((UomDto Id)=>SelectedChangeUoM(Id))"
                                                                                   TextChanged="((string e) => OnInputUomChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchUomIndexDecrement"
@@ -225,21 +225,21 @@
                                                                     </MyDxComboBox>
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Purchase UoM" CaptionCssClass="required-caption normal-caption" ColSpanMd="12">
-                                                                    <MyDxComboBox Data="@GetUoms"
-                                                                                  NullText="Select Uom"
-                                                                                  @ref="refUomComboBox"
+                                                                    <MyDxComboBox Data="@GetUomPurchases"
+                                                                                  NullText="Select Uom Purchase"
+                                                                                  @ref="refUomPurchaseComboBox"
                                                                                   @bind-Value="@PostProductDetails.PurchaseUomId"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
-                                                                                  TextChanged="((string e) => OnInputUomChanged(e))">
+                                                                                  TextChanged="((string e) => OnInputUomPurchaseChanged(e))">
                                                                         <Buttons>
-                                                                            <DxEditorButton Click="OnSearchUomIndexDecrement"
+                                                                            <DxEditorButton Click="OnSearchUomPurchaseIndexDecrement"
                                                                                             IconCssClass="fa-solid fa-caret-left"
                                                                                             Tooltip="Previous Index" />
-                                                                            <DxEditorButton Click="OnSearchUom"
+                                                                            <DxEditorButton Click="OnSearchUomPurchase"
                                                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                                                             Tooltip="Search" />
-                                                                            <DxEditorButton Click="OnSearchUomIndexIncrement"
+                                                                            <DxEditorButton Click="OnSearchUomPurchaseIndexIncrement"
                                                                                             IconCssClass="fa-solid fa-caret-right"
                                                                                             Tooltip="Next Index" />
                                                                         </Buttons>
@@ -250,7 +250,6 @@
                                                                             <DxListEditorColumn FieldName="@nameof(Uom.BiggerRatio)" Caption="Big Ratio" />
                                                                         </Columns>
                                                                     </MyDxComboBox>
-
                                                                     <ValidationMessage For="@(()=> PostProductDetails.PurchaseUomId)"   />
                                                                 </DxFormLayoutItem>
                                                                 <DxFormLayoutItem Caption="Batch & Expired" CaptionCssClass="normal-caption" ColSpanMd="12">
@@ -340,12 +339,11 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
-
                                                                     <MyDxComboBox Data="@GetDrugRoutes"
                                                                                   NullText="Select Routes"
                                                                                   @ref="refDrugRouteComboBox"
-                                                                                  @bind-Value="@PostProductDetails.FormId"
-                                                                                  TextFieldName="Name"
+                                                                                  @bind-Value="@PostProductDetails.RouteId"
+                                                                                  TextFieldName="Route"
                                                                                   ValueFieldName="Id"
                                                                                   TextChanged="((string e) => OnInputDrugRouteChanged(e))">
                                                                         <Buttons>
@@ -435,9 +433,9 @@
                                                                                   NullText="Select DrugDosage"
                                                                                   @ref="refDrugDosageComboBox"
                                                                                   @bind-Value="@PostProductDetails.FrequencyId"
-                                                                                  TextFieldName="Name"
+                                                                                  TextFieldName="Frequency"
                                                                                   ValueFieldName="Id"
-                                                                                  TextChanged="((string e) => OnInputUomChanged(e))">
+                                                                                  TextChanged="((string e) => OnInputDrugDosageChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchDrugDosageIndexDecrement"
                                                                                             IconCssClass="fa-solid fa-caret-left"

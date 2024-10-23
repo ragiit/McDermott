@@ -193,7 +193,7 @@ namespace McDermott.Application.Extentions
             Cancel = 6
         }
 
-        public enum EnumStatusReceiving
+        public enum EnumStatusGoodsReceipt
         {
             [Display(Name = "draft")]
             Draft = 0,

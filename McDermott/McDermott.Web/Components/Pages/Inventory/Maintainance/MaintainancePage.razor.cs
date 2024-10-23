@@ -230,7 +230,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
         private async Task EditItem_Click(MaintainanceDto? p = null)
         {
-            NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={postMaintainance.Id}");
+            var DataId = SelectedDataItems[0].Adapt<MaintainanceDto>();
+            NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={DataId.Id}");
             return;
         }
 

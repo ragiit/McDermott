@@ -1,0 +1,6 @@
+@McDermott.TelemedicianApi_HostAddress = http://localhost:5252
+
+GET {{McDermott.TelemedicianApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

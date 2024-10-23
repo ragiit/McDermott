@@ -13,10 +13,8 @@ namespace McDermott.Application.Dtos.Inventory
         public string? ResponsibleName { get; set; }
         public DateTime RequestDate { get; set; } = DateTime.Now;
         public DateTime ScheduleDate { get; set; } = DateTime.Now;
-        public long? ResponsibleById { get; set; }
-        public long? EquipmentId { get; set; }
+        public long? ResponsibleById { get; set; }       
         public string? EquipmentName { get; set; }
-        public string? SerialNumber { get; set; }
         public bool isCorrective { get; set; } = false;
         public bool isPreventive { get; set; } = false;
         public bool isInternal { get; set; } = false;
@@ -26,7 +24,6 @@ namespace McDermott.Application.Dtos.Inventory
         public int? RepeatNumber { get; set; }
         public string? RepeatWork { get; set; }
         public EnumStatusMaintainance? Status { get; set; }
-        public string? Note { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [SetToNull]
@@ -34,10 +31,6 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual UserDto? ResponsibleBy { get; set; }
-
-        [SetToNull]
-        public virtual ProductDto? Equipment { get; set; }
-
         [SetToNull]
         public virtual LocationDto? Location { get; set; }
     }

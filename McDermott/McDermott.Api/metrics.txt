@@ -1,4 +1,4 @@
-# TIMESTAMP: 638599821901961192
+# TIMESTAMP: 638635454624241998
 # MEASUREMENT: [appmetrics.internal] report_success  items
 # TAGS:
                    item = App.Metrics.Reporting.TextFile.TextFileMetricsReporter
@@ -8,7 +8,7 @@
                   total = 1
                 percent = 100
 --------------------------------------------------------------
-# TIMESTAMP: 638599821901961192
+# TIMESTAMP: 638635454624241998
 # MEASUREMENT: [appmetrics.internal] report_success
 # TAGS:
                   mtype = counter
@@ -16,15 +16,7 @@
 # FIELDS:
                   value = 1
 --------------------------------------------------------------
-# TIMESTAMP: 638599821901961192
-# MEASUREMENT: [Application] My Counter
-# TAGS:
-                  mtype = counter
-                   unit = calls
-# FIELDS:
-                  value = 6
---------------------------------------------------------------
-# TIMESTAMP: 638599821901961192
+# TIMESTAMP: 638635454624241998
 # MEASUREMENT: [Application] Request Duration
 # TAGS:
                   mtype = timer
@@ -32,23 +24,23 @@
                unit_dur = ms
               unit_rate = min
 # FIELDS:
-            count.meter = 54
-                 rate1m = 3.048881559143799
-                 rate5m = 16.40082351579269
-                rate15m = 21.203183270841464
-              rate.mean = 13.05278358713599
-                samples = 54
-                   last = 0.6968
-             count.hist = 54
-                    sum = 5410.8624
-                    min = 0.32889999999999997
-                    max = 4971.788799999999
-                   mean = 47.67902313620145
-                 median = 0.6179
-                 stddev = 459.5384234659053
-                   p999 = 4971.788799999999
-                    p99 = 141.58339999999998
-                    p98 = 138.4799
-                    p95 = 6.9342
-                    p75 = 0.7455999999999999
+            count.meter = 12
+                 rate1m = 3.2286928687553736E-08
+                 rate5m = 1.3347534216485202
+                rate15m = 24.96378949411676
+              rate.mean = 0.5416316540920137
+                samples = 12
+                   last = 17.7226
+             count.hist = 12
+                    sum = 927.52
+                    min = 0.6504
+                    max = 251.5212
+                   mean = 67.96781127455016
+                 median = 31.197699999999998
+                 stddev = 72.72187937007529
+                   p999 = 251.5212
+                    p99 = 251.5212
+                    p98 = 251.5212
+                    p95 = 251.5212
+                    p75 = 124.1531
 --------------------------------------------------------------

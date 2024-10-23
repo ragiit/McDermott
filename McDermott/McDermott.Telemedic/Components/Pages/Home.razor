@@ -1,0 +1,145 @@
+﻿@page "/"
+@using McDermott.Telemedic.Model
+@using McDermott.Telemedic.Service
+@using System.ComponentModel.DataAnnotations
+@using static TelemedicService
+@inject ILogger<Home> Logger
+@inject ITelemedicService TelemedicService
+@inject NavigationManager NavigationManager
+
+
+<div class="wrapper">
+    <section class="content">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="card custom-card">
+                        <div class="row g-0">
+                            <div class="col-md-5 navy-bg d-flex flex-column justify-content-between">
+                                <div class="p-4">
+                                    <h2 class="text-center">Telemedic</h2>
+                                </div>
+                                <div class="p-4 text-center">
+                                    <i class="fas fa-stethoscope telemedic-icon"></i>
+                                    <p>Pelayanan Medis Jarak Jauh</p>
+                                </div>
+                                <div class="p-4"></div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card-body p-5">
+                                    <h3 class="card-title mb-4">Pencarian</h3>
+                                    <EditForm Model="searchModel" OnValidSubmit="SearchTelemedic">
+                                        <DataAnnotationsValidator />
+                                        <ValidationSummary />
+                                        <AntiforgeryToken />
+
+                                        <div class="form-container">
+                                            <InputText class="form-control" @bind-Value="searchModel.Number" placeholder="Nomor" />
+                                            <button class="btn btn-primary search-button rounded-circle" type="submit">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+
+                                        </div>
+
+                                        @if (isLoading)
+                                        {
+                                            <div class="row justify-content-center">
+                                                <div class="spinner-border text-primary mt-3" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @if (searchResult is not null)
+                                        {
+                                            <div class="mt-3">
+                                                <label for="nameField" class="form-label">Name</label>
+                                                <InputText id="nameField" class="form-control mt-0" @bind-Value="searchResult.Data.User[0].setNameFamily" placeholder="Name" />
+                                            </div>
+                                            <div class="mt-3">
+                                                <label for="Register" class="form-label">Register</label>
+                                                <InputDate id="nameField" class="form-control mt-0" @bind-Value="searchResult.Data.User[0].Register" placeholder="Name" />
+                                            </div>
+                                            @* <div class="mt-3">
+                                                <label for="Register" class="form-label">Register</label>
+                                                <InputText id="nameField" class="form-control mt-0" @bind-Value="searchResult.Data.Docter[0].service" placeholder="Name" />
+                                            </div> *@
+                                        }
+                                        @if (!string.IsNullOrEmpty(errorMessage))
+                                        {
+                                            <div class="alert alert-danger mt-3">@errorMessage</div>
+                                        }
+
+                                    </EditForm>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@code
+{
+    private TelemedicSearchModel searchModel = new TelemedicSearchModel();
+    private string errorMessage = "";
+    private const int SERVICE_ID = 2;
+    private TelemedicResult searchResult;
+    private bool isLoading = false;
+    private string names = "";
+
+
+    private async Task SearchTelemedic()
+    {
+        errorMessage = "";
+        searchResult = null;
+        isLoading = true;
+
+        if (string.IsNullOrWhiteSpace(searchModel.Number))
+        {
+            errorMessage = "Silakan masukkan nomor.";
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            searchResult = await TelemedicService.SearchTelemedicAsync(searchModel.Number, SERVICE_ID);
+            Logger.LogInformation($"Pencarian berhasil untuk nomor: {searchModel.Number}");
+            if (searchResult?.Data?.User?.Count > 0)
+            {
+                names = $"{searchResult.Data.User[0].Name} ({searchResult.Data.User[0].Email})";
+            }
+            else
+            {
+                errorMessage = "Data tidak ditemukan.";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            Logger.LogError(ex, "Error dalam permintaan API");
+            errorMessage = $"Error dalam permintaan API: {ex.Message}";
+        }
+        catch (InvalidOperationException ex)
+        {
+            Logger.LogError(ex, "Error dalam memproses respon");
+            errorMessage = $"Error dalam memproses respon: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Terjadi kesalahan yang tidak terduga");
+            errorMessage = $"Terjadi kesalahan: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    public class TelemedicSearchModel
+    {
+        [Required(ErrorMessage = "Nomor tidak boleh kosong")]
+        public string Number { get; set; }
+    }
+}

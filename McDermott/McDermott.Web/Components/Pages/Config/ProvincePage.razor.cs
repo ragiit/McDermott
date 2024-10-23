@@ -83,6 +83,10 @@ namespace McDermott.Web.Components.Pages.Config
                 SelectedDataItems = [];
                 var result = await Mediator.Send(new GetProvinceQuery
                 {
+                    OrderByList =
+                    [
+                        (x => x.Name, true)
+                    ],
                     SearchTerm = searchTerm,
                     PageSize = pageSize,
                     PageIndex = pageIndex,

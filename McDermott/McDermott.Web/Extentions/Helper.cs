@@ -661,5 +661,29 @@ namespace McDermott.Web.Extentions
                 Console.WriteLine($"Terjadi kesalahan saat menghapus file: {ex.Message}");
             }
         }
+
+        public static DateTime CalculateNewExpiryDate(DateTime? expired, int? number, string unit)
+        {
+            if (expired == null || number == null)
+            {
+                // Tangani jika salah satu parameter null
+                throw new ArgumentNullException("Expired date and number must not be null.");
+            }
+
+            switch (unit?.ToLower())
+            {
+                case "days":
+                    return expired.Value.AddDays(number.Value);
+                case "weeks":
+                    return expired.Value.AddDays(number.Value * 7);
+                case "months":
+                    return expired.Value.AddMonths(number.Value);
+                case "years":
+                    return expired.Value.AddYears(number.Value);
+                default:
+                    throw new ArgumentException("Unit not recognized.", nameof(unit));
+            }
+        }
+
     }
 }
