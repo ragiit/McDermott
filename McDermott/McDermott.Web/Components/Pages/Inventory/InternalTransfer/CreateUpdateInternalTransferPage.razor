@@ -5,7 +5,7 @@
 
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
-    <BaseHeaderPage Title="Good Receipt" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/goods-receipts"))" ShowBackButton="true" />
+    <BaseHeaderPage Title="Internal Transfer" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/internal-transfers"))" ShowBackButton="true" />
 
     <div class="content">
         <div class="container-fluid">

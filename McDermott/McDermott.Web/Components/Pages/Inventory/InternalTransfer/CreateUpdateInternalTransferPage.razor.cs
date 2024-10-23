@@ -121,7 +121,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 {
                     if (result is null || !Id.HasValue)
                     {
-                        NavigationManager.NavigateTo("inventory/goods-receipts");
+                        NavigationManager.NavigateTo("inventory/internal-transfers");
                         return;
                     }
                     postTransferStocks = result ?? new();
@@ -547,14 +547,17 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     postTransferStockLogs.Status = EnumStatusInternalTransfer.Draft;
 
                     await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
+                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}");
+
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateTransferStockRequest(postTransferStocks));
+                    var tempTransferStock = await Mediator.Send(new UpdateTransferStockRequest(postTransferStocks));
                     ToastService.ShowSuccess("Update Data Success...");
+                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}");
                 }
 
-                await LoadData();
+               
                 StateHasChanged();
             }
             catch (Exception ex)

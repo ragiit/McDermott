@@ -11,26 +11,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
     {
         #region relation Data
 
-        private List<TransferStockDto> TransferStocks = [];
-        private List<TransferStockProductDto> TempTransferStocks = [];
-        private List<TransferStockProductDto> TransferStockProducts = [];
-        private List<TransferStockLogDto> AllLogs = [];
-        private List<TransferStockLogDto> Logs = [];
-        private List<TransferStockLogDto> TransferStockLogs = [];
-        private List<TransactionStockDto> TransactionStocks = [];
-        private List<StockProductDto> StockProducts = [];
-        private List<LocationDto> Locations = [];
-        private List<ProductDto> Products = [];
-        private List<ProductDto> AllProducts = [];
-        private List<ProductDto> filteredProducts = [];
-        private List<UomDto> Uoms = [];
-        private TransferStockDto FormInternalTransfer = new();
-        private TransferStockDto getInternalTransfer = new();
-        private TransferStockProductDto TempFormInternalTransfer = new();
-        private TransferStockLogDto FormInternalTransferDetail = new();
-        private TransactionStockDto FormTransactionStocks = new();
-        private StockProductDto FormStock = new();
-        private UserDto NameUser = new();
+        private List<TransferStockDto> getTransferStocks = [];        
 
         #endregion relation Data
 
@@ -45,36 +26,36 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
+            //await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                    StateHasChanged();
-                }
-                catch { }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //        StateHasChanged();
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
+            //    await LoadData();
+            //    StateHasChanged();
 
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                        StateHasChanged();
-                    }
-                }
-                catch { }
+            //    try
+            //    {
+            //        if (Grid is not null)
+            //        {
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(1);
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(2);
+            //            StateHasChanged();
+            //        }
+            //    }
+            //    catch { }
 
-                await LoadAsyncData();
-                StateHasChanged();
-            }
+            //    await LoadAsyncData();
+            //    StateHasChanged();
+            //}
         }
 
         private async Task GetUserInfo()
@@ -94,63 +75,67 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         #region static Variable
 
         private IGrid? Grid { get; set; }
-        private IGrid? GridDetailTransferStock { get; set; }
-        private IGrid? GridDetailTransferStockLogs { get; set; }
-        private bool PanelVisible { get; set; } = false;
-        private bool showForm { get; set; } = false;
-        private bool showFormDetail { get; set; } = false;
-        private bool FormValidationState { get; set; } = false;
-        private bool IsAddTransfer { get; set; } = false;
-        private bool showButton { get; set; } = false;
-        private bool ActiveButton { get; set; } = true;
-        private bool showMatching { get; set; } = false;
-
-        //private bool HasValueFalse { get; set; }
-        private long? TransferId { get; set; }
-
-        private string? header { get; set; } = string.Empty;
-        private string? headerDetail { get; set; } = string.Empty;
-
-        private bool isActiveButton = false;
-        private string? UomName { get; set; }
+        private bool PanelVisible { get; set; } = false;       
+        private bool isActiveButton { get; set; } = false;       
+        private bool FormValidationState { get; set; } = false;      
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemsDetail { get; set; } = new ObservableRangeCollection<object>();
-        private IReadOnlyList<object> SelectedDataItemsDetailLogs { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
-        private int FocusedRowVisibleIndexDetail { get; set; }
 
         #endregion static Variable
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
+        {
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        #endregion Searching
 
         #region Load
 
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await GetUserInfo();
+            await LoadData();
+            PanelVisible = false;
         }
 
-        private async Task LoadAsyncData()
-        {
-            //TransferStocks = await Mediator.Send(new GetTransferStockQuery());
-            //TransferStockProducts = await Mediator.Send(new GetTransferStockProductQuery());
-            //TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            //var Locations = (await Mediator.Send(new GetLocationQuery())).Item1;
-            //this.Locations = Locations;
-            //Products = await Mediator.Send(new GetProductQuery());
-            //Uoms = await Mediator.Send(new GetUomQuery());
-            //UomName = Uoms.Select(x => x.Name).FirstOrDefault();
-            //TransferStockLogs = await Mediator.Send(new GetTransferStockLogQuery());
-            //var user_group = await Mediator.Send(new GetUserQuery());
-            //NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
-        }
-
-        private async Task LoadData()
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
                 PanelVisible = true;
-                showForm = false;
-                showFormDetail = false;
-                await LoadAsyncData();
+                var result = await Mediator.Send(new GetTransferStockQuery
+                {
+                    OrderByList = [
+                    (x=>x.Status == EnumStatusInternalTransfer.Draft, true)
+                    ],
+                    SearchTerm = searchTerm,
+                    PageSize = pageSize,
+                    PageIndex = pageIndex,
+                });
+                getTransferStocks = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -264,11 +249,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             }
         }
 
-        private void Grid_FocusedRowChangedDetail(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowVisibleIndexDetail = args.VisibleIndex;
-        }
-
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
             await EditItem_Click();
@@ -310,8 +290,11 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             try
             {
                 ToastService.ClearAll();
+                var TransferStockProducts = await Mediator.Send(new GetAllTransferStockProductQuery());
+                var TransferStockLogs = await Mediator.Send(new GetAllTransferStockLogQuery());
                 List<TransferStockDto> Transfers = SelectedDataItems.Adapt<List<TransferStockDto>>();
-                List<long> id = Transfers.Select(x => x.Id).ToList();
+                long id = SelectedDataItems[0].Adapt<TransferStockDto>().Id;
+                List<long> ids = Transfers.Select(x => x.Id).ToList();
                 List<long> ProductIdsToDelete = new();
                 List<long> DetailsIdsToDelete = new();
 
@@ -319,7 +302,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 {
                     //delete data Transfer Stock Product
                     ProductIdsToDelete = TransferStockProducts
-                               .Where(x => x.TransferStockId == TransferId)
+                               .Where(x => x.TransferStockId == id)
                                .Select(x => x.Id)
                                .ToList();
                     await Mediator.Send(new DeleteTransferStockProductRequest(ids: ProductIdsToDelete));
@@ -327,7 +310,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     //Delete data Transfer Detal transfer (Log)
 
                     DetailsIdsToDelete = TransferStockLogs
-                       .Where(x => x.TransferStockId == TransferId)
+                       .Where(x => x.TransferStockId == id)
                        .Select(x => x.Id)
                        .ToList();
                     await Mediator.Send(new DeleteTransferStockLogRequest(ids: DetailsIdsToDelete));
@@ -338,11 +321,11 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 }
                 else
                 {
-                    foreach (var uid in id)
+                    foreach (var uid in ids)
                     {
                         //delete data Transfer Stock Product
                         ProductIdsToDelete = TransferStockProducts
-                                   .Where(x => x.TransferStockId == TransferId)
+                                   .Where(x => x.TransferStockId == id)
                                    .Select(x => x.Id)
                                    .ToList();
                         await Mediator.Send(new DeleteTransferStockProductRequest(ids: ProductIdsToDelete));
@@ -350,12 +333,12 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                         //Delete data Transfer Detal transfer (Log)
 
                         DetailsIdsToDelete = TransferStockLogs
-                           .Where(x => x.TransferStockId == TransferId)
+                           .Where(x => x.TransferStockId == id)
                            .Select(x => x.Id)
                            .ToList();
                         await Mediator.Send(new DeleteTransferStockLogRequest(ids: DetailsIdsToDelete));
                     }
-                    await Mediator.Send(new DeleteTransferStockRequest(ids: id));
+                    await Mediator.Send(new DeleteTransferStockRequest(ids: ids));
                 }
                 ToastService.ShowSuccess("Data Deleting success..");
                 await LoadData();
