@@ -2,15 +2,44 @@
 {
     public class BpjsClassificationCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetBpjsClassificationQuery(Expression<Func<BpjsClassification, bool>>? predicate = null, bool removeCache = false) : IRequest<List<BpjsClassificationDto>>
+        public class GetSingleBpjsClassificationQuery : IRequest<BpjsClassificationDto>
         {
-            public Expression<Func<BpjsClassification, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
+            public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
+            public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
+            public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
+
+            public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        #endregion  
+        public class GetBpjsClassificationQuery : IRequest<(List<BpjsClassificationDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
+            public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
+            public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
+
+            public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class BulkValidateBpjsClassificationQuery(List<BpjsClassificationDto> BpjsClassificationsToValidate) : IRequest<List<BpjsClassificationDto>>
+        {
+            public List<BpjsClassificationDto> BpjsClassificationsToValidate { get; } = BpjsClassificationsToValidate;
+        }
+
+        #endregion GET
 
         #region CREATE
 

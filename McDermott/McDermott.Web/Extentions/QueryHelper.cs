@@ -366,64 +366,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(ProvinceDto))
-            {
-                var result = await mediator.Send(new GetMenuQuery(
-                    predicate as Expression<Func<Menu, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Parent
-                    ] : includes as List<Expression<Func<Menu, object>>>,
-                    select: select is null ? x => new Menu
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Sequence = x.Sequence,
-                        Url = x.Url,
-                        ParentId = x.ParentId,
-                        Parent = new Domain.Entities.Menu
-                        {
-                            Name = x.Parent.Name
-                        },
-                    } : select as Expression<Func<Menu, Menu>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(DistrictDto))
-            {
-                var result = await mediator.Send(new GetDistrictQuery(
-                    predicate as Expression<Func<District, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Province,
-                        x => x.City
-                    ] : includes as List<Expression<Func<District, object>>>,
-                    select: select is null ? x => new District
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        ProvinceId = x.ProvinceId,
-                        CityId = x.CityId,
-                        Province = new Domain.Entities.Province
-                        {
-                            Name = x.Province.Name
-                        },
-                        City = new Domain.Entities.City
-                        {
-                            Name = x.City.Name
-                        },
-                    } : select as Expression<Func<District, District>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(VillageDto))
             {
                 var result = await mediator.Send(new GetVillageQuery(

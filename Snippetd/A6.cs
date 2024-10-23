@@ -27,13 +27,13 @@
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetKioskConfigQuery
+        var result = await Mediator.Send(new GetBpjsClassificationQuery
         {
             PageIndex = pageIndex,
             PageSize = pageSize,
             SearchTerm = searchTerm,
         });
-        KioskConfigs = result.Item1;
+        BpjsClassifications = result.Item1;
         totalCount = result.PageCount;
         activePageIndex = pageIndex;
         PanelVisible = false;

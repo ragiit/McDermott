@@ -172,9 +172,21 @@ namespace McDermott.Web.Components.Pages.Config
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CompanyDto ?? new());
-                Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == a.CountryId)).Item1;
-                Provinces = (await Mediator.QueryGetHelper<Province, ProvinceDto>(predicate: x => x.Id == a.ProvinceId)).Item1;
-                Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == a.CityId)).Item1;
+
+                Countries = (await Mediator.Send(new GetCountryQuery
+                {
+                    Predicate = x => x.Id == a.CountryId,
+                })).Item1;
+
+                Provinces = (await Mediator.Send(new GetProvinceQuery
+                {
+                    Predicate = x => x.Id == a.ProvinceId,
+                })).Item1;
+
+                Cities = (await Mediator.Send(new GetCityQuery
+                {
+                    Predicate = x => x.Id == a.CityId,
+                })).Item1;
                 PanelVisible = false;
             }
             catch (Exception ex)

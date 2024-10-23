@@ -2,6 +2,110 @@
 {
     public partial class BpjsClassificationPage
     {
+        #region Import
+
+        private async Task ImportFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+        }
+
+        public async Task ImportExcelFile(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                try
+                {
+                    using MemoryStream ms = new();
+                    await file.OpenReadStream().CopyToAsync(ms);
+                    ms.Position = 0;
+
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                    using ExcelPackage package = new(ms);
+                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
+
+                    if (Enumerable.Range(1, ws.Dimension.End.Column)
+                        .Any(i => ExportTemp.Select(x => x.Column).ToList()[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
+                    {
+                        PanelVisible = false;
+                        ToastService.ShowInfo("The header must match with the template.");
+                        return;
+                    }
+
+                    var list = new List<BpjsClassificationDto>();
+
+                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
+                    {
+                        var name = ws.Cells[row, 1].Value?.ToString()?.Trim();
+                        var code = ws.Cells[row, 2].Value?.ToString()?.Trim();
+
+                        bool isValid = true;
+
+                        if (string.IsNullOrWhiteSpace(name))
+                        {
+                            ToastService.ShowErrorImport(row, 1, name ?? string.Empty);
+                            isValid = false;
+                        }
+
+                        if (!isValid)
+                            continue;
+
+                        var c = new BpjsClassificationDto
+                        {
+                            Name = name,
+                            Code = code
+                        };
+
+                        list.Add(c);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        list = list.DistinctBy(x => new
+                        {
+                            x.Name,
+                            x.Code
+                        }).ToList();
+
+                        // Panggil BulkValidateProjectQuery untuk validasi bulk
+                        var existingProjects = await Mediator.Send(new BulkValidateBpjsClassificationQuery(list));
+
+                        // Filter Project baru yang tidak ada di database
+                        list = list.Where(x =>
+                            !existingProjects.Any(ev =>
+                                ev.Code == x.Code &&
+                                ev.Name == x.Name
+                            )
+                        ).ToList();
+
+                        await Mediator.Send(new CreateListBpjsClassificationRequest(list));
+                        await LoadData(0, pageSize);
+                        SelectedDataItems = [];
+                    }
+
+                    ToastService.ShowSuccessCountImported(list.Count);
+                }
+                catch (Exception ex)
+                {
+                    ToastService.ShowError(ex.Message);
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private async Task ExportToExcel()
+        {
+            await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "bpjs_classification_template.xlsx", ExportTemp);
+        }
+
+        private List<ExportFileData> ExportTemp =
+       [
+            new() { Column = "Name", Notes = "Mandatory" },
+            new() { Column = "Code" },
+        ];
+
+        #endregion Import
+
         #region UserLoginAndAccessRole
 
         [Inject]
@@ -70,13 +174,55 @@
             await LoadData();
         }
 
-        private async Task LoadData()
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            BpjsClassifications = await Mediator.Send(new GetBpjsClassificationQuery());
-            PanelVisible = false;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
         }
+
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = new ObservableRangeCollection<object>();
+                var result = await Mediator.Send(new GetBpjsClassificationQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+                BpjsClassifications = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion Searching
 
         #endregion Load
 

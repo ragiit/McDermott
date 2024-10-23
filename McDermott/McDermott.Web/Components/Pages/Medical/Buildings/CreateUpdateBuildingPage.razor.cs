@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Spreadsheet;
 using MailKit.Search;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
@@ -104,7 +105,10 @@ namespace McDermott.Web.Components.Pages.Medical.Buildings
                 PanelVisible = true;
                 await GridBuildingLocations.StartEditNewRowAsync();
                 var a = (GridBuildingLocations.GetDataItem(FocusedRowVisibleIndexBuildingLocations) as BuildingLocationDto ?? new());
-                Locations = (await Mediator.QueryGetHelper<Locations, LocationDto>(predicate: x => x.Id == a.LocationId)).Item1;
+                Locations = (await Mediator.Send(new GetLocationQuery
+                {
+                    Predicate = x => x.Id == a.LocationId,
+                })).Item1;
             }
             catch (Exception ex)
             {
@@ -181,9 +185,14 @@ namespace McDermott.Web.Components.Pages.Medical.Buildings
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.QueryGetHelper<Locations, LocationDto>(pageIndex, pageSize, refLocationComboBox?.Text ?? "");
+                var result = await Mediator.Send(new GetLocationQuery
+                {
+                    SearchTerm = refLocationComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Locations = result.Item1;
-                totalCountLocation = result.pageCount;
+                totalCountLocation = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
