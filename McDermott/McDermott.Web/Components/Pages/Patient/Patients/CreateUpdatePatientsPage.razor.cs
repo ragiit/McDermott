@@ -655,7 +655,9 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
             await GetUserInfo();
             await LoadData();
-            await LoadComboBoxEdit();
+
+            if (Id.HasValue)
+                await LoadComboBoxEdit();
             PanelVisible = false;
             return;
         }
@@ -666,12 +668,17 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
             #region KTP Address
 
-            Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == UserForm.IdCardCountryId)).Item1;
-            Provinces = (await Mediator.Send(new GetProvinceQuery
+            Countries = (await Mediator.Send(new GetCountryQuery
+            {
+                Predicate = x => x.Id == UserForm.IdCardCountryId,
+            })).Item1; Provinces = (await Mediator.Send(new GetProvinceQuery
             {
                 Predicate = x => x.Id == UserForm.IdCardProvinceId
             })).Item1;
-            Cities = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == UserForm.IdCardCityId)).Item1;
+            Cities = (await Mediator.Send(new GetCityQuery
+            {
+                Predicate = x => x.Id == UserForm.IdCardCityId,
+            })).Item1;
             Districts = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == UserForm.IdCardDistrictId)).Item1;
             Villages = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.IdCardVillageId)).Item1;
 
@@ -679,12 +686,17 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
             #region Residence  Address
 
-            CountriesResidence = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == UserForm.DomicileCountryId)).Item1;
-            Provinces = (await Mediator.Send(new GetProvinceQuery
+            CountriesResidence = (await Mediator.Send(new GetCountryQuery
+            {
+                Predicate = x => x.Id == UserForm.DomicileCountryId,
+            })).Item1; Provinces = (await Mediator.Send(new GetProvinceQuery
             {
                 Predicate = x => x.Id == UserForm.DomicileProvinceId
             })).Item1;
-            CitiesResidence = (await Mediator.QueryGetHelper<City, CityDto>(predicate: x => x.Id == UserForm.DomicileCityId)).Item1;
+            CitiesResidence = (await Mediator.Send(new GetCityQuery
+            {
+                Predicate = x => x.Id == UserForm.DomicileCityId,
+            })).Item1;
             DistrictsResidence = (await Mediator.QueryGetHelper<District, DistrictDto>(predicate: x => x.Id == UserForm.DomicileDistrictId)).Item1;
             VillagesResidence = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.DomicileVillageId)).Item1;
 
@@ -1465,9 +1477,14 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             UserForm.IdCardCityId = null;
             UserForm.IdCardDistrictId = null;
             UserForm.IdCardVillageId = null;
-            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetCountryQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refCountryComboBox?.Text ?? ""
+            });
             Countries = result.Item1;
-            totalCountCountry = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -1516,9 +1533,15 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             UserForm.IdCardDistrictId = null;
             UserForm.IdCardVillageId = null;
             var id = refCityComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityComboBox?.Text ?? "", x => x.ProvinceId == provinceId);
+            var result = await Mediator.Send(new GetCityQuery
+            {
+                Predicate = x => x.ProvinceId == provinceId,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refCityComboBox?.Text ?? ""
+            });
             Cities = result.Item1;
-            totalCountCity = result.pageCount;
+            totalCountCity = result.PageCount;
             PanelVisible = false;
         }
 
@@ -1568,9 +1591,15 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             UserForm.IdCardDistrictId = null;
             UserForm.IdCardVillageId = null;
 
-            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceComboBox?.Text ?? "", x => x.CountryId == countryId);
+            var result = await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.CountryId == countryId,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refProvinceComboBox?.Text ?? ""
+            });
             Provinces = result.Item1;
-            totalCountProvince = result.pageCount;
+            totalCountProvince = result.PageCount;
             PanelVisible = false;
         }
 
@@ -1715,9 +1744,14 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         private async Task LoadDataCountryResidence(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, refCountryComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetCountryQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refCountryResidenceComboBox?.Text ?? ""
+            });
             CountriesResidence = result.Item1;
-            totalCountCountryResidence = result.pageCount;
+            totalCountCountryResidence = result.PageCount;
             PanelVisible = false;
         }
 
@@ -1763,9 +1797,15 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             PanelVisible = true;
             SelectedDataItems = [];
             var ProvinceResidenceId = refProvinceResidenceComboBox?.Value.GetValueOrDefault();
-            var result = await Mediator.QueryGetHelper<City, CityDto>(pageIndex, pageSize, refCityResidenceComboBox?.Text ?? "", x => x.ProvinceId == ProvinceResidenceId);
+            var result = await Mediator.Send(new GetCityQuery
+            {
+                Predicate = x => x.ProvinceId == ProvinceResidenceId,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refCityResidenceComboBox?.Text ?? ""
+            });
             CitiesResidence = result.Item1;
-            totalCountCityResidence = result.pageCount;
+            totalCountCityResidence = result.PageCount;
             PanelVisible = false;
         }
 
@@ -1811,9 +1851,15 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             PanelVisible = true;
             var CountryResidenceId = refCountryResidenceComboBox?.Value.GetValueOrDefault();
             var id = refProvinceResidenceComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<Province, ProvinceDto>(pageIndex, pageSize, refProvinceResidenceComboBox?.Text ?? "", x => x.CountryId == CountryResidenceId);
+            var result = await Mediator.Send(new GetProvinceQuery
+            {
+                Predicate = x => x.CountryId == CountryResidenceId,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refProvinceResidenceComboBox?.Text ?? ""
+            });
             ProvincesResidence = result.Item1;
-            totalCountProvinceResidence = result.pageCount;
+            totalCountProvinceResidence = result.PageCount;
             PanelVisible = false;
         }
 

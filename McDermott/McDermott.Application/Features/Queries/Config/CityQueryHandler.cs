@@ -5,6 +5,7 @@ namespace McDermott.Application.Features.Queries.Config
 {
     public class CityQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetCityQuery, (List<CityDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleCityQuery, CityDto>,
         IRequestHandler<ValidateCityQuery, bool>,
         IRequestHandler<BulkValidateCityQuery, List<CityDto>>,
         IRequestHandler<CreateCityRequest, CityDto>,
@@ -39,6 +40,25 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 var query = _unitOfWork.Repository<City>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<City>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<City>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -48,8 +68,85 @@ namespace McDermott.Application.Features.Queries.Config
                     }
                 }
 
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new City
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ProvinceId = x.ProvinceId,
+                        Province = new Domain.Entities.Province
+                        {
+                            Name = x.Province.Name
+                        },
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<CityDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<CityDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<CityDto> Handle(GetSingleCityQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<City>().Entities.AsNoTracking();
+
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<City>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<City>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
@@ -61,21 +158,24 @@ namespace McDermott.Application.Features.Queries.Config
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
-                }
+                else
+                    query = query.Select(x => new City
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ProvinceId = x.ProvinceId,
+                        Province = new Domain.Entities.Province
+                        {
+                            Name = x.Province.Name
+                        },
+                    });
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
-
-                return (pagedItems.Adapt<List<CityDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CityDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

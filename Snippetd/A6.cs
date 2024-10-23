@@ -27,13 +27,13 @@
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetInsuranceQuery
+        var result = await Mediator.Send(new GetKioskConfigQuery
         {
             PageIndex = pageIndex,
             PageSize = pageSize,
             SearchTerm = searchTerm,
         });
-        Insurances = result.Item1;
+        KioskConfigs = result.Item1;
         totalCount = result.PageCount;
         activePageIndex = pageIndex;
         PanelVisible = false;

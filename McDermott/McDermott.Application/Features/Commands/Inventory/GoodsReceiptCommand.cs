@@ -11,6 +11,11 @@ namespace McDermott.Application.Features.Commands.Inventory
         #region GET
         #region GET Goods Receipt Detail
 
+        public class GetAllGoodsReceiptDetailQuery(Expression<Func<GoodsReceiptDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GoodsReceiptDetailDto>>
+        {
+            public Expression<Func<GoodsReceiptDetail, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
         public class GetSingleGoodsReceiptDetailQuery : IRequest<GoodsReceiptDetailDto>
         {
             public List<Expression<Func<GoodsReceiptDetail, object>>> Includes { get; set; }
@@ -97,6 +102,12 @@ namespace McDermott.Application.Features.Commands.Inventory
         #endregion GET Goods Receipt
 
         #region GET Goods Receipt Log
+
+        public class GetAllGoodsReceiptLogQuery(Expression<Func<GoodsReceiptLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GoodsReceiptLogDto>>
+        {
+            public Expression<Func<GoodsReceiptLog, bool>> Predicate { get; } = predicate!;
+            public bool RemoveCache { get; } = removeCache!;
+        }
         public class GetSingleGoodsReceiptLogQuery : IRequest<GoodsReceiptLogDto>
         {
             public List<Expression<Func<GoodsReceiptLog, object>>> Includes { get; set; }
@@ -227,13 +238,13 @@ namespace McDermott.Application.Features.Commands.Inventory
         #region DELETE
         #region DELETE Goods Receipt Detail
 
-        public class DeleteGoodsReceiptPoductRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        public class DeleteGoodsReceiptDetailRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion DELETE Receiving Stock Product
+        #endregion DELETE Goods Receipt Detail
 
         #region DELETE Goods Receipt
 

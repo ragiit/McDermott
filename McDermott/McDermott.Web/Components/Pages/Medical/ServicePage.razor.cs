@@ -145,9 +145,15 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadDataService(int pageIndex = 0, int pageSize = 10, long? ServiceId = null)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetServiceQuery(x => x.IsKiosk == true, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetServiceQuery
+            {
+                Predicate = x => x.IsKiosk == true,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refServiceComboBox?.Text ?? ""
+            });
             ServicesK = result.Item1;
-            totalCountService = result.pageCount;
+            totalCountService = result.PageCount;
             PanelVisible = false;
         }
 
@@ -158,10 +164,15 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             PopUpVisible = false;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetServiceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+
+            var result = await Mediator.Send(new GetServiceQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = searchTerm ?? ""
+            });
             Services = result.Item1;
-            activePageIndex = pageIndex;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
 
             foreach (var i in Services)
             {
@@ -379,7 +390,10 @@ namespace McDermott.Web.Components.Pages.Medical
         private async Task LoadComboboxEdit(ServiceDto a)
         {
             if (a.IsPatient)
-                ServicesK = (await Mediator.Send(new GetServiceQuery(x => x.Id == a.ServicedId && x.IsKiosk == true))).Item1;
+                ServicesK = (await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.Id == a.ServicedId && x.IsKiosk == true,
+                })).Item1;
         }
 
         private void OnCancel()

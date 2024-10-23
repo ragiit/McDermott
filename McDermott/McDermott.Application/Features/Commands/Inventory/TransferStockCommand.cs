@@ -10,35 +10,146 @@ namespace McDermott.Application.Features.Commands.Inventory
     public class TransferStockCommand
     {
         #region GET
+        #region GET Transfer Stock Detail
 
-        public class GetTransferStockQuery(Expression<Func<TransferStock, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockDto>>
-        {
-            public Expression<Func<TransferStock, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-        }
-
-        #endregion GET
-
-        #region GET Product
-
-        public class GetTransferStockProductQuery(Expression<Func<TransferStockProduct, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockProductDto>>
+        public class GetAllTransferStockProductQuery(Expression<Func<TransferStockProduct, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockProductDto>>
         {
             public Expression<Func<TransferStockProduct, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+        public class GetSingleTransferStockProductQuery : IRequest<TransferStockProductDto>
+        {
+            public List<Expression<Func<TransferStockProduct, object>>> Includes { get; set; }
+            public Expression<Func<TransferStockProduct, bool>> Predicate { get; set; }
+            public Expression<Func<TransferStockProduct, TransferStockProduct>> Select { get; set; }
 
-        #endregion GET Product
+            public List<(Expression<Func<TransferStockProduct, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
-        #region GET Detail
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
 
-        public class GetTransferStockLogQuery(Expression<Func<TransferStockLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockLogDto>>
+        public class GetTransferStockProductQuery : IRequest<(List<TransferStockProductDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<TransferStockProduct, object>>> Includes { get; set; }
+            public Expression<Func<TransferStockProduct, bool>> Predicate { get; set; }
+            public Expression<Func<TransferStockProduct, TransferStockProduct>> Select { get; set; }
+
+            public List<(Expression<Func<TransferStockProduct, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class BulkValidateTransferStockProductQuery(List<TransferStockProductDto> TransferStockProductToValidate) : IRequest<List<TransferStockProductDto>>
+        {
+            public List<TransferStockProductDto> TransferStockProductToValidate { get; } = TransferStockProductToValidate;
+        }
+
+        public class ValidateTransferStockProductQuery(Expression<Func<TransferStockProduct, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<TransferStockProduct, bool>> Predicate { get; } = predicate!;
+        }
+        #endregion GET Transfer Stock Detail
+
+        #region GET Transfer Stock
+
+        public class GetSingleTransferStockQuery : IRequest<TransferStockDto>
+        {
+            public List<Expression<Func<TransferStock, object>>> Includes { get; set; }
+            public Expression<Func<TransferStock, bool>> Predicate { get; set; }
+            public Expression<Func<TransferStock, TransferStock>> Select { get; set; }
+
+            public List<(Expression<Func<TransferStock, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetTransferStockQuery : IRequest<(List<TransferStockDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<TransferStock, object>>> Includes { get; set; }
+            public Expression<Func<TransferStock, bool>> Predicate { get; set; }
+            public Expression<Func<TransferStock, TransferStock>> Select { get; set; }
+
+            public List<(Expression<Func<TransferStock, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+
+        public class BulkValidateTransferStockQuery(List<TransferStockDto> TransferStockToValidate) : IRequest<List<TransferStockDto>>
+        {
+            public List<TransferStockDto> TransferStockToValidate { get; } = TransferStockToValidate;
+        }
+
+        public class ValidateTransferStockQuery(Expression<Func<TransferStock, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<TransferStock, bool>> Predicate { get; } = predicate!;
+        }
+        #endregion GET Transfer Stock
+
+        #region GET Transfer Stock Log
+
+        public class GetAllTransferStockLogQuery(Expression<Func<TransferStockLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockLogDto>>
         {
             public Expression<Func<TransferStockLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+        public class GetSingleTransferStockLogQuery : IRequest<TransferStockLogDto>
+        {
+            public List<Expression<Func<TransferStockLog, object>>> Includes { get; set; }
+            public Expression<Func<TransferStockLog, bool>> Predicate { get; set; }
+            public Expression<Func<TransferStockLog, TransferStockLog>> Select { get; set; }
 
-        #endregion GET Detail
+            public List<(Expression<Func<TransferStockLog, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetTransferStockLogQuery : IRequest<(List<TransferStockLogDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<TransferStockLog, object>>> Includes { get; set; }
+            public Expression<Func<TransferStockLog, bool>> Predicate { get; set; }
+            public Expression<Func<TransferStockLog, TransferStockLog>> Select { get; set; }
+
+            public List<(Expression<Func<TransferStockLog, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class BulkValidateTransferStockLogQuery(List<TransferStockLogDto> TransferStockLogToValidate) : IRequest<List<TransferStockLogDto>>
+        {
+            public List<TransferStockLogDto> TransferStockLogToValidate { get; } = TransferStockLogToValidate;
+        }
+
+        public class ValidateTransferStockLogQuery(Expression<Func<TransferStockLog, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<TransferStockLog, bool>> Predicate { get; } = predicate!;
+        }
+        #endregion
+        #endregion
         #region CREATE
 
         public class CreateTransferStockRequest(TransferStockDto TransferStockDto) : IRequest<TransferStockDto>

@@ -4,16 +4,34 @@
     {
         #region GET
 
-        public class GetServiceQuery(Expression<Func<Service, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Service, object>>>? includes = null, Expression<Func<Service, Service>>? select = null) : IRequest<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleServiceQuery : IRequest<ServiceDto>
         {
-            public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Service, object>>> Includes { get; set; }
+            public Expression<Func<Service, bool>> Predicate { get; set; }
+            public Expression<Func<Service, Service>> Select { get; set; }
 
-            public List<Expression<Func<Service, object>>> Includes { get; } = includes!;
-            public Expression<Func<Service, Service>>? Select { get; } = select!;
+            public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetServiceQuery : IRequest<(List<ServiceDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Service, object>>> Includes { get; set; }
+            public Expression<Func<Service, bool>> Predicate { get; set; }
+            public Expression<Func<Service, Service>> Select { get; set; }
+
+            public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateServiceQuery(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>

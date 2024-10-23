@@ -4,16 +4,34 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetCityQuery(Expression<Func<City, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<City, object>>>? includes = null, Expression<Func<City, City>>? select = null) : IRequest<(List<CityDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleCityQuery : IRequest<CityDto>
         {
-            public Expression<Func<City, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<City, object>>> Includes { get; set; }
+            public Expression<Func<City, bool>> Predicate { get; set; }
+            public Expression<Func<City, City>> Select { get; set; }
 
-            public List<Expression<Func<City, object>>> Includes { get; } = includes!;
-            public Expression<Func<City, City>>? Select { get; } = select!;
+            public List<(Expression<Func<City, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetCityQuery : IRequest<(List<CityDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<City, object>>> Includes { get; set; }
+            public Expression<Func<City, bool>> Predicate { get; set; }
+            public Expression<Func<City, City>> Select { get; set; }
+
+            public List<(Expression<Func<City, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateCityQuery(List<CityDto> CitysToValidate) : IRequest<List<CityDto>>

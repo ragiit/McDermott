@@ -1,4 +1,6 @@
 ﻿using McDermott.Application.Dtos.Queue;
+using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -98,27 +100,74 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             catch { }
 
-            await LoadData();
+            await LoadDataKioskConfig();
         }
 
         private List<CountryDto> Countries { get; set; }
         private long aaa { get; set; }
 
-        private async Task LoadData()
+        #endregion async data
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            PanelVisible = true;
-            PopUpVisible = false;
-            SelectedDataItems = new ObservableRangeCollection<object>();
-            var a = await Mediator.Send(new GetKioskConfigQuery());
-            var service = await Mediator.Send(new GetServiceQuery());
-            Services = [.. service.Item1.Where(x => x.IsPatient == true)];
-            a.ForEach(x => x.ServiceName = string.Join(", ", Services.Where(z => x.ServiceIds != null && x.ServiceIds.Contains(z.Id)).Select(x => x.Name).ToList()));
-            kioskConfigs = a;
-            Countries = (await Mediator.Send(new GetCountryQuery())).Item1;
-            PanelVisible = false;
+            searchTerm = searchText;
+            await LoadDataKioskConfig(0, pageSize);
         }
 
-        #endregion async data
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadDataKioskConfig(0, newPageSize);
+        }
+
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadDataKioskConfig(newPageIndex, pageSize);
+        }
+
+        private async Task LoadDataKioskConfig(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var result = await Mediator.Send(new GetKioskConfigQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+                kioskConfigs = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
+
+                foreach (var q in kioskConfigs)
+                {
+                    var s = (await Mediator.Send(new GetServiceQuery
+                    {
+                        Predicate = x => q.ServiceIds != null && q.ServiceIds.Contains(x.Id)
+                    })).Item1;
+
+                    q.ServiceName = string.Join(", ", s.Select(z => z.Name).ToList());
+                }
+
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion Searching
 
         #region Config Grid
 
@@ -161,10 +210,16 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task EditItem_Click()
         {
-            var a = SelectedDataItems[0].Adapt<KioskConfigDto>();
-            SelectedServices = Services.Where(x => a.ServiceIds != null && a.ServiceIds.Contains(x.Id)).ToList();
-
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as KioskConfigDto ?? new());
+
+            var selectedCounter = (await Mediator.Send(new GetServiceQuery
+            {
+                Predicate = x => a.ServiceIds != null && a.ServiceIds.Contains(x.Id),
+            })).Item1;
+            Services = selectedCounter;
+            SelectedServices = selectedCounter;
             return;
             TextPopUp = "Edit Config Kiosk";
             FormKioskConfig = SelectedDataItems[0].Adapt<KioskConfigDto>();
@@ -230,9 +285,9 @@ namespace McDermott.Web.Components.Pages.Queue
                 else
                 {
                     var a = SelectedDataItems.Adapt<List<KioskConfigDto>>();
-                    await Mediator.Send(new DeleteListKioskConfigRequest(a.Select(x => x.Id).ToList()));
+                    await Mediator.Send(new DeleteKioskConfigRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData();
+                await LoadDataKioskConfig();
             }
             catch { }
         }
@@ -253,9 +308,78 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormKioskConfig.ServiceIds = SelectedServices.Select(x => x.Id).ToList();
                     await Mediator.Send(new UpdateKioskConfigRequest(FormKioskConfig));
                 }
-                await LoadData();
+                await LoadDataKioskConfig();
             }
             catch { }
         }
+
+        #region ComboboxService
+
+        private DxComboBox<ServiceDto?, long?> refServiceComboBox { get; set; }
+        private int ServiceComboBoxIndex { get; set; } = 0;
+        private int totalCountService = 0;
+
+        public string SearchTextService { get; set; }
+
+        private async Task OnSearchService(string e)
+        {
+            SearchTextService = e;
+            await LoadDataService();
+        }
+
+        private async Task OnSearchServiceClick()
+        {
+            await LoadDataService();
+        }
+
+        private async Task OnSearchServiceIndexIncrement()
+        {
+            if (ServiceComboBoxIndex < (totalCountService - 1))
+            {
+                ServiceComboBoxIndex++;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchServicendexDecrement()
+        {
+            if (ServiceComboBoxIndex > 0)
+            {
+                ServiceComboBoxIndex--;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputServiceChanged(string e)
+        {
+            ServiceComboBoxIndex = 0;
+            await LoadDataService();
+        }
+
+        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.IsPatient == true,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refServiceComboBox?.Text ?? ""
+                });
+                Services = result.Item1.Where(x => !SelectedServices.Select(z => z.Id).Contains(x.Id)).ToList();
+                totalCountService = result.PageCount;
+
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxService
     }
 }

@@ -1,4 +1,4 @@
-public class GetGeneralConsultanCPPTsQuery : IRequest<(List<GeneralConsultanCPPTDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetCountryQuery : IRequest<(List<GeneralConsultanCPPTDto>, int PageIndex, int PageSize, int PageCount)>
 {
     public List<Expression<Func<GeneralConsultanCPPT, object>>> Includes { get; set; }
     public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; set; }
@@ -13,7 +13,7 @@ public class GetGeneralConsultanCPPTsQuery : IRequest<(List<GeneralConsultanCPPT
     public string SearchTerm { get; set; }
 }
 
-public class GetSingleGeneralConsultanCPPTsQuery : IRequest<GeneralConsultanCPPTDto>
+public class GetSingleCountryQuery : IRequest<GeneralConsultanCPPTDto>
 {
     public List<Expression<Func<GeneralConsultanCPPT, object>>> Includes { get; set; }
     public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; set; }
@@ -28,22 +28,17 @@ public class GetSingleGeneralConsultanCPPTsQuery : IRequest<GeneralConsultanCPPT
     public string SearchTerm { get; set; }
 }
 
-IRequestHandler<GetGeneralConsultanCPPTsQuery, (List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGeneralConsultanCPPTsQuery, GeneralConsultanCPPTDto>,
+IRequestHandler<GetCountryQuery, (List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleCountryQuery, GeneralConsultanCPPTDto>,
 
-public async Task<(List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanCPPTsQuery request, CancellationToken cancellationToken)
+public async Task<(List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCountryQuery request, CancellationToken cancellationToken)
 {
     try
     {
         var query = _unitOfWork.Repository<GeneralConsultanCPPT>().Entities.AsNoTracking();
-
-        //// Apply custom order by if provided
-        //if (request.OrderBy is not null)
-        //    query = request.IsDescending ?
-        //        query.OrderByDescending(request.OrderBy) :
-        //        query.OrderBy(request.OrderBy);
-        //else
-        //    query = query.OrderBy(x => x.Id);
+ 
+        if (request.Predicate is not null)
+            query = query.Where(request.Predicate);
 
         // Apply ordering
         if (request.OrderByList.Count != 0)
@@ -69,9 +64,6 @@ public async Task<(List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, i
                 query = query.Include(includeExpression);
             }
         }
-
-        if (request.Predicate is not null)
-            query = query.Where(request.Predicate);
 
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
@@ -138,7 +130,7 @@ public async Task<(List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, i
     }
 }
 
-public async Task<GeneralConsultanCPPTDto> Handle(GetSingleGeneralConsultanCPPTsQuery request, CancellationToken cancellationToken)
+public async Task<GeneralConsultanCPPTDto> Handle(GetSingleCountryQuery request, CancellationToken cancellationToken)
 {
     try
     {

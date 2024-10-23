@@ -1776,7 +1776,7 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         private async Task GetScheduleTimesUser(long value)
         {
-            var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == value));
+            //var slots = await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.PhysicianId == value));
         }
 
         private async Task SetTimeSchedule()
@@ -1784,17 +1784,17 @@ namespace McDermott.Web.Components.Pages.Transaction
             try
             {
                 return;
-                var result = await Mediator.Send(new GetDoctorScheduleSlotQuery(searchTerm: searchTerm, pageSize: 10, pageIndex: 0));
-                var slots = result.Item1.Where(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId).ToList();
+                //var result = await Mediator.Send(new GetDoctorScheduleSlotQuery(searchTerm: searchTerm, pageSize: 10, pageIndex: 0));
+                //var slots = result.Item1.Where(x => x.PhysicianId == FormRegis.PratitionerId && x.StartDate.Date == FormRegis.RegistrationDate.Date && x.DoctorSchedule.ServiceId == FormRegis.ServiceId).ToList();
 
-                Times.Clear();
+                //Times.Clear();
 
-                Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
+                //Times.AddRange(slots.Select(x => $"{x.WorkFromFormatString} - {x.WorkToFormatString}"));
 
-                if (slots.Count <= 0)
-                    FormRegis.ScheduleTime = null;
+                //if (slots.Count <= 0)
+                //    FormRegis.ScheduleTime = null;
 
-                StateHasChanged();
+                //StateHasChanged();
 
                 //if (Times.Count <= 0)
                 //    FormRegis.ScheduleTime = null;

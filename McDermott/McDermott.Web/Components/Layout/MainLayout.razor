@@ -149,7 +149,7 @@
                                             }
                                             @foreach (var menu in details)
                                             {
-                                                if (!menu.Name.ToLower().Equals("kiosk"))
+                                                if (!menu.Url.ToLower().Equals("queue/kiosk"))
                                                 {
                                                     var url = string.IsNullOrEmpty(menu.Url) ? "test" : menu.Url;
                                                     <li class="nav-item">

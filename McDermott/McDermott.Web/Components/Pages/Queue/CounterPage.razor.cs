@@ -1,4 +1,7 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using FluentValidation.Results;
+using McDermott.Application.Dtos.Queue;
+using McDermott.Persistence.Migrations;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -13,7 +16,6 @@ namespace McDermott.Web.Components.Pages.Queue
         private List<ServiceDto> Services = [];
         private List<UserDto> Physicians = [];
         public List<UserDto> Phys = new();
-        private List<ServiceDto> ServiceK = new();
         private List<ServiceDto> ServiceP = [];
         private CounterDto counterForm = new();
         private List<KioskQueueDto> KiosksQueue = new();
@@ -31,6 +33,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private bool PanelVisible { get; set; } = true;
         private bool IsLoading { get; set; } = true;
         private bool PopUpVisible { get; set; } = false;
+        private bool PopUpEditCOunter { get; set; } = false;
         private bool ArchiveCard { get; set; } = false;
         private bool EditItemsEnabled { get; set; }
         private bool showFormProcess { get; set; } = false;
@@ -178,16 +181,20 @@ namespace McDermott.Web.Components.Pages.Queue
             countersActive.Clear();
             counterForm = new();
             IsLoading = true;
-            counters = await Mediator.Send(new GetCounterQuery());
+            counters = (await Mediator.Send(new GetCounterQuery
+            {
+                IsGetAll = true
+            })).Item1;
             IsLoading = false;
 
-            //Services = await Mediator.Send(new GetServiceQuery());
-            ServiceK = [.. Services.Where(x => x.IsKiosk == true)];
-            var Physician = await Mediator.Send(new GetUserQuery());
-            Physicians = [.. Physician.Where(x => x.IsPhysicion == true)];
             countersActive = [.. counters.Where(x => x.IsActive == true)];
             countersInActive = [.. counters.Where(x => x.IsActive == false)];
-            ServiceP = [.. Services.Where(x => x.IsPatient == true)];
+
+            Services = (await Mediator.Send(new GetServiceQuery
+            {
+                Predicate = x => counters.Select(z => z.ServiceId).Contains(x.Id),
+                IsGetAll = true
+            })).Item1;
             PanelVisible = false;
         }
 
@@ -232,19 +239,55 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             counterForm = new();
             PopUpVisible = true;
-            textPopUp = "Add Data Counter";
+            textPopUp = "Add Counter";
         }
 
         private async Task EditItem_Click(long Id)
         {
             try
             {
-                var General = await Mediator.Send(new GetCounterByIdQuery(Id));
+                var General = await Mediator.Send(new GetSingleCounterQuery
+                {
+                    Predicate = x => x.Id == Id
+                });
                 counterForm = General;
                 PopUpVisible = true;
-                textPopUp = "Edit Data Counter";
+                textPopUp = $"Edit Counter {General.Name}";
+
+                //var results = await Mediator.Send(new GetUserQueryNew
+                //{
+                //    Predicate = x => x.Id == General.PhysicianId,
+                //    Select = x => new User
+                //    {
+                //        Id = x.Id,
+                //        Name = x.Name,
+                //        Email = x.Email,
+                //        MobilePhone = x.MobilePhone,
+                //        Gender = x.Gender,
+                //        DateOfBirth = x.DateOfBirth,
+                //        IsPhysicion = x.IsPhysicion,
+                //        IsNurse = x.IsNurse,
+                //    }
+                //});
+                //Physicians = results.Item1;
+
+                //var resultK = await Mediator.Send(new GetServiceQuery
+                //{
+                //    Predicate = x => x.Id == General.ServiceKId,
+                //});
+                //ServiceK = resultK.Item1;
+
+                //var resultP = await Mediator.Send(new GetServiceQuery
+                //{
+                //    Predicate = x => x.Id == General.ServiceId,
+                //});
+                //ServiceK = resultP.Item1;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private void DeleteItem_Click(long Id)
@@ -262,12 +305,14 @@ namespace McDermott.Web.Components.Pages.Queue
                 PanelVisible = true;
                 counterForm = new();
 
-                var General = await Mediator.Send(new GetCounterByIdQuery(id));
+                var General = await Mediator.Send(new GetSingleCounterQuery
+                {
+                    Predicate = x => x.Id == id
+                });
                 counterForm.Id = General.Id;
                 counterForm.Name = General.Name;
-                //PopUpVisible = true;
                 textPopUp = "Configurtion Counter " + counterForm.Name;
-                showFormProcess = true;
+                PopUpEditCOunter = true;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -445,6 +490,83 @@ namespace McDermott.Web.Components.Pages.Queue
             catch { }
         }
 
+        private bool IsLoadingAddNewCounter = false;
+
+        private async Task OnSaveAddNewCounter(int state)
+        {
+            try
+            {
+                if (state == 1)
+                {
+                    IsLoadingAddNewCounter = true;
+
+                    counterForm.IsActive = true;
+                    counterForm.Status = "on process";
+                    if (counterForm.Id != 0)
+                    {
+                        await Mediator.Send(new UpdateCounterRequest(counterForm));
+                    }
+                    NavigationManager.NavigateTo($"/queue/counter-view/{counterForm.Id}");
+                    showFormProcess = false;
+                    await LoadData();
+                }
+                else if (state == 2)
+                {
+                    IsLoadingAddNewCounter = true;
+
+                    ValidationResult results = new AddCounterPopUp().Validate(counterForm);
+
+                    bool success = results.IsValid;
+                    List<ValidationFailure> failures = results.Errors;
+
+                    ToastService.ClearInfoToasts();
+                    if (!success)
+                    {
+                        foreach (var f in failures)
+                        {
+                            ToastService.ShowInfo(f.ErrorMessage);
+                        }
+                    }
+
+                    if (!success)
+                    {
+                        IsLoadingAddNewCounter = false;
+                        return;
+                    }
+
+                    var checkName = await Mediator.Send(new ValidateCounterQuery(x => x.Id != counterForm.Id && x.Name.ToLower().Equals(counterForm.Name.ToLower())));
+
+                    if (checkName)
+                    {
+                        ToastService.ShowInfo("Counter name already exist");
+                        IsLoadingAddNewCounter = false;
+                        return;
+                    }
+
+                    counterForm.IsActive = true;
+                    counterForm.Status = "open";
+
+                    if (counterForm.Id == 0)
+                        await Mediator.Send(new CreateCounterRequest(counterForm));
+                    else
+                        await Mediator.Send(new UpdateCounterRequest(counterForm));
+
+                    ToastService.ShowSuccess($"'{counterForm.Name}' successfully added");
+
+                    counterForm = new();
+                    await LoadData();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                IsLoadingAddNewCounter = false;
+            }
+        }
+
         private async Task StopProcess(long id)
         {
             try
@@ -515,5 +637,199 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         #endregion Methode Save And Update
+
+        private bool IsLoadingEditCounter = false;
+
+        #region ComboboxServiceK
+
+        private DxComboBox<ServiceDto, long?> refServiceKComboBox { get; set; }
+        private int ServiceKComboBoxIndex { get; set; } = 0;
+        private int totalCountServiceK = 0;
+
+        private async Task OnSearchServiceK()
+        {
+            await LoadDataServiceK();
+        }
+
+        private async Task OnSearchServiceKIndexIncrement()
+        {
+            if (ServiceKComboBoxIndex < (totalCountServiceK - 1))
+            {
+                ServiceKComboBoxIndex++;
+                await LoadDataServiceK(ServiceKComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchServiceKIndexDecrement()
+        {
+            if (ServiceKComboBoxIndex > 0)
+            {
+                ServiceKComboBoxIndex--;
+                await LoadDataServiceK(ServiceKComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputServiceKChanged(string e)
+        {
+            ServiceKComboBoxIndex = 0;
+            await LoadDataServiceK();
+        }
+
+        private List<ServiceDto> ServiceK { get; set; } = [];
+
+        private async Task LoadDataServiceK(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                IsLoadingEditCounter = true;
+                var result = await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.IsKiosk == true,
+                    SearchTerm = refServiceKComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                ServiceK = result.Item1;
+                totalCountServiceK = result.PageCount;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { IsLoadingEditCounter = false; }
+        }
+
+        #endregion ComboboxServiceK
+
+        #region ComboboxServiceP
+
+        private DxComboBox<ServiceDto, long?> refServicePComboBox { get; set; }
+        private int ServicePComboBoxIndex { get; set; } = 0;
+        private int totalCountServiceP = 0;
+
+        private async Task OnSearchServiceP()
+        {
+            await LoadDataServiceP();
+        }
+
+        private async Task OnSearchServicePIndexIncrement()
+        {
+            if (ServicePComboBoxIndex < (totalCountServiceP - 1))
+            {
+                ServicePComboBoxIndex++;
+                await LoadDataServiceP(ServicePComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchServicePIndexDecrement()
+        {
+            if (ServicePComboBoxIndex > 0)
+            {
+                ServicePComboBoxIndex--;
+                await LoadDataServiceP(ServicePComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputServicePChanged(string e)
+        {
+            ServicePComboBoxIndex = 0;
+            await LoadDataServiceP();
+        }
+
+        private async Task LoadDataServiceP(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                IsLoadingEditCounter = true;
+                var result = await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.IsPatient == true,
+                    SearchTerm = refServicePComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                ServiceP = result.Item1;
+                totalCountServiceP = result.PageCount;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { IsLoadingEditCounter = false; }
+        }
+
+        #endregion ComboboxServiceP
+
+        #region ComboboxPhysicion
+
+        private DxComboBox<UserDto, long?> refPhysicionComboBox { get; set; }
+        private int PhysicionComboBoxIndex { get; set; } = 0;
+        private int totalCountPhysicion = 0;
+
+        private async Task OnSearchPhysicion()
+        {
+            await LoadDataPhysicion();
+        }
+
+        private async Task OnSearchPhysicionIndexIncrement()
+        {
+            if (PhysicionComboBoxIndex < (totalCountPhysicion - 1))
+            {
+                PhysicionComboBoxIndex++;
+                await LoadDataPhysicion(PhysicionComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchPhysicionIndexDecrement()
+        {
+            if (PhysicionComboBoxIndex > 0)
+            {
+                PhysicionComboBoxIndex--;
+                await LoadDataPhysicion(PhysicionComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputPhysicionChanged(string e)
+        {
+            PhysicionComboBoxIndex = 0;
+            await LoadDataPhysicion();
+        }
+
+        private async Task LoadDataPhysicion(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetUserQuery2(
+                               x => x.IsDoctor == true && x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(counterForm.ServiceId.GetValueOrDefault()),
+                               searchTerm: refPhysicionComboBox?.Text ?? "",
+                               pageSize: pageSize,
+                               pageIndex:
+                               pageIndex,
+                               includes: [],
+                               select: x => new User
+                               {
+                                   Id = x.Id,
+                                   Name = x.Name,
+                                   Email = x.Email,
+                                   MobilePhone = x.MobilePhone,
+                                   Gender = x.Gender,
+                                   DateOfBirth = x.DateOfBirth,
+                                   IsPhysicion = x.IsPhysicion,
+                                   IsNurse = x.IsNurse,
+                               }
+                           ));
+                Physicians = result.Item1;
+                totalCountPhysicion = result.pageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxPhysicion
     }
 }

@@ -1,0 +1,214 @@
+﻿@page "/medical/doctor-schedules/{PageMode}"
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Doctor Schedule Details</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Doctor Schedule Details" OnClickBack="@(() => NavigationManager.NavigateTo(FormUrl))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <EditForm Model="@DoctorSchedule" @onkeypress="@KeyPressHandler" Context="EditFormContext22" Enhance OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <AntiforgeryToken />
+
+                                <div class="card sticky">
+                                    <div class="card-body">
+                                        <div class=" row w-100">
+                                            <div class="w-100 row justify-content-end mt-2 mb-2">
+                                                <div class="col-auto align-self-end p-0 m-0">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                    </DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="(() => NavigationManager.NavigateTo(FormUrl))"></DxButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Physicion" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Users"
+                                                              NullText="Select Physicion..."
+                                                              @ref="refUserComboBox"
+                                                              @bind-Value="@DoctorSchedule.PhysicionId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id" >
+                                                                <Columns>
+                                                                        <DxListEditorColumn FieldName="Name" />
+                                                                        <DxListEditorColumn FieldName="Email" />
+                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                        <DxListEditorColumn FieldName="Gender" />
+                                                                        <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                        <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                        <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>DoctorSchedule.PhysicionId)" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </div>
+                                </div>
+
+                                @if (DoctorSchedule.Id != 0)
+                                {
+                                    <div class="w-100">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <span class="fw-bolder">Schedule Detail</span>
+                                            </div>
+                                            <MyGridPaginate @ref="GridDoctorScheduleDetail"
+                                                            Data="DoctorScheduleDetails"
+                                                            @bind-SelectedDataItems="@SelectedDataItemsDoctorScheduleDetail"
+                                                            KeyFieldName="Id"
+                                                            FocusedRowChanged="GridDoctorScheduleDetail_FocusedRowChanged"
+                                                            EditModelSaving="OnSaveDoctorScheduleDetail"
+                                                            SearchTextChanged="OnSearchBoxChanged"
+                                                            DataItemDeleting="OnDeleteDoctorScheduleDetail">
+
+                                                <ToolbarTemplate>
+                                                    <MyDxToolbarBase TItem="DoctorScheduleDetailDto"
+                                                                     Items="@DoctorScheduleDetails"
+                                                                     SelectedDataItems="@SelectedDataItemsDoctorScheduleDetail"
+                                                                     NewItem_Click="@NewItemDoctorScheduleDetail_Click"
+                                                                     EditItem_Click="() => EditItemDoctorScheduleDetail_Click(GridDoctorScheduleDetail)"
+                                                                     DeleteItem_Click="@DeleteItemDoctorScheduleDetail_Click"
+                                                                     Refresh_Click="(() => LoadDataDoctorScheduleDetail())"
+                                                                     IsImport="false"
+                                                                     Grid="GridDoctorScheduleDetail"
+                                                                     VisibleNew="UserAccessCRUID.IsCreate"
+                                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                </ToolbarTemplate>
+
+                                                <Columns>
+                                                    <DxGridSelectionColumn Context="ToolbarContext" Width="15px" />
+                                                    <DxGridDataColumn FieldName="DayOfWeek" Caption="Day Of Week" />
+                                                    <DxGridDataColumn FieldName="WorkFromFormatString" Caption="Work From" />
+                                                    <DxGridDataColumn FieldName="WorkToFormatString" Caption="Work To" />
+                                                    <DxGridDataColumn FieldName="Quota" />
+                                                    <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
+                                                </Columns>
+
+
+                                                <TotalSummary>
+                                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                       FieldName="DayOfWeek.Name"
+                                                                       Visible="true" />
+                                                </TotalSummary>
+
+                                                <EditFormTemplate Context="EditFormContext2">
+                                                    @{
+                                                        var a = (DoctorScheduleDetailDto)EditFormContext2.EditModel;
+                                                    }
+                                                    <DxFormLayout CssClass="w-100">
+
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Day of Week" ColSpanMd="12">
+                                                            <DxComboBox Data="@DayOfWeeks" @bind-Value="@a.DayOfWeek" FilteringMode="@DataGridFilteringMode.Contains" NullText="Day of Weeks" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Work From" ColSpanMd="12">
+                                                            <DxTimeEdit @bind-Time="@a.WorkFrom"
+                                                                        Format="@DisplayFormat"
+                                                                        DisplayFormat="@DisplayFormat"
+                                                                        CssClass="cw-320" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Work To" ColSpanMd="12">
+                                                            <DxTimeEdit @bind-Time="@a.WorkTo"
+                                                                        Format="@DisplayFormat"
+                                                                        DisplayFormat="@DisplayFormat"
+                                                                        CssClass="cw-320" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Quota" ColSpanMd="12">
+                                                            <DxSpinEdit @bind-Value="@a.Quota" NullText="Quota" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                        </DxFormLayoutItem>
+
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@Services"
+                                                                          NullText="Select Service"
+                                                                          @ref="refServiceComboBox"
+                                                                          @bind-Value="@a.ServiceId"
+                                                                          TextFieldName="Name"
+                                                                          ValueFieldName="Id"
+                                                                          TextChanged="((string e) => OnInputServiceChanged(e))">
+                                                                <Buttons>
+                                                                    <DxEditorButton Click="OnSearchServiceIndexDecrement"
+                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                    Tooltip="Previous Index" />
+                                                                    <DxEditorButton Click="OnSearchService"
+                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                    Tooltip="Search" />
+                                                                    <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                    Tooltip="Next Index" />
+                                                                </Buttons>
+                                                                <Columns>
+                                                                    <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
+                                                                    <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                                                                </Columns>
+                                                            </MyDxComboBox>
+                                                            <ValidationMessage For="@(()=>a.ServiceId)" />
+                                                        </DxFormLayoutItem>
+                                                    </DxFormLayout>
+                                                </EditFormTemplate>
+                                            </MyGridPaginate>
+
+                                            <div class="row">
+                                                <DxFormLayout>
+                                                    <div class="col-md-9">
+                                                        <DxFormLayoutItem>
+                                                            <DxPager PageCount="totalCountDoctorScheduleDetail"
+                                                                     ActivePageIndexChanged="OnPageIndexChanged"
+                                                                     ActivePageIndex="activePageIndex"
+                                                                     VisibleNumericButtonCount="10"
+                                                                     SizeMode="SizeMode.Medium"
+                                                                     NavigationMode="PagerNavigationMode.Auto">
+                                                            </DxPager>
+                                                        </DxFormLayoutItem>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex justify-content-end">
+                                                        <DxFormLayoutItem Caption="Page Size:">
+                                                            <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                          NullText="Select Page Size"
+                                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                          SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                          @bind-Value="pageSize">
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
+                                                    </div>
+                                                </DxFormLayout>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </EditForm>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && (!UserAccessCRUID.IsCreate && !UserAccessCRUID.IsUpdate))
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}   

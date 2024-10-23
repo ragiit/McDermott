@@ -17,7 +17,7 @@ namespace McDermott.Application.Dtos.Inventory
         public string? ReceiptNumber { get; set; }
         public string? Reference { get; set; }
 
-        public EnumStatusReceiving? Status { get; set; }
+        public EnumStatusGoodsReceipt? Status { get; set; }
 
         [SetToNull]
         public virtual LocationDto? Destination { get; set; }

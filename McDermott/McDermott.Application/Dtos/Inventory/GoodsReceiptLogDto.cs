@@ -8,7 +8,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public long? UserById { get; set; }
-        public EnumStatusReceiving? Status { get; set; }
+        public EnumStatusGoodsReceipt? Status { get; set; }
 
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public string? UpdatedBy { get; set; }

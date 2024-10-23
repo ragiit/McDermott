@@ -11,7 +11,7 @@
         text-decoration: none;
         display: flex;
         align-items: center;
-        cursor:pointer;
+        cursor: pointer;
     }
 
         .toolbar-item:hover {
@@ -73,13 +73,13 @@
                                                     <span>Scrap</span>
                                                     <span class="ms-2 badge bg-secondary">@TotalScrapQty Unit</span>
                                                 </a>
-                                                <div class="divider border-start"></div> 
+                                                <div class="divider border-start"></div>
                                                 <a @onclick="NewTableStock_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-boxes-stacked"></i></span>
                                                     <span>On Hand</span>
                                                     <span class="ms-2 badge bg-secondary">@TotalScrapQty Unit</span>
                                                 </a>
-                                                <div class="divider border-start"></div> 
+                                                <div class="divider border-start"></div>
                                                 <a @onclick="NewTableEquipment_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-trash"></i></span>
                                                     <span>Maintenance</span>
@@ -231,7 +231,6 @@
                                                                                   @bind-Value="@PostProductDetails.PurchaseUomId"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
-                                                                                  
                                                                                   TextChanged="((string e) => OnInputUomPurchaseChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchUomPurchaseIndexDecrement"
@@ -340,12 +339,11 @@
                                                                 </DxFormLayoutItem>
 
                                                                 <DxFormLayoutItem Caption="Route" CaptionCssClass="normal-caption" ColSpanMd="12">
-
                                                                     <MyDxComboBox Data="@GetDrugRoutes"
                                                                                   NullText="Select Routes"
                                                                                   @ref="refDrugRouteComboBox"
-                                                                                  @bind-Value="@PostProductDetails.FormId"
-                                                                                  TextFieldName="Name"
+                                                                                  @bind-Value="@PostProductDetails.RouteId"
+                                                                                  TextFieldName="Route"
                                                                                   ValueFieldName="Id"
                                                                                   TextChanged="((string e) => OnInputDrugRouteChanged(e))">
                                                                         <Buttons>
@@ -435,9 +433,9 @@
                                                                                   NullText="Select DrugDosage"
                                                                                   @ref="refDrugDosageComboBox"
                                                                                   @bind-Value="@PostProductDetails.FrequencyId"
-                                                                                  TextFieldName="Name"
+                                                                                  TextFieldName="Frequency"
                                                                                   ValueFieldName="Id"
-                                                                                  TextChanged="((string e) => OnInputUomChanged(e))">
+                                                                                  TextChanged="((string e) => OnInputDrugDosageChanged(e))">
                                                                         <Buttons>
                                                                             <DxEditorButton Click="OnSearchDrugDosageIndexDecrement"
                                                                                             IconCssClass="fa-solid fa-caret-left"

@@ -141,9 +141,14 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, searchTerm);
+            var result = (await Mediator.Send(new GetCountryQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = searchTerm
+            }));
             Countries = result.Item1;
-            totalCountCountry = result.pageCount;
+            totalCountCountry = result.PageCount;
             PanelVisible = false;
         }
 
@@ -208,7 +213,10 @@ namespace McDermott.Web.Components.Pages.Config
 
                 PanelVisible = true;
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
-                Countries = (await Mediator.QueryGetHelper<Country, CountryDto>(predicate: x => x.Id == a.CountryId)).Item1;
+                Countries = (await Mediator.Send(new GetCountryQuery
+                {
+                    Predicate = x => x.Id == a.CountryId,
+                })).Item1;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -313,12 +321,16 @@ namespace McDermott.Web.Components.Pages.Config
                             countryNames.Add(prov.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetCountryQuery(x => countryNames.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new Country
+                    list1 = (await Mediator.Send(new GetCountryQuery
+                    {
+                        IsGetAll = true,
+                        Predicate = x => countryNames.Contains(x.Name.ToLower()),
+                        Select = x => new Country
                         {
                             Id = x.Id,
                             Name = x.Name
-                        }))).Item1;
+                        }
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

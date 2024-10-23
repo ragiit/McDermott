@@ -107,7 +107,7 @@ namespace McDermott.Web.Components.Pages.Queue
         #region Data Static And Variable Additional
 
         [Parameter]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         private List<string> type = new List<string>
         {
@@ -212,7 +212,7 @@ namespace McDermott.Web.Components.Pages.Queue
             var schedules = await Mediator.Send(new GetDoctorScheduleQuery(x => x.ServiceId == FormKios.ServiceId && x.PhysicionIds != null && x.PhysicionIds.Contains(FormKios.PhysicianId.GetValueOrDefault())));
             if (schedules.Count > 0)
             {
-                DoctorScheduleSlots = (await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.DoctorScheduleId == schedules[0].Id && x.PhysicianId == FormKios.PhysicianId))).Item1;
+                //DoctorScheduleSlots = (await Mediator.Send(new GetDoctorScheduleSlotQuery(x => x.DoctorScheduleId == schedules[0].Id && x.PhysicianId == FormKios.PhysicianId))).Item1;
             }
         }
 
@@ -283,6 +283,9 @@ namespace McDermott.Web.Components.Pages.Queue
 
         protected override async Task OnInitializedAsync()
         {
+            if (!Id.HasValue)
+                NavigationManager.NavigateTo("");
+
             Id = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/kiosk/", "")}".ToInt32();
 
             var NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId);
@@ -336,9 +339,12 @@ namespace McDermott.Web.Components.Pages.Queue
             //InsurancePolices = await Mediator.Send(new GetInsurancePolicyQuery());
             SelectedDataItems = new ObservableRangeCollection<object>();
             Kiosks = await Mediator.Send(new GetKioskQuery());
-            Services = (await Mediator.Send(new GetServiceQuery())).Item1;
-            var kconfig = await Mediator.Send(new GetKioskConfigQuery());
-            KioskConf = kconfig.Where(x => x.Id == Id).ToList();
+            //Services = await Mediator.Send(new GetServiceQuery());
+            var kconfig = await Mediator.Send(new GetKioskConfigQuery
+            {
+                Predicate = x => x.Id == Id
+            });
+            KioskConf = kconfig.Item1;
             classTypes = await Mediator.Send(new GetClassTypeQuery());
             var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
             groups = result2.Item1;

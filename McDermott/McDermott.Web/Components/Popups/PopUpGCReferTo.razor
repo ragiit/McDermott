@@ -231,9 +231,24 @@
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
                                                                 <MyDxComboBox Data="@InsurancePolicies"
-                                                                              @bind-Value="@SelectedInsurancePolicy"
-                                                                              NullText="Select Insurance Policy..."
-                                                                              EditFormat="{0} - {1}">
+                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                              NullText="Select InsurancePolicy"
+                                                                              @ref="refInsurancePolicyComboBox"
+                                                                              @bind-Value="GeneralConsultanService.InsurancePolicyId"
+                                                                              EditFormat="{0} - {1}"
+                                                                              ValueFieldName="Id"
+                                                                              TextChanged="((string e) => OnInputInsurancePolicyChanged(e))">
+                                                                    <Buttons>
+                                                                        <DxEditorButton Click="OnSearchInsurancePolicyIndexDecrement"
+                                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                                        Tooltip="Previous Index" />
+                                                                        <DxEditorButton Click="OnSearchInsurancePolicy"
+                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                        Tooltip="Search" />
+                                                                        <DxEditorButton Click="OnSearchInsurancePolicyIndexIncrement"
+                                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                                        Tooltip="Next Index" />
+                                                                    </Buttons>
                                                                     <Columns>
                                                                         <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
                                                                                             Caption="No Card" />
@@ -533,7 +548,6 @@
     private IEnumerable<string> RujukanExtenalVertical = new[] { "Kondisi Khusus", "Spesialis" };
     private IGrid GridRujukanRefer { get; set; }
 
-    private InsurancePolicyDto SelectedInsurancePolicyReferTo { get; set; } = new();
     private bool IsLoadingFollowUp { get; set; } = false;
 
     [Parameter] public EventCallback OnClosePopupReferTo { get; set; }
@@ -543,7 +557,7 @@
 
         try
         {
-            GeneralConsultanService.InsurancePolicyId = SelectedInsurancePolicy == null || SelectedInsurancePolicy.Id == 0 ? null : SelectedInsurancePolicy.Id;
+            GeneralConsultanService.InsurancePolicyId = GeneralConsultanService.InsurancePolicyId == null || GeneralConsultanService.InsurancePolicyId == 0 ? null : GeneralConsultanService.InsurancePolicyId;
 
             // Execute the validator
             ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
@@ -585,7 +599,7 @@
             if (!success2 || !success)
                 return;
 
-            if (!GeneralConsultanService.Payment!.Equals("Personal") && (SelectedInsurancePolicy is null || SelectedInsurancePolicy.Id == 0))
+            if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
             {
                 IsLoading = false;
                 ToastService.ShowInfoSubmittingForm();
@@ -718,11 +732,14 @@
 
         try
         {
+            string input = refInsurancePolicyComboBox?.Text ?? "";
+            string noCard = input.Split('-')[0].Trim();
+
             if (GeneralConsultanService.ReferVerticalKhususCategoryCode is not null && (GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("THA") || GeneralConsultanService.ReferVerticalKhususCategoryCode.Equals("HEM")))
             {
-                Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
+                Console.WriteLine("Hit URL: " + JsonConvert.SerializeObject($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{noCard}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", Formatting.Indented));
 
-                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/subspesialis/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode}/noKartu/{noCard}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                 if (result.Item2 == 200)
                 {
@@ -764,9 +781,9 @@
             }
             else
             {
-                Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
+                Console.WriteLine($"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{noCard}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}");
 
-                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{SelectedInsurancePolicy.NoKartu}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/rujuk/khusus/{GeneralConsultanService.ReferVerticalKhususCategoryCode}/noKartu/{noCard}/tglEstRujuk/{GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")}", HttpMethod.Get);
 
                 if (result.Item2 == 200)
                 {
@@ -879,8 +896,6 @@
         if (TempInsurancePolicies.Count > 0)
             InsurancePolicies = TempInsurancePolicies;
 
-        if (TempSelectedInsurancePolicy is not null)
-            SelectedInsurancePolicy = TempSelectedInsurancePolicy;
 
         await SendPCareGetRefrensiKhusus();
         await SendPcareGetSpesialis();
@@ -1070,7 +1085,7 @@
         GeneralConsultanService.InsurancePolicyId = null;
         InsurancePolicies.Clear();
         GeneralConsultanService.Patient = new();
-        SelectedInsurancePolicy = new();
+        GeneralConsultanService.InsurancePolicyId = new();
 
         if (e is null)
             return;
@@ -1082,9 +1097,18 @@
         if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
         {
             InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-            {
-                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
-            })).Item1;
+                {
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                        PolicyNumber = x.PolicyNumber,
+                    },
+                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+                })).Item1;
         }
     }
 
@@ -1132,9 +1156,16 @@
         try
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetServiceQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refServiceComboBox?.Text ?? ""));
+
+            var result = await Mediator.Send(new GetServiceQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refServiceComboBox?.Text ?? ""
+            });
             Services = result.Item1;
-            totalCountService = result.pageCount;
+            totalCountService = result.PageCount;
+
             PanelVisible = false;
         }
         catch (Exception ex)
@@ -1181,8 +1212,81 @@
         PhysicionComboBoxIndex = 0;
         await LoadDataPhysicion();
     }
+    #region ComboboxInsurancePolicy
 
-    private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
+    private DxComboBox<InsurancePolicyDto, long?> refInsurancePolicyComboBox { get; set; }
+    private int InsurancePolicyComboBoxIndex { get; set; } = 0;
+    private int totalCountInsurancePolicy = 0;
+
+    private async Task OnSearchInsurancePolicy()
+    {
+        await LoadDataInsurancePolicy();
+    }
+
+    private async Task OnSearchInsurancePolicyIndexIncrement()
+    {
+        if (InsurancePolicyComboBoxIndex < (totalCountInsurancePolicy - 1))
+        {
+            InsurancePolicyComboBoxIndex++;
+            await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchInsurancePolicyIndexDecrement()
+    {
+        if (InsurancePolicyComboBoxIndex > 0)
+        {
+            InsurancePolicyComboBoxIndex--;
+            await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputInsurancePolicyChanged(string e)
+    {
+        InsurancePolicyComboBoxIndex = 0;
+        await LoadDataInsurancePolicy();
+    }
+
+    private async Task LoadDataInsurancePolicy(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+
+            string input = refInsurancePolicyComboBox?.Text ?? "";
+            string b = input.Split('-')[0].Trim();
+
+            var result = await Mediator.Send(new GetInsurancePolicyQuery
+                {
+                    SearchTerm = b,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Includes =
+                                [
+                                    x => x.Insurance
+                                ],
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        PolicyNumber = x.PolicyNumber,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                    }
+                });
+            InsurancePolicies = result.Item1;
+            totalCountInsurancePolicy = result.PageCount;
+            PanelVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion ComboboxInsurancePolicy
     private List<UserDto> Physicions { get; set; } = [];
     private async Task LoadDataPhysicion(int pageIndex = 0, int pageSize = 10)
     {
@@ -1225,15 +1329,23 @@
     {
         GeneralConsultanService.Payment = null;
         GeneralConsultanService.InsurancePolicyId = null;
-        SelectedInsurancePolicy = new();
 
         if (e is null)
             return;
 
         InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-        {
-            Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
-        })).Item1;
+            {
+                Select = x => new InsurancePolicy
+                {
+                    Id = x.Id,
+                    Insurance = new Insurance
+                    {
+                        Name = x.Insurance == null ? "" : x.Insurance.Name,
+                    },
+                    PolicyNumber = x.PolicyNumber,
+                },
+                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
+            })).Item1;
     }
     private async Task SelectedItemSpesialis(SpesialisPCare e)
     {
@@ -1299,7 +1411,6 @@
 
     [Parameter] public UserDto UserForm { get; set; } = new();
     [Parameter] public List<InsurancePolicyDto> TempInsurancePolicies { get; set; } = new();
-    [Parameter] public InsurancePolicyDto TempSelectedInsurancePolicy { get; set; } = new();
     [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
     [Parameter] public EventCallback OnClosePopup { get; set; }
     private bool PanelVisible { get; set; } = false;
@@ -1325,11 +1436,11 @@
                 GeneralConsultanService.ReferReason = GeneralConsultanService.ReferReason is null || SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[0]) ? "-" : GeneralConsultanService.ReferReason;
 
                 var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
-                {
-                    GeneralConsultanServiceDto = GeneralConsultanService,
-                    Status = EnumStatusGeneralConsultantService.Physician,
-                    IsReferTo = true
-                };
+                    {
+                        GeneralConsultanServiceDto = GeneralConsultanService,
+                        Status = EnumStatusGeneralConsultantService.Physician,
+                        IsReferTo = true
+                    };
 
                 await Mediator.Send(updateRequest);
                 await OnClosePopupReferTo.InvokeAsync();

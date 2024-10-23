@@ -71,17 +71,17 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 var item = Schedules.FirstOrDefault(x => x.Id == newId);
 
-                PhysicionName = item?.Physicions ?? string.Empty;
+                //PhysicionName = item?.Physicions ?? string.Empty;
 
-                var n = item?.Physicions.Split(",") ?? [];
+                //var n = item?.Physicions.Split(",") ?? [];
 
-                foreach (var item1 in n)
-                {
-                    if (Names.Contains(item1))
-                        continue;
+                //foreach (var item1 in n)
+                //{
+                //    if (Names.Contains(item1))
+                //        continue;
 
-                    Names.Add(item1);
-                }
+                //    Names.Add(item1);
+                //}
 
                 SelectedNames = Names.Distinct();
             }
@@ -157,15 +157,15 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 foreach (var item in e)
                 {
-                    var n = item.Physicions.Split(",");
+                    //var n = item.Physicions.Split(",");
 
-                    foreach (var item1 in n)
-                    {
-                        if (Names.Contains(item1))
-                            continue;
+                    //foreach (var item1 in n)
+                    //{
+                    //    if (Names.Contains(item1))
+                    //        continue;
 
-                        Names.Add(item1);
-                    }
+                    //    Names.Add(item1);
+                    //}
                 }
 
                 SelectedNames = Names.Distinct();
@@ -183,7 +183,7 @@ namespace McDermott.Web.Components.Pages.Medical
             DoctorSchedules.Clear();
 
             var doctorSchedules = await Mediator.Send(new GetDoctorScheduleQuery());
-            doctorSchedules.ForEach(x => x.Physicions = string.Join(", ", users.Where(z => x.PhysicionIds != null && x.PhysicionIds.Contains(z.Id)).Select(z => z.Name).ToList()));
+            //doctorSchedules.ForEach(x => x.Physicions = string.Join(", ", users.Where(z => x.PhysicionIds != null && x.PhysicionIds.Contains(z.Id)).Select(z => z.Name).ToList()));
 
             DoctorSchedules = doctorSchedules;
 
@@ -690,7 +690,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
                 await Mediator.Send(new DeleteDoctorScheduleSlotByPhysicionIdRequest(DoctorSchedule.PhysicionIds, DoctorSchedule.Id));
 
-                await Mediator.Send(new CreateDoctorScheduleDetailRequest(DoctorScheduleDetails));
+                //await Mediator.Send(new CreateDoctorScheduleDetailRequest(DoctorScheduleDetails));
 
                 ShowForm = false;
 

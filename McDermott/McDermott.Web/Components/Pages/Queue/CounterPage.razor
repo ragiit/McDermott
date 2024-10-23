@@ -148,7 +148,38 @@
                                         </div> *@
                                                 </div>
 
-                                                <div class="row mt-3">
+                                                @* <div class="row mt-3">
+                                                    <div class="col-12">
+                                                        @if (i.Status == "open")
+                                                        {
+                                                            <div class="row justify-content-end">
+                                                                <div class="col-md-12 d-flex justify-content-end">
+                                                                    <DxButton IconCssClass="fa-solid fa-gears" RenderStyle="ButtonRenderStyle.Primary" Text="Start Configuration" Click="@(()=>ShowOnProcess(i.Id))"></DxButton>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else if (i.Status == "on process")
+                                                        {
+                                                            <div class="row justify-content-end">
+                                                                <div class="col-md-12 d-flex justify-content-end">
+                                                                    <DxButton CssClass="mr-2" IconCssClass="fa-solid fa-stop" RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Stop" Click="@(() => StopProcess(i.Id))" />
+                                                                    <DxButton IconCssClass="fa-solid fa-eye" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="View" Click="@(() => DetailList(i.Id))" />
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else if (i.Status == "stop")
+                                                        {
+                                                            <div class="row justify-content-end">
+                                                                <div class="col-md-5 d-flex justify-content-end">
+                                                                    <DxButton IconCssClass="fa-solid fa-circle-play" RenderStyleMode="@ButtonRenderStyleMode.Outline" Text="Resume" Click="@(() => ResumeProcess(i.Id))" />
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div> *@
+                                            </div>
+                                            <div class="card-footer ">
+                                                <div class="row">
                                                     <div class="col-12">
                                                         @if (i.Status == "open")
                                                         {
@@ -199,7 +230,7 @@ else
     </div>
 }
 
-<DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" CloseOnOutsideClick="false" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+@* <DxPopup HeaderText="@textPopUp" @bind-Visible="@PopUpVisible" CloseOnOutsideClick="false" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center">
     <EditForm Model="@counterForm" Context="EditFormContext">
         <DataAnnotationsValidator />
@@ -222,15 +253,50 @@ else
             </div>
         </div>
     </EditForm>
+</DxPopup> *@
+
+<DxPopup Context="A"
+         HeaderText="@textPopUp"
+         @bind-Visible="@PopUpVisible"
+         HeaderCssClass="fw-bold"
+         CloseOnOutsideClick="false"
+         Width="70%"
+         HorizontalAlignment="HorizontalAlignment.Center"
+         VerticalAlignment="VerticalAlignment.Center"
+         EnableAdaptivity="true"
+         ShowFooter="true">
+    <BodyContentTemplate>
+        <DxLoadingPanel @bind-Visible="IsLoadingAddNewCounter"
+                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="false"
+                        Text="Saving...">
+            <EditForm Context="B" Model="@counterForm" OnValidSubmit="(async () => await OnSaveAddNewCounter(2))">
+                <AntiforgeryToken />
+                <Blazored.FluentValidation.FluentValidationValidator />
+                <DxFormLayout CssClass="w-100">
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Name" ColSpanMd="12">
+                        <MyTextBox @bind-Text="@counterForm.Name" NullText="Name" />
+                        <ValidationMessage For="@(() => counterForm.Name)"   />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditForm>
+        </DxLoadingPanel>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" SubmitFormOnClick="true" Enabled="!IsLoadingAddNewCounter" Click="(async () => await OnSaveAddNewCounter(2))" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Enabled="!IsLoadingAddNewCounter" Click="@(() => PopUpVisible = false)" />
+    </FooterContentTemplate>
 </DxPopup>
 
-<DxPopup HeaderText="@textPopUp.ToUpper()" CloseOnOutsideClick="false" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+@* <DxPopup HeaderText="@textPopUp.ToUpper()" CloseOnOutsideClick="false" HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
          VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center" MinWidth="500" @bind-Visible="@showFormProcess" Width="auto">
     <EditForm Model="@counterForm" Context="EditFormContext">
         <DataAnnotationsValidator />
         <DxFormLayout CssClass="w-100">
             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Service Counter" ColSpanMd="12">
-                <DxComboBox Data="@ServiceK"
+                <DxComboBox Data="@ServiceP"
                             @bind-Value="@counterForm.ServiceKId"
                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                             FilteringMode="@DataGridFilteringMode.Contains"
@@ -263,4 +329,121 @@ else
             </DxFormLayoutItem>
         </DxFormLayout>
     </EditForm>
+</DxPopup> *@
+
+<DxPopup Context="A"
+    HeaderText="@textPopUp.ToUpper()"
+         @bind-Visible="@PopUpEditCOunter"
+         HeaderCssClass="fw-bold"
+         CloseOnOutsideClick="false"
+         Width="70%"
+         HorizontalAlignment="HorizontalAlignment.Center"
+         VerticalAlignment="VerticalAlignment.Center"
+         EnableAdaptivity="true"
+         ShowFooter="true">
+    <BodyContentTemplate>
+        <DxLoadingPanel @bind-Visible="IsLoadingAddNewCounter"
+                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="false"
+                        Text="Saving...">
+            <EditForm Context="B" Model="@counterForm" OnValidSubmit="(async () => await OnSaveAddNewCounter(1))">
+                <DataAnnotationsValidator />
+                <AntiforgeryToken />
+                <Blazored.FluentValidation.FluentValidationValidator />
+                <DxFormLayout CssClass="w-100">
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Counter Service" ColSpanMd="12">
+                        <MyDxComboBox Data="@ServiceK"
+                                      NullText="Select Counter Service"
+                                      @ref="refServiceKComboBox"
+                                      @bind-Value="@counterForm.ServiceKId" 
+                                      TextFieldName="Name"
+                                      ValueFieldName="Id"
+                                      TextChanged="((string e) => OnInputServiceKChanged(e))">
+                            <Buttons>
+                                <DxEditorButton  Click="OnSearchServiceKIndexDecrement"
+                                                IconCssClass="fa-solid fa-caret-left"
+                                                Tooltip="Previous Index" />
+                                <DxEditorButton  Click="OnSearchServiceK"
+                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                Tooltip="Search" />
+                                <DxEditorButton  Click="OnSearchServiceKIndexIncrement"
+                                                IconCssClass="fa-solid fa-caret-right"
+                                                Tooltip="Next Index" />
+                            </Buttons>
+                            <Columns>
+                                <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
+                                <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                            </Columns>
+                        </MyDxComboBox>
+                        <ValidationMessage For="@(()=>counterForm.ServiceKId)" />
+                    </DxFormLayoutItem>
+
+                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                        <MyDxComboBox Data="@ServiceP"
+                                      NullText="Select Service"
+                                      @ref="refServicePComboBox"
+                                      @bind-Value="@counterForm.ServiceId"
+                                      TextFieldName="Name"
+                                      ValueFieldName="Id"
+                                      TextChanged="((string e) => OnInputServicePChanged(e))">
+                            <Buttons>
+                                <DxEditorButton Click="OnSearchServicePIndexDecrement"
+                                                IconCssClass="fa-solid fa-caret-left"
+                                                Tooltip="Previous Index" />
+                                <DxEditorButton Click="OnSearchServiceP"
+                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                Tooltip="Search" />
+                                <DxEditorButton Click="OnSearchServicePIndexIncrement"
+                                                IconCssClass="fa-solid fa-caret-right"
+                                                Tooltip="Next Index" />
+                            </Buttons>
+                            <Columns>
+                                <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
+                                <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                            </Columns>
+                        </MyDxComboBox>
+                        <ValidationMessage For="@(()=>counterForm.ServiceId)" />
+                    </DxFormLayoutItem>
+
+                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physician" ColSpanMd="12">
+                        <MyDxComboBox Data="@Physicians"
+                                      NullText="Select Physician"
+                                      @ref="refPhysicionComboBox"
+                                      @bind-Value="@counterForm.PhysicianId" 
+                                      TextFieldName="Name"
+                                      ValueFieldName="Id"
+                                      TextChanged="((string e) => OnInputPhysicionChanged(e))">
+                            <Buttons>
+                                <DxEditorButton  Click="OnSearchPhysicionIndexDecrement"
+                                                IconCssClass="fa-solid fa-caret-left"
+                                                Tooltip="Previous Index" />
+                                <DxEditorButton  Click="OnSearchPhysicion"
+                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                Tooltip="Search" />
+                                <DxEditorButton  Click="OnSearchPhysicionIndexIncrement"
+                                                IconCssClass="fa-solid fa-caret-right"
+                                                Tooltip="Next Index" />
+                            </Buttons>
+                            <Columns>
+                                <DxListEditorColumn FieldName="Name" />
+                                <DxListEditorColumn FieldName="Email" />
+                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                <DxListEditorColumn FieldName="Gender" />
+                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                            </Columns>
+                        </MyDxComboBox>
+                        <ValidationMessage For="@(()=>counterForm.PhysicianId)" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditForm>
+        </DxLoadingPanel>
+    </BodyContentTemplate>
+    <FooterContentTemplate>
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" SubmitFormOnClick="true" Enabled="!IsLoadingAddNewCounter" Click="(async () => await OnSaveAddNewCounter(1))" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Enabled="!IsLoadingAddNewCounter" Click="@(() => PopUpEditCOunter = false)" />
+    </FooterContentTemplate>
 </DxPopup>

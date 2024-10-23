@@ -21,9 +21,86 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<GetSingleUserQuery, UserDto>,
         IRequestHandler<CreateListUserRequest, List<UserDto>>,
         IRequestHandler<UpdateUserRequest, UserDto>,
-        IRequestHandler<DeleteUserRequest, bool>
+        IRequestHandler<DeleteUserRequest, bool>,
+
+        IRequestHandler<GetUserQueryNew, (List<UserDto>, int pageIndex, int pageSize, int pageCount)>
     {
         #region Get
+
+        public async Task<(List<UserDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUserQueryNew request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<User>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<User>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<User>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Department.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Supervisor.Name, $"%{request.SearchTerm}%"));
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new User
+                    {
+                        Id = x.Id,
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<UserDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<UserDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
 
         public async Task<List<UserDto>> Handle(BulkValidateEmployeeQuery request, CancellationToken cancellationToken)
         {

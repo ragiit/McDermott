@@ -9,7 +9,7 @@ namespace McDermott.Application.Dtos.Inventory
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public EnumStatusInternalTransfer? Status { get; set; }
-        public string? CreatedBy { get; set; }
+        public long? UserById { get; set; }
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
@@ -22,5 +22,8 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual LocationDto? Destination { get; set; }
+        
+        [SetToNull]
+        public virtual UserDto? UserBy { get; set; }
     }
 }

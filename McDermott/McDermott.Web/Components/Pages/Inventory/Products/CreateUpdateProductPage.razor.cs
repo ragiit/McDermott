@@ -274,6 +274,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             await LoadData();
             await LoadDataDrugForm();
             await LoadDataDrugRoute();
+            await LoadDataDrugDosage();
             //await LoadDataBPJSCl();
             //await LoadDataLocation();
             await LoadDataProductCategory();
@@ -723,9 +724,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private async Task OnSearchDrugDosageIndexIncrement()
         {
-            if (UomComboBoxIndex < (totalCountUom - 1))
+            if (DrugDosageComboBoxIndex < (totalCountDrugDosage - 1))
             {
-                UomComboBoxIndex++;
+                DrugDosageComboBoxIndex++;
                 await LoadDataDrugDosage(DrugDosageComboBoxIndex, 10);
             }
         }
@@ -734,7 +735,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             if (DrugDosageComboBoxIndex > 0)
             {
-                UomComboBoxIndex--;
+                DrugDosageComboBoxIndex--;
                 await LoadDataDrugDosage(DrugDosageComboBoxIndex, 10);
             }
         }
@@ -749,7 +750,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: refUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: refDrugDosageComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             GetDrugDosage = result.Item1;
             totalCount = result.pageCount;
             PanelVisible = false;
@@ -1053,7 +1054,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private void SetFormMedicamentDetails()
         {
             PostMedicaments.Id = PostProductDetails.MedicamentId ?? 0;
-            PostMedicaments.ProductId = TempProduct?.Id ?? 0;
             PostMedicaments.FormId = PostProductDetails.FormId;
             PostMedicaments.RouteId = PostProductDetails.RouteId;
             PostMedicaments.Dosage = PostProductDetails.Dosage;
@@ -1078,10 +1078,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private bool ValidateMedicamentDetails()
         {
             // Validasi jika data dalam PostMedicaments kosong atau tidak valid
-            if (PostMedicaments.FormId == null ||
-                PostMedicaments.RouteId == null ||
-                PostMedicaments.Dosage == 0 ||
-                PostMedicaments.UomId == null)
+            if (PostProductDetails.FormId == null ||
+                PostProductDetails.RouteId == null ||
+                PostProductDetails.Dosage == 0 ||
+                PostProductDetails.UomMId == null)
             {
                 return false;
             }
@@ -1095,7 +1095,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             if (PostProductDetails.HospitalType == "Medicament")
             {
-                PostMedicaments.ProductId = PostProduct.Id;
+                PostMedicaments.ProductId = TempProduct.Id;
 
                 if (PostMedicaments.Id == 0)
                 {

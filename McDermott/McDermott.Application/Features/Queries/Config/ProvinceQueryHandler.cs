@@ -96,7 +96,8 @@ namespace McDermott.Application.Features.Queries.Config
                         CountryId = x.CountryId,
                         Country = new Country
                         {
-                            Name = x.Country == null ? string.Empty : x.Country.Name
+                            Name = x.Country == null ? string.Empty : x.Country.Name,
+                            Code = x.Country == null ? string.Empty : x.Country.Code
                         }
                     });
 
@@ -177,7 +178,8 @@ namespace McDermott.Application.Features.Queries.Config
                         CountryId = x.CountryId,
                         Country = new Country
                         {
-                            Name = x.Country == null ? string.Empty : x.Country.Name
+                            Name = x.Country == null ? string.Empty : x.Country.Name,
+                            Code = x.Country == null ? string.Empty : x.Country.Code
                         }
                     });
 

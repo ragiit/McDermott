@@ -15,7 +15,7 @@ namespace McDermott.Domain.Entities
         public string? NumberPurchase { get; set; }
         public string? Reference { get; set; }
 
-        public EnumStatusReceiving? Status { get; set; }
+        public EnumStatusGoodsReceipt? Status { get; set; }
 
         [SetToNull]
         public Locations? Destination { get; set; }

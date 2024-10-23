@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Features.Services;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
 
@@ -88,9 +89,13 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.QueryGetHelper<Country, CountryDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetCountryQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Countries = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
             }
             catch (Exception ex)

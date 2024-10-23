@@ -59,12 +59,10 @@ namespace McDermott.Application.Features.Queries.Patient
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    //query = query.Where(v =>
-                    //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.Phycisian.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.UoM.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.FormDrug.Name, $"%{request.SearchTerm}%")
-                    //    );
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.Insurance.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.PolicyNumber, $"%{request.SearchTerm}%"
+                        ));
                 }
 
                 // Apply dynamic select if provided

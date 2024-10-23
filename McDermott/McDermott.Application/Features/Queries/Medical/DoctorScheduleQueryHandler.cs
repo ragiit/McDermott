@@ -147,34 +147,34 @@
             }
         }
 
-        internal class CreateDoctorScheduleDetailHandler : IRequestHandler<CreateDoctorScheduleDetailRequest, bool>
-        {
-            private readonly IUnitOfWork _unitOfWork;
+        //internal class CreateDoctorScheduleDetailHandler : IRequestHandler<CreateDoctorScheduleDetailRequest, bool>
+        //{
+        //    private readonly IUnitOfWork _unitOfWork;
 
-            public CreateDoctorScheduleDetailHandler(IUnitOfWork unitOfWork)
-            {
-                _unitOfWork = unitOfWork;
-            }
+        //    public CreateDoctorScheduleDetailHandler(IUnitOfWork unitOfWork)
+        //    {
+        //        _unitOfWork = unitOfWork;
+        //    }
 
-            public async Task<bool> Handle(CreateDoctorScheduleDetailRequest request, CancellationToken cancellationToken)
-            {
-                try
-                {
-                    foreach (var item in request.DoctorScheduleDetailDtos)
-                    {
-                        await _unitOfWork.Repository<DoctorScheduleDetail>().AddAsync(item.Adapt<DoctorScheduleDetail>());
-                    }
+        //    public async Task<bool> Handle(CreateDoctorScheduleDetailRequest request, CancellationToken cancellationToken)
+        //    {
+        //        try
+        //        {
+        //            foreach (var item in request.DoctorScheduleDetailDtos)
+        //            {
+        //                await _unitOfWork.Repository<DoctorScheduleDetail>().AddAsync(item.Adapt<DoctorScheduleDetail>());
+        //            }
 
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+        //            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            }
-        }
+        //            return true;
+        //        }
+        //        catch (Exception)
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //}
 
         internal class DeleteDoctorScheduleDetailByScheduleIdHandler : IRequestHandler<DeleteDoctorScheduleDetailByScheduleIdRequest, bool>
         {

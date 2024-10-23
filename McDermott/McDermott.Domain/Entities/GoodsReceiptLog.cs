@@ -8,7 +8,7 @@ namespace McDermott.Domain.Entities
         public long? SourceId { get; set; }
         public long? DestinationId { get; set; }
         public long? UserById { get; set; }
-        public EnumStatusReceiving? Status { get; set; }
+        public EnumStatusGoodsReceipt? Status { get; set; }
 
         public GoodsReceipt? GoodsReceipt {  get; set; }
         public User? UserBy { get; set; }

@@ -925,9 +925,14 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCountryQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCountryComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetCountryQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refCountryComboBox?.Text ?? ""
+            });
             Countries = result.Item1;
-            totalCountCountry = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -972,9 +977,9 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
-            Cities = result.Item1;
-            totalCountCity = result.pageCount;
+            //var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
+            //Cities = result.Item1;
+            //totalCountCity = result.pageCount;
             PanelVisible = false;
         }
 

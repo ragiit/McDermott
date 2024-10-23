@@ -4,56 +4,86 @@ namespace McDermott.Application.Features.Commands.Queue
 {
     public class QueueDisplayCommand
     {
-        public class GetQueueDisplayQuery : IRequest<List<QueueDisplayDto>>;
+        #region GET
 
-        public class GetQueueDisplayByIdQuery : IRequest<QueueDisplayDto>
+        public class GetQueueDisplayQuery : IRequest<(List<QueueDisplayDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public long Id { get; set; }
+            public List<Expression<Func<QueueDisplay, object>>> Includes { get; set; }
+            public Expression<Func<QueueDisplay, bool>> Predicate { get; set; }
+            public Expression<Func<QueueDisplay, QueueDisplay>> Select { get; set; }
 
-            public GetQueueDisplayByIdQuery(long id)
-            {
-                Id = id;
-            }
+            public List<(Expression<Func<QueueDisplay, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        public class CreateQueueDisplayRequest : IRequest<QueueDisplayDto>
+        public class GetSingleQueueDisplayQuery : IRequest<QueueDisplayDto>
         {
-            public QueueDisplayDto QueueDisplayDto { get; set; }
+            public List<Expression<Func<QueueDisplay, object>>> Includes { get; set; }
+            public Expression<Func<QueueDisplay, bool>> Predicate { get; set; }
+            public Expression<Func<QueueDisplay, QueueDisplay>> Select { get; set; }
 
-            public CreateQueueDisplayRequest(QueueDisplayDto QueueDisplayDto)
-            {
-                this.QueueDisplayDto = QueueDisplayDto;
-            }
+            public List<(Expression<Func<QueueDisplay, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        public class UpdateQueueDisplayRequest : IRequest<bool>
+        public class ValidateQueueDisplayQuery(Expression<Func<QueueDisplay, bool>>? predicate = null) : IRequest<bool>
         {
-            public QueueDisplayDto QueueDisplayDto { get; set; }
-
-            public UpdateQueueDisplayRequest(QueueDisplayDto QueueDisplayDto)
-            {
-                this.QueueDisplayDto = QueueDisplayDto;
-            }
+            public Expression<Func<QueueDisplay, bool>> Predicate { get; } = predicate!;
         }
 
-        public class DeleteQueueDisplayRequest : IRequest<bool>
-        {
-            public long Id { get; set; }
+        #endregion GET
 
-            public DeleteQueueDisplayRequest(long id)
-            {
-                Id = id;
-            }
+        #region CREATE
+
+        public class CreateQueueDisplayRequest(QueueDisplayDto QueueDisplayDto) : IRequest<QueueDisplayDto>
+        {
+            public QueueDisplayDto QueueDisplayDto { get; set; } = QueueDisplayDto;
         }
 
-        public class DeleteListQueueDisplayRequest : IRequest<bool>
+        public class BulkValidateQueueDisplayQuery(List<QueueDisplayDto> QueueDisplaysToValidate) : IRequest<List<QueueDisplayDto>>
         {
-            public List<long> Id { get; set; }
-
-            public DeleteListQueueDisplayRequest(List<long> id)
-            {
-                Id = id;
-            }
+            public List<QueueDisplayDto> QueueDisplaysToValidate { get; } = QueueDisplaysToValidate;
         }
+
+        public class CreateListQueueDisplayRequest(List<QueueDisplayDto> QueueDisplayDtos) : IRequest<List<QueueDisplayDto>>
+        {
+            public List<QueueDisplayDto> QueueDisplayDtos { get; set; } = QueueDisplayDtos;
+        }
+
+        #endregion CREATE
+
+        #region Update
+
+        public class UpdateQueueDisplayRequest(QueueDisplayDto QueueDisplayDto) : IRequest<QueueDisplayDto>
+        {
+            public QueueDisplayDto QueueDisplayDto { get; set; } = QueueDisplayDto;
+        }
+
+        public class UpdateListQueueDisplayRequest(List<QueueDisplayDto> QueueDisplayDtos) : IRequest<List<QueueDisplayDto>>
+        {
+            public List<QueueDisplayDto> QueueDisplayDtos { get; set; } = QueueDisplayDtos;
+        }
+
+        #endregion Update
+
+        #region DELETE
+
+        public class DeleteQueueDisplayRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+        {
+            public long Id { get; set; } = id ?? 0;
+            public List<long> Ids { get; set; } = ids ?? [];
+        }
+
+        #endregion DELETE
     }
 }

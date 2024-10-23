@@ -4,16 +4,34 @@
     {
         #region GET
 
-        public class GetCountryQuery(Expression<Func<Country, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Country, object>>>? includes = null, Expression<Func<Country, Country>>? select = null) : IRequest<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetCountryQuery : IRequest<(List<CountryDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public Expression<Func<Country, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Country, object>>> Includes { get; set; }
+            public Expression<Func<Country, bool>> Predicate { get; set; }
+            public Expression<Func<Country, Country>> Select { get; set; }
 
-            public List<Expression<Func<Country, object>>> Includes { get; } = includes!;
-            public Expression<Func<Country, Country>>? Select { get; } = select!;
+            public List<(Expression<Func<Country, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetSingleCountryQuery : IRequest<CountryDto>
+        {
+            public List<Expression<Func<Country, object>>> Includes { get; set; }
+            public Expression<Func<Country, bool>> Predicate { get; set; }
+            public Expression<Func<Country, Country>> Select { get; set; }
+
+            public List<(Expression<Func<Country, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateCountryQuery(List<CountryDto> CountrysToValidate) : IRequest<List<CountryDto>>
@@ -35,9 +53,9 @@
             public CountryDto CountryDto { get; set; } = CountryDto;
         }
 
-        public class CreateListCountryRequest(List<CountryDto> GeneralConsultanCPPTDtos) : IRequest<List<CountryDto>>
+        public class CreateListCountryRequest(List<CountryDto> CountryDtos) : IRequest<List<CountryDto>>
         {
-            public List<CountryDto> CountryDtos { get; set; } = GeneralConsultanCPPTDtos;
+            public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
         }
 
         #endregion CREATE

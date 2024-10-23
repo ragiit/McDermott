@@ -12,15 +12,17 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<UpdateGoodsReceiptRequest, GoodsReceiptDto>,
         IRequestHandler<UpdateListGoodsReceiptRequest, List<GoodsReceiptDto>>,
         IRequestHandler<DeleteGoodsReceiptRequest, bool>,
-        IRequestHandler<GetGoodsReceiptDetailQuery, (List<GoodsReceiptDetailDto>, int pageIndex, int pageSize, int pageCount)>, //GoodsReceiptDetail
+        IRequestHandler<GetAllGoodsReceiptDetailQuery, List<GoodsReceiptDetailDto>>,//GoodsReceiptDetail
+        IRequestHandler<GetGoodsReceiptDetailQuery, (List<GoodsReceiptDetailDto>, int pageIndex, int pageSize, int pageCount)>, 
         IRequestHandler<GetSingleGoodsReceiptDetailQuery, GoodsReceiptDetailDto>, IRequestHandler<ValidateGoodsReceiptDetailQuery, bool>,
         IRequestHandler<BulkValidateGoodsReceiptDetailQuery, List<GoodsReceiptDetailDto>>,
         IRequestHandler<CreateGoodsReceiptDetailRequest, GoodsReceiptDetailDto>,
         IRequestHandler<CreateListGoodsReceiptDetailRequest, List<GoodsReceiptDetailDto>>,
         IRequestHandler<UpdateGoodsReceiptDetailRequest, GoodsReceiptDetailDto>,
         IRequestHandler<UpdateListGoodsReceiptDetailRequest, List<GoodsReceiptDetailDto>>,
-        IRequestHandler<DeleteGoodsReceiptPoductRequest, bool>,
-        IRequestHandler<GetGoodsReceiptLogQuery, (List<GoodsReceiptLogDto>, int pageIndex, int pageSize, int pageCount)>,  //GoodsReceiptLog
+        IRequestHandler<DeleteGoodsReceiptDetailRequest, bool>,
+        IRequestHandler<GetAllGoodsReceiptLogQuery, List<GoodsReceiptLogDto>>,//GoodsReceiptLog
+        IRequestHandler<GetGoodsReceiptLogQuery, (List<GoodsReceiptLogDto>, int pageIndex, int pageSize, int pageCount)>,  
         IRequestHandler<GetSingleGoodsReceiptLogQuery, GoodsReceiptLogDto>, IRequestHandler<ValidateGoodsReceiptLogQuery, bool>,
         IRequestHandler<BulkValidateGoodsReceiptLogQuery, List<GoodsReceiptLogDto>>, 
         IRequestHandler<CreateGoodsReceiptLogRequest, GoodsReceiptLogDto>,
@@ -109,6 +111,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         NumberPurchase = x.NumberPurchase,
                         SchenduleDate = x.SchenduleDate,
                         SourceId = x.SourceId,
+                        Status = x.Status,
                         Source = new Locations
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name,
@@ -196,6 +199,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         NumberPurchase = x.NumberPurchase,
                         SchenduleDate = x.SchenduleDate,
                         SourceId = x.SourceId,
+                        Status=x.Status,
                         Source = new Locations
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name,
@@ -218,6 +222,40 @@ namespace McDermott.Application.Features.Queries.Inventory
         #endregion GET Goods Receipt
 
         #region GET Goods Receipt Detail
+
+        public async Task<List<GoodsReceiptDetailDto>> Handle(GetAllGoodsReceiptDetailQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetAllGoodsReceiptDetailQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<GoodsReceiptDetail>? result))
+                {
+                    result = await _unitOfWork.Repository<GoodsReceiptDetail>().Entities
+                        .Include(x => x.GoodsReceipt)
+                        .Include(x=>x.Product)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<GoodsReceiptDetailDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public async Task<List<GoodsReceiptDetailDto>> Handle(BulkValidateGoodsReceiptDetailQuery request, CancellationToken cancellationToken)
         {
@@ -302,7 +340,17 @@ namespace McDermott.Application.Features.Queries.Inventory
                         ProductId = x.ProductId,
                         Product = new Product
                         {
-                            Name = x.Product == null ? string.Empty : x.Product.Name
+                            Name = x.Product == null ? string.Empty : x.Product.Name,
+                            UomId = x.Product.UomId,
+                            Uom = new Uom
+                            {
+                                Name = x.Product.Uom == null ? string.Empty : x.Product.Uom.Name
+                            },
+                            PurchaseUomId = x.Product.PurchaseUomId,
+                            PurchaseUom = new Uom
+                            {
+                                Name = x.Product.PurchaseUom == null ? string.Empty : x.Product.PurchaseUom.Name
+                            }
                         }
                     });
 
@@ -404,6 +452,38 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region GET Goods Receipt Log
 
+        public async Task<List<GoodsReceiptLogDto>> Handle(GetAllGoodsReceiptLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetAllGoodsReceiptLogQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<GoodsReceiptLog>? result))
+                {
+                    result = await _unitOfWork.Repository<GoodsReceiptLog>().Entities
+                        .Include(x => x.GoodsReceipt)
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                // Filter result based on request.Predicate if it's not null
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<GoodsReceiptLogDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async Task<List<GoodsReceiptLogDto>> Handle(BulkValidateGoodsReceiptLogQuery request, CancellationToken cancellationToken)
         {
             var GoodsReceiptLogDtos = request.GoodsReceiptLogToValidate;
@@ -482,6 +562,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         Id = x.Id,
                         GoodsReceiptId = x.GoodsReceiptId,
                         UserById = x.UserById,
+                        Status = x.Status,
                         UserBy = new User
                         {
                             Name = x.UserBy == null ? string.Empty : x.UserBy.Name
@@ -574,6 +655,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         Id = x.Id,
                         GoodsReceiptId = x.GoodsReceiptId,
                         UserById = x.UserById,
+                        Status = x.Status,
                         UserBy = new User
                         {
                             Name = x.UserBy == null ? string.Empty : x.UserBy.Name
@@ -848,7 +930,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region DELETE Goods Receipt Detail
 
-        public async Task<bool> Handle(DeleteGoodsReceiptPoductRequest request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteGoodsReceiptDetailRequest request, CancellationToken cancellationToken)
         {
             try
             {

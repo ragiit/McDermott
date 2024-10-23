@@ -1,10 +1,10 @@
- public class GetSingleProvinceQuery : IRequest<ProvinceDto>
+ public class GetSingleServiceQuery : IRequest<ServiceDto>
  {
-     public List<Expression<Func<Province, object>>> Includes { get; set; }
-     public Expression<Func<Province, bool>> Predicate { get; set; }
-     public Expression<Func<Province, Province>> Select { get; set; }
+     public List<Expression<Func<Service, object>>> Includes { get; set; }
+     public Expression<Func<Service, bool>> Predicate { get; set; }
+     public Expression<Func<Service, Service>> Select { get; set; }
 
-     public List<(Expression<Func<Province, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+     public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
      public bool IsDescending { get; set; } = false; // default to ascending
      public int PageIndex { get; set; } = 0;
@@ -13,13 +13,13 @@
      public string SearchTerm { get; set; }
  }
 
-public class GetProvinceQuery : IRequest<(List<ProvinceDto>, int PageIndex, int PageSize, int PageCount)>
+public class GetServiceQuery : IRequest<(List<ServiceDto>, int PageIndex, int PageSize, int PageCount)>
 {
-    public List<Expression<Func<Province, object>>> Includes { get; set; }
-    public Expression<Func<Province, bool>> Predicate { get; set; }
-    public Expression<Func<Province, Province>> Select { get; set; }
+    public List<Expression<Func<Service, object>>> Includes { get; set; }
+    public Expression<Func<Service, bool>> Predicate { get; set; }
+    public Expression<Func<Service, Service>> Select { get; set; }
 
-    public List<(Expression<Func<Province, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+    public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
     public bool IsDescending { get; set; } = false; // default to ascending
     public int PageIndex { get; set; } = 0;
@@ -28,14 +28,14 @@ public class GetProvinceQuery : IRequest<(List<ProvinceDto>, int PageIndex, int 
     public string SearchTerm { get; set; }
 }
   
-IRequestHandler<GetProvinceQuery, (List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleProvinceQuery, ProvinceDto>,
+IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleServiceQuery, ServiceDto>,
 
-public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProvinceQuery request, CancellationToken cancellationToken)
+public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetServiceQuery request, CancellationToken cancellationToken)
 {
     try
     {
-        var query = _unitOfWork.Repository<Province>().Entities.AsNoTracking(); 
+        var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking(); 
 
         if (request.Predicate is not null)
             query = query.Where(request.Predicate);
@@ -51,8 +51,8 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
             foreach (var additionalOrderBy in request.OrderByList.Skip(1))
             {
                 query = additionalOrderBy.IsDescending
-                    ? ((IOrderedQueryable<Province>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                    : ((IOrderedQueryable<Province>)query).ThenBy(additionalOrderBy.OrderBy);
+                    ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                    : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
             }
         }
 
@@ -69,7 +69,7 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
         {
             query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
                     );
         }
 
@@ -77,7 +77,7 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
         if (request.Select is not null)
             query = query.Select(request.Select);
         else
-            query = query.Select(x => new Province
+            query = query.Select(x => new Service
             {
                 Id = x.Id, 
             });
@@ -91,11 +91,11 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
                 cancellationToken
             );
 
-            return (pagedItems.Adapt<List<ProvinceDto>>(), request.PageIndex, request.PageSize, totalPages);
+            return (pagedItems.Adapt<List<ServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
         }
         else
         {
-            return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProvinceDto>>(), 0, 1, 1);
+            return ((await query.ToListAsync(cancellationToken)).Adapt<List<ServiceDto>>(), 0, 1, 1);
         }
     }
     catch (Exception ex)
@@ -106,11 +106,11 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
 }
 
 
-  public async Task<ProvinceDto> Handle(GetSingleProvinceQuery request, CancellationToken cancellationToken)
+  public async Task<ServiceDto> Handle(GetSingleServiceQuery request, CancellationToken cancellationToken)
  {
      try
      {
-         var query = _unitOfWork.Repository<Province>().Entities.AsNoTracking();
+         var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking();
 
          if (request.Predicate is not null)
              query = query.Where(request.Predicate);
@@ -126,8 +126,8 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
              foreach (var additionalOrderBy in request.OrderByList.Skip(1))
              {
                  query = additionalOrderBy.IsDescending
-                     ? ((IOrderedQueryable<Province>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                     : ((IOrderedQueryable<Province>)query).ThenBy(additionalOrderBy.OrderBy);
+                     ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                     : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
              }
          }
 
@@ -144,7 +144,7 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
          {
             query = query.Where(v =>
                 EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%")
+                EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
                 );
          }
 
@@ -152,12 +152,12 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
          if (request.Select is not null)
              query = query.Select(request.Select);
          else
-             query = query.Select(x => new Province
+             query = query.Select(x => new Service
              {
                  Id = x.Id, 
              });
 
-         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProvinceDto>();
+         return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ServiceDto>();
      }
      catch (Exception ex)
      {
@@ -169,7 +169,7 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
 
 
 
- var a = await Mediator.Send(new GetProvincesQuery
+ var a = await Mediator.Send(new GetServicesQuery
  {
      OrderByList =
      [
@@ -181,10 +181,10 @@ public async Task<(List<ProvinceDto>, int pageIndex, int pageSize, int pageCount
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleUserQuery
+var patienss = (await Mediator.Send(new GetSingleServiceQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new User
+    Select = x => new Service
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -199,7 +199,7 @@ var patienss = (await Mediator.Send(new GetSingleUserQuery
 
 
 
-var data = (await Mediator.Send(new GetSingleProvincesQuery
+var data = (await Mediator.Send(new GetSingleServicesQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -207,17 +207,17 @@ var data = (await Mediator.Send(new GetSingleProvincesQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Province
+    Select = x => new Service
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new User
+        Patient = new Service
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new User
+        Pratitioner = new Service
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
