@@ -115,6 +115,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 postMaintainanceProduct.ProductId = e.Id;
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == postMaintainance.LocationId));
+                if(stockProducts is null)
+                {
+                    ToastService.ShowInfo("The product does not have Stock yet...");
+                    return;
+                }
                 if (e.TraceAbility)
                 {
                     var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.Batch != null && x.Batch == postMaintainanceProduct.SerialNumber));
@@ -556,10 +561,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             try
             {
                 PanelVisible = true;
-                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 var result = await Mediator.Send(new GetMaintainanceProductQuery(searchTerm: searchTerm, pageSize: 0, pageIndex: 1));
                 getMaintainanceProduct = result.Item1;
-                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Maintainance))
+                var cekReference = getTransactionStocks.Where(x => x.SourceTable == nameof(Maintainance))
                            .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
                 if (cekReference != null)
