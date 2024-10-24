@@ -11,6 +11,19 @@ function downloadFileFromStream(fileName, streamReference) {
     });
 }
 
+// ini Kepae
+function saveFileExcellExporrt(fileName, streamReference) {
+    streamReference.arrayBuffer().then(function (arrayBuffer) {
+        const blob = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const anchorElement = document.createElement('a');
+        anchorElement.href = url;
+        anchorElement.download = fileName;
+        anchorElement.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
 window.BlazorDownloadFileExample = (fileName) => {
     const anchor = document.createElement('a');
     anchor.setAttribute('download', fileName);
@@ -20,6 +33,15 @@ window.BlazorDownloadFileExample = (fileName) => {
     anchor.click();
     document.body.removeChild(anchor);
 };
+
+function saveExportFile(filename, bytesBase64) {
+    var link = document.createElement('a');
+    link.download = filename;
+    link.href = "data:application/octet-stream;base64," + bytesBase64;
+    document.body.appendChild(link); // Needed for Firefox
+    link.click();
+    document.body.removeChild(link);
+}
 
 function getCanvasDataUrl(canvasId) {
     var canvas = document.getElementById(canvasId);
