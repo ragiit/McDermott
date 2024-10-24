@@ -241,7 +241,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 if ((TransferStockDto)args.DataItem is null)
                     return;
 
-                isActiveButton = ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Draft);
+                isActiveButton = ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Draft ) || ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Cancel);
             }
             catch (Exception ex)
             {

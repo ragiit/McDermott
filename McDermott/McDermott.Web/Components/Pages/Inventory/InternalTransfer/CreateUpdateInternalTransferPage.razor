@@ -45,30 +45,32 @@
                                         <div class="card-body">
                                             <div class="row justify-content-between">
                                                 <div class="col-auto align-self-start">
-                                                    @if (postTransferStocks.StockRequest == true)
+                                                    @if (getTransferStockProducts.Count > 0)
                                                     {
-                                                        <DxButton Text="Request" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft && (UserLogin.IsPharmacy == false ))" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-clipboard-check" Click="Request"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft && (UserLogin.IsPharmacy == false ))" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                        @if (postTransferStocks.StockRequest == true)
+                                                        {
+                                                            <DxButton Text="Request" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft && (UserLogin.IsPharmacy == false ))" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-clipboard-check" Click="Request"></DxButton>
+                                                            <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft && (UserLogin.IsPharmacy == false ))" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
 
-                                                        <DxButton Text="Approve Request" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Request && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Approv_Check"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Request && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                            <DxButton Text="Approve Request" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Request && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Approv_Check"></DxButton>
+                                                            <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Request && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
 
-                                                        <DxButton Text="Ready" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.ApproveRequest && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.ApproveRequest && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                            <DxButton Text="Ready" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.ApproveRequest && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
+                                                            <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.ApproveRequest && UserLogin.IsPharmacy == true)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
 
-                                                        <DxButton Text="Validate" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                            <DxButton Text="Validate" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
+                                                            <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                        }
+                                                        else
+                                                        {
+                                                            <DxButton Text="Ready" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
+                                                            <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+
+                                                            <DxButton Text="Validate" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
+                                                            <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
+                                                        }
+
                                                     }
-                                                    else
-                                                    {
-                                                        <DxButton Text="Ready" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="Ready"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Draft)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-
-                                                        <DxButton Text="Validate" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Primary" Click="validation" IconCssClass="fa-solid fa-check"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@(postTransferStocks.Status == EnumStatusInternalTransfer.Ready)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel"></DxButton>
-                                                    }
-
-
                                                 </div>
 
                                                 <div class="col-auto align-self-start">
@@ -82,7 +84,6 @@
                             }
                             <div class="card">
                                 <div class="card-header">
-                                    
                                 </div>
                                 <div class="card-body">
 
@@ -213,18 +214,13 @@
                                                         <EditFormTemplate Context="EditFormContextt">
                                                             @{
                                                                 postTransferStockProducts = (TransferStockProductDto)EditFormContextt.EditModel;
-
-                                                                if (postTransferStockProducts?.Product?.TraceAbility == true)
-                                                                {
-                                                                    postTransferStockProducts.TraceAvability = true;
-                                                                }
-                                                                else if (postTransferStockProducts?.Product?.TraceAbility == false)
-                                                                {
-                                                                    postTransferStockProducts.TraceAvability = false;
-                                                                }
-
-
+                                                                // Ambil produk yang dipilih
+                                                                var selectedProduct = getProducts.FirstOrDefault(x => x.Id == postTransferStockProducts?.ProductId);
+                                                                postTransferStockProducts.UomName = selectedProduct?.Uom.Name;
+                                                                // Set TraceAvability berdasarkan TraceAbility produk
+                                                                postTransferStockProducts.TraceAvability = selectedProduct?.TraceAbility ?? false;
                                                             }
+
                                                             <DxFormLayout CssClass="mt w-100">
                                                                 <div class="col-md-6">
                                                                     <DxFormLayoutItem Caption="Product Name" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -233,7 +229,7 @@
                                                                                       @ref="refProductComboBox"
                                                                                       @bind-Value="@postTransferStockProducts.ProductId"
                                                                                       ReadOnly="@(postTransferStocks.Id != 0 && postTransferStocks.Status != EnumStatusInternalTransfer.Draft)"
-                                                                                      SelectedItemChanged="@((ProductDto product)=> SelectedItemByProduct(product))"
+                                                                                      SelectedItemChanged="@((ProductDto product) => SelectedItemByProduct(product))"
                                                                                       TextFieldName="Name"
                                                                                       ValueFieldName="Id"
                                                                                       TextChanged="((string e) => OnInputProductChanged(e))">
@@ -253,23 +249,24 @@
                                                                                 <DxListEditorColumn FieldName="@nameof(Locations.ParentLocation.Name)" Caption="Parent" />
                                                                             </Columns>
                                                                         </MyDxComboBox>
-                                                                        <ValidationMessage For="@(()=>postTransferStockProducts.ProductId)"></ValidationMessage>
+                                                                        <ValidationMessage For="@(() => postTransferStockProducts.ProductId)" />
                                                                     </DxFormLayoutItem>
                                                                 </div>
+
                                                                 <div class="col-md-6">
-                                                                    <DxFormLayoutItem Caption="Current Stock " CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                    <DxFormLayoutItem Caption="Current Stock" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                         <DxSpinEdit @bind-Value="@currentStocks"
                                                                                     NullText="Input Stock To Be Sent..."
                                                                                     MinValue="0"
                                                                                     ReadOnly
                                                                                     ShowSpinButtons="false"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                    ShowValidationIcon="true"></DxSpinEdit>
-                                                                        <ValidationMessage For="@(()=>postTransferStockProducts.CurrentStock)"></ValidationMessage>
+                                                                                    ShowValidationIcon="true" />
+                                                                        <ValidationMessage For="@(() => postTransferStockProducts.CurrentStock)" />
                                                                     </DxFormLayoutItem>
-
                                                                 </div>
                                                             </DxFormLayout>
+
                                                             <DxFormLayout CssClass="mt w-100">
                                                                 <div class="col-md-6">
                                                                     <DxFormLayoutItem Caption="Unit Of Measure" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -277,24 +274,26 @@
                                                                                    NullText="Unit Of Measure"
                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                    ReadOnly
-                                                                                   ShowValidationIcon="true"></DxTextBox>
+                                                                                   ShowValidationIcon="true" />
                                                                     </DxFormLayoutItem>
                                                                 </div>
+
                                                                 <div class="col-md-6">
                                                                     <DxFormLayoutItem Caption="Stock Shipped" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                        <DxSpinEdit Value="postTransferStockProducts.QtyStock"
+                                                                        <DxSpinEdit Value="@postTransferStockProducts.QtyStock"
                                                                                     ValueExpression="@(()=>postTransferStockProducts.QtyStock)"
                                                                                     NullText="Input Stock To Be Sent..."
                                                                                     MinValue="0"
                                                                                     ReadOnly="@(postTransferStocks.Id != 0 && postTransferStocks.Status != EnumStatusInternalTransfer.Draft)"
-                                                                                    ValueChanged="@((long value)=>checkStock(value))"
+                                                                                    ValueChanged="@((long value) => checkStock(value))"
                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                    ShowValidationIcon="true"></DxSpinEdit>
-                                                                        <ValidationMessage For="@(()=>postTransferStockProducts.QtyStock)"></ValidationMessage>
+                                                                                    ShowValidationIcon="true" />
+                                                                        <ValidationMessage For="@(() => postTransferStockProducts.QtyStock)" />
                                                                     </DxFormLayoutItem>
                                                                 </div>
                                                             </DxFormLayout>
-                                                            @if (postTransferStockProducts.TraceAvability != false)
+
+                                                            @if (postTransferStockProducts.TraceAvability)
                                                             {
                                                                 <DxFormLayout CssClass="mt w-100">
                                                                     <div class="col-md-6">
@@ -304,28 +303,26 @@
                                                                                         NullText="Select Batch..."
                                                                                         @bind-Value="@postTransferStockProducts.Batch"
                                                                                         ReadOnly="@(postTransferStocks.Id != 0 && postTransferStocks.Status != EnumStatusInternalTransfer.Draft)"
-                                                                                        SelectedItemChanged="@((string value)=> SelectedBatch(value))"
+                                                                                        SelectedItemChanged="@((string value) => SelectedBatch(value))"
                                                                                         ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                        FilteringMode="@DataGridFilteringMode.Contains">
-                                                                            </DxComboBox>
+                                                                                        FilteringMode="@DataGridFilteringMode.Contains" />
                                                                             <ValidationMessage For="@(() => postTransferStockProducts.Batch)" />
                                                                         </DxFormLayoutItem>
                                                                     </div>
+
                                                                     <div class="col-md-6">
                                                                         <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                             <DxDateEdit ShowValidationIcon="true"
                                                                                         DisplayFormat="dd MMMM yyyy"
                                                                                         ReadOnly="@(postTransferStocks.Id != 0 && postTransferStocks.Status != EnumStatusInternalTransfer.Draft)"
                                                                                         @bind-Date="@postTransferStockProducts.ExpiredDate"
-                                                                                        NullText="Expired Date">
-                                                                            </DxDateEdit>
+                                                                                        NullText="Expired Date" />
                                                                         </DxFormLayoutItem>
-
                                                                     </div>
                                                                 </DxFormLayout>
                                                             }
-                                                            
                                                         </EditFormTemplate>
+
                                                     </MyGrid>
                                                 </Items>
                                             </DxFormLayoutGroup>

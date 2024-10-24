@@ -2,6 +2,7 @@
 using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintainanceProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
 
@@ -25,7 +26,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<DrugDosageDto> GetDrugDosage = [];
         private List<LocationDto> GetLocations = [];
         private List<StockProductDto> StockProducts = [];
-        private List<TransactionStockDto> TransactionStocks = [];
+        private List<TransactionStockDto> getTransactionStocks = [];
         private List<MaintainanceDto> GetMaintainance = [];
         private List<MaintainanceProductDto> GetMaintainanceProduct = [];
         private List<MaintainanceProductDto> GetMaintainanceScrap = [];
@@ -271,14 +272,20 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             await GetUserInfo();
             await LoadDataUom();
             await LoadDataUomPurchase();
-            await LoadData();
+            await LoadDataAsync();
             await LoadDataDrugForm();
             await LoadDataDrugRoute();
             await LoadDataDrugDosage();
+            await LoadData();
             //await LoadDataBPJSCl();
             //await LoadDataLocation();
             await LoadDataProductCategory();
             PanelVisible = false;
+        }
+
+        private async Task LoadDataAsync()
+        {
+            getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -315,7 +322,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
 
                 // Medicament-specific details
-                if (PostProduct.HospitalType == "Medicament")
+                    if (PostProduct.HospitalType == "Medicament")
                 {
                     if (PostMedicaments.ProductId != null)
                     {
@@ -325,21 +332,21 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                         selectedActiveComponents = ActiveComponents
                             .Where(a => PostMedicaments.ActiveComponentId?.Contains(a.Id) == true).ToList();
 
-                        TotalQty = TransactionStocks
-                            .Where(x => x.ProductId == PostProduct.Id && x.Validate)
+                        TotalQty = getTransactionStocks
+                            .Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
                             .Sum(z => z.Quantity);
                     }
                 }
                 // Medical equipment-specific details
-                else if (PostProduct.HospitalType == "Medical Equipment")
+                else if (PostProduct.HospitalType != "Medical Equipment")
                 {
                     PostProductDetails.Brand = PostProduct.Brand;
                     HandleMedicalEquipmentStock();
                 }
                 else
                 {
-                    TotalQty = TransactionStocks
-                        .Where(x => x.ProductId == PostProduct.Id && x.Validate)
+                    TotalQty = getTransactionStocks
+                        .Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
                         .Sum(z => z.Quantity);
                 }
             }
@@ -378,7 +385,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             TotalMaintainanceQty = GetMaintainanceProduct
                 .Count(x => x.ProductId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap);
 
-            TotalQty = TransactionStocks
+            TotalQty = getTransactionStocks
                 .Where(x => x.ProductId == PostProduct.Id && x.Validate)
                 .Sum(z => z.Quantity);
         }
@@ -822,7 +829,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
                     if (PostProduct.TraceAbility == true)
                     {
-                        StockProducts = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
+                        StockProducts = getTransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
                         .GroupBy(z => new { z.ProductId, z.Batch, z.LocationId, z.UomId })
                         .Select(y => new StockProductDto
                         {
@@ -841,7 +848,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     }
                     else
                     {
-                        StockProducts = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
+                        StockProducts = getTransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
                         .GroupBy(z => new { z.ProductId, z.LocationId, z.UomId })
                         .Select(y => new StockProductDto
                         {
@@ -859,7 +866,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 else
                 {
                     // Jika ada item yang dipilih, gunakan produk yang dipilih
-                    StockProducts = TransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
+                    StockProducts = getTransactionStocks.Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
                         .GroupBy(z => new { z.ProductId, z.Batch, z.LocationId })
                         .Select(y => new StockProductDto
                         {

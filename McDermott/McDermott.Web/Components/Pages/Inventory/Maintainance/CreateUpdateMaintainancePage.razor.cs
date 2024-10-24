@@ -17,7 +17,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private List<UserDto> getRequestBy = [];
         private List<ProductDto> getProduct = [];
         private List<LocationDto> getLocation = [];
-        private List<TransactionStockDto> TransactionStocks = [];
+        private List<TransactionStockDto> getTransactionStocks = [];
         private MaintainanceDto postMaintainance = new();
         private MaintainanceDto getMaintainanceById = new();
         private MaintainanceProductDto getMaintainanceProductById = new();
@@ -105,7 +105,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
         private async Task selectByProduct(ProductDto e)
         {
-
             try
             {
                 Batch.Clear();
@@ -170,14 +169,16 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             if (stockProduct != null)
             {
                 currentExpiryDate = stockProduct.ExpiredDate;
-                postMaintainanceProduct.Expired =  Helper.CalculateNewExpiryDate(currentExpiryDate, postMaintainance.RepeatNumber, postMaintainance.RepeatWork);
+                if (currentExpiryDate is not null)
+                {
+                    postMaintainanceProduct.Expired = Helper.CalculateNewExpiryDate(currentExpiryDate, postMaintainance.RepeatNumber, postMaintainance.RepeatWork);
+                }
             }
         }
 
         private async Task selectByLocation(LocationDto value)
         {
             postMaintainance.LocationId = value.Id;
-
         }
 
         private List<string> RepeatWork = new List<string>()
@@ -249,7 +250,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         }
 
         #endregion UserLoginAndAccessRole
-
       
         #region Load data
 
@@ -280,8 +280,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             }
              
         }
-
-
         private async Task LoadDataDetail(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -360,8 +358,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-           
+            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));           
             getProduct = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
             totalCount = result.pageCount;
             PanelVisible = false;

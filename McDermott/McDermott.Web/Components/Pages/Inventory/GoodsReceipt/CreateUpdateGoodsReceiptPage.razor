@@ -13,27 +13,28 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        <EditForm Model="@postGoodsReceipt" @onkeypress="@KeyPressHandler" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
-                            <DataAnnotationsValidator />
-                            <AntiforgeryToken />
-                            @if (postGoodsReceipt.Id != 0)
-                            {
-                                <div class="row justify-content-end mb-3">
-                                    <div class="col-auto align-self-end">
-                                        <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                            <DxTab Text="Draft" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Draft)"></DxTab>
-                                            <DxTab Text="Process" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Process)"></DxTab>
-                                            <DxTab Text="Done" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Done)"></DxTab>
-                                            <DxTab Text="Cancel" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Cancel)"></DxTab>
-                                        </DxTabs>
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="true"
+                                        Text="Fetching Data...">
+                            <EditForm Model="@postGoodsReceipt" @onkeypress="@KeyPressHandler" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+                                <DataAnnotationsValidator />
+                                <AntiforgeryToken />
+                                @if (postGoodsReceipt.Id != 0)
+                                {
+                                    <div class="row justify-content-end mb-3">
+                                        <div class="col-auto align-self-end">
+                                            <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                                <DxTab Text="Draft" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Draft)"></DxTab>
+                                                <DxTab Text="Process" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Process)"></DxTab>
+                                                <DxTab Text="Done" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Done)"></DxTab>
+                                                <DxTab Text="Cancel" Enabled="@(postGoodsReceipt.Status == EnumStatusGoodsReceipt.Cancel)"></DxTab>
+                                            </DxTabs>
+                                        </div>
                                     </div>
-                                </div>
-                            }
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="true"
-                                            Text="Fetching Data...">
+                                }
+
 
                                 @if (postGoodsReceipt.Status != EnumStatusGoodsReceipt.Done && postGoodsReceipt.Status != EnumStatusGoodsReceipt.Cancel)
                                 {
@@ -272,8 +273,8 @@
                                         </DxFormLayout>
                                     </div>
                                 </div>
-                            </DxLoadingPanel>
-                        </EditForm>
+                            </EditForm>
+                        </DxLoadingPanel>
 
 
 

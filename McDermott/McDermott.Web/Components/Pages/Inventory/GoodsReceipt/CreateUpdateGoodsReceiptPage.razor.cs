@@ -694,7 +694,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 }
 
                 ToastService.ClearSuccessToasts();
-                await LoadData();
+                NavigationManager.NavigateTo($"inventory/goods-receipts/{EnumPageMode.Update.GetDisplayName()}?Id={goodsReceipt.Id}", true);
                 StateHasChanged();
             }
             catch (Exception ex)

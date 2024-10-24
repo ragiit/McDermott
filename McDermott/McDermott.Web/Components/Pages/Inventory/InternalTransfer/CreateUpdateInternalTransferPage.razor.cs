@@ -105,6 +105,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             await LoadDataDestination();
             await LoadDataSource();
             await LoadDataProduct();
+            await LoadDataAsync();
             PanelVisible = false;
         }
 
@@ -125,7 +126,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                         return;
                     }
                     postTransferStocks = result ?? new();
-                    await LoadDataProduct();
+                    await LoadDataDetail();
                 }
                 PanelVisible = false;
             }
@@ -135,7 +136,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             }
         }
 
-        private async Task LoadDataProduct()
+        private async Task LoadDataDetail()
         {
             try
             {
@@ -145,6 +146,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     Predicate = x => x.TransferStockId == postTransferStocks.Id
 
                 });
+                getTransferStockProducts = result.Item1;
                 PanelVisible = false;
             }
             catch
@@ -155,6 +157,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
         private async Task LoadDataAsync()
         {
+            PanelVisible = true;
             getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
             var resultGet = await Mediator.Send(new GetTransferStockQuery
             {
@@ -162,6 +165,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             });
             getTransferStocks = resultGet.Item1;
             getUoms = await Mediator.Send(new GetAllUomQuery());
+            PanelVisible = false;
         }
 
         #endregion
@@ -341,9 +345,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
         private async Task SelectedBatch(string value)
         {
-            // Reset FormInventoryAdjustmentDetail fields to default values
-
-            // Return if stockProduct is null
+            // Reset fields to default if the batch value is null
             if (value is null)
             {
                 postTransferStockProducts.TransactionStockId = null;
@@ -353,10 +355,10 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 return;
             }
 
-            // Assign stockProduct to Batch
+            // Assign batch value
             postTransferStockProducts.Batch = value;
 
-            // Proceed only if ProductId is not null
+            // Proceed if ProductId is not null
             if (postTransferStockProducts.ProductId is not null)
             {
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
@@ -365,23 +367,28 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     s.Validate == true
                 ));
 
-                // Find the first matching product
+                // Get the first matching product
                 var matchedProduct = stockProducts.FirstOrDefault(x =>
-                    x.LocationId == postTransferStocks.SourceId &&
                     x.ProductId == postTransferStockProducts.ProductId &&
+                    x.LocationId == postTransferStocks.SourceId &&
                     x.Batch == postTransferStockProducts.Batch
                 );
 
-                // Set UomId and ExpiredDate from the matched product
+                // Assign UomId, UomName, and ExpiredDate
                 postTransferStockProducts.UomId = matchedProduct?.UomId;
+                postTransferStockProducts.UomName = matchedProduct?.Uom?.Name;
                 postTransferStockProducts.ExpiredDate = matchedProduct?.ExpiredDate;
 
-                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == postTransferStockProducts.ProductId
-                && x.LocationId == postTransferStocks.SourceId && x.Batch == postTransferStockProducts.Batch));
+                // Calculate the current stock for the batch
+                var batchStock = await Mediator.Send(new GetTransactionStockQuery(x =>
+                    x.Validate == true &&
+                    x.ProductId == postTransferStockProducts.ProductId &&
+                    x.LocationId == postTransferStocks.SourceId &&
+                    x.Batch == postTransferStockProducts.Batch
+                ));
 
-                // Calculate the sum of quantities for batch products
-                postTransferStockProducts.CurrentStock = aa.Sum(x => x.Quantity);
-                currentStocks = aa.Sum(x => x.Quantity);
+                postTransferStockProducts.CurrentStock = batchStock.Sum(x => x.Quantity);
+                currentStocks = postTransferStockProducts.CurrentStock;
             }
         }
 
@@ -547,14 +554,14 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     postTransferStockLogs.Status = EnumStatusInternalTransfer.Draft;
 
                     await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
-                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}");
+                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}", true);
 
                 }
                 else
                 {
                     var tempTransferStock = await Mediator.Send(new UpdateTransferStockRequest(postTransferStocks));
                     ToastService.ShowSuccess("Update Data Success...");
-                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}");
+                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}",true);
                 }
 
                
@@ -568,7 +575,27 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
         private async Task OnSaveProduct()
         {
+            try
+            {
+                if(postTransferStockProducts.Id == 0)
+                {
+                    postTransferStockProducts.TransferStockId = postTransferStocks.Id;
+                    await Mediator.Send(new CreateTransferStockProductRequest(postTransferStockProducts));
+                    ToastService.ShowSuccess("Save Data Product Success..");
+                }
+                else
+                {
+                    await Mediator.Send(new UpdateTransferStockProductRequest(postTransferStockProducts));
+                    ToastService.ShowSuccess("Save Data Product Success..");
+                }
 
+                await LoadDataDetail();
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError(ex.Message);
+            }
         }
 
         #endregion Function Save
@@ -589,9 +616,24 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         private async Task EditItem_Click(IGrid context)
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            postTransferStockProducts = (TransferStockProductDto)context.SelectedDataItem;
 
+            if (context.SelectedDataItem == null) return;
+
+            var selectedItem = context.SelectedDataItem.Adapt<TransferStockProductDto>();
+            postTransferStockProducts = getTransferStockProducts.FirstOrDefault(x => x.Id == selectedItem.Id);
+
+            var product = getProducts.FirstOrDefault(x => x.Id == postTransferStockProducts?.ProductId);
+            if (product?.TraceAbility == true)
+            {
+                await SelectedBatch(postTransferStockProducts.Batch);
+                postTransferStockProducts.TraceAvability = true;
+            }
+            else
+            {
+                await SelectedItemByProduct(product);
+            }
         }
+
 
         private void DeleteItem_Click()
         {

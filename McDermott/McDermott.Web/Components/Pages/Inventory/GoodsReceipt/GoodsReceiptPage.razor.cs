@@ -279,7 +279,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                             .Where(x => x.GoodsReceiptId == Uid)
                             .Select(x => x.Id)
                             .ToList();
-                        await Mediator.Send(new DeleteGoodsReceiptDetailRequest(ids: DetailsIdsToDelete));
+                        await Mediator.Send(new DeleteGoodsReceiptLogRequest(ids: DetailsIdsToDelete));
                     }
                     //Delete list Id GoodsReceipt
                     await Mediator.Send(new DeleteGoodsReceiptRequest(ids: ids));

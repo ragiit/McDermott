@@ -12,6 +12,8 @@
         display: flex;
         align-items: center;
         cursor: pointer;
+        border: 2px solid #8E8A8AE0;
+        border-radius: 5px;
     }
 
         .toolbar-item:hover {
@@ -58,7 +60,7 @@
                                                 <a @onclick="NewTableStock_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-boxes-stacked"></i></span>
                                                     <span>On Hand</span>
-                                                    <span class="ms-2 badge bg-secondary">@TotalScrapQty @NameUom</span>
+                                                    <span class="ms-2 badge bg-secondary">@TotalQty @NameUom</span>
                                                 </a>
                                             }
                                             else
@@ -77,7 +79,7 @@
                                                 <a @onclick="NewTableStock_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-boxes-stacked"></i></span>
                                                     <span>On Hand</span>
-                                                    <span class="ms-2 badge bg-secondary">@TotalScrapQty Unit</span>
+                                                    <span class="ms-2 badge bg-secondary">@TotalQty Unit</span>
                                                 </a>
                                                 <div class="divider border-start"></div>
                                                 <a @onclick="NewTableEquipment_Item" class="toolbar-item">

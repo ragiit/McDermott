@@ -36,12 +36,13 @@
                                     <div class="card-body">
                                         <div class="row justify-content-between">
                                             <div class="col-auto align-self-start">
-                                                <DxButton Text="In Progress" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="InProgress_Click"></DxButton>
-                                                <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
-                                                <DxButton Text="Repair" Visible="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Repaired_Click"></DxButton>
-                                                <DxButton Text="Scrap" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired || postMaintainance.Status == EnumStatusMaintainance.InProgress)" RenderStyle="ButtonRenderStyle.Warning" IconCssClass="fa-solid fa-check" Click="Scrap_Click"></DxButton>
-                                                <DxButton Text="Done" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-check" Click="Done_Click"></DxButton>
-                                                <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired ||postMaintainance.Status == EnumStatusMaintainance.InProgress || postMaintainance.Status == EnumStatusMaintainance.Scrap)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
+                                                @if (getMaintainanceProduct.Count > 0)
+                                                {
+                                                    <DxButton Text="In Progress" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="InProgress_Click"></DxButton>
+                                                    <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
+                                                    <DxButton Text="Done" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-check" Click="Done_Click"></DxButton>
+                                                    <DxButton Text="Cancel" Visible="@(postMaintainance.Status == EnumStatusMaintainance.Repaired ||postMaintainance.Status == EnumStatusMaintainance.InProgress || postMaintainance.Status == EnumStatusMaintainance.Scrap)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
+                                                }
                                             </div>
                                             <div class="col-auto align-self-start">
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@(postMaintainance.Id == 0 || postMaintainance.Status == EnumStatusMaintainance.Request)" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true" Click="OnSave"></DxButton>
@@ -51,7 +52,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         }
 
                         <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -314,9 +314,12 @@
                                                                         </div>
                                                                         <div class="col-6">
                                                                             <DxFormLayout CssClass="w-100">
-                                                                                <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                                    <DxDateEdit @bind-Date="@postMaintainanceProduct.Expired" ReadOnly></DxDateEdit>
-                                                                                </DxFormLayoutItem>
+                                                                                @if (postMaintainance.Recurrent == true)
+                                                                                {
+                                                                                    <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                        <DxDateEdit @bind-Date="@postMaintainanceProduct.Expired" ReadOnly></DxDateEdit>
+                                                                                    </DxFormLayoutItem>
+                                                                                }
                                                                                 <DxFormLayoutItem Caption="Note" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <DxMemo @bind-Text="@postMaintainanceProduct.Note" NullText="Entri Note Here..."></DxMemo>
                                                                                 </DxFormLayoutItem>
