@@ -1,8 +1,7 @@
 ﻿using Aspose.Words.Saving;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
-using McDermott.Domain.Entities;
-using McDermott.Persistence.Migrations;
+using McDermott.Domain.Entities; 
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules

@@ -125,6 +125,7 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                     });
                     Users = r.Item1;
                     GeneralConsultanMedicalSupport.EmployeeId = cek.PatientId;
+                    SelectedPatient = Users.FirstOrDefault(x => x.Id == cek.PatientId) ?? new();
                 }
             }
             else

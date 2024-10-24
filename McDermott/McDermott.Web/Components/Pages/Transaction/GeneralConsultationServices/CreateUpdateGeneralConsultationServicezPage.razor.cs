@@ -1146,6 +1146,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 GeneralConsultanServiceDto res = new();
 
+                GeneralConsultanService.IsGC = true;
+
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -1538,6 +1540,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         default:
                             break;
                     }
+
+                    GeneralConsultanService.IsGC = true;
 
                     if (GeneralConsultanService.Id == 0)
                     {

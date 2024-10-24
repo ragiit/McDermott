@@ -476,6 +476,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                     Predicate = x => x.Id == Accident.ProjectId,
                 })).Item1;
 
+                Services = (await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.Id == GeneralConsultanService.ServiceId
+                })).Item1; 
+
                 UserForm = resultGC.Patient ?? new();
 
                 Patients = (await Mediator.Send(new GetUserQueryNew
@@ -1293,7 +1298,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                     {
                         var res = await Mediator.Send(new CreateGeneralConsultanServiceRequest(GeneralConsultanService));
                         Accident.GeneralConsultanServiceId = res.Id;
-                        await Mediator.Send(new CreateAccidentRequest(Accident));
+                        Accident = await Mediator.Send(new CreateAccidentRequest(Accident));
                     }
                     else
                     {
@@ -1413,7 +1418,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                     {
                         var res = await Mediator.Send(new CreateGeneralConsultanServiceRequest(GeneralConsultanService));
                         Accident.GeneralConsultanServiceId = res.Id;
-                        await Mediator.Send(new CreateAccidentRequest(Accident));
+                        Accident = await Mediator.Send(new CreateAccidentRequest(Accident));
                     }
                     else
                     {
@@ -1423,6 +1428,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                 }
 
                 GeneralConsultanService = await GetGeneralConsultanServiceById();
+                Id = Accident.Id;
                 Accident = await GetAccidentById();
 
                 if (PageMode == EnumPageMode.Create.GetDisplayName())

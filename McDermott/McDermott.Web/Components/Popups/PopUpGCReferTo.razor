@@ -890,16 +890,45 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadDataPatient();
-        await LoadDataService();
-        await LoadDataPhysicion();
+        // await LoadDataService();
+        // await LoadDataPhysicion();
+
+        var result = await Mediator.Send(new GetServiceQuery
+            {
+                Predicate = x => x.Id == GeneralConsultanService.ServiceId
+            });
+        Services = result.Item1;
+        var results = await Mediator.Send(new GetUserQueryNew
+            {
+                Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
+                Select = x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth,
+                    IsPhysicion = x.IsPhysicion,
+                    IsNurse = x.IsNurse,
+                }
+            });
+        Physicions = results.Item1;
 
         if (TempInsurancePolicies.Count > 0)
             InsurancePolicies = TempInsurancePolicies;
 
 
-        await SendPCareGetRefrensiKhusus();
-        await SendPcareGetSpesialis();
-        await SendPcareGetSpesialisSarana();
+        try
+        {
+            await SendPCareGetRefrensiKhusus();
+            await SendPcareGetSpesialis();
+            await SendPcareGetSpesialisSarana();
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowInfo("Error when sending Pcare Web Services...");
+        }
     }
 
     private async Task SendPCareGetRefrensiKhusus()
@@ -1034,43 +1063,38 @@
         try
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetUserQuery2(
-                    x => x.IsPatient == true,
-                    searchTerm: refPatientComboBox?.Text ?? "",
-                    pageSize: pageSize,
-                    pageIndex:
-                    pageIndex,
-                    includes: [],
-                    select: x => new User
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            NoRm = x.NoRm,
-                            Email = x.Email,
-                            MobilePhone = x.MobilePhone,
-                            Gender = x.Gender,
-                            DateOfBirth = x.DateOfBirth,
-                            NoId = x.NoId,
-                            CurrentMobile = x.CurrentMobile,
+            var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsPatient == true && x.Id == UserForm.Id,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile,
 
-                            IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
-                            IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
-                            IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
-                            WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
-                            FoodPatientAllergyIds = x.FoodPatientAllergyIds,
-                            PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
 
-                            IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
-                            FamilyMedicalHistory = x.FamilyMedicalHistory,
-                            FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                        FamilyMedicalHistory = x.FamilyMedicalHistory,
+                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
 
-                            IsMedicationHistory = x.IsMedicationHistory,
-                            MedicationHistory = x.MedicationHistory,
-                            PastMedicalHistory = x.PastMedicalHistory
-                        }
-            ));
+                        IsMedicationHistory = x.IsMedicationHistory,
+                        MedicationHistory = x.MedicationHistory,
+                        PastMedicalHistory = x.PastMedicalHistory
+                    }
+                });
             Patients = result.Item1;
-            totalCountPatient = result.pageCount;
             PanelVisible = false;
         }
         catch (Exception ex)
@@ -1158,11 +1182,11 @@
             PanelVisible = true;
 
             var result = await Mediator.Send(new GetServiceQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refServiceComboBox?.Text ?? ""
-            });
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refServiceComboBox?.Text ?? ""
+                });
             Services = result.Item1;
             totalCountService = result.PageCount;
 
@@ -1262,9 +1286,9 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-                                [
-                                    x => x.Insurance
-                                ],
+                                        [
+                                            x => x.Insurance
+                                        ],
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -1293,27 +1317,23 @@
         try
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetUserQuery2(
-                           x => x.IsDoctor == true,
-                           searchTerm: refPhysicionComboBox?.Text ?? "",
-                           pageSize: pageSize,
-                           pageIndex:
-                           pageIndex,
-                           includes: [],
-                           select: x => new User
-                               {
-                                   Id = x.Id,
-                                   Name = x.Name,
-                                   Email = x.Email,
-                                   MobilePhone = x.MobilePhone,
-                                   Gender = x.Gender,
-                                   DateOfBirth = x.DateOfBirth,
-                                   IsPhysicion = x.IsPhysicion,
-                                   IsNurse = x.IsNurse,
-                               }
-                       ));
+            var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsDoctor == true,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        IsPhysicion = x.IsPhysicion,
+                        IsNurse = x.IsNurse,
+                    }
+                });
             Physicions = result.Item1;
-            totalCountPhysicion = result.pageCount;
+            totalCountPhysicion = result.PageCount;
             PanelVisible = false;
         }
         catch (Exception ex)

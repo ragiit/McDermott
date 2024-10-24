@@ -1305,6 +1305,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                 PanelVisible = true;
                 var result = await Mediator.Send(new GetServiceQuery
                 {
+                    Predicate = x => x.IsVaccination == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = refServiceComboBox?.Text ?? ""

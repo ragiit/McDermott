@@ -980,6 +980,10 @@ namespace McDermott.Application.Features.Queries.Transaction
                         InsurancePolicyId = request.GeneralConsultanServiceDto.InsurancePolicyId,
                         RegistrationDate = request.GeneralConsultanServiceDto.RegistrationDate,
                         Status = request.Status,
+                        IsGC = request.GeneralConsultanServiceDto.IsGC,
+                        IsVaccination = request.GeneralConsultanServiceDto.IsVaccination,
+                        IsMcu = request.GeneralConsultanServiceDto.IsMcu,
+                        IsAccident = request.GeneralConsultanServiceDto.IsAccident,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
                     };
@@ -1007,6 +1011,10 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Payment = request.GeneralConsultanServiceDto.Payment,
                         InsurancePolicyId = request.GeneralConsultanServiceDto.InsurancePolicyId,
                         Status = EnumStatusGeneralConsultantService.Planned,
+                        IsGC = request.GeneralConsultanServiceDto.IsGC,
+                        IsVaccination = request.GeneralConsultanServiceDto.IsVaccination,
+                        IsMcu = request.GeneralConsultanServiceDto.IsMcu,
+                        IsAccident = request.GeneralConsultanServiceDto.IsAccident,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
                     };

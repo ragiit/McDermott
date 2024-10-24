@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateTamble : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -773,31 +773,6 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DoctorSchedules",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    ServiceId = table.Column<long>(type: "bigint", nullable: false),
-                    PhysicionIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DoctorSchedules", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DoctorSchedules_Services_ServiceId",
-                        column: x => x.ServiceId,
-                        principalTable: "Services",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Uoms",
                 columns: table => new
                 {
@@ -882,35 +857,6 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_LabTestDetails_LabUoms_LabUomId",
                         column: x => x.LabUomId,
                         principalTable: "LabUoms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DoctorScheduleDetails",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DoctorScheduleId = table.Column<long>(type: "bigint", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    DayOfWeek = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    WorkFrom = table.Column<TimeSpan>(type: "time", nullable: false),
-                    WorkTo = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Quota = table.Column<long>(type: "bigint", nullable: false),
-                    UpdateToBpjs = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DoctorScheduleDetails", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DoctorScheduleDetails_DoctorSchedules_DoctorScheduleId",
-                        column: x => x.DoctorScheduleId,
-                        principalTable: "DoctorSchedules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1625,43 +1571,6 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TransferStockLogs",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TransferStockId = table.Column<long>(type: "bigint", nullable: true),
-                    SourceId = table.Column<long>(type: "bigint", nullable: true),
-                    DestinationId = table.Column<long>(type: "bigint", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransferStockLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TransferStockLogs_Locations_DestinationId",
-                        column: x => x.DestinationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_TransferStockLogs_Locations_SourceId",
-                        column: x => x.SourceId,
-                        principalTable: "Locations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_TransferStockLogs_TransferStocks_TransferStockId",
-                        column: x => x.TransferStockId,
-                        principalTable: "TransferStocks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "TransferStockProduct",
                 columns: table => new
                 {
@@ -1709,6 +1618,7 @@ namespace McDermott.Persistence.Migrations
                     EmployeeClass = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EstimatedDisability = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AreaOfYard = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProjectId = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     EmployeeDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AccidentLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -1804,6 +1714,12 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accidents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Accidents_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -2061,16 +1977,75 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DoctorScheduleSlots",
+                name: "DoctorScheduleDetails",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DoctorScheduleId = table.Column<long>(type: "bigint", nullable: false),
+                    ServiceId = table.Column<long>(type: "bigint", nullable: false),
+                    DayOfWeek = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    WorkFrom = table.Column<TimeSpan>(type: "time", nullable: false),
+                    WorkTo = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Quota = table.Column<long>(type: "bigint", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    UpdateToBpjs = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DoctorScheduleDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DoctorScheduleDetails_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DoctorSchedules",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhysicionId = table.Column<long>(type: "bigint", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    PhysicionIds = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DoctorSchedules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DoctorSchedules_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DoctorScheduleSlots",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     PhysicianId = table.Column<long>(type: "bigint", nullable: true),
+                    DayOfWeek = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     WorkFrom = table.Column<TimeSpan>(type: "time", nullable: false),
                     WorkTo = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Quota = table.Column<long>(type: "bigint", nullable: false),
+                    ServiceId = table.Column<long>(type: "bigint", nullable: false),
+                    DoctorScheduleId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2083,6 +2058,12 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_DoctorScheduleSlots_DoctorSchedules_DoctorScheduleId",
                         column: x => x.DoctorScheduleId,
                         principalTable: "DoctorSchedules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DoctorScheduleSlots_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2648,6 +2629,50 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TransferStockLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransferStockId = table.Column<long>(type: "bigint", nullable: true),
+                    SourceId = table.Column<long>(type: "bigint", nullable: true),
+                    DestinationId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransferStockLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_Locations_DestinationId",
+                        column: x => x.DestinationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_Locations_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_TransferStocks_TransferStockId",
+                        column: x => x.TransferStockId,
+                        principalTable: "TransferStocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_TransferStockLogs_Users_UserById",
+                        column: x => x.UserById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "KioskQueues",
                 columns: table => new
                 {
@@ -2908,6 +2933,7 @@ namespace McDermott.Persistence.Migrations
                     StartMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsGC = table.Column<bool>(type: "bit", nullable: false),
                     AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     WorkFrom = table.Column<TimeSpan>(type: "time", nullable: true),
                     WorkTo = table.Column<TimeSpan>(type: "time", nullable: true),
@@ -2962,8 +2988,11 @@ namespace McDermott.Persistence.Migrations
                     V = table.Column<long>(type: "bigint", nullable: false),
                     M = table.Column<long>(type: "bigint", nullable: false),
                     LocationId = table.Column<long>(type: "bigint", nullable: true),
+                    IsVaccination = table.Column<bool>(type: "bit", nullable: false),
+                    IsTelemedicine = table.Column<bool>(type: "bit", nullable: false),
                     LinkMeet = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProjectId = table.Column<long>(type: "bigint", nullable: true),
+                    IsAccident = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -3607,6 +3636,11 @@ namespace McDermott.Persistence.Migrations
                 column: "GeneralConsultanServiceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Accidents_ProjectId",
+                table: "Accidents",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Accidents_SafetyPersonnelId",
                 table: "Accidents",
                 column: "SafetyPersonnelId");
@@ -3792,6 +3826,16 @@ namespace McDermott.Persistence.Migrations
                 column: "DoctorScheduleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DoctorScheduleDetails_ServiceId",
+                table: "DoctorScheduleDetails",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DoctorSchedules_PhysicionId",
+                table: "DoctorSchedules",
+                column: "PhysicionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DoctorSchedules_ServiceId",
                 table: "DoctorSchedules",
                 column: "ServiceId");
@@ -3805,6 +3849,11 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_DoctorScheduleSlots_PhysicianId",
                 table: "DoctorScheduleSlots",
                 column: "PhysicianId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DoctorScheduleSlots_ServiceId",
+                table: "DoctorScheduleSlots",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DrugDosages_DrugRouteId",
@@ -4486,6 +4535,11 @@ namespace McDermott.Persistence.Migrations
                 column: "TransferStockId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TransferStockLogs_UserById",
+                table: "TransferStockLogs",
+                column: "UserById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TransferStockProduct_ProductId",
                 table: "TransferStockProduct",
                 column: "ProductId");
@@ -4802,6 +4856,22 @@ namespace McDermott.Persistence.Migrations
                 name: "FK_Departments_Users_ManagerId",
                 table: "Departments",
                 column: "ManagerId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DoctorScheduleDetails_DoctorSchedules_DoctorScheduleId",
+                table: "DoctorScheduleDetails",
+                column: "DoctorScheduleId",
+                principalTable: "DoctorSchedules",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DoctorSchedules_Users_PhysicionId",
+                table: "DoctorSchedules",
+                column: "PhysicionId",
                 principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
