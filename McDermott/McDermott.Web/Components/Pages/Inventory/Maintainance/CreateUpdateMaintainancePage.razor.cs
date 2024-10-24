@@ -40,7 +40,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private bool FormValidationState { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
-        private DateTime? currentExpiryDate {  get; set; }
+        private DateTime? currentExpiryDate { get; set; }
 
         #endregion variable Static
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -115,6 +115,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 postMaintainanceProduct.ProductId = e.Id;
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == postMaintainance.LocationId));
+                if (stockProducts.Count < 1)
+                {
+                    ToastService.ShowInfo("The product does not have Stock yet...");
+                    return;
+                }
                 if (e.TraceAbility)
                 {
                     var s = await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == e.Id && x.Batch != null && x.Batch == postMaintainanceProduct.SerialNumber));
@@ -250,7 +255,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         }
 
         #endregion UserLoginAndAccessRole
-      
+
         #region Load data
 
         protected override async Task OnInitializedAsync()
@@ -278,12 +283,12 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
                 postMaintainance = result.Item1.FirstOrDefault() ?? new();
             }
-             
+
         }
         private async Task LoadDataDetail(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetMaintainanceProductQuery(x=>x.MaintainanceId == postMaintainance.Id, pageIndex: pageIndex, pageSize: pageSize));
+            var result = await Mediator.Send(new GetMaintainanceProductQuery(x => x.MaintainanceId == postMaintainance.Id, pageIndex: pageIndex, pageSize: pageSize));
             getMaintainanceProduct = result.Item1;
             totalCount = result.pageCount;
             PanelVisible = false;
@@ -358,7 +363,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));           
+            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
             getProduct = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
             totalCount = result.pageCount;
             PanelVisible = false;
@@ -556,10 +561,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             try
             {
                 PanelVisible = true;
-                TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+                getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
                 var result = await Mediator.Send(new GetMaintainanceProductQuery(searchTerm: searchTerm, pageSize: 0, pageIndex: 1));
                 getMaintainanceProduct = result.Item1;
-                var cekReference = TransactionStocks.Where(x => x.SourceTable == nameof(Maintainance))
+                var cekReference = getTransactionStocks.Where(x => x.SourceTable == nameof(Maintainance))
                            .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
                 if (cekReference != null)

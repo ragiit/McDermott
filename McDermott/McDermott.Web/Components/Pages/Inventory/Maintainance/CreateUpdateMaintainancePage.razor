@@ -19,9 +19,7 @@
                                 <div class="col-auto align-self-end">
                                     <DxTabs RenderMode="TabsRenderMode.AllTabs">
                                         <DxTab Text="Requst" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Request)"></DxTab>
-                                        <DxTab Text="In Progress" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)"></DxTab>
-                                        <DxTab Text="Repair" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Repaired)"></DxTab>
-                                        <DxTab Text="Scrap" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Scrap)"></DxTab>
+                                        <DxTab Text="In Progress" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)"></DxTab>                                        
                                         <DxTab Text="Done" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Done)"></DxTab>
                                         <DxTab Text="Cancel" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Canceled)"></DxTab>
                                     </DxTabs>
