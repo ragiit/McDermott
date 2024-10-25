@@ -1,6 +1,11 @@
-﻿using DevExpress.Blazor.RichEdit;
+﻿using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+
+using DevExpress.Blazor.RichEdit;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
+using MailKit.Search;
 using McDermott.Application.Features.Services;
+using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
@@ -12,6 +17,289 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
     public partial class CreateUpdateVaccinationsPage
     {
         #region Vaccination Tabs
+
+        #region Vaccination Given
+
+        #region ComboboxVaccinationGiven
+
+        private DxComboBox<ProductDto, long> refVaccinationGivenComboBox { get; set; }
+        private int VaccinationGivenComboBoxIndex { get; set; } = 0;
+        private int totalCountVaccinationGiven = 0;
+
+        private async Task OnSearchVaccinationGiven()
+        {
+            await LoadDataVaccinationGiven();
+        }
+
+        private async Task OnSearchVaccinationGivenIndexIncrement()
+        {
+            if (VaccinationGivenComboBoxIndex < (totalCountVaccinationGiven - 1))
+            {
+                VaccinationGivenComboBoxIndex++;
+                await LoadDataVaccinationGiven(VaccinationGivenComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchVaccinationGivenIndexDecrement()
+        {
+            if (VaccinationGivenComboBoxIndex > 0)
+            {
+                VaccinationGivenComboBoxIndex--;
+                await LoadDataVaccinationGiven(VaccinationGivenComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputVaccinationGivenChanged(string e)
+        {
+            VaccinationGivenComboBoxIndex = 0;
+            await LoadDataVaccinationGiven();
+        }
+
+
+        private async Task LoadDataVaccinationGiven(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetProductQueryNew
+                {
+                    SearchTerm = refVaccinationGivenComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                Products = result.Item1;
+                totalCountVaccinationGiven = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxProduct
+
+        #region ComboboxSalesPerson
+
+        private DxComboBox<UserDto, long?> refSalesPersonComboBox { get; set; }
+        private int SalesPersonComboBoxIndex { get; set; } = 0;
+        private int totalCountSalesPerson = 0;
+
+        private async Task OnSearchSalesPerson()
+        {
+            await LoadDataSalesPerson();
+        }
+
+        private async Task OnSearchSalesPersonIndexIncrement()
+        {
+            if (SalesPersonComboBoxIndex < (totalCountSalesPerson - 1))
+            {
+                SalesPersonComboBoxIndex++;
+                await LoadDataSalesPerson(SalesPersonComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchSalesPersonIndexDecrement()
+        {
+            if (SalesPersonComboBoxIndex > 0)
+            {
+                SalesPersonComboBoxIndex--;
+                await LoadDataSalesPerson(SalesPersonComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputSalesPersonChanged(string e)
+        {
+            SalesPersonComboBoxIndex = 0;
+            await LoadDataSalesPerson();
+        }
+
+        private List<UserDto> SalesPersons { get; set; } = [];
+        private async Task LoadDataSalesPerson(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    SearchTerm = refSalesPersonComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Predicate = x => x.IsDoctor == true,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                });
+                SalesPersons = result.Item1;
+                totalCountSalesPerson = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxSalesPerson
+
+        #region ComboboxEducator
+
+        private DxComboBox<UserDto, long?> refEducatorComboBox { get; set; }
+        private int EducatorComboBoxIndex { get; set; } = 0;
+        private int totalCountEducator = 0;
+
+        private async Task OnSearchEducator()
+        {
+            await LoadDataEducator();
+        }
+
+        private async Task OnSearchEducatorIndexIncrement()
+        {
+            if (EducatorComboBoxIndex < (totalCountEducator - 1))
+            {
+                EducatorComboBoxIndex++;
+                await LoadDataEducator(EducatorComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchEducatorIndexDecrement()
+        {
+            if (EducatorComboBoxIndex > 0)
+            {
+                EducatorComboBoxIndex--;
+                await LoadDataEducator(EducatorComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputEducatorChanged(string e)
+        {
+            EducatorComboBoxIndex = 0;
+            await LoadDataEducator();
+        }
+
+        private List<UserDto> Educators { get; set; } = [];
+        private async Task LoadDataEducator(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    SearchTerm = refEducatorComboBox?.Text ?? "",
+                    Predicate = x => x.IsDoctor == true,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                });
+                Educators = result.Item1;
+                totalCountEducator = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxEducator  
+
+        #region ComboboxVaccinationGivenPhysicion
+
+        private DxComboBox<UserDto, long?> refVaccinationGivenPhysicionComboBox { get; set; }
+        private int VaccinationGivenPhysicionComboBoxIndex { get; set; } = 0;
+        private int totalCountVaccinationGivenPhysicion = 0;
+
+        private async Task OnSearchVaccinationGivenPhysicion()
+        {
+            await LoadDataVaccinationGivenPhysicion();
+        }
+
+        private async Task OnSearchVaccinationGivenPhysicionIndexIncrement()
+        {
+            if (VaccinationGivenPhysicionComboBoxIndex < (totalCountVaccinationGivenPhysicion - 1))
+            {
+                VaccinationGivenPhysicionComboBoxIndex++;
+                await LoadDataVaccinationGivenPhysicion(VaccinationGivenPhysicionComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchVaccinationGivenPhysicionIndexDecrement()
+        {
+            if (VaccinationGivenPhysicionComboBoxIndex > 0)
+            {
+                VaccinationGivenPhysicionComboBoxIndex--;
+                await LoadDataVaccinationGivenPhysicion(VaccinationGivenPhysicionComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputVaccinationGivenPhysicionChanged(string e)
+        {
+            VaccinationGivenPhysicionComboBoxIndex = 0;
+            await LoadDataVaccinationGivenPhysicion();
+        }
+
+        private List<UserDto> VaccinationGivenPhysicions { get; set; } = [];
+        private async Task LoadDataVaccinationGivenPhysicion(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    SearchTerm = refVaccinationGivenPhysicionComboBox?.Text ?? "",
+                    Predicate = x => x.IsDoctor == true,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                });
+                VaccinationGivenPhysicions = result.Item1;
+                totalCountVaccinationGivenPhysicion = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxVaccinationGivenPhysicion  
+
+        #endregion
 
         private async Task OnClickCancelGiveVaccine(VaccinationPlanDto e)
         {
@@ -64,14 +352,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
             if (VaccinationGiven.ProductId != 0)
             {
-                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
-                    s.ProductId == VaccinationGiven.ProductId &&
-                    s.LocationId == GeneralConsultanService.LocationId &&
-                    s.Validate == true
-                ));
-
-                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == VaccinationGiven.ProductId
-                && x.LocationId == GeneralConsultanService.LocationId && x.Batch == VaccinationGiven.Batch));
+                var aa = (await Mediator.Send(new GetTransactionStockQueryNew
+                {
+                    Select = x => new TransactionStock
+                    {
+                        Quantity = x.Quantity
+                    },
+                    Predicate = x => x.Validate == true && x.ProductId == VaccinationGiven.ProductId && x.LocationId == GeneralConsultanService.LocationId && x.Batch == VaccinationGiven.Batch
+                })).Item1;
 
                 VaccinationGiven.TeoriticalQty = aa.Sum(x => x.Quantity);
             }
@@ -103,6 +391,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             }
         }
 
+        private bool IsVaccinationGiven = false;
         private async Task OnSelectProduct(ProductDto e)
         {
             try
@@ -111,14 +400,30 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
                 if (e == null) return;
 
-                var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == GeneralConsultanService.LocationId)) ?? []);
+                //var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == GeneralConsultanService.LocationId)) ?? []);
+
+                var result = (await Mediator.Send(new GetTransactionStockQueryNew
+                {
+                    Select = x => new TransactionStock
+                    {
+                        Batch = x.Batch,
+                        Quantity = x.Quantity
+                    },
+                    IsGetAll = true,
+                    Predicate = s => s.ProductId == e.Id && s.LocationId == GeneralConsultanService.LocationId
+                })).Item1;
+
                 if (e.TraceAbility)
                 {
-                    Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                    Batch = result?.Select(x => x.Batch)?.ToList() ?? [];
                     Batch = Batch.Distinct().ToList();
                 }
                 else
                 {
+                    if (IsVaccinationGiven)
+                        VaccinationGiven.TeoriticalQty = result.Sum(x => x.Quantity);
+                    else
+                        VaccinationPlan.TeoriticalQty = result.Sum(x => x.Quantity);
                 }
 
                 return;
@@ -147,7 +452,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                     return;
                 }
 
-                if (VaccinationPlan.TeoriticalQty <= 0)
+                if (VaccinationPlan.TeoriticalQty < 0)
                 {
                     ToastService.ShowInfo("The Theoretical quantity must be greater than zero. Please adjust the quantity and try again.");
                     e.Cancel = true;
@@ -257,10 +562,93 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                 VaccinationGiven = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
                 try
                 {
-                    var stockProducts2 = (await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == VaccinationGiven.ProductId)) ?? []);
-                    if (VaccinationGiven.Product?.TraceAbility ?? false)
+                    var resultx = await Mediator.Send(new GetProductQueryNew
                     {
-                        Batch = stockProducts2?.Select(x => x.Batch)?.ToList() ?? [];
+                        Predicate = x => x.Id == VaccinationGiven.ProductId
+                    });
+                    Products = resultx.Item1;
+
+                    SalesPersons = (await Mediator.Send(new GetUserQueryNew
+                    {
+                        Predicate = x => x.Id == VaccinationGiven.SalesPersonId,
+                        Select = x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile
+                        }
+                    })).Item1;
+
+                    SalesPersons = (await Mediator.Send(new GetUserQueryNew
+                    {
+                        Predicate = x => x.Id == VaccinationGiven.SalesPersonId,
+                        Select = x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile
+                        }
+                    })).Item1;
+
+                    Educators = (await Mediator.Send(new GetUserQueryNew
+                    {
+                        Predicate = x => x.Id == VaccinationGiven.EducatorId,
+                        Select = x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile
+                        }
+                    })).Item1;
+
+                    VaccinationGivenPhysicions = (await Mediator.Send(new GetUserQueryNew
+                    {
+                        Predicate = x => x.Id == VaccinationGiven.PhysicianId,
+                        Select = x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile
+                        }
+                    })).Item1;
+
+                    if (VaccinationGiven.Product.TraceAbility)
+                    {
+                        var result = (await Mediator.Send(new GetTransactionStockQueryNew
+                        {
+                            Select = x => new TransactionStock
+                            {
+                                Batch = x.Batch,
+                            },
+                            IsGetAll = true,
+                            Predicate = s => s.ProductId == VaccinationGiven.ProductId && s.LocationId == GeneralConsultanService.LocationId
+                        })).Item1;
+
+                        Batch = result?.Select(x => x.Batch)?.ToList() ?? [];
                         Batch = Batch.Distinct().ToList();
                     }
 
@@ -283,7 +671,97 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             {
                 VaccinationPlan = (await Mediator.Send(new GetVaccinationPlanQuery(x => x.Id == context.SelectedDataItem.Adapt<VaccinationPlanDto>().Id))).FirstOrDefault() ?? new();
 
-                await SelectedBatchPlan(VaccinationGiven.Batch);
+                var resultx = await Mediator.Send(new GetProductQueryNew
+                {
+                    Predicate = x => x.Id == VaccinationPlan.ProductId
+                });
+                Products = resultx.Item1;
+
+                SalesPersons = (await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.Id == VaccinationPlan.SalesPersonId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                })).Item1;
+
+                SalesPersons = (await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.Id == VaccinationPlan.SalesPersonId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                })).Item1;
+
+                Educators = (await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.Id == VaccinationPlan.EducatorId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                })).Item1;
+
+                VaccinationGivenPhysicions = (await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.Id == VaccinationPlan.PhysicianId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                })).Item1;
+
+                if (VaccinationPlan.Product.TraceAbility)
+                {
+                    var result = (await Mediator.Send(new GetTransactionStockQueryNew
+                    {
+                        Select = x => new TransactionStock
+                        {
+                            Batch = x.Batch,
+                        },
+                        IsGetAll = true,
+                        Predicate = s => s.ProductId == VaccinationPlan.ProductId && s.LocationId == GeneralConsultanService.LocationId
+                    })).Item1;
+
+                    Batch = result?.Select(x => x.Batch)?.ToList() ?? [];
+                    Batch = Batch.Distinct().ToList();
+                }
+
+                await SelectedBatchPlan(VaccinationPlan.Batch);
 
                 StateHasChanged();
             }
@@ -339,6 +817,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         {
             IsLoadingVaccinationPlan = true;
             VaccinationPlans = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && (x.GeneralConsultanServiceId == 0 || x.GeneralConsultanServiceId == null)));
+            IsVaccinationGiven = false;
             IsLoadingVaccinationPlan = false;
         }
 
@@ -346,6 +825,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         {
             IsLoadingVaccinationGiven = true;
             VaccinationGivens = await Mediator.Send(new GetVaccinationPlanQuery(x => x.PatientId == GeneralConsultanService.PatientId && x.GeneralConsultanServiceId != null && x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+            await LoadDataVaccinationGiven();
+            IsVaccinationGiven = true;
             IsLoadingVaccinationGiven = false;
         }
 
@@ -686,6 +1167,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         Name = x.Service == null ? string.Empty : x.Service.Name,
                     },
                     Payment = x.Payment,
+                    LocationId = x.LocationId,
                     InsurancePolicyId = x.InsurancePolicyId,
                     AppointmentDate = x.AppointmentDate,
                     IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
@@ -756,6 +1238,30 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                 GeneralConsultanService = result;
                 UserForm = result.Patient ?? new();
 
+                //if (GeneralConsultanService.PratitionerId is null)
+                //{
+                //    if (Convert.ToBoolean(UserLogin.IsUser) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                //    {
+                //        Physicions = (await Mediator.Send(new GetUserQueryNew
+                //        {
+                //            Predicate = x => x.IsDoctor == true && x.Id == UserLogin.Id,
+                //            Select = x => new User
+                //            {
+                //                Id = x.Id,
+                //                Name = x.Name,
+                //                NoRm = x.NoRm,
+                //                Email = x.Email,
+                //                MobilePhone = x.MobilePhone,
+                //                Gender = x.Gender,
+                //                DateOfBirth = x.DateOfBirth,
+                //                NoId = x.NoId,
+                //                CurrentMobile = x.CurrentMobile
+                //            }
+                //        })).Item1;
+                //        GeneralConsultanService.PratitionerId = UserLogin.Id;
+                //    }
+                //}
+
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -767,28 +1273,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         break;
 
                     case EnumStatusGeneralConsultantService.NurseStation:
-                        StagingText = EnumStatusGeneralConsultantService.Waiting;
+                        StagingText = EnumStatusGeneralConsultantService.Finished;
                         break;
 
                     case EnumStatusGeneralConsultantService.Waiting:
-                        StagingText = EnumStatusGeneralConsultantService.Physician;
-                        break;
-
-                    case EnumStatusGeneralConsultantService.Physician:
                         StagingText = EnumStatusGeneralConsultantService.Finished;
-
-                        if (GeneralConsultanService.PratitionerId is null)
-                        {
-                            if (!Convert.ToBoolean(UserLogin.IsEmployee) && !Convert.ToBoolean(UserLogin.IsPatient) && Convert.ToBoolean(UserLogin.IsUser) && !Convert.ToBoolean(UserLogin.IsNurse) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
-                            {
-                                var phy = await Mediator.Send(new GetSingleUserQuery
-                                {
-                                    Predicate = x => x.Id == UserLogin.Id
-                                });
-
-                                GeneralConsultanService.PratitionerId = Physicions.Count > 0 ? Physicions[0].Id : null;
-                            }
-                        }
                         break;
 
                     case EnumStatusGeneralConsultantService.Finished:
@@ -800,9 +1289,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         StagingText = EnumStatusGeneralConsultantService.Canceled;
                         break;
 
-                    case EnumStatusGeneralConsultantService.ProcedureRoom:
-                        StagingText = EnumStatusGeneralConsultantService.ProcedureRoom;
-                        break;
 
                     default:
                         break;
@@ -845,23 +1331,31 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                     Predicate = x => x.Id == GeneralConsultanService.ServiceId && x.IsVaccination == true,
                 })).Item1;
 
-                var ph = await Mediator.Send(new GetUserQueryNew
+                Locations = (await Mediator.Send(new GetLocationQuery
                 {
-                    Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
-                    Select = x => new User
+                    Predicate = x => x.Id == GeneralConsultanService.LocationId
+                })).Item1;
+
+                if (!IsStatus(EnumStatusGeneralConsultantService.Physician))
+                {
+                    var ph = await Mediator.Send(new GetUserQueryNew
                     {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NoRm = x.NoRm,
-                        Email = x.Email,
-                        MobilePhone = x.MobilePhone,
-                        Gender = x.Gender,
-                        DateOfBirth = x.DateOfBirth,
-                        NoId = x.NoId,
-                        CurrentMobile = x.CurrentMobile
-                    }
-                });
-                Physicions = ph.Item1;
+                        Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
+                        Select = x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile
+                        }
+                    });
+                    Physicions = ph.Item1;
+                }
 
                 if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
                 {
@@ -876,6 +1370,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                                 Name = x.Insurance == null ? "" : x.Insurance.Name,
                             },
                             PolicyNumber = x.PolicyNumber,
+                            PstPrb = x.PstPrb,
+                            PstProl = x.PstProl
                         }
                     })).Item1;
                 }
@@ -1042,6 +1538,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 });
                 InsurancePolicies = result.Item1;
@@ -1245,6 +1743,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
                         PolicyNumber = x.PolicyNumber,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 })).Item1;
             }
@@ -1305,6 +1805,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                 PanelVisible = true;
                 var result = await Mediator.Send(new GetServiceQuery
                 {
+                    Predicate = x => x.IsVaccination == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = refServiceComboBox?.Text ?? ""
@@ -1410,6 +1911,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
                     PolicyNumber = x.PolicyNumber,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 }
             })).Item1;
         }
@@ -1885,8 +2388,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                             break;
 
                         case EnumStatusGeneralConsultantService.Waiting:
-                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Waiting;
-                            StagingText = EnumStatusGeneralConsultantService.Physician;
+                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Finished;
+                            StagingText = EnumStatusGeneralConsultantService.Finished;
                             break;
 
                         case EnumStatusGeneralConsultantService.Physician:
@@ -1988,6 +2491,42 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
                     if (PageMode == EnumPageMode.Create.GetDisplayName())
                         NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={GeneralConsultanService.Id}");
+
+
+
+                    if (IsStatus(EnumStatusGeneralConsultantService.Finished))
+                    {
+                        #region Cut Product Stock
+
+                        var vaccinations = await Mediator.Send(new GetVaccinationPlanQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+                        var stocks = new List<TransactionStockDto>();
+
+                        foreach (var i in vaccinations)
+                        {
+                            i.Status = EnumStatusVaccination.Done;
+
+                            var s = (await Mediator.Send(new GetTransactionStockQuery(x => x.ProductId == i.ProductId && x.Batch == i.Batch && x.LocationId == GeneralConsultanService.LocationId))).FirstOrDefault() ?? new();
+
+                            stocks.Add(new TransactionStockDto
+                            {
+                                SourceTable = nameof(VaccinationPlan),
+                                SourcTableId = i.Id,
+                                ProductId = i.ProductId,
+                                Reference = GeneralConsultanService.Reference,
+                                Batch = i.Batch,
+                                LocationId = GeneralConsultanService.LocationId,
+                                Quantity = -i.Quantity,
+                                Validate = true,
+                                ExpiredDate = s.ExpiredDate,
+                                UomId = s.UomId
+                            });
+                        }
+
+                        await Mediator.Send(new UpdateListVaccinationPlanRequest(vaccinations));
+                        await Mediator.Send(new CreateListTransactionStockRequest(stocks));
+
+                        #endregion Cut Product Stock
+                    }
                 }
 
                 // Method to map UserForm to UserDto
@@ -2061,7 +2600,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"/pharmacy/prescription/{GeneralConsultanService.Id}");
+            NavigationManager.NavigateTo($"/pharmacy/presciptions/{GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()
@@ -2265,8 +2804,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             finally { PanelVisible = false; }
         }
 
-        private async Task OnClickPainScalePopUp()
+        private bool IsPopUpPainScale = false;
+        private void OnClickPainScalePopUp()
         {
+            IsPopUpPainScale = true;
+        }
+        private void OnClosePopup()
+        {
+            IsPopUpPainScale = false;
         }
 
         #endregion OnClick

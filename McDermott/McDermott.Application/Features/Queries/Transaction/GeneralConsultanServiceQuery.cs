@@ -804,13 +804,14 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.Temp = dto.Temp;
             entity.HR = dto.HR;
             entity.Systolic = dto.Systolic;
+            entity.LocationId = dto.LocationId;
             entity.DiastolicBP = dto.DiastolicBP;
             entity.PainScale = dto.PainScale;
             entity.BMIState = dto.BMIState;
             entity.RiskOfFalling = dto.RiskOfFalling;
             entity.RiskOfFallingDetail = dto.RiskOfFallingDetail;
 
-            SetPropertiesModified(entity, nameof(entity.InformationFrom), nameof(entity.AwarenessId), nameof(entity.Weight),
+            SetPropertiesModified(entity, nameof(entity.InformationFrom), nameof(entity.AwarenessId), nameof(entity.LocationId), nameof(entity.Weight),
                 nameof(entity.Height), nameof(entity.RR), nameof(entity.SpO2), nameof(entity.WaistCircumference),
                 nameof(entity.BMIIndex), nameof(entity.BMIIndexString), nameof(entity.ScrinningTriageScale), nameof(entity.ClinicVisitTypes),
                 nameof(entity.E), nameof(entity.V), nameof(entity.M), nameof(entity.Temp), nameof(entity.HR),
@@ -837,6 +838,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             else
             {
+                entity.LocationId = dto.LocationId;
                 entity.PratitionerId = dto.PratitionerId;
                 entity.HomeStatus = dto.HomeStatus;
                 entity.IsSickLeave = dto.IsSickLeave;
@@ -849,6 +851,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 UpdateNurseStationFields(entity, dto); // Including NurseStation fields
 
                 SetPropertiesModified(entity, nameof(entity.PratitionerId), nameof(entity.HomeStatus), nameof(entity.IsSickLeave),
+                    nameof(entity.LocationId),
                     nameof(entity.PPKRujukanCode),
                     nameof(entity.PPKRujukanName),
                     nameof(entity.ReferVerticalSpesialisParentSpesialisName),
@@ -980,8 +983,13 @@ namespace McDermott.Application.Features.Queries.Transaction
                         InsurancePolicyId = request.GeneralConsultanServiceDto.InsurancePolicyId,
                         RegistrationDate = request.GeneralConsultanServiceDto.RegistrationDate,
                         Status = request.Status,
+                        IsGC = request.GeneralConsultanServiceDto.IsGC,
+                        IsVaccination = request.GeneralConsultanServiceDto.IsVaccination,
+                        IsMcu = request.GeneralConsultanServiceDto.IsMcu,
+                        IsAccident = request.GeneralConsultanServiceDto.IsAccident,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
+                        LocationId = request.GeneralConsultanServiceDto.LocationId
                     };
 
                     // Tambahkan entitas baru ke repository dan simpan ke database
@@ -1007,8 +1015,13 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Payment = request.GeneralConsultanServiceDto.Payment,
                         InsurancePolicyId = request.GeneralConsultanServiceDto.InsurancePolicyId,
                         Status = EnumStatusGeneralConsultantService.Planned,
+                        IsGC = request.GeneralConsultanServiceDto.IsGC,
+                        IsVaccination = request.GeneralConsultanServiceDto.IsVaccination,
+                        IsMcu = request.GeneralConsultanServiceDto.IsMcu,
+                        IsAccident = request.GeneralConsultanServiceDto.IsAccident,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
+                        LocationId = request.GeneralConsultanServiceDto.LocationId
                     };
 
                     // Tambahkan entitas baru ke repository dan simpan ke database
@@ -1038,7 +1051,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 if (request.GeneralConsultanServiceDto is null)
                     return new();
 
-                GeneralConsultanService? entity = null;
+                GeneralConsultanService? entity = null; 
 
                 if (request.Status == EnumStatusGeneralConsultantService.Confirmed)
                 {
@@ -1137,7 +1150,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                     _unitOfWork.Repository<GeneralConsultanService>().Attach(entity);
 
-                    entity.Status = request.GeneralConsultanServiceDto.Status;
+                    entity.Status = request.GeneralConsultanServiceDto.Status; 
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                 }

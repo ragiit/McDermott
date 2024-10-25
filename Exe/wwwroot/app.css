@@ -236,3 +236,21 @@ h1:focus {
     background-position: center;
     color: #2a2b2b; /* Sesuaikan warna teks dengan gambar latar belakang */
 }
+
+.toolbar-item {
+    padding: 10px;
+    color: #000;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+    .toolbar-item:hover {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
+/* Adding spacing around the vertical divider */
+.divider {
+    padding-left: 10px;
+    padding-right: 10px;
+}

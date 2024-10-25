@@ -26,13 +26,35 @@ namespace McDermott.Web.Extentions
 
                 //var groups = await _mediator.Send(new GetGroupMenuQuery(x => x.GroupId == (long)user!.GroupId!)!);
 
-                var user = (await _mediator.Send(new GetUserQuery2(predicate: x => x.Id == cookieUser.Id, 0, short.MaxValue, includes: [],
-                    select: x => new User
+                //var user = (await _mediator.Send(new GetUserQuery2(predicate: x => x.Id == cookieUser.Id, 0, short.MaxValue, includes: [],
+                //    select: x => new User
+                //    {
+                //        Id = x.Id,
+                //        Name = x.Name,
+                //        GroupId = x.GroupId
+                //    }))).Item1.FirstOrDefault() ?? new();
+
+                var user = await _mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.Id == cookieUser.Id,
+                    Select = x => new User
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        GroupId = x.GroupId
-                    }))).Item1.FirstOrDefault() ?? new();
+                        GroupId = x.GroupId,
+                        IsAdmin = x.IsAdmin,
+                        IsDefaultData = x.IsDefaultData,
+                        IsDoctor = x.IsDoctor,
+                        IsEmployee = x.IsEmployee,
+                        IsHr    = x.IsHr,
+                        IsNurse = x.IsNurse,
+                        IsPatient = x.IsPatient,
+                        IsPhysicion = x.IsPhysicion,
+                        IsPharmacy = x.IsPharmacy,
+                        IsUser = x.IsUser,
+                        IsMcu = x.IsMcu, 
+                    }
+                });
 
                 var groups = (await _mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(0, short.MaxValue, predicate: x => x.GroupId == (long)user!.GroupId!,
                     includes:

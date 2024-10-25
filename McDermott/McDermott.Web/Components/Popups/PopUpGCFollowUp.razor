@@ -55,12 +55,15 @@
                                                   TextChanged="((string e) => OnInputPatientChanged(e))">
                                         <Buttons>
                                             <DxEditorButton Click="OnSearchPatientIndexDecrement"
+                                                            Visible="false"
                                                             IconCssClass="fa-solid fa-caret-left"
                                                             Tooltip="Previous Index" />
                                             <DxEditorButton Click="OnSearchPatient"
+                                                            Visible="false"
                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                             Tooltip="Search" />
                                             <DxEditorButton Click="OnSearchPatientIndexIncrement"
+                                                            Visible="false"
                                                             IconCssClass="fa-solid fa-caret-right"
                                                             Tooltip="Next Index" />
                                         </Buttons>
@@ -160,12 +163,15 @@
                                                   TextChanged="((string e) => OnInputServiceChanged(e))">
                                         <Buttons>
                                             <DxEditorButton Click="OnSearchServiceIndexDecrement"
+                                                            Visible="false"
                                                             IconCssClass="fa-solid fa-caret-left"
                                                             Tooltip="Previous Index" />
                                             <DxEditorButton Click="OnSearchService"
+                                                            Visible="false"
                                                             IconCssClass="fa-solid fa-magnifying-glass"
                                                             Tooltip="Search" />
                                             <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                            Visible="false"
                                                             IconCssClass="fa-solid fa-caret-right"
                                                             Tooltip="Next Index" />
                                         </Buttons>
@@ -218,6 +224,14 @@
                                     </MyDxComboBox>
                                     <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
                                 </DxFormLayoutItem>
+                                @{
+                                    var a = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                                    var res = "-";
+                                    if (a is not null)
+                                    {
+                                        res = $"{a.PstProl}/{a.PstPrb}";
+                                    }
+                                }
                                 @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                 {
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
@@ -248,6 +262,9 @@
                                                                     Caption="Insurance Company" />
                                             </Columns>
                                         </MyDxComboBox>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PRB" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@res" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
                                     </DxFormLayoutItem>
                                 }
 
@@ -290,7 +307,7 @@
     private bool IsLoading { get; set; }
 
     protected override async Task OnInitializedAsync()
-    {
+    { 
         await LoadDataPatient();
         await LoadDataService();
         await LoadDataPhysicion();
@@ -346,9 +363,9 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-                    [
-                        x => x.Insurance
-                    ],
+                                    [
+                                        x => x.Insurance
+                                    ],
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -357,6 +374,8 @@
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 });
             InsurancePolicies = result.Item1;
@@ -556,43 +575,38 @@
         try
         {
             IsLoading = true;
-            var result = await Mediator.Send(new GetUserQuery2(
-                    x => x.IsPatient == true,
-                    searchTerm: refPatientComboBox?.Text ?? "",
-                    pageSize: pageSize,
-                    pageIndex:
-                    pageIndex,
-                    includes: [],
-                    select: x => new User
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            NoRm = x.NoRm,
-                            Email = x.Email,
-                            MobilePhone = x.MobilePhone,
-                            Gender = x.Gender,
-                            DateOfBirth = x.DateOfBirth,
-                            NoId = x.NoId,
-                            CurrentMobile = x.CurrentMobile,
+            var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsPatient == true && x.Id == UserForm.Id,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile,
 
-                            IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
-                            IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
-                            IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
-                            WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
-                            FoodPatientAllergyIds = x.FoodPatientAllergyIds,
-                            PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
 
-                            IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
-                            FamilyMedicalHistory = x.FamilyMedicalHistory,
-                            FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                        FamilyMedicalHistory = x.FamilyMedicalHistory,
+                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
 
-                            IsMedicationHistory = x.IsMedicationHistory,
-                            MedicationHistory = x.MedicationHistory,
-                            PastMedicalHistory = x.PastMedicalHistory
-                        }
-            ));
+                        IsMedicationHistory = x.IsMedicationHistory,
+                        MedicationHistory = x.MedicationHistory,
+                        PastMedicalHistory = x.PastMedicalHistory
+                    }
+                });
             Patients = result.Item1;
-            totalCountPatient = result.pageCount;
             IsLoading = false;
         }
         catch (Exception ex)
@@ -627,6 +641,8 @@
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
                         PolicyNumber = x.PolicyNumber,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     },
                     Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
                 })).Item1;
@@ -678,6 +694,7 @@
             IsLoading = true;
             var result = await Mediator.Send(new GetServiceQuery
                 {
+                    Predicate = x => x.Id == GeneralConsultanService.ServiceId,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = refServiceComboBox?.Text ?? ""
@@ -735,26 +752,22 @@
         try
         {
             IsLoading = true;
-            var result = await Mediator.Send(new GetUserQuery2(
-                           x => x.IsDoctor == true,
-                           searchTerm: refPhysicionComboBox?.Text ?? "",
-                           pageSize: pageSize,
-                           pageIndex:
-                           pageIndex,
-                           includes: [],
-                           select: x => new User
-                               {
-                                   Id = x.Id,
-                                   Name = x.Name,
-                                   Email = x.Email,
-                                   MobilePhone = x.MobilePhone,
-                                   Gender = x.Gender,
-                                   DateOfBirth = x.DateOfBirth,
-                                   IsPhysicion = x.IsPhysicion,
-                                   IsNurse = x.IsNurse,
-                               }
-                       )); Physicions = result.Item1;
-            totalCountPhysicion = result.pageCount;
+            var result = await Mediator.Send(new GetUserQueryNew
+                {
+                    Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        IsPhysicion = x.IsPhysicion,
+                        IsNurse = x.IsNurse,
+                    }
+                });
+            Physicions = result.Item1;
             IsLoading = false;
         }
         catch (Exception ex)
@@ -784,6 +797,8 @@
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
                     PolicyNumber = x.PolicyNumber,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 },
                 Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
             })).Item1;

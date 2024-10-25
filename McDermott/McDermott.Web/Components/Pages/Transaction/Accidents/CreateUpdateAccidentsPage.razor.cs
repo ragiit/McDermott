@@ -476,6 +476,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                     Predicate = x => x.Id == Accident.ProjectId,
                 })).Item1;
 
+                Services = (await Mediator.Send(new GetServiceQuery
+                {
+                    Predicate = x => x.Id == GeneralConsultanService.ServiceId
+                })).Item1; 
+
                 UserForm = resultGC.Patient ?? new();
 
                 Patients = (await Mediator.Send(new GetUserQueryNew
@@ -535,6 +540,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                                 Name = x.Insurance == null ? "" : x.Insurance.Name,
                             },
                             PolicyNumber = x.PolicyNumber,
+                            PstPrb = x.PstPrb,
+                            PstProl = x.PstProl
                         }
                     })).Item1;
                 }
@@ -687,6 +694,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 });
                 InsurancePolicies = result.Item1;
@@ -898,6 +907,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
                         PolicyNumber = x.PolicyNumber,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 })).Item1;
             }
@@ -1194,6 +1205,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
                     PolicyNumber = x.PolicyNumber,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 }
             })).Item1;
         }
@@ -1293,7 +1306,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                     {
                         var res = await Mediator.Send(new CreateGeneralConsultanServiceRequest(GeneralConsultanService));
                         Accident.GeneralConsultanServiceId = res.Id;
-                        await Mediator.Send(new CreateAccidentRequest(Accident));
+                        Accident = await Mediator.Send(new CreateAccidentRequest(Accident));
                     }
                     else
                     {
@@ -1413,7 +1426,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                     {
                         var res = await Mediator.Send(new CreateGeneralConsultanServiceRequest(GeneralConsultanService));
                         Accident.GeneralConsultanServiceId = res.Id;
-                        await Mediator.Send(new CreateAccidentRequest(Accident));
+                        Accident = await Mediator.Send(new CreateAccidentRequest(Accident));
                     }
                     else
                     {
@@ -1423,6 +1436,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                 }
 
                 GeneralConsultanService = await GetGeneralConsultanServiceById();
+                Id = Accident.Id;
                 Accident = await GetAccidentById();
 
                 if (PageMode == EnumPageMode.Create.GetDisplayName())
@@ -1780,10 +1794,15 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
         private DevExpress.Blazor.RichEdit.Document documentAPI;
         public byte[]? DocumentContent;
 
-        private async Task OnClickPainScalePopUp()
+        private bool IsPopUpPainScale = false;
+        private void OnClickPainScalePopUp()
         {
+            IsPopUpPainScale = true;
         }
-
+        private void OnClosePopup()
+        {
+            IsPopUpPainScale = false;
+        }
         #endregion OnClick
 
         #region Assesment of Injury

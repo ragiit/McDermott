@@ -408,14 +408,25 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                         if (GeneralConsultanService.PratitionerId is null)
                         {
-                            if (!Convert.ToBoolean(UserLogin.IsEmployee) && !Convert.ToBoolean(UserLogin.IsPatient) && Convert.ToBoolean(UserLogin.IsUser) && !Convert.ToBoolean(UserLogin.IsNurse) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                            if ((Convert.ToBoolean(UserLogin.IsUser) || Convert.ToBoolean(UserLogin.IsAdmin)) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
                             {
-                                var phy = await Mediator.Send(new GetSingleUserQuery
+                                Physicions = (await Mediator.Send(new GetUserQueryNew
                                 {
-                                    Predicate = x => x.Id == UserLogin.Id
-                                });
-
-                                GeneralConsultanService.PratitionerId = Physicions.Count > 0 ? Physicions[0].Id : null;
+                                    Predicate = x => x.IsDoctor == true && x.Id == UserLogin.Id,
+                                    Select = x => new User
+                                    {
+                                        Id = x.Id,
+                                        Name = x.Name,
+                                        NoRm = x.NoRm,
+                                        Email = x.Email,
+                                        MobilePhone = x.MobilePhone,
+                                        Gender = x.Gender,
+                                        DateOfBirth = x.DateOfBirth,
+                                        NoId = x.NoId,
+                                        CurrentMobile = x.CurrentMobile
+                                    }
+                                })).Item1;
+                                GeneralConsultanService.PratitionerId = UserLogin.Id;
                             }
                         }
                         break;
@@ -474,23 +485,26 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     Predicate = x => x.Id == GeneralConsultanService.ServiceId,
                 })).Item1;
 
-                var ph = await Mediator.Send(new GetUserQueryNew
+                if (!IsStatus(EnumStatusGeneralConsultantService.Physician))
                 {
-                    Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
-                    Select = x => new User
+                    var ph = await Mediator.Send(new GetUserQueryNew
                     {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NoRm = x.NoRm,
-                        Email = x.Email,
-                        MobilePhone = x.MobilePhone,
-                        Gender = x.Gender,
-                        DateOfBirth = x.DateOfBirth,
-                        NoId = x.NoId,
-                        CurrentMobile = x.CurrentMobile
-                    }
-                });
-                Physicions = ph.Item1;
+                        Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
+                        Select = x => new User
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                            NoRm = x.NoRm,
+                            Email = x.Email,
+                            MobilePhone = x.MobilePhone,
+                            Gender = x.Gender,
+                            DateOfBirth = x.DateOfBirth,
+                            NoId = x.NoId,
+                            CurrentMobile = x.CurrentMobile
+                        }
+                    });
+                    Physicions = ph.Item1;
+                }
 
                 if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
                 {
@@ -505,6 +519,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 Name = x.Insurance == null ? "" : x.Insurance.Name,
                             },
                             PolicyNumber = x.PolicyNumber,
+                            PstPrb = x.PstPrb,
+                            PstProl = x.PstProl
                         }
                     })).Item1;
                 }
@@ -671,6 +687,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 });
                 InsurancePolicies = result.Item1;
@@ -874,6 +892,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
                         PolicyNumber = x.PolicyNumber,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 })).Item1;
             }
@@ -1039,6 +1059,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
                     PolicyNumber = x.PolicyNumber,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 }
             })).Item1;
         }
@@ -1145,6 +1167,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     : [];
 
                 GeneralConsultanServiceDto res = new();
+
+                GeneralConsultanService.IsGC = true;
 
                 switch (GeneralConsultanService.Status)
                 {
@@ -1539,6 +1563,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             break;
                     }
 
+                    GeneralConsultanService.IsGC = true;
+
                     if (GeneralConsultanService.Id == 0)
                     {
                         newGC = await Mediator.Send(new CreateFormGeneralConsultanServiceNewRequest
@@ -1615,6 +1641,30 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                     if (PageMode == EnumPageMode.Create.GetDisplayName())
                         NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={GeneralConsultanService.Id}");
+
+                    if (IsStatus(EnumStatusGeneralConsultantService.Physician))
+                    {
+                        if ((Convert.ToBoolean(UserLogin.IsUser) || Convert.ToBoolean(UserLogin.IsAdmin)) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
+                        {
+                            Physicions = (await Mediator.Send(new GetUserQueryNew
+                            {
+                                Predicate = x => x.IsDoctor == true && x.Id == UserLogin.Id,
+                                Select = x => new User
+                                {
+                                    Id = x.Id,
+                                    Name = x.Name,
+                                    NoRm = x.NoRm,
+                                    Email = x.Email,
+                                    MobilePhone = x.MobilePhone,
+                                    Gender = x.Gender,
+                                    DateOfBirth = x.DateOfBirth,
+                                    NoId = x.NoId,
+                                    CurrentMobile = x.CurrentMobile
+                                }
+                            })).Item1;
+                            GeneralConsultanService.PratitionerId = UserLogin.Id;
+                        }
+                    }
                 }
 
                 // Method to map UserForm to UserDto
@@ -1688,7 +1738,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"/pharmacy/prescription/{GeneralConsultanService.Id}");
+            NavigationManager.NavigateTo($"/pharmacy/presciptions/{GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()
@@ -1892,8 +1942,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        private async Task OnClickPainScalePopUp()
+        private bool IsPopUpPainScale = false;
+        private void OnClickPainScalePopUp()
         {
+            IsPopUpPainScale = true;
+        }
+        private void OnClosePopup()
+        {
+            IsPopUpPainScale = false;
         }
 
         #endregion OnClick
