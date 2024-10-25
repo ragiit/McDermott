@@ -136,14 +136,31 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await GetUserInfo();
-            await LoadDataDestination();
-            await LoadDataSource();
-            await LoadAsyncData();
-            await LoadDataProduct();
-            await LoadData();
-            PanelVisible = false;
 
+            try
+            {
+                await GetUserInfo();
+
+                var loadTasks = new[]
+                {
+                    GetUserInfo(),
+                 LoadDataDestination(),
+                 LoadDataSource(),
+                 LoadAsyncData(),
+                 LoadDataProduct(),
+                 LoadData()
+            };
+
+                await Task.WhenAll(loadTasks);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -171,7 +188,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 getGoodsReceiptLogs = resultLog.Item1 ?? new();
             }
 
-            
+
             PanelVisible = false;
         }
 
@@ -763,7 +780,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             PanelVisible = true;
             var results = await Mediator.Send(new GetGoodsReceiptQuery
             {
-                Predicate= x=>x.Id == postGoodsReceipt.Id,
+                Predicate = x => x.Id == postGoodsReceipt.Id,
             });
 
             getGoodsReceipts = results.Item1;

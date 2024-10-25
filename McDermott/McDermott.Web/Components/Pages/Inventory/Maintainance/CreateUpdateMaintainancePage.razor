@@ -266,15 +266,28 @@
                                                                     <DxGridDataColumn FieldName="SerialNumber" Caption="Serial Number" />
                                                                     <DxGridDataColumn FieldName="Expired" Caption="Expired" />
                                                                     <DxGridDataColumn FieldName="Note" Caption="Note" />
-                                                                    <DxGridDataColumn FieldName="Status" Caption="Status">
-                                                                        <CellEditTemplate>
-                                                                            @if (postMaintainance.Status == EnumStatusMaintainance.InProgress)
-                                                                            {
-                                                                                <DxComboBox Data="@listString" @bind-Value="@postMaintainanceProduct.Status" />
-                                                                            }
-                                                                            
-                                                                        </CellEditTemplate>
-                                                                    </DxGridDataColumn>
+                                                                    @if (postMaintainance.Status == EnumStatusMaintainance.Request)
+                                                                    {
+                                                                        <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                            <CellDisplayTemplate>
+                                                                                @{
+                                                                                    var status = (context.DataItem as MaintainanceProductDto)?.Status;
+                                                                                }
+
+                                                                                @if (status == null)
+                                                                                {
+                                                                                    <DxComboBox Data="@listString"
+                                                                                                @bind-Value="StatusString"
+                                                                                                SelectedItemChanged="((string value) => selectedStatus((context.DataItem as MaintainanceProductDto).Id, value))" />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    @status
+                                                                                }
+                                                                            </CellDisplayTemplate>
+                                                                        </DxGridDataColumn>
+
+                                                                    }
                                                                 </Columns>
 
                                                                 <EditFormTemplate Context="EditFormContextt">

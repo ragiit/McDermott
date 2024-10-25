@@ -40,6 +40,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
         private long? TransactionId { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
+        private string? StatusString { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
         private DateTime? currentExpiryDate { get; set; }
@@ -324,15 +325,39 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                     }
 
                     postMaintainance = result.Item1.FirstOrDefault() ?? new();
+                    await LoadDataDetail();
                 }
             }
             finally
             {
                 await InvokeAsync(() => PanelVisible = false);
             }
-           
 
         }
+
+        private async Task selectedStatus(long? Id, string value)
+        {
+            var DataProduct = getMaintainanceProduct.FirstOrDefault(x => x.Id == Id);
+
+            if (DataProduct is not null)
+            {
+                DataProduct.Status = value switch
+                {
+                    "Scrap" => EnumStatusMaintainance.Scrap,
+                    "Done" => EnumStatusMaintainance.Done,
+                    _ => DataProduct.Status
+                };
+
+                if (value == "Scrap" || value == "Done")
+                {
+                    await Mediator.Send(new UpdateMaintainanceProductRequest(DataProduct));
+                }
+            }
+
+            await LoadDataDetail();
+        }
+
+
         private async Task LoadDataDetail(int pageIndex = 0, int pageSize = 10)
         {
             await InvokeAsync(() => PanelVisible = true);
@@ -342,10 +367,21 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 var result = await Mediator.Send(new GetMaintainanceProductQuery(x => x.MaintainanceId == postMaintainance.Id, pageIndex: pageIndex, pageSize: pageSize));
                 getMaintainanceProduct = result.Item1;
                 totalCount = result.pageCount;
+                await HandlerData();
             }
             finally
             {
                 await InvokeAsync(() => PanelVisible = false);
+            }
+        }
+
+        private async Task HandlerData()
+        {
+            StatusString = listString[0];
+
+            foreach(var item in getMaintainanceProduct)
+            {
+                postMaintainanceProduct = item ?? new();
             }
         }
 
