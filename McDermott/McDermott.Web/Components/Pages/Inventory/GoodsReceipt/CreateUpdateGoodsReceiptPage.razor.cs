@@ -137,11 +137,11 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         {
             PanelVisible = true;
             await GetUserInfo();
-            await LoadData();
             await LoadDataDestination();
             await LoadDataSource();
             await LoadAsyncData();
             await LoadDataProduct();
+            await LoadData();
             PanelVisible = false;
 
         }

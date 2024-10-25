@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Inventory
 {
-    public class MaintainanceProductDto
+    public class MaintainanceProductDto : IMapFrom<MaintainanceProduct>
     {
+        public long Id {  get; set; }
         public long? MaintainanceId { get; set; }
         public long? ProductId { get; set; }
         public string? SerialNumber { get; set; }

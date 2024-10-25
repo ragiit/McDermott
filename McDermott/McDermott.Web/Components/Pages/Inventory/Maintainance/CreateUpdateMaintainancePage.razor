@@ -7,7 +7,7 @@
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
     <div class="wrapper">
-        <BaseHeaderPage Title="Group" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/maintainance"))" ShowBackButton="true" />
+        <BaseHeaderPage Title="Maintainance" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/maintainance"))" ShowBackButton="true" />
 
         <div class="content">
             <div class="container-fluid">
@@ -19,7 +19,7 @@
                                 <div class="col-auto align-self-end">
                                     <DxTabs RenderMode="TabsRenderMode.AllTabs">
                                         <DxTab Text="Requst" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Request)"></DxTab>
-                                        <DxTab Text="In Progress" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)"></DxTab>                                        
+                                        <DxTab Text="In Progress" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.InProgress)"></DxTab>
                                         <DxTab Text="Done" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Done)"></DxTab>
                                         <DxTab Text="Cancel" Enabled="@(postMaintainance.Status == EnumStatusMaintainance.Canceled)"></DxTab>
                                     </DxTabs>
@@ -264,9 +264,19 @@
                                                                     <DxGridSelectionColumn Width="15px" />
                                                                     <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" SortIndex="0" />
                                                                     <DxGridDataColumn FieldName="SerialNumber" Caption="Serial Number" />
-                                                                    <DxGridDataColumn FieldName="expired" Caption="Expired" />
-                                                                    <DxGridDataColumn FieldName="Note" Caption="note" />
+                                                                    <DxGridDataColumn FieldName="Expired" Caption="Expired" />
+                                                                    <DxGridDataColumn FieldName="Note" Caption="Note" />
+                                                                    <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                        <CellEditTemplate>
+                                                                            @if (postMaintainance.Status == EnumStatusMaintainance.InProgress)
+                                                                            {
+                                                                                <DxComboBox Data="@listString" @bind-Value="@postMaintainanceProduct.Status" />
+                                                                            }
+                                                                            
+                                                                        </CellEditTemplate>
+                                                                    </DxGridDataColumn>
                                                                 </Columns>
+
                                                                 <EditFormTemplate Context="EditFormContextt">
                                                                     @{
                                                                         var a = (MaintainanceProductDto)EditFormContextt.EditModel;
@@ -303,7 +313,8 @@
                                                                                 <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <MyDxComboBox Data="@Batch"
                                                                                                   NullText="Select Batch..."
-                                                                                                  @bind-Value="@postMaintainanceProduct.SerialNumber"></MyDxComboBox>
+                                                                                                  @bind-Value="@postMaintainanceProduct.SerialNumber"
+                                                                                                  SelectedItemChanged="((string value) => selectByBatch(value))"></MyDxComboBox>
                                                                                 </DxFormLayoutItem>
                                                                                 <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <DxDateEdit @bind-Date="@currentExpiryDate" ReadOnly></DxDateEdit>
@@ -314,7 +325,7 @@
                                                                             <DxFormLayout CssClass="w-100">
                                                                                 @if (postMaintainance.Recurrent == true)
                                                                                 {
-                                                                                    <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                    <DxFormLayoutItem Caption="Next Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                         <DxDateEdit @bind-Date="@postMaintainanceProduct.Expired" ReadOnly></DxDateEdit>
                                                                                     </DxFormLayoutItem>
                                                                                 }
