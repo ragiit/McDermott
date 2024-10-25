@@ -249,6 +249,16 @@
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
                                                             </DxFormLayoutItem>
+
+                                                            @{
+                                                                var a = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                                                                var res = "-";
+                                                                if (a is not null)
+                                                                {
+                                                                    res = $"{a.PstProl}/{a.PstPrb}";
+                                                                }
+                                                            }
+
                                                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                                             {
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
@@ -282,6 +292,10 @@
                                                                                                 Caption="Insurance Company" />
                                                                         </Columns>
                                                                     </MyDxComboBox>
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PRB" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@res" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
                                                                 </DxFormLayoutItem>
                                                             }
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
@@ -433,13 +447,13 @@
                                                                               ValueFieldName="Id"
                                                                               TextChanged="((string e) => OnInputProjectChanged(e))">
                                                                     <Buttons>
-                                                                        <DxEditorButton Click="OnSearchProjectIndexDecrement" 
-                                                                             Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                        <DxEditorButton Click="OnSearchProjectIndexDecrement"
+                                                                                        Visible="(!IsStatus(EnumStatusAccident.Done))"
                                                                                         IconCssClass="fa-solid fa-caret-left"
                                                                                         Tooltip="Previous Index" />
                                                                         <DxEditorButton Click="OnSearchProject"
                                                                                         IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                         Visible="(!IsStatus(EnumStatusAccident.Done))"
+                                                                                        Visible="(!IsStatus(EnumStatusAccident.Done))"
                                                                                         Tooltip="Search" />
                                                                         <DxEditorButton Click="OnSearchProjectIndexIncrement"
                                                                                         IconCssClass="fa-solid fa-caret-right"
@@ -1852,3 +1866,6 @@ else
 
     </PopUpGCHistoricalMedicalRecordPatient>
 </DxPopup>
+
+<PopUpPainScale IsPopUpPainScale="@IsPopUpPainScale"
+                OnClosePopup="OnClosePopup" />

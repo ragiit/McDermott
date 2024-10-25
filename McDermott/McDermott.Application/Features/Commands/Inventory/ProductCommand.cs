@@ -24,6 +24,36 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<Product, bool>> Predicate { get; } = predicate!;
         }
 
+        public class GetSingleProductQueryNew : IRequest<ProductDto>
+        {
+            public List<Expression<Func<Product, object>>> Includes { get; set; }
+            public Expression<Func<Product, bool>> Predicate { get; set; }
+            public Expression<Func<Product, Product>> Select { get; set; }
+
+            public List<(Expression<Func<Product, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetProductQueryNew : IRequest<(List<ProductDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Product, object>>> Includes { get; set; }
+            public Expression<Func<Product, bool>> Predicate { get; set; }
+            public Expression<Func<Product, Product>> Select { get; set; }
+
+            public List<(Expression<Func<Product, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
         #endregion GET (Bisa berdasarkan kondisi WHERE juga)
 
         #region CREATE

@@ -38,15 +38,6 @@
                                             <DxTab Text="Planned" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Planned)"></DxTab>
                                             <DxTab Text="Confirmed" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Confirmed)"></DxTab>
                                             <DxTab Text="Nurse Station" Enabled="@IsStatus(EnumStatusGeneralConsultantService.NurseStation)"></DxTab>
-                                            <DxTab Text="Waiting" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Waiting)"></DxTab>
-                                            @if (IsStatus(EnumStatusGeneralConsultantService.ProcedureRoom))
-                                            {
-                                                <DxTab Text="Procedure Room" Enabled="@IsStatus(EnumStatusGeneralConsultantService.ProcedureRoom)"></DxTab>
-                                            }
-                                            else
-                                            {
-                                                <DxTab Text="Physician" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Physician)"></DxTab>
-                                            }
                                             <DxTab Text="Finished" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Finished)"></DxTab>
                                             <DxTab Text="Canceled" Enabled="@IsStatus(EnumStatusGeneralConsultantService.Canceled)"></DxTab>
                                         </DxTabs>
@@ -112,17 +103,38 @@
                                                 </div>
                                             </div>
                                         </div>
-
-
                                     }
-                                } 
+                                }
+
+                                @if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))
+                                {
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="w-100">
+                                                <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
+                                                    <Items>
+                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                                       IconCssClass="fa-solid fa-notes-medical"
+                                                                       Click="OnReferToClick"
+                                                                       Text="Refer To" />
+
+                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                                       IconCssClass="fa-solid fa-notes-medical"
+                                                                       Click="OnClickReferralPrescriptionConcoction"
+                                                                       Text="Referral Prescription & Concoction" />
+                                                    </Items>
+                                                </DxToolbar>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
 
                                 @* General Information Services *@
                                 <div class="w-100">
                                     <div class="w-100">
                                         <div class="card">
                                             <div class="card-header">
-                                                <span class="fw-bolder">General Consultation Service Information</span>
+                                                <span class="fw-bolder">General Information</span>
                                             </div>
 
                                             <div class="card-body">
@@ -325,6 +337,16 @@
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
                                                             </DxFormLayoutItem>
+
+                                                            @{
+                                                                var a = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                                                                var res = "-";
+                                                                if (a is not null)
+                                                                {
+                                                                    res = $"{a.PstProl}/{a.PstPrb}";
+                                                                }
+                                                            }
+
                                                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                                             {
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
@@ -356,6 +378,9 @@
                                                                         </Columns>
                                                                     </MyDxComboBox>
                                                                 </DxFormLayoutItem>
+                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PRB" ColSpanMd="12">
+            <DxTextBox @bind-Text="@res" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+        </DxFormLayoutItem>
                                                             }
 
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
@@ -386,7 +411,7 @@
                                                                                         IconCssClass="fa-solid fa-caret-right"
                                                                                         Tooltip="Next Index" />
                                                                     </Buttons>
-                                                                    <Columns> 
+                                                                    <Columns>
                                                                         <DxListEditorColumn FieldName="Name" Caption="Name" />
                                                                         <DxListEditorColumn FieldName="ParentLocation.Name" Caption="Parent" />
                                                                     </Columns>
@@ -1186,14 +1211,34 @@
                                                                                         <div class="row w-100">
                                                                                             <DxFormLayout CssClass="w-100">
                                                                                                 <div class="col-md-4">
-                                                                                                    <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                                    <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" CaptionCssClass="required-caption normal-caption" Caption="Vaccination Given" ColSpanMd="12">
                                                                                                         <MyDxComboBox Data="@Products"
+                                                                                                                      NullText="Select Vaccination Given"
+                                                                                                                      @ref="refVaccinationGivenComboBox"
                                                                                                                       @bind-Value="@VaccinationGiven.ProductId"
-                                                                                                                      NullText="Select Vaccination..."
                                                                                                                       TextFieldName="Name"
                                                                                                                       ValueFieldName="Id"
-                                                                                                                      SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))" />
-                                                                                                        <ValidationMessage For="@(()=> VaccinationGiven.ProductId)"   />
+                                                                                                                      SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
+                                                                                                                      TextChanged="((string e) => OnInputVaccinationGivenChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGiven"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="@nameof(ProductDto.Name)" Caption="Name" />
+                                                                                                                <DxListEditorColumn FieldName="@nameof(ProductDto.InternalReference)" Caption="Internal Reference" />
+                                                                                                                <DxListEditorColumn FieldName="@nameof(ProductDto.SalesPrice)" Caption="Sales Price" />
+                                                                                                                <DxListEditorColumn FieldName="ProductDto.Uom.Name" Caption="UoM" />
+                                                                                                            </Columns>
+                                                                                                        </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=>VaccinationGiven.ProductId)" />
                                                                                                     </DxFormLayoutItem>
 
                                                                                                     <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -1228,13 +1273,36 @@
 
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
-                                                                                                    <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <MyDxComboBox Data="@Physicions"
-                                                                                                                      NullText="Select Sales Person..."
+                                                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Sales Person" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@SalesPersons"
+                                                                                                                      NullText="Select Sales Person"
+                                                                                                                      @ref="refSalesPersonComboBox"
                                                                                                                       @bind-Value="@VaccinationGiven.SalesPersonId"
                                                                                                                       TextFieldName="Name"
-                                                                                                                      ValueFieldName="Id">
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      TextChanged="((string e) => OnInputSalesPersonChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchSalesPersonIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchSalesPerson"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchSalesPersonIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="Name" />
+                                                                                                                <DxListEditorColumn FieldName="Email" />
+                                                                                                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                                                                <DxListEditorColumn FieldName="Gender" />
+                                                                                                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                                                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                                                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                                                            </Columns>
                                                                                                         </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=> VaccinationGiven.SalesPersonId)" />
                                                                                                     </DxFormLayoutItem>
 
                                                                                                     <DxFormLayoutItem Caption="Reminder Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -1254,13 +1322,36 @@
                                                                                                         <ValidationMessage For="@(()=> VaccinationGiven.Dose)"   />
                                                                                                     </DxFormLayoutItem>
 
-                                                                                                    <DxFormLayoutItem Caption="Educator" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <MyDxComboBox Data="@Physicions"
-                                                                                                                      NullText="Select Educator..."
+                                                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Educator" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@Educators"
+                                                                                                                      NullText="Select Educator"
+                                                                                                                      @ref="refEducatorComboBox"
                                                                                                                       @bind-Value="@VaccinationGiven.EducatorId"
                                                                                                                       TextFieldName="Name"
-                                                                                                                      ValueFieldName="Id">
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      TextChanged="((string e) => OnInputEducatorChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchEducatorIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchEducator"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchEducatorIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="Name" />
+                                                                                                                <DxListEditorColumn FieldName="Email" />
+                                                                                                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                                                                <DxListEditorColumn FieldName="Gender" />
+                                                                                                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                                                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                                                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                                                            </Columns>
                                                                                                         </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=> VaccinationGiven.EducatorId)" />
                                                                                                     </DxFormLayoutItem>
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
@@ -1271,17 +1362,42 @@
                                                                                                                     NullText="Next Dose Date">
                                                                                                         </DxDateEdit>
                                                                                                     </DxFormLayoutItem>
-                                                                                                    <DxFormLayoutItem Caption="Physicion" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <MyDxComboBox Data="@Physicions"
-                                                                                                                      NullText="Select Physicion..."
+
+                                                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Physicion" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@VaccinationGivenPhysicions"
+                                                                                                                      NullText="Select Physicion"
+                                                                                                                      @ref="refVaccinationGivenPhysicionComboBox"
                                                                                                                       @bind-Value="@VaccinationGiven.PhysicianId"
                                                                                                                       TextFieldName="Name"
-                                                                                                                      ValueFieldName="Id">
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      TextChanged="((string e) => OnInputVaccinationGivenPhysicionChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenPhysicionIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenPhysicion"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenPhysicionIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="Name" />
+                                                                                                                <DxListEditorColumn FieldName="Email" />
+                                                                                                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                                                                <DxListEditorColumn FieldName="Gender" />
+                                                                                                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                                                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                                                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                                                            </Columns>
                                                                                                         </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=> VaccinationGiven.PhysicianId)" />
                                                                                                     </DxFormLayoutItem>
+
                                                                                                     <DxFormLayoutItem Caption="Observations" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                         <MyTextBox @bind-Text="@VaccinationGiven.Observations"
-                                                                                                                   NullText="Observations..."
+                                                                                                                   NullText="Observations"
                                                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                                    ShowValidationIcon="true" />
                                                                                                         <ValidationMessage For="@(()=> VaccinationGiven.Observations)"   />
@@ -1317,7 +1433,7 @@
                                                                                         KeyFieldName="Id">
 
                                                                                     <ToolbarTemplate>
-                                                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain" hidden="@(GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Finished)">
                                                                                             <DxToolbarItem Text="New" Click="NewItemDetailVaccinationPlan_Click" IconCssClass="fa-solid fa-plus" />
                                                                                             <DxToolbarItem Text="Edit" Click="async () => await EditItemDetailVaccinationPlan_Click(context.Grid)" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataVaccinationPlanItems.Count > 0 && VaccinationPlans.Count > 0 " />
                                                                                             <DxToolbarItem Text="Delete" Click="(() =>    GridVaccinationPlan.ShowRowDeleteConfirmation(FocusedRowVisibleIndexVaccinationPlan))" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataVaccinationPlanItems.Count > 0 && VaccinationPlans.Count > 0" />
@@ -1345,7 +1461,7 @@
                                                                                         <DxGridDataColumn FieldName="SalesPerson.Name" Caption="SalesPerson" />
                                                                                         <DxGridDataColumn FieldName="Educator.Name" Caption="Educator" />
                                                                                         <DxGridDataColumn FieldName="StatusName" Caption="Status" />
-                                                                                        <DxGridDataColumn AllowSort="false" Width="150px" TextAlignment="GridTextAlignment.Center">
+                                                                                        <DxGridDataColumn AllowSort="false" Visible="GeneralConsultanService.Status != EnumStatusGeneralConsultantService.Finished" Width="150px" TextAlignment="GridTextAlignment.Center">
                                                                                             <CellDisplayTemplate>
                                                                                                 <DxButton RenderStyle="ButtonRenderStyle.Info"
                                                                                                           Click="@(()=> OnClickGiveVaccine((context.DataItem as VaccinationPlanDto)))"
@@ -1367,18 +1483,48 @@
                                                                                         <div class="row w-100">
                                                                                             <DxFormLayout CssClass="w-100">
                                                                                                 <div class="col-md-4">
-                                                                                                    <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <DxComboBox Data="@Products"
-                                                                                                                    @bind-Value="@VaccinationPlan.ProductId"
-                                                                                                                    FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                                                    NullText="Select Vaccination..."
-                                                                                                                    TextFieldName="Name"
-                                                                                                                    ReadOnly="@(VaccinationPlan.Id != 0)"
-                                                                                                                    ValueFieldName="Id"
-                                                                                                                    SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
-                                                                                                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                                                    ShowValidationIcon="true" />
-                                                                                                        <ValidationMessage For="@(()=> VaccinationPlan.ProductId)"   />
+                                                                                                    @*   <DxFormLayoutItem Caption="Vaccination" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                            <DxComboBox Data="@Products"
+                                                                                            @bind-Value="@VaccinationPlan.ProductId"
+                                                                                            FilteringMode="@DataGridFilteringMode.Contains"
+                                                                                            NullText="Select Vaccination..."
+                                                                                            TextFieldName="Name"
+                                                                                            ReadOnly="@(VaccinationPlan.Id != 0)"
+                                                                                            ValueFieldName="Id"
+                                                                                            SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
+                                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                            ShowValidationIcon="true" />
+                                                                                            <ValidationMessage For="@(()=> VaccinationPlan.ProductId)"   />
+                                                                                            </DxFormLayoutItem> *@
+
+                                                                                                    <DxFormLayoutItem CaptionPosition="CaptionPosition.Vertical" CaptionCssClass="required-caption normal-caption" Caption="Vaccination Given" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@Products"
+                                                                                                                      NullText="Select Vaccination Given"
+                                                                                                                      @ref="refVaccinationGivenComboBox"
+                                                                                                                      @bind-Value="@VaccinationPlan.ProductId"
+                                                                                                                      TextFieldName="Name"
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
+                                                                                                                      TextChanged="((string e) => OnInputVaccinationGivenChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGiven"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="@nameof(ProductDto.Name)" Caption="Name" />
+                                                                                                                <DxListEditorColumn FieldName="@nameof(ProductDto.InternalReference)" Caption="Internal Reference" />
+                                                                                                                <DxListEditorColumn FieldName="@nameof(ProductDto.SalesPrice)" Caption="Sales Price" />
+                                                                                                                <DxListEditorColumn FieldName="ProductDto.Uom.Name" Caption="UoM" />
+                                                                                                            </Columns>
+                                                                                                        </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=>VaccinationPlan.ProductId)" />
                                                                                                     </DxFormLayoutItem>
 
                                                                                                     <DxFormLayoutItem Caption="Batch" Enabled="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -1414,13 +1560,45 @@
 
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
-                                                                                                    <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <MyDxComboBox Data="@Physicions"
-                                                                                                                      NullText="Select Sales Person..."
+                                                                                                    @*   <DxFormLayoutItem Caption="Sales Person" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                            NullText="Select Sales Person..."
+                                                                                            @bind-Value="@VaccinationPlan.SalesPersonId"
+                                                                                            TextFieldName="Name"
+                                                                                            ValueFieldName="Id">
+                                                                                            </MyDxComboBox>
+                                                                                            </DxFormLayoutItem> *@
+
+                                                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Sales Person" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@SalesPersons"
+                                                                                                                      NullText="Select Sales Person"
+                                                                                                                      @ref="refSalesPersonComboBox"
                                                                                                                       @bind-Value="@VaccinationPlan.SalesPersonId"
                                                                                                                       TextFieldName="Name"
-                                                                                                                      ValueFieldName="Id">
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      TextChanged="((string e) => OnInputSalesPersonChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchSalesPersonIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchSalesPerson"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchSalesPersonIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="Name" />
+                                                                                                                <DxListEditorColumn FieldName="Email" />
+                                                                                                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                                                                <DxListEditorColumn FieldName="Gender" />
+                                                                                                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                                                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                                                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                                                            </Columns>
                                                                                                         </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=> VaccinationPlan.SalesPersonId)" />
                                                                                                     </DxFormLayoutItem>
 
                                                                                                     <DxFormLayoutItem Caption="Reminder Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
@@ -1440,13 +1618,45 @@
                                                                                                         <ValidationMessage For="@(()=> VaccinationPlan.Dose)"   />
                                                                                                     </DxFormLayoutItem>
 
-                                                                                                    <DxFormLayoutItem Caption="Educator" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <MyDxComboBox Data="@Physicions"
-                                                                                                                      NullText="Select Educator..."
+                                                                                                    @*     <DxFormLayoutItem Caption="Educator" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                            NullText="Select Educator..."
+                                                                                            @bind-Value="@VaccinationPlan.EducatorId"
+                                                                                            TextFieldName="Name"
+                                                                                            ValueFieldName="Id">
+                                                                                            </MyDxComboBox>
+                                                                                            </DxFormLayoutItem> *@
+
+                                                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Educator" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@Educators"
+                                                                                                                      NullText="Select Educator"
+                                                                                                                      @ref="refEducatorComboBox"
                                                                                                                       @bind-Value="@VaccinationPlan.EducatorId"
                                                                                                                       TextFieldName="Name"
-                                                                                                                      ValueFieldName="Id">
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      TextChanged="((string e) => OnInputEducatorChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchEducatorIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchEducator"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchEducatorIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="Name" />
+                                                                                                                <DxListEditorColumn FieldName="Email" />
+                                                                                                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                                                                <DxListEditorColumn FieldName="Gender" />
+                                                                                                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                                                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                                                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                                                            </Columns>
                                                                                                         </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=> VaccinationPlan.EducatorId)" />
                                                                                                     </DxFormLayoutItem>
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
@@ -1457,13 +1667,44 @@
                                                                                                                     NullText="Next Dose Date">
                                                                                                         </DxDateEdit>
                                                                                                     </DxFormLayoutItem>
-                                                                                                    <DxFormLayoutItem Caption="Physicion" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                                        <MyDxComboBox Data="@Physicions"
-                                                                                                                      NullText="Select Physicion..."
+                                                                                                    @*  <DxFormLayoutItem Caption="Physicion" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                            <MyDxComboBox Data="@Physicions"
+                                                                                            NullText="Select Physicion..."
+                                                                                            @bind-Value="@VaccinationPlan.PhysicianId"
+                                                                                            TextFieldName="Name"
+                                                                                            ValueFieldName="Id">
+                                                                                            </MyDxComboBox>
+                                                                                            </DxFormLayoutItem> *@
+                                                                                                    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Physicion" ColSpanMd="12">
+                                                                                                        <MyDxComboBox Data="@VaccinationGivenPhysicions"
+                                                                                                                      NullText="Select Physicion"
+                                                                                                                      @ref="refVaccinationGivenPhysicionComboBox"
                                                                                                                       @bind-Value="@VaccinationPlan.PhysicianId"
                                                                                                                       TextFieldName="Name"
-                                                                                                                      ValueFieldName="Id">
+                                                                                                                      ValueFieldName="Id"
+                                                                                                                      TextChanged="((string e) => OnInputVaccinationGivenPhysicionChanged(e))">
+                                                                                                            <Buttons>
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenPhysicionIndexDecrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-left"
+                                                                                                                                Tooltip="Previous Index" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenPhysicion"
+                                                                                                                                IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                                Tooltip="Search" />
+                                                                                                                <DxEditorButton Click="OnSearchVaccinationGivenPhysicionIndexIncrement"
+                                                                                                                                IconCssClass="fa-solid fa-caret-right"
+                                                                                                                                Tooltip="Next Index" />
+                                                                                                            </Buttons>
+                                                                                                            <Columns>
+                                                                                                                <DxListEditorColumn FieldName="Name" />
+                                                                                                                <DxListEditorColumn FieldName="Email" />
+                                                                                                                <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                                                                <DxListEditorColumn FieldName="Gender" />
+                                                                                                                <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                                                                                <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                                                                                <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                                                                            </Columns>
                                                                                                         </MyDxComboBox>
+                                                                                                        <ValidationMessage For="@(()=> VaccinationPlan.PhysicianId)" />
                                                                                                     </DxFormLayoutItem>
                                                                                                     <DxFormLayoutItem Caption="Observations" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                                         <MyTextBox @bind-Text="@VaccinationPlan.Observations"
@@ -1523,44 +1764,6 @@
                                                             </DxTabPage>
                                                         </DxTabs>
                                                     </DxTabPage>
-
-                                                    @if (IsStatus(EnumStatusGeneralConsultantService.Physician) || IsStatus(EnumStatusGeneralConsultantService.Finished) || IsStatus(EnumStatusGeneralConsultantService.Canceled))
-                                                    {
-                                                        <DxTabPage Text="BPJS Integration">
-                                                            <div class="w-100 mt-2">
-                                                                <div class="card">
-                                                                    <div class="card-header">
-                                                                        <span class="fw-bolder">BPJS Integration</span>
-                                                                    </div>
-
-                                                                    <div class="card-body">
-                                                                        <div class="row w-100">
-                                                                            <div class="col-md-12">
-                                                                                <DxFormLayout CssClass="w-100">
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Number" ColSpanMd="12">
-                                                                                        <label>-</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Refer" ColSpanMd="12">
-                                                                                        <label>@GeneralConsultanService.PPKRujukanName</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Spesialis/Subspesialis" ColSpanMd="12">
-                                                                                        <label>@($"{GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName}/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisName}")</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Note" ColSpanMd="12">
-                                                                                        <label>@GeneralConsultanService.ReferReason</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="12">
-                                                                                        <label>@GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                </DxFormLayout>
-                                                                            </div>
-
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </DxTabPage>
-                                                    }
                                                 </DxTabs>
                                             </div>
                                         </div>
@@ -1629,3 +1832,6 @@ else
 
     </PopUpGCHistoricalMedicalRecordPatient>
 </DxPopup>
+
+<PopUpPainScale IsPopUpPainScale="@IsPopUpPainScale"
+                OnClosePopup="OnClosePopup" />

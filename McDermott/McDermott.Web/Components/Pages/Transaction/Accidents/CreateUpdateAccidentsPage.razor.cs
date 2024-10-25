@@ -540,6 +540,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                                 Name = x.Insurance == null ? "" : x.Insurance.Name,
                             },
                             PolicyNumber = x.PolicyNumber,
+                            PstPrb = x.PstPrb,
+                            PstProl = x.PstProl
                         }
                     })).Item1;
                 }
@@ -692,6 +694,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 });
                 InsurancePolicies = result.Item1;
@@ -903,6 +907,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
                         PolicyNumber = x.PolicyNumber,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 })).Item1;
             }
@@ -1199,6 +1205,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
                     PolicyNumber = x.PolicyNumber,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 }
             })).Item1;
         }
@@ -1786,10 +1794,15 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
         private DevExpress.Blazor.RichEdit.Document documentAPI;
         public byte[]? DocumentContent;
 
-        private async Task OnClickPainScalePopUp()
+        private bool IsPopUpPainScale = false;
+        private void OnClickPainScalePopUp()
         {
+            IsPopUpPainScale = true;
         }
-
+        private void OnClosePopup()
+        {
+            IsPopUpPainScale = false;
+        }
         #endregion OnClick
 
         #region Assesment of Injury

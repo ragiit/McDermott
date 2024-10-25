@@ -373,8 +373,18 @@
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
                                                             </DxFormLayoutItem>
+
+                                                            @{
+                                                                var a = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                                                                var res = "-";
+                                                                if (a is not null)
+                                                                {
+                                                                    res = $"{a.PstProl}/{a.PstPrb}";
+                                                                }
+                                                            }
+
                                                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
-                                                            { 
+                                                            {
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
                                                                     <MyDxComboBox Data="@InsurancePolicies"
                                                                                   ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
@@ -404,6 +414,11 @@
                                                                         </Columns>
                                                                     </MyDxComboBox>
                                                                 </DxFormLayoutItem>
+
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PRB" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@res" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
+                                                                </DxFormLayoutItem>
                                                             }
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
                                                                 <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
@@ -425,7 +440,7 @@
                                                                     <ValidationMessage For="@(() => GeneralConsultanService.AppointmentDate)" />
                                                                 </DxFormLayoutItem>
                                                             }
-                                                              
+
                                                             <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption="Sick Leave" ColSpanMd="12">
                                                                 <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Checked="@GeneralConsultanService.IsSickLeave" />
                                                             </DxFormLayoutItem>
@@ -1214,6 +1229,8 @@ else
     </PopUpGCReferTo>
 </DxPopup>
 
+<PopUpPainScale IsPopUpPainScale="@IsPopUpPainScale"
+                OnClosePopup="OnClosePopup" />
 
 <DxPopup Visible="isPrint" Width="874px">
     <DxRichEdit @ref="richEdit" ActiveRibbonTabIndex="0" DocumentContent="@DocumentContent" CssClass="w-100 ch-720">

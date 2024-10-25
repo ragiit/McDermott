@@ -224,6 +224,14 @@
                                     </MyDxComboBox>
                                     <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
                                 </DxFormLayoutItem>
+                                @{
+                                    var a = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                                    var res = "-";
+                                    if (a is not null)
+                                    {
+                                        res = $"{a.PstProl}/{a.PstPrb}";
+                                    }
+                                }
                                 @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                 {
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
@@ -254,6 +262,9 @@
                                                                     Caption="Insurance Company" />
                                             </Columns>
                                         </MyDxComboBox>
+                                    </DxFormLayoutItem>
+                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PRB" ColSpanMd="12">
+                                        <DxTextBox @bind-Text="@res" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
                                     </DxFormLayoutItem>
                                 }
 
@@ -363,6 +374,8 @@
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     }
                 });
             InsurancePolicies = result.Item1;
@@ -628,6 +641,8 @@
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
                         PolicyNumber = x.PolicyNumber,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
                     },
                     Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
                 })).Item1;
@@ -782,6 +797,8 @@
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
                     PolicyNumber = x.PolicyNumber,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 },
                 Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true
             })).Item1;

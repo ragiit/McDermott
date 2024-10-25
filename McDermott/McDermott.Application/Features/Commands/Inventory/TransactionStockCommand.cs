@@ -15,7 +15,35 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<TransactionStock, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+        public class GetSingleTransactionStockQueryNew : IRequest<TransactionStockDto>
+        {
+            public List<Expression<Func<TransactionStock, object>>> Includes { get; set; }
+            public Expression<Func<TransactionStock, bool>> Predicate { get; set; }
+            public Expression<Func<TransactionStock, TransactionStock>> Select { get; set; }
 
+            public List<(Expression<Func<TransactionStock, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetTransactionStockQueryNew : IRequest<(List<TransactionStockDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<TransactionStock, object>>> Includes { get; set; }
+            public Expression<Func<TransactionStock, bool>> Predicate { get; set; }
+            public Expression<Func<TransactionStock, TransactionStock>> Select { get; set; }
+
+            public List<(Expression<Func<TransactionStock, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
         #endregion GET
 
         #region CREATE

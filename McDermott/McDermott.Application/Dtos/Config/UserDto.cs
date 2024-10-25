@@ -101,6 +101,7 @@ namespace McDermott.Application.Dtos.Config
         public bool? IsEmployee { get; set; } = false;
         public bool? IsPharmacy { get; set; } = false;
         public bool? IsPatient { get; set; } = false;
+        public bool? IsAdmin { get; set; } = false;
         public bool? IsUser { get; set; } = false;
         public bool IsMcu { get; set; } = false;
         public bool IsHr { get; set; } = false;
