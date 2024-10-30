@@ -130,9 +130,9 @@
 
         #region GET GeneralConsultan Logs
 
-        public class GetGeneralConsultationLogQuery(Expression<Func<GeneralConsultationLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GeneralConsultanlogDto>>
+        public class GetGeneralConsultationServiceLogQuery(Expression<Func<GeneralConsultationServiceLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GeneralConsultationServiceLogDto>>
         {
-            public Expression<Func<GeneralConsultationLog, bool>> Predicate { get; } = predicate!;
+            public Expression<Func<GeneralConsultationServiceLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
 
@@ -140,28 +140,28 @@
 
         #region Create GeneralConsultan Logs
 
-        public class CreateGeneralConsultationLogRequest(GeneralConsultanlogDto GeneralConsultanlogDto) : IRequest<GeneralConsultanlogDto>
+        public class CreateGeneralConsultationLogRequest(GeneralConsultationServiceLogDto GeneralConsultanlogDto) : IRequest<GeneralConsultationServiceLogDto>
         {
-            public GeneralConsultanlogDto GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+            public GeneralConsultationServiceLogDto GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
         }
 
-        public class CreateListGeneralConsultationLogRequest(List<GeneralConsultanlogDto> GeneralConsultanlogDto) : IRequest<List<GeneralConsultanlogDto>>
+        public class CreateListGeneralConsultationLogRequest(List<GeneralConsultationServiceLogDto> GeneralConsultanlogDto) : IRequest<List<GeneralConsultationServiceLogDto>>
         {
-            public List<GeneralConsultanlogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+            public List<GeneralConsultationServiceLogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
         }
 
         #endregion Create GeneralConsultan Logs
 
         #region Update GeneralConsultan Logs
 
-        public class UpdateGeneralConsultationLogRequest(GeneralConsultanlogDto GeneralConsultanlogDto) : IRequest<GeneralConsultanlogDto>
+        public class UpdateGeneralConsultationLogRequest(GeneralConsultationServiceLogDto GeneralConsultanlogDto) : IRequest<GeneralConsultationServiceLogDto>
         {
-            public GeneralConsultanlogDto GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+            public GeneralConsultationServiceLogDto GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
         }
 
-        public class UpdateListGeneralConsultationLogRequest(List<GeneralConsultanlogDto> GeneralConsultanlogDto) : IRequest<List<GeneralConsultanlogDto>>
+        public class UpdateListGeneralConsultationLogRequest(List<GeneralConsultationServiceLogDto> GeneralConsultanlogDto) : IRequest<List<GeneralConsultationServiceLogDto>>
         {
-            public List<GeneralConsultanlogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
+            public List<GeneralConsultationServiceLogDto> GeneralConsultanlogDto { get; set; } = GeneralConsultanlogDto;
         }
 
         #endregion Update GeneralConsultan Logs

@@ -11,7 +11,7 @@ namespace McDermott.Domain.Entities
         public long? GeneralConsultanServiceId { get; set; }
         public long? ProcedureRoomId { get; set; }
         public long? UserById { get; set; }
-        public Enum? Status { get; set; }
+        public EnumStatusGeneralConsultantService? Status { get; set; }
 
         public GeneralConsultanService? GeneralConsultanService { get; set; }
         public GeneralConsultanMedicalSupport? ProcedureRoom { get; set; }

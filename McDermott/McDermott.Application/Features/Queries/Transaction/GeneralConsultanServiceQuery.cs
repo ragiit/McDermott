@@ -20,10 +20,10 @@ namespace McDermott.Application.Features.Queries.Transaction
         IRequestHandler<GetSingleGeneralConsultanServicesQuery, GeneralConsultanServiceDto>,
         IRequestHandler<UpdateStatusGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
         IRequestHandler<DeleteGeneralConsultanServiceRequest, bool>,
-        IRequestHandler<GetGeneralConsultationLogQuery, List<GeneralConsultanlogDto>>,
-        IRequestHandler<CreateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
-        IRequestHandler<CreateListGeneralConsultationLogRequest, List<GeneralConsultanlogDto>>,
-        IRequestHandler<UpdateGeneralConsultationLogRequest, GeneralConsultanlogDto>,
+        IRequestHandler<GetGeneralConsultationServiceLogQuery, List<GeneralConsultationServiceLogDto>>,
+        IRequestHandler<CreateGeneralConsultationLogRequest, GeneralConsultationServiceLogDto>,
+        IRequestHandler<CreateListGeneralConsultationLogRequest, List<GeneralConsultationServiceLogDto>>,
+        IRequestHandler<UpdateGeneralConsultationLogRequest, GeneralConsultationServiceLogDto>,
         IRequestHandler<DeleteGeneralConsultationLogRequest, bool>,
         IRequestHandler<GetGeneralConsultanServiceCountQuery, int>,
 
@@ -579,20 +579,19 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region GET General Consultan Service Log
 
-        public async Task<List<GeneralConsultanlogDto>> Handle(GetGeneralConsultationLogQuery request, CancellationToken cancellationToken)
+        public async Task<List<GeneralConsultationServiceLogDto>> Handle(GetGeneralConsultationServiceLogQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetGeneralConsultationLogQuery_";
+                string cacheKey = $"GetGeneralConsultationServiceLogQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
-                if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultationLog>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultationServiceLog>? result))
                 {
-                    result = await _unitOfWork.Repository<GeneralConsultationLog>().Entities
+                    result = await _unitOfWork.Repository<GeneralConsultationServiceLog>().Entities
                         .Include(z => z.GeneralConsultanService)
-                        .Include(z => z.ProcedureRoom)
                         .Include(z => z.UserBy)
 
                         //.ThenInclude(z => z.Gender)
@@ -606,7 +605,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                return result.ToList().Adapt<List<GeneralConsultanlogDto>>();
+                return result.ToList().Adapt<List<GeneralConsultationServiceLogDto>>();
             }
             catch (Exception)
             {
@@ -618,17 +617,17 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region CREATE General Consultan Service Log
 
-        public async Task<GeneralConsultanlogDto> Handle(CreateGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        public async Task<GeneralConsultationServiceLogDto> Handle(CreateGeneralConsultationLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultationLog>().AddAsync(request.GeneralConsultanlogDto.Adapt<GeneralConsultationLog>());
+                var result = await _unitOfWork.Repository<GeneralConsultationServiceLog>().AddAsync(request.GeneralConsultanlogDto.Adapt<GeneralConsultationServiceLog>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGeneralConsultationLogQuery_");
+                _cache.Remove("GetGeneralConsultationServiceLogQuery_");
 
-                return result.Adapt<GeneralConsultanlogDto>();
+                return result.Adapt<GeneralConsultationServiceLogDto>();
             }
             catch (Exception)
             {
@@ -636,17 +635,17 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        public async Task<List<GeneralConsultanlogDto>> Handle(CreateListGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        public async Task<List<GeneralConsultationServiceLogDto>> Handle(CreateListGeneralConsultationLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultationLog>().AddAsync(request.GeneralConsultanlogDto.Adapt<List<GeneralConsultationLog>>());
+                var result = await _unitOfWork.Repository<GeneralConsultationServiceLog>().AddAsync(request.GeneralConsultanlogDto.Adapt<List<GeneralConsultationServiceLog>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGeneralConsultationLogQuery_");
+                _cache.Remove("GetGeneralConsultationServiceLogQuery_");
 
-                return result.Adapt<List<GeneralConsultanlogDto>>();
+                return result.Adapt<List<GeneralConsultationServiceLogDto>>();
             }
             catch (Exception)
             {
@@ -658,17 +657,17 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region Update General Consultan Service Log
 
-        public async Task<GeneralConsultanlogDto> Handle(UpdateGeneralConsultationLogRequest request, CancellationToken cancellationToken)
+        public async Task<GeneralConsultationServiceLogDto> Handle(UpdateGeneralConsultationLogRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<GeneralConsultationLog>().UpdateAsync(request.GeneralConsultanlogDto.Adapt<GeneralConsultationLog>());
+                var result = await _unitOfWork.Repository<GeneralConsultationServiceLog>().UpdateAsync(request.GeneralConsultanlogDto.Adapt<GeneralConsultationServiceLog>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGeneralConsultationLogQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultationServiceLogQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<GeneralConsultanlogDto>();
+                return result.Adapt<GeneralConsultationServiceLogDto>();
             }
             catch (Exception)
             {
@@ -686,17 +685,17 @@ namespace McDermott.Application.Features.Queries.Transaction
             {
                 if (request.Id > 0)
                 {
-                    await _unitOfWork.Repository<GeneralConsultationLog>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<GeneralConsultationServiceLog>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<GeneralConsultationLog>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<GeneralConsultationServiceLog>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGeneralConsultationLogQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultationServiceLogQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }

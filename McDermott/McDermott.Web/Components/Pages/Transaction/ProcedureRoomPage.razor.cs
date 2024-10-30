@@ -514,7 +514,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             LabUom = labTest.LabUom;
         }
 
-        private GeneralConsultanlogDto generalLog = new GeneralConsultanlogDto();
+        private GeneralConsultanMedicalSupportLogDto generalLog = new GeneralConsultanMedicalSupportLogDto();
 
         private bool IsStatus(EnumStatusGeneralConsultantServiceProcedureRoom status) => GeneralConsultanMedicalSupport.Status == status;
 
