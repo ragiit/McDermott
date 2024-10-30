@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class GeneralConsultationLog : BaseAuditableEntity
+    public class GeneralConsultationServiceLog : BaseAuditableEntity
     {
-        public long? GeneralConsultanServiceId { get; set; }
-        public long? ProcedureRoomId { get; set; }
+        public long? GeneralConsultationServiceId { get; set; }
         public long? UserById { get; set; }
-        public Enum? Status { get; set; }
+        public EnumStatusGeneralConsultantService status {get;set;}
 
         public GeneralConsultanService? GeneralConsultanService { get; set; }
-        public GeneralConsultanMedicalSupport? ProcedureRoom { get; set; }
         public User? UserBy {  get; set; }
-        
+
     }
 }
