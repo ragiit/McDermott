@@ -92,11 +92,12 @@ namespace McDermott.Persistence.Context
         public DbSet<Accident> Accidents { get; set; }
         public DbSet<LabResultDetail> LabResultDetails { get; set; }
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
+        public DbSet<GeneralConsultationLog> GeneralConsultanServiceLogs { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
         public DbSet<GeneralConsultanCPPT> GeneralConsultanCPPTs { get; set; }
         public DbSet<GeneralConsultanMedicalSupport> GeneralConsultanMedicalSupports { get; set; }
 
-        public DbSet<GeneralConsultationLog> GeneralConsultationLogs { get; set; }
+        public DbSet<GeneralConsultanMedicalSupportLog> GeneralConsultanMedicalSupportLogs { get; set; }
         public DbSet<VaccinationPlan> VaccinationPlans { get; set; }
 
         #endregion Transfer
@@ -152,6 +153,7 @@ namespace McDermott.Persistence.Context
 
         public DbSet<InventoryAdjusment> InventoryAdjusments { get; set; }
         public DbSet<InventoryAdjusmentDetail> InventoryAdjusmentDetails { get; set; }
+        public DbSet<InventoryAdjusmentLog> InventoryAdjusmentLogs { get; set; }
 
         #endregion MyRegion
 
