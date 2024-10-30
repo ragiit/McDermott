@@ -123,6 +123,14 @@
                                                 <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
                                                 <ValidationMessage For="@(()=>a.IsTelemedicine)" />
                                             </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
+                                                <ValidationMessage For="@(()=>a.IsTelemedicine)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Maternity" ColSpanMd="12">
+                                                <DxCheckBox @bind-Checked="@a.IsMaternity" />
+                                                <ValidationMessage For="@(()=>a.IsMaternity)" />
+                                            </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
 
@@ -131,6 +139,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
+
                                 </MyGridPaginate>
                                 <div class="row">
                                     <DxFormLayout>

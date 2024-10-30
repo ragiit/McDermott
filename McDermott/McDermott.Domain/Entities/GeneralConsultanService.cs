@@ -27,6 +27,7 @@ namespace McDermott.Domain.Entities
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
         public bool IsGC { get; set; }
+        public bool IsMaternity { get; set; }
 
         [NotMapped]
         public string RegistrationDateString => RegistrationDate.GetValueOrDefault().ToString("dd-MM-yyyy");

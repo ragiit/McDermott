@@ -77,6 +77,7 @@ namespace McDermott.Application.Features.Queries.Config
                     query = query.Select(x => new User
                     {
                         Id = x.Id,
+                        Name = x.Name
                     });
 
                 if (!request.IsGetAll)

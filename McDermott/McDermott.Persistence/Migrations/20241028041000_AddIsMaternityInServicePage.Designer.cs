@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241028041000_AddIsMaternityInServicePage")]
+    partial class AddIsMaternityInServicePage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2196,9 +2199,6 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsGC")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsMaternity")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsMaternityLeave")

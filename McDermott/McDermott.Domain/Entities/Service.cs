@@ -14,6 +14,7 @@
         public bool IsMcu { get; set; } = false;
         public bool IsVaccination { get; set; } = false;
         public bool IsTelemedicine { get; set; } = false;
+        public bool IsMaternity { get; set; } = false;
         public long? ServicedId { get; set; }
 
         [SetToNull]

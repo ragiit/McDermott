@@ -1,14 +1,14 @@
- public class GeneralConsultanMedicalSupportCommand
+ public class BpjsClassificationCommand
  {
      #region GET
 
-     public class GetGeneralConsultanMedicalSupportQuery : IRequest<(List<GeneralConsultanMedicalSupportDto>, int PageIndex, int PageSize, int PageCount)>
+     public class GetBpjsClassificationQuery : IRequest<(List<BpjsClassificationDto>, int PageIndex, int PageSize, int PageCount)>
      {
-         public List<Expression<Func<GeneralConsultanMedicalSupport, object>>> Includes { get; set; }
-         public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; set; }
-         public Expression<Func<GeneralConsultanMedicalSupport, GeneralConsultanMedicalSupport>> Select { get; set; }
+         public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
+         public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
+         public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
 
-         public List<(Expression<Func<GeneralConsultanMedicalSupport, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+         public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
          public bool IsDescending { get; set; } = false; // default to ascending
          public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@
          public string SearchTerm { get; set; }
      }
 
-     public class GetSingleGeneralConsultanMedicalSupportQuery : IRequest<GeneralConsultanMedicalSupportDto>
+     public class GetSingleBpjsClassificationQuery : IRequest<BpjsClassificationDto>
      {
-         public List<Expression<Func<GeneralConsultanMedicalSupport, object>>> Includes { get; set; }
-         public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; set; }
-         public Expression<Func<GeneralConsultanMedicalSupport, GeneralConsultanMedicalSupport>> Select { get; set; }
+         public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
+         public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
+         public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
 
-         public List<(Expression<Func<GeneralConsultanMedicalSupport, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+         public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
          public bool IsDescending { get; set; } = false; // default to ascending
          public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@
          public string SearchTerm { get; set; }
      }
 
-     public class ValidateGeneralConsultanMedicalSupport(Expression<Func<GeneralConsultanMedicalSupport, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateBpjsClassification(Expression<Func<BpjsClassification, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<BpjsClassification, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto) : IRequest<GeneralConsultanMedicalSupportDto>
+     public class CreateBpjsClassificationRequest(BpjsClassificationDto BpjsClassificationDto) : IRequest<BpjsClassificationDto>
      {
-         public GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto { get; set; } = GeneralConsultanMedicalSupportDto;
+         public BpjsClassificationDto BpjsClassificationDto { get; set; } = BpjsClassificationDto;
      }
 
-     public class BulkValidateGeneralConsultanMedicalSupport(List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportsToValidate) : IRequest<List<GeneralConsultanMedicalSupportDto>>
+     public class BulkValidateBpjsClassification(List<BpjsClassificationDto> BpjsClassificationsToValidate) : IRequest<List<BpjsClassificationDto>>
      {
-         public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportsToValidate { get; } = GeneralConsultanMedicalSupportsToValidate;
+         public List<BpjsClassificationDto> BpjsClassificationsToValidate { get; } = BpjsClassificationsToValidate;
      }
 
-     public class CreateListGeneralConsultanMedicalSupportRequest(List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos) : IRequest<List<GeneralConsultanMedicalSupportDto>>
+     public class CreateListBpjsClassificationRequest(List<BpjsClassificationDto> BpjsClassificationDtos) : IRequest<List<BpjsClassificationDto>>
      {
-         public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos { get; set; } = GeneralConsultanMedicalSupportDtos;
+         public List<BpjsClassificationDto> BpjsClassificationDtos { get; set; } = BpjsClassificationDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto) : IRequest<GeneralConsultanMedicalSupportDto>
+     public class UpdateBpjsClassificationRequest(BpjsClassificationDto BpjsClassificationDto) : IRequest<BpjsClassificationDto>
      {
-         public GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupportDto { get; set; } = GeneralConsultanMedicalSupportDto;
+         public BpjsClassificationDto BpjsClassificationDto { get; set; } = BpjsClassificationDto;
      }
 
-     public class UpdateListGeneralConsultanMedicalSupportRequest(List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos) : IRequest<List<GeneralConsultanMedicalSupportDto>>
+     public class UpdateListBpjsClassificationRequest(List<BpjsClassificationDto> BpjsClassificationDtos) : IRequest<List<BpjsClassificationDto>>
      {
-         public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos { get; set; } = GeneralConsultanMedicalSupportDtos;
+         public List<BpjsClassificationDto> BpjsClassificationDtos { get; set; } = BpjsClassificationDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteGeneralConsultanMedicalSupportRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
+     public class DeleteBpjsClassificationRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
      {
          public long Id { get; set; } = id ?? 0;
          public List<long> Ids { get; set; } = ids ?? [];
@@ -83,50 +83,50 @@
      #endregion DELETE
  }
 
-public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetGeneralConsultanMedicalSupportQuery, (List<GeneralConsultanMedicalSupportDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleGeneralConsultanMedicalSupportQuery, GeneralConsultanMedicalSupportDto>, IRequestHandler<ValidateGeneralConsultanMedicalSupport, bool>,
-     IRequestHandler<CreateGeneralConsultanMedicalSupportRequest, GeneralConsultanMedicalSupportDto>,
-     IRequestHandler<BulkValidateGeneralConsultanMedicalSupport, List<GeneralConsultanMedicalSupportDto>>,
-     IRequestHandler<CreateListGeneralConsultanMedicalSupportRequest, List<GeneralConsultanMedicalSupportDto>>,
-     IRequestHandler<UpdateGeneralConsultanMedicalSupportRequest, GeneralConsultanMedicalSupportDto>,
-     IRequestHandler<UpdateListGeneralConsultanMedicalSupportRequest, List<GeneralConsultanMedicalSupportDto>>,
-     IRequestHandler<DeleteGeneralConsultanMedicalSupportRequest, bool>
+public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetBpjsClassificationQuery, (List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>, IRequestHandler<ValidateBpjsClassification, bool>,
+     IRequestHandler<CreateBpjsClassificationRequest, BpjsClassificationDto>,
+     IRequestHandler<BulkValidateBpjsClassification, List<BpjsClassificationDto>>,
+     IRequestHandler<CreateListBpjsClassificationRequest, List<BpjsClassificationDto>>,
+     IRequestHandler<UpdateBpjsClassificationRequest, BpjsClassificationDto>,
+     IRequestHandler<UpdateListBpjsClassificationRequest, List<BpjsClassificationDto>>,
+     IRequestHandler<DeleteBpjsClassificationRequest, bool>
  {
      #region GET
 
-     public async Task<List<GeneralConsultanMedicalSupportDto>> Handle(BulkValidateGeneralConsultanMedicalSupport request, CancellationToken cancellationToken)
+     public async Task<List<BpjsClassificationDto>> Handle(BulkValidateBpjsClassification request, CancellationToken cancellationToken)
      {
-         var GeneralConsultanMedicalSupportDtos = request.GeneralConsultanMedicalSupportsToValidate;
+         var BpjsClassificationDtos = request.BpjsClassificationsToValidate;
 
          // Ekstrak semua kombinasi yang akan dicari di database
-         var GeneralConsultanMedicalSupportNames = GeneralConsultanMedicalSupportDtos.Select(x => x.Name).Distinct().ToList();
-         var a = GeneralConsultanMedicalSupportDtos.Select(x => x.CountryId).Distinct().ToList();
+         var BpjsClassificationNames = BpjsClassificationDtos.Select(x => x.Name).Distinct().ToList();
+         var a = BpjsClassificationDtos.Select(x => x.CountryId).Distinct().ToList();
 
-         var existingGeneralConsultanMedicalSupports = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>()
+         var existingBpjsClassifications = await _unitOfWork.Repository<BpjsClassification>()
              .Entities
              .AsNoTracking()
-             .Where(v => GeneralConsultanMedicalSupportNames.Contains(v.Name)
+             .Where(v => BpjsClassificationNames.Contains(v.Name)
                          && a.Contains(v.CountryId))
              .ToListAsync(cancellationToken);
 
-         return existingGeneralConsultanMedicalSupports.Adapt<List<GeneralConsultanMedicalSupportDto>>();
+         return existingBpjsClassifications.Adapt<List<BpjsClassificationDto>>();
      }
 
-     public async Task<bool> Handle(ValidateGeneralConsultanMedicalSupport request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(ValidateBpjsClassification request, CancellationToken cancellationToken)
      {
-         return await _unitOfWork.Repository<GeneralConsultanMedicalSupport>()
+         return await _unitOfWork.Repository<BpjsClassification>()
              .Entities
              .AsNoTracking()
              .Where(request.Predicate)  // Apply the Predicate for filtering
              .AnyAsync(cancellationToken);  // Check if any record matches the condition
      }
 
-     public async Task<(List<GeneralConsultanMedicalSupportDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanMedicalSupportQuery request, CancellationToken cancellationToken)
+     public async Task<(List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBpjsClassificationQuery request, CancellationToken cancellationToken)
      {
          try
          {
-             var query = _unitOfWork.Repository<GeneralConsultanMedicalSupport>().Entities.AsNoTracking();
+             var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking();
 
              if (request.Predicate is not null)
                  query = query.Where(request.Predicate);
@@ -142,8 +142,8 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
                  foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                  {
                      query = additionalOrderBy.IsDescending
-                         ? ((IOrderedQueryable<GeneralConsultanMedicalSupport>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                         : ((IOrderedQueryable<GeneralConsultanMedicalSupport>)query).ThenBy(additionalOrderBy.OrderBy);
+                         ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                         : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
                  }
              }
 
@@ -168,7 +168,7 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
              if (request.Select is not null)
                  query = query.Select(request.Select);
              else
-                 query = query.Select(x => new GeneralConsultanMedicalSupport
+                 query = query.Select(x => new BpjsClassification
                  {
                      Id = x.Id,
                      Name = x.Name,
@@ -189,11 +189,11 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
                      cancellationToken
                  );
 
-                 return (pagedItems.Adapt<List<GeneralConsultanMedicalSupportDto>>(), request.PageIndex, request.PageSize, totalPages);
+                 return (pagedItems.Adapt<List<BpjsClassificationDto>>(), request.PageIndex, request.PageSize, totalPages);
              }
              else
              {
-                 return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralConsultanMedicalSupportDto>>(), 0, 1, 1);
+                 return ((await query.ToListAsync(cancellationToken)).Adapt<List<BpjsClassificationDto>>(), 0, 1, 1);
              }
          }
          catch (Exception ex)
@@ -203,11 +203,11 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
          }
      }
 
-     public async Task<GeneralConsultanMedicalSupportDto> Handle(GetSingleGeneralConsultanMedicalSupportQuery request, CancellationToken cancellationToken)
+     public async Task<BpjsClassificationDto> Handle(GetSingleBpjsClassificationQuery request, CancellationToken cancellationToken)
      {
          try
          {
-             var query = _unitOfWork.Repository<GeneralConsultanMedicalSupport>().Entities.AsNoTracking();
+             var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking();
 
              if (request.Predicate is not null)
                  query = query.Where(request.Predicate);
@@ -223,8 +223,8 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
                  foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                  {
                      query = additionalOrderBy.IsDescending
-                         ? ((IOrderedQueryable<GeneralConsultanMedicalSupport>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                         : ((IOrderedQueryable<GeneralConsultanMedicalSupport>)query).ThenBy(additionalOrderBy.OrderBy);
+                         ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                         : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
                  }
              }
 
@@ -249,7 +249,7 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
              if (request.Select is not null)
                  query = query.Select(request.Select);
              else
-                 query = query.Select(x => new GeneralConsultanMedicalSupport
+                 query = query.Select(x => new BpjsClassification
                  {
                      Id = x.Id,
                      Name = x.Name,
@@ -261,7 +261,7 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
                      }
                  });
 
-             return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanMedicalSupportDto>();
+             return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BpjsClassificationDto>();
          }
          catch (Exception ex)
          {
@@ -274,17 +274,17 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
 
      #region CREATE
 
-     public async Task<GeneralConsultanMedicalSupportDto> Handle(CreateGeneralConsultanMedicalSupportRequest request, CancellationToken cancellationToken)
+     public async Task<BpjsClassificationDto> Handle(CreateBpjsClassificationRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().AddAsync(request.GeneralConsultanMedicalSupportDto.Adapt<CreateUpdateGeneralConsultanMedicalSupportDto>().Adapt<GeneralConsultanMedicalSupport>());
+             var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDto.Adapt<CreateUpdateBpjsClassificationDto>().Adapt<BpjsClassification>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanMedicalSupportQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GeneralConsultanMedicalSupportDto>();
+             return result.Adapt<BpjsClassificationDto>();
          }
          catch (Exception)
          {
@@ -292,16 +292,16 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
          }
      }
 
-     public async Task<List<GeneralConsultanMedicalSupportDto>> Handle(CreateListGeneralConsultanMedicalSupportRequest request, CancellationToken cancellationToken)
+     public async Task<List<BpjsClassificationDto>> Handle(CreateListBpjsClassificationRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().AddAsync(request.GeneralConsultanMedicalSupportDtos.Adapt<List<GeneralConsultanMedicalSupport>>());
+             var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDtos.Adapt<List<BpjsClassification>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanMedicalSupportQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GeneralConsultanMedicalSupportDto>>();
+             return result.Adapt<List<BpjsClassificationDto>>();
          }
          catch (Exception)
          {
@@ -313,17 +313,17 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
 
      #region UPDATE
 
-     public async Task<GeneralConsultanMedicalSupportDto> Handle(UpdateGeneralConsultanMedicalSupportRequest request, CancellationToken cancellationToken)
+     public async Task<BpjsClassificationDto> Handle(UpdateBpjsClassificationRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().UpdateAsync(request.GeneralConsultanMedicalSupportDto.Adapt<GeneralConsultanMedicalSupportDto>().Adapt<GeneralConsultanMedicalSupport>());
+             var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDto.Adapt<BpjsClassificationDto>().Adapt<BpjsClassification>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanMedicalSupportQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GeneralConsultanMedicalSupportDto>();
+             return result.Adapt<BpjsClassificationDto>();
          }
          catch (Exception)
          {
@@ -331,16 +331,16 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
          }
      }
 
-     public async Task<List<GeneralConsultanMedicalSupportDto>> Handle(UpdateListGeneralConsultanMedicalSupportRequest request, CancellationToken cancellationToken)
+     public async Task<List<BpjsClassificationDto>> Handle(UpdateListBpjsClassificationRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().UpdateAsync(request.GeneralConsultanMedicalSupportDtos.Adapt<List<GeneralConsultanMedicalSupport>>());
+             var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDtos.Adapt<List<BpjsClassification>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanMedicalSupportQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GeneralConsultanMedicalSupportDto>>();
+             return result.Adapt<List<BpjsClassificationDto>>();
          }
          catch (Exception)
          {
@@ -352,23 +352,23 @@ public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMem
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteGeneralConsultanMedicalSupportRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteBpjsClassificationRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<BpjsClassification>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<GeneralConsultanMedicalSupport>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<BpjsClassification>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanMedicalSupportQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }

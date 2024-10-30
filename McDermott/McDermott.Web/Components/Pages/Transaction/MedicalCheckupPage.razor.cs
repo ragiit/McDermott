@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml;
+﻿using BitMiracle.Docotic.Pdf; 
+using DocumentFormat.OpenXml;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace McDermott.Web.Components.Pages.Transaction
@@ -1110,8 +1111,15 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task LoadComboBox()
         {
             ClassTypes = await Mediator.Send(new GetClassTypeQuery());
-            Patients = await Mediator.Send(new GetUserQuery(x => x.IsPatient == true || x.IsEmployeeRelation == true));
-            //Services = await Mediator.Send(new GetServiceQuery(x => x.IsMcu == true));
+            Patients = (await Mediator.Send(new GetUserQueryNew
+            {
+                Predicate = x => x.IsPatient == true || x.IsEmployeeRelation == true,
+
+            })).Item1;
+            Services = (await Mediator.Send(new GetServiceQuery
+            {
+
+            })).Item1;
         }
 
         private void DeleteItem_Click()
@@ -1432,23 +1440,59 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
+        //private async void SelectFiles(InputFileChangeEventArgs e)
+        //{
+        //    var file = e.File;
+        //    bool isError = false;
+
+        //    // Validate file size
+        //    if (file.Size > 10 * 1024 * 1024)
+        //    {
+        //        // Handle error: File too large
+        //        ToastService.ShowError("The file is too large. Maximum allowed size is 10 MB.");
+        //        isError = true;
+        //    }
+
+        //    // Validate file type
+        //    if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        // Handle error: File is not PDF
+        //        ToastService.ShowError("Invalid file type. Only PDF files are allowed.");
+        //        isError = true;
+        //    }
+
+        //    if (isError)
+        //        return;
+
+        //    BrowserFiles.Clear();
+        //    BrowserFiles.Add(e.File);
+
+        //    GeneralConsultanService.McuExaminationDocs = e.File.Name;
+
+        //    using (var memoryStream = new MemoryStream())
+        //    {
+        //        await e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(memoryStream); // Batas ukuran file 10 MB
+        //        GeneralConsultanService.McuExaminationBase64 = Convert.ToBase64String(memoryStream.ToArray());
+        //    }
+
+        //    StateHasChanged();
+        //}
+
         private async void SelectFiles(InputFileChangeEventArgs e)
         {
             var file = e.File;
             bool isError = false;
 
-            // Validate file size
+            // Validasi ukuran file
             if (file.Size > 10 * 1024 * 1024)
             {
-                // Handle error: File too large
                 ToastService.ShowError("The file is too large. Maximum allowed size is 10 MB.");
                 isError = true;
             }
 
-            // Validate file type
+            // Validasi tipe file
             if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
             {
-                // Handle error: File is not PDF
                 ToastService.ShowError("Invalid file type. Only PDF files are allowed.");
                 isError = true;
             }
@@ -1461,14 +1505,33 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             GeneralConsultanService.McuExaminationDocs = e.File.Name;
 
-            using (var memoryStream = new MemoryStream())
+            using (var pdf = new PdfDocument())
             {
-                await e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(memoryStream); // Batas ukuran file 10 MB
+                //pdf.Save(e.File.OpenReadStream());
+
+
+                using var memoryStream = new MemoryStream();
+                pdf.Save(memoryStream);
                 GeneralConsultanService.McuExaminationBase64 = Convert.ToBase64String(memoryStream.ToArray());
             }
 
+            // Buffering saat membaca stream
+            //using (var memoryStream = new MemoryStream())
+            //{
+            //    var buffer = new byte[81920]; // Buffer 80 KB
+            //    var stream = e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            //    int bytesRead;
+            //    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            //    {
+            //        await memoryStream.WriteAsync(buffer, 0, bytesRead);
+            //    }
+
+            //    GeneralConsultanService.McuExaminationBase64 = Convert.ToBase64String(memoryStream.ToArray());
+            //}
+
             StateHasChanged();
         }
+
 
         private async Task SelectFile()
         {

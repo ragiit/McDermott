@@ -157,6 +157,7 @@ namespace McDermott.Web.Extentions
             "clinic-service/accidents",
             "clinic-service/telemedicines",
             "clinic-service/vaccinations",
+            "clinic-service/maternities",
             "clinic-service/reporting-and-analytics",
 
             // Queues

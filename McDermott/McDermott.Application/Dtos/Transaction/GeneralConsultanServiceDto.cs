@@ -127,6 +127,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsFood { get; set; } = false;
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public bool IsGC { get; set; }
+        public bool IsMaternity { get; set; }
         public string? SerialNo { get; set; } // NoUrut
 
         /// <BPJS Rujukan>
@@ -334,6 +335,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Reference { get; set; }
 
         public bool IsGC { get; set; }
+        public bool IsMaternity { get; set; }
         public long? KioskQueueId { get; set; }
 
         //[Required(ErrorMessage = "The Patient field is required.")]

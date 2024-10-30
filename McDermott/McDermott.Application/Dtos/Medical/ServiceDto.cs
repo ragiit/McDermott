@@ -17,6 +17,7 @@
         public bool IsMcu { get; set; } = false;
         public bool IsVaccination { get; set; } = false;
         public bool IsTelemedicine { get; set; } = false;
+        public bool IsMaternity { get; set; } = false;
         public string Flag { get; set; } = string.Empty;
         public string KioskName { get; set; } = string.Empty;
         public long? ServicedId { get; set; }
