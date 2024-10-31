@@ -152,6 +152,7 @@ namespace McDermott.Persistence.Context
 
         #region MyRegion
 
+        public DbSet<GeneralConsultationServiceLog> GeneralConsultationServiceLogs { get; set; }
         public DbSet<InventoryAdjusment> InventoryAdjusments { get; set; }
         public DbSet<InventoryAdjusmentDetail> InventoryAdjusmentDetails { get; set; }
         public DbSet<InventoryAdjusmentLog> InventoryAdjusmentLogs { get; set; }
