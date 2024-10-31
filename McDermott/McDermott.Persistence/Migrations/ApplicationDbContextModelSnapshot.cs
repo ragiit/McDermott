@@ -2210,6 +2210,12 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("EndMaternityLeave")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("HPHT")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HPL")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("HR")
                         .HasColumnType("bigint");
 
@@ -2267,6 +2273,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("KioskQueueId")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("LILA")
+                        .HasColumnType("int");
+
                     b.Property<string>("LinkMeet")
                         .HasColumnType("nvarchar(max)");
 
@@ -2308,6 +2317,15 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<long?>("PratitionerId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("PregnancyStatusA")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PregnancyStatusG")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PregnancyStatusP")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("ProjectId")
                         .HasColumnType("bigint");
@@ -2436,6 +2454,89 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("ServiceId");
 
                     b.ToTable("GeneralConsultanServices");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAnc", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("BB")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Complaint")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DJJ")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FetusPosition")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("GeneralConsultanServiceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("InspectionInitials")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsReadOnly")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("KU")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("PatientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Suhu")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TD")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TFU")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TT")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Trimester")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UK")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("GeneralConsultanServiceAncs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
@@ -6580,6 +6681,24 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAnc", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
+                        .WithMany()
+                        .HasForeignKey("GeneralConsultanServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McDermott.Domain.Entities.User", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GeneralConsultanService");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>

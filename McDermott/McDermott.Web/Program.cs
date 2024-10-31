@@ -64,11 +64,16 @@ builder.Services.AddOptions();
 //builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 // Add rate limiting processing strategy
 //builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
-builder.Services.AddHttpClient("GraphQLClient", client =>
-{
-    var a = new Uri(builder.Configuration["GraphQLServer"]);
-    client.BaseAddress = a;
-});
+//builder.Services.AddHttpClient("GraphQLClient", client =>
+//{
+//    var a = new Uri(builder.Configuration["GraphQLServer"]);
+//    client.BaseAddress = a;
+//});
+
+#region For read base url href apps started 
+var baseHref = builder.Configuration.GetValue<string>("BaseHref");
+builder.Services.AddSingleton(new AppSettings { BaseHref = baseHref ?? "" });
+#endregion
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
@@ -206,6 +211,12 @@ if (!app.Environment.IsDevelopment())
 else
 {
     app.UseDeveloperExceptionPage();
+}
+
+// Mengatur path dasar untuk aplikasi
+if (!string.IsNullOrEmpty(baseHref))
+{
+    app.UsePathBase(baseHref);  // Mengatur Base Path untuk seluruh aplikasi
 }
 
 //app.UsePathBase("/McDermott");

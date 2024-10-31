@@ -8,8 +8,15 @@ using Path = System.IO.Path;
 
 namespace McDermott.Web.Extentions
 {
+    public class AppSettings
+    {
+        public string BaseHref { get; set; }
+    }
+
     public static class Helper
     {
+       
+
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {
             ToastService.ShowInfo($"Data with name \"{val}\" in row {row} and column {col} is invalid");
@@ -24,6 +31,26 @@ namespace McDermott.Web.Extentions
         {
             ToastService.ShowSuccess($"{count} items were successfully imported.");
         }
+
+        public static List<string> BloodTypes = new List<string>
+        {
+            "A+",
+            "A-",
+            "B+",
+            "B-",
+            "AB+",
+            "AB-",
+            "O+",
+            "O-"
+        };
+
+        public static List<string> Trimester = new List<string>
+        {
+            "Trim I",
+            "Trim II",
+            "Trim III"
+        };
+
 
         public static List<string> HumptyDumpty =
         [

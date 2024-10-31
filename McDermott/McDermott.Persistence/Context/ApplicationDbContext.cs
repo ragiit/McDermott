@@ -99,6 +99,7 @@ namespace McDermott.Persistence.Context
 
         public DbSet<GeneralConsultanMedicalSupportLog> GeneralConsultanMedicalSupportLogs { get; set; }
         public DbSet<VaccinationPlan> VaccinationPlans { get; set; }
+        public DbSet<GeneralConsultanServiceAnc> GeneralConsultanServiceAncs { get; set; }
 
         #endregion Transfer
 

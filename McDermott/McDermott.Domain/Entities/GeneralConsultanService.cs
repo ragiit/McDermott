@@ -120,6 +120,15 @@ namespace McDermott.Domain.Entities
 
         #endregion Telemedic
 
+        #region ANC 
+        public string? PregnancyStatusG { get; set; }
+        public string? PregnancyStatusP { get; set; }
+        public string? PregnancyStatusA { get; set; }
+        public string? HPHT { get; set; }
+        public string? HPL { get; set; } 
+        public int? LILA { get; set; }    // CM
+        #endregion
+
         public long? ProjectId { get; set; }
         public bool IsAccident { get; set; }
 
