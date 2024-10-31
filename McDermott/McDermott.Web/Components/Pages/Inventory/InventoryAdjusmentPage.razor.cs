@@ -65,6 +65,8 @@ namespace McDermott.Web.Components.Pages.Inventory
 
         private List<InventoryAdjusmentDto> InventoryAdjusments { get; set; } = [];
         private List<InventoryAdjusmentDetailDto> InventoryAdjusmentDetails { get; set; } = [];
+        private List<InventoryAdjustmentLogDto> InventoryAdjusmentLogs { get; set; } = [];
+        private InventoryAdjustmentLogDto postInventoryAdjusmentLog { get; set; } = new();
         private List<LocationDto> Locations { get; set; } = [];
         private List<CompanyDto> Companies { get; set; } = [];
         private List<ProductDto> AllProducts { get; set; } = [];
@@ -232,6 +234,8 @@ namespace McDermott.Web.Components.Pages.Inventory
                 //        ExpiredDate = null;
                 //    }
                 //});
+
+                InventoryAdjusmentLogs = await Mediator.Send(new GetInventoryAdjusmentLogQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
             }
         }
 
@@ -311,6 +315,14 @@ namespace McDermott.Web.Components.Pages.Inventory
                         x.Product = Products.FirstOrDefault(z => z.Id == x.ProductId);
                         x.UomId = x.Product?.UomId;
                     });
+
+                    if(InventoryAdjusment is not null)
+                    {
+                        postInventoryAdjusmentLog.InventoryAdjusmentId = InventoryAdjusment.Id;
+                        postInventoryAdjusmentLog.UserById = UserLogin.Id;
+                        postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.Draft;
+                    }
+
                 }
                 else
                 {
@@ -709,7 +721,15 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                             await SelectLocation(new LocationDto { Id = InventoryAdjusment.LocationId.GetValueOrDefault(), });
 
-                            await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                            var a = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+
+                            if (a is not null)
+                            {
+                                postInventoryAdjusmentLog.InventoryAdjusmentId = a.Id;
+                                postInventoryAdjusmentLog.UserById = UserLogin.Id;
+                                postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
+                                await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
+                            }
 
                             var temps = new List<InventoryAdjusmentDetailDto>();
                             foreach (var o in Products)
@@ -791,7 +811,15 @@ namespace McDermott.Web.Components.Pages.Inventory
                             InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
                             StagingText = EnumStatusInventoryAdjustment.Invalidate.GetDisplayName();
 
-                            await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                            var i = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+
+                            if (i is not null)
+                            {
+                                postInventoryAdjusmentLog.InventoryAdjusmentId = i.Id;
+                                postInventoryAdjusmentLog.UserById = UserLogin.Id;
+                                postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
+                                await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
+                            }
 
                             if (StagingText == EnumStatusInventoryAdjustment.Invalidate.GetDisplayName())
                             {
@@ -841,7 +869,14 @@ namespace McDermott.Web.Components.Pages.Inventory
 
                         case "Invalidate":
                             InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
-                            await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                            var x =await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                            if (x is not null)
+                            {
+                                postInventoryAdjusmentLog.InventoryAdjusmentId = x.Id;
+                                postInventoryAdjusmentLog.UserById = UserLogin.Id;
+                                postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
+                                await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
+                            }
 
                             if (StagingText == EnumStatusInventoryAdjustment.Invalidate.GetDisplayName())
                             {

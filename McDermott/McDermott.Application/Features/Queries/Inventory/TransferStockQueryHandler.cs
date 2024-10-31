@@ -34,7 +34,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<DeleteTransferStockLogRequest, bool>
 
     {
-        #region GET Goods Receipt 
+        #region GET Transfer Stock
         public async Task<List<TransferStockDto>> Handle(BulkValidateTransferStockQuery request, CancellationToken cancellationToken)
         {
             var TransferStockDtos = request.TransferStockToValidate;
@@ -225,7 +225,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         }
         #endregion GET Goods Receipt
 
-        #region GET Goods Receipt Detail
+        #region GET Transfer StockDetail
 
         public async Task<List<TransferStockProductDto>> Handle(GetAllTransferStockProductQuery request, CancellationToken cancellationToken)
         {
@@ -462,9 +462,9 @@ namespace McDermott.Application.Features.Queries.Inventory
 
 
 
-        #endregion GET Goods Receipt Detail
+        #endregion GET Transfer StockDetail
 
-        #region GET Goods Receipt Log
+        #region GET Transfer StockLog
 
         public async Task<List<TransferStockLogDto>> Handle(GetAllTransferStockLogQuery request, CancellationToken cancellationToken)
         {
@@ -699,7 +699,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
 
 
-        #endregion GET Goods Receipt Log
+        #endregion GET Transfer Stock Log
 
 
         #region CREATE

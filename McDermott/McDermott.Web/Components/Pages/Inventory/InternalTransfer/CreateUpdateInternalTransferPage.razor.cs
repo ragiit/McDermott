@@ -127,6 +127,12 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     }
                     postTransferStocks = result ?? new();
                     await LoadDataDetail();
+                    var resultLog = await Mediator.Send(new GetTransferStockLogQuery
+                    {
+                        Predicate = x => x.TransferStockId == postTransferStocks.Id
+                    });
+
+                    getTransferStockLog = resultLog.Item1;
                 }
                 PanelVisible = false;
             }
@@ -552,6 +558,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     postTransferStockLogs.SourceId = tempTransferStock.SourceId;
                     postTransferStockLogs.DestinationId = tempTransferStock.DestinationId;
                     postTransferStockLogs.Status = EnumStatusInternalTransfer.Draft;
+                    postTransferStockLogs.UserById = UserLogin.Id;
 
                     await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
                     NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}", true);
@@ -667,6 +674,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 postTransferStockLogs.SourceId = tempTransferStock.SourceId;
                 postTransferStockLogs.DestinationId = tempTransferStock.DestinationId;
                 postTransferStockLogs.Status = EnumStatusInternalTransfer.Request;
+                postTransferStockLogs.UserById = UserLogin.Id;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
 
@@ -744,6 +752,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 postTransferStockLogs.SourceId = postTransferStocks.SourceId;
                 postTransferStockLogs.DestinationId = postTransferStocks.DestinationId;
                 postTransferStockLogs.Status = EnumStatusInternalTransfer.Ready;
+                postTransferStockLogs.UserById = UserLogin.Id;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
 
@@ -774,6 +783,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 postTransferStockLogs.SourceId = postTransferStocks.SourceId;
                 postTransferStockLogs.DestinationId = postTransferStocks.DestinationId;
                 postTransferStockLogs.Status = EnumStatusInternalTransfer.ApproveRequest;
+                postTransferStockLogs.UserById = UserLogin.Id;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
 
@@ -816,6 +826,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 postTransferStockLogs.SourceId = postTransferStocks.SourceId;
                 postTransferStockLogs.DestinationId = postTransferStocks.DestinationId;
                 postTransferStockLogs.Status = EnumStatusInternalTransfer.Done;
+                postTransferStockLogs.UserById = UserLogin.Id;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
 

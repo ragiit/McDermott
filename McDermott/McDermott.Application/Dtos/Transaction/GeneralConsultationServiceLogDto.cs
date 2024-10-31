@@ -13,6 +13,9 @@ namespace McDermott.Application.Dtos.Transaction
         public long? GeneralConsultationServiceId { get; set; }
         public long? UserById { get; set; }
         public EnumStatusGeneralConsultantService Status { get; set; }
+        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
+        public string? UpdatedBy { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
         [SetToNull]
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }

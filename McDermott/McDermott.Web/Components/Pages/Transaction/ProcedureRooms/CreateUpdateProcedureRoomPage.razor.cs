@@ -53,6 +53,8 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
 
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport { get; set; } = new();
+        private List<GeneralConsultanMedicalSupportLogDto> GetProsedureRoomLog { get; set; } = [];
+        private GeneralConsultanMedicalSupportLogDto PostProsedureRoomLog { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -272,7 +274,13 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                             default:
                                 break;
                         }
+
                     }
+
+                    var resultLog = await Mediator.Send(new GetGeneralConsultanMedicalSupportLogQuery
+                    {
+                        Predicate = x => x.GeneralConsultanMedicalSupportId == GeneralConsultanMedicalSupport.Id
+                    });
                 }
                 else
                 {
@@ -344,6 +352,14 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                         });
 
                         GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                        if(GeneralConsultanMedicalSupport is not null)
+                        {
+                            PostProsedureRoomLog.GeneralConsultationMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                            PostProsedureRoomLog.UserById = UserLogin.Id;
+                            PostProsedureRoomLog.Status = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
+                            await Mediator.Send(new CreateGeneralConsultanMedicalSupportLogRequest(PostProsedureRoomLog));
+                        }
                     }
                     else
                         GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
@@ -367,6 +383,13 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                                 });
                                 GeneralConsultanMedicalSupport.GeneralConsultanServiceId = GcId;
                                 GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+                                if (GeneralConsultanMedicalSupport is not null)
+                                {
+                                    PostProsedureRoomLog.GeneralConsultationMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                                    PostProsedureRoomLog.UserById = UserLogin.Id;
+                                    PostProsedureRoomLog.Status = EnumStatusGeneralConsultantServiceProcedureRoom.InProgress;
+                                    await Mediator.Send(new CreateGeneralConsultanMedicalSupportLogRequest(PostProsedureRoomLog));
+                                }
                             }
                             else
                                 GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
@@ -381,6 +404,14 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
 
                             GeneralConsultanMedicalSupport.Status = EnumStatusGeneralConsultantServiceProcedureRoom.Finish;
                             GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
+
+                            if (GeneralConsultanMedicalSupport is not null)
+                            {
+                                PostProsedureRoomLog.GeneralConsultationMedicalSupportId = GeneralConsultanMedicalSupport.Id;
+                                PostProsedureRoomLog.UserById = UserLogin.Id;
+                                PostProsedureRoomLog.Status = EnumStatusGeneralConsultantServiceProcedureRoom.Finish;
+                                await Mediator.Send(new CreateGeneralConsultanMedicalSupportLogRequest(PostProsedureRoomLog));
+                            }
                             break;
 
                         default:

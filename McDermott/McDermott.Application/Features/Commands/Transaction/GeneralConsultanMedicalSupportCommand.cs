@@ -54,6 +54,38 @@
             public Expression<Func<GeneralConsultanMedicalSupport, bool>> Predicate { get; } = predicate!;
         }
 
+        #region Get Log
+
+        public class GetGeneralConsultanMedicalSupportLogQuery : IRequest<(List<GeneralConsultanMedicalSupportLogDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<GeneralConsultanMedicalSupportLog, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupportLog, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupportLog, GeneralConsultanMedicalSupportLog>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultanMedicalSupportLog, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetSingleGeneralConsultanMedicalSupportLogQuery : IRequest<GeneralConsultanMedicalSupportLogDto>
+        {
+            public List<Expression<Func<GeneralConsultanMedicalSupportLog, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupportLog, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultanMedicalSupportLog, GeneralConsultanMedicalSupportLog>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultanMedicalSupportLog, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+        #endregion
         #endregion GET
 
         #region CREATE
@@ -73,6 +105,17 @@
             public List<GeneralConsultanMedicalSupportDto> GeneralConsultanMedicalSupportDtos { get; set; } = GeneralConsultanMedicalSupportDtos;
         }
 
+        #region Create Log
+        public class CreateGeneralConsultanMedicalSupportLogRequest(GeneralConsultanMedicalSupportLogDto GeneralConsultanMedicalSupportLogDto) : IRequest<GeneralConsultanMedicalSupportLogDto>
+        {
+            public GeneralConsultanMedicalSupportLogDto GeneralConsultanMedicalSupportLogDto { get; set; } = GeneralConsultanMedicalSupportLogDto;
+        }
+        public class CreateListGeneralConsultanMedicalSupportLogRequest(List<GeneralConsultanMedicalSupportLogDto> GeneralConsultanMedicalSupportLogDtos) : IRequest<List<GeneralConsultanMedicalSupportLogDto>>
+        {
+            public List<GeneralConsultanMedicalSupportLogDto> GeneralConsultanMedicalSupportLogDtos { get; set; } = GeneralConsultanMedicalSupportLogDtos;
+        }
+
+        #endregion
         #endregion CREATE
 
         #region Update

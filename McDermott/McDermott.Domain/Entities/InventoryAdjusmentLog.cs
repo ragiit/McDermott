@@ -8,7 +8,7 @@ namespace McDermott.Domain.Entities
 {
     public class InventoryAdjusmentLog : BaseAuditableEntity
     {
-        public long? InventoryAdjustmentId { get; set; }
+        public long? InventoryAdjusmentId { get; set; }
         public long? UserById { get; set; }
         public EnumStatusInventoryAdjustment Status { get; set; }
 

@@ -66,7 +66,6 @@ namespace McDermott.Persistence.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GeneralConsultationMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
                     UserById = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     GeneralConsultanMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
@@ -98,10 +97,9 @@ namespace McDermott.Persistence.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    InventoryAdjustmentId = table.Column<long>(type: "bigint", nullable: true),
+                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: true),
                     UserById = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),

@@ -4,6 +4,9 @@
         IRequestHandler<GetInventoryAdjusmentQuery, List<InventoryAdjusmentDto>>,
         IRequestHandler<CreateInventoryAdjusmentRequest, InventoryAdjusmentDto>,
         IRequestHandler<CreateListInventoryAdjusmentRequest, List<InventoryAdjusmentDto>>,
+        IRequestHandler<GetInventoryAdjusmentLogQuery, List<InventoryAdjustmentLogDto>>,
+        IRequestHandler<CreateInventoryAdjusmentLogRequest, InventoryAdjustmentLogDto>,
+        IRequestHandler<CreateListInventoryAdjusmentLogRequest, List<InventoryAdjustmentLogDto>>,
         IRequestHandler<UpdateInventoryAdjusmentRequest, InventoryAdjusmentDto>,
         IRequestHandler<UpdateListInventoryAdjusmentRequest, List<InventoryAdjusmentDto>>,
         IRequestHandler<DeleteInventoryAdjusmentRequest, bool>
@@ -36,6 +39,39 @@
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
                 return result.ToList().Adapt<List<InventoryAdjusmentDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<InventoryAdjustmentLogDto>> Handle(GetInventoryAdjusmentLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string cacheKey = $"GetInventoryAdjusmentLogQuery_";
+
+                if (request.RemoveCache)
+                    _cache.Remove(cacheKey);
+
+                if (!_cache.TryGetValue(cacheKey, out List<InventoryAdjusmentLog>? result))
+                {
+                    result = await _unitOfWork.Repository<InventoryAdjusmentLog>().Entities
+                       .Include(x => x.InventoryAdjusment)
+                       .Include(x => x.UserBy)
+                       .AsNoTracking()
+                       .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+                }
+
+                result ??= [];
+
+                if (request.Predicate is not null)
+                    result = [.. result.AsQueryable().Where(request.Predicate)];
+
+                return result.ToList().Adapt<List<InventoryAdjustmentLogDto>>();
             }
             catch (Exception)
             {
@@ -82,6 +118,44 @@
                 throw;
             }
         }
+
+        //Log
+        public async Task<InventoryAdjustmentLogDto> Handle(CreateInventoryAdjusmentLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<InventoryAdjusmentLog>().AddAsync(request.InventoryAdjusmentLogDto.Adapt<InventoryAdjusmentLog>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInventoryAdjusmentLogQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<InventoryAdjustmentLogDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<InventoryAdjustmentLogDto>> Handle(CreateListInventoryAdjusmentLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<InventoryAdjusmentLog>().AddAsync(request.InventoryAdjusmentLogDtos.Adapt<List<InventoryAdjusmentLog>>());
+
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetInventoryAdjusmentLogQuery_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<InventoryAdjustmentLogDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
         #endregion CREATE
 
