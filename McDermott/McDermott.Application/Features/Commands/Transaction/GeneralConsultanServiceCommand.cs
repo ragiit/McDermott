@@ -130,10 +130,34 @@
 
         #region GET GeneralConsultan Logs
 
-        public class GetGeneralConsultationServiceLogQuery(Expression<Func<GeneralConsultationServiceLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GeneralConsultationServiceLogDto>>
+        public class GetGeneralConsultanServicesLogQuery : IRequest<(List<GeneralConsultationServiceLogDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public Expression<Func<GeneralConsultationServiceLog, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
+            public List<Expression<Func<GeneralConsultationServiceLog, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultationServiceLog, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultationServiceLog, GeneralConsultationServiceLog>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultationServiceLog, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetSingleGeneralConsultanServicesLogQuery : IRequest<GeneralConsultationServiceLogDto>
+        {
+            public List<Expression<Func<GeneralConsultationServiceLog, object>>> Includes { get; set; }
+            public Expression<Func<GeneralConsultationServiceLog, bool>> Predicate { get; set; }
+            public Expression<Func<GeneralConsultationServiceLog, GeneralConsultationServiceLog>> Select { get; set; }
+
+            public List<(Expression<Func<GeneralConsultationServiceLog, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         #endregion GET GeneralConsultan Logs

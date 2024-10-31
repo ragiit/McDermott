@@ -56,6 +56,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private List<LocationDto> Locations { get; set; } = [];
         private List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
         private List<InsurancePolicyDto> ReferToInsurancePolicies { get; set; } = [];
+        private List<GeneralConsultationServiceLogDto> getGeneralConsultationServiceLog { get; set; } = [];
         private List<string> RiskOfFallingDetail = [];
 
         private List<AwarenessDto> Awareness { get; set; } = [];
@@ -75,6 +76,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private bool IsStatus(EnumStatusGeneralConsultantService status) => GeneralConsultanService.Status == status;
 
         private EnumStatusGeneralConsultantService StagingText { get; set; } = EnumStatusGeneralConsultantService.Confirmed;
+        private GeneralConsultationServiceLogDto postGeneralConsultationServiceLog { get; set; } = new();
         private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
         private UserDto UserForm { get; set; } = new();
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport { get; set; } = new();
@@ -537,6 +539,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     RiskOfFallingDetail = [.. Helper.Geriati];
                 }
+
+                var resultLog = await Mediator.Send(new GetGeneralConsultanServicesLogQuery
+                {
+                    Predicate = x => x.Id == GeneralConsultanService.Id
+                });
+
+                getGeneralConsultationServiceLog = resultLog.Item1;
             }
             else
             {
@@ -1267,6 +1276,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         };
 
                         res = await Mediator.Send(createRequest);
+                        if(res is not null)
+                        {
+                            postGeneralConsultationServiceLog.GeneralConsultationServiceId = res.Id;
+                            postGeneralConsultationServiceLog.UserById = UserLogin.Id;
+                            postGeneralConsultationServiceLog.Status = service.Status;
+
+                            await Mediator.Send(new CreateGeneralConsultationLogRequest(postGeneralConsultationServiceLog));
+                        }
                     }
                     else
                     {
@@ -1589,6 +1606,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 CurrentMobile = UserForm.CurrentMobile
                             }
                         });
+                        if(newGC is not null)
+                        {
+                            postGeneralConsultationServiceLog.GeneralConsultationServiceId = newGC.Id;
+                            postGeneralConsultationServiceLog.UserById = UserLogin.Id;
+                            postGeneralConsultationServiceLog.Status = GeneralConsultanService.Status;
+
+                            await Mediator.Send(new CreateGeneralConsultationLogRequest(postGeneralConsultationServiceLog));
+                        }
                     }
                     else
                     {
@@ -1614,6 +1639,15 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 CurrentMobile = UserForm.CurrentMobile
                             }
                         });
+
+                        if (newGC is not null)
+                        {
+                            postGeneralConsultationServiceLog.GeneralConsultationServiceId = newGC.Id;
+                            postGeneralConsultationServiceLog.UserById = UserLogin.Id;
+                            postGeneralConsultationServiceLog.Status = GeneralConsultanService.Status;
+
+                            await Mediator.Send(new CreateGeneralConsultationLogRequest(postGeneralConsultationServiceLog));
+                        }
                     }
 
                     // Handle user login state

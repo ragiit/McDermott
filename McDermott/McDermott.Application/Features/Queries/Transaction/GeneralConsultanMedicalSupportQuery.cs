@@ -5,11 +5,15 @@ namespace McDermott.Application.Features.Queries.Transaction
     public class GeneralConsultanMedicalSupportHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
       IRequestHandler<GetGeneralConsultanMedicalSupportQuery, (List<GeneralConsultanMedicalSupportDto>, int pageIndex, int pageSize, int pageCount)>,
       IRequestHandler<GetSingleGeneralConsultanMedicalSupportQuery, GeneralConsultanMedicalSupportDto>,
+      IRequestHandler<GetGeneralConsultanMedicalSupportLogQuery, (List<GeneralConsultanMedicalSupportLogDto>, int pageIndex, int pageSize, int pageCount)>,
+      IRequestHandler<GetSingleGeneralConsultanMedicalSupportLogQuery, GeneralConsultanMedicalSupportLogDto>,
       IRequestHandler<ValidateGeneralConsultanMedicalSupport, bool>,
       IRequestHandler<GetSingleConfinedSpaceOrProcedureRoomQuery, GeneralConsultanMedicalSupportDto>,
       IRequestHandler<CreateGeneralConsultanMedicalSupportRequest, GeneralConsultanMedicalSupportDto>,
-      IRequestHandler<BulkValidateGeneralConsultanMedicalSupport, List<GeneralConsultanMedicalSupportDto>>,
       IRequestHandler<CreateListGeneralConsultanMedicalSupportRequest, List<GeneralConsultanMedicalSupportDto>>,
+      IRequestHandler<CreateGeneralConsultanMedicalSupportLogRequest, GeneralConsultanMedicalSupportLogDto>,
+      IRequestHandler<CreateListGeneralConsultanMedicalSupportLogRequest, List<GeneralConsultanMedicalSupportLogDto>>,
+      IRequestHandler<BulkValidateGeneralConsultanMedicalSupport, List<GeneralConsultanMedicalSupportDto>>,
       IRequestHandler<UpdateGeneralConsultanMedicalSupportRequest, GeneralConsultanMedicalSupportDto>,
       IRequestHandler<UpdateListGeneralConsultanMedicalSupportRequest, List<GeneralConsultanMedicalSupportDto>>,
       IRequestHandler<DeleteGeneralConsultanMedicalSupportRequest, bool>
@@ -354,6 +358,153 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
+        #region Get Log
+
+        public async Task<(List<GeneralConsultanMedicalSupportLogDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanMedicalSupportLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<GeneralConsultanMedicalSupportLog>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<GeneralConsultanMedicalSupportLog>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<GeneralConsultanMedicalSupportLog>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                //if (!string.IsNullOrEmpty(request.SearchTerm))
+                //{
+                //    query = query.Where(v => EF.Functions.Like(v.CreatedDate, $"%{request.SearchTerm}%"));
+                //}
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new GeneralConsultanMedicalSupportLog
+                    {
+                        Id = x.Id,
+                        UserById = x.UserById,
+                        GeneralConsultanMedicalSupportId = x.GeneralConsultanMedicalSupportId,
+                        UserBy = new User
+                        {
+                            Name = x.UserBy == null ? "" : x.UserBy.Name,
+                        },
+                        Status = x.Status,
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<GeneralConsultanMedicalSupportLogDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralConsultanMedicalSupportLogDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<GeneralConsultanMedicalSupportLogDto> Handle(GetSingleGeneralConsultanMedicalSupportLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<GeneralConsultanMedicalSupportLog>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<GeneralConsultanMedicalSupportLog>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<GeneralConsultanMedicalSupportLog>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.UserBy.Name, $"%{request.SearchTerm}%")
+                        );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new GeneralConsultanMedicalSupportLog
+                    {
+                        Id = x.Id,
+                        UserById = x.UserById,
+                        GeneralConsultanMedicalSupportId = x.GeneralConsultanMedicalSupportId,
+                        UserBy = new User
+                        {
+                            Name = x.UserBy == null ? "" : x.UserBy.Name,
+                        },
+                        Status = x.Status,
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanMedicalSupportLogDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        #endregion
         #endregion GET
 
         #region CREATE
@@ -402,6 +553,41 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
+
+        #region Create Log
+        public async Task<GeneralConsultanMedicalSupportLogDto> Handle(CreateGeneralConsultanMedicalSupportLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultanMedicalSupportLog>().AddAsync(request.GeneralConsultanMedicalSupportLogDto.Adapt<GeneralConsultanMedicalSupportLog>());
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultanMedicalSupportLog_"); // Ganti dengan key yang sesuai
+                return result.Adapt<GeneralConsultanMedicalSupportLogDto>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GeneralConsultanMedicalSupportLogDto>> Handle(CreateListGeneralConsultanMedicalSupportLogRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var result = await _unitOfWork.Repository<GeneralConsultanMedicalSupportLog>().AddAsync(request.GeneralConsultanMedicalSupportLogDtos.Adapt<List<GeneralConsultanMedicalSupportLog>>());
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _cache.Remove("GetGeneralConsultanMedicalSupportLog_"); // Ganti dengan key yang sesuai
+
+                return result.Adapt<List<GeneralConsultanMedicalSupportLogDto>>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
 
         #endregion CREATE
 

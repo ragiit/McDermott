@@ -1180,6 +1180,134 @@
                                         </div>
                                     </div>
                                 }
+
+                                @if (getGeneralConsultationServiceLog.Count > 0)
+                                {
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <DxFormLayout>
+                                                <DxFormLayoutGroup ColSpanMd="12" Caption="Transaction Logs" AnimationType="LayoutAnimationType.Slide" Expanded="false" Decoration="FormLayoutGroupDecoration.Card" ExpandButtonDisplayMode="GroupExpandButtonDisplayMode.Start">
+                                                    <CaptionTemplate>
+                                                        <div>
+                                                            <span class="text-center">Transaction Logs</span>
+                                                        </div>
+                                                    </CaptionTemplate>
+                                                    <Items>
+                                                        @{
+                                                            var groupedLogs = getGeneralConsultationServiceLog
+                                                            .GroupBy(x => x.CreatedDate?.Date) // Group by the date part only
+                                                            .OrderByDescending(g => g.Key)
+                                                            .ToList();
+                                                        }
+
+                                                        <section class="content w-100">
+                                                            <div class="container-fluid w-100">
+                                                                <div class="row w-100">
+                                                                    @foreach (var group in groupedLogs)
+                                                                    {
+                                                                        <div class="col-md-12">
+                                                                            <div class="timeline">
+                                                                                <div class="time-label">
+                                                                                    <span class="bg-red">@group.Key?.ToString("dd MMM, yyyy")</span>
+                                                                                </div>
+
+                                                                                @foreach (var item in group.OrderByDescending(x => x.CreatedDate.GetValueOrDefault().TimeOfDay))
+                                                                                {
+                                                                                    <div>
+                                                                                        <i class="fas fa-user bg-green"></i>
+                                                                                        <div class="timeline-item">
+                                                                                            <span class="time"><i class="fas fa-clock"></i> @item.CreatedDate.GetValueOrDefault().ToString("HH:mm")</span>
+                                                                                            <h3 class="timeline-header">
+                                                                                                <a class="no-underline">@item.UserBy.Name</a>
+                                                                                            </h3>
+
+                                                                                            <div class="timeline-body">
+                                                                                                @{
+                                                                                                    string priorityClass = "";
+                                                                                                    string title = "";
+
+                                                                                                    switch (item.Status)
+                                                                                                    {
+                                                                                                        case EnumStatusGeneralConsultantService.Planned:
+                                                                                                            priorityClass = "info";
+                                                                                                            title = "Planned";
+                                                                                                            break;
+
+                                                                                                        case EnumStatusGeneralConsultantService.Confirmed:
+                                                                                                            priorityClass = "info";
+                                                                                                            title = "Confirmed";
+                                                                                                            break;
+
+                                                                                                        case EnumStatusGeneralConsultantService.NurseStation:
+                                                                                                            priorityClass = "primary";
+                                                                                                            title = "Nurse Station";
+                                                                                                            break;
+
+                                                                                                        case EnumStatusGeneralConsultantService.Waiting:
+                                                                                                            priorityClass = "warning";
+                                                                                                            title = "Waiting";
+                                                                                                            break;
+                                                                                                            
+                                                                                                        case EnumStatusGeneralConsultantService.Physician:
+                                                                                                            priorityClass = "primary";
+                                                                                                            title = "Physician";
+                                                                                                            break; 
+                                                                                                        case EnumStatusGeneralConsultantService.Finished:
+                                                                                                            priorityClass = "success";
+                                                                                                            title = "Finished";
+                                                                                                            break; 
+                                                                                                        case EnumStatusGeneralConsultantService.Canceled:
+                                                                                                            priorityClass = "danger";
+                                                                                                            title = "Canceled";
+                                                                                                            break;
+                                                                                                        case EnumStatusGeneralConsultantService.ProcedureRoom:
+                                                                                                            priorityClass = "warning";
+                                                                                                            title = "Procedure Room";
+                                                                                                            break;
+                                                                                                    }
+
+                                                                                                    string html = $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span>";
+                                                                                                }
+
+                                                                                                <div class="row w-100">
+                                                                                                    <div class="col-md-2">
+                                                                                                        Status
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-10">
+                                                                                                        : @((MarkupString)html)
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                                @* <div class="row w-100">
+                                                                                                    <div class="col-md-2">
+                                                                                                        Destination
+                                                                                                    </div>
+
+                                                                                                    <div class="col-md-10">
+                                                                                                        : @item.Source?.Name
+                                                                                                    </div>
+                                                                                                </div> *@
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                }
+                                                                                <div>
+                                                                                    <i class="fas fa-clock bg-gray"></i>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </section>
+                                                    </Items>
+                                                </DxFormLayoutGroup>
+                                            </DxFormLayout>
+                                        </div>
+                                    </div>
+                                }
+
                             </EditForm>
                         </DxLoadingPanel>
                     </div>

@@ -8,7 +8,7 @@ namespace McDermott.Domain.Entities
 {
     public class GeneralConsultationServiceLog : BaseAuditableEntity
     {
-        public long? GeneralConsultationServiceId { get; set; }
+        public long? GeneralConsultanServiceId { get; set; }
         public long? UserById { get; set; }
         public EnumStatusGeneralConsultantService status {get;set;}
 

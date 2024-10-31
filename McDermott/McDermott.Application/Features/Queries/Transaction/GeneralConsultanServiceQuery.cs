@@ -22,7 +22,8 @@ namespace McDermott.Application.Features.Queries.Transaction
         IRequestHandler<GetSingleGeneralConsultanServicesQuery, GeneralConsultanServiceDto>,
         IRequestHandler<UpdateStatusGeneralConsultanServiceRequest, GeneralConsultanServiceDto>,
         IRequestHandler<DeleteGeneralConsultanServiceRequest, bool>,
-        IRequestHandler<GetGeneralConsultationServiceLogQuery, List<GeneralConsultationServiceLogDto>>,
+        IRequestHandler<GetGeneralConsultanServicesLogQuery, (List<GeneralConsultationServiceLogDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleGeneralConsultanServicesLogQuery, GeneralConsultationServiceLogDto>,
         IRequestHandler<CreateGeneralConsultationLogRequest, GeneralConsultationServiceLogDto>,
         IRequestHandler<CreateListGeneralConsultationLogRequest, List<GeneralConsultationServiceLogDto>>,
         IRequestHandler<UpdateGeneralConsultationLogRequest, GeneralConsultationServiceLogDto>,
@@ -582,39 +583,191 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region GET General Consultan Service Log
 
-        public async Task<List<GeneralConsultationServiceLogDto>> Handle(GetGeneralConsultationServiceLogQuery request, CancellationToken cancellationToken)
+        public async Task<GeneralConsultationServiceLogDto> Handle(GetSingleGeneralConsultanServicesLogQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetGeneralConsultationServiceLogQuery_";
+                var query = _unitOfWork.Repository<GeneralConsultationServiceLog>().Entities.AsNoTracking();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<GeneralConsultationServiceLog>? result))
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
                 {
-                    result = await _unitOfWork.Repository<GeneralConsultationServiceLog>().Entities
-                        .Include(z => z.GeneralConsultanService)
-                        .Include(z => z.UserBy)
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
 
-                        //.ThenInclude(z => z.Gender)
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<GeneralConsultationServiceLog>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<GeneralConsultationServiceLog>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                return result.ToList().Adapt<List<GeneralConsultationServiceLogDto>>();
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    //query = query.Where(v =>
+                    //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Phycisian.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.UoM.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.FormDrug.Name, $"%{request.SearchTerm}%")
+                    //    );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new GeneralConsultationServiceLog
+                    {
+                        Id = x.Id,
+                        status = x.status,
+                        UserById = x.UserById,
+                        UserBy = new User
+                        {
+                            Name = x.UserBy == null ? string.Empty : x.UserBy.Name,
+                        },
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        
+                       
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultationServiceLogDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }
+
+        public async Task<(List<GeneralConsultationServiceLogDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServicesLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<GeneralConsultationServiceLog>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<GeneralConsultationServiceLog>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<GeneralConsultationServiceLog>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    //query = query.Where(v =>
+                    //    EF.Functions.Like(v.Reference, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.SerialNo, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Status.GetDisplayName(), $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.StatusMCU.GetDisplayName(), $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.Pratitioner.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.RegistrationDate.Value.ToString("dd-MM-yyyy"), $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.AppointmentDate.Value.ToString("dd-MM-yyyy"), $"%{request.SearchTerm}%"));
+
+                    var result = EnumHelper.GetEnumByDisplayName<EnumStatusGeneralConsultantService>(request.SearchTerm);
+                    var resultMcu = EnumHelper.GetEnumByDisplayName<EnumStatusMCU>(request.SearchTerm);
+
+                    DateTime parsedDate;
+                    bool isDate = DateTime.TryParseExact(request.SearchTerm, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out parsedDate);
+
+                    //query = query
+                    //    .Where(v =>
+                    //        //EF.Functions.Like(v.Reference, $"%{request.SearchTerm}%") ||
+                    //        //EF.Functions.Like(v.SerialNo, $"%{request.SearchTerm}%") ||
+                    //        //EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                    //        //EF.Functions.Like(v.Pratitioner.Name, $"%{request.SearchTerm}%") ||
+                    //        //(result != null && v.Status == result) ||
+                    //        //(resultMcu != null && v.StatusMCU == resultMcu) ||
+                    //        //    (isDate && v.RegistrationDate.HasValue && v.RegistrationDate.Value.Date == parsedDate.Date)
+
+                    //        //v.AppointmentDate.HasValue && v.AppointmentDate.Value.ToString("dd-MM-yyyy").Contains(request.SearchTerm
+                    //        );
+
+                    //.AsEnumerable()  // Evaluasi di memori mulai dari sini
+                    //.Where(v =>
+                    //    v.Status.GetDisplayName().ToLower().Contains(request.SearchTerm) ||
+                    //    v.StatusMCU.GetDisplayName().ToLower().Contains(request.SearchTerm) ||
+                    //    v.RegistrationDate.HasValue && v.RegistrationDate.Value.ToString("dd-MM-yyyy").Contains(request.SearchTerm) ||
+                    //    v.AppointmentDate.HasValue && v.AppointmentDate.Value.ToString("dd-MM-yyyy").Contains(request.SearchTerm))
+                    //.AsQueryable();
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new GeneralConsultationServiceLog
+                    {
+                        Id = x.Id,
+                        status = x.status,
+                        UserById = x.UserById,
+                        UserBy = new User
+                        {
+                            Name = x.UserBy == null ? string.Empty : x.UserBy.Name,
+                        },
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                       
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<GeneralConsultationServiceLogDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralConsultationServiceLogDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
 
         #endregion GET General Consultan Service Log
 
