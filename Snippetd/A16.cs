@@ -1,14 +1,14 @@
-public class GeneralCosultanServiceAncCommand
+public class WellnessProgramSessionCommand
  {
      #region GET
 
-    public class GetSingleGeneralCosultanServiceAncQuery : IRequest<GeneralCosultanServiceAncDto>
+    public class GetSingleWellnessProgramSessionQuery : IRequest<WellnessProgramSessionDto>
     {
-        public List<Expression<Func<GeneralCosultanServiceAnc, object>>> Includes { get; set; }
-        public Expression<Func<GeneralCosultanServiceAnc, bool>> Predicate { get; set; }
-        public Expression<Func<GeneralCosultanServiceAnc, GeneralCosultanServiceAnc>> Select { get; set; }
+        public List<Expression<Func<WellnessProgramSession, object>>> Includes { get; set; }
+        public Expression<Func<WellnessProgramSession, bool>> Predicate { get; set; }
+        public Expression<Func<WellnessProgramSession, WellnessProgramSession>> Select { get; set; }
 
-        public List<(Expression<Func<GeneralCosultanServiceAnc, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<WellnessProgramSession, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class GeneralCosultanServiceAncCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetGeneralCosultanServiceAncQuery : IRequest<(List<GeneralCosultanServiceAncDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetWellnessProgramSessionQuery : IRequest<(List<WellnessProgramSessionDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<GeneralCosultanServiceAnc, object>>> Includes { get; set; }
-        public Expression<Func<GeneralCosultanServiceAnc, bool>> Predicate { get; set; }
-        public Expression<Func<GeneralCosultanServiceAnc, GeneralCosultanServiceAnc>> Select { get; set; }
+        public List<Expression<Func<WellnessProgramSession, object>>> Includes { get; set; }
+        public Expression<Func<WellnessProgramSession, bool>> Predicate { get; set; }
+        public Expression<Func<WellnessProgramSession, WellnessProgramSession>> Select { get; set; }
 
-        public List<(Expression<Func<GeneralCosultanServiceAnc, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<WellnessProgramSession, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class GeneralCosultanServiceAncCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateGeneralCosultanServiceAnc(Expression<Func<GeneralCosultanServiceAnc, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateWellnessProgramSession(Expression<Func<WellnessProgramSession, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<GeneralCosultanServiceAnc, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<WellnessProgramSession, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateGeneralCosultanServiceAncRequest(GeneralCosultanServiceAncDto GeneralCosultanServiceAncDto) : IRequest<GeneralCosultanServiceAncDto>
+     public class CreateWellnessProgramSessionRequest(WellnessProgramSessionDto WellnessProgramSessionDto) : IRequest<WellnessProgramSessionDto>
      {
-         public GeneralCosultanServiceAncDto GeneralCosultanServiceAncDto { get; set; } = GeneralCosultanServiceAncDto;
+         public WellnessProgramSessionDto WellnessProgramSessionDto { get; set; } = WellnessProgramSessionDto;
      }
 
-     public class BulkValidateGeneralCosultanServiceAnc(List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncsToValidate) : IRequest<List<GeneralCosultanServiceAncDto>>
+     public class BulkValidateWellnessProgramSession(List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate) : IRequest<List<WellnessProgramSessionDto>>
      {
-         public List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncsToValidate { get; } = GeneralCosultanServiceAncsToValidate;
+         public List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate { get; } = WellnessProgramSessionsToValidate;
      }
 
-     public class CreateListGeneralCosultanServiceAncRequest(List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncDtos) : IRequest<List<GeneralCosultanServiceAncDto>>
+     public class CreateListWellnessProgramSessionRequest(List<WellnessProgramSessionDto> WellnessProgramSessionDtos) : IRequest<List<WellnessProgramSessionDto>>
      {
-         public List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncDtos { get; set; } = GeneralCosultanServiceAncDtos;
+         public List<WellnessProgramSessionDto> WellnessProgramSessionDtos { get; set; } = WellnessProgramSessionDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateGeneralCosultanServiceAncRequest(GeneralCosultanServiceAncDto GeneralCosultanServiceAncDto) : IRequest<GeneralCosultanServiceAncDto>
+     public class UpdateWellnessProgramSessionRequest(WellnessProgramSessionDto WellnessProgramSessionDto) : IRequest<WellnessProgramSessionDto>
      {
-         public GeneralCosultanServiceAncDto GeneralCosultanServiceAncDto { get; set; } = GeneralCosultanServiceAncDto;
+         public WellnessProgramSessionDto WellnessProgramSessionDto { get; set; } = WellnessProgramSessionDto;
      }
 
-     public class UpdateListGeneralCosultanServiceAncRequest(List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncDtos) : IRequest<List<GeneralCosultanServiceAncDto>>
+     public class UpdateListWellnessProgramSessionRequest(List<WellnessProgramSessionDto> WellnessProgramSessionDtos) : IRequest<List<WellnessProgramSessionDto>>
      {
-         public List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncDtos { get; set; } = GeneralCosultanServiceAncDtos;
+         public List<WellnessProgramSessionDto> WellnessProgramSessionDtos { get; set; } = WellnessProgramSessionDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteGeneralCosultanServiceAncRequest : IRequest<bool>
+     public class DeleteWellnessProgramSessionRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,26 +83,53 @@ public class GeneralCosultanServiceAncCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateGeneralCosultanServiceAncQuery, List<GeneralCosultanServiceAncDto>>,
+IRequestHandler<BulkValidateWellnessProgramSessionQuery, List<WellnessProgramSessionDto>>,
   
-IRequestHandler<GetGeneralCosultanServiceAncQuery, (List<GeneralCosultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGeneralCosultanServiceAncQuery, GeneralCosultanServiceAncDto>,
-public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetGeneralCosultanServiceAncQuery, (List<GeneralCosultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleGeneralCosultanServiceAncQuery, GeneralCosultanServiceAncDto>, IRequestHandler<ValidateGeneralCosultanServiceAnc, bool>,
-     IRequestHandler<CreateGeneralCosultanServiceAncRequest, GeneralCosultanServiceAncDto>,
-     IRequestHandler<BulkValidateGeneralCosultanServiceAnc, List<GeneralCosultanServiceAncDto>>,
-     IRequestHandler<CreateListGeneralCosultanServiceAncRequest, List<GeneralCosultanServiceAncDto>>,
-     IRequestHandler<UpdateGeneralCosultanServiceAncRequest, GeneralCosultanServiceAncDto>,
-     IRequestHandler<UpdateListGeneralCosultanServiceAncRequest, List<GeneralCosultanServiceAncDto>>,
-     IRequestHandler<DeleteGeneralCosultanServiceAncRequest, bool>
+IRequestHandler<GetWellnessProgramSessionQuery, (List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleWellnessProgramSessionQuery, WellnessProgramSessionDto>,
+public class WellnessProgramSessionHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetWellnessProgramSessionQuery, (List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleWellnessProgramSessionQuery, WellnessProgramSessionDto>, IRequestHandler<ValidateWellnessProgramSession, bool>,
+     IRequestHandler<CreateWellnessProgramSessionRequest, WellnessProgramSessionDto>,
+     IRequestHandler<BulkValidateWellnessProgramSession, List<WellnessProgramSessionDto>>,
+     IRequestHandler<CreateListWellnessProgramSessionRequest, List<WellnessProgramSessionDto>>,
+     IRequestHandler<UpdateWellnessProgramSessionRequest, WellnessProgramSessionDto>,
+     IRequestHandler<UpdateListWellnessProgramSessionRequest, List<WellnessProgramSessionDto>>,
+     IRequestHandler<DeleteWellnessProgramSessionRequest, bool>
 {
     #region GET
-    public async Task<(List<GeneralCosultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralCosultanServiceAncQuery request, CancellationToken cancellationToken)
+    public async Task<List<WellnessProgramSessionDto>> Handle(BulkValidateWellnessProgramSession request, CancellationToken cancellationToken)
+    {
+        var CountryDtos = request.WellnessProgramSessionsToValidate;
+
+        // Ekstrak semua kombinasi yang akan dicari di database
+        //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = CountryDtos.Select(x => x.Code).Distinct().ToList();
+
+        //var existingCountrys = await _unitOfWork.Repository<Country>()
+        //    .Entities
+        //    .AsNoTracking()
+        //    .Where(v => CountryNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .ToListAsync(cancellationToken);
+
+        //return existingCountrys.Adapt<List<CountryDto>>();
+
+        return [];
+    }
+    public async Task<bool> Handle(ValidateWellnessProgramSession request, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.Repository<WellnessProgramSession>()
+            .Entities
+            .AsNoTracking()
+            .Where(request.Predicate)  // Apply the Predicate for filtering
+            .AnyAsync(cancellationToken);  // Check if any record matches the condition
+    }
+
+    public async Task<(List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramSessionQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<GeneralCosultanServiceAnc>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<WellnessProgramSession>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -118,8 +145,8 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<GeneralCosultanServiceAnc>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<GeneralCosultanServiceAnc>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<WellnessProgramSession>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<WellnessProgramSession>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -136,7 +163,7 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.GeneralCosultanServiceAnc.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.WellnessProgramSession.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -144,7 +171,7 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new GeneralCosultanServiceAnc
+                query = query.Select(x => new WellnessProgramSession
                 {
                     Id = x.Id, 
                 });
@@ -158,11 +185,11 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<GeneralCosultanServiceAncDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<WellnessProgramSessionDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralCosultanServiceAncDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<WellnessProgramSessionDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -172,11 +199,11 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
         }
     }
  
-    public async Task<GeneralCosultanServiceAncDto> Handle(GetSingleGeneralCosultanServiceAncQuery request, CancellationToken cancellationToken)
+    public async Task<WellnessProgramSessionDto> Handle(GetSingleWellnessProgramSessionQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<GeneralCosultanServiceAnc>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<WellnessProgramSession>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -192,8 +219,8 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<GeneralCosultanServiceAnc>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<GeneralCosultanServiceAnc>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<WellnessProgramSession>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<WellnessProgramSession>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -210,7 +237,7 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.GeneralCosultanServiceAnc.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.WellnessProgramSession.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -218,12 +245,12 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new GeneralCosultanServiceAnc
+                query = query.Select(x => new WellnessProgramSession
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralCosultanServiceAncDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramSessionDto>();
         }
         catch (Exception ex)
         {
@@ -231,45 +258,22 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
             throw;
         }
     }
-
-    public async Task<List<GeneralCosultanServiceAncDto>> Handle(BulkValidateGeneralCosultanServiceAncQuery request, CancellationToken cancellationToken)
-    {
-        var GeneralCosultanServiceAncDtos = request.GeneralCosultanServiceAncsToValidate;
-
-        // Ekstrak semua kombinasi yang akan dicari di database
-        var GeneralCosultanServiceAncNames = GeneralCosultanServiceAncDtos.Select(x => x.Name).Distinct().ToList();
-        var postalCodes = GeneralCosultanServiceAncDtos.Select(x => x.PostalCode).Distinct().ToList();
-        var provinceIds = GeneralCosultanServiceAncDtos.Select(x => x.ProvinceId).Distinct().ToList();
-        var cityIds = GeneralCosultanServiceAncDtos.Select(x => x.CityId).Distinct().ToList();
-        var GeneralCosultanServiceAncIds = GeneralCosultanServiceAncDtos.Select(x => x.GeneralCosultanServiceAncId).Distinct().ToList();
-
-        var existingGeneralCosultanServiceAncs = await _unitOfWork.Repository<GeneralCosultanServiceAnc>()
-            .Entities
-            .AsNoTracking()
-            .Where(v => GeneralCosultanServiceAncNames.Contains(v.Name)
-                        && postalCodes.Contains(v.PostalCode)
-                        && provinceIds.Contains(v.ProvinceId)
-                        && cityIds.Contains(v.CityId)
-                        && GeneralCosultanServiceAncIds.Contains(v.GeneralCosultanServiceAncId))
-            .ToListAsync(cancellationToken);
-
-        return existingGeneralCosultanServiceAncs.Adapt<List<GeneralCosultanServiceAncDto>>();
-    } 
+ 
     #endregion GET
 
      #region CREATE
 
-     public async Task<GeneralCosultanServiceAncDto> Handle(CreateGeneralCosultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<WellnessProgramSessionDto> Handle(CreateWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().AddAsync(request.GeneralCosultanServiceAncDto.Adapt<CreateUpdateGeneralCosultanServiceAncDto>().Adapt<GeneralCosultanServiceAnc>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDto.Adapt<CreateUpdateWellnessProgramSessionDto>().Adapt<WellnessProgramSession>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralCosultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GeneralCosultanServiceAncDto>();
+             return result.Adapt<WellnessProgramSessionDto>();
          }
          catch (Exception)
          {
@@ -277,16 +281,16 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
          }
      }
 
-     public async Task<List<GeneralCosultanServiceAncDto>> Handle(CreateListGeneralCosultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<List<WellnessProgramSessionDto>> Handle(CreateListWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().AddAsync(request.GeneralCosultanServiceAncDtos.Adapt<List<GeneralCosultanServiceAnc>>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDtos.Adapt<List<WellnessProgramSession>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralCosultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GeneralCosultanServiceAncDto>>();
+             return result.Adapt<List<WellnessProgramSessionDto>>();
          }
          catch (Exception)
          {
@@ -298,17 +302,17 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
 
      #region UPDATE
 
-     public async Task<GeneralCosultanServiceAncDto> Handle(UpdateGeneralCosultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<WellnessProgramSessionDto> Handle(UpdateWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().UpdateAsync(request.GeneralCosultanServiceAncDto.Adapt<GeneralCosultanServiceAncDto>().Adapt<GeneralCosultanServiceAnc>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDto.Adapt<WellnessProgramSessionDto>().Adapt<WellnessProgramSession>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralCosultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GeneralCosultanServiceAncDto>();
+             return result.Adapt<WellnessProgramSessionDto>();
          }
          catch (Exception)
          {
@@ -316,16 +320,16 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
          }
      }
 
-     public async Task<List<GeneralCosultanServiceAncDto>> Handle(UpdateListGeneralCosultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<List<WellnessProgramSessionDto>> Handle(UpdateListWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().UpdateAsync(request.GeneralCosultanServiceAncDtos.Adapt<List<GeneralCosultanServiceAnc>>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDtos.Adapt<List<WellnessProgramSession>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralCosultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GeneralCosultanServiceAncDto>>();
+             return result.Adapt<List<WellnessProgramSessionDto>>();
          }
          catch (Exception)
          {
@@ -337,23 +341,23 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteGeneralCosultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<GeneralCosultanServiceAnc>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<WellnessProgramSession>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<GeneralCosultanServiceAnc>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<WellnessProgramSession>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralCosultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -367,20 +371,20 @@ public class GeneralCosultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCa
 }
 
  
-public class BulkValidateGeneralCosultanServiceAncQuery(List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncsToValidate) : IRequest<List<GeneralCosultanServiceAncDto>>
+public class BulkValidateWellnessProgramSessionQuery(List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate) : IRequest<List<WellnessProgramSessionDto>>
 {
-    public List<GeneralCosultanServiceAncDto> GeneralCosultanServiceAncsToValidate { get; } = GeneralCosultanServiceAncsToValidate;
+    public List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate { get; } = WellnessProgramSessionsToValidate;
 }a
 
 
-IRequestHandler<BulkValidateGeneralCosultanServiceAncQuery, List<GeneralCosultanServiceAncDto>>,
+IRequestHandler<BulkValidateWellnessProgramSessionQuery, List<WellnessProgramSessionDto>>,
   
-IRequestHandler<GetGeneralCosultanServiceAncQuery, (List<GeneralCosultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGeneralCosultanServiceAncQuery, GeneralCosultanServiceAncDto>,
+IRequestHandler<GetWellnessProgramSessionQuery, (List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleWellnessProgramSessionQuery, WellnessProgramSessionDto>,
 
 
 
- var a = await Mediator.Send(new GetGeneralCosultanServiceAncsQuery
+ var a = await Mediator.Send(new GetWellnessProgramSessionsQuery
  {
      OrderByList =
      [
@@ -392,10 +396,10 @@ IRequestHandler<GetSingleGeneralCosultanServiceAncQuery, GeneralCosultanServiceA
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleGeneralCosultanServiceAncQuery
+var patienss = (await Mediator.Send(new GetSingleWellnessProgramSessionQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new GeneralCosultanServiceAnc
+    Select = x => new WellnessProgramSession
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -408,13 +412,13 @@ var patienss = (await Mediator.Send(new GetSingleGeneralCosultanServiceAncQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetGeneralCosultanServiceAncQuery
+    var result = await Mediator.Send(new GetWellnessProgramSessionQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    GeneralCosultanServiceAncs = result.Item1;
+    WellnessProgramSessions = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -427,22 +431,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetGeneralCosultanServiceAncQuery
+ var result = await Mediator.Send(new GetWellnessProgramSessionQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refGeneralCosultanServiceAncComboBox?.Text ?? "",
+     SearchTerm = refWellnessProgramSessionComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- GeneralCosultanServiceAncs = result.Item1;
- totalCountGeneralCosultanServiceAnc = result.PageCount;
+ WellnessProgramSessions = result.Item1;
+ totalCountWellnessProgramSession = result.PageCount;
 
- GeneralCosultanServiceAncs = (await Mediator.Send(new GetGeneralCosultanServiceAncQuery
+ WellnessProgramSessions = (await Mediator.Send(new GetWellnessProgramSessionQuery
  {
-     Predicate = x => x.Id == UserForm.IdCardGeneralCosultanServiceAncId,
+     Predicate = x => x.Id == WellnessProgramSessionForm.IdCardWellnessProgramSessionId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleGeneralCosultanServiceAncsQuery
+var data = (await Mediator.Send(new GetSingleWellnessProgramSessionsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -450,17 +454,17 @@ var data = (await Mediator.Send(new GetSingleGeneralCosultanServiceAncsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new GeneralCosultanServiceAnc
+    Select = x => new WellnessProgramSession
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new GeneralCosultanServiceAnc
+        Patient = new WellnessProgramSession
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new GeneralCosultanServiceAnc
+        Pratitioner = new WellnessProgramSession
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -473,55 +477,55 @@ var data = (await Mediator.Send(new GetSingleGeneralCosultanServiceAncsQuery
 })) ?? new();
 
 
-#region ComboboxGeneralCosultanServiceAnc
+#region ComboboxWellnessProgramSession
 
- private DxComboBox<GeneralCosultanServiceAncDto, long?> refGeneralCosultanServiceAncComboBox { get; set; }
- private int GeneralCosultanServiceAncComboBoxIndex { get; set; } = 0;
- private int totalCountGeneralCosultanServiceAnc = 0;
+ private DxComboBox<WellnessProgramSessionDto, long?> refWellnessProgramSessionComboBox { get; set; }
+ private int WellnessProgramSessionComboBoxIndex { get; set; } = 0;
+ private int totalCountWellnessProgramSession = 0;
 
- private async Task OnSearchGeneralCosultanServiceAnc()
+ private async Task OnSearchWellnessProgramSession()
  {
-     await LoadDataGeneralCosultanServiceAnc();
+     await LoadDataWellnessProgramSession();
  }
 
- private async Task OnSearchGeneralCosultanServiceAncIndexIncrement()
+ private async Task OnSearchWellnessProgramSessionIndexIncrement()
  {
-     if (GeneralCosultanServiceAncComboBoxIndex < (totalCountGeneralCosultanServiceAnc - 1))
+     if (WellnessProgramSessionComboBoxIndex < (totalCountWellnessProgramSession - 1))
      {
-         GeneralCosultanServiceAncComboBoxIndex++;
-         await LoadDataGeneralCosultanServiceAnc(GeneralCosultanServiceAncComboBoxIndex, 10);
+         WellnessProgramSessionComboBoxIndex++;
+         await LoadDataWellnessProgramSession(WellnessProgramSessionComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchGeneralCosultanServiceAncIndexDecrement()
+ private async Task OnSearchWellnessProgramSessionIndexDecrement()
  {
-     if (GeneralCosultanServiceAncComboBoxIndex > 0)
+     if (WellnessProgramSessionComboBoxIndex > 0)
      {
-         GeneralCosultanServiceAncComboBoxIndex--;
-         await LoadDataGeneralCosultanServiceAnc(GeneralCosultanServiceAncComboBoxIndex, 10);
+         WellnessProgramSessionComboBoxIndex--;
+         await LoadDataWellnessProgramSession(WellnessProgramSessionComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputGeneralCosultanServiceAncChanged(string e)
+ private async Task OnInputWellnessProgramSessionChanged(string e)
  {
-     GeneralCosultanServiceAncComboBoxIndex = 0;
-     await LoadDataGeneralCosultanServiceAnc();
+     WellnessProgramSessionComboBoxIndex = 0;
+     await LoadDataWellnessProgramSession();
  }
 
  
-  private async Task LoadDataGeneralCosultanServiceAnc(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataWellnessProgramSession(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetGeneralCosultanServiceAncQuery
+          var result = await Mediator.Send(new GetWellnessProgramSessionQuery
           {
-              SearchTerm = refGeneralCosultanServiceAncComboBox?.Text ?? "",
+              SearchTerm = refWellnessProgramSessionComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          GeneralCosultanServiceAncs = result.Item1;
-          totalCountGeneralCosultanServiceAnc = result.PageCount;
+          WellnessProgramSessions = result.Item1;
+          totalCountWellnessProgramSession = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -531,47 +535,47 @@ var data = (await Mediator.Send(new GetSingleGeneralCosultanServiceAncsQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxGeneralCosultanServiceAnc
+ #endregion ComboboxWellnessProgramSession
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralCosultanServiceAnc" ColSpanMd="12">
-    <MyDxComboBox Data="@GeneralCosultanServiceAncs"
-                  NullText="Select GeneralCosultanServiceAnc"
-                  @ref="refGeneralCosultanServiceAncComboBox"
-                  @bind-Value="@a.GeneralCosultanServiceAncId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="WellnessProgramSession" ColSpanMd="12">
+    <MyDxComboBox Data="@WellnessProgramSessions"
+                  NullText="Select WellnessProgramSession"
+                  @ref="refWellnessProgramSessionComboBox"
+                  @bind-Value="@a.WellnessProgramSessionId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputGeneralCosultanServiceAncChanged(e))">
+                  TextChanged="((string e) => OnInputWellnessProgramSessionChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchGeneralCosultanServiceAncIndexDecrement"
+            <DxEditorButton Click="OnSearchWellnessProgramSessionIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchGeneralCosultanServiceAnc"
+            <DxEditorButton Click="OnSearchWellnessProgramSession"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchGeneralCosultanServiceAncIndexIncrement"
+            <DxEditorButton Click="OnSearchWellnessProgramSessionIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(GeneralCosultanServiceAncDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="GeneralCosultanServiceAnc.Name" Caption="GeneralCosultanServiceAnc" />
-            <DxListEditorColumn FieldName="@nameof(GeneralCosultanServiceAncDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(WellnessProgramSessionDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="WellnessProgramSession.Name" Caption="WellnessProgramSession" />
+            <DxListEditorColumn FieldName="@nameof(WellnessProgramSessionDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.GeneralCosultanServiceAncId)" />
+    <ValidationMessage For="@(()=>a.WellnessProgramSessionId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().AddAsync(request.GeneralCosultanServiceAncDto.Adapt<CreateUpdateGeneralCosultanServiceAncDto>().Adapt<GeneralCosultanServiceAnc>());
-var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().AddAsync(request.GeneralCosultanServiceAncDtos.Adapt<List<CreateUpdateGeneralCosultanServiceAncDto>>().Adapt<List<GeneralCosultanServiceAnc>>()); 
+var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDto.Adapt<CreateUpdateWellnessProgramSessionDto>().Adapt<WellnessProgramSession>());
+var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDtos.Adapt<List<CreateUpdateWellnessProgramSessionDto>>().Adapt<List<WellnessProgramSession>>()); 
 
-var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().UpdateAsync(request.GeneralCosultanServiceAncDto.Adapt<CreateUpdateGeneralCosultanServiceAncDto>().Adapt<GeneralCosultanServiceAnc>());  
-var result = await _unitOfWork.Repository<GeneralCosultanServiceAnc>().UpdateAsync(request.GeneralCosultanServiceAncDtos.Adapt<List<CreateUpdateGeneralCosultanServiceAncDto>>().Adapt<List<GeneralCosultanServiceAnc>>());
+var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDto.Adapt<CreateUpdateWellnessProgramSessionDto>().Adapt<WellnessProgramSession>());  
+var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDtos.Adapt<List<CreateUpdateWellnessProgramSessionDto>>().Adapt<List<WellnessProgramSession>>());
 
-list3 = (await Mediator.Send(new GetGeneralCosultanServiceAncQuery
+list3 = (await Mediator.Send(new GetWellnessProgramSessionQuery
 {
-    Predicate = x => GeneralCosultanServiceAncNames.Contains(x.Name.ToLower()),
+    Predicate = x => WellnessProgramSessionNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new GeneralCosultanServiceAnc
+    Select = x => new WellnessProgramSession
     {
         Id = x.Id,
         Name = x.Name
@@ -581,42 +585,42 @@ list3 = (await Mediator.Send(new GetGeneralCosultanServiceAncQuery
 
 #region Searching
 
-    private int pageSize { get; set; } = 10;
-    private int totalCount = 0;
-    private int activePageIndex { get; set; } = 0;
-    private string searchTerm { get; set; } = string.Empty;
+    private int pageSizeWellnessProgramSessionAttendance { get; set; } = 10;
+    private int totalCountWellnessProgramSessionAttendance = 0;
+    private int activePageIndexWellnessProgramSessionAttendance { get; set; } = 0;
+    private string searchTermWellnessProgramSessionAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChanged(string searchText)
+    private async Task OnSearchBoxChangedWellnessProgramSessionAttendance(string searchText)
     {
-        searchTerm = searchText;
-        await LoadData(0, pageSize);
+        searchTermWellnessProgramSessionAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeWellnessProgramSessionAttendance);
     }
 
-    private async Task OnPageSizeIndexChanged(int newPageSize)
+    private async Task OnpageSizeWellnessProgramSessionAttendanceIndexChanged(int newpageSizeWellnessProgramSessionAttendance)
     {
-        pageSize = newPageSize;
-        await LoadData(0, newPageSize);
+        pageSizeWellnessProgramSessionAttendance = newpageSizeWellnessProgramSessionAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeWellnessProgramSessionAttendance);
     }
 
-    private async Task OnPageIndexChanged(int newPageIndex)
+    private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadData(newPageIndex, pageSize);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeWellnessProgramSessionAttendance);
     }
- private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeWellnessProgramSessionAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetGeneralCosultanServiceAncQuery
+        var result = await Mediator.Send(new GetWellnessProgramSessionAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSize,
-            SearchTerm = searchTerm,
+            PageSize = pageSizeWellnessProgramSessionAttendance,
+            SearchTerm = searchTermWellnessProgramSessionAttendance,
         });
-        GeneralCosultanServiceAncs = result.Item1;
-        totalCount = result.PageCount;
-        activePageIndex = pageIndex;
+        WellnessProgramSessionAttendances = result.Item1;
+        totalCountWellnessProgramSessionAttendance = result.PageCount;
+        activePageIndexWellnessProgramSessionAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)

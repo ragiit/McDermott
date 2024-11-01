@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Antiforgery;
 using McDermott.Web;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.SignalR;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -69,6 +70,8 @@ builder.Services.AddOptions();
 //    var a = new Uri(builder.Configuration["GraphQLServer"]);
 //    client.BaseAddress = a;
 //});
+
+builder.Services.AddSignalR();
 
 #region For read base url href apps started 
 var baseHref = builder.Configuration.GetValue<string>("BaseHref");
@@ -228,6 +231,8 @@ app.UseAntiforgery();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGraphQL();
+    endpoints.MapHub<ChatHub>("/chathub");
+
 });
 //app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
@@ -529,5 +534,13 @@ public class SeedData
             await context.Users.AddAsync(adminUser);
             await context.SaveChangesAsync();
         }
+    }
+}
+
+public class ChatHub : Hub
+{
+    public async Task SendMessage(string user, string message)
+    {
+        await Clients.All.SendAsync("ReceiveMessage", user, message);
     }
 }

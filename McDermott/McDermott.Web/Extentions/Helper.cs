@@ -11,8 +11,7 @@ namespace McDermott.Web.Extentions
     public class AppSettings
     {
         public string BaseHref { get; set; }
-    }
-
+    }  
     public static class Helper
     {
        
