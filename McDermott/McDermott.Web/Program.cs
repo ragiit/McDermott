@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Antiforgery;
 using McDermott.Web;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.SignalR;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -64,11 +65,18 @@ builder.Services.AddOptions();
 //builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 // Add rate limiting processing strategy
 //builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
-builder.Services.AddHttpClient("GraphQLClient", client =>
-{
-    var a = new Uri(builder.Configuration["GraphQLServer"]);
-    client.BaseAddress = a;
-});
+//builder.Services.AddHttpClient("GraphQLClient", client =>
+//{
+//    var a = new Uri(builder.Configuration["GraphQLServer"]);
+//    client.BaseAddress = a;
+//});
+
+builder.Services.AddSignalR();
+
+#region For read base url href apps started 
+var baseHref = builder.Configuration.GetValue<string>("BaseHref");
+builder.Services.AddSingleton(new AppSettings { BaseHref = baseHref ?? "" });
+#endregion
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
@@ -208,6 +216,12 @@ else
     app.UseDeveloperExceptionPage();
 }
 
+// Mengatur path dasar untuk aplikasi
+if (!string.IsNullOrEmpty(baseHref))
+{
+    app.UsePathBase(baseHref);  // Mengatur Base Path untuk seluruh aplikasi
+}
+
 //app.UsePathBase("/McDermott");
 //app.UseMiddleware<AuthorizationMiddleware>();
 
@@ -217,6 +231,8 @@ app.UseAntiforgery();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGraphQL();
+    endpoints.MapHub<ChatHub>("/chathub");
+
 });
 //app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
@@ -518,5 +534,13 @@ public class SeedData
             await context.Users.AddAsync(adminUser);
             await context.SaveChangesAsync();
         }
+    }
+}
+
+public class ChatHub : Hub
+{
+    public async Task SendMessage(string user, string message)
+    {
+        await Clients.All.SendAsync("ReceiveMessage", user, message);
     }
 }

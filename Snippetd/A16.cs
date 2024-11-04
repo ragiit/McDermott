@@ -1,14 +1,14 @@
-public class BpjsClassificationCommand
+public class WellnessProgramSessionCommand
  {
      #region GET
 
-    public class GetSingleBpjsClassificationQuery : IRequest<BpjsClassificationDto>
+    public class GetSingleWellnessProgramSessionQuery : IRequest<WellnessProgramSessionDto>
     {
-        public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
-        public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
-        public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
+        public List<Expression<Func<WellnessProgramSession, object>>> Includes { get; set; }
+        public Expression<Func<WellnessProgramSession, bool>> Predicate { get; set; }
+        public Expression<Func<WellnessProgramSession, WellnessProgramSession>> Select { get; set; }
 
-        public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<WellnessProgramSession, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class BpjsClassificationCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetBpjsClassificationQuery : IRequest<(List<BpjsClassificationDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetWellnessProgramSessionQuery : IRequest<(List<WellnessProgramSessionDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<BpjsClassification, object>>> Includes { get; set; }
-        public Expression<Func<BpjsClassification, bool>> Predicate { get; set; }
-        public Expression<Func<BpjsClassification, BpjsClassification>> Select { get; set; }
+        public List<Expression<Func<WellnessProgramSession, object>>> Includes { get; set; }
+        public Expression<Func<WellnessProgramSession, bool>> Predicate { get; set; }
+        public Expression<Func<WellnessProgramSession, WellnessProgramSession>> Select { get; set; }
 
-        public List<(Expression<Func<BpjsClassification, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<WellnessProgramSession, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class BpjsClassificationCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateBpjsClassification(Expression<Func<BpjsClassification, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateWellnessProgramSession(Expression<Func<WellnessProgramSession, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<BpjsClassification, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<WellnessProgramSession, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateBpjsClassificationRequest(BpjsClassificationDto BpjsClassificationDto) : IRequest<BpjsClassificationDto>
+     public class CreateWellnessProgramSessionRequest(WellnessProgramSessionDto WellnessProgramSessionDto) : IRequest<WellnessProgramSessionDto>
      {
-         public BpjsClassificationDto BpjsClassificationDto { get; set; } = BpjsClassificationDto;
+         public WellnessProgramSessionDto WellnessProgramSessionDto { get; set; } = WellnessProgramSessionDto;
      }
 
-     public class BulkValidateBpjsClassification(List<BpjsClassificationDto> BpjsClassificationsToValidate) : IRequest<List<BpjsClassificationDto>>
+     public class BulkValidateWellnessProgramSession(List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate) : IRequest<List<WellnessProgramSessionDto>>
      {
-         public List<BpjsClassificationDto> BpjsClassificationsToValidate { get; } = BpjsClassificationsToValidate;
+         public List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate { get; } = WellnessProgramSessionsToValidate;
      }
 
-     public class CreateListBpjsClassificationRequest(List<BpjsClassificationDto> BpjsClassificationDtos) : IRequest<List<BpjsClassificationDto>>
+     public class CreateListWellnessProgramSessionRequest(List<WellnessProgramSessionDto> WellnessProgramSessionDtos) : IRequest<List<WellnessProgramSessionDto>>
      {
-         public List<BpjsClassificationDto> BpjsClassificationDtos { get; set; } = BpjsClassificationDtos;
+         public List<WellnessProgramSessionDto> WellnessProgramSessionDtos { get; set; } = WellnessProgramSessionDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateBpjsClassificationRequest(BpjsClassificationDto BpjsClassificationDto) : IRequest<BpjsClassificationDto>
+     public class UpdateWellnessProgramSessionRequest(WellnessProgramSessionDto WellnessProgramSessionDto) : IRequest<WellnessProgramSessionDto>
      {
-         public BpjsClassificationDto BpjsClassificationDto { get; set; } = BpjsClassificationDto;
+         public WellnessProgramSessionDto WellnessProgramSessionDto { get; set; } = WellnessProgramSessionDto;
      }
 
-     public class UpdateListBpjsClassificationRequest(List<BpjsClassificationDto> BpjsClassificationDtos) : IRequest<List<BpjsClassificationDto>>
+     public class UpdateListWellnessProgramSessionRequest(List<WellnessProgramSessionDto> WellnessProgramSessionDtos) : IRequest<List<WellnessProgramSessionDto>>
      {
-         public List<BpjsClassificationDto> BpjsClassificationDtos { get; set; } = BpjsClassificationDtos;
+         public List<WellnessProgramSessionDto> WellnessProgramSessionDtos { get; set; } = WellnessProgramSessionDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteBpjsClassificationRequest : IRequest<bool>
+     public class DeleteWellnessProgramSessionRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,26 +83,53 @@ public class BpjsClassificationCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateBpjsClassificationQuery, List<BpjsClassificationDto>>,
+IRequestHandler<BulkValidateWellnessProgramSessionQuery, List<WellnessProgramSessionDto>>,
   
-IRequestHandler<GetBpjsClassificationQuery, (List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>,
-public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetBpjsClassificationQuery, (List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>, IRequestHandler<ValidateBpjsClassification, bool>,
-     IRequestHandler<CreateBpjsClassificationRequest, BpjsClassificationDto>,
-     IRequestHandler<BulkValidateBpjsClassification, List<BpjsClassificationDto>>,
-     IRequestHandler<CreateListBpjsClassificationRequest, List<BpjsClassificationDto>>,
-     IRequestHandler<UpdateBpjsClassificationRequest, BpjsClassificationDto>,
-     IRequestHandler<UpdateListBpjsClassificationRequest, List<BpjsClassificationDto>>,
-     IRequestHandler<DeleteBpjsClassificationRequest, bool>
+IRequestHandler<GetWellnessProgramSessionQuery, (List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleWellnessProgramSessionQuery, WellnessProgramSessionDto>,
+public class WellnessProgramSessionHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetWellnessProgramSessionQuery, (List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleWellnessProgramSessionQuery, WellnessProgramSessionDto>, IRequestHandler<ValidateWellnessProgramSession, bool>,
+     IRequestHandler<CreateWellnessProgramSessionRequest, WellnessProgramSessionDto>,
+     IRequestHandler<BulkValidateWellnessProgramSession, List<WellnessProgramSessionDto>>,
+     IRequestHandler<CreateListWellnessProgramSessionRequest, List<WellnessProgramSessionDto>>,
+     IRequestHandler<UpdateWellnessProgramSessionRequest, WellnessProgramSessionDto>,
+     IRequestHandler<UpdateListWellnessProgramSessionRequest, List<WellnessProgramSessionDto>>,
+     IRequestHandler<DeleteWellnessProgramSessionRequest, bool>
 {
     #region GET
-    public async Task<(List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBpjsClassificationQuery request, CancellationToken cancellationToken)
+    public async Task<List<WellnessProgramSessionDto>> Handle(BulkValidateWellnessProgramSession request, CancellationToken cancellationToken)
+    {
+        var CountryDtos = request.WellnessProgramSessionsToValidate;
+
+        // Ekstrak semua kombinasi yang akan dicari di database
+        //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = CountryDtos.Select(x => x.Code).Distinct().ToList();
+
+        //var existingCountrys = await _unitOfWork.Repository<Country>()
+        //    .Entities
+        //    .AsNoTracking()
+        //    .Where(v => CountryNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .ToListAsync(cancellationToken);
+
+        //return existingCountrys.Adapt<List<CountryDto>>();
+
+        return [];
+    }
+    public async Task<bool> Handle(ValidateWellnessProgramSession request, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.Repository<WellnessProgramSession>()
+            .Entities
+            .AsNoTracking()
+            .Where(request.Predicate)  // Apply the Predicate for filtering
+            .AnyAsync(cancellationToken);  // Check if any record matches the condition
+    }
+
+    public async Task<(List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramSessionQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<WellnessProgramSession>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -118,8 +145,8 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<WellnessProgramSession>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<WellnessProgramSession>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -136,7 +163,7 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.BpjsClassification.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.WellnessProgramSession.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -144,7 +171,7 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new BpjsClassification
+                query = query.Select(x => new WellnessProgramSession
                 {
                     Id = x.Id, 
                 });
@@ -158,11 +185,11 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<BpjsClassificationDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<WellnessProgramSessionDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<BpjsClassificationDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<WellnessProgramSessionDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -172,11 +199,11 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
         }
     }
  
-    public async Task<BpjsClassificationDto> Handle(GetSingleBpjsClassificationQuery request, CancellationToken cancellationToken)
+    public async Task<WellnessProgramSessionDto> Handle(GetSingleWellnessProgramSessionQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<BpjsClassification>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<WellnessProgramSession>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -192,8 +219,8 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<BpjsClassification>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<BpjsClassification>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<WellnessProgramSession>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<WellnessProgramSession>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -210,7 +237,7 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.BpjsClassification.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.WellnessProgramSession.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -218,12 +245,12 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new BpjsClassification
+                query = query.Select(x => new WellnessProgramSession
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BpjsClassificationDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramSessionDto>();
         }
         catch (Exception ex)
         {
@@ -231,45 +258,22 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
             throw;
         }
     }
-
-    public async Task<List<BpjsClassificationDto>> Handle(BulkValidateBpjsClassificationQuery request, CancellationToken cancellationToken)
-    {
-        var BpjsClassificationDtos = request.BpjsClassificationsToValidate;
-
-        // Ekstrak semua kombinasi yang akan dicari di database
-        var BpjsClassificationNames = BpjsClassificationDtos.Select(x => x.Name).Distinct().ToList();
-        var postalCodes = BpjsClassificationDtos.Select(x => x.PostalCode).Distinct().ToList();
-        var provinceIds = BpjsClassificationDtos.Select(x => x.ProvinceId).Distinct().ToList();
-        var cityIds = BpjsClassificationDtos.Select(x => x.CityId).Distinct().ToList();
-        var BpjsClassificationIds = BpjsClassificationDtos.Select(x => x.BpjsClassificationId).Distinct().ToList();
-
-        var existingBpjsClassifications = await _unitOfWork.Repository<BpjsClassification>()
-            .Entities
-            .AsNoTracking()
-            .Where(v => BpjsClassificationNames.Contains(v.Name)
-                        && postalCodes.Contains(v.PostalCode)
-                        && provinceIds.Contains(v.ProvinceId)
-                        && cityIds.Contains(v.CityId)
-                        && BpjsClassificationIds.Contains(v.BpjsClassificationId))
-            .ToListAsync(cancellationToken);
-
-        return existingBpjsClassifications.Adapt<List<BpjsClassificationDto>>();
-    } 
+ 
     #endregion GET
 
      #region CREATE
 
-     public async Task<BpjsClassificationDto> Handle(CreateBpjsClassificationRequest request, CancellationToken cancellationToken)
+     public async Task<WellnessProgramSessionDto> Handle(CreateWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDto.Adapt<CreateUpdateBpjsClassificationDto>().Adapt<BpjsClassification>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDto.Adapt<CreateUpdateWellnessProgramSessionDto>().Adapt<WellnessProgramSession>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<BpjsClassificationDto>();
+             return result.Adapt<WellnessProgramSessionDto>();
          }
          catch (Exception)
          {
@@ -277,16 +281,16 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
          }
      }
 
-     public async Task<List<BpjsClassificationDto>> Handle(CreateListBpjsClassificationRequest request, CancellationToken cancellationToken)
+     public async Task<List<WellnessProgramSessionDto>> Handle(CreateListWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDtos.Adapt<List<BpjsClassification>>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDtos.Adapt<List<WellnessProgramSession>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<BpjsClassificationDto>>();
+             return result.Adapt<List<WellnessProgramSessionDto>>();
          }
          catch (Exception)
          {
@@ -298,17 +302,17 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
 
      #region UPDATE
 
-     public async Task<BpjsClassificationDto> Handle(UpdateBpjsClassificationRequest request, CancellationToken cancellationToken)
+     public async Task<WellnessProgramSessionDto> Handle(UpdateWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDto.Adapt<BpjsClassificationDto>().Adapt<BpjsClassification>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDto.Adapt<WellnessProgramSessionDto>().Adapt<WellnessProgramSession>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<BpjsClassificationDto>();
+             return result.Adapt<WellnessProgramSessionDto>();
          }
          catch (Exception)
          {
@@ -316,16 +320,16 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
          }
      }
 
-     public async Task<List<BpjsClassificationDto>> Handle(UpdateListBpjsClassificationRequest request, CancellationToken cancellationToken)
+     public async Task<List<WellnessProgramSessionDto>> Handle(UpdateListWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDtos.Adapt<List<BpjsClassification>>());
+             var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDtos.Adapt<List<WellnessProgramSession>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<BpjsClassificationDto>>();
+             return result.Adapt<List<WellnessProgramSessionDto>>();
          }
          catch (Exception)
          {
@@ -337,23 +341,23 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteBpjsClassificationRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteWellnessProgramSessionRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<BpjsClassification>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<WellnessProgramSession>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<BpjsClassification>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<WellnessProgramSession>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsClassificationQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramSessionQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -367,20 +371,20 @@ public class BpjsClassificationHandler(IUnitOfWork _unitOfWork, IMemoryCache _ca
 }
 
  
-public class BulkValidateBpjsClassificationQuery(List<BpjsClassificationDto> BpjsClassificationsToValidate) : IRequest<List<BpjsClassificationDto>>
+public class BulkValidateWellnessProgramSessionQuery(List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate) : IRequest<List<WellnessProgramSessionDto>>
 {
-    public List<BpjsClassificationDto> BpjsClassificationsToValidate { get; } = BpjsClassificationsToValidate;
-}
+    public List<WellnessProgramSessionDto> WellnessProgramSessionsToValidate { get; } = WellnessProgramSessionsToValidate;
+}a
 
 
-IRequestHandler<BulkValidateBpjsClassificationQuery, List<BpjsClassificationDto>>,
+IRequestHandler<BulkValidateWellnessProgramSessionQuery, List<WellnessProgramSessionDto>>,
   
-IRequestHandler<GetBpjsClassificationQuery, (List<BpjsClassificationDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>,
+IRequestHandler<GetWellnessProgramSessionQuery, (List<WellnessProgramSessionDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleWellnessProgramSessionQuery, WellnessProgramSessionDto>,
 
 
 
- var a = await Mediator.Send(new GetBpjsClassificationsQuery
+ var a = await Mediator.Send(new GetWellnessProgramSessionsQuery
  {
      OrderByList =
      [
@@ -392,10 +396,10 @@ IRequestHandler<GetSingleBpjsClassificationQuery, BpjsClassificationDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleBpjsClassificationQuery
+var patienss = (await Mediator.Send(new GetSingleWellnessProgramSessionQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new BpjsClassification
+    Select = x => new WellnessProgramSession
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -408,13 +412,13 @@ var patienss = (await Mediator.Send(new GetSingleBpjsClassificationQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetBpjsClassificationQuery
+    var result = await Mediator.Send(new GetWellnessProgramSessionQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    BpjsClassifications = result.Item1;
+    WellnessProgramSessions = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -427,22 +431,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetBpjsClassificationQuery
+ var result = await Mediator.Send(new GetWellnessProgramSessionQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refBpjsClassificationComboBox?.Text ?? "",
+     SearchTerm = refWellnessProgramSessionComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- BpjsClassifications = result.Item1;
- totalCountBpjsClassification = result.PageCount;
+ WellnessProgramSessions = result.Item1;
+ totalCountWellnessProgramSession = result.PageCount;
 
- BpjsClassifications = (await Mediator.Send(new GetBpjsClassificationQuery
+ WellnessProgramSessions = (await Mediator.Send(new GetWellnessProgramSessionQuery
  {
-     Predicate = x => x.Id == UserForm.IdCardBpjsClassificationId,
+     Predicate = x => x.Id == WellnessProgramSessionForm.IdCardWellnessProgramSessionId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleBpjsClassificationsQuery
+var data = (await Mediator.Send(new GetSingleWellnessProgramSessionsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -450,17 +454,17 @@ var data = (await Mediator.Send(new GetSingleBpjsClassificationsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new BpjsClassification
+    Select = x => new WellnessProgramSession
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new BpjsClassification
+        Patient = new WellnessProgramSession
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new BpjsClassification
+        Pratitioner = new WellnessProgramSession
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -473,55 +477,55 @@ var data = (await Mediator.Send(new GetSingleBpjsClassificationsQuery
 })) ?? new();
 
 
-#region ComboboxBpjsClassification
+#region ComboboxWellnessProgramSession
 
- private DxComboBox<BpjsClassificationDto, long?> refBpjsClassificationComboBox { get; set; }
- private int BpjsClassificationComboBoxIndex { get; set; } = 0;
- private int totalCountBpjsClassification = 0;
+ private DxComboBox<WellnessProgramSessionDto, long?> refWellnessProgramSessionComboBox { get; set; }
+ private int WellnessProgramSessionComboBoxIndex { get; set; } = 0;
+ private int totalCountWellnessProgramSession = 0;
 
- private async Task OnSearchBpjsClassification()
+ private async Task OnSearchWellnessProgramSession()
  {
-     await LoadDataBpjsClassification();
+     await LoadDataWellnessProgramSession();
  }
 
- private async Task OnSearchBpjsClassificationIndexIncrement()
+ private async Task OnSearchWellnessProgramSessionIndexIncrement()
  {
-     if (BpjsClassificationComboBoxIndex < (totalCountBpjsClassification - 1))
+     if (WellnessProgramSessionComboBoxIndex < (totalCountWellnessProgramSession - 1))
      {
-         BpjsClassificationComboBoxIndex++;
-         await LoadDataBpjsClassification(BpjsClassificationComboBoxIndex, 10);
+         WellnessProgramSessionComboBoxIndex++;
+         await LoadDataWellnessProgramSession(WellnessProgramSessionComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchBpjsClassificationIndexDecrement()
+ private async Task OnSearchWellnessProgramSessionIndexDecrement()
  {
-     if (BpjsClassificationComboBoxIndex > 0)
+     if (WellnessProgramSessionComboBoxIndex > 0)
      {
-         BpjsClassificationComboBoxIndex--;
-         await LoadDataBpjsClassification(BpjsClassificationComboBoxIndex, 10);
+         WellnessProgramSessionComboBoxIndex--;
+         await LoadDataWellnessProgramSession(WellnessProgramSessionComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputBpjsClassificationChanged(string e)
+ private async Task OnInputWellnessProgramSessionChanged(string e)
  {
-     BpjsClassificationComboBoxIndex = 0;
-     await LoadDataBpjsClassification();
+     WellnessProgramSessionComboBoxIndex = 0;
+     await LoadDataWellnessProgramSession();
  }
 
  
-  private async Task LoadDataBpjsClassification(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataWellnessProgramSession(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetBpjsClassificationQuery
+          var result = await Mediator.Send(new GetWellnessProgramSessionQuery
           {
-              SearchTerm = refBpjsClassificationComboBox?.Text ?? "",
+              SearchTerm = refWellnessProgramSessionComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          BpjsClassifications = result.Item1;
-          totalCountBpjsClassification = result.PageCount;
+          WellnessProgramSessions = result.Item1;
+          totalCountWellnessProgramSession = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -531,47 +535,47 @@ var data = (await Mediator.Send(new GetSingleBpjsClassificationsQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxBpjsClassification
+ #endregion ComboboxWellnessProgramSession
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="BpjsClassification" ColSpanMd="12">
-    <MyDxComboBox Data="@BpjsClassifications"
-                  NullText="Select BpjsClassification"
-                  @ref="refBpjsClassificationComboBox"
-                  @bind-Value="@a.BpjsClassificationId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="WellnessProgramSession" ColSpanMd="12">
+    <MyDxComboBox Data="@WellnessProgramSessions"
+                  NullText="Select WellnessProgramSession"
+                  @ref="refWellnessProgramSessionComboBox"
+                  @bind-Value="@a.WellnessProgramSessionId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputBpjsClassificationChanged(e))">
+                  TextChanged="((string e) => OnInputWellnessProgramSessionChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchBpjsClassificationIndexDecrement"
+            <DxEditorButton Click="OnSearchWellnessProgramSessionIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchBpjsClassification"
+            <DxEditorButton Click="OnSearchWellnessProgramSession"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchBpjsClassificationIndexIncrement"
+            <DxEditorButton Click="OnSearchWellnessProgramSessionIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(BpjsClassificationDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="BpjsClassification.Name" Caption="BpjsClassification" />
-            <DxListEditorColumn FieldName="@nameof(BpjsClassificationDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(WellnessProgramSessionDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="WellnessProgramSession.Name" Caption="WellnessProgramSession" />
+            <DxListEditorColumn FieldName="@nameof(WellnessProgramSessionDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.BpjsClassificationId)" />
+    <ValidationMessage For="@(()=>a.WellnessProgramSessionId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDto.Adapt<CreateUpdateBpjsClassificationDto>().Adapt<BpjsClassification>());
-var result = await _unitOfWork.Repository<BpjsClassification>().AddAsync(request.BpjsClassificationDtos.Adapt<List<CreateUpdateBpjsClassificationDto>>().Adapt<List<BpjsClassification>>()); 
+var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDto.Adapt<CreateUpdateWellnessProgramSessionDto>().Adapt<WellnessProgramSession>());
+var result = await _unitOfWork.Repository<WellnessProgramSession>().AddAsync(request.WellnessProgramSessionDtos.Adapt<List<CreateUpdateWellnessProgramSessionDto>>().Adapt<List<WellnessProgramSession>>()); 
 
-var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDto.Adapt<CreateUpdateBpjsClassificationDto>().Adapt<BpjsClassification>());  
-var result = await _unitOfWork.Repository<BpjsClassification>().UpdateAsync(request.BpjsClassificationDtos.Adapt<List<CreateUpdateBpjsClassificationDto>>().Adapt<List<BpjsClassification>>());
+var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDto.Adapt<CreateUpdateWellnessProgramSessionDto>().Adapt<WellnessProgramSession>());  
+var result = await _unitOfWork.Repository<WellnessProgramSession>().UpdateAsync(request.WellnessProgramSessionDtos.Adapt<List<CreateUpdateWellnessProgramSessionDto>>().Adapt<List<WellnessProgramSession>>());
 
-list3 = (await Mediator.Send(new GetBpjsClassificationQuery
+list3 = (await Mediator.Send(new GetWellnessProgramSessionQuery
 {
-    Predicate = x => BpjsClassificationNames.Contains(x.Name.ToLower()),
+    Predicate = x => WellnessProgramSessionNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new BpjsClassification
+    Select = x => new WellnessProgramSession
     {
         Id = x.Id,
         Name = x.Name
@@ -581,42 +585,42 @@ list3 = (await Mediator.Send(new GetBpjsClassificationQuery
 
 #region Searching
 
-    private int pageSize { get; set; } = 10;
-    private int totalCount = 0;
-    private int activePageIndex { get; set; } = 0;
-    private string searchTerm { get; set; } = string.Empty;
+    private int pageSizeWellnessProgramSessionAttendance { get; set; } = 10;
+    private int totalCountWellnessProgramSessionAttendance = 0;
+    private int activePageIndexWellnessProgramSessionAttendance { get; set; } = 0;
+    private string searchTermWellnessProgramSessionAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChanged(string searchText)
+    private async Task OnSearchBoxChangedWellnessProgramSessionAttendance(string searchText)
     {
-        searchTerm = searchText;
-        await LoadData(0, pageSize);
+        searchTermWellnessProgramSessionAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeWellnessProgramSessionAttendance);
     }
 
-    private async Task OnPageSizeIndexChanged(int newPageSize)
+    private async Task OnpageSizeWellnessProgramSessionAttendanceIndexChanged(int newpageSizeWellnessProgramSessionAttendance)
     {
-        pageSize = newPageSize;
-        await LoadData(0, newPageSize);
+        pageSizeWellnessProgramSessionAttendance = newpageSizeWellnessProgramSessionAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeWellnessProgramSessionAttendance);
     }
 
-    private async Task OnPageIndexChanged(int newPageIndex)
+    private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadData(newPageIndex, pageSize);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeWellnessProgramSessionAttendance);
     }
- private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeWellnessProgramSessionAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetBpjsClassificationQuery
+        var result = await Mediator.Send(new GetWellnessProgramSessionAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSize,
-            SearchTerm = searchTerm,
+            PageSize = pageSizeWellnessProgramSessionAttendance,
+            SearchTerm = searchTermWellnessProgramSessionAttendance,
         });
-        BpjsClassifications = result.Item1;
-        totalCount = result.PageCount;
-        activePageIndex = pageIndex;
+        WellnessProgramSessionAttendances = result.Item1;
+        totalCountWellnessProgramSessionAttendance = result.PageCount;
+        activePageIndexWellnessProgramSessionAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)

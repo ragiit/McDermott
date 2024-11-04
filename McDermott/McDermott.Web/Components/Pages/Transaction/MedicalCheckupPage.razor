@@ -365,6 +365,7 @@
                                                     <DxFormLayout Enabled="true">
 
                                                         <DxFormLayoutItem ColSpanMd="12">
+                                                            <MyTextBox @bind-Text="GeneralConsultanService.McuExaminationBase64"></MyTextBox>
                                                             <iframe src="@($"data:application/pdf;base64,{GeneralConsultanService.McuExaminationBase64}")" style="width: 100%; height: 500px;" frameborder="0"></iframe>
                                                         </DxFormLayoutItem>
 

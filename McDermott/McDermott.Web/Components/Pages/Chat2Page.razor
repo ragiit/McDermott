@@ -1,0 +1,170 @@
+﻿@page "/chats"
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<div class="container-fluid">
+    <div class="row clearfix">
+        <div class="col-lg-12">
+            <div class="card chat-app">
+                <div id="plist" class="people-list">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search...">
+                    </div>
+                    <ul class="list-unstyled chat-list mt-2 mb-0">
+                        @foreach (var user in users)
+                        {
+                            <li class="clearfix @(activeUser == user ? "active" : "")" @onclick="() => SetActiveUser(user)">
+                                <img src="@user.AvatarUrl" alt="avatar">
+                                <div class="about">
+                                    <div class="name">@user.Name</div>
+                                    <div class="status">
+                                        <i class="fa fa-circle @(user.IsOnline ? "online" : "offline")"></i> @(user.Status)
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="chat">
+                    <div class="chat-header clearfix">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                @if (activeUser != null)
+                                {
+                                    <img src="@activeUser.AvatarUrl" alt="avatar">
+                                    <div class="chat-about">
+                                        <h6 class="m-b-0">@activeUser.Name</h6>
+                                        <small>@activeUser.Status</small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-history">
+                        <ul class="m-b-0">
+                            @foreach (var message in messages)
+                            {
+                                <li class="clearfix">
+                                    @if (activeUser != null && message.Sender == activeUser.Name)
+                                    {
+                                        <div class="message-data text-right">
+                                            <span class="message-data-time">@message.Timestamp</span>
+                                            <img src="@message.AvatarUrl" alt="avatar">
+                                        </div>
+                                        <div class="message other-message float-right">@message.Content</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="message-data">
+                                            <span class="message-data-time">@message.Timestamp</span>
+                                        </div>
+                                        <div class="message my-message">@message.Content</div>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="chat-message clearfix">
+                        <div class="input-group mb-0">
+                            <input type="text" class="form-control" placeholder="Enter text here..." @bind="messageInput" @onkeydown="HandleEnterKey">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" @onclick="SendMessage"><i class="fa fa-send"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* <input type="text" class="form-control" @bind="messageInput2" placeholder="Name">
+<button class="btn btn-primary" @onclick="SetActiveUser2"><i class="fa fa-send"></i></button> *@
+
+
+@code {
+    private HubConnection hubConnection;
+    private List<User> users = new List<User>
+    {
+        new User { Name = "Vincent Porter", AvatarUrl = "https://bootdey.com/img/Content/avatar/avatar1.png", Status = "left 7 mins ago", IsOnline = false },
+        new User { Name = "Aiden Chavez", AvatarUrl = "https://bootdey.com/img/Content/avatar/avatar2.png", Status = "online", IsOnline = true },
+        // Add more users as needed
+    };
+    private List<Message> messages = new List<Message>();
+    private string messageInput;
+    private string messageInput2 = "Vincent Porter";
+    private User activeUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            messages.Add(new Message { Sender = user, Content = message, Timestamp = DateTime.Now.ToString("hh:mm tt") });
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(messageInput) && activeUser != null)
+        {
+            await hubConnection.SendAsync("SendMessage", "Me", messageInput);  // Send message to hub
+            messages.Add(new Message { Sender = "Me", Content = messageInput, Timestamp = DateTime.Now.ToString("hh:mm tt") });
+            messageInput = string.Empty;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void SetActiveUser2()
+    {
+        activeUser = users.FirstOrDefault(x => x.Name == messageInput2);
+    }
+
+    private void SetActiveUser(User user)
+    {
+        activeUser = user;
+        messages.Clear();
+    }
+
+    private async Task HandleEnterKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    private class User
+    {
+        public string Name { get; set; }
+        public string AvatarUrl { get; set; }
+        public string Status { get; set; }
+        public bool IsOnline { get; set; }
+    }
+
+    private class Message
+    {
+        public string Sender { get; set; }
+        public string Content { get; set; }
+        public string Timestamp { get; set; }
+        public string AvatarUrl { get; set; } = "https://bootdey.com/img/Content/avatar/avatar1.png"; // Default avatar
+    }
+}

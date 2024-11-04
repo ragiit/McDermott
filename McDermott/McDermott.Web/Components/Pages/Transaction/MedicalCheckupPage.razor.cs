@@ -1,6 +1,8 @@
-﻿using BitMiracle.Docotic.Pdf; 
+﻿
 using DocumentFormat.OpenXml;
 using Microsoft.Extensions.Caching.Memory;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -1505,15 +1507,30 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             GeneralConsultanService.McuExaminationDocs = e.File.Name;
 
-            using (var pdf = new PdfDocument())
+            // Membaca dan mengompres PDF
+            using (var inputStream = file.OpenReadStream())
             {
-                //pdf.Save(e.File.OpenReadStream());
+                // Membuat PdfDocument dari input stream
+                PdfDocument document = PdfReader.Open(inputStream, PdfDocumentOpenMode.Import);
 
+                // Membuat dokumen PDF baru untuk output
+                PdfDocument outputDocument = new PdfDocument();
 
+                // Menyalin halaman dari input ke output
+                foreach (var page in document.Pages)
+                {
+                    outputDocument.AddPage(page);
+                }
+
+                // Menyimpan PDF ke MemoryStream
                 using var memoryStream = new MemoryStream();
-                pdf.Save(memoryStream);
+                outputDocument.Save(memoryStream, false);
+                // Mengonversi ke Base64
                 GeneralConsultanService.McuExaminationBase64 = Convert.ToBase64String(memoryStream.ToArray());
             }
+
+            // Menyimpan nama file
+            GeneralConsultanService.McuExaminationDocs = file.Name;
 
             // Buffering saat membaca stream
             //using (var memoryStream = new MemoryStream())

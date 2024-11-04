@@ -1,20 +1,25 @@
-﻿<!DOCTYPE html>
+﻿@inject AppSettings AppSettings
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    @if (!true)
+    @*  @if (!true)
     {
 
-        <base href="/new/">
+    <base href="/new/">
     }
     else
     {
 
-        <base href="/">
-    }
+    <base href="/">
+    } *@
+
+
+    <base href="@AppSettings.BaseHref" />
     <link rel="icon" type="image/png" href="image/logo.png" />
 
     <link rel="stylesheet" href="css/site.min.css" />
@@ -51,6 +56,7 @@
     @* <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> *@
 
     @* <link rel="stylesheet" href="/css/Ticket.css" /> *@
+   @*  <link rel="stylesheet" href="css/pale.css" />  *@
     @* <link rel="stylesheet" href="_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.bs5.css" /> *@
 
     @*...*@
@@ -263,3 +269,4 @@
     }
 </script>
  *@
+

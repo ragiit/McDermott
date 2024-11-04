@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using McDermott.Application.Extentions;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.VisualBasic;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Linq;
 
 namespace McDermott.Application.Features.Queries.Transaction
@@ -213,6 +215,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Service = new Service
                         {
                             Name = x.Service == null ? string.Empty : x.Service.Name,
+                            IsMaternity = x.IsMaternity
                         },
                         Payment = x.Payment,
                         AppointmentDate = x.AppointmentDate,
@@ -931,9 +934,20 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.PratitionerId = dto.PratitionerId;
             entity.Payment = dto.Payment;
             entity.RegistrationDate = dto.RegistrationDate;
+            entity.PregnancyStatusA = dto.PregnancyStatusA;
+            entity.PregnancyStatusP = dto.PregnancyStatusP;
+            entity.PregnancyStatusG = dto.PregnancyStatusG;
+            entity.HPHT = dto.HPHT;
+            entity.HPL = dto.HPL;
 
             SetPropertiesModified(entity, nameof(entity.Status), nameof(entity.PatientId), nameof(entity.TypeRegistration),
-                nameof(entity.IsAlertInformationSpecialCase), nameof(entity.ClassType), nameof(entity.ServiceId),
+                nameof(entity.IsAlertInformationSpecialCase),
+                nameof(entity.PregnancyStatusA),
+                nameof(entity.PregnancyStatusP),
+                nameof(entity.PregnancyStatusG),
+                nameof(entity.HPHT),
+                nameof(entity.HPL),
+                nameof(entity.ClassType), nameof(entity.ServiceId),
                 nameof(entity.InsurancePolicyId), nameof(entity.PratitionerId), nameof(entity.Payment), nameof(entity.RegistrationDate));
         }
 
@@ -953,6 +967,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.E = dto.E;
             entity.V = dto.V;
             entity.M = dto.M;
+            entity.LILA = dto.LILA;
             entity.Temp = dto.Temp;
             entity.HR = dto.HR;
             entity.Systolic = dto.Systolic;
@@ -965,6 +980,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
             SetPropertiesModified(entity, nameof(entity.InformationFrom), nameof(entity.AwarenessId), nameof(entity.LocationId), nameof(entity.Weight),
                 nameof(entity.Height), nameof(entity.RR), nameof(entity.SpO2), nameof(entity.WaistCircumference),
+                 nameof(entity.LILA),
                 nameof(entity.BMIIndex), nameof(entity.BMIIndexString), nameof(entity.ScrinningTriageScale), nameof(entity.ClinicVisitTypes),
                 nameof(entity.E), nameof(entity.V), nameof(entity.M), nameof(entity.Temp), nameof(entity.HR),
                 nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState),
@@ -1136,9 +1152,15 @@ namespace McDermott.Application.Features.Queries.Transaction
                         RegistrationDate = request.GeneralConsultanServiceDto.RegistrationDate,
                         Status = request.Status,
                         IsGC = request.GeneralConsultanServiceDto.IsGC,
+                        IsMaternity = request.GeneralConsultanServiceDto.IsMaternity,
                         IsVaccination = request.GeneralConsultanServiceDto.IsVaccination,
                         IsMcu = request.GeneralConsultanServiceDto.IsMcu,
                         IsAccident = request.GeneralConsultanServiceDto.IsAccident,
+                        PregnancyStatusA = request.GeneralConsultanServiceDto.PregnancyStatusA,
+                        PregnancyStatusP = request.GeneralConsultanServiceDto.PregnancyStatusP,
+                        PregnancyStatusG = request.GeneralConsultanServiceDto.PregnancyStatusG,
+                        HPHT = request.GeneralConsultanServiceDto.HPHT,
+                        HPL = request.GeneralConsultanServiceDto.HPL,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
                         LocationId = request.GeneralConsultanServiceDto.LocationId
@@ -1168,9 +1190,15 @@ namespace McDermott.Application.Features.Queries.Transaction
                         InsurancePolicyId = request.GeneralConsultanServiceDto.InsurancePolicyId,
                         Status = EnumStatusGeneralConsultantService.Planned,
                         IsGC = request.GeneralConsultanServiceDto.IsGC,
+                        IsMaternity = request.GeneralConsultanServiceDto.IsMaternity,
                         IsVaccination = request.GeneralConsultanServiceDto.IsVaccination,
                         IsMcu = request.GeneralConsultanServiceDto.IsMcu,
                         IsAccident = request.GeneralConsultanServiceDto.IsAccident,
+                        PregnancyStatusA = request.GeneralConsultanServiceDto.PregnancyStatusA,
+                        PregnancyStatusP = request.GeneralConsultanServiceDto.PregnancyStatusP,
+                        PregnancyStatusG = request.GeneralConsultanServiceDto.PregnancyStatusG,
+                        HPHT = request.GeneralConsultanServiceDto.HPHT,
+                        HPL = request.GeneralConsultanServiceDto.HPL,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
                         LocationId = request.GeneralConsultanServiceDto.LocationId
@@ -1203,7 +1231,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 if (request.GeneralConsultanServiceDto is null)
                     return new();
 
-                GeneralConsultanService? entity = null; 
+                GeneralConsultanService? entity = null;
 
                 if (request.Status == EnumStatusGeneralConsultantService.Confirmed)
                 {
@@ -1302,7 +1330,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                     _unitOfWork.Repository<GeneralConsultanService>().Attach(entity);
 
-                    entity.Status = request.GeneralConsultanServiceDto.Status; 
+                    entity.Status = request.GeneralConsultanServiceDto.Status;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                 }
@@ -1337,6 +1365,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.M = request.GeneralConsultanServiceDto.M;
                     entity.Temp = request.GeneralConsultanServiceDto.Temp;
                     entity.HR = request.GeneralConsultanServiceDto.HR;
+                    entity.LILA = request.GeneralConsultanServiceDto.LILA;
                     entity.Systolic = request.GeneralConsultanServiceDto.Systolic;
                     entity.DiastolicBP = request.GeneralConsultanServiceDto.DiastolicBP;
                     entity.PainScale = request.GeneralConsultanServiceDto.PainScale;

@@ -266,6 +266,36 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GeneralConsultanServiceAncs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Trimester = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Complaint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    KU = table.Column<int>(type: "int", nullable: false),
+                    TD = table.Column<int>(type: "int", nullable: false),
+                    Suhu = table.Column<int>(type: "int", nullable: false),
+                    BB = table.Column<int>(type: "int", nullable: false),
+                    UK = table.Column<int>(type: "int", nullable: false),
+                    TFU = table.Column<int>(type: "int", nullable: false),
+                    FetusPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DJJ = table.Column<int>(type: "int", nullable: false),
+                    TT = table.Column<int>(type: "int", nullable: false),
+                    InspectionInitials = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultanServiceAncs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
                 {
@@ -532,6 +562,7 @@ namespace McDermott.Persistence.Migrations
                     IsMcu = table.Column<bool>(type: "bit", nullable: false),
                     IsVaccination = table.Column<bool>(type: "bit", nullable: false),
                     IsTelemedicine = table.Column<bool>(type: "bit", nullable: false),
+                    IsMaternity = table.Column<bool>(type: "bit", nullable: false),
                     ServicedId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -2432,6 +2463,38 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InventoryAdjusmentLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InventoryAdjustmentId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InventoryAdjusmentLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusmentLogs_InventoryAdjusments_InventoryAdjusmentId",
+                        column: x => x.InventoryAdjusmentId,
+                        principalTable: "InventoryAdjusments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InventoryAdjusmentLogs_Users_UserById",
+                        column: x => x.UserById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Kiosks",
                 columns: table => new
                 {
@@ -2934,6 +2997,7 @@ namespace McDermott.Persistence.Migrations
                     EndMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsGC = table.Column<bool>(type: "bit", nullable: false),
+                    IsMaternity = table.Column<bool>(type: "bit", nullable: false),
                     AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     WorkFrom = table.Column<TimeSpan>(type: "time", nullable: true),
                     WorkTo = table.Column<TimeSpan>(type: "time", nullable: true),
@@ -2991,6 +3055,12 @@ namespace McDermott.Persistence.Migrations
                     IsVaccination = table.Column<bool>(type: "bit", nullable: false),
                     IsTelemedicine = table.Column<bool>(type: "bit", nullable: false),
                     LinkMeet = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PregnancyStatusG = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PregnancyStatusP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PregnancyStatusA = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HPHT = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HPL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LILA = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<long>(type: "bigint", nullable: true),
                     IsAccident = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -3547,15 +3617,15 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GeneralConsultationLogs",
+                name: "GeneralConsultanMedicalSupportLogs",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GeneralConsultanServiceId = table.Column<long>(type: "bigint", nullable: true),
-                    ProcedureRoomId = table.Column<long>(type: "bigint", nullable: true),
+                    GeneralConsultationMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
                     UserById = table.Column<long>(type: "bigint", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    GeneralConsultanMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -3563,21 +3633,53 @@ namespace McDermott.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GeneralConsultationLogs", x => x.Id);
+                    table.PrimaryKey("PK_GeneralConsultanMedicalSupportLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GeneralConsultationLogs_GeneralConsultanMedicalSupports_ProcedureRoomId",
+                        name: "FK_GeneralConsultanMedicalSupportLogs_GeneralConsultanMedicalSupports_GeneralConsultanMedicalSupportId",
+                        column: x => x.GeneralConsultanMedicalSupportId,
+                        principalTable: "GeneralConsultanMedicalSupports",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanMedicalSupportLogs_Users_UserById",
+                        column: x => x.UserById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GeneralConsultanServiceLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultanServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    ProcedureRoomId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultanServiceLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanServiceLogs_GeneralConsultanMedicalSupports_ProcedureRoomId",
                         column: x => x.ProcedureRoomId,
                         principalTable: "GeneralConsultanMedicalSupports",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_GeneralConsultationLogs_GeneralConsultanServices_GeneralConsultanServiceId",
+                        name: "FK_GeneralConsultanServiceLogs_GeneralConsultanServices_GeneralConsultanServiceId",
                         column: x => x.GeneralConsultanServiceId,
                         principalTable: "GeneralConsultanServices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GeneralConsultationLogs_Users_UserById",
+                        name: "FK_GeneralConsultanServiceLogs_Users_UserById",
                         column: x => x.UserById,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -3896,6 +3998,16 @@ namespace McDermott.Persistence.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanMedicalSupportLogs_GeneralConsultanMedicalSupportId",
+                table: "GeneralConsultanMedicalSupportLogs",
+                column: "GeneralConsultanMedicalSupportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanMedicalSupportLogs_UserById",
+                table: "GeneralConsultanMedicalSupportLogs",
+                column: "UserById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanMedicalSupports_EmployeeId",
                 table: "GeneralConsultanMedicalSupports",
                 column: "EmployeeId");
@@ -3939,6 +4051,21 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_GeneralConsultanMedicalSupports_PractitionerRadiologyEximinationId",
                 table: "GeneralConsultanMedicalSupports",
                 column: "PractitionerRadiologyEximinationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServiceLogs_GeneralConsultanServiceId",
+                table: "GeneralConsultanServiceLogs",
+                column: "GeneralConsultanServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServiceLogs_ProcedureRoomId",
+                table: "GeneralConsultanServiceLogs",
+                column: "ProcedureRoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServiceLogs_UserById",
+                table: "GeneralConsultanServiceLogs",
+                column: "UserById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanServices_AwarenessId",
@@ -3989,21 +4116,6 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_GeneralConsultantClinicalAssesments_GeneralConsultanServiceId",
                 table: "GeneralConsultantClinicalAssesments",
                 column: "GeneralConsultanServiceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralConsultationLogs_GeneralConsultanServiceId",
-                table: "GeneralConsultationLogs",
-                column: "GeneralConsultanServiceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralConsultationLogs_ProcedureRoomId",
-                table: "GeneralConsultationLogs",
-                column: "ProcedureRoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralConsultationLogs_UserById",
-                table: "GeneralConsultationLogs",
-                column: "UserById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GoodsReceiptDetails_GoodsReceiptId",
@@ -4111,6 +4223,16 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_InventoryAdjusmentDetails_TransactionStockId",
                 table: "InventoryAdjusmentDetails",
                 column: "TransactionStockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusmentLogs_InventoryAdjusmentId",
+                table: "InventoryAdjusmentLogs",
+                column: "InventoryAdjusmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InventoryAdjusmentLogs_UserById",
+                table: "InventoryAdjusmentLogs",
+                column: "UserById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InventoryAdjusments_CompanyId",
@@ -4936,10 +5058,16 @@ namespace McDermott.Persistence.Migrations
                 name: "GeneralConsultanCPPTs");
 
             migrationBuilder.DropTable(
-                name: "GeneralConsultantClinicalAssesments");
+                name: "GeneralConsultanMedicalSupportLogs");
 
             migrationBuilder.DropTable(
-                name: "GeneralConsultationLogs");
+                name: "GeneralConsultanServiceAncs");
+
+            migrationBuilder.DropTable(
+                name: "GeneralConsultanServiceLogs");
+
+            migrationBuilder.DropTable(
+                name: "GeneralConsultantClinicalAssesments");
 
             migrationBuilder.DropTable(
                 name: "GoodsReceiptDetails");
@@ -4952,6 +5080,9 @@ namespace McDermott.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "InventoryAdjusmentDetails");
+
+            migrationBuilder.DropTable(
+                name: "InventoryAdjusmentLogs");
 
             migrationBuilder.DropTable(
                 name: "KioskConfigs");

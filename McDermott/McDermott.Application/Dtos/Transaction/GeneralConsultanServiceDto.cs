@@ -8,7 +8,7 @@ namespace McDermott.Application.Dtos.Transaction
     {
         public long Id { get; set; }
 
-        public string? Reference { get; set; }
+        public string Reference { get; set; } = string.Empty;
 
         public long? KioskQueueId { get; set; }
 
@@ -243,6 +243,15 @@ namespace McDermott.Application.Dtos.Transaction
         public long? LocationId { get; set; }
 
         #endregion Vaccination
+
+        #region ANC 
+        public string? PregnancyStatusG { get; set; }
+        public string? PregnancyStatusP { get; set; }
+        public string? PregnancyStatusA { get; set; } 
+        public string? HPHT { get; set; }
+        public string? HPL { get; set; }
+        public int? LILA { get; set; }    // CM
+        #endregion
 
         public string Number { get; set; }
         public DateTime Date { get; set; }

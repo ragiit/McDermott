@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Transaction
+﻿namespace McDermott.Application.Dtos.Transaction
 {
-    public class GeneralCosultanServiceAncDetailDto : IMapFrom<GeneralCosultanServiceAncDetail>
+    public class GeneralConsultanServiceAncDto : IMapFrom<GeneralConsultanServiceAnc>
     {
-        public long GeneralCosultanServiceAncId { get; set; }
+        public long Id { get; set; }
+        public long? PatientId { get; set; }
+        public long GeneralConsultanServiceId { get; set; }
+        public string Reference { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public string Trimester { get; set; } = string.Empty;
         public string? Complaint { get; set; }
@@ -21,14 +18,19 @@ namespace McDermott.Application.Dtos.Transaction
         public string? FetusPosition { get; set; }  // Letak Janin
         public int DJJ { get; set; } // Temperature
         public int TT { get; set; } // Temperature
-        public string? InspectionInitials { get; set; }   // Paraf Pemeriksaan
+        public string? InspectionInitials { get; set; }   // Paraf Pemeriksaan  
+        public bool IsReadOnly { get; set; } = false;
 
-        public GeneralCosultanServiceAncDto? GeneralCosultanServiceAnc { get; set; }
+        public virtual UserDto? Patient { get; set; }
+        public virtual GeneralConsultanServiceDto? GeneralConsultanService { get; set; }    
     }
 
-    public class CreateUpdateGeneralCosultanServiceAncDetailDto  
+    public class CreateUpdateGeneralConsultanServiceAncDto
     {
-        public long GeneralCosultanServiceAncId { get; set; }
+        public long Id { get; set; }
+        public long? PatientId { get; set; }
+        public string Reference { get; set; } = string.Empty;
+        public long GeneralConsultanServiceId { get; set; }
         public DateTime Date { get; set; }
         public string Trimester { get; set; } = string.Empty;
         public string? Complaint { get; set; }
@@ -41,6 +43,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? FetusPosition { get; set; }  // Letak Janin
         public int DJJ { get; set; } // Temperature
         public int TT { get; set; } // Temperature
-        public string? InspectionInitials { get; set; }   // Paraf Pemeriksaan 
+        public string? InspectionInitials { get; set; }   // Paraf Pemeriksaan  
+        public bool IsReadOnly { get; set; } = false;
     }
 }
