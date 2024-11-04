@@ -85,7 +85,7 @@
                                                 <a @onclick="NewTableEquipment_Item" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-trash"></i></span>
                                                     <span>Maintenance</span>
-                                                    <span class="ms-2 badge bg-secondary">@TotalMaintainanceQty Unit</span>
+                                                    <span class="ms-2 badge bg-secondary">@TotalMaintenanceQty Unit</span>
                                                 </a>
                                             }
                                         </div>
@@ -541,19 +541,19 @@
     </div>
 </DxPopup>
 
-<!-- Histroy Maintainance Status Scrap-->
+<!-- Histroy Maintenance Status Scrap-->
 <DxPopup Visible="@showScrapProduct" HeaderText="Scrap Product" Width="85%" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="Back_Click">
     <div class="card">
         <div class="card-header">
-            <span class="normal-caption">Product Name : </span><h4 class="fw-bolder"> @NameProduct</h4>
+            @* <span class="normal-caption">Product Name : </span><h4 class="fw-bolder"> @NameProduct</h4> *@
         </div>
         <DxLoadingPanel @bind-Visible="PanelVisible"
                         IsContentBlocked="true"
                         ApplyBackgroundShading="true"
                         IndicatorAreaVisible="true"
                         Text="Fetching Data...">
-            <MyGridPaginate @ref="Grid"
-                            Data="@GetMaintainanceScrap"
+            <MyGrid @ref="GridScrap"
+                            Data="@GetMaintenanceScrap"
                             FocusedRowEnabled="false"
                             KeyFieldName="Id"
                             AllowSelectRowByClick="false">
@@ -565,89 +565,24 @@
                 </ToolbarTemplate>
                 <Columns>
                     <DxGridDataColumn FieldName="Title" Caption="Subject" />
-                    <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
-                    <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
+                    <DxGridDataColumn FieldName="Maintenance.RequestBy.Name" Caption="Employee" />
+                    <DxGridDataColumn FieldName="Maintenance.ResponsibleBy.Name" Caption="Technical" />
                     <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                    <DxGridDataColumn FieldName="Equipment.Name" Caption="Brand" />
-                    <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
-                    <DxGridDataColumn FieldName="Status" Caption="Status">
+                    <DxGridDataColumn FieldName="Product.Name" Caption="Brand" /> 
+                    <DxGridDataColumn FieldName="Maintenance.RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
+                    @* <DxGridDataColumn FieldName="Status" Caption="Status">
                         <CellDisplayTemplate>
-                            @((MarkupString)GetIssueStatusIconHtmlMaintainance((context.DataItem as MaintainanceDto).Status))
+                            @((MarkupString)GetIssueStatusIconHtmlMaintenance((context.DataItem as MaintenanceDto).Status))
                         </CellDisplayTemplate>
-                    </DxGridDataColumn>
+                    </DxGridDataColumn> *@
                 </Columns>
-                <TotalSummary>
-                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                       FieldName="Name"
-                                       Visible="true" />
-                </TotalSummary>
-            </MyGridPaginate>
-            <div class="row">
-                <DxFormLayout>
-                    <div class="col-md-8">
-                        <DxFormLayoutItem>
-                            <DxPager PageCount="totalCount"
-                                     ActivePageIndexChanged="OnPageIndexChanged"
-                                     ActivePageIndex="activePageIndex"
-                                     VisibleNumericButtonCount="10"
-                                     SizeMode="SizeMode.Medium"
-                                     NavigationMode="PagerNavigationMode.Auto">
-                            </DxPager>
-                        </DxFormLayoutItem>
-                    </div>
-                    <div class="col-md-4 d-flex justify-content-end">
-                        <DxFormLayoutItem Caption="Page Size:">
-                            <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                          NullText="Select Page Size"
-                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                          SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                          @bind-Value="pageSize">
-                            </MyDxComboBox>
-                        </DxFormLayoutItem>
-                    </div>
-                </DxFormLayout>
-            </div>
-
-        </DxLoadingPanel>
-    </div>
-</DxPopup>
-
-<!-- Histroy Maintainance  -->
-<DxPopup Visible="@showMaintaiananaceProduct" HeaderText="History Product Maintainance" Width="85%" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="Back_Click">
-    <div class="card">
-        <div class="card-header">
-            <span class="normal-caption">Name Product : </span> <h4 class="fw-bolder"> @NameProduct</h4>
-        </div>
-        <DxLoadingPanel @bind-Visible="PanelVisible"
-                        IsContentBlocked="true"
-                        ApplyBackgroundShading="true"
-                        IndicatorAreaVisible="true"
-                        Text="Fetching Data...">
-            <MyGrid @ref="Grid"
-                    Data="@GetMaintainanceHistory"
-                    FocusedRowEnabled="false"
-                    KeyFieldName="Id"
-                    AllowSelectRowByClick="false">
-                <ToolbarTemplate>
-                    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                        <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
-                        <DxToolbarItem BeginGroup="true" Text="Refresh" Click="RefreshMaintainance_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                    </DxToolbar>
-                </ToolbarTemplate>
-                <Columns>
-                    <DxGridDataColumn FieldName="Title" Caption="Subject" />
-                    <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
-                    <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
-                    <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                    <DxGridDataColumn FieldName="Equipment.Name" Caption="Brand" />
-                    <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
-                    <DxGridDataColumn FieldName="Status" Caption="Status">
-                        <CellDisplayTemplate>
-                            @((MarkupString)GetIssueStatusIconHtmlMaintainance((context.DataItem as MaintainanceDto).Status))
-                        </CellDisplayTemplate>
-                    </DxGridDataColumn>
-                </Columns>
+                
             </MyGrid>
+            
+
         </DxLoadingPanel>
     </div>
 </DxPopup>
+
+<!-- Histroy Maintenance  -->
+ 

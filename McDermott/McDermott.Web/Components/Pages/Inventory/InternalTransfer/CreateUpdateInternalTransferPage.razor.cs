@@ -164,13 +164,13 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         private async Task LoadDataAsync()
         {
             PanelVisible = true;
-            getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+            getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery()).ConfigureAwait(false);
             var resultGet = await Mediator.Send(new GetTransferStockQuery
             {
                 Predicate = x => x.Id == postTransferStocks.Id
             });
             getTransferStocks = resultGet.Item1;
-            getUoms = await Mediator.Send(new GetAllUomQuery());
+            getUoms = await Mediator.Send(new GetAllUomQuery()).ConfigureAwait(false);
             PanelVisible = false;
         }
 
@@ -698,6 +698,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                     ToastService.ShowError("");
                     return;
                 }
+                await LoadDataAsync().ConfigureAwait(false);
                 var cekReference = getTransactionStocks.Where(x => x.SourceTable == nameof(TransferStock)).OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
                 int NextReferenceNumber = 1;
                 if (cekReference != null)
@@ -806,7 +807,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             try
             {
                 PanelVisible = true;
-
+                await LoadDataAsync().ConfigureAwait(false);
                 var data_TransactionStock = getTransactionStocks.Where(x => x.SourceTable == nameof(TransferStock) && x.SourcTableId == postTransferStocks.Id).ToList();
                 if (postTransferStocks is null)
                 {

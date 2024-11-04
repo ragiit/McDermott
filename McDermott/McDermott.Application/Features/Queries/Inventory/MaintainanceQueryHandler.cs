@@ -3,34 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
-    public class MaintainanceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetMaintainanceQuery, (List<MaintainanceDto>, int pageIndex, int pageSize, int pageCount)>,
-        IRequestHandler<GetAllMaintainanceQuery, List<MaintainanceDto>>,
-        IRequestHandler<ValidateMaintainanceQuery, bool>,
-        IRequestHandler<CreateMaintainanceRequest, MaintainanceDto>,
-        IRequestHandler<CreateListMaintainanceRequest, List<MaintainanceDto>>,
-        IRequestHandler<UpdateMaintainanceRequest, MaintainanceDto>,
-        IRequestHandler<UpdateListMaintainanceRequest, List<MaintainanceDto>>,
-        IRequestHandler<DeleteMaintainanceRequest, bool>
+    public class MaintenanceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetMaintenanceQuery, (List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetAllMaintenanceQuery, List<MaintenanceDto>>,
+        IRequestHandler<ValidateMaintenanceQuery, bool>,
+        IRequestHandler<CreateMaintenanceRequest, MaintenanceDto>,
+        IRequestHandler<CreateListMaintenanceRequest, List<MaintenanceDto>>,
+        IRequestHandler<UpdateMaintenanceRequest, MaintenanceDto>,
+        IRequestHandler<UpdateListMaintenanceRequest, List<MaintenanceDto>>,
+        IRequestHandler<DeleteMaintenanceRequest, bool>
     {
         #region GET
 
-        public async Task<List<MaintainanceDto>> Handle(GetAllMaintainanceQuery request, CancellationToken cancellationToken)
+        public async Task<List<MaintenanceDto>> Handle(GetAllMaintenanceQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetMaintainanceQuery_";
+                string cacheKey = $"GetMaintenanceQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
-                if (!_cache.TryGetValue(cacheKey, out List<Maintainance>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<Maintenance>? result))
                 {
-                    result = await _unitOfWork.Repository<Maintainance>().Entities
+                    result = await _unitOfWork.Repository<Maintenance>().Entities
                     .Include(x => x.RequestBy)
                     .Include(x => x.Location)
                         .AsNoTracking()
@@ -45,7 +45,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
-                return result.ToList().Adapt<List<MaintainanceDto>>();
+                return result.ToList().Adapt<List<MaintenanceDto>>();
             }
             catch (Exception)
             {
@@ -53,11 +53,11 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<(List<MaintainanceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMaintainanceQuery request, CancellationToken cancellationToken)
+        public async Task<(List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMaintenanceQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<Maintainance>().Entities
+                var query = _unitOfWork.Repository<Maintenance>().Entities
                     .Include(x => x.RequestBy)
                     .Include(x => x.Location)
                     .AsNoTracking()
@@ -86,7 +86,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
 
-                return (paged.Adapt<List<MaintainanceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (paged.Adapt<List<MaintenanceDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             catch (Exception)
             {
@@ -94,9 +94,9 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<bool> Handle(ValidateMaintainanceQuery request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ValidateMaintenanceQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Repository<Maintainance>()
+            return await _unitOfWork.Repository<Maintenance>()
                 .Entities
                 .AsNoTracking()
                 .Where(request.Predicate)  // Apply the Predicate for filtering
@@ -107,17 +107,17 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region CREATE
 
-        public async Task<MaintainanceDto> Handle(CreateMaintainanceRequest request, CancellationToken cancellationToken)
+        public async Task<MaintenanceDto> Handle(CreateMaintenanceRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<Maintainance>().AddAsync(request.MaintainanceDto.Adapt<Maintainance>());
+                var result = await _unitOfWork.Repository<Maintenance>().AddAsync(request.MaintenanceDto.Adapt<Maintenance>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetMaintainanceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<MaintainanceDto>();
+                return result.Adapt<MaintenanceDto>();
             }
             catch (Exception)
             {
@@ -125,17 +125,17 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<List<MaintainanceDto>> Handle(CreateListMaintainanceRequest request, CancellationToken cancellationToken)
+        public async Task<List<MaintenanceDto>> Handle(CreateListMaintenanceRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<Maintainance>().AddAsync(request.MaintainanceDtos.Adapt<List<Maintainance>>());
+                var result = await _unitOfWork.Repository<Maintenance>().AddAsync(request.MaintenanceDtos.Adapt<List<Maintenance>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetMaintainanceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<MaintainanceDto>>();
+                return result.Adapt<List<MaintenanceDto>>();
             }
             catch (Exception)
             {
@@ -147,17 +147,17 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region UPDATE
 
-        public async Task<MaintainanceDto> Handle(UpdateMaintainanceRequest request, CancellationToken cancellationToken)
+        public async Task<MaintenanceDto> Handle(UpdateMaintenanceRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<Maintainance>().UpdateAsync(request.MaintainanceDto.Adapt<Maintainance>());
+                var result = await _unitOfWork.Repository<Maintenance>().UpdateAsync(request.MaintenanceDto.Adapt<Maintenance>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetMaintainanceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<MaintainanceDto>();
+                return result.Adapt<MaintenanceDto>();
             }
             catch (Exception)
             {
@@ -165,17 +165,17 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        public async Task<List<MaintainanceDto>> Handle(UpdateListMaintainanceRequest request, CancellationToken cancellationToken)
+        public async Task<List<MaintenanceDto>> Handle(UpdateListMaintenanceRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<Maintainance>().UpdateAsync(request.MaintainanceDtos.Adapt<List<Maintainance>>());
+                var result = await _unitOfWork.Repository<Maintenance>().UpdateAsync(request.MaintenanceDtos.Adapt<List<Maintenance>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetMaintainanceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<MaintainanceDto>>();
+                return result.Adapt<List<MaintenanceDto>>();
             }
             catch (Exception)
             {
@@ -187,23 +187,23 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #region DELETE
 
-        public async Task<bool> Handle(DeleteMaintainanceRequest request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteMaintenanceRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (request.Id > 0)
                 {
-                    await _unitOfWork.Repository<Maintainance>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<Maintenance>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<Maintainance>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<Maintenance>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetMaintainanceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }

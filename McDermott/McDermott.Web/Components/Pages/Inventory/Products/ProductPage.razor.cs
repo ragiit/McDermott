@@ -1,5 +1,5 @@
 ﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
@@ -26,9 +26,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private List<ProductDto> Products = [];
         private List<ProductDto> DataProducts = [];        
-        private List<MaintainanceDto> getMaintainance = [];
-        private List<MaintainanceDto> getMaintainanceDone = [];
-        private List<MaintainanceDto> getMaintainanceScrap = [];
+        private List<MaintenanceDto> getMaintenance = [];
+        private List<MaintenanceDto> getMaintenanceDone = [];
+        private List<MaintenanceDto> getMaintenanceScrap = [];
         private List<TransactionStockDto> TransactionStocks = [];
         private List<MedicamentDto> Medicaments = [];
         private TransactionStockDto FormTransactionStocks = new();

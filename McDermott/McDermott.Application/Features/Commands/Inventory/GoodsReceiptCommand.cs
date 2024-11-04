@@ -89,7 +89,6 @@ namespace McDermott.Application.Features.Commands.Inventory
             public string SearchTerm { get; set; }
         }
     
-
         public class BulkValidateGoodsReceiptQuery(List<GoodsReceiptDto> GoodsReceiptToValidate) : IRequest<List<GoodsReceiptDto>>
         {
             public List<GoodsReceiptDto> GoodsReceiptToValidate { get; } = GoodsReceiptToValidate;

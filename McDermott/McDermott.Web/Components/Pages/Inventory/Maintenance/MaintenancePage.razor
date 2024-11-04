@@ -1,55 +1,60 @@
-﻿@page "/inventory/maintainance-records"
-
+﻿@page "/inventory/Maintenance"
 @rendermode InteractiveServer
 
-<PageTitle>McHealthCare - Maintainance Record</PageTitle>
+<PageTitle>@Helper.APP_NAME - Maintenance</PageTitle>
 
- @if (IsAccess)
-{ 
-<BaseHeaderPage Title="Maintainance Record" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/product"))" ShowBackButton="true" />
+@if (IsAccess)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Maintenance" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
 
-<div class="wrapper">
-
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
+                        <div class="card">
                             <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
+                                            IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
                                 <MyGridPaginate @ref="Grid"
-                                                Data="GetMaintainanceRecords"
+                                                Data="@getMaintenance"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 DataItemDeleting="OnDelete"
                                                 FocusedRowChanged="Grid_FocusedRowChanged"
                                                 SearchTextChanged="OnSearchBoxChanged"
                                                 KeyFieldName="Id">
+
                                     <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="MaintainanceRecordDto"
-                                                         Items="@GetMaintainanceRecords"
+                                        <MyDxToolbarBase TItem="MaintenanceDto"
+                                                         Items="@getMaintenance"
+                                                         Grid="Grid"
                                                          SelectedDataItems="@SelectedDataItems"
                                                          NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
+                                                         EditItem_Click="@(async () => await EditItem_Click())"
                                                          DeleteItem_Click="@DeleteItem_Click"
                                                          Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
-                                                         Grid="Grid"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
+                                                         IsImport="false"
+                                                         EnableDelete="isActiveButton"
                                                          VisibleNew="UserAccessCRUID.IsCreate"
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption"Poduct Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="SequenceProduct" Caption="Sequence Maintainance" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="DocumentName" Caption="Document Name" />
+                                        <DxGridDataColumn FieldName="Sequence" Caption="Sequence code" />
+                                        <DxGridDataColumn FieldName="Title" Caption="Subject" />
+                                        <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
+                                        <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
+                                        <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
+                                        <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand" />
+                                        <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
+                                        <DxGridDataColumn FieldName="Status" Caption="Status">
+                                            <CellDisplayTemplate>
+                                                @((MarkupString)GetIssueStatusIconHtml((context.DataItem as MaintenanceDto).Status))
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
                                     </Columns>
                                     <TotalSummary>
                                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -84,10 +89,11 @@
                                 </div>
                             </DxLoadingPanel>
                         </div>
+
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     </div>
-</div>
- } 
+}
+

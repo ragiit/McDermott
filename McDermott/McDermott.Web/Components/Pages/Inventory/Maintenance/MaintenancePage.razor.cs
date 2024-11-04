@@ -1,11 +1,11 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.Maintainance
+namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 {
-    public partial class MaintainancePage
+    public partial class MaintenancePage
     {
-        private List<MaintainanceDto> getMaintainance = [];       
-        private MaintainanceDto postMaintainance = new();
+        private List<MaintenanceDto> getMaintenance = [];       
+        private MaintenanceDto postMaintenance = new();
 
         #region Variable
 
@@ -30,36 +30,36 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
+            //await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                    StateHasChanged();
-                }
-                catch { }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //        StateHasChanged();
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
+            //    await LoadData();
+            //    StateHasChanged();
 
-                try
-                {
-                    if (Grid is not null)
-                    {
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(1);
-                        await Grid.WaitForDataLoadAsync();
-                        Grid.ExpandGroupRow(2);
-                        StateHasChanged();
-                    }
-                }
-                catch { }
+            //    try
+            //    {
+            //        if (Grid is not null)
+            //        {
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(1);
+            //            await Grid.WaitForDataLoadAsync();
+            //            Grid.ExpandGroupRow(2);
+            //            StateHasChanged();
+            //        }
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
-            }
+            //    await LoadData();
+            //    StateHasChanged();
+            //}
         }
 
         private async Task GetUserInfo()
@@ -104,14 +104,39 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
         #region Load
 
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+
+            try
+            {
+                await GetUserInfo();
+
+                var loadTasks = new[]
+                {
+                    LoadData()
+                };
+
+                await Task.WhenAll(loadTasks);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
+        }
+
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
                 PanelVisible = true;
                 showForm = false;
-                var result = await Mediator.Send(new GetMaintainanceQuery(searchTerm:searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-                getMaintainance = result.Item1;
+                var result = await Mediator.Send(new GetMaintenanceQuery(searchTerm:searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                getMaintenance = result.Item1;
                 totalCount = result.pageCount;
 
 
@@ -126,39 +151,39 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
             }
         }
 
-        public MarkupString GetIssueStatusIconHtml(EnumStatusMaintainance? status)
+        public MarkupString GetIssueStatusIconHtml(EnumStatusMaintenance? status)
         {
             string priorityClass;
             string title;
 
             switch (status)
             {
-                case EnumStatusMaintainance.Request:
+                case EnumStatusMaintenance.Request:
                     priorityClass = "info";
                     title = "Request";
                     break;
 
-                case EnumStatusMaintainance.InProgress:
+                case EnumStatusMaintenance.InProgress:
                     priorityClass = "primary";
                     title = "In Progress";
                     break;
 
-                case EnumStatusMaintainance.Repaired:
+                case EnumStatusMaintenance.Repaired:
                     priorityClass = "warning";
                     title = "Repaire";
                     break;
 
-                case EnumStatusMaintainance.Scrap:
+                case EnumStatusMaintenance.Scrap:
                     priorityClass = "warning";
                     title = "Scrap";
                     break;
 
-                case EnumStatusMaintainance.Done:
+                case EnumStatusMaintenance.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
 
-                case EnumStatusMaintainance.Canceled:
+                case EnumStatusMaintenance.Canceled:
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
@@ -201,10 +226,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
 
             try
             {
-                if ((MaintainanceDto)args.DataItem is null)
+                if ((MaintenanceDto)args.DataItem is null)
                     return;
 
-                isActiveButton = ((MaintainanceDto)args.DataItem)!.Status!.Equals(EnumStatusMaintainance.Request);
+                isActiveButton = ((MaintenanceDto)args.DataItem)!.Status!.Equals(EnumStatusMaintenance.Request);
             }
             catch (Exception ex)
             {
@@ -224,14 +249,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
        
         private async Task NewItem_Click()
         {
-            NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Create.GetDisplayName()}");
+            NavigationManager.NavigateTo($"inventory/Maintenance/{EnumPageMode.Create.GetDisplayName()}");
             return;
         }
 
-        private async Task EditItem_Click(MaintainanceDto? p = null)
+        private async Task EditItem_Click(MaintenanceDto? p = null)
         {
-            var DataId = SelectedDataItems[0].Adapt<MaintainanceDto>();
-            NavigationManager.NavigateTo($"inventory/maintainance/{EnumPageMode.Update.GetDisplayName()}?Id={DataId.Id}");
+            var DataId = SelectedDataItems[0].Adapt<MaintenanceDto>();
+            NavigationManager.NavigateTo($"inventory/Maintenance/{EnumPageMode.Update.GetDisplayName()}?Id={DataId.Id}");
             return;
         }
 
@@ -257,12 +282,12 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintainance
                 PanelVisible = true;
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
-                    await Mediator.Send(new DeleteMaintainanceRequest(((MaintainanceDto)e.DataItem).Id));
+                    await Mediator.Send(new DeleteMaintenanceRequest(((MaintenanceDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var a = SelectedDataItems.Adapt<List<MaintainanceDto>>();
-                    await Mediator.Send(new DeleteMaintainanceRequest(ids: a.Select(x => x.Id).ToList()));
+                    var a = SelectedDataItems.Adapt<List<MaintenanceDto>>();
+                    await Mediator.Send(new DeleteMaintenanceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 PanelVisible = false;
             }

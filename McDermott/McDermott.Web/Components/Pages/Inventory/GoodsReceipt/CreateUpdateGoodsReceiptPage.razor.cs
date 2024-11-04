@@ -143,7 +143,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
                 var loadTasks = new[]
                 {
-                    GetUserInfo(),
+                 GetUserInfo(),
                  LoadDataDestination(),
                  LoadDataSource(),
                  LoadAsyncData(),
@@ -194,8 +194,8 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
         private async Task LoadAsyncData()
         {
-            getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
-            getUoms = await Mediator.Send(new GetAllUomQuery());
+            getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery()).ConfigureAwait(false); ;
+            getUoms = await Mediator.Send(new GetAllUomQuery()).ConfigureAwait(false); ;
 
         }
 
@@ -850,6 +850,8 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
             getGoodsReceipts = results.Item1;
 
+            // Ensure we have the latest getTransactionStocks data
+            await LoadAsyncData().ConfigureAwait(false);
             var data_TransactionStock = getTransactionStocks.Where(x => x.SourceTable == nameof(GoodsReceipt) && x.SourcTableId == postGoodsReceipt.Id).ToList();
 
             foreach (var item in data_TransactionStock)

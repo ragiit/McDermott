@@ -1,7 +1,7 @@
 ﻿using MailKit.Search;
 using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.MaintainanceCommand;
-using static McDermott.Application.Features.Commands.Inventory.MaintainanceProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
@@ -27,10 +27,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<LocationDto> GetLocations = [];
         private List<StockProductDto> StockProducts = [];
         private List<TransactionStockDto> getTransactionStocks = [];
-        private List<MaintainanceDto> GetMaintainance = [];
-        private List<MaintainanceProductDto> GetMaintainanceProduct = [];
-        private List<MaintainanceProductDto> GetMaintainanceScrap = [];
-        private List<MaintainanceProductDto> GetMaintainanceHistory = [];
+        private List<MaintenanceDto> GetMaintenance = [];
+        private List<MaintenanceProductDto> GetMaintenanceProduct = [];
+        private List<MaintenanceProductDto> GetMaintenanceScrap = [];
+        private List<MaintenanceProductDto> GetMaintenanceHistory = [];
 
         //Post data
         private ProductDto PostProduct = new();
@@ -51,6 +51,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         private IGrid Grid;
         private IGrid GridStock;
+        private IGrid GridScrap;
         private bool PanelVisible { get; set; } = false;
         private bool _SmartButton { get; set; } = false;
         private bool showTabs { get; set; } = false;
@@ -62,7 +63,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private bool showMaintaiananaceProduct { get; set; } = false;
         private long TotalQty { get; set; } = 0;
         private long? TotalScrapQty { get; set; }
-        private long? TotalMaintainanceQty { get; set; }
+        private long? TotalMaintenanceQty { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private string? NameUom { get; set; }
         private string? NameProduct { get; set; }
@@ -74,41 +75,41 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         #endregion Variable Static
 
-        #region Status Maintainance
+        #region Status Maintenance
 
-        public MarkupString GetIssueStatusIconHtmlMaintainance(EnumStatusMaintainance? status)
+        public MarkupString GetIssueStatusIconHtmlMaintenance(EnumStatusMaintenance? status)
         {
             string priorityClass;
             string title;
 
             switch (status)
             {
-                case EnumStatusMaintainance.Request:
+                case EnumStatusMaintenance.Request:
                     priorityClass = "info";
                     title = "Request";
                     break;
 
-                case EnumStatusMaintainance.InProgress:
+                case EnumStatusMaintenance.InProgress:
                     priorityClass = "primary";
                     title = "In Progress";
                     break;
 
-                case EnumStatusMaintainance.Repaired:
+                case EnumStatusMaintenance.Repaired:
                     priorityClass = "warning";
                     title = "Repaire";
                     break;
 
-                case EnumStatusMaintainance.Scrap:
+                case EnumStatusMaintenance.Scrap:
                     priorityClass = "warning";
                     title = "Scrap";
                     break;
 
-                case EnumStatusMaintainance.Done:
+                case EnumStatusMaintenance.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
 
-                case EnumStatusMaintainance.Canceled:
+                case EnumStatusMaintenance.Canceled:
                     priorityClass = "danger";
                     title = "Cancel";
                     break;
@@ -123,7 +124,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             return new MarkupString(html);
         }
 
-        #endregion Status Maintainance
+        #endregion Status Maintenance
 
         #region select data static
 
@@ -270,22 +271,34 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             await GetUserInfo();
-            await LoadDataUom();
-            await LoadDataUomPurchase();
-            await LoadDataAsync();
-            await LoadDataDrugForm();
-            await LoadDataDrugRoute();
-            await LoadDataDrugDosage();
-            await LoadData();
-            //await LoadDataBPJSCl();
-            //await LoadDataLocation();
-            await LoadDataProductCategory();
+
+            // Run multiple load tasks concurrently
+            var loadTasks = new List<Task>
+            {
+                LoadDataUom(),
+                LoadDataUomPurchase(),
+                LoadDataAsync(),
+                LoadDataDrugForm(),
+                LoadDataDrugRoute(),
+                LoadDataDrugDosage(),
+                LoadData(),
+                // LoadDataBPJSCl(),
+                // LoadDataLocation(),
+                LoadDataProductCategory()
+            };
+
+            await Task.WhenAll(loadTasks);
+
             PanelVisible = false;
         }
+
 
         private async Task LoadDataAsync()
         {
             getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+
+            GetMaintenanceProduct = await Mediator.Send(new GetAllMaintenanceProductQuery());
+            
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -312,17 +325,15 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     Predicate = x => x.ProductId == PostProduct.Id
                 })).Item1;
                 PostMedicaments = GetMedicaments.FirstOrDefault() ?? new();
-                var maintainanceResult = await Mediator.Send(new GetMaintainanceQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
-                GetMaintainance = maintainanceResult.Item1;
-                var maintainanceProduct = await Mediator.Send(new GetMaintainanceProductQuery(searchTerm: searchTerm ?? "", pageSize: 0, pageIndex: 1));
-                GetMaintainanceProduct = maintainanceProduct.Item1;
+                GetMaintenance = await Mediator.Send(new GetAllMaintenanceQuery());
+
                 // Map product details
                 PostProductDetails = PostProduct.Adapt<ProductDetailDto>();
                 NameProduct = PostProductDetails.Name;
                 NameUom = GetUoms.FirstOrDefault(u => u.Id == PostProductDetails.UomId)?.Name;
 
                 // Medicament-specific details
-                    if (PostProduct.HospitalType == "Medicament")
+                if (PostProduct.HospitalType == "Medicament")
                 {
                     if (PostMedicaments.ProductId != null)
                     {
@@ -338,7 +349,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     }
                 }
                 // Medical equipment-specific details
-                else if (PostProduct.HospitalType != "Medical Equipment")
+                else if (PostProduct.HospitalType == "Medical Equipment")
                 {
                     PostProductDetails.Brand = PostProduct.Brand;
                     HandleMedicalEquipmentStock();
@@ -379,11 +390,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         // Handles stock and maintenance for medical equipment
         private void HandleMedicalEquipmentStock()
         {
-            TotalScrapQty = GetMaintainanceProduct
-                .Count(x => x.ProductId == PostProduct.Id && x.Status == EnumStatusMaintainance.Scrap);
+            TotalScrapQty = GetMaintenanceProduct
+                .Count(x => x.Status == EnumStatusMaintenance.Scrap);
 
-            TotalMaintainanceQty = GetMaintainanceProduct
-                .Count(x => x.ProductId == PostProduct.Id && x.Status != EnumStatusMaintainance.Scrap);
+            TotalMaintenanceQty = GetMaintenanceProduct
+                .Count(x => x.Status != EnumStatusMaintenance.Scrap);
 
             TotalQty = getTransactionStocks
                 .Where(x => x.ProductId == PostProduct.Id && x.Validate)
@@ -425,9 +436,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     PostProductDetails.UomId = dataUoM.Id;
 
                     // Only set PurchaseUomId if it's not manually changed
-                    
-                        PostProductDetails.PurchaseUomId = dataUoM.Id;
-                    
+
+                    PostProductDetails.PurchaseUomId = dataUoM.Id;
+
                     StateHasChanged();
                 }
             }
@@ -904,9 +915,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             try
             {
-                showScrapProduct = true;
                 PanelVisible = true;
-                GetMaintainanceScrap = GetMaintainanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintainance.Scrap).ToList();
+                showScrapProduct = true;
+                GetMaintenanceScrap = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintenance.Scrap).ToList();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -921,7 +932,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 showMaintaiananaceProduct = true;
                 PanelVisible = true;
-                GetMaintainanceHistory = GetMaintainanceProduct.Where(x => x.ProductId == Id && x.Status != EnumStatusMaintainance.Scrap).ToList();
+                GetMaintenanceHistory = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status != EnumStatusMaintenance.Scrap).ToList();
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -944,9 +955,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             showStockProduct = false;
             StockProducts = [];
             showScrapProduct = false;
-            GetMaintainanceScrap = [];
+            GetMaintenanceScrap = [];
             showMaintaiananaceProduct = false;
-            GetMaintainanceHistory = [];
+            GetMaintenanceHistory = [];
         }
 
         private async Task RefreshStock_Click()
@@ -959,7 +970,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             await NewTableEquipment_Scrap();
         }
 
-        private async Task RefreshMaintainance_Click()
+        private async Task RefreshMaintenance_Click()
         {
             await NewTableEquipment_Item();
         }
@@ -974,7 +985,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 await OnSave();
             else
                 FormValidationState = true;
-            
+
         }
 
         private async Task HandleInvalidSubmit()

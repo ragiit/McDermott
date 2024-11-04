@@ -3556,7 +3556,7 @@ namespace McDermott.Persistence.Migrations
                     b.ToTable("Locations");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.Maintainance", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.Maintenance", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3633,10 +3633,10 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ResponsibleById");
 
-                    b.ToTable("Maintainances");
+                    b.ToTable("Maintenances");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.MaintainanceProduct", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.MaintenanceProduct", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3654,7 +3654,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("Expired")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("MaintainanceId")
+                    b.Property<long?>("MaintenanceId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Note")
@@ -3677,14 +3677,14 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MaintainanceId");
+                    b.HasIndex("MaintenanceId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("MaintainanceProducts");
+                    b.ToTable("MaintenanceProducts");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.MaintainanceRecord", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.MaintenanceRecord", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -3705,7 +3705,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("DocumentName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("MaintainanceId")
+                    b.Property<long?>("MaintenanceId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("ProductId")
@@ -3722,11 +3722,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MaintainanceId");
+                    b.HasIndex("MaintenanceId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("MaintainanceRecords");
+                    b.ToTable("MaintenanceRecords");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Medicament", b =>
@@ -6835,7 +6835,7 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("ParentLocation");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.Maintainance", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.Maintenance", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.Locations", "Location")
                         .WithMany()
@@ -6859,11 +6859,11 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("ResponsibleBy");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.MaintainanceProduct", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.MaintenanceProduct", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Maintainance", "Maintainance")
+                    b.HasOne("McDermott.Domain.Entities.Maintenance", "Maintenance")
                         .WithMany()
-                        .HasForeignKey("MaintainanceId")
+                        .HasForeignKey("MaintenanceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
@@ -6871,16 +6871,16 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Maintainance");
+                    b.Navigation("Maintenance");
 
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.MaintainanceRecord", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.MaintenanceRecord", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Maintainance", "Maintainance")
+                    b.HasOne("McDermott.Domain.Entities.Maintenance", "Maintenance")
                         .WithMany()
-                        .HasForeignKey("MaintainanceId")
+                        .HasForeignKey("MaintenanceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Product", "Product")
@@ -6888,7 +6888,7 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Maintainance");
+                    b.Navigation("Maintenance");
 
                     b.Navigation("Product");
                 });

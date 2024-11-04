@@ -2,7 +2,7 @@
 
 namespace McDermott.Application.Dtos.Inventory
 {
-    public class MaintainanceDto : IMapFrom<Maintainance>
+    public class MaintenanceDto : IMapFrom<Maintenance>
     {
         public long Id { get; set; }
         public long? RequestById { get; set; }
@@ -23,7 +23,7 @@ namespace McDermott.Application.Dtos.Inventory
         public bool Recurrent { get; set; } = false;
         public int? RepeatNumber { get; set; }
         public string? RepeatWork { get; set; }
-        public EnumStatusMaintainance? Status { get; set; }
+        public EnumStatusMaintenance? Status { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [SetToNull]
