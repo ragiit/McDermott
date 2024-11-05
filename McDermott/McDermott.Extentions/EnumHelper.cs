@@ -244,7 +244,7 @@ namespace McDermott.Application.Extentions
             Years = 3,
         }
 
-        public enum EnumStatusMaintainance
+        public enum EnumStatusMaintenance
         {
             [Display(Name = "Request")]
             Request = 0,

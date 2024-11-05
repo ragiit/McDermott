@@ -2536,7 +2536,7 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Maintainances",
+                name: "Maintenances",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -2564,21 +2564,21 @@ namespace McDermott.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Maintainances", x => x.Id);
+                    table.PrimaryKey("PK_Maintenances", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Maintainances_Locations_LocationId",
+                        name: "FK_Maintenances_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Maintainances_Users_RequestById",
+                        name: "FK_Maintenances_Users_RequestById",
                         column: x => x.RequestById,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Maintainances_Users_ResponsibleById",
+                        name: "FK_Maintenances_Users_ResponsibleById",
                         column: x => x.ResponsibleById,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -2783,12 +2783,12 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MaintainanceProducts",
+                name: "MaintenanceProducts",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaintainanceId = table.Column<long>(type: "bigint", nullable: true),
+                    MaintenanceId = table.Column<long>(type: "bigint", nullable: true),
                     ProductId = table.Column<long>(type: "bigint", nullable: true),
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2801,15 +2801,15 @@ namespace McDermott.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MaintainanceProducts", x => x.Id);
+                    table.PrimaryKey("PK_MaintenanceProducts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MaintainanceProducts_Maintainances_MaintainanceId",
-                        column: x => x.MaintainanceId,
-                        principalTable: "Maintainances",
+                        name: "FK_MaintenanceProducts_Maintenances_MaintenanceId",
+                        column: x => x.MaintenanceId,
+                        principalTable: "Maintenances",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MaintainanceProducts_Products_ProductId",
+                        name: "FK_MaintenanceProducts_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -2817,12 +2817,12 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MaintainanceRecords",
+                name: "MaintenanceRecords",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MaintainanceId = table.Column<long>(type: "bigint", nullable: true),
+                    MaintenanceId = table.Column<long>(type: "bigint", nullable: true),
                     ProductId = table.Column<long>(type: "bigint", nullable: true),
                     DocumentBase64 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DocumentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2834,15 +2834,15 @@ namespace McDermott.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MaintainanceRecords", x => x.Id);
+                    table.PrimaryKey("PK_MaintenanceRecords", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MaintainanceRecords_Maintainances_MaintainanceId",
-                        column: x => x.MaintainanceId,
-                        principalTable: "Maintainances",
+                        name: "FK_MaintenanceRecords_Maintenances_MaintenanceId",
+                        column: x => x.MaintenanceId,
+                        principalTable: "Maintenances",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MaintainanceRecords_Products_ProductId",
+                        name: "FK_MaintenanceRecords_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -4320,38 +4320,38 @@ namespace McDermott.Persistence.Migrations
                 column: "ParentLocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MaintainanceProducts_MaintainanceId",
-                table: "MaintainanceProducts",
-                column: "MaintainanceId");
+                name: "IX_MaintenanceProducts_MaintenanceId",
+                table: "MaintenanceProducts",
+                column: "MaintenanceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MaintainanceProducts_ProductId",
-                table: "MaintainanceProducts",
+                name: "IX_MaintenanceProducts_ProductId",
+                table: "MaintenanceProducts",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MaintainanceRecords_MaintainanceId",
-                table: "MaintainanceRecords",
-                column: "MaintainanceId");
+                name: "IX_MaintenanceRecords_MaintenanceId",
+                table: "MaintenanceRecords",
+                column: "MaintenanceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MaintainanceRecords_ProductId",
-                table: "MaintainanceRecords",
+                name: "IX_MaintenanceRecords_ProductId",
+                table: "MaintenanceRecords",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Maintainances_LocationId",
-                table: "Maintainances",
+                name: "IX_Maintenances_LocationId",
+                table: "Maintenances",
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Maintainances_RequestById",
-                table: "Maintainances",
+                name: "IX_Maintenances_RequestById",
+                table: "Maintenances",
                 column: "RequestById");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Maintainances_ResponsibleById",
-                table: "Maintainances",
+                name: "IX_Maintenances_ResponsibleById",
+                table: "Maintenances",
                 column: "ResponsibleById");
 
             migrationBuilder.CreateIndex(
@@ -5091,10 +5091,10 @@ namespace McDermott.Persistence.Migrations
                 name: "LabResultDetails");
 
             migrationBuilder.DropTable(
-                name: "MaintainanceProducts");
+                name: "MaintenanceProducts");
 
             migrationBuilder.DropTable(
-                name: "MaintainanceRecords");
+                name: "MaintenanceRecords");
 
             migrationBuilder.DropTable(
                 name: "PatientAllergies");
@@ -5166,7 +5166,7 @@ namespace McDermott.Persistence.Migrations
                 name: "GeneralConsultanMedicalSupports");
 
             migrationBuilder.DropTable(
-                name: "Maintainances");
+                name: "Maintenances");
 
             migrationBuilder.DropTable(
                 name: "Families");

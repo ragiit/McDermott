@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Domain.Entities
 {
-    public class Maintainance : BaseAuditableEntity
+    public class Maintenance : BaseAuditableEntity
     {
         public long? RequestById { get; set; }
         public long? LocationId { get; set; }
@@ -23,7 +23,7 @@ namespace McDermott.Domain.Entities
         public bool? Recurrent {  get; set; }
         public int? RepeatNumber {  get; set; }
         public string? RepeatWork {  get; set; }
-        public EnumStatusMaintainance? Status {  get; set; }
+        public EnumStatusMaintenance? Status {  get; set; }
 
         [SetToNull]
         public virtual User? RequestBy { get; set; }
