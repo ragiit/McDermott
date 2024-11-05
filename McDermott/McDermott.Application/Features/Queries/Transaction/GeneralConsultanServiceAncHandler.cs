@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,17 +9,43 @@ using static McDermott.Application.Features.Commands.Transaction.GeneralConsulta
 namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>, 
-        //IRequestHandler<ValidateGeneralConsultanServiceAnc, bool>,
-     IRequestHandler<CreateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
-     //IRequestHandler<BulkValidateGeneralConsultanServiceAnc, List<GeneralConsultanServiceAncDto>>,
-     IRequestHandler<CreateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
-     IRequestHandler<UpdateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
-     IRequestHandler<UpdateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
-     IRequestHandler<DeleteGeneralConsultanServiceAncRequest, bool>
+      IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
+      IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>, IRequestHandler<ValidateGeneralConsultanServiceAnc, bool>,
+      IRequestHandler<CreateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
+      IRequestHandler<BulkValidateGeneralConsultanServiceAnc, List<GeneralConsultanServiceAncDto>>,
+      IRequestHandler<CreateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
+      IRequestHandler<UpdateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
+      IRequestHandler<UpdateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
+      IRequestHandler<DeleteGeneralConsultanServiceAncRequest, bool>
     {
         #region GET
+        public async Task<List<GeneralConsultanServiceAncDto>> Handle(BulkValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
+        {
+            var CountryDtos = request.GeneralConsultanServiceAncsToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
+            //var Codes = CountryDtos.Select(x => x.Code).Distinct().ToList();
+
+            //var existingCountrys = await _unitOfWork.Repository<Country>()
+            //    .Entities
+            //    .AsNoTracking()
+            //    .Where(v => CountryNames.Contains(v.Name) && Codes.Contains(v.Code))
+            //    .ToListAsync(cancellationToken);
+
+            //return existingCountrys.Adapt<List<CountryDto>>();
+
+            return [];
+        }
+        public async Task<bool> Handle(ValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
         public async Task<(List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServiceAncQuery request, CancellationToken cancellationToken)
         {
             try
@@ -70,20 +95,15 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new GeneralConsultanServiceAnc
                     {
                         Id = x.Id,
-                        Date  = x.Date,
-                        Trimester = x.Trimester,
-                        Complaint = x.Complaint,
-                        KU = x.KU,
-                        TD = x.TD,
-                        BB = x.BB,
-                        UK = x.UK,
-                        TFU = x.TFU,
-                        FetusPosition = x.FetusPosition,
-                        DJJ  = x.DJJ,
-                        TT = x.TT, 
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
                         Reference = x.Reference,
-                        IsReadOnly = x.IsReadOnly,
-                        PatientId = x.PatientId,
+                        PregnancyStatusA = x.PregnancyStatusA,
+                        PregnancyStatusG = x.PregnancyStatusG,
+                        PregnancyStatusP = x.PregnancyStatusP,
+                        HPHT = x.HPHT,
+                        HPL = x.HPL,
+                        LILA = x.LILA,
+                        PatientId = x.PatientId
                     });
 
                 if (!request.IsGetAll)
@@ -158,6 +178,15 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new GeneralConsultanServiceAnc
                     {
                         Id = x.Id,
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        Reference = x.Reference,
+                        PregnancyStatusA = x.PregnancyStatusA,
+                        PregnancyStatusG = x.PregnancyStatusG,
+                        PregnancyStatusP = x.PregnancyStatusP,
+                        HPHT = x.HPHT,
+                        HPL = x.HPL,
+                        LILA = x.LILA,
+                        PatientId = x.PatientId
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceAncDto>();
@@ -169,29 +198,6 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        //public async Task<List<GeneralConsultanServiceAncDto>> Handle(BulkValidateGeneralConsultanServiceAncQuery request, CancellationToken cancellationToken)
-        //{
-        //    var GeneralConsultanServiceAncDtos = request.GeneralConsultanServiceAncsToValidate;
-
-        //    // Ekstrak semua kombinasi yang akan dicari di database
-        //    var GeneralConsultanServiceAncNames = GeneralConsultanServiceAncDtos.Select(x => x.Name).Distinct().ToList();
-        //    var postalCodes = GeneralConsultanServiceAncDtos.Select(x => x.PostalCode).Distinct().ToList();
-        //    var provinceIds = GeneralConsultanServiceAncDtos.Select(x => x.ProvinceId).Distinct().ToList();
-        //    var cityIds = GeneralConsultanServiceAncDtos.Select(x => x.CityId).Distinct().ToList();
-        //    var GeneralConsultanServiceAncIds = GeneralConsultanServiceAncDtos.Select(x => x.GeneralConsultanServiceAncId).Distinct().ToList();
-
-        //    var existingGeneralConsultanServiceAncs = await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
-        //        .Entities
-        //        .AsNoTracking()
-        //        .Where(v => GeneralConsultanServiceAncNames.Contains(v.Name)
-        //                    && postalCodes.Contains(v.PostalCode)
-        //                    && provinceIds.Contains(v.ProvinceId)
-        //                    && cityIds.Contains(v.CityId)
-        //                    && GeneralConsultanServiceAncIds.Contains(v.GeneralConsultanServiceAncId))
-        //        .ToListAsync(cancellationToken);
-
-        //    return existingGeneralConsultanServiceAncs.Adapt<List<GeneralConsultanServiceAncDto>>();
-        //}
         #endregion GET
 
         #region CREATE
@@ -207,7 +213,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     // Fetch the latest sequence from the Reference field
                     var lastSeq = await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
                         .Entities
-                        .OrderByDescending(x => x.Reference) 
+                        .OrderByDescending(x => x.Reference)
                         .Select(x => x.Reference)
                         .FirstOrDefaultAsync();
 
@@ -234,6 +240,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                     aa.Reference = $"ANC/{year}/{month}/{day}/{aa.PatientId}/{sequence}";
                 }
+
 
                 var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(aa);
 
@@ -305,10 +312,10 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-
         #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
         {
             try
@@ -325,7 +332,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGeneralConsultanServiceQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }
@@ -334,6 +341,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
-} 
+}

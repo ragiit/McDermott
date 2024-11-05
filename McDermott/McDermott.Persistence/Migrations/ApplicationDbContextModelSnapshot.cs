@@ -34,7 +34,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("MedicamentGroupDetailsId");
 
-                    b.ToTable("ActiveComponentMedicamentGroupDetail", (string)null);
+                    b.ToTable("ActiveComponentMedicamentGroupDetail");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Accident", b =>
@@ -403,7 +403,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("SafetyPersonnelId");
 
-                    b.ToTable("Accidents", (string)null);
+                    b.ToTable("Accidents");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ActiveComponent", b =>
@@ -456,7 +456,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomId");
 
-                    b.ToTable("ActiveComponents", (string)null);
+                    b.ToTable("ActiveComponents");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Allergy", b =>
@@ -495,7 +495,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Allergies", (string)null);
+                    b.ToTable("Allergies");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Awareness", b =>
@@ -531,7 +531,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Awarenesses", (string)null);
+                    b.ToTable("Awarenesses");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.BpjsClassification", b =>
@@ -564,7 +564,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BpjsClassifications", (string)null);
+                    b.ToTable("BpjsClassifications");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Building", b =>
@@ -605,7 +605,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("HealthCenterId");
 
-                    b.ToTable("Buildings", (string)null);
+                    b.ToTable("Buildings");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.BuildingLocation", b =>
@@ -641,7 +641,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("BuildingLocations", (string)null);
+                    b.ToTable("BuildingLocations");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.City", b =>
@@ -680,7 +680,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Cities", (string)null);
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ClassType", b =>
@@ -710,7 +710,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ClassTypes", (string)null);
+                    b.ToTable("ClassTypes");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Company", b =>
@@ -788,7 +788,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Concoction", b =>
@@ -850,7 +850,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("PractitionerId");
 
-                    b.ToTable("Concoctions", (string)null);
+                    b.ToTable("Concoctions");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ConcoctionLine", b =>
@@ -909,7 +909,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomId");
 
-                    b.ToTable("ConcoctionLines", (string)null);
+                    b.ToTable("ConcoctionLines");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Counter", b =>
@@ -965,7 +965,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceKId");
 
-                    b.ToTable("Counters", (string)null);
+                    b.ToTable("Counters");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Country", b =>
@@ -1001,7 +1001,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.CronisCategory", b =>
@@ -1036,7 +1036,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CronisCategories", (string)null);
+                    b.ToTable("CronisCategories");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Degree", b =>
@@ -1067,7 +1067,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Degrees", (string)null);
+                    b.ToTable("Degrees");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Department", b =>
@@ -1116,7 +1116,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ParentDepartmentId");
 
-                    b.ToTable("Departments", (string)null);
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DetailQueueDisplay", b =>
@@ -1154,7 +1154,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DetailQueueDisplays", (string)null);
+                    b.ToTable("DetailQueueDisplays");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Diagnosis", b =>
@@ -1199,7 +1199,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DiseaseCategoryId");
 
-                    b.ToTable("Diagnoses", (string)null);
+                    b.ToTable("Diagnoses");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DiseaseCategory", b =>
@@ -1235,7 +1235,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ParentDiseaseCategoryId");
 
-                    b.ToTable("DiseaseCategories", (string)null);
+                    b.ToTable("DiseaseCategories");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.District", b =>
@@ -1279,7 +1279,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Districts", (string)null);
+                    b.ToTable("Districts");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DoctorSchedule", b =>
@@ -1323,7 +1323,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("DoctorSchedules", (string)null);
+                    b.ToTable("DoctorSchedules");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DoctorScheduleDetail", b =>
@@ -1381,7 +1381,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("DoctorScheduleDetails", (string)null);
+                    b.ToTable("DoctorScheduleDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DoctorScheduleSlot", b =>
@@ -1438,7 +1438,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("DoctorScheduleSlots", (string)null);
+                    b.ToTable("DoctorScheduleSlots");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DrugDosage", b =>
@@ -1479,7 +1479,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DrugRouteId");
 
-                    b.ToTable("DrugDosages", (string)null);
+                    b.ToTable("DrugDosages");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DrugForm", b =>
@@ -1511,7 +1511,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FormDrugs", (string)null);
+                    b.ToTable("FormDrugs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.DrugRoute", b =>
@@ -1544,7 +1544,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DrugRoutes", (string)null);
+                    b.ToTable("DrugRoutes");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailSetting", b =>
@@ -1600,7 +1600,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmailSettings", (string)null);
+                    b.ToTable("EmailSettings");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.EmailTemplate", b =>
@@ -1673,7 +1673,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("EmailFromId");
 
-                    b.ToTable("EmailTemplates", (string)null);
+                    b.ToTable("EmailTemplates");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Family", b =>
@@ -1709,7 +1709,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("InverseRelationId");
 
-                    b.ToTable("Families", (string)null);
+                    b.ToTable("Families");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanCPPT", b =>
@@ -1775,7 +1775,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GeneralConsultanCPPTs", (string)null);
+                    b.ToTable("GeneralConsultanCPPTs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupport", b =>
@@ -2099,7 +2099,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("PractitionerRadiologyEximinationId");
 
-                    b.ToTable("GeneralConsultanMedicalSupports", (string)null);
+                    b.ToTable("GeneralConsultanMedicalSupports");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanMedicalSupportLog", b =>
@@ -2138,7 +2138,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserById");
 
-                    b.ToTable("GeneralConsultanMedicalSupportLogs", (string)null);
+                    b.ToTable("GeneralConsultanMedicalSupportLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanService", b =>
@@ -2309,6 +2309,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("PatientId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("PatientNextVisitSchedule")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Payment")
                         .HasColumnType("nvarchar(max)");
 
@@ -2361,6 +2364,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceAnc")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RegistrationDate")
@@ -2450,10 +2456,68 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("GeneralConsultanServices", (string)null);
+                    b.ToTable("GeneralConsultanServices");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAnc", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("GeneralConsultanServiceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("HPHT")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HPL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("LILA")
+                        .HasColumnType("int");
+
+                    b.Property<long>("PatientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PregnancyStatusA")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PregnancyStatusG")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PregnancyStatusP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("GeneralConsultanServiceAncs");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAncDetail", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -2483,7 +2547,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("FetusPosition")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("GeneralConsultanServiceId")
+                    b.Property<long?>("GeneralConsultanServiceAncId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("InspectionInitials")
@@ -2494,13 +2558,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<int>("KU")
                         .HasColumnType("int");
-
-                    b.Property<long?>("PatientId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Suhu")
                         .HasColumnType("int");
@@ -2529,11 +2586,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GeneralConsultanServiceId");
+                    b.HasIndex("GeneralConsultanServiceAncId");
 
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("GeneralConsultanServiceAncs");
+                    b.ToTable("GeneralConsultanServiceAncDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
@@ -2628,7 +2683,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("GeneralConsultanServiceId");
 
-                    b.ToTable("GeneralConsultantClinicalAssesments", (string)null);
+                    b.ToTable("GeneralConsultantClinicalAssesments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultationLog", b =>
@@ -2672,7 +2727,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserById");
 
-                    b.ToTable("GeneralConsultanServiceLogs", (string)null);
+                    b.ToTable("GeneralConsultanServiceLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultationServiceLog", b =>
@@ -2762,7 +2817,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("SourceId");
 
-                    b.ToTable("GoodsReceipts", (string)null);
+                    b.ToTable("GoodsReceipts");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceiptDetail", b =>
@@ -2812,7 +2867,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("GoodsReceiptDetails", (string)null);
+                    b.ToTable("GoodsReceiptDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GoodsReceiptLog", b =>
@@ -2861,7 +2916,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserById");
 
-                    b.ToTable("GoodsReceiptLogs", (string)null);
+                    b.ToTable("GoodsReceiptLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Group", b =>
@@ -2895,7 +2950,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Groups", (string)null);
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GroupMenu", b =>
@@ -2949,7 +3004,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("MenuId");
 
-                    b.ToTable("GroupMenus", (string)null);
+                    b.ToTable("GroupMenus");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.HealthCenter", b =>
@@ -3016,7 +3071,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("HealthCenters", (string)null);
+                    b.ToTable("HealthCenters");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Insurance", b =>
@@ -3071,7 +3126,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Insurances", (string)null);
+                    b.ToTable("Insurances");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.InsurancePolicy", b =>
@@ -3213,7 +3268,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("InsurancePolicies", (string)null);
+                    b.ToTable("InsurancePolicies");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.InventoryAdjusment", b =>
@@ -3263,7 +3318,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("InventoryAdjusments", (string)null);
+                    b.ToTable("InventoryAdjusments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.InventoryAdjusmentDetail", b =>
@@ -3321,7 +3376,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("TransactionStockId");
 
-                    b.ToTable("InventoryAdjusmentDetails", (string)null);
+                    b.ToTable("InventoryAdjusmentDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.InventoryAdjusmentLog", b =>
@@ -3360,7 +3415,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserById");
 
-                    b.ToTable("InventoryAdjusmentLogs", (string)null);
+                    b.ToTable("InventoryAdjusmentLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.JobPosition", b =>
@@ -3396,7 +3451,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("JobPositions", (string)null);
+                    b.ToTable("JobPositions");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Kiosk", b =>
@@ -3449,7 +3504,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Kiosks", (string)null);
+                    b.ToTable("Kiosks");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.KioskConfig", b =>
@@ -3481,7 +3536,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KioskConfigs", (string)null);
+                    b.ToTable("KioskConfigs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.KioskQueue", b =>
@@ -3536,7 +3591,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceKId");
 
-                    b.ToTable("KioskQueues", (string)null);
+                    b.ToTable("KioskQueues");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabResultDetail", b =>
@@ -3590,7 +3645,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("LabUomId");
 
-                    b.ToTable("LabResultDetails", (string)null);
+                    b.ToTable("LabResultDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTest", b =>
@@ -3631,7 +3686,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("SampleTypeId");
 
-                    b.ToTable("LabTests", (string)null);
+                    b.ToTable("LabTests");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabTestDetail", b =>
@@ -3689,7 +3744,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("LabUomId");
 
-                    b.ToTable("LabTestDetails", (string)null);
+                    b.ToTable("LabTestDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.LabUom", b =>
@@ -3722,7 +3777,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LabUoms", (string)null);
+                    b.ToTable("LabUoms");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Locations", b =>
@@ -3768,7 +3823,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ParentLocationId");
 
-                    b.ToTable("Locations", (string)null);
+                    b.ToTable("Locations");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Maintenance", b =>
@@ -3848,7 +3903,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ResponsibleById");
 
-                    b.ToTable("Maintenances", (string)null);
+                    b.ToTable("Maintenances");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.MaintenanceProduct", b =>
@@ -3896,7 +3951,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("MaintenanceProducts", (string)null);
+                    b.ToTable("MaintenanceProducts");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.MaintenanceRecord", b =>
@@ -3941,7 +3996,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("MaintenanceRecords", (string)null);
+                    b.ToTable("MaintenanceRecords");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Medicament", b =>
@@ -4021,7 +4076,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomId");
 
-                    b.ToTable("Medicaments", (string)null);
+                    b.ToTable("Medicaments");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.MedicamentGroup", b =>
@@ -4068,7 +4123,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UoMId");
 
-                    b.ToTable("MedicamentGroups", (string)null);
+                    b.ToTable("MedicamentGroups");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.MedicamentGroupDetail", b =>
@@ -4149,7 +4204,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UnitOfDosageId");
 
-                    b.ToTable("MedicamentGroupDetails", (string)null);
+                    b.ToTable("MedicamentGroupDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Menu", b =>
@@ -4200,7 +4255,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("Menus", (string)null);
+                    b.ToTable("Menus");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.NursingDiagnoses", b =>
@@ -4233,7 +4288,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NursingDiagnoses", (string)null);
+                    b.ToTable("NursingDiagnoses");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Occupational", b =>
@@ -4268,7 +4323,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Occupationals", (string)null);
+                    b.ToTable("Occupationals");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PatientAllergy", b =>
@@ -4320,7 +4375,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PatientAllergies", (string)null);
+                    b.ToTable("PatientAllergies");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PatientFamilyRelation", b =>
@@ -4364,7 +4419,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("PatientFamilyRelations", (string)null);
+                    b.ToTable("PatientFamilyRelations");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Pharmacy", b =>
@@ -4436,7 +4491,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Pharmacies", (string)null);
+                    b.ToTable("Pharmacies");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.PharmacyLog", b =>
@@ -4475,7 +4530,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserById");
 
-                    b.ToTable("PharmacyLogs", (string)null);
+                    b.ToTable("PharmacyLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Prescription", b =>
@@ -4560,7 +4615,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("SignaId");
 
-                    b.ToTable("Prescriptions", (string)null);
+                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Procedure", b =>
@@ -4599,7 +4654,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Procedures", (string)null);
+                    b.ToTable("Procedures");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Product", b =>
@@ -4701,7 +4756,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ProductCategory", b =>
@@ -4741,7 +4796,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductCategories", (string)null);
+                    b.ToTable("ProductCategories");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Project", b =>
@@ -4776,7 +4831,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Province", b =>
@@ -4819,7 +4874,7 @@ namespace McDermott.Persistence.Migrations
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_Provinces_Name");
 
-                    b.ToTable("Provinces", (string)null);
+                    b.ToTable("Provinces");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.QueueDisplay", b =>
@@ -4851,7 +4906,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QueueDisplays", (string)null);
+                    b.ToTable("QueueDisplays");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Religion", b =>
@@ -4882,7 +4937,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Religions", (string)null);
+                    b.ToTable("Religions");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.ReorderingRule", b =>
@@ -4928,7 +4983,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("ReorderingRules", (string)null);
+                    b.ToTable("ReorderingRules");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.SampleType", b =>
@@ -4961,7 +5016,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SampleTypes", (string)null);
+                    b.ToTable("SampleTypes");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Service", b =>
@@ -5024,7 +5079,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ServicedId");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.SickLeave", b =>
@@ -5061,7 +5116,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("GeneralConsultansId");
 
-                    b.ToTable("SickLeaves", (string)null);
+                    b.ToTable("SickLeaves");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Signa", b =>
@@ -5090,7 +5145,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Signas", (string)null);
+                    b.ToTable("Signas");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Speciality", b =>
@@ -5125,7 +5180,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specialities", (string)null);
+                    b.ToTable("Specialities");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.StockOutLines", b =>
@@ -5164,7 +5219,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("TransactionStockId");
 
-                    b.ToTable("StockOutLines", (string)null);
+                    b.ToTable("StockOutLines");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.StockOutPrescription", b =>
@@ -5208,7 +5263,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("TransactionStockId");
 
-                    b.ToTable("StockOutPrescriptions", (string)null);
+                    b.ToTable("StockOutPrescriptions");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.StockProduct", b =>
@@ -5274,7 +5329,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomId");
 
-                    b.ToTable("StockProducts", (string)null);
+                    b.ToTable("StockProducts");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.SystemParameter", b =>
@@ -5327,7 +5382,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SystemParameters", (string)null);
+                    b.ToTable("SystemParameters");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransactionStock", b =>
@@ -5389,7 +5444,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomId");
 
-                    b.ToTable("TransactionStocks", (string)null);
+                    b.ToTable("TransactionStocks");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStock", b =>
@@ -5445,7 +5500,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("StockProductId");
 
-                    b.ToTable("TransferStocks", (string)null);
+                    b.ToTable("TransferStocks");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStockLog", b =>
@@ -5494,7 +5549,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UserById");
 
-                    b.ToTable("TransferStockLogs", (string)null);
+                    b.ToTable("TransferStockLogs");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.TransferStockProduct", b =>
@@ -5539,7 +5594,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("TransferStockId");
 
-                    b.ToTable("TransferStockProduct", (string)null);
+                    b.ToTable("TransferStockProduct");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Uom", b =>
@@ -5586,7 +5641,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("UomCategoryId");
 
-                    b.ToTable("Uoms", (string)null);
+                    b.ToTable("Uoms");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.UomCategory", b =>
@@ -5619,7 +5674,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UomCategories", (string)null);
+                    b.ToTable("UomCategories");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.User", b =>
@@ -5991,7 +6046,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("SupervisorId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.VaccinationPlan", b =>
@@ -6072,7 +6127,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("SalesPersonId");
 
-                    b.ToTable("VaccinationPlans", (string)null);
+                    b.ToTable("VaccinationPlans");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.Village", b =>
@@ -6128,7 +6183,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("ProvinceId");
 
-                    b.ToTable("Villages", (string)null);
+                    b.ToTable("Villages");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgram", b =>
@@ -6880,11 +6935,22 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("GeneralConsultanService");
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAncDetail", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanServiceAnc", "GeneralConsultanServiceAnc")
+                        .WithMany()
+                        .HasForeignKey("GeneralConsultanServiceAncId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GeneralConsultanServiceAnc");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>

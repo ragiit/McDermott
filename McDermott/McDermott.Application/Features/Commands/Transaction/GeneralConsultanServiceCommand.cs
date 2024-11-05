@@ -105,6 +105,12 @@
             public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
+        public class UpdateGCReferenceAnc : IRequest<bool>
+        { 
+            public long Id {  get; set; }
+            public string ReferenceAnc { get; set; } = string.Empty;
+        }
+
         public class UpdateStatusGeneralConsultanServiceRequest : IRequest<GeneralConsultanServiceDto>
         {
             public long Id { get; set; }

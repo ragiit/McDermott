@@ -7,6 +7,7 @@ using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;
+using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncDetailCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction.Maternities
 {
@@ -230,7 +231,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         #region Region
         #region ComboboxReference
 
-        private DxComboBox<string, string?> refReferenceComboBox { get; set; }
+        private DxComboBox<GeneralConsultanServiceAncDto, string> refReferenceComboBox { get; set; }
         private int ReferenceComboBoxIndex { get; set; } = 0;
         private int totalCountReference = 0;
 
@@ -259,13 +260,16 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             }
         }
 
-        private async Task OnSelectedReferenceChanged(string e)
+        private async Task OnSelectedReferenceChanged(GeneralConsultanServiceAncDto e)
         {
             if (e is null)
             {
-                GeneralConsultanServiceAncs.Clear();
+                GeneralConsultanServiceAnc = new();
+                GeneralConsultanServiceAncDetails = [];
                 return;
             }
+
+            GeneralConsultanServiceAnc = GeneralConsultanServiceAncReferences.FirstOrDefault(x => x.Reference == e.Reference) ?? new();
 
             await LoadDataAnc();
         }
@@ -275,14 +279,19 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
             if (e is null)
             {
-                GeneralConsultanServiceAncs = [];
+                GeneralConsultanServiceAnc = new();
+                GeneralConsultanServiceAncDetails = [];
                 return;
             }
+
+            GeneralConsultanServiceAnc = GeneralConsultanServiceAncReferences.FirstOrDefault(x => x.Reference == e) ?? new();
 
             await LoadDataReference();
         }
 
-        private string? SelectedReference { get; set; }
+        private string? SelectedReference { get; set; } 
+        private List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncReferences{ get; set; } = [];
+
         private async Task LoadDataReference(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -292,15 +301,12 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 {
                     SearchTerm = refReferenceComboBox?.Text ?? "",
                     PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Select = x => new GeneralConsultanServiceAnc
-                    {
-                        Reference = x.Reference
-                    },
+                    PageSize = pageSize, 
                     Predicate = x => x.PatientId == GeneralConsultanService.PatientId
                 });
-                References = result.Item1.Select(z => z.Reference).ToList();
-                References = References.Distinct().ToList();
+                //References = result.Item1.Select(z => z.Reference).ToList();
+                //References = References.Distinct().ToList();
+                GeneralConsultanServiceAncReferences = result.Item1;
                 totalCountReference = result.PageCount;
                 PanelVisible = false;
             }
@@ -358,21 +364,22 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         #endregion Searching
 
         private List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncs { get; set; } = [];
+        private List<GeneralConsultanServiceAncDetailDto> GeneralConsultanServiceAncDetails { get; set; } = [];
         private async Task LoadDataAnc(int pageIndex = 0, int pageSizeGridAnc = 10)
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItemsAnc = [];
-                var ab = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                var ab = await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
                 {
                     SearchTerm = searchTermGridAnc ?? "",
-                    Predicate = x => refReferenceComboBox != null && x.Reference == refReferenceComboBox.Text && x.PatientId == GeneralConsultanService.PatientId,
+                    Predicate = x => refReferenceComboBox != null && x.GeneralConsultanServiceAncId == GeneralConsultanServiceAnc.Id,
                 });
-                GeneralConsultanServiceAncs = ab.Item1;
+                GeneralConsultanServiceAncDetails = ab.Item1;
                 totalCountGridAnc = ab.PageCount;
-                var aa = GeneralConsultanServiceAncs.FirstOrDefault(x => refReferenceComboBox != null && x.Reference == refReferenceComboBox.Text);
-                IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false;
+                //var aa = GeneralConsultanServiceAncDetails.FirstOrDefault(x => refReferenceComboBox != null && x.Reference == refReferenceComboBox.Text);
+                //IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false;
                 activePageIndexTotalCountGridAnc = pageIndex;
             }
             catch (Exception ex)
@@ -419,7 +426,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             FocusedGridTabAncRowVisibleIndex = args.VisibleIndex;
 
             if (args.DataItem is not null)
-                IsReadOnlyAncField = ((GeneralConsultanServiceAncDto)args.DataItem).IsReadOnly;
+                IsReadOnlyAncField = ((GeneralConsultanServiceAncDetailDto)args.DataItem).IsReadOnly;
         }
 
         private async Task OnSaveAnc(GridEditModelSavingEventArgs e)
@@ -428,37 +435,48 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             {
                 PanelVisible = true;
 
-                var editModel = (GeneralConsultanServiceAncDto)e.EditModel;
+                var editModel = (GeneralConsultanServiceAncDetailDto)e.EditModel;
 
-                var cekRef = References.FirstOrDefault(x => x == refReferenceComboBox.Text);
-                if (cekRef is not null)
-                    editModel.Reference = cekRef;
-                //else 
-                //    editModel.Reference= GeneralConsultanService.Reference;
+                //var cekRef = References.FirstOrDefault(x => x == refReferenceComboBox.Text);
+                //if (cekRef is not null)
+                //    editModel.Reference = cekRef;
+                ////else 
+                ////    editModel.Reference= GeneralConsultanService.Reference;
 
                 if (editModel.Id == 0)
                 {
-                    editModel.PatientId = GeneralConsultanService.PatientId;
-                    editModel.GeneralConsultanServiceId = GeneralConsultanService.Id;
-                    editModel.Date = DateTime.Now;
-                    var x = await Mediator.Send(new CreateGeneralConsultanServiceAncRequest(editModel));
+                    editModel.GeneralConsultanServiceAncId = GeneralConsultanServiceAnc.Id;
+                    //editModel.Date = DateTime.Now;
+                    var x = await Mediator.Send(new CreateGeneralConsultanServiceAncDetailRequest(editModel));
 
-                    await LoadDataReference();
-                    SelectedReference = x.Reference;
-                    var ab = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
-                    {
-                        SearchTerm = searchTermGridAnc ?? "",
-                        Predicate = x => SelectedReference != null && x.Reference == SelectedReference && x.PatientId == GeneralConsultanService.PatientId,
-                    });
-                    GeneralConsultanServiceAncs = ab.Item1;
-                    totalCountGridAnc = ab.PageCount;
-                    var aa = GeneralConsultanServiceAncs.FirstOrDefault(x => SelectedReference != null && x.Reference == SelectedReference);
-                    IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false; 
+                    //await LoadDataReference();
+                    //SelectedReference = x.Reference;
+
+                    //var ab = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                    //{
+                    //    SearchTerm = searchTermGridAnc ?? "",
+                    //    Predicate = x => SelectedReference != null && x.Reference == SelectedReference && x.PatientId == GeneralConsultanService.PatientId,
+                    //});
+                    //GeneralConsultanServiceAncs = ab.Item1;
+                    //totalCountGridAnc = ab.PageCount;
+                    //var aa = GeneralConsultanServiceAncs.FirstOrDefault(x => SelectedReference != null && x.Reference == SelectedReference);
+                    //IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false; 
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateGeneralConsultanServiceAncRequest(editModel));
-                    await LoadDataAnc(activePageIndexTotalCountGridAnc, pageSizeGridAnc);
+                    await Mediator.Send(new UpdateGeneralConsultanServiceAncDetailRequest(editModel));
+                }
+                await LoadDataAnc(activePageIndexTotalCountGridAnc, pageSizeGridAnc);
+
+                if (string.IsNullOrWhiteSpace(GeneralConsultanService.ReferenceAnc))
+                {
+                    GeneralConsultanService.ReferenceAnc = GeneralConsultanServiceAnc.Reference;
+
+                    await Mediator.Send(new UpdateGCReferenceAnc
+                    {
+                        Id = GeneralConsultanService.Id,
+                        ReferenceAnc = GeneralConsultanServiceAnc.Reference
+                    });
                 }
 
             }
@@ -523,9 +541,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         {
             var a = ((
                 GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) ||
-                GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) ||
-                GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician)
-                ));
+                GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife))
+                );
 
             return !a;
         }
@@ -632,10 +649,13 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                     PregnancyStatusP = x.PregnancyStatusP,
                     HPHT = x.HPHT,
                     HPL = x.HPL,
+
+                    PatientNextVisitSchedule = x.PatientNextVisitSchedule,
+                    ReferenceAnc = x.ReferenceAnc,
                 }
             });
 
-            if (result.Status == EnumStatusGeneralConsultantService.NurseStation || result.Status == EnumStatusGeneralConsultantService.NurseStation)
+            if (result.Status == EnumStatusGeneralConsultantService.Midwife || result.Status == EnumStatusGeneralConsultantService.Midwife)
             {
                 result = await GetClinicalAssesmentPatientHistory(result);
             }
@@ -660,6 +680,33 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 GeneralConsultanService = result;
                 UserForm = result.Patient ?? new();
 
+                if (result.Status == EnumStatusGeneralConsultantService.Midwife || result.Status == EnumStatusGeneralConsultantService.Finished)
+                {
+                    //var ph = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                    //{
+                    //    Predicate = x => x.Reference != null && x.Reference == GeneralConsultanService.ReferenceAnc
+                    //});
+                    //References = ph.Item1.Select(z => z.Reference).ToList();
+                    //References = References.Distinct().ToList();
+
+                    var ph = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                    {  
+                        Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc
+                    }); 
+                    GeneralConsultanServiceAncReferences = ph.Item1;
+
+                    GeneralConsultanServiceAnc = await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
+                    {
+                        Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc
+                    });
+
+                    var ab = await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
+                    { 
+                        Predicate = x =>  x.GeneralConsultanServiceAncId == GeneralConsultanServiceAnc.Id,
+                    });
+                    GeneralConsultanServiceAncDetails = ab.Item1;
+                }
+
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:
@@ -667,15 +714,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                         break;
 
                     case EnumStatusGeneralConsultantService.Confirmed:
-                        StagingText = EnumStatusGeneralConsultantService.NurseStation;
+                        StagingText = EnumStatusGeneralConsultantService.Midwife;
                         break;
 
-                    case EnumStatusGeneralConsultantService.NurseStation:
-                        StagingText = EnumStatusGeneralConsultantService.Waiting;
-                        break;
-
-                    case EnumStatusGeneralConsultantService.Waiting:
-                        StagingText = EnumStatusGeneralConsultantService.Physician;
+                    case EnumStatusGeneralConsultantService.Midwife:
+                        StagingText = EnumStatusGeneralConsultantService.Finished;
                         break;
 
                     case EnumStatusGeneralConsultantService.Physician:
@@ -1393,12 +1436,56 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             }
         }
 
+        private GeneralConsultanServiceAncDto GeneralConsultanServiceAnc { get; set; } = new();
+        private async Task HandleValidSubmitAnc()
+        {
+            IsLoading = true;
+
+            try
+            {
+                GeneralConsultanServiceAnc.GeneralConsultanServiceId = GeneralConsultanService.Id;
+                GeneralConsultanServiceAnc.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
+
+                if (GeneralConsultanServiceAnc.Id == 0)
+                    GeneralConsultanServiceAnc = await Mediator.Send(new CreateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAnc));
+                else
+                    GeneralConsultanServiceAnc = await Mediator.Send(new UpdateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAnc));
+
+
+                GeneralConsultanService.ReferenceAnc = GeneralConsultanServiceAnc.Reference;
+
+                await Mediator.Send(new UpdateGCReferenceAnc
+                {
+                    Id = GeneralConsultanService.Id,
+                    ReferenceAnc = GeneralConsultanServiceAnc.Reference
+                });
+
+                await GetGeneralConsultanServiceById();
+            }
+            catch (Exception x)
+            {
+                x.HandleException(ToastService);
+                throw;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        private async Task LoadDataAncHeader()
+        {
+
+        }
+
         private async Task HandleValidSubmit()
         {
             IsLoading = true;
 
             try
             {
+                GeneralConsultanService.IsMaternity = true;
+
                 // Execute the validator
                 ValidationResult results = new GeneralConsultanServiceValidator().Validate(GeneralConsultanService);
 
@@ -1433,7 +1520,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 if (!success2 || !success)
                     return;
 
-                GeneralConsultanService.IsGC = true;
 
                 if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
                 {
@@ -1455,8 +1541,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                     : [];
 
                 GeneralConsultanServiceDto res = new();
-
-                GeneralConsultanService.IsMaternity = true;
 
                 switch (GeneralConsultanService.Status)
                 {
@@ -1810,21 +1894,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                     {
                         case EnumStatusGeneralConsultantService.Confirmed:
                             GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Confirmed;
-                            StagingText = EnumStatusGeneralConsultantService.NurseStation;
+                            StagingText = EnumStatusGeneralConsultantService.Midwife;
                             break;
 
-                        case EnumStatusGeneralConsultantService.NurseStation:
-                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.NurseStation;
-                            StagingText = EnumStatusGeneralConsultantService.Waiting;
-                            break;
-
-                        case EnumStatusGeneralConsultantService.Waiting:
-                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Waiting;
-                            StagingText = EnumStatusGeneralConsultantService.Physician;
-                            break;
-
-                        case EnumStatusGeneralConsultantService.Physician:
-                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Physician;
+                        case EnumStatusGeneralConsultantService.Midwife:
+                            GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Midwife;
                             StagingText = EnumStatusGeneralConsultantService.Finished;
                             break;
 
@@ -1919,16 +1993,24 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                     if (newGC.Status == EnumStatusGeneralConsultantService.Finished)
                     {
-                        var searchAnc = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                        var a = await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
+                        {
+                            Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc && x.PatientId == GeneralConsultanService.PatientId,
+                            Select = x => new GeneralConsultanServiceAnc
+                            {
+                                Id = x.Id
+                            }
+                        });
+                        var searchAnc = (await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
                         {
                             IsGetAll = true,
-                            Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && x.IsReadOnly == false && x.PatientId == GeneralConsultanService.PatientId,
+                            Predicate = x => x.GeneralConsultanServiceAncId == a.Id && x.IsReadOnly == false,
                             Select = x => x
                         })).Item1;
 
                         searchAnc.ForEach(x => x.IsReadOnly = true);
 
-                        await Mediator.Send(new UpdateListGeneralConsultanServiceAncRequest(searchAnc));
+                        await Mediator.Send(new UpdateListGeneralConsultanServiceAncDetailRequest(searchAnc));
 
                         await LoadDataAnc();
                     }

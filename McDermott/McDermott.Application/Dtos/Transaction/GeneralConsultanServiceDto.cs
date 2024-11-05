@@ -9,6 +9,7 @@ namespace McDermott.Application.Dtos.Transaction
         public long Id { get; set; }
 
         public string Reference { get; set; } = string.Empty;
+        public string? ReferenceAnc { get; set; } = string.Empty; // For Anc Form
 
         public long? KioskQueueId { get; set; }
 
@@ -68,6 +69,8 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
+        [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
+        public DateTime? PatientNextVisitSchedule { get; set; }  // this field for Maternities -> Anc form
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? AppointmentDate { get; set; }
@@ -247,7 +250,7 @@ namespace McDermott.Application.Dtos.Transaction
         #region ANC 
         public string? PregnancyStatusG { get; set; }
         public string? PregnancyStatusP { get; set; }
-        public string? PregnancyStatusA { get; set; } 
+        public string? PregnancyStatusA { get; set; }
         public string? HPHT { get; set; }
         public string? HPL { get; set; }
         public int? LILA { get; set; }    // CM
@@ -267,6 +270,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string InpatientClass { get; set; }
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
+
         public string? Markers { get; set; }
         public string? LinkMeet { get; set; }
         public bool IsTelemedicine { get; set; } = false;
@@ -289,7 +293,12 @@ namespace McDermott.Application.Dtos.Transaction
     public class GeneralConsultanServiceValidator : AbstractValidator<GeneralConsultanServiceDto>
     {
         public GeneralConsultanServiceValidator()
-        {
+        {  
+            // Validation for IsMaternity field
+            RuleFor(x => x.PatientNextVisitSchedule)
+                .NotEmpty().WithMessage("Patient's next visit schedule is required for maternity cases")
+                .When(x => x.IsMaternity == true);
+
             // Validation for Patient field
             RuleFor(x => x.PatientId)
                 .NotEmpty().WithMessage("Patient is required")
@@ -342,6 +351,7 @@ namespace McDermott.Application.Dtos.Transaction
     {
         public long Id { get; set; }
         public string? Reference { get; set; }
+        public string? ReferenceAnc { get; set; } = string.Empty; // For Anc Form
 
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
@@ -390,6 +400,8 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
+        [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
+        public DateTime? PatientNextVisitSchedule { get; set; }  // this field for Maternities -> Anc form
 
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? AppointmentDate { get; set; }

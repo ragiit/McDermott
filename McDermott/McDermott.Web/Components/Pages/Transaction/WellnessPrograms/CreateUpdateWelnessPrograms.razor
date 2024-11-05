@@ -167,9 +167,9 @@
                                             </DxFormLayoutItem>
 
 
-                                           @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Content" ColSpanMd="12">
-                                                  <DxHtmlEditor @bind-Content="@WellnessProgram.ProgramContent" />
-                                            <ValidationMessage For="@(() => WellnessProgram.ProgramContent)" />
+                                            @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Content" ColSpanMd="12">
+                                        <DxHtmlEditor @bind-Content="@WellnessProgram.ProgramContent" />
+                                        <ValidationMessage For="@(() => WellnessProgram.ProgramContent)" />
                                         </DxFormLayoutItem> *@
 
                                             @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Schedule" ColSpanMd="12">
@@ -182,6 +182,12 @@
 
                                 @if (WellnessProgram.Id != 0)
                                 {
+                                    <div class="w-100">
+                                        <div class="card">
+                                            <div class="card-body">
+                                            </div>
+                                        </div>
+                                    </div>
                                     <DxTabs>
                                         <DxTabPage CssClass="w-100" Text="Schedule Settings">
                                             <div class="card">

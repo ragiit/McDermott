@@ -32,7 +32,8 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         IRequestHandler<CreateFormGeneralConsultanServiceNewRequest, GeneralConsultanServiceDto>,
         IRequestHandler<UpdateFormGeneralConsultanServiceNewRequest, GeneralConsultanServiceDto>,
-        IRequestHandler<UpdateConfirmFormGeneralConsultanServiceNewRequest, GeneralConsultanServiceDto>
+        IRequestHandler<UpdateConfirmFormGeneralConsultanServiceNewRequest, GeneralConsultanServiceDto>,
+        IRequestHandler<UpdateGCReferenceAnc, bool>
     {
         #region GET
 
@@ -641,8 +642,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                             Name = x.UserBy == null ? string.Empty : x.UserBy.Name,
                         },
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
-                        
-                       
+
+
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultationServiceLogDto>();
@@ -742,7 +743,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                             Name = x.UserBy == null ? string.Empty : x.UserBy.Name,
                         },
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
-                       
+
                     });
 
                 if (!request.IsGetAll)
@@ -935,6 +936,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.Payment = dto.Payment;
             entity.RegistrationDate = dto.RegistrationDate;
             entity.PregnancyStatusA = dto.PregnancyStatusA;
+            entity.PatientNextVisitSchedule = dto.PatientNextVisitSchedule;
             entity.PregnancyStatusP = dto.PregnancyStatusP;
             entity.PregnancyStatusG = dto.PregnancyStatusG;
             entity.HPHT = dto.HPHT;
@@ -943,6 +945,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             SetPropertiesModified(entity, nameof(entity.Status), nameof(entity.PatientId), nameof(entity.TypeRegistration),
                 nameof(entity.IsAlertInformationSpecialCase),
                 nameof(entity.PregnancyStatusA),
+                nameof(entity.PatientNextVisitSchedule),
                 nameof(entity.PregnancyStatusP),
                 nameof(entity.PregnancyStatusG),
                 nameof(entity.HPHT),
@@ -1161,6 +1164,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         PregnancyStatusG = request.GeneralConsultanServiceDto.PregnancyStatusG,
                         HPHT = request.GeneralConsultanServiceDto.HPHT,
                         HPL = request.GeneralConsultanServiceDto.HPL,
+                        PatientNextVisitSchedule = request.GeneralConsultanServiceDto.PatientNextVisitSchedule,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
                         LocationId = request.GeneralConsultanServiceDto.LocationId
@@ -1195,6 +1199,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         IsMcu = request.GeneralConsultanServiceDto.IsMcu,
                         IsAccident = request.GeneralConsultanServiceDto.IsAccident,
                         PregnancyStatusA = request.GeneralConsultanServiceDto.PregnancyStatusA,
+                        PatientNextVisitSchedule = request.GeneralConsultanServiceDto.PatientNextVisitSchedule,
                         PregnancyStatusP = request.GeneralConsultanServiceDto.PregnancyStatusP,
                         PregnancyStatusG = request.GeneralConsultanServiceDto.PregnancyStatusG,
                         HPHT = request.GeneralConsultanServiceDto.HPHT,
@@ -1224,6 +1229,31 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
+        public async Task<bool> Handle(UpdateGCReferenceAnc request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (request.ReferenceAnc is null)
+                    return new();
+
+                GeneralConsultanService? entity = new GeneralConsultanService { Id = request.Id };
+
+                _unitOfWork.Repository<GeneralConsultanService>().Attach(entity);
+
+                entity.ReferenceAnc = request.ReferenceAnc;
+
+                _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.ReferenceAnc));
+                 
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Tangani kesalahan atau log sesuai kebutuhan
+                throw;
+            }
+        }
         public async Task<GeneralConsultanServiceDto> Handle(UpdateConfirmFormGeneralConsultanServiceNewRequest request, CancellationToken cancellationToken)
         {
             try
@@ -1248,6 +1278,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.PratitionerId = request.GeneralConsultanServiceDto.PratitionerId;
                     entity.Payment = request.GeneralConsultanServiceDto.Payment;
                     entity.RegistrationDate = request.GeneralConsultanServiceDto.RegistrationDate;
+                    entity.PatientNextVisitSchedule = request.GeneralConsultanServiceDto.PatientNextVisitSchedule;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PatientId));
@@ -1256,6 +1287,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.ClassType));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.ServiceId));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PratitionerId));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PatientNextVisitSchedule));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Payment));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.RegistrationDate));
                 }
@@ -1314,7 +1346,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.RiskOfFalling));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.RiskOfFallingDetail));
                 }
-                else if (request.Status == EnumStatusGeneralConsultantService.NurseStation)
+                else if (request.Status == EnumStatusGeneralConsultantService.NurseStation || request.Status == EnumStatusGeneralConsultantService.Midwife)
                 {
                     entity = new GeneralConsultanService { Id = request.GeneralConsultanServiceDto.Id };
 

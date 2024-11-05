@@ -125,7 +125,10 @@ namespace McDermott.Application.Extentions
         }
 
         public enum EnumStatusGeneralConsultantService
-        {
+        { 
+            [Display(Name = "Canceled")]
+            Canceled = 0,
+
             [Display(Name = "Planned")]
             Planned = 1,
 
@@ -138,17 +141,18 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Waiting")]
             Waiting = 4,
 
+            [Display(Name = "Procedure Room")]
+            ProcedureRoom = 5,
+
             [Display(Name = "Physician")]
             Physician = 6,
 
             [Display(Name = "Finished")]
             Finished = 7,
 
-            [Display(Name = "Canceled")]
-            Canceled = 0,
+            [Display(Name = "Midwife")]
+            Midwife = 8,
 
-            [Display(Name = "Procedure Room")]
-            ProcedureRoom = 5
         }
 
         public enum EnumStatusSickLeave
