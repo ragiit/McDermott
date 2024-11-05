@@ -1,0 +1,342 @@
+﻿@page "/clinic-service/wellness/{PageMode}"
+@rendermode InteractiveServer
+
+<PageTitle>Wellness</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Wellness" OnClickBack="@(async () => NavigationManager.NavigateTo("clinic-service/wellness"))" ShowBackButton="true" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                        IsContentBlocked="true"
+                                        ApplyBackgroundShading="true"
+                                        IndicatorAreaVisible="false"
+                                        Text="Fetching Data...">
+                            <EditForm Context="L" Model="@WellnessProgram" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                <AntiforgeryToken />
+
+
+                                <div class="row justify-content-end mb-3">
+                                    <div class="col-auto align-self-end">
+                                        <DxTabs>
+                                            <DxTab Text="Active"></DxTab>
+                                            <DxTab Text="InActive"></DxTab>
+                                            <DxTab Text="Done"></DxTab>
+                                        </DxTabs>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row w-100 justify-content-end mt-2 mb-2">
+
+                                            @*   <div class="col-auto pe-0 ">
+                                        <DxButton Enabled="!IsLoading"
+                                        IconCssClass="fa-solid fa-check"
+                                        Text="Active"
+                                        RenderStyle="ButtonRenderStyle.Primary">
+                                        </DxButton>
+                                        <DxButton Enabled="!IsLoading"
+                                        IconCssClass="fa-solid fa-xmark"
+                                        Text="Cancel"
+                                        RenderStyle="ButtonRenderStyle.Danger">
+                                        </DxButton>
+                                        </div> *@
+
+                                            <div class="col-auto align-self-end p-0 m-0">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true">
+                                                </DxButton>
+                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="CancelForm_Click"></DxButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-body">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@WellnessProgram.ProgramName"
+                                                           ShowValidationIcon="true"
+                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                           NullText="Enter Program Name" />
+                                                <ValidationMessage For="@(() => WellnessProgram.ProgramName)" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Categories"
+                                                              @bind-Value="@WellnessProgram.Category"
+                                                              NullText="Select Category"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never" />
+                                                <ValidationMessage For="@(() => WellnessProgram.Category)" />
+                                            </DxFormLayoutItem>
+
+                                            @*  <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                        <MyDxComboBox Data="@Diagnosiss"
+                                        NullText="Select Diagnosis"
+                                        @ref="refDiagnosisComboBox"
+                                        @bind-Value="@a.DiagnosisId"
+                                        TextFieldName="Name"
+                                        ValueFieldName="Id"
+                                        TextChanged="((string e) => OnInputDiagnosisChanged(e))">
+                                        <Buttons>
+                                        <DxEditorButton Click="OnSearchDiagnosisIndexDecrement"
+                                        IconCssClass="fa-solid fa-caret-left"
+                                        Tooltip="Previous Index" />
+                                        <DxEditorButton Click="OnSearchDiagnosis"
+                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                        Tooltip="Search" />
+                                        <DxEditorButton Click="OnSearchDiagnosisIndexIncrement"
+                                        IconCssClass="fa-solid fa-caret-right"
+                                        Tooltip="Next Index" />
+                                        </Buttons>
+                                        <Columns>
+                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)" Caption="Name" />
+                                        <DxListEditorColumn FieldName="Diagnosis.Name" Caption="Diagnosis" />
+                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)" Caption="Code" />
+                                        </Columns>
+                                        </MyDxComboBox>
+                                        <ValidationMessage For="@(()=>a.DiagnosisId)" />
+
+                                        </DxFormLayoutItem> *@
+                                            @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                        <DxCheckBoxList Data="@Diagnoses" @bind-SelectedValues="@WellnessProgram.SelectedDiagnoses" />
+                                        <ValidationMessage For="@(() => WellnessProgram.SelectedDiagnoses)" />
+                                        </DxFormLayoutItem>*@
+
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                <MyDxComboBox Data="@Diagnoses"
+                                                              NullText="Select Diagnosis"
+                                                              @ref="refDiagnosisComboBox"
+                                                              @bind-Value="@WellnessProgram.DiagnosisId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputDiagnosisChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchDiagnosisIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchDiagnosis"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchDiagnosisIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)" Caption="Code" />
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>WellnessProgram.DiagnosisId)" />
+                                            </DxFormLayoutItem>
+
+                                            @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Status" ColSpanMd="12">
+                                        <MyDxComboBox Data="@(new[] { "Active", "Inactive", "Completed" })"
+                                        @bind-Value="@WellnessProgram.Status"
+                                        NullText="Select Status" />
+                                        </DxFormLayoutItem> *@
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@WellnessProgram.StartDate" />
+                                            </DxFormLayoutItem>
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Date" ColSpanMd="12">
+                                                <DxDateEdit @bind-Date="@WellnessProgram.EndDate" />
+                                            </DxFormLayoutItem>
+
+                                            @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Diagnosis Types" ColSpanMd="12">
+                                        <DxCheckBoxList Data="@Diagnoses" @bind-SelectedValues="@WellnessProgram.SelectedDiagnoses" />
+                                        <ValidationMessage For="@(() => WellnessProgram.SelectedDiagnoses)" />
+                                        <DxButton RenderStyle="ButtonRenderStyle.Secondary" RenderStyleMode="@ButtonRenderStyleMode.Contained" Text="Add Custom Diagnosis" Click="AddCustomDiagnosis_Click" />
+                                        </DxFormLayoutItem> *@
+
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Severity Level for Diagnosis" ColSpanMd="12">
+                                                <MyDxComboBox Data="@(new[] { "Low", "Medium", "High" })"
+                                                              @bind-Value="@WellnessProgram.Status"
+                                                              NullText="Select Severity Level" />
+                                                <ValidationMessage For="@(() => WellnessProgram.Status)" />
+                                            </DxFormLayoutItem>
+
+
+                                           @*    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Content" ColSpanMd="12">
+                                                  <DxHtmlEditor @bind-Content="@WellnessProgram.ProgramContent" />
+                                            <ValidationMessage For="@(() => WellnessProgram.ProgramContent)" />
+                                        </DxFormLayoutItem> *@
+
+                                            @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Schedule" ColSpanMd="12">
+                                        <DxCheckBox @bind-Checked="@WellnessProgram.HasSpecialSessions" Text="Special Sessions or Routine?" />
+                                        <DxScheduler Data="@WellnessProgram.Sessions" />
+                                        </DxFormLayoutItem> *@
+                                        </DxFormLayout>
+                                    </div>
+                                </div>
+
+                                @if (WellnessProgram.Id != 0)
+                                {
+                                    <DxTabs>
+                                        <DxTabPage CssClass="w-100" Text="Schedule Settings">
+                                            <div class="card">
+                                                <div class="card-body">
+
+                                                    <MyGridPaginate @ref="GridSessionSchedule"
+                                                                    Data="@WellnessProgramSessions"
+                                                                    @bind-SelectedDataItems="@SelectedDataItemWellnessProgramSessions"
+                                                                    KeyFieldName="Id"
+                                                                    FocusedRowChanged="GridFocusedRowSessionVisibleIndex_FocusedRowChanged"
+                                                                    EditModelSaving="OnSaveSchedule"
+                                                                    SearchTextChanged="OnSearchBoxChangedWellnessProgramSession"
+                                                                    DataItemDeleting="OnDeleteAttendence"
+                                                                    RowDoubleClick="EditSession_Click">
+                                                        <ToolbarTemplate>
+                                                            <MyDxToolbarBase TItem="WellnessProgramSessionDto"
+                                                                             Items="@WellnessProgramSessions"
+                                                                             NewItem_Click="NewSession_Click"
+                                                                             EditItem_Click="EditSession_Click"
+                                                                             DeleteItem_Click="DeleteSession_Click"
+                                                                             Refresh_Click="RefreshSessions_Click" />
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="Name" Caption="Name" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="Day" Caption="Day" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="StartTime" Caption="Start Time" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="EndTime" Caption="End Time" MinWidth="100" />
+                                                        </Columns>
+                                                        <EditFormTemplate Context="EditFormContext">
+                                                            @{
+                                                                var a = (WellnessProgramSessionDto)EditFormContext.EditModel;
+                                                            }
+                                                            <DxFormLayout CssClass="w-100">
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@WellnessProgram.ProgramName"
+                                                                               ShowValidationIcon="true"
+                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                               NullText="Name" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Day" ColSpanMd="12">
+                                                                    <DxComboBox Data="@(new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" })"
+                                                                                @bind-Value="@a.Day"
+                                                                                NullText="Select Day" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Time" ColSpanMd="12">
+                                                                    <DxDateEdit @bind-Date="@a.StartTime" TimeSectionVisible="true" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Time" ColSpanMd="12">
+                                                                    <DxDateEdit @bind-Date="@a.EndTime" TimeSectionVisible="true" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </EditFormTemplate>
+                                                    </MyGridPaginate>
+                                                </div>
+                                            </div>
+                                        </DxTabPage>
+                                        <DxTabPage CssClass="w-100" Text="Attendance">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <MyGridPaginate @ref="GridAttendance"
+                                                                    Data="@WellnessProgramAttendances"
+                                                                    @bind-SelectedDataItems="@SelectedDataItemWellnessProgramAttendances"
+                                                                    KeyFieldName="Id"
+                                                                    FocusedRowChanged="GridFocusedRowScheduleVisibleIndex_FocusedRowChanged"
+                                                                    EditModelSaving="OnSaveAttendence"
+                                                                    SearchTextChanged="OnSearchBoxChangedWellnessProgramAttendanceAttendance"
+                                                                    DataItemDeleting="OnDeleteAttendence"
+                                                                    RowDoubleClick="EditAttendance_Click">
+                                                        <ToolbarTemplate>
+                                                            <MyDxToolbarBase TItem="WellnessProgramAttendanceDto"
+                                                                             Items="@WellnessProgramAttendances"
+                                                                             NewItem_Click="NewAttendance_Click"
+                                                                             EditItem_Click="EditAttendance_Click"
+                                                                             DeleteItem_Click="DeleteAttendance_Click"
+                                                                             Refresh_Click="RefreshAttendance_Click" />
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="PatientName" Caption="Patient Name" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="AttendanceDate" Caption="Attendance Date" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="AttendanceStatus" Caption="Status" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="Notes" Caption="Notes" MinWidth="200" />
+                                                        </Columns>
+                                                        <EditFormTemplate Context="EditFormContext">
+                                                            @{
+                                                                var a = (WellnessProgramAttendanceDto)EditFormContext.EditModel;
+                                                            }
+                                                            <DxFormLayout CssClass="w-100">
+                                                                @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Name" ColSpanMd="12">
+                                                        <DxTextBox @bind-Text="@a.user" NullText="Enter Patient Name" />
+                                                        </DxFormLayoutItem> *@
+
+                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="User" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Users"
+                                                                                  NullText="Select User"
+                                                                                  @ref="refUserComboBox"
+                                                                                  @bind-Value="@a.PatientId"
+                                                                                  TextFieldName="Name"
+                                                                                  ValueFieldName="Id"
+                                                                                  TextChanged="((string e) => OnInputUserChanged(e))">
+                                                                        <Buttons>
+                                                                            <DxEditorButton Click="OnSearchUserIndexDecrement"
+                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                            Tooltip="Previous Index" />
+                                                                            <DxEditorButton Click="OnSearchUser"
+                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                            Tooltip="Search" />
+                                                                            <DxEditorButton Click="OnSearchUserIndexIncrement"
+                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                            Tooltip="Next Index" />
+                                                                        </Buttons>
+                                                                        <Columns>
+                                                                            <DxListEditorColumn FieldName="@nameof(UserDto.Name)" Caption="Name" />
+                                                                        </Columns>
+                                                                    </MyDxComboBox>
+                                                                    <ValidationMessage For="@(()=>a.PatientId)" />
+                                                                </DxFormLayoutItem>
+
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Attendance Date" ColSpanMd="12">
+                                                                    <DxDateEdit @bind-Date="@a.AttendanceDate" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Status" ColSpanMd="12">
+                                                                    <DxComboBox Data="@(new[] { "Present", "Absent", "Excused" })"
+                                                                                @bind-Value="@a.AttendanceStatus"
+                                                                                NullText="Select Status" />
+                                                                </DxFormLayoutItem>
+
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Notes" ColSpanMd="12">
+                                                                    <DxTextBox @bind-Text="@a.Comments" NullText="Enter Notes" />
+                                                                </DxFormLayoutItem>
+                                                            </DxFormLayout>
+                                                        </EditFormTemplate>
+                                                    </MyGridPaginate>
+                                                </div>
+                                            </div>
+                                        </DxTabPage>
+                                    </DxTabs>
+                                }
+                            </EditForm>
+                        </DxLoadingPanel>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}

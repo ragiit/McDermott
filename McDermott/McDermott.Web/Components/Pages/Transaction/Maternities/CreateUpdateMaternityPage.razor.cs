@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.RichEdit;
+using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
 using McDermott.Application.Dtos.Transaction;
 using McDermott.Application.Features.Services;
@@ -236,6 +237,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         private async Task OnSearchReference()
         {
             await LoadDataReference();
+            //SelectedReference = GeneralConsultanService.Reference;
+            //await LoadDataAnc();
         }
 
         private async Task OnSearchReferenceIndexIncrement()
@@ -430,20 +433,34 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 var cekRef = References.FirstOrDefault(x => x == refReferenceComboBox.Text);
                 if (cekRef is not null)
                     editModel.Reference = cekRef;
+                //else 
+                //    editModel.Reference= GeneralConsultanService.Reference;
 
                 if (editModel.Id == 0)
                 {
                     editModel.PatientId = GeneralConsultanService.PatientId;
                     editModel.GeneralConsultanServiceId = GeneralConsultanService.Id;
                     editModel.Date = DateTime.Now;
-                    await Mediator.Send(new CreateGeneralConsultanServiceAncRequest(editModel));
+                    var x = await Mediator.Send(new CreateGeneralConsultanServiceAncRequest(editModel));
+
+                    await LoadDataReference();
+                    SelectedReference = x.Reference;
+                    var ab = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                    {
+                        SearchTerm = searchTermGridAnc ?? "",
+                        Predicate = x => SelectedReference != null && x.Reference == SelectedReference && x.PatientId == GeneralConsultanService.PatientId,
+                    });
+                    GeneralConsultanServiceAncs = ab.Item1;
+                    totalCountGridAnc = ab.PageCount;
+                    var aa = GeneralConsultanServiceAncs.FirstOrDefault(x => SelectedReference != null && x.Reference == SelectedReference);
+                    IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false; 
                 }
                 else
                 {
                     await Mediator.Send(new UpdateGeneralConsultanServiceAncRequest(editModel));
+                    await LoadDataAnc(activePageIndexTotalCountGridAnc, pageSizeGridAnc);
                 }
 
-                await LoadDataAnc(activePageIndexTotalCountGridAnc, pageSizeGridAnc);
             }
             catch (Exception ex)
             {

@@ -307,7 +307,7 @@
                                                                 <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
                                                             </DxFormLayoutItem>
 
-                                                            <DxFormLayoutItem Caption="Pregnancy Status" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                      @*       <DxFormLayoutItem Caption="Pregnancy Status" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusG"
                                                                            ReadOnly="ReadOnlyForm()"
                                                                            NullText="G" />
@@ -321,7 +321,31 @@
                                                                 <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusA"
                                                                            ReadOnly="ReadOnlyForm()"
                                                                            NullText="A" />
+                                                            </DxFormLayoutItem> *@
+
+                                                            <DxFormLayoutItem Context="abc" Caption="Pregnancy Status" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                <DxFormLayout>
+                                                                    <DxFormLayoutItem Caption="G" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusG"
+                                                                                   ReadOnly="ReadOnlyForm()"
+                                                                                   NullText="G" />
+                                                                    </DxFormLayoutItem>
+
+                                                                    <DxFormLayoutItem Caption="P" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusP"
+                                                                                   ReadOnly="ReadOnlyForm()"
+                                                                                   NullText="P" />
+                                                                    </DxFormLayoutItem>
+
+                                                                    <DxFormLayoutItem Caption="A" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusA"
+                                                                                   ReadOnly="ReadOnlyForm()"
+                                                                                   NullText="A" />
+                                                                    </DxFormLayoutItem>
+                                                                </DxFormLayout>
                                                             </DxFormLayoutItem>
+
+
                                                             <DxFormLayoutItem Caption="HPHT" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                 <MyTextBox @bind-Text="@GeneralConsultanService.HPHT"
                                                                            ReadOnly="ReadOnlyForm()"
@@ -933,8 +957,8 @@
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Pain Scale" ColSpanMd="12">
                                                                                     <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" MaxValue="10" @bind-Value="@GeneralConsultanService.PainScale">
-                                                                                        <Buttons> 
-                                                                                            <DxEditorButton IconCssClass="fa-regular fa-face-smile" Click="OnClickPainScalePopUp"  />
+                                                                                        <Buttons>
+                                                                                            <DxEditorButton IconCssClass="fa-regular fa-face-smile" Click="OnClickPainScalePopUp" />
                                                                                         </Buttons>
                                                                                     </DxSpinEdit>
                                                                                 </DxFormLayoutItem>

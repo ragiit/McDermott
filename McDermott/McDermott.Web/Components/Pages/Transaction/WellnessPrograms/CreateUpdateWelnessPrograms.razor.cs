@@ -1,13 +1,55 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramSessionCommand;
 
-namespace McDermott.Web.Components.Pages.WellnessPrograms
+namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 {
     public partial class CreateUpdateWelnessPrograms
     {
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (firstRender)
+            {
+                await GetUserInfo();
+            }
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo(ToastService);
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
+        protected override async Task OnInitializedAsync()
+        {
+            PanelVisible = true;
+            await GetUserInfo();
+            await LoadData();
+            PanelVisible = false;
+        }
+
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
 
@@ -29,13 +71,13 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
                 if (WellnessProgram.Id == 0)
                 {
                     var ye = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
-                    NavigationManager.NavigateTo($"wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true); 
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true); 
                 }
                 else
                 { 
                     WellnessProgram = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
 
-                    NavigationManager.NavigateTo($"wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
                 }
             }
             catch (Exception ex)
@@ -62,6 +104,11 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
         private async Task EditSession_Click()
         {
             await GridSessionSchedule.StartEditRowAsync(FocusedRowScheduleVisibleIndex);
+            //var a = (GridSessionSchedule.GetDataItem(FocusedRowScheduleVisibleIndex) as WellnessProgramAttendanceDto ?? new());
+            //Users = (await Mediator.Send(new GetUserQueryNew
+            //{
+            //    Predicate = x => x.Id == a.PatientId,
+            //})).Item1;
         }
 
         private void DeleteSession_Click()
@@ -85,7 +132,12 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
         private int FocusedRowAttendenceVisibleIndex { get; set; }
         private async Task EditAttendance_Click()
         {
-            await GridAttendance.StartEditRowAsync(FocusedRowAttendenceVisibleIndex);
+            await GridAttendance.StartEditRowAsync(FocusedRowAttendenceVisibleIndex); 
+            var a = (GridAttendance.GetDataItem(FocusedRowAttendenceVisibleIndex) as WellnessProgramAttendanceDto ?? new());
+            Users = (await Mediator.Send(new GetUserQueryNew
+            {
+                Predicate = x => x.Id == a.PatientId,
+            })).Item1;
         }
         private int FocusedRowSessionVisibleIndex { get; set; }
         private void GridFocusedRowSessionVisibleIndex_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -133,7 +185,7 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
             try
             {
                 PanelVisible = true;
-                var editModel = (WellnessProgramSessionDto)e.EditModel;
+                var editModel = (WellnessProgramAttendanceDto)e.EditModel;
 
                 //bool validate = await Mediator.Send(new ValidateCountryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
@@ -147,11 +199,11 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
                 editModel.WellnessProgramId = WellnessProgram.Id;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateWellnessProgramSessionRequest(editModel));
+                    await Mediator.Send(new CreateWellnessProgramAttendanceRequest(editModel));
                 else
-                    await Mediator.Send(new UpdateWellnessProgramSessionRequest(editModel));
+                    await Mediator.Send(new UpdateWellnessProgramAttendanceRequest(editModel));
 
-                SelectedDataItemWellnessProgramSessions = [];
+                SelectedDataItemWellnessProgramAttendances = [];
                 await LoadDataOnSearchBoxChangedWellnessProgramSession();
             }
             catch (Exception ex)
@@ -244,7 +296,7 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
             {
                 if (result == null || !Id.HasValue)
                 {
-                    NavigationManager.NavigateTo("wellness");
+                    NavigationManager.NavigateTo("clinic-service/wellness");
                     return;
                 }
 
@@ -280,6 +332,7 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
         }
 
         private IReadOnlyList<object> SelectedDataItemWellnessProgramSessions { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemWellnessProgramAttendances { get; set; } = [];
         private List<WellnessProgramSessionDto> WellnessProgramSessions { get; set; } = [];
         private async Task LoadDataOnSearchBoxChangedWellnessProgramSession(int pageIndex = 0, int pageSizeWellnessProgramSession = 10)
         {
@@ -482,5 +535,56 @@ namespace McDermott.Web.Components.Pages.WellnessPrograms
 
         #endregion ComboboxUser
         #endregion Searching
+
+        #region Attendence
+
+        #region Searching
+
+        private int pageSizeWellnessProgramAttendanceAttendance { get; set; } = 10;
+        private int totalCountWellnessProgramAttendanceAttendance = 0;
+        private int activePageIndexWellnessProgramAttendanceAttendance { get; set; } = 0;
+        private string searchTermWellnessProgramAttendanceAttendance { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedWellnessProgramAttendanceAttendance(string searchText)
+        {
+            searchTermWellnessProgramAttendanceAttendance = searchText;
+            await LoadDataOnSearchBoxChanged(0, pageSizeWellnessProgramAttendanceAttendance);
+        }
+
+        private async Task OnpageSizeWellnessProgramAttendanceAttendanceIndexChanged(int newpageSizeWellnessProgramAttendanceAttendance)
+        {
+            pageSizeWellnessProgramAttendanceAttendance = newpageSizeWellnessProgramAttendanceAttendance;
+            await LoadDataOnSearchBoxChanged(0, newpageSizeWellnessProgramAttendanceAttendance);
+        }
+
+        private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
+        {
+            await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeWellnessProgramAttendanceAttendance);
+        }
+        private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeWellnessProgramAttendanceAttendance = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItemWellnessProgramAttendances = new ObservableRangeCollection<object>();
+                var result = await Mediator.Send(new GetWellnessProgramAttendanceQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSizeWellnessProgramAttendanceAttendance,
+                    SearchTerm = searchTermWellnessProgramAttendanceAttendance,
+                });
+                WellnessProgramAttendances = result.Item1;
+                totalCountWellnessProgramAttendanceAttendance = result.PageCount;
+                activePageIndexWellnessProgramAttendanceAttendance = pageIndex;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+        #endregion Searching
+        #endregion
     }
 }

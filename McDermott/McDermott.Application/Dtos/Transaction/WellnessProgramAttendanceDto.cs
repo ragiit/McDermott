@@ -17,5 +17,16 @@ namespace McDermott.Application.Dtos.Transaction
 
         public UserDto? Patient { get; set; }
         public WellnessProgramDto? WellnessProgram { get; set; }
+
+    }
+          public class CreateUpdateWellnessProgramAttendanceDto  
+    {
+        public long Id { get; set; }
+        public long WellnessProgramId { get; set; }
+        public long PatientId { get; set; }
+        public DateTime AttendanceDate { get; set; } = DateTime.Now;
+        public string? AttendanceStatus { get; set; }
+        public string? Comments { get; set; }
+         
     }
 }

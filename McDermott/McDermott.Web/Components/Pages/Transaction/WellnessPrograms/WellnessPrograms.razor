@@ -1,11 +1,13 @@
-﻿@page "/wellness" 
+﻿@page "/clinic-service/wellness"
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand
 @rendermode InteractiveServer
 
-<PageTitle>Wellness Program Enrollment</PageTitle>
+<PageTitle>Wellness</PageTitle>
 
- 
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+{
     <div class="wrapper">
-        <BaseHeaderPage Title="Wellness Program Enrollment" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+        <BaseHeaderPage Title="Wellness" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
 
         <section class="content">
             <div class="container-fluid">
@@ -34,7 +36,7 @@
                                                              Items="@WellnessProgramss"
                                                              SelectedDataItems="@SelectedDataItems"
                                                              NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@EditItem_Click"  />
+                                                             EditItem_Click="@EditItem_Click" />
                                         </ToolbarTemplate>
 
                                         <Columns>
@@ -58,13 +60,21 @@
             </div>
         </section>
     </div>
-
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
 
 @code {
     private int FocusedRowVisibleIndexGroupMenu { get; set; }
     private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
     {
-        FocusedRowVisibleIndexGroupMenu = args.VisibleIndex; 
+        FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
     }
     public IGrid Grid { get; set; }
     private bool PanelVisible { get; set; } = true;
@@ -76,36 +86,118 @@
     private List<string> Diagnoses = new() { "Hypertension", "Diabetes", "Depression" };
     private IReadOnlyList<object> SelectedDataItems { get; set; } = new List<object>();
 
-    protected override async Task OnInitializedAsync()
+
+    #region UserLoginAndAccessRole
+
+    [Inject]
+    public UserInfoService UserInfoService { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private User UserLogin { get; set; } = new();
+    private bool IsAccess = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await LoadData();
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await GetUserInfo();
+        }
     }
 
-    private async Task LoadData()
+    private async Task GetUserInfo()
     {
-        // Load data from server or database
+        try
+        {
+            var user = await UserInfoService.GetUserInfo(ToastService);
+            IsAccess = user.Item1;
+            UserAccessCRUID = user.Item2;
+            UserLogin = user.Item3;
+        }
+        catch { }
+    }
+
+    #endregion UserLoginAndAccessRole
+
+    protected override async Task OnInitializedAsync()
+    {
+        PanelVisible = true;
+        await GetUserInfo();
+        await LoadData();
         PanelVisible = false;
     }
 
-    private void NewItem_Click()
+    #region Searching
+
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChanged(string searchText)
     {
-        NavigationManager.NavigateTo($"wellness/{EnumPageMode.Create.GetDisplayName()}");
-            return;
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
     }
 
-    private async Task EditItem_Click()
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+    private async Task LoadData(int pageIndex = 0, int pageSize = 10)
     {
         try
-            {
-                WellnessProgram = SelectedDataItems[0].Adapt<WellnessProgramDto>();
-                NavigationManager.NavigateTo($"wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
-                return;
-                
-            }
-            catch (Exception e)
-            {
-                var zz = e;
-            }
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var a = await Mediator.Send(new GetWellnessProgramQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+
+            WellnessProgramss = a.Item1;
+            totalCount = a.PageCount;
+            activePageIndex = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion Searching
+
+
+    private void NewItem_Click()
+    {
+        NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Create.GetDisplayName()}");
+        return;
+    }
+
+    private void EditItem_Click()
+    {
+        try
+        {
+            WellnessProgram = SelectedDataItems[0].Adapt<WellnessProgramDto>();
+            NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+            return;
+
+        }
+        catch (Exception e)
+        {
+            var zz = e;
+        }
     }
 
     private async Task HandleValidSubmit()
@@ -127,5 +219,5 @@
     }
 
 }
-    
+
 
