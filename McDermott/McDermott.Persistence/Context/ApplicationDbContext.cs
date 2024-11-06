@@ -164,6 +164,12 @@ namespace McDermott.Persistence.Context
 
         #endregion MyRegion
 
+        #region AwarenessEvent
+        DbSet<EducationProgram> EducationPrograms { get; set; }
+        DbSet<AwarenessEduCategory> AwarenessEduCategories {  get; set; }
+        DbSet<ParticipanEdu> ParticipanEdus {  get; set; }
+        #endregion
+
         #endregion DbSet
 
         #region OnModelCreating

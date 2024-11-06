@@ -46,6 +46,7 @@ builder.Services.AddResponseCompression(options =>
 });
 
 builder.Services.AddScoped<GoogleMeetService>();
+builder.Services.AddSingleton<IUploadDocumentService, UploadDocumentService>();
 // Konfigurasi tingkat kompresi (opsional)
 builder.Services.Configure<GzipCompressionProviderOptions>(options =>
 {

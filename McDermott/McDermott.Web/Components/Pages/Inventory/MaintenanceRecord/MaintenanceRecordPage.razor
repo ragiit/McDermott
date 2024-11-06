@@ -1,93 +1,99 @@
-﻿@page "/inventory/Maintenance-records/{PageMode}"
+﻿@* @page "/inventory/Maintenance-records/product/{long Id}" *@
+@page "/inventory/Maintenance-records/product/"
 
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Maintenance Record</PageTitle>
 
- @if (IsAccess)
-{ 
-<BaseHeaderPage Title="Maintenance Record" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/product"))" ShowBackButton="true" />
 
-<div class="wrapper">
+@if (UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <BaseHeaderPage Title="Maintenance Record" OnClickBack="@(async () => NavigationManager.NavigateTo("inventory/product"))" ShowBackButton="true" />
 
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body">
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
-                                <MyGridPaginate @ref="Grid"
-                                                Data="GetMaintenanceRecords"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                DataItemDeleting="OnDelete"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                SearchTextChanged="OnSearchBoxChanged"
-                                                KeyFieldName="Id">
-                                    <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="MaintenanceRecordDto"
-                                                         Items="@GetMaintenanceRecords"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         IsImport="true"
-                                                         Grid="Grid"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.IsCreate"
-                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption"Poduct Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="SequenceProduct" Caption="Sequence Maintenance" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="DocumentName" Caption="Document Name" />
-                                    </Columns>
-                                    <TotalSummary>
-                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                           FieldName="Name"
-                                                           Visible="true" />
-                                    </TotalSummary>
-                                </MyGridPaginate>
-                                <div class="row">
-                                    <DxFormLayout>
-                                        <div class="col-md-8">
-                                            <DxFormLayoutItem>
-                                                <DxPager PageCount="totalCount"
-                                                         ActivePageIndexChanged="OnPageIndexChanged"
-                                                         ActivePageIndex="activePageIndex"
-                                                         VisibleNumericButtonCount="10"
-                                                         SizeMode="SizeMode.Medium"
-                                                         NavigationMode="PagerNavigationMode.Auto">
-                                                </DxPager>
-                                            </DxFormLayoutItem>
-                                        </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
-                                            <DxFormLayoutItem Caption="Page Size:">
-                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                              NullText="Select Page Size"
-                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                              @bind-Value="pageSize">
-                                                </MyDxComboBox>
-                                            </DxFormLayoutItem>
-                                        </div>
-                                    </DxFormLayout>
-                                </div>
-                            </DxLoadingPanel>
+    <div class="wrapper">
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGridPaginate @ref="Grid"
+                                                    Data="GetMaintenanceRecords"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    DataItemDeleting="OnDelete"
+                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    SearchTextChanged="OnSearchBoxChanged"
+                                                    KeyFieldName="Id">
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="MaintenanceRecordDto"
+                                                             Items="@GetMaintenanceRecords"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"
+                                                             IsImport="true"
+                                                             Grid="Grid"
+                                                             ExportToExcel="ExportToExcel"
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
+                                        </ToolbarTemplate>
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Product.Name" Caption"Poduct Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="SequenceProduct" Caption="Sequence Maintenance" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="DocumentName" Caption="Document Name" />
+                                        </Columns>
+
+                                    </MyGridPaginate>
+
+                                </DxLoadingPanel>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
- } 
+}
+
+<!--PopUp Modal-->
+<DxPopup Visible="@showPopUp" HeaderText="" Width="85%" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="Back_Click">
+    <div class="card">
+        <div class="card-body">
+            <EditForm Model="@PostMaintenanceRecords" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <AntiforgeryToken />
+                <DxFormLayout CssClass="w-100 mt-1">
+                    <DxFormLayoutItem Caption="Sequence Product Maintenance" ColSpanMd="12" CaptionCssClass="normal-caption">
+                        <MyDxComboBox Data="@GetMaintenances"
+                                      NullText="select Sequence Maintenance Product.."
+                                      @bind-Value="@PostMaintenanceRecords.SequenceProduct"
+                                      TextFieldName="Sequence"
+                                      ValueFieldName="Id" />
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <div style="@(SelectedFilesCount > 0 ? "display: none" : string.Empty)">
+                            <span class=" mb-3"><i class="fa-solid fa-file-arrow-up"></i></span>
+                            <span class="mb-3">Click the Select Files button to select a file</span>
+                        
+                        @* <DxFileInput AllowMultiFileUpload="true"
+                                  MaxFileSize="1048576"
+                                  SelectedFilesChanged="@SelectedFilesChanged"
+                                  UploadButtonText="Select File"
+                            CssClass="@(SelectedFilesCount > 0 ? "w-100" : string.Empty)" />*@
+                        </div> 
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            </EditForm>
+        </div>
+    </div>
+</DxPopup>

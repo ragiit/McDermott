@@ -1,11 +1,16 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using MailKit.Search;
 using McDermott.Application.Dtos.Medical;
+using McDermott.Application.Features.Services;
+using McDermott.Application.Interfaces.Repositories;
 using McDermott.Domain.Entities;
 using McDermott.Extentions;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using System.Net;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
+
 
 namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 {
@@ -20,13 +25,16 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
         #region Variable Static
 
+        [Inject]
+        protected IUploadDocumentService UploadDocumentService { get; set; }
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
 
-        [Parameter]
-        public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
-
         private bool PanelVisible { get; set; } = false;
+        private bool showPopUp { get; set; } = false;
+        private string? NameProduct { get; set; }
+        private int? SelectedFilesCount { get; set; }
         private bool FormValidationState { get; set; } = true;
         private Timer _timer;
         private int FocusedRowVisibleIndex { get; set; }
@@ -146,6 +154,19 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
                 return;
             }
         }
+
+        private async Task HandleValidSubmit()
+        {
+            if(FormValidationState )
+            {
+                await OnSave();
+            }
+         
+        }private async Task HandleInvalidSubmit()
+        {
+            FormValidationState = false;
+         
+        }
         #endregion
 
         #region SaveDelete
@@ -173,8 +194,46 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             }
         }
 
+        private async Task OnSave()
+        {
+
+        }
+        private List<UploadFileInfo> SelectedFiles = new List<UploadFileInfo>();
+
+        // Event handler untuk `FilesChanged`
+        protected async Task SelectedFilesChanged(InputFileChangeEventArgs e)
+        {
+            var files = e.GetMultipleFiles();
+            foreach (var file in files)
+            {
+               
+                    var allowedExtensions = new[] { ".pdf" };
+                    var (status, fileName) = await UploadDocumentService.UploadDocumentAsync(file, 1048576, allowedExtensions);
+
+                if (status == 1)
+                {
+                    // Dapatkan user yang sedang login
+                    var authState = UserLogin.Id;
+
+                    // Panggil OnSave untuk menyimpan ke database
+                    //await OnSave(fileName, authState, DateTime.Now);
+
+                    // Tampilkan notifikasi sukses
+                    ToastService.ShowInfo($"File {file.Name} uploaded successfully as {fileName}.");
+                }
+                else
+                {
+                    // Tampilkan notifikasi error
+                    ToastService.ShowError($"Failed to upload file {file.Name}. Reason: {fileName}");
+                }
+            }
+
+            InvokeAsync(StateHasChanged);
+        }
+        #endregion SaveDelete
 
         #region Load ComboBox
+
         #region ComboBox Maintenance
         private DxComboBox<MaintenanceDto, long?> refMaintenanceComboBox { get; set; }
         private int MaintenanceComboBoxIndex { get; set; } = 0;
@@ -219,6 +278,7 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             PanelVisible = false;
         }
         #endregion
+
         #region Combo Box Product
         private DxComboBox<ProductDto, long?> refProductComboBox { get; set; }
         private int ProductComboBoxIndex { get; set; } = 0;
@@ -266,7 +326,6 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
         #endregion
 
 
-        #endregion SaveDelete
 
         #region Grid Configure
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -283,8 +342,9 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
         private async Task NewItem_Click()
         {
-            NavigationManager.NavigateTo($"inventory/Maintenance-records/{EnumPageMode.Create.GetDisplayName()}");
-            return;
+            PanelVisible = true;
+            showPopUp = true;
+            PanelVisible = false;
         }
 
         private async Task EditItem_Click()
@@ -292,8 +352,6 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             try
             {
                 var LabTest = SelectedDataItems[0].Adapt<MaintenanceRecordDto>();
-               
-
             }
             catch (Exception ex) { }
         }
@@ -303,9 +361,10 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        private async Task ImportFile()
+        private async Task Back_Click()
         {
-            await JsRuntime.InvokeVoidAsync("clickInputFile", "fileInput");
+            showPopUp = false;
+            PostMaintenanceRecords = new();
         }
 
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
