@@ -115,7 +115,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             PanelVisible = false;
         }
 
-
         public MarkupString GetIssueStatusIconHtml(EnumStatusGoodsReceipt? status)
         {
             string priorityClass;

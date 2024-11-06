@@ -254,3 +254,29 @@ h1:focus {
     padding-left: 10px;
     padding-right: 10px;
 }
+
+    .upload-container,
+    .upload-container > div:first-child {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .drop-file-icon {
+        background-size: contain;
+        mask-repeat: no-repeat;
+        -webkit-mask-repeat: no-repeat;
+        background-position: center center;
+        background-color: #ADB5BD;
+        width: 48px;
+        height: 48px;
+        -webkit-mask-image: url("../image/icons/drop-file.svg");
+        mask-image: url("../image/icons/drop-file.svg");
+    }
+
+    .drop-file-label {
+        font-weight: 500;
+        font-size: 1rem;
+    }

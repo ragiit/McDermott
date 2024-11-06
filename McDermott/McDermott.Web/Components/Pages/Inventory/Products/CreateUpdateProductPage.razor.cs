@@ -297,8 +297,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
 
-            GetMaintenanceProduct = await Mediator.Send(new GetAllMaintenanceProductQuery());
-            
+            var resultScrap = await Mediator.Send(new GetMaintenanceProductQuery());
+            GetMaintenanceProduct = resultScrap.Item1;
+
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -917,7 +918,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 PanelVisible = true;
                 showScrapProduct = true;
-                GetMaintenanceScrap = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintenance.Scrap).ToList();
+                GetMaintenanceScrap = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintenance.Scrap) .ToList();
+                NameProduct = GetMaintenanceScrap[0].Product.Name;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -932,7 +934,19 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 showMaintaiananaceProduct = true;
                 PanelVisible = true;
-                GetMaintenanceHistory = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status != EnumStatusMaintenance.Scrap).ToList();
+
+                // Modifikasi query untuk menampilkan 1 jika Statusnya NULL
+                GetMaintenanceHistory = GetMaintenanceProduct
+                    .Where(x => x.ProductId == Id && (x.Status ?? EnumStatusMaintenance.InProgress) != EnumStatusMaintenance.Scrap)
+                    .Select(x =>
+                    {
+                        // Menampilkan Status sebagai 1 jika NULL
+                        x.Status = x.Status ?? EnumStatusMaintenance.InProgress; // Asumsi: Pending atau 1 sebagai default
+                        return x;
+                    })
+                    .ToList();
+
+                NameProduct = GetMaintenanceHistory[0].Product.Name;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -940,6 +954,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 ex.HandleException(ToastService);
             }
         }
+
 
         #endregion Smart Button
 

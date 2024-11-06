@@ -109,6 +109,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         Note = x.Note,
                         Expired = x.Expired,
                         ProductId = x.ProductId,
+                        Status = x.Status,
                         Product = new Product
                         {
                             Name = x.Product == null ? string.Empty : x.Product.Name,
@@ -206,6 +207,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         Note = x.Note,
                         Expired = x.Expired,
                         ProductId = x.ProductId,
+                        Status = x.Status,
                         Product = new Product
                         {
                             Name = x.Product == null ? string.Empty : x.Product.Name,

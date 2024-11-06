@@ -264,5 +264,20 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Canceled")]
             Canceled = 5
         }
+
+        public enum EnumStatusEducationProgram
+        {
+            [Display(Name = "Draf")]
+            Draf = 0,
+
+            [Display(Name = "Active")]
+            Active = 1,
+
+            [Display(Name = "InActive")]
+            InActive = 2,
+            
+            [Display(Name = "Complete")]
+            Complete = 2,
+        }
     }
 }
