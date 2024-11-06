@@ -2399,6 +2399,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long?>("PatientId")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("PatientNextVisitSchedule")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Payment")
                         .HasColumnType("nvarchar(max)");
 
@@ -2451,6 +2454,9 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferenceAnc")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RegistrationDate")
@@ -2552,6 +2558,64 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("GeneralConsultanServiceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("HPHT")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HPL")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("LILA")
+                        .HasColumnType("int");
+
+                    b.Property<long>("PatientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PregnancyStatusA")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PregnancyStatusG")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PregnancyStatusP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GeneralConsultanServiceId");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("GeneralConsultanServiceAncs");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAncDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
                     b.Property<int>("BB")
                         .HasColumnType("int");
 
@@ -2573,7 +2637,7 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("FetusPosition")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("GeneralConsultanServiceId")
+                    b.Property<long?>("GeneralConsultanServiceAncId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("InspectionInitials")
@@ -2584,13 +2648,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<int>("KU")
                         .HasColumnType("int");
-
-                    b.Property<long?>("PatientId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Suhu")
                         .HasColumnType("int");
@@ -2619,11 +2676,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GeneralConsultanServiceId");
+                    b.HasIndex("GeneralConsultanServiceAncId");
 
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("GeneralConsultanServiceAncs");
+                    b.ToTable("GeneralConsultanServiceAncDetails");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>
@@ -7016,11 +7071,22 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("GeneralConsultanService");
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultanServiceAncDetail", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanServiceAnc", "GeneralConsultanServiceAnc")
+                        .WithMany()
+                        .HasForeignKey("GeneralConsultanServiceAncId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GeneralConsultanServiceAnc");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.GeneralConsultantClinicalAssesment", b =>

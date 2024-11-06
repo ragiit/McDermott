@@ -11,6 +11,7 @@ namespace McDermott.Domain.Entities
         public long? PratitionerId { get; set; }
         public string? ClassType { get; set; }
         public string? Reference { get; set; }
+        public string? ReferenceAnc { get; set; } = string.Empty; // For Anc Form
         public string? Method { get; set; }
         public string? AdmissionQueue { get; set; }
         public string? Payment { get; set; }
@@ -26,6 +27,8 @@ namespace McDermott.Domain.Entities
         public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
+        public DateTime? PatientNextVisitSchedule { get; set; }  // this field for Maternities -> Anc form
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
 

@@ -1,0 +1,223 @@
+﻿@page "/clinic-service/wellness"
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand
+@rendermode InteractiveServer
+
+<PageTitle>Wellness</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Wellness" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            @if (!ShowForm)
+                            {
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGridPaginate @ref="Grid"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    Data="WellnessProgramss"
+                                                    KeyFieldName="Id"
+                                                    DataItemDeleting="OnDelete"
+                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    RowDoubleClick="EditItem_Click">
+
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="WellnessProgramDto"
+                                                             Grid="Grid"
+                                                             Items="@WellnessProgramss"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@EditItem_Click" />
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn FieldName="ProgramName" MinWidth="200" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Category" MinWidth="200" />
+                                            <DxGridDataColumn FieldName="StartDate" MinWidth="100" />
+                                            <DxGridDataColumn FieldName="EndDate" MinWidth="100" />
+                                        </Columns>
+                                        <TotalSummary>
+                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                               FieldName="ProgramName"
+                                                               Visible="true" />
+                                        </TotalSummary>
+                                    </MyGridPaginate>
+                                </DxLoadingPanel>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+@code {
+    private int FocusedRowVisibleIndexGroupMenu { get; set; }
+    private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedRowVisibleIndexGroupMenu = args.VisibleIndex;
+    }
+    public IGrid Grid { get; set; }
+    private bool PanelVisible { get; set; } = true;
+    private bool IsLoading { get; set; } = false;
+    private bool ShowForm { get; set; } = false;
+    private WellnessProgramDto WellnessProgram { get; set; } = new();
+    private List<WellnessProgramDto> WellnessProgramss = new();
+    private List<string> Categories = new() { "Mental Health", "Dietary Awareness", "Physical Exercise" };
+    private List<string> Diagnoses = new() { "Hypertension", "Diabetes", "Depression" };
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = new List<object>();
+
+
+    #region UserLoginAndAccessRole
+
+    [Inject]
+    public UserInfoService UserInfoService { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private User UserLogin { get; set; } = new();
+    private bool IsAccess = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await GetUserInfo();
+        }
+    }
+
+    private async Task GetUserInfo()
+    {
+        try
+        {
+            var user = await UserInfoService.GetUserInfo(ToastService);
+            IsAccess = user.Item1;
+            UserAccessCRUID = user.Item2;
+            UserLogin = user.Item3;
+        }
+        catch { }
+    }
+
+    #endregion UserLoginAndAccessRole
+
+    protected override async Task OnInitializedAsync()
+    {
+        PanelVisible = true;
+        await GetUserInfo();
+        await LoadData();
+        PanelVisible = false;
+    }
+
+    #region Searching
+
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+    private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var a = await Mediator.Send(new GetWellnessProgramQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+
+            WellnessProgramss = a.Item1;
+            totalCount = a.PageCount;
+            activePageIndex = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion Searching
+
+
+    private void NewItem_Click()
+    {
+        NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Create.GetDisplayName()}");
+        return;
+    }
+
+    private void EditItem_Click()
+    {
+        try
+        {
+            WellnessProgram = SelectedDataItems[0].Adapt<WellnessProgramDto>();
+            NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+            return;
+
+        }
+        catch (Exception e)
+        {
+            var zz = e;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Save data
+        ShowForm = false;
+        await LoadData();
+    }
+
+    private void CancelForm_Click()
+    {
+        ShowForm = false;
+    }
+
+    private async Task OnDelete(GridDataItemDeletingEventArgs e)
+    {
+        // Delete logic
+        await LoadData();
+    }
+
+}
+
+
