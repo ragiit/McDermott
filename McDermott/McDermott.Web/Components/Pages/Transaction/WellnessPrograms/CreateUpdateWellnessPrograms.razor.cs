@@ -7,7 +7,7 @@ using static McDermott.Application.Features.Commands.Transaction.WellnessProgram
 
 namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 {
-    public partial class CreateUpdateWelnessPrograms
+    public partial class CreateUpdateWellnessPrograms
     {
         #region UserLoginAndAccessRole
 
@@ -42,6 +42,34 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         #endregion UserLoginAndAccessRole
 
+        private bool IsStatus(EnumWellness status) => WellnessProgram.Status == status;
+
+        private EnumWellness StagingText { get; set; } = EnumWellness.Active;
+
+        private async Task OnCancelStatus()
+        {
+            try
+            {
+                IsLoading = true;
+
+                if (WellnessProgram.Id != 0)
+                {
+                    WellnessProgram.Status = EnumWellness.Inactive;
+                    WellnessProgram = await Mediator.Send(new CancelWellnessProgramRequest(WellnessProgram));
+                    StagingText = EnumWellness.Inactive;
+                    ToastService.ShowSuccess("The Wellness Program has been successfully set to inactive. The patient is no longer active in the program.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -57,24 +85,51 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         //private List<AttendanceDto> AttendanceRecords { get; set; } = [];
         private bool PanelVisible { get; set; } = false;
+
         private bool IsLoading { get; set; } = false;
         private WellnessProgramDto WellnessProgram { get; set; } = new();
         private List<string> Categories = new() { "Mental Health", "Dietary Awareness", "Physical Exercise" };
-        //private List<string> Diagnoses = new() { "Hypertension", "Diabetes", "Depression" };
 
-        private async Task HandleValidSubmit()
+        //private List<string> Diagnoses = new() { "Hypertension", "Diabetes", "Depression" };
+        private async Task ClickConfirm()
         {
             try
             {
                 PanelVisible = true;
 
+                switch (WellnessProgram.Status)
+                {
+                    case EnumWellness.Draft:
+                        WellnessProgram.Status = EnumWellness.Active;
+                        StagingText = EnumWellness.Completed;
+                        break;
+
+                    case EnumWellness.Active:
+                        WellnessProgram.Status = EnumWellness.Completed;
+                        StagingText = EnumWellness.Completed;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                if (WellnessProgram.Status == EnumWellness.Active)
+                {
+                    // Convert the ProgramName to a slug (lowercase and spaces replaced with hyphens)
+                    WellnessProgram.Slug = WellnessProgram.Name?
+                        .ToLower()
+                        .Replace(" ", "-")
+                        .Replace(",", "")
+                        .Replace(".", "");
+                }
+
                 if (WellnessProgram.Id == 0)
                 {
                     var ye = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
-                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true); 
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true);
                 }
                 else
-                { 
+                {
                     WellnessProgram = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
 
                     NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
@@ -86,16 +141,44 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             }
             finally { PanelVisible = false; }
         }
+
+        private async Task HandleValidSubmit()
+        {
+            try
+            {
+                PanelVisible = true;
+
+                if (WellnessProgram.Id == 0)
+                {
+                    var ye = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true);
+                }
+                else
+                {
+                    WellnessProgram = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
+
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
         private void HandleInvalidSubmit()
         {
             ToastService.ShowInfo("Please ensure that all fields marked in red are filled in before submitting the form.");
         }
+
         private void CancelForm_Click()
         {
-            NavigationManager.NavigateTo("wellness");
+            NavigationManager.NavigateTo("clinic-service/wellness");
         }
 
         private int FocusedRowVisibleIndex { get; set; }
+
         private async Task NewSession_Click()
         {
             await GridSessionSchedule.StartEditNewRowAsync();
@@ -116,38 +199,40 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             GridSessionSchedule.ShowRowDeleteConfirmation(FocusedRowScheduleVisibleIndex);
         }
 
-
         private void RefreshSessions_Click()
         {
             // Logic to refresh session list
         }
-
 
         private async Task NewAttendance_Click()
         {
             await GridAttendance.StartEditNewRowAsync();
         }
 
-
         private int FocusedRowAttendenceVisibleIndex { get; set; }
+
         private async Task EditAttendance_Click()
         {
-            await GridAttendance.StartEditRowAsync(FocusedRowAttendenceVisibleIndex); 
+            await GridAttendance.StartEditRowAsync(FocusedRowAttendenceVisibleIndex);
             var a = (GridAttendance.GetDataItem(FocusedRowAttendenceVisibleIndex) as WellnessProgramAttendanceDto ?? new());
             Users = (await Mediator.Send(new GetUserQueryNew
             {
                 Predicate = x => x.Id == a.PatientId,
             })).Item1;
         }
+
         private int FocusedRowSessionVisibleIndex { get; set; }
+
         private void GridFocusedRowSessionVisibleIndex_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowAttendenceVisibleIndex = args.VisibleIndex;
         }
+
         private void DeleteAttendance_Click()
         {
             GridAttendance.ShowRowDeleteConfirmation(FocusedRowAttendenceVisibleIndex);
         }
+
         private async Task OnDeleteAttendence(GridDataItemDeletingEventArgs e)
         {
             try
@@ -254,11 +339,12 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         }
 
         private List<DiagnosisDto> Diagnoses { get; set; } = [];
+
         private async Task LoadDataDiagnosis(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
-                PanelVisible = true; 
+                PanelVisible = true;
                 var result = await Mediator.Send(new GetDiagnosisQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosisComboBox?.Text ?? ""));
 
                 Diagnoses = result.Item1;
@@ -274,12 +360,13 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         #endregion ComboboxDiagnosis
 
-
         #region Schedule
-        //private List<WellnessProgramSessionDto> 
+
+        //private List<WellnessProgramSessionDto>
 
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
+
         private async Task LoadData()
         {
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
@@ -291,7 +378,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             {
                 Predicate = x => x.Id == Id
             });
-              
+
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
                 if (result == null || !Id.HasValue)
@@ -300,14 +387,37 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                     return;
                 }
 
-                WellnessProgram = result  ?? new();
+                WellnessProgram = result ?? new();
+
+                switch (WellnessProgram.Status)
+                {
+                    case EnumWellness.Draft:
+                        StagingText = EnumWellness.Active;
+                        break;
+
+                    case EnumWellness.Active:
+                        StagingText = EnumWellness.Completed;
+                        break;
+
+                    case EnumWellness.Completed:
+                        StagingText = EnumWellness.Completed;
+                        break;
+
+                    case EnumWellness.Inactive:
+                        StagingText = EnumWellness.Inactive;
+                        break;
+
+                    default:
+                        break;
+                }
 
                 await LoadDataOnSearchBoxChangedWellnessProgramAttendance();
                 await LoadDataOnSearchBoxChangedWellnessProgramSession();
             }
         }
 
-        #region Searching 
+        #region Searching
+
         private IGrid GridSessionSchedule { get; set; }
         private int pageSizeWellnessProgramSession { get; set; } = 10;
         private int totalCountWellnessProgramSession = 0;
@@ -334,6 +444,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         private IReadOnlyList<object> SelectedDataItemWellnessProgramSessions { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemWellnessProgramAttendances { get; set; } = [];
         private List<WellnessProgramSessionDto> WellnessProgramSessions { get; set; } = [];
+
         private async Task LoadDataOnSearchBoxChangedWellnessProgramSession(int pageIndex = 0, int pageSizeWellnessProgramSession = 10)
         {
             try
@@ -357,10 +468,11 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             }
             finally { PanelVisible = false; }
         }
+
         #endregion Searching
 
-
         private int FocusedRowScheduleVisibleIndex { get; set; }
+
         private void GridFocusedRowScheduleVisibleIndex_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowScheduleVisibleIndex = args.VisibleIndex;
@@ -424,7 +536,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion Schedule
 
         #region Searching
 
@@ -451,6 +563,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         }
 
         private List<WellnessProgramAttendanceDto> WellnessProgramAttendances { get; set; } = [];
+
         private async Task LoadDataOnSearchBoxChangedWellnessProgramAttendance(int pageIndex = 0, int pageSizeWellnessProgramAttendance = 10)
         {
             try
@@ -476,6 +589,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         }
 
         #region ComboboxUser
+
         private List<UserDto> Users { get; set; } = [];
         private DxComboBox<UserDto, long> refUserComboBox { get; set; }
         private int UserComboBoxIndex { get; set; } = 0;
@@ -510,7 +624,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             await LoadDataUser();
         }
 
-
         private async Task LoadDataUser(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -534,6 +647,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         }
 
         #endregion ComboboxUser
+
         #endregion Searching
 
         #region Attendence
@@ -561,6 +675,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         {
             await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeWellnessProgramAttendanceAttendance);
         }
+
         private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeWellnessProgramAttendanceAttendance = 10)
         {
             try
@@ -584,7 +699,9 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             }
             finally { PanelVisible = false; }
         }
+
         #endregion Searching
-        #endregion
+
+        #endregion Attendence
     }
 }

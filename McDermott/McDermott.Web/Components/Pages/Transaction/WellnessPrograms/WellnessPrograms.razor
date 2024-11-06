@@ -2,7 +2,7 @@
 @using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand
 @rendermode InteractiveServer
 
-<PageTitle>Wellness</PageTitle>
+<PageTitle>@Helper.APP_NAME - Wellness</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {

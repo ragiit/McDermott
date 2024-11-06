@@ -4,28 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;
+using static McDermott.Application.Features.Commands.Transaction.WellnessProgramDetailCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {
-    public class WellnessProgramHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-         IRequestHandler<GetWellnessProgramQuery, (List<WellnessProgramDto>, int pageIndex, int pageSize, int pageCount)>,
-         IRequestHandler<GetSingleWellnessProgramQuery, WellnessProgramDto>,
-         IRequestHandler<ValidateWellnessProgram, bool>,
-         IRequestHandler<CreateWellnessProgramRequest, WellnessProgramDto>,
-         IRequestHandler<BulkValidateWellnessProgram, List<WellnessProgramDto>>,
-         IRequestHandler<CreateListWellnessProgramRequest, List<WellnessProgramDto>>,
-         IRequestHandler<UpdateWellnessProgramRequest, WellnessProgramDto>,
-         IRequestHandler<CancelWellnessProgramRequest, WellnessProgramDto>,
-         IRequestHandler<UpdateListWellnessProgramRequest, List<WellnessProgramDto>>,
-         IRequestHandler<DeleteWellnessProgramRequest, bool>
+    public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>, IRequestHandler<ValidateWellnessProgramDetail, bool>,
+     IRequestHandler<CreateWellnessProgramDetailRequest, WellnessProgramDetailDto>,
+     IRequestHandler<BulkValidateWellnessProgramDetail, List<WellnessProgramDetailDto>>,
+     IRequestHandler<CreateListWellnessProgramDetailRequest, List<WellnessProgramDetailDto>>,
+     IRequestHandler<UpdateWellnessProgramDetailRequest, WellnessProgramDetailDto>,
+     IRequestHandler<UpdateListWellnessProgramDetailRequest, List<WellnessProgramDetailDto>>,
+     IRequestHandler<DeleteWellnessProgramDetailRequest, bool>
     {
         #region GET
 
-        public async Task<List<WellnessProgramDto>> Handle(BulkValidateWellnessProgram request, CancellationToken cancellationToken)
+        public async Task<List<WellnessProgramDetailDto>> Handle(BulkValidateWellnessProgramDetail request, CancellationToken cancellationToken)
         {
-            var CountryDtos = request.WellnessProgramsToValidate;
+            var CountryDtos = request.WellnessProgramDetailsToValidate;
 
             // Ekstrak semua kombinasi yang akan dicari di database
             //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -42,20 +39,20 @@ namespace McDermott.Application.Features.Queries.Transaction
             return [];
         }
 
-        public async Task<bool> Handle(ValidateWellnessProgram request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ValidateWellnessProgramDetail request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Repository<WellnessProgram>()
+            return await _unitOfWork.Repository<WellnessProgramDetail>()
                 .Entities
                 .AsNoTracking()
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
-        public async Task<(List<WellnessProgramDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramQuery request, CancellationToken cancellationToken)
+        public async Task<(List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramDetailQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<WellnessProgram>().Entities.AsNoTracking();
+                var query = _unitOfWork.Repository<WellnessProgramDetail>().Entities.AsNoTracking();
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -71,8 +68,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                     foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                     {
                         query = additionalOrderBy.IsDescending
-                            ? ((IOrderedQueryable<WellnessProgram>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                            : ((IOrderedQueryable<WellnessProgram>)query).ThenBy(additionalOrderBy.OrderBy);
+                            ? ((IOrderedQueryable<WellnessProgramDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<WellnessProgramDetail>)query).ThenBy(additionalOrderBy.OrderBy);
                     }
                 }
 
@@ -89,7 +86,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 {
                     //query = query.Where(v =>
                     //        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    //        EF.Functions.Like(v.WellnessProgram.Name, $"%{request.SearchTerm}%")
+                    //        EF.Functions.Like(v.WellnessProgramDetail.Name, $"%{request.SearchTerm}%")
                     //        );
                 }
 
@@ -97,15 +94,14 @@ namespace McDermott.Application.Features.Queries.Transaction
                 if (request.Select is not null)
                     query = query.Select(request.Select);
                 else
-                    query = query.Select(x => new WellnessProgram
+                    query = query.Select(x => new WellnessProgramDetail
                     {
                         Id = x.Id,
+                        WellnessProgramId = x.WellnessProgramId,
                         Name = x.Name,
-                        Category = x.Category,
-                        Content = x.Content,
-                        Status = x.Status,
                         StartDate = x.StartDate,
                         EndDate = x.EndDate,
+                        Notes = x.Notes,
                         Slug = x.Slug
                     });
 
@@ -118,11 +114,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                         cancellationToken
                     );
 
-                    return (pagedItems.Adapt<List<WellnessProgramDto>>(), request.PageIndex, request.PageSize, totalPages);
+                    return (pagedItems.Adapt<List<WellnessProgramDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
                 }
                 else
                 {
-                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<WellnessProgramDto>>(), 0, 1, 1);
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<WellnessProgramDetailDto>>(), 0, 1, 1);
                 }
             }
             catch (Exception ex)
@@ -132,11 +128,11 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        public async Task<WellnessProgramDto> Handle(GetSingleWellnessProgramQuery request, CancellationToken cancellationToken)
+        public async Task<WellnessProgramDetailDto> Handle(GetSingleWellnessProgramDetailQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var query = _unitOfWork.Repository<WellnessProgram>().Entities.AsNoTracking();
+                var query = _unitOfWork.Repository<WellnessProgramDetail>().Entities.AsNoTracking();
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
@@ -152,8 +148,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                     foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                     {
                         query = additionalOrderBy.IsDescending
-                            ? ((IOrderedQueryable<WellnessProgram>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                            : ((IOrderedQueryable<WellnessProgram>)query).ThenBy(additionalOrderBy.OrderBy);
+                            ? ((IOrderedQueryable<WellnessProgramDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<WellnessProgramDetail>)query).ThenBy(additionalOrderBy.OrderBy);
                     }
                 }
 
@@ -170,7 +166,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 {
                     //query = query.Where(v =>
                     //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    //    EF.Functions.Like(v.WellnessProgram.Name, $"%{request.SearchTerm}%")
+                    //    EF.Functions.Like(v.WellnessProgramDetail.Name, $"%{request.SearchTerm}%")
                     //    );
                 }
 
@@ -178,19 +174,18 @@ namespace McDermott.Application.Features.Queries.Transaction
                 if (request.Select is not null)
                     query = query.Select(request.Select);
                 else
-                    query = query.Select(x => new WellnessProgram
+                    query = query.Select(x => new WellnessProgramDetail
                     {
                         Id = x.Id,
+                        WellnessProgramId = x.WellnessProgramId,
                         Name = x.Name,
-                        Category = x.Category,
-                        Content = x.Content,
-                        Status = x.Status,
                         StartDate = x.StartDate,
                         EndDate = x.EndDate,
+                        Notes = x.Notes,
                         Slug = x.Slug
                     });
 
-                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramDto>();
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramDetailDto>();
             }
             catch (Exception ex)
             {
@@ -203,17 +198,17 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region CREATE
 
-        public async Task<WellnessProgramDto> Handle(CreateWellnessProgramRequest request, CancellationToken cancellationToken)
+        public async Task<WellnessProgramDetailDto> Handle(CreateWellnessProgramDetailRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<WellnessProgram>().AddAsync(request.WellnessProgramDto.Adapt<CreateUpdateWellnessProgramDto>().Adapt<WellnessProgram>());
+                var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetWellnessProgramQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<WellnessProgramDto>();
+                return result.Adapt<WellnessProgramDetailDto>();
             }
             catch (Exception)
             {
@@ -221,16 +216,16 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        public async Task<List<WellnessProgramDto>> Handle(CreateListWellnessProgramRequest request, CancellationToken cancellationToken)
+        public async Task<List<WellnessProgramDetailDto>> Handle(CreateListWellnessProgramDetailRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<WellnessProgram>().AddAsync(request.WellnessProgramDtos.Adapt<List<WellnessProgram>>());
+                var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDtos.Adapt<List<WellnessProgramDetail>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetWellnessProgramQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<List<WellnessProgramDto>>();
+                return result.Adapt<List<WellnessProgramDetailDto>>();
             }
             catch (Exception)
             {
@@ -242,29 +237,17 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region UPDATE
 
-        public async Task<WellnessProgramDto> Handle(CancelWellnessProgramRequest request, CancellationToken cancellationToken)
+        public async Task<WellnessProgramDetailDto> Handle(UpdateWellnessProgramDetailRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                // Get the entity from the database, or you can attach it directly if the ID is known
-                var entity = new WellnessProgram { Id = request.WellnessProgramDto.Id };
+                var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<WellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
 
-                // Attach the entity to the context
-                _unitOfWork.Repository<WellnessProgram>().Attach(entity);
-
-                // Only update the specific fields you need
-                entity.Status = request.WellnessProgramDto.Status;
-
-                // Mark specific properties as modified
-                _unitOfWork.Repository<WellnessProgram>().SetPropertyModified(entity, nameof(entity.Status));
-
-                // Save changes
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                // Clear cache if needed
-                _cache.Remove("GetWellnessProgramQuery_");
+                _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-                return entity.Adapt<WellnessProgramDto>();
+                return result.Adapt<WellnessProgramDetailDto>();
             }
             catch (Exception)
             {
@@ -272,34 +255,16 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        public async Task<WellnessProgramDto> Handle(UpdateWellnessProgramRequest request, CancellationToken cancellationToken)
+        public async Task<List<WellnessProgramDetailDto>> Handle(UpdateListWellnessProgramDetailRequest request, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _unitOfWork.Repository<WellnessProgram>().UpdateAsync(request.WellnessProgramDto.Adapt<WellnessProgramDto>().Adapt<WellnessProgram>());
-
+                var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDtos.Adapt<List<WellnessProgramDetail>>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetWellnessProgramQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-                return result.Adapt<WellnessProgramDto>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<List<WellnessProgramDto>> Handle(UpdateListWellnessProgramRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await _unitOfWork.Repository<WellnessProgram>().UpdateAsync(request.WellnessProgramDtos.Adapt<List<WellnessProgram>>());
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _cache.Remove("GetWellnessProgramQuery_"); // Ganti dengan key yang sesuai
-
-                return result.Adapt<List<WellnessProgramDto>>();
+                return result.Adapt<List<WellnessProgramDetailDto>>();
             }
             catch (Exception)
             {
@@ -311,23 +276,23 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         #region DELETE
 
-        public async Task<bool> Handle(DeleteWellnessProgramRequest request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteWellnessProgramDetailRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (request.Id > 0)
                 {
-                    await _unitOfWork.Repository<WellnessProgram>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<WellnessProgramDetail>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<WellnessProgram>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<WellnessProgramDetail>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetWellnessProgramQuery_"); // Ganti dengan key yang sesuai
+                _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
                 return true;
             }

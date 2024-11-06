@@ -31,6 +31,13 @@
                                                   SubmitFormOnClick="true"
                                                   RenderStyle="ButtonRenderStyle.Primary">
                                         </DxButton>
+                                         
+                                        <DxButton IconCssClass="fa-solid fa-file-import"
+                                                  Text="Import"
+                                                  Click="ImportFile" 
+                                                  RenderStyle="ButtonRenderStyle.Success">
+                                        </DxButton> 
+                                        <InputFile id="fileInput" accept=".json" style="display:none" OnChange="ImportSettings" />
                                     </div>
                                 </div>
                             </div>
@@ -131,110 +138,7 @@
                     </EditForm>
                 </DxLoadingPanel>
             </div>
-        </section>
-
-
-        @* <section class="content">
-    <div class="container-fluid">
-    <div class="row">
-    <div class="col">
-    <div class="card">
-    <div class="card-body">
-    <DxLoadingPanel @bind-Visible="PanelVisible"
-    IsContentBlocked="true"
-    ApplyBackgroundShading="true"
-    IndicatorAreaVisible="true"
-    Text="Fetching Data...">
-    <EditForm Model="SystemParameter" OnValidSubmit="OnValidSubmit" OnInvalidSubmit="OnInvalidSubmit">
-    <AntiforgeryToken />
-    <DataAnnotationsValidator />
-
-    <DxGrid @ref="Grid"
-    Data="SystemParameters"
-    @bind-SelectedDataItems="@SelectedDataItems"
-    EditModelSaving="OnSave"
-    DataItemDeleting="OnDelete"
-    PopupEditFormHeaderText="@(IsAddForm ? "Add System Parameter" : "Edit System Parameter")"
-    PagerNavigationMode="PagerNavigationMode.InputBox"
-    EditorRenderMode="GridEditorRenderMode.Detached"
-    PageSize="10"
-    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-    KeyFieldName="Id"
-    CustomizeDataRowEditor="@GridExtention.Grid_CustomizeDataRowEditor"
-    AllowSelectRowByClick="true"
-    PagerPosition="GridPagerPosition.Bottom"
-    PageSizeSelectorVisible="true"
-    PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-    PageSizeSelectorAllRowsItemVisible="true"
-    PagerSwitchToInputBoxButtonCount="10"
-    FocusedRowEnabled="true"
-    PagerVisibleNumericButtonCount="10"
-    ShowGroupPanel="true"
-    AutoExpandAllGroupRows="true"
-    ShowFilterRow="true"
-    CustomizeElement="@GridExtention.Grid_CustomizeElement"
-    ShowSearchBox="true"
-    SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-    KeyboardNavigationEnabled="true">
-    <ToolbarTemplate>
-    <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-    <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-    <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
-    <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && SystemParameters.Count > 0" />
-    <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-    <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-    <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-    <Items>
-    <DxToolbarItem Text="To CSV" Click="(() => GridExtention.ExportCsvItem_Click(Grid))" />
-    <DxToolbarItem Text="To XLSX" Click="(() => GridExtention.ExportXlsxItem_Click(Grid))" />
-    <DxToolbarItem Text="To XLS" Click="(() => GridExtention.ExportXlsItem_Click(Grid))" />
-    </Items>
-    </DxToolbarItem>
-    <DxToolbarItem Visible="@UserAccessCRUID.IsImport" Text="Import" IconCssClass="fa-solid fa-file-import">
-    <Items>
-    <DxToolbarItem Text="Template" Click="ExportToExcel" />
-    <DxToolbarItem Text="Import" Click="ImportFile" />
-    </Items>
-    </DxToolbarItem>
-    </DxToolbar>
-    </ToolbarTemplate>
-
-    <Columns>
-    <DxGridSelectionColumn Width="15px" />
-    <DxGridDataColumn MinWidth="200" FieldName="Key" SortIndex="0" />
-    <DxGridDataColumn MinWidth="200" FieldName="Value" />
-
-
-    </Columns>
-    <EditFormTemplate Context="EditFormContext">
-    @{
-    var a = (SystemParameterDto)EditFormContext.EditModel;
-    }
-    <DxFormLayout CssClass="w-100">
-    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionCssClass="required-caption normal-caption" Caption="Key" ColSpanMd="12">
-    <DxTextBox @bind-Text="@a.Key"
-    ShowValidationIcon="true"
-    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-    NullText="Key" />
-    <ValidationMessage For="@(()=> a.Key)"   />
-
-    <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" CaptionCssClass="normal-caption" Caption="Value" ColSpanMd="12">
-    <DxTextBox @bind-Text="@a.Value"
-    ShowValidationIcon="true"
-    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-    NullText="Value" />
-    <ValidationMessage For="@(()=> a.Value)"   />
-    </DxFormLayoutItem>
-    </DxFormLayout>
-    </EditFormTemplate>
-    </DxGrid>
-    </DxLoadingPanel>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </section> *@
+        </section> 
     </div>
 }
 else

@@ -11,11 +11,10 @@ namespace McDermott.Web.Extentions
     public class AppSettings
     {
         public string BaseHref { get; set; }
-    }  
+    }
+
     public static class Helper
     {
-       
-
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {
             ToastService.ShowInfo($"Data with name \"{val}\" in row {row} and column {col} is invalid");
@@ -49,7 +48,6 @@ namespace McDermott.Web.Extentions
             "Trim II",
             "Trim III"
         };
-
 
         public static List<string> HumptyDumpty =
         [
@@ -235,8 +233,8 @@ namespace McDermott.Web.Extentions
             "inventory/locations",
             "inventory/reporting-inventories",
             "inventory/stock-moves",
-            "inventory/Maintenance",
-            "inventory/Maintenance-records",
+            "inventory/maintenance",
+            "inventory/maintenance-records",
 
             // Employees
             "employee/employees",
@@ -702,16 +700,19 @@ namespace McDermott.Web.Extentions
             {
                 case "days":
                     return expired.Value.AddDays(number.Value);
+
                 case "weeks":
                     return expired.Value.AddDays(number.Value * 7);
+
                 case "months":
                     return expired.Value.AddMonths(number.Value);
+
                 case "years":
                     return expired.Value.AddYears(number.Value);
+
                 default:
                     throw new ArgumentException("Unit not recognized.", nameof(unit));
             }
         }
-
     }
 }

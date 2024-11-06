@@ -642,8 +642,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                             Name = x.UserBy == null ? string.Empty : x.UserBy.Name,
                         },
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
-
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultationServiceLogDto>();
@@ -743,7 +741,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                             Name = x.UserBy == null ? string.Empty : x.UserBy.Name,
                         },
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
-
                     });
 
                 if (!request.IsGetAll)
@@ -768,7 +765,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-
 
         #endregion GET General Consultan Service Log
 
@@ -873,7 +869,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             {
                 UpdatePlannedFields(entity, request.GeneralConsultanServiceDto);
             }
-            else if (request.Status == EnumStatusGeneralConsultantService.NurseStation)
+            else if (request.Status == EnumStatusGeneralConsultantService.NurseStation || request.Status == EnumStatusGeneralConsultantService.Midwife)
             {
                 UpdateNurseStationFields(entity, request.GeneralConsultanServiceDto);
             }
@@ -1243,7 +1239,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.ReferenceAnc = request.ReferenceAnc;
 
                 _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.ReferenceAnc));
-                 
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return true;
@@ -1254,6 +1250,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
+
         public async Task<GeneralConsultanServiceDto> Handle(UpdateConfirmFormGeneralConsultanServiceNewRequest request, CancellationToken cancellationToken)
         {
             try

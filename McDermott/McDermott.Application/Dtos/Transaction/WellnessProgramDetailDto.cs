@@ -6,27 +6,27 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Transaction
 {
-    public class WellnessProgramDto : IMapFrom<WellnessProgram>
+    public class WellnessProgramDetailDto : IMapFrom<WellnessProgramDetail>
     {
         public long Id { get; set; }
-        public string? Category { get; set; } // Id
+        public long WellnessProgramId { get; set; }
         public string Name { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public string? Notes { get; set; }
         public string? Slug { get; set; }
-        public string? Content { get; set; }
-        public EnumWellness Status { get; set; } = EnumWellness.Draft;
+
+        public WellnessProgramDto? WellnessProgram { get; set; }
     }
 
-    public class CreateUpdateWellnessProgramDto
+    public class CreateUpdateWellnessProgramDetailDto
     {
         public long Id { get; set; }
-        public string? Category { get; set; } // Id
+        public long WellnessProgramId { get; set; }
         public string Name { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public string? Notes { get; set; }
         public string? Slug { get; set; }
-        public string? Content { get; set; }
-        public EnumWellness Status { get; set; } = EnumWellness.Draft;
     }
 }

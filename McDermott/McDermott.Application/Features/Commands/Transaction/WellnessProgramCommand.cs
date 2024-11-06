@@ -68,6 +68,11 @@ namespace McDermott.Application.Features.Commands.Transaction
 
         #region Update
 
+        public class CancelWellnessProgramRequest(WellnessProgramDto WellnessProgramDto) : IRequest<WellnessProgramDto>
+        {
+            public WellnessProgramDto WellnessProgramDto { get; set; } = WellnessProgramDto;
+        }
+
         public class UpdateWellnessProgramRequest(WellnessProgramDto WellnessProgramDto) : IRequest<WellnessProgramDto>
         {
             public WellnessProgramDto WellnessProgramDto { get; set; } = WellnessProgramDto;

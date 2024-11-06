@@ -229,6 +229,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         #region ANC
 
         #region Region
+
         #region ComboboxReference
 
         private DxComboBox<GeneralConsultanServiceAncDto, string> refReferenceComboBox { get; set; }
@@ -273,6 +274,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
             await LoadDataAnc();
         }
+
         private async Task OnInputReferenceChanged(string e)
         {
             ReferenceComboBoxIndex = 0;
@@ -289,8 +291,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             await LoadDataReference();
         }
 
-        private string? SelectedReference { get; set; } 
-        private List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncReferences{ get; set; } = [];
+        private string? SelectedReference { get; set; }
+        private List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncReferences { get; set; } = [];
 
         private async Task LoadDataReference(int pageIndex = 0, int pageSize = 10)
         {
@@ -301,7 +303,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 {
                     SearchTerm = refReferenceComboBox?.Text ?? "",
                     PageIndex = pageIndex,
-                    PageSize = pageSize, 
+                    PageSize = pageSize,
                     Predicate = x => x.PatientId == GeneralConsultanService.PatientId
                 });
                 //References = result.Item1.Select(z => z.Reference).ToList();
@@ -319,7 +321,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         #endregion ComboboxReference
 
-        #endregion
+        #endregion Region
 
         private IGrid GridAnc { get; set; }
         private IReadOnlyList<object> SelectedDataItemsAnc { get; set; } = [];
@@ -365,6 +367,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncs { get; set; } = [];
         private List<GeneralConsultanServiceAncDetailDto> GeneralConsultanServiceAncDetails { get; set; } = [];
+
         private async Task LoadDataAnc(int pageIndex = 0, int pageSizeGridAnc = 10)
         {
             try
@@ -421,6 +424,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private bool IsReadOnlyAncField { get; set; } = false;
         private bool IsReadOnlyAncFieldAdd { get; set; } = false;
+
         private void GridTabAnc_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedGridTabAncRowVisibleIndex = args.VisibleIndex;
@@ -440,7 +444,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 //var cekRef = References.FirstOrDefault(x => x == refReferenceComboBox.Text);
                 //if (cekRef is not null)
                 //    editModel.Reference = cekRef;
-                ////else 
+                ////else
                 ////    editModel.Reference= GeneralConsultanService.Reference;
 
                 if (editModel.Id == 0)
@@ -460,7 +464,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                     //GeneralConsultanServiceAncs = ab.Item1;
                     //totalCountGridAnc = ab.PageCount;
                     //var aa = GeneralConsultanServiceAncs.FirstOrDefault(x => SelectedReference != null && x.Reference == SelectedReference);
-                    //IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false; 
+                    //IsReadOnlyAncFieldAdd = aa?.IsReadOnly ?? false;
                 }
                 else
                 {
@@ -478,7 +482,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                         ReferenceAnc = GeneralConsultanServiceAnc.Reference
                     });
                 }
-
             }
             catch (Exception ex)
             {
@@ -516,7 +519,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             }
             finally { PanelVisible = false; }
         }
-        #endregion
+
+        #endregion ANC
 
         private void KeyPressHandler(KeyboardEventArgs args)
         {
@@ -682,29 +686,28 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                 if (result.Status == EnumStatusGeneralConsultantService.Midwife || result.Status == EnumStatusGeneralConsultantService.Finished)
                 {
-                    //var ph = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
-                    //{
-                    //    Predicate = x => x.Reference != null && x.Reference == GeneralConsultanService.ReferenceAnc
-                    //});
-                    //References = ph.Item1.Select(z => z.Reference).ToList();
-                    //References = References.Distinct().ToList();
-
-                    var ph = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
-                    {  
-                        Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc
-                    }); 
-                    GeneralConsultanServiceAncReferences = ph.Item1;
-
-                    GeneralConsultanServiceAnc = await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
+                    if (!string.IsNullOrWhiteSpace(GeneralConsultanService.ReferenceAnc))
                     {
-                        Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc
-                    });
+                        var ph = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                        {
+                            Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc
+                        });
+                        GeneralConsultanServiceAncReferences = ph.Item1;
 
-                    var ab = await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
-                    { 
-                        Predicate = x =>  x.GeneralConsultanServiceAncId == GeneralConsultanServiceAnc.Id,
-                    });
-                    GeneralConsultanServiceAncDetails = ab.Item1;
+                        GeneralConsultanServiceAnc = await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
+                        {
+                            Predicate = x => x.Reference == GeneralConsultanService.ReferenceAnc
+                        });
+
+                        if (GeneralConsultanServiceAnc != null)
+                        {
+                            var ab = await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
+                            {
+                                Predicate = x => x.GeneralConsultanServiceAncId == GeneralConsultanServiceAnc.Id,
+                            });
+                            GeneralConsultanServiceAncDetails = ab.Item1;
+                        }
+                    }
                 }
 
                 switch (GeneralConsultanService.Status)
@@ -1437,6 +1440,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         }
 
         private GeneralConsultanServiceAncDto GeneralConsultanServiceAnc { get; set; } = new();
+
         private async Task HandleValidSubmitAnc()
         {
             IsLoading = true;
@@ -1447,10 +1451,12 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 GeneralConsultanServiceAnc.PatientId = GeneralConsultanService.PatientId.GetValueOrDefault();
 
                 if (GeneralConsultanServiceAnc.Id == 0)
+                {
                     GeneralConsultanServiceAnc = await Mediator.Send(new CreateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAnc));
+                    await LoadDataReference();
+                }
                 else
                     GeneralConsultanServiceAnc = await Mediator.Send(new UpdateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAnc));
-
 
                 GeneralConsultanService.ReferenceAnc = GeneralConsultanServiceAnc.Reference;
 
@@ -1475,7 +1481,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private async Task LoadDataAncHeader()
         {
-
         }
 
         private async Task HandleValidSubmit()
@@ -1519,7 +1524,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                 if (!success2 || !success)
                     return;
-
 
                 if (!GeneralConsultanService.Payment!.Equals("Personal") && (GeneralConsultanService.InsurancePolicyId is null || GeneralConsultanService.InsurancePolicyId == 0))
                 {
@@ -2324,10 +2328,12 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         }
 
         private bool IsPopUpPainScale = false;
+
         private void OnClickPainScalePopUp()
         {
             IsPopUpPainScale = true;
         }
+
         private void OnClosePopup()
         {
             IsPopUpPainScale = false;

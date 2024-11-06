@@ -154,6 +154,7 @@ namespace McDermott.Persistence.Context
         #region MyRegion
 
         public DbSet<WellnessProgram> WellnessPrograms { get; set; }
+        public DbSet<WellnessProgramDetail> WellnessProgramDetails { get; set; }
         public DbSet<WellnessProgramAttendance> WellnessProgramAttendances { get; set; }
         public DbSet<WellnessProgramSession> WellnessProgramSessions { get; set; }
         public DbSet<GeneralConsultationServiceLog> GeneralConsultationServiceLogs { get; set; }
