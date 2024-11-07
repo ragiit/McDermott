@@ -224,6 +224,9 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 if (QuillHtml != null)
                     WellnessProgram.Content = await QuillHtml.GetContent();
 
+                if (WellnessProgram.EndDate is not null)
+                    WellnessProgram.EndDate = WellnessProgram.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+
                 if (WellnessProgram.Id == 0)
                 {
                     var ye = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));

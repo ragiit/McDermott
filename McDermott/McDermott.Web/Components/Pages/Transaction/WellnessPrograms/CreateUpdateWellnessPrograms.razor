@@ -42,21 +42,21 @@
                                             <div class="row w-100 justify-content-end mt-2 mb-2">
 
                                                 @if (WellnessProgram.Id != 0)
-                                                { 
-                                                <div class="col-auto pe-0 ">
-                                                    <DxButton Enabled="!IsLoading"
-                                                              IconCssClass="fa-solid fa-check"
-                                                              Text="@StagingText.GetDisplayName()"
-                                                              Click="ClickConfirm"
-                                                              RenderStyle="ButtonRenderStyle.Primary">
-                                                    </DxButton>
-                                                    <DxButton Enabled="!IsLoading"
-                                                              IconCssClass="fa-solid fa-xmark"
-                                                              Text="Inactive"
-                                                              Click="OnCancelStatus"
-                                                              RenderStyle="ButtonRenderStyle.Danger">
-                                                    </DxButton>
-                                                </div>
+                                                {
+                                                    <div class="col-auto pe-0 ">
+                                                        <DxButton Enabled="!IsLoading"
+                                                                  IconCssClass="fa-solid fa-check"
+                                                                  Text="@StagingText.GetDisplayName()"
+                                                                  Click="ClickConfirm"
+                                                                  RenderStyle="ButtonRenderStyle.Primary">
+                                                        </DxButton>
+                                                        <DxButton Enabled="!IsLoading"
+                                                                  IconCssClass="fa-solid fa-xmark"
+                                                                  Text="Inactive"
+                                                                  Click="OnCancelStatus"
+                                                                  RenderStyle="ButtonRenderStyle.Danger">
+                                                        </DxButton>
+                                                    </div>
                                                 }
 
                                                 <div class="col-sm align-self-end">
@@ -108,11 +108,13 @@
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Date" ColSpanMd="12">
                                                 <DxDateEdit @bind-Date="@WellnessProgram.StartDate"
+                                                            DisplayFormat="@Helper.DefaultFormatDate"
                                                             Enabled="EnableForm" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Date" ColSpanMd="12">
                                                 <DxDateEdit @bind-Date="@WellnessProgram.EndDate"
+                                                            DisplayFormat="@Helper.DefaultFormatDate"
                                                             Enabled="EnableForm" />
                                             </DxFormLayoutItem>
 
@@ -227,8 +229,8 @@
                                                                         <Columns>
                                                                             <DxGridSelectionColumn Width="15px" />
                                                                             <DxGridDataColumn FieldName="Name" Caption="Name" />
-                                                                            <DxGridDataColumn FieldName="StartDate" Caption="Start Time" />
-                                                                            <DxGridDataColumn FieldName="EndDate" Caption="End Time" />
+                                                                            <DxGridDataColumn FieldName="StartDate" Caption="Start Time" DisplayFormat="@Helper.DefaultFormatDateTime"/>
+                                                                            <DxGridDataColumn FieldName="EndDate" Caption="End Time" DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                             <DxGridDataColumn FieldName="Notes" />
                                                                             <DxGridDataColumn FieldName="Slug" />
                                                                             @if (IsStatus(EnumWellness.Active))
@@ -251,11 +253,13 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Start Time" ColSpanMd="12">
-                                                                                    <DxDateEdit @bind-Date="@a.StartDate" TimeSectionVisible="true" />
+                                                                                    <DxDateEdit @bind-Date="@a.StartDate" TimeSectionVisible="true"
+                                                                                                DisplayFormat="@Helper.DefaultFormatDate" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Time" ColSpanMd="12">
-                                                                                    <DxDateEdit @bind-Date="@a.EndDate" TimeSectionVisible="true" />
+                                                                                    <DxDateEdit @bind-Date="@a.EndDate" TimeSectionVisible="true"
+                                                                                                DisplayFormat="@Helper.DefaultFormatDate" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Notes" ColSpanMd="12">
