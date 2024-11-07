@@ -279,6 +279,10 @@ namespace McDermott.Web.Extentions
             "configuration/sub-districts",
             "configuration/religions",
             "configuration/occupationals",
+
+            //AwarenessEvent
+            "awareness-event/awareness-edu-category",
+            "awereness-event/education-program"
         ];
 
         public class HomeStatusTemp

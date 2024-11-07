@@ -1,0 +1,102 @@
+﻿@page "/awereness-event/education-program/{PageMode}"
+@using McDermott.Web.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Education Program</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Education Program" OnClickBack="@(async () => NavigationManager.NavigateTo("awereness-event/education-program"))" ShowBackButton="true" />
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+
+                        <EditForm Model="postEducationPrograms" Context="EditFormContext" onkeypress="KeyPressHandler" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+                            <DataAnnotationsValidator />
+                            <AntiforgeryToken />
+                            @if (postEducationPrograms.Id != 0)
+                            {
+                                <div class="row justify-content-end mb-3">
+                                    <div class="col-auto align-self-end">
+                                        <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                            <DxTab Text="Draft" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Draft)"></DxTab>
+                                            <DxTab Text="Active" style="background-color:green" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Active)"></DxTab>
+                                            <DxTab Text="Inactive" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.InActive)"></DxTab>
+                                            <DxTab Text="Done" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Done)"></DxTab>
+                                            <DxTab Text="Cancel" style="background-color:red" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Cancel)"></DxTab>
+                                        </DxTabs>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (postEducationPrograms.Status != EnumStatusEducationProgram.Done)
+                            {
+                                <div class="sticky">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row justify-content-between">
+                                                <div class="col-auto align-self-start">
+                                                    @if (postEducationPrograms.Id != 0)
+                                                    {
+                                                        <DxButton Text="Active" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
+                                                        <DxButton Text="InActive" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.InActive)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                                                        <DxButton Text="Done" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onDone"></DxButton>
+                                                        <DxButton Text="Cancel" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Cancel)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
+                                                    }
+                                                </div>
+                                                <div class="col-auto align-self-start">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@(postEducationPrograms.Id == 0 ||  postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Visible="@(postEducationPrograms.Id == 0 || postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="row">
+                                <!-- Kolom Kiri -->
+                                <div class="col-md-6">
+                                    <!-- EventName -->
+                                    <DxFormLayoutItem Caption="Event Name">
+                                        <DxTextBox @bind-Text="postEducationPrograms.EventName" Width="100%" />
+                                    </DxFormLayoutItem>
+
+                                    <!-- Start Date -->
+                                    <DxFormLayoutItem Caption="Start Date">
+                                        <DxDateEdit @bind-Date="postEducationPrograms.StartDate" Width="100%" />
+                                    </DxFormLayoutItem>
+                                </div>
+
+                                <!-- Kolom Kanan -->
+                                <div class="col-md-6">
+                                    <!-- EventCategory -->
+                                    <DxFormLayoutItem Caption="Event Category">
+                                        <DxComboBox Data="@getAwarenessEduCategories" TextField="Name" ValueField="Id" @bind-Value="postEducationPrograms.EventCategoryId" Width="100%" />
+                                    </DxFormLayoutItem>
+
+                                    <!-- End Date -->
+                                    <DxFormLayoutItem Caption="End Date">
+                                        <DxDateEdit @bind-Date="postEducationPrograms.EndDate" Width="100%" />
+                                    </DxFormLayoutItem>
+                                </div>
+                            </div>
+
+                            <!-- Konten Content dengan lebar penuh -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <DxFormLayoutItem Caption="Content">
+                                        @* <DxHtmlEditor @bind-Value="postEducationPrograms.HTMLContent" Width="100%" Height="300px" /> *@
+                                    </DxFormLayoutItem>
+                                </div>
+                            </div>
+
+                        </EditForm>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}

@@ -271,8 +271,8 @@ namespace McDermott.Application.Extentions
 
         public enum EnumStatusEducationProgram
         {
-            [Display(Name = "Draf")]
-            Draf = 0,
+            [Display(Name = "Draft")]
+            Draft = 0,
 
             [Display(Name = "Active")]
             Active = 1,
@@ -280,8 +280,11 @@ namespace McDermott.Application.Extentions
             [Display(Name = "InActive")]
             InActive = 2,
             
-            [Display(Name = "Complete")]
-            Complete = 2,
+            [Display(Name = "Done")]
+            Done = 3,
+            
+            [Display(Name = "Cancel")]
+            Cancel = 4,
         }
     }
 }

@@ -151,7 +151,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     using ExcelPackage package = new(ms);
                     ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
 
-                    var headerNames = new List<string>() { "Name", "Code", };
+                    var headerNames = new List<string>() { "Name" };
 
                     if (Enumerable.Range(1, ws.Dimension.End.Column)
                         .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))

@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Antiforgery;
 using McDermott.Web;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -266,10 +268,22 @@ using (var scope = app.Services.CreateScope())
     try
     {
         Log.Information("=== ===");
-        Log.Information("=== Starting Migrate the database. ===");
+        Log.Information("=== Starting migration check for the database. ===");
+
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
-        Console.WriteLine("=== Success Migrated ===");
+        var databaseCreator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
+
+        // Cek jika database sudah ada dan tabel utama sudah ada
+        if (await databaseCreator.ExistsAsync() && await databaseCreator.HasTablesAsync())
+        {
+            Log.Information("=== Database and tables already exist, skipping migration. ===");
+        }
+        else
+        {
+            Log.Information("=== Applying Migrations ===");
+            await context.Database.MigrateAsync();
+            Console.WriteLine("=== Success Migrated ===");
+        }
 
         Console.WriteLine("=== Starting Seeding the data. ===");
         await new SeedData().Initialize(services);
@@ -287,6 +301,7 @@ using (var scope = app.Services.CreateScope())
     {
         Log.Information("=== ===");
     }
+
 }
 
 //app.UseMiddleware<RequestTimeoutMiddleware>();

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class initialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,23 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Allergies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AwarenessEduCategories",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AwarenessEduCategories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -263,36 +280,6 @@ namespace McDermott.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FormDrugs", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GeneralConsultanServiceAncs",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Trimester = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Complaint = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    KU = table.Column<int>(type: "int", nullable: false),
-                    TD = table.Column<int>(type: "int", nullable: false),
-                    Suhu = table.Column<int>(type: "int", nullable: false),
-                    BB = table.Column<int>(type: "int", nullable: false),
-                    UK = table.Column<int>(type: "int", nullable: false),
-                    TFU = table.Column<int>(type: "int", nullable: false),
-                    FetusPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DJJ = table.Column<int>(type: "int", nullable: false),
-                    TT = table.Column<int>(type: "int", nullable: false),
-                    InspectionInitials = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GeneralConsultanServiceAncs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -659,6 +646,39 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EducationPrograms",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EventCategoryId = table.Column<long>(type: "bigint", nullable: true),
+                    HTMLContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HTMLMaterial = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EventLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MaterialContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Attendance = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EducationPrograms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EducationPrograms_AwarenessEduCategories_EventCategoryId",
+                        column: x => x.EventCategoryId,
+                        principalTable: "AwarenessEduCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Provinces",
                 columns: table => new
                 {
@@ -856,6 +876,38 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WellnessPrograms",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DiagnosisId = table.Column<long>(type: "bigint", nullable: false),
+                    ProgramName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SelectedDiagnoses = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SeverityLevel = table.Column<int>(type: "int", nullable: false),
+                    ProgramContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    HasSpecialSessions = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WellnessPrograms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WellnessPrograms_Diagnoses_DiagnosisId",
+                        column: x => x.DiagnosisId,
+                        principalTable: "Diagnoses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LabTestDetails",
                 columns: table => new
                 {
@@ -1011,6 +1063,35 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_HealthCenters_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WellnessProgramSessions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Time = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Day = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WellnessProgramSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WellnessProgramSessions_WellnessPrograms_WellnessProgramId",
+                        column: x => x.WellnessProgramId,
+                        principalTable: "WellnessPrograms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2468,10 +2549,9 @@ namespace McDermott.Persistence.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    InventoryAdjustmentId = table.Column<long>(type: "bigint", nullable: true),
+                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: true),
                     UserById = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    InventoryAdjusmentId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2625,6 +2705,36 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ParticipanEdus",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PatientId = table.Column<long>(type: "bigint", nullable: true),
+                    EducationProgramId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ParticipanEdus", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ParticipanEdus_EducationPrograms_EducationProgramId",
+                        column: x => x.EducationProgramId,
+                        principalTable: "EducationPrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ParticipanEdus_Users_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PatientAllergies",
                 columns: table => new
                 {
@@ -2731,6 +2841,39 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_TransferStockLogs_Users_UserById",
                         column: x => x.UserById,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WellnessProgramAttendances",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
+                    PatientId = table.Column<long>(type: "bigint", nullable: false),
+                    AttendanceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AttendanceStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WellnessProgramAttendances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WellnessProgramAttendances_Users_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WellnessProgramAttendances_WellnessPrograms_WellnessProgramId",
+                        column: x => x.WellnessProgramId,
+                        principalTable: "WellnessPrograms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2981,6 +3124,7 @@ namespace McDermott.Persistence.Migrations
                     PratitionerId = table.Column<long>(type: "bigint", nullable: true),
                     ClassType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Reference = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReferenceAnc = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Method = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AdmissionQueue = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Payment = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2996,6 +3140,7 @@ namespace McDermott.Persistence.Migrations
                     StartMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndMaternityLeave = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PatientNextVisitSchedule = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsGC = table.Column<bool>(type: "bit", nullable: false),
                     IsMaternity = table.Column<bool>(type: "bit", nullable: false),
                     AppointmentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -3439,6 +3584,43 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GeneralConsultanServiceAncs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultanServiceId = table.Column<long>(type: "bigint", nullable: false),
+                    PatientId = table.Column<long>(type: "bigint", nullable: false),
+                    Reference = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PregnancyStatusG = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PregnancyStatusP = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PregnancyStatusA = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HPHT = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HPL = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LILA = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultanServiceAncs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanServiceAncs_GeneralConsultanServices_GeneralConsultanServiceId",
+                        column: x => x.GeneralConsultanServiceId,
+                        principalTable: "GeneralConsultanServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanServiceAncs_Users_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GeneralConsultantClinicalAssesments",
                 columns: table => new
                 {
@@ -3485,6 +3667,37 @@ namespace McDermott.Persistence.Migrations
                         principalTable: "GeneralConsultanServices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GeneralConsultationServiceLogs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultanServiceId = table.Column<long>(type: "bigint", nullable: true),
+                    UserById = table.Column<long>(type: "bigint", nullable: true),
+                    status = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultationServiceLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultationServiceLogs_GeneralConsultanServices_GeneralConsultanServiceId",
+                        column: x => x.GeneralConsultanServiceId,
+                        principalTable: "GeneralConsultanServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultationServiceLogs_Users_UserById",
+                        column: x => x.UserById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -3622,10 +3835,9 @@ namespace McDermott.Persistence.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GeneralConsultationMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
+                    GeneralConsultanMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
                     UserById = table.Column<long>(type: "bigint", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    GeneralConsultanMedicalSupportId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -3718,6 +3930,43 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_LabResultDetails_LabUoms_LabUomId",
                         column: x => x.LabUomId,
                         principalTable: "LabUoms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GeneralConsultanServiceAncDetails",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralConsultanServiceAncId = table.Column<long>(type: "bigint", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Trimester = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Complaint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    KU = table.Column<int>(type: "int", nullable: false),
+                    TD = table.Column<int>(type: "int", nullable: false),
+                    Suhu = table.Column<int>(type: "int", nullable: false),
+                    BB = table.Column<int>(type: "int", nullable: false),
+                    UK = table.Column<int>(type: "int", nullable: false),
+                    TFU = table.Column<int>(type: "int", nullable: false),
+                    FetusPosition = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DJJ = table.Column<int>(type: "int", nullable: false),
+                    TT = table.Column<int>(type: "int", nullable: false),
+                    InspectionInitials = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsReadOnly = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralConsultanServiceAncDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GeneralConsultanServiceAncDetails_GeneralConsultanServiceAncs_GeneralConsultanServiceAncId",
+                        column: x => x.GeneralConsultanServiceAncId,
+                        principalTable: "GeneralConsultanServiceAncs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -3963,6 +4212,11 @@ namespace McDermott.Persistence.Migrations
                 column: "DrugRouteId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EducationPrograms_EventCategoryId",
+                table: "EducationPrograms",
+                column: "EventCategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmailTemplates_ById",
                 table: "EmailTemplates",
                 column: "ById");
@@ -4053,6 +4307,21 @@ namespace McDermott.Persistence.Migrations
                 column: "PractitionerRadiologyEximinationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServiceAncDetails_GeneralConsultanServiceAncId",
+                table: "GeneralConsultanServiceAncDetails",
+                column: "GeneralConsultanServiceAncId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServiceAncs_GeneralConsultanServiceId",
+                table: "GeneralConsultanServiceAncs",
+                column: "GeneralConsultanServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultanServiceAncs_PatientId",
+                table: "GeneralConsultanServiceAncs",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GeneralConsultanServiceLogs_GeneralConsultanServiceId",
                 table: "GeneralConsultanServiceLogs",
                 column: "GeneralConsultanServiceId");
@@ -4116,6 +4385,16 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_GeneralConsultantClinicalAssesments_GeneralConsultanServiceId",
                 table: "GeneralConsultantClinicalAssesments",
                 column: "GeneralConsultanServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultationServiceLogs_GeneralConsultanServiceId",
+                table: "GeneralConsultationServiceLogs",
+                column: "GeneralConsultanServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GeneralConsultationServiceLogs_UserById",
+                table: "GeneralConsultationServiceLogs",
+                column: "UserById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GoodsReceiptDetails_GoodsReceiptId",
@@ -4433,6 +4712,16 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_Menus_ParentId",
                 table: "Menus",
                 column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ParticipanEdus_EducationProgramId",
+                table: "ParticipanEdus",
+                column: "EducationProgramId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ParticipanEdus_PatientId",
+                table: "ParticipanEdus",
+                column: "PatientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PatientAllergies_UserId",
@@ -4870,6 +5159,26 @@ namespace McDermott.Persistence.Migrations
                 table: "Villages",
                 column: "ProvinceId");
 
+            migrationBuilder.CreateIndex(
+                name: "IX_WellnessProgramAttendances_PatientId",
+                table: "WellnessProgramAttendances",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WellnessProgramAttendances_WellnessProgramId",
+                table: "WellnessProgramAttendances",
+                column: "WellnessProgramId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WellnessPrograms_DiagnosisId",
+                table: "WellnessPrograms",
+                column: "DiagnosisId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WellnessProgramSessions_WellnessProgramId",
+                table: "WellnessProgramSessions",
+                column: "WellnessProgramId");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_Accidents_Departments_DepartmentId",
                 table: "Accidents",
@@ -5061,13 +5370,16 @@ namespace McDermott.Persistence.Migrations
                 name: "GeneralConsultanMedicalSupportLogs");
 
             migrationBuilder.DropTable(
-                name: "GeneralConsultanServiceAncs");
+                name: "GeneralConsultanServiceAncDetails");
 
             migrationBuilder.DropTable(
                 name: "GeneralConsultanServiceLogs");
 
             migrationBuilder.DropTable(
                 name: "GeneralConsultantClinicalAssesments");
+
+            migrationBuilder.DropTable(
+                name: "GeneralConsultationServiceLogs");
 
             migrationBuilder.DropTable(
                 name: "GoodsReceiptDetails");
@@ -5095,6 +5407,9 @@ namespace McDermott.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "MaintenanceRecords");
+
+            migrationBuilder.DropTable(
+                name: "ParticipanEdus");
 
             migrationBuilder.DropTable(
                 name: "PatientAllergies");
@@ -5133,6 +5448,12 @@ namespace McDermott.Persistence.Migrations
                 name: "VaccinationPlans");
 
             migrationBuilder.DropTable(
+                name: "WellnessProgramAttendances");
+
+            migrationBuilder.DropTable(
+                name: "WellnessProgramSessions");
+
+            migrationBuilder.DropTable(
                 name: "ActiveComponents");
 
             migrationBuilder.DropTable(
@@ -5148,10 +5469,10 @@ namespace McDermott.Persistence.Migrations
                 name: "DoctorSchedules");
 
             migrationBuilder.DropTable(
-                name: "Diagnoses");
+                name: "NursingDiagnoses");
 
             migrationBuilder.DropTable(
-                name: "NursingDiagnoses");
+                name: "GeneralConsultanServiceAncs");
 
             migrationBuilder.DropTable(
                 name: "GoodsReceipts");
@@ -5169,6 +5490,9 @@ namespace McDermott.Persistence.Migrations
                 name: "Maintenances");
 
             migrationBuilder.DropTable(
+                name: "EducationPrograms");
+
+            migrationBuilder.DropTable(
                 name: "Families");
 
             migrationBuilder.DropTable(
@@ -5176,6 +5500,9 @@ namespace McDermott.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "TransferStocks");
+
+            migrationBuilder.DropTable(
+                name: "WellnessPrograms");
 
             migrationBuilder.DropTable(
                 name: "ConcoctionLines");
@@ -5190,19 +5517,19 @@ namespace McDermott.Persistence.Migrations
                 name: "HealthCenters");
 
             migrationBuilder.DropTable(
-                name: "CronisCategories");
-
-            migrationBuilder.DropTable(
-                name: "DiseaseCategories");
-
-            migrationBuilder.DropTable(
                 name: "GeneralConsultanServices");
 
             migrationBuilder.DropTable(
                 name: "LabTestDetails");
 
             migrationBuilder.DropTable(
+                name: "AwarenessEduCategories");
+
+            migrationBuilder.DropTable(
                 name: "StockProducts");
+
+            migrationBuilder.DropTable(
+                name: "Diagnoses");
 
             migrationBuilder.DropTable(
                 name: "Concoctions");
@@ -5230,6 +5557,12 @@ namespace McDermott.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "CronisCategories");
+
+            migrationBuilder.DropTable(
+                name: "DiseaseCategories");
 
             migrationBuilder.DropTable(
                 name: "DrugDosages");

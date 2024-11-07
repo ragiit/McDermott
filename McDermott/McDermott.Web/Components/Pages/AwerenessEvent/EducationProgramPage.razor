@@ -1,4 +1,5 @@
-﻿@page "/awerenessEvent/Educationpage/"
+﻿ @page "/awereness-event/education-program/"
+@using McDermott.Application.Dtos.AwarenessEvent
 @rendermode InteractiveServer
 
 @if (IsAccess)
@@ -10,7 +11,47 @@
                     <div class="col">
                         <div class="card">
                             <div class="card-body">
+                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
+                                    <MyGrid @ref="Grid"
+                                            Data="getEducationPrograms"
+                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                            DataItemDeleting="OnDelete"
+                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                            KeyFieldName="Id">
 
+                                        <ToolbarTemplate>
+                                            <MyDxToolbarBase TItem="EducationProgramDto"
+                                                             Items="@getEducationPrograms"
+                                                             Grid="Grid"
+                                                             SelectedDataItems="@SelectedDataItems"
+                                                             NewItem_Click="@NewItem_Click"
+                                                             EditItem_Click="@(async () => await EditItem_Click())"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             Refresh_Click="@Refresh_Click"                                                            
+                                                             IsImport="false"
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
+
+                                        </ToolbarTemplate>
+
+                                        <Columns>
+                                            <DxGridSelectionColumn Width="15px" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EventName" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EventCategory.name" Caption="Category"  />
+                                            <DxGridDataColumn MinWidth="200" FieldName="StartDate" Caption="Start Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EndDate" Caption="End date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EventLink" Caption="Link Join" />
+                                        </Columns>
+                                        
+                                    </MyGrid>
+
+                                </DxLoadingPanel>
                             </div>
                         </div>
                     </div>
