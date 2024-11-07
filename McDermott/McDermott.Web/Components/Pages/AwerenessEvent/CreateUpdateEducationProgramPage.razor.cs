@@ -136,7 +136,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         #region ComboBox Category
 
-        private DxComboBox<LocationDto, long?> refCategoryComboBox { get; set; }
+        private DxComboBox<AwarenessEduCategoryDto, long?> refCategoryComboBox { get; set; }
         private int CategoryComboBoxIndex { get; set; } = 0;
         private int totalCountCategory = 0;
 
@@ -178,6 +178,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 PageIndex = pageIndex,
                 PageSize = pageSize,
                 SearchTerm = refCategoryComboBox?.Text ?? "",
+                Select = x => new AwarenessEduCategory
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                }
 
             });
 
