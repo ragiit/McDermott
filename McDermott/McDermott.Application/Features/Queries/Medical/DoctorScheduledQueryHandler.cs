@@ -238,8 +238,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<DoctorSchedule>().UpdateAsync(request.DoctorScheduleDto.Adapt<DoctorScheduleDto>().Adapt<DoctorSchedule>());
-
+                var result = await _unitOfWork.Repository<DoctorSchedule>().UpdateAsync(request.DoctorScheduleDto.Adapt<CreateUpdateDoctorScheduleDto>().Adapt<DoctorSchedule>());
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _cache.Remove("GetDoctorScheduleQuery_"); // Ganti dengan key yang sesuai

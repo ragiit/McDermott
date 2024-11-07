@@ -1,7 +1,7 @@
 ﻿using Aspose.Words.Saving;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
-using McDermott.Domain.Entities; 
+using McDermott.Domain.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
@@ -245,9 +245,22 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
             try
             {
                 PanelVisible = true;
+
+                var physicianSLotIds = (await Mediator.Send(new GetDoctorScheduledQuery
+                {
+                    Select = x => new DoctorSchedule
+                    {
+                        PhysicionId = x.PhysicionId,
+                    },
+                    IsGetAll = true
+                })).Item1;
+
+                var ids = physicianSLotIds.Select(x => x.PhysicionId).ToList();
+                ids = ids.Distinct().ToList();
+
                 var result = await Mediator.Send(new GetUserQueryNew
                 {
-                    Predicate = x => x.IsDoctor == true && x.IsPhysicion == true,
+                    Predicate = x => x.IsDoctor == true && x.IsPhysicion == true && ids.Contains(x.Id),
                     SearchTerm = refUserComboBox?.Text ?? "",
                     PageIndex = pageIndex,
                     PageSize = pageSize,
@@ -373,7 +386,7 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
                                 WorkFrom = d.WorkFrom,
                                 WorkTo = d.WorkTo,
                                 Quota = d.Quota,
-                                ServiceId = d.ServiceId,
+                                ServiceId = d.ServiceId.GetValueOrDefault(),
                                 StartDate = date,
                             });
                         }

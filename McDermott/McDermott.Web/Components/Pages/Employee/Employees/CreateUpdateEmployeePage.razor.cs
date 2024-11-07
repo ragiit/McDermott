@@ -128,8 +128,13 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id == 0 ? null : Group.Id);
-            var result = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id, pageIndex, pageSize, searchTerm));
+            var result = await Mediator.Send(new GetGroupMenuQuery
+            {
+                SearchTerm = searchTerm ?? "",
+                Predicate = x => x.GroupId == Group.Id,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             GroupMenus = result.Item1;
             totalCount = result.Item4;
             var aa = GroupMenus.Where(x => x.MenuId == 66).ToList();
@@ -837,28 +842,28 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         long? menuId = null;
                         if (!string.IsNullOrEmpty(parentName))
                         {
-                            var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
-                            if (cachedParent is null)
-                            {
-                                var parentMenu = (await Mediator.Send(new GetMenuQuery(
-                                    x => x.Parent != null && x.Parent.Name == parentName,
-                                    searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+                            //var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
+                            //if (cachedParent is null)
+                            //{
+                            //    var parentMenu = (await Mediator.Send(new GetMenuQuery(
+                            //        x => x.Parent != null && x.Parent.Name == parentName,
+                            //        searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
 
-                                if (parentMenu is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
-                                }
-                                else
-                                {
-                                    menuId = parentMenu.Id;
-                                    parentCache.Add(parentMenu);
-                                }
-                            }
-                            else
-                            {
-                                menuId = cachedParent.Id;
-                            }
+                            //    if (parentMenu is null)
+                            //    {
+                            //        isValid = false;
+                            //        ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
+                            //    }
+                            //    else
+                            //    {
+                            //        menuId = parentMenu.Id;
+                            //        parentCache.Add(parentMenu);
+                            //    }
+                            //}
+                            //else
+                            //{
+                            //    menuId = cachedParent.Id;
+                            //}
                         }
 
                         if (!isValid)

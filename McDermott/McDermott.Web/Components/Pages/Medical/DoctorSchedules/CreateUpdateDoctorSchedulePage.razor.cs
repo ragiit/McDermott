@@ -161,10 +161,26 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
             {
                 PanelVisible = true;
 
+                var check = await Mediator.Send(new ValidateDoctorScheduledQuery(x => x.Id != DoctorSchedule.Id && x.PhysicionId == DoctorSchedule.PhysicionId));
+                if (check)
+                {
+                    ToastService.ShowWarning("The physician already has a schedules.");
+                    return;
+                }
+
+                var d = new DoctorScheduleDto();
                 if (DoctorSchedule.Id == 0)
-                    DoctorSchedule = await Mediator.Send(new CreateDoctorScheduledRequest(DoctorSchedule));
+                    d = await Mediator.Send(new CreateDoctorScheduledRequest(DoctorSchedule));
                 else
-                    await Mediator.Send(new UpdateDoctorScheduledRequest(DoctorSchedule));
+                    d = await Mediator.Send(new UpdateDoctorScheduledRequest(DoctorSchedule));
+
+                var result = await Mediator.Send(new GetSingleDoctorScheduledQuery
+                {
+                    Predicate = x => x.Id == d.Id
+                });
+
+                DoctorSchedule = result;
+                Id = DoctorSchedule.Id;
 
                 NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={DoctorSchedule.Id}");
             }
@@ -356,7 +372,7 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
 
         #region ComboboxService
 
-        private DxComboBox<ServiceDto, long> refServiceComboBox { get; set; }
+        private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
         private int ServiceComboBoxIndex { get; set; } = 0;
         private int totalCountService = 0;
 

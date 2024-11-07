@@ -6,7 +6,7 @@ using GreenDonut;
 using HotChocolate.Utilities;
 using Humanizer;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities; 
+using McDermott.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
@@ -139,8 +139,13 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id == 0 ? null : Group.Id);
-            var result = await Mediator.Send(new GetGroupMenuQuery(x => x.GroupId == Group.Id, pageIndex, pageSize, searchTerm));
+            var result = await Mediator.Send(new GetGroupMenuQuery
+            {
+                SearchTerm = searchTerm ?? "",
+                Predicate = x => x.GroupId == Group.Id,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             GroupMenus = result.Item1;
             totalCount = result.Item4;
             var aa = GroupMenus.Where(x => x.MenuId == 66).ToList();
@@ -185,7 +190,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
             Districts = (await Mediator.Send(new GetDistrictQuery
             {
                 Predicate = x => x.Id == UserForm.IdCardDistrictId,
-            })).Item1; Villages = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.IdCardVillageId)).Item1;
+            })).Item1;
+            Villages = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.IdCardVillageId)).Item1;
 
             #endregion KTP Address
 
@@ -211,7 +217,10 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             #endregion Residence  Address
 
-            Groups = (await Mediator.QueryGetHelper<Group, GroupDto>(predicate: x => x.Id == UserForm.GroupId)).Item1;
+            Groups = (await Mediator.Send(new GetGroupQuery
+            {
+                Predicate = x => x.Id == UserForm.GroupId
+            })).Item1;
             Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId,
             select: x => new User
             {
@@ -896,20 +905,20 @@ namespace McDermott.Web.Components.Pages.Config.Users
                             var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
                             if (cachedParent is null)
                             {
-                                var parentMenu = (await Mediator.Send(new GetMenuQuery(
-                                    x => x.Parent != null && x.Parent.Name == parentName,
-                                    searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
+                                //var parentMenu = (await Mediator.Send(new GetMenuQuery(
+                                //    x => x.Parent != null && x.Parent.Name == parentName,
+                                //    searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
 
-                                if (parentMenu is null)
-                                {
-                                    isValid = false;
-                                    ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
-                                }
-                                else
-                                {
-                                    menuId = parentMenu.Id;
-                                    parentCache.Add(parentMenu);
-                                }
+                                //if (parentMenu is null)
+                                //{
+                                //    isValid = false;
+                                //    ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
+                                //}
+                                //else
+                                //{
+                                //    menuId = parentMenu.Id;
+                                //    parentCache.Add(parentMenu);
+                                //}
                             }
                             else
                             {
@@ -1170,10 +1179,15 @@ namespace McDermott.Web.Components.Pages.Config.Users
         private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Group, GroupDto>(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refGroupComboBox?.Text ?? "");
+            var result = (await Mediator.Send(new GetGroupQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refGroupComboBox?.Text ?? ""
+            }));
             //var result = await Mediator.Send(new GetGroupQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refGroupComboBox?.Text ?? ""));
             Groups = result.Item1;
-            totalCountGroup = result.pageCount;
+            totalCountGroup = result.PageCount;
             PanelVisible = false;
         }
 

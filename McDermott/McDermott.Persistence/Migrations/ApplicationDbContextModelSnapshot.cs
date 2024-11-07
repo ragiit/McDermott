@@ -1618,6 +1618,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("MaterialContent")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -6324,33 +6327,21 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DiagnosisId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("HasSpecialSessions")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProgramContent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProgramName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SelectedDiagnoses")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SeverityLevel")
-                        .HasColumnType("int");
 
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
@@ -6369,8 +6360,6 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DiagnosisId");
-
                     b.ToTable("WellnessPrograms");
                 });
 
@@ -6383,19 +6372,104 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("AttendanceDate")
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("AttendanceStatus")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("PatientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Comments")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("WellnessProgramDetailId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WellnessProgramId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("WellnessProgramDetailId");
+
+                    b.HasIndex("WellnessProgramId");
+
+                    b.ToTable("WellnessProgramAttendances");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("WellnessProgramId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WellnessProgramId");
+
+                    b.ToTable("WellnessProgramDetails");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramParticipant", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<long>("PatientId")
@@ -6416,7 +6490,7 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("WellnessProgramId");
 
-                    b.ToTable("WellnessProgramAttendances");
+                    b.ToTable("wellnessProgramParticipants");
                 });
 
             modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramSession", b =>
@@ -8278,18 +8352,45 @@ namespace McDermott.Persistence.Migrations
                     b.Navigation("Province");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgram", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramAttendance", b =>
                 {
-                    b.HasOne("McDermott.Domain.Entities.Diagnosis", "Diagnosis")
+                    b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
-                        .HasForeignKey("DiagnosisId")
+                        .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Diagnosis");
+                    b.HasOne("McDermott.Domain.Entities.WellnessProgramDetail", "WellnessProgramDetail")
+                        .WithMany()
+                        .HasForeignKey("WellnessProgramDetailId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("McDermott.Domain.Entities.WellnessProgram", "WellnessProgram")
+                        .WithMany()
+                        .HasForeignKey("WellnessProgramId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("WellnessProgram");
+
+                    b.Navigation("WellnessProgramDetail");
                 });
 
-            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramAttendance", b =>
+            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramDetail", b =>
+                {
+                    b.HasOne("McDermott.Domain.Entities.WellnessProgram", "WellnessProgram")
+                        .WithMany("WellnessProgramDetails")
+                        .HasForeignKey("WellnessProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WellnessProgram");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgramParticipant", b =>
                 {
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
@@ -8537,6 +8638,11 @@ namespace McDermott.Persistence.Migrations
             modelBuilder.Entity("McDermott.Domain.Entities.User", b =>
                 {
                     b.Navigation("PatientAllergies");
+                });
+
+            modelBuilder.Entity("McDermott.Domain.Entities.WellnessProgram", b =>
+                {
+                    b.Navigation("WellnessProgramDetails");
                 });
 #pragma warning restore 612, 618
         }

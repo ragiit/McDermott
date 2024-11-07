@@ -4,16 +4,34 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetMenuQuery(Expression<Func<Menu, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Menu, object>>>? includes = null, Expression<Func<Menu, Menu>>? select = null) : IRequest<(List<MenuDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleMenuQuery : IRequest<MenuDto>
         {
-            public Expression<Func<Menu, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Menu, object>>> Includes { get; set; }
+            public Expression<Func<Menu, bool>> Predicate { get; set; }
+            public Expression<Func<Menu, Menu>> Select { get; set; }
 
-            public List<Expression<Func<Menu, object>>> Includes { get; } = includes!;
-            public Expression<Func<Menu, Menu>>? Select { get; } = select!;
+            public List<(Expression<Func<Menu, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetMenuQuery : IRequest<(List<MenuDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Menu, object>>> Includes { get; set; }
+            public Expression<Func<Menu, bool>> Predicate { get; set; }
+            public Expression<Func<Menu, Menu>> Select { get; set; }
+
+            public List<(Expression<Func<Menu, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateMenuQuery(List<MenuDto> MenusToValidate) : IRequest<List<MenuDto>>

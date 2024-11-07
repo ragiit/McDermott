@@ -8,6 +8,7 @@
                 Text="Fetching Data...">
     <MyGridPaginate Data="GroupMenus"
                     @ref="Grid"
+                    SearchTextChanged="OnSearchBoxChanged"
                     PageSize="10">
         <Columns>
             <DxGridDataColumn MinWidth="200" FieldName="Menu.Name" Caption="Menu" SortIndex="0" />
@@ -92,9 +93,16 @@
     private async Task LoadData(int pageIndex = 0, int pageSize = 10)
     {
         PanelVisible = true;
-        var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id);
+        // var result = await MyQuery.GetGroupMenus(HttpClientFactory, pageIndex, pageSize, searchTerm ?? "", groupId: Group.Id);
+        var result = await Mediator.Send(new GetGroupMenuQuery
+        {
+            SearchTerm = searchTerm ?? "",
+            Predicate = x => x.GroupId == Group.Id,
+            PageIndex = pageIndex,
+            PageSize = pageSize
+        });
         GroupMenus = result.Item1;
-        totalCount = result.Item2;
+        totalCount = result.PageCount;
         activePageIndex = pageIndex;
         PanelVisible = false;
     }

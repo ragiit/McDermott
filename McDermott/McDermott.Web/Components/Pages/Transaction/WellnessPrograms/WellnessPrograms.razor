@@ -36,22 +36,54 @@
                                                              Items="@WellnessProgramss"
                                                              SelectedDataItems="@SelectedDataItems"
                                                              NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@EditItem_Click" />
+                                                             EditItem_Click="@EditItem_Click"
+                                                             DeleteItem_Click="@DeleteItem_Click"
+                                                             IsImport="false"
+                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
                                         </ToolbarTemplate>
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="ProgramName" MinWidth="200" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
                                             <DxGridDataColumn FieldName="Category" MinWidth="200" />
                                             <DxGridDataColumn FieldName="StartDate" MinWidth="100" />
                                             <DxGridDataColumn FieldName="EndDate" MinWidth="100" />
+                                            <DxGridDataColumn FieldName="Slug" />
+                                            <DxGridDataColumn FieldName="StatusString" MinWidth="100" />
                                         </Columns>
                                         <TotalSummary>
                                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                               FieldName="ProgramName"
+                                                               FieldName="Name"
                                                                Visible="true" />
                                         </TotalSummary>
                                     </MyGridPaginate>
+                                    <div class="row">
+                                        <DxFormLayout>
+                                            <div class="col-md-9">
+                                                <DxFormLayoutItem>
+                                                    <DxPager PageCount="totalCount"
+                                                             ActivePageIndexChanged="OnPageIndexChanged"
+                                                             ActivePageIndex="activePageIndex"
+                                                             VisibleNumericButtonCount="10"
+                                                             SizeMode="SizeMode.Medium"
+                                                             NavigationMode="PagerNavigationMode.Auto">
+                                                    </DxPager>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                            <div class="col-md-3 d-flex justify-content-end">
+                                                <DxFormLayoutItem Caption="Page Size:">
+                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                  NullText="Select Page Size"
+                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                  @bind-Value="pageSize">
+                                                    </MyDxComboBox>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                        </DxFormLayout>
+                                    </div>
                                 </DxLoadingPanel>
                             }
                         </div>
@@ -199,7 +231,10 @@ else
             var zz = e;
         }
     }
-
+    private void DeleteItem_Click()
+    {
+        Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndexGroupMenu);
+    }
     private async Task HandleValidSubmit()
     {
         // Save data
@@ -214,8 +249,33 @@ else
 
     private async Task OnDelete(GridDataItemDeletingEventArgs e)
     {
-        // Delete logic
-        await LoadData();
+        try
+        {
+            PanelVisible = true;
+            if (SelectedDataItems == null || !SelectedDataItems.Any())
+            {
+                await Mediator.Send(new DeleteWellnessProgramRequest
+                    {
+                        Id = ((WellnessProgramDetailDto)e.DataItem).Id
+                    });
+            }
+            else
+            {
+                var countriesToDelete = SelectedDataItems.Adapt<List<WellnessProgramDetailDto>>();
+                await Mediator.Send(new DeleteWellnessProgramRequest
+                    {
+                        Ids = countriesToDelete.Select(x => x.Id).ToList()
+                    });
+            }
+
+            SelectedDataItems = [];
+            await LoadData(activePageIndex, pageSize);
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
     }
 
 }

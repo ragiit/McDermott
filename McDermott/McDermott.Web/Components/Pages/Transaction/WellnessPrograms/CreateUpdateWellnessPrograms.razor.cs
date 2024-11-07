@@ -1,8 +1,11 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
+﻿using Blazored.TextEditor;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;
+using static McDermott.Application.Features.Commands.Transaction.WellnessProgramDetailCommand;
+using static McDermott.Application.Features.Commands.Transaction.WellnessProgramParticipantCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramSessionCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
@@ -18,16 +21,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                await GetUserInfo();
-            }
-        }
-
         private async Task GetUserInfo()
         {
             try
@@ -42,9 +35,43 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         #endregion UserLoginAndAccessRole
 
+        #region HTML Editor
+
+        private bool IsShowPreviewOutput { get; set; } = false;
+        private BlazoredTextEditor QuillHtml;
+        private MarkupString preview;
+
+        private async Task ShowAoutPutPreview(bool b)
+        {
+            IsShowPreviewOutput = b;
+
+            if (!string.IsNullOrWhiteSpace(await QuillHtml.GetText()))
+            {
+                preview = (MarkupString)await QuillHtml.GetHTML();
+            }
+        }
+
+        #endregion HTML Editor
+
+        private async Task OnClickSlugProgram()
+        {
+            //NavigationManager.NavigateTo($"clinic-service/wellness/join-participant/{WellnessProgram.Slug}");
+            var url = $"clinic-service/wellness/join-participant/{WellnessProgram.Slug}";
+            await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
+        }
+
+        private async Task OnClickSlugProgramActivity(string slug)
+        {
+            //NavigationManager.NavigateTo($"clinic-service/wellness/join-participant/{WellnessProgram.Slug}");
+            var url = $"clinic-service/wellness/attendance/{slug}";
+            await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
+        }
+
         private bool IsStatus(EnumWellness status) => WellnessProgram.Status == status;
 
         private EnumWellness StagingText { get; set; } = EnumWellness.Active;
+
+        private bool EnableForm => !IsStatus(EnumWellness.Inactive) && !IsStatus(EnumWellness.Completed);
 
         private async Task OnCancelStatus()
         {
@@ -55,9 +82,13 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 if (WellnessProgram.Id != 0)
                 {
                     WellnessProgram.Status = EnumWellness.Inactive;
-                    WellnessProgram = await Mediator.Send(new CancelWellnessProgramRequest(WellnessProgram));
-                    StagingText = EnumWellness.Inactive;
+                    await Mediator.Send(new CancelWellnessProgramRequest(WellnessProgram));
+                    StagingText = EnumWellness.Active;
                     ToastService.ShowSuccess("The Wellness Program has been successfully set to inactive. The patient is no longer active in the program.");
+                    WellnessProgram = await Mediator.Send(new GetSingleWellnessProgramQuery
+                    {
+                        Predicate = x => x.Id == Id
+                    });
                 }
             }
             catch (Exception ex)
@@ -81,8 +112,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
 
-        private IGrid GridAttendance { get; set; }
-
         //private List<AttendanceDto> AttendanceRecords { get; set; } = [];
         private bool PanelVisible { get; set; } = false;
 
@@ -91,11 +120,49 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         private List<string> Categories = new() { "Mental Health", "Dietary Awareness", "Physical Exercise" };
 
         //private List<string> Diagnoses = new() { "Hypertension", "Diabetes", "Depression" };
+        private async Task ClickSetToDraft()
+        {
+            try
+            {
+                PanelVisible = true;
+                WellnessProgram.Status = EnumWellness.Draft;
+                await Mediator.Send(new CancelWellnessProgramRequest(WellnessProgram));
+                ToastService.ShowSuccess("The program status has been successfully reset to Draft from Inactive.");
+                NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+                StagingText = EnumWellness.Active;
+                WellnessProgram = await Mediator.Send(new GetSingleWellnessProgramQuery
+                {
+                    Predicate = x => x.Id == Id
+                });
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
         private async Task ClickConfirm()
         {
             try
             {
                 PanelVisible = true;
+                if (WellnessProgram.Status == EnumWellness.Draft)
+                {
+                    // Convert the ProgramName to a slug (lowercase and spaces replaced with hyphens)
+                    WellnessProgram.Slug = WellnessProgram.Name?
+                        .ToLower()
+                        .Replace(" ", "-")
+                        .Replace(",", "")
+                        .Replace(".", "");
+                }
+
+                var cek = await Mediator.Send(new ValidateWellnessProgram(x => x.Slug == WellnessProgram.Slug && x.Id != WellnessProgram.Id));
+                if (cek)
+                {
+                    ToastService.ShowWarning("Program Name is already exist!");
+                    return;
+                }
 
                 switch (WellnessProgram.Status)
                 {
@@ -113,15 +180,8 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                         break;
                 }
 
-                if (WellnessProgram.Status == EnumWellness.Active)
-                {
-                    // Convert the ProgramName to a slug (lowercase and spaces replaced with hyphens)
-                    WellnessProgram.Slug = WellnessProgram.Name?
-                        .ToLower()
-                        .Replace(" ", "-")
-                        .Replace(",", "")
-                        .Replace(".", "");
-                }
+                if (QuillHtml != null)
+                    WellnessProgram.Content = await QuillHtml.GetContent();
 
                 if (WellnessProgram.Id == 0)
                 {
@@ -147,6 +207,22 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             try
             {
                 PanelVisible = true;
+
+                WellnessProgram.Slug = WellnessProgram.Name?
+                    .ToLower()
+                    .Replace(" ", "-")
+                    .Replace(",", "")
+                    .Replace(".", "");
+
+                var cek = await Mediator.Send(new ValidateWellnessProgram(x => x.Slug == WellnessProgram.Slug && x.Id != WellnessProgram.Id));
+                if (cek)
+                {
+                    ToastService.ShowWarning("Program Name is already exist!");
+                    return;
+                }
+
+                if (QuillHtml != null)
+                    WellnessProgram.Content = await QuillHtml.GetContent();
 
                 if (WellnessProgram.Id == 0)
                 {
@@ -179,31 +255,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         private int FocusedRowVisibleIndex { get; set; }
 
-        private async Task NewSession_Click()
-        {
-            await GridSessionSchedule.StartEditNewRowAsync();
-        }
-
-        private async Task EditSession_Click()
-        {
-            await GridSessionSchedule.StartEditRowAsync(FocusedRowScheduleVisibleIndex);
-            //var a = (GridSessionSchedule.GetDataItem(FocusedRowScheduleVisibleIndex) as WellnessProgramAttendanceDto ?? new());
-            //Users = (await Mediator.Send(new GetUserQueryNew
-            //{
-            //    Predicate = x => x.Id == a.PatientId,
-            //})).Item1;
-        }
-
-        private void DeleteSession_Click()
-        {
-            GridSessionSchedule.ShowRowDeleteConfirmation(FocusedRowScheduleVisibleIndex);
-        }
-
-        private void RefreshSessions_Click()
-        {
-            // Logic to refresh session list
-        }
-
         private async Task NewAttendance_Click()
         {
             await GridAttendance.StartEditNewRowAsync();
@@ -221,13 +272,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             })).Item1;
         }
 
-        private int FocusedRowSessionVisibleIndex { get; set; }
-
-        private void GridFocusedRowSessionVisibleIndex_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedRowAttendenceVisibleIndex = args.VisibleIndex;
-        }
-
         private void DeleteAttendance_Click()
         {
             GridAttendance.ShowRowDeleteConfirmation(FocusedRowAttendenceVisibleIndex);
@@ -238,7 +282,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             try
             {
                 PanelVisible = true;
-                if (SelectedDataItemWellnessProgramSessions == null || !SelectedDataItemWellnessProgramSessions.Any())
+                if (SelectedDataItemWellnessProgramDetails == null || !SelectedDataItemWellnessProgramDetails.Any())
                 {
                     await Mediator.Send(new DeleteWellnessProgramSessionRequest
                     {
@@ -247,7 +291,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 }
                 else
                 {
-                    var countriesToDelete = SelectedDataItemWellnessProgramSessions.Adapt<List<WellnessProgramSessionDto>>();
+                    var countriesToDelete = SelectedDataItemWellnessProgramDetails.Adapt<List<WellnessProgramSessionDto>>();
                     //await Mediator.Send(new DeleteWellnessProgramSessionRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
                     await Mediator.Send(new DeleteWellnessProgramSessionRequest
                     {
@@ -255,7 +299,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                     });
                 }
 
-                SelectedDataItemWellnessProgramSessions = [];
+                SelectedDataItemWellnessProgramDetails = [];
                 //await LoadData(activePageIndex, pageSize);
             }
             catch (Exception ex)
@@ -281,15 +325,12 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 //    return;
                 //}
 
-                editModel.WellnessProgramId = WellnessProgram.Id;
+                //editModel.WellnessProgramId = WellnessProgram.Id;
 
-                if (editModel.Id == 0)
-                    await Mediator.Send(new CreateWellnessProgramAttendanceRequest(editModel));
-                else
-                    await Mediator.Send(new UpdateWellnessProgramAttendanceRequest(editModel));
-
-                SelectedDataItemWellnessProgramAttendances = [];
-                await LoadDataOnSearchBoxChangedWellnessProgramSession();
+                //if (editModel.Id == 0)
+                //    await Mediator.Send(new CreateWellnessProgramAttendanceRequest(editModel));
+                //else
+                //    await Mediator.Send(new UpdateWellnessProgramAttendanceRequest(editModel));
             }
             catch (Exception ex)
             {
@@ -367,6 +408,31 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
 
+        private bool isContentLoaded = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                //// Retry loading content until QuillHtml is ready
+                //while (QuillHtml == null && !isContentLoaded)
+                //{
+                //    await Task.Delay(50); // Small delay to wait for QuillHtml to initialize
+                //}
+
+                //if (!isContentLoaded && QuillHtml != null)
+                //{
+                //    if (!string.IsNullOrWhiteSpace(WellnessProgram.Content))
+                //    {
+                //        await QuillHtml.LoadContent(WellnessProgram.Content);
+                //    }
+                //    isContentLoaded = true;
+                //}
+
+                await GetUserInfo();
+            }
+        }
+
         private async Task LoadData()
         {
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
@@ -412,54 +478,162 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 }
 
                 await LoadDataOnSearchBoxChangedWellnessProgramAttendance();
-                await LoadDataOnSearchBoxChangedWellnessProgramSession();
+                await LoadDataOnSearchBoxChangedWellnessProgramDetail();
             }
         }
 
         #region Searching
 
-        private IGrid GridSessionSchedule { get; set; }
-        private int pageSizeWellnessProgramSession { get; set; } = 10;
-        private int totalCountWellnessProgramSession = 0;
-        private int activePageIndexWellnessProgramSession { get; set; } = 0;
-        private string searchTermWellnessProgramSession { get; set; } = string.Empty;
+        private IGrid GridActivityDetail { get; set; }
+        private List<WellnessProgramDetailDto> WellnessProgramDetails { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemWellnessProgramDetails { get; set; } = [];
 
-        private async Task OnSearchBoxChangedWellnessProgramSession(string searchText)
-        {
-            searchTermWellnessProgramSession = searchText;
-            await LoadDataOnSearchBoxChangedWellnessProgramSession(0, pageSizeWellnessProgramSession);
-        }
-
-        private async Task OnpageSizeWellnessProgramSessionIndexChanged(int newpageSizeWellnessProgramSession)
-        {
-            pageSizeWellnessProgramSession = newpageSizeWellnessProgramSession;
-            await LoadDataOnSearchBoxChangedWellnessProgramSession(0, newpageSizeWellnessProgramSession);
-        }
-
-        private async Task OnPageIndexChangedOnSearchBoxChangedWellnessProgramSession(int newPageIndex)
-        {
-            await LoadDataOnSearchBoxChangedWellnessProgramSession(newPageIndex, pageSizeWellnessProgramSession);
-        }
-
-        private IReadOnlyList<object> SelectedDataItemWellnessProgramSessions { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemWellnessProgramAttendances { get; set; } = [];
-        private List<WellnessProgramSessionDto> WellnessProgramSessions { get; set; } = [];
-
-        private async Task LoadDataOnSearchBoxChangedWellnessProgramSession(int pageIndex = 0, int pageSizeWellnessProgramSession = 10)
+        private async Task OnDeleteActivityDetail(GridDataItemDeletingEventArgs e)
         {
             try
             {
                 PanelVisible = true;
-                SelectedDataItemWellnessProgramSessions = [];
-                var result = await Mediator.Send(new GetWellnessProgramSessionQuery
+                if (SelectedDataItemWellnessProgramDetails == null || !SelectedDataItemWellnessProgramDetails.Any())
                 {
+                    await Mediator.Send(new DeleteWellnessProgramDetailRequest
+                    {
+                        Id = ((WellnessProgramDetailDto)e.DataItem).Id
+                    });
+                }
+                else
+                {
+                    var countriesToDelete = SelectedDataItemWellnessProgramDetails.Adapt<List<WellnessProgramDetailDto>>();
+                    await Mediator.Send(new DeleteWellnessProgramDetailRequest
+                    {
+                        Ids = countriesToDelete.Select(x => x.Id).ToList()
+                    });
+                }
+
+                SelectedDataItemWellnessProgramDetails = [];
+                await LoadDataOnSearchBoxChangedWellnessProgramDetail(activePageIndexWellnessProgramDetail, pageSizeWellnessProgramDetail);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        private async Task OnSaveActivityDetail(GridEditModelSavingEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+                var editModel = (WellnessProgramDetailDto)e.EditModel;
+
+                if (WellnessProgram.EndDate != null && editModel.EndDate > WellnessProgram.EndDate)
+                {
+                    ToastService.ShowInfo("The selected end date exceeds the allowed program end date.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (editModel.EndDate is null)
+                    editModel.EndDate = WellnessProgram.EndDate;
+
+                editModel.WellnessProgramId = WellnessProgram.Id;
+
+                // Convert the ProgramName to a slug (lowercase and spaces replaced with hyphens)
+                editModel.Slug = editModel.Name?
+                    .ToLower()
+                    .Replace(" ", "-")
+                    .Replace(",", "")
+                    .Replace(".", "");
+
+                var cek = await Mediator.Send(new ValidateWellnessProgramDetail(x => x.Slug == editModel.Slug && x.Id != editModel.Id));
+                if (cek)
+                {
+                    ToastService.ShowWarning("Activity Name is already exist!");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (editModel.Id == 0)
+                    await Mediator.Send(new CreateWellnessProgramDetailRequest(editModel));
+                else
+                    await Mediator.Send(new UpdateWellnessProgramDetailRequest(editModel));
+
+                SelectedDataItemWellnessProgramDetails = [];
+
+                await LoadDataOnSearchBoxChangedWellnessProgramDetail(activePageIndexWellnessProgramDetail, pageSizeWellnessProgramDetail);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        private int FocusedRowActivityDetailVisibleIndex { get; set; }
+
+        private void GridFocusedRowActivityDetailVisibleIndex_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowActivityDetailVisibleIndex = args.VisibleIndex;
+        }
+
+        private async Task NewActivityDetail_Click()
+        {
+            await GridActivityDetail.StartEditNewRowAsync();
+        }
+
+        private async Task EditActivityDetail_Click()
+        {
+            await GridActivityDetail.StartEditRowAsync(FocusedRowActivityDetailVisibleIndex);
+        }
+
+        private void DeleteActivityDetail_Click()
+        {
+            GridActivityDetail.ShowRowDeleteConfirmation(FocusedRowActivityDetailVisibleIndex);
+        }
+
+        private void RefreshActivityDetails_Click()
+        {
+            // Logic to refresh session list
+        }
+
+        private int pageSizeWellnessProgramDetail { get; set; } = 10;
+        private int totalCountWellnessProgramDetail = 0;
+        private int activePageIndexWellnessProgramDetail { get; set; } = 0;
+        private string searchTermWellnessProgramDetail { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedWellnessProgramDetail(string searchText)
+        {
+            searchTermWellnessProgramDetail = searchText;
+            await LoadDataOnSearchBoxChangedWellnessProgramDetail(0, pageSizeWellnessProgramDetail);
+        }
+
+        private async Task OnpageSizeWellnessProgramDetailIndexChanged(int newpageSizeWellnessProgramDetail)
+        {
+            pageSizeWellnessProgramDetail = newpageSizeWellnessProgramDetail;
+            await LoadDataOnSearchBoxChangedWellnessProgramDetail(0, newpageSizeWellnessProgramDetail);
+        }
+
+        private async Task OnPageIndexChangedOnSearchBoxChangedWellnessProgramDetail(int newPageIndex)
+        {
+            await LoadDataOnSearchBoxChangedWellnessProgramDetail(newPageIndex, pageSizeWellnessProgramDetail);
+        }
+
+        private async Task LoadDataOnSearchBoxChangedWellnessProgramDetail(int pageIndex = 0, int pageSizeWellnessProgramDetail = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItemWellnessProgramDetails = [];
+                var result = await Mediator.Send(new GetWellnessProgramDetailQuery
+                {
+                    Predicate = x => x.WellnessProgramId == WellnessProgram.Id,
                     PageIndex = pageIndex,
-                    PageSize = pageSizeWellnessProgramSession,
-                    SearchTerm = searchTermWellnessProgramSession,
+                    PageSize = pageSizeWellnessProgramDetail,
+                    SearchTerm = searchTermWellnessProgramDetail,
                 });
-                WellnessProgramSessions = result.Item1;
-                totalCountWellnessProgramSession = result.PageCount;
-                activePageIndexWellnessProgramSession = pageIndex;
+                WellnessProgramDetails = result.Item1;
+                totalCountWellnessProgramDetail = result.PageCount;
+                activePageIndexWellnessProgramDetail = pageIndex;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -476,64 +650,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         private void GridFocusedRowScheduleVisibleIndex_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowScheduleVisibleIndex = args.VisibleIndex;
-        }
-
-        private async Task OnDeleteSchedule(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                PanelVisible = true;
-                if (SelectedDataItemWellnessProgramSessions == null || !SelectedDataItemWellnessProgramSessions.Any())
-                {
-                    //await Mediator.Send(new DeleteWellnessProgramSessionRequest(((WellnessProgramSessionDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var countriesToDelete = SelectedDataItemWellnessProgramSessions.Adapt<List<WellnessProgramSessionDto>>();
-                    //await Mediator.Send(new DeleteWellnessProgramSessionRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
-                }
-
-                SelectedDataItemWellnessProgramSessions = [];
-                //await LoadData(activePageIndex, pageSize);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        private async Task OnSaveSchedule(GridEditModelSavingEventArgs e)
-        {
-            try
-            {
-                PanelVisible = true;
-                var editModel = (WellnessProgramSessionDto)e.EditModel;
-
-                //bool validate = await Mediator.Send(new ValidateCountryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
-
-                //if (validate)
-                //{
-                //    ToastService.ShowInfo($"Country with name '{editModel.Name}' and code '{editModel.Code}' is already exists");
-                //    e.Cancel = true;
-                //    return;
-                //}
-
-                editModel.WellnessProgramId = WellnessProgram.Id;
-
-                if (editModel.Id == 0)
-                    await Mediator.Send(new CreateWellnessProgramSessionRequest(editModel));
-                else
-                    await Mediator.Send(new UpdateWellnessProgramSessionRequest(editModel));
-
-                SelectedDataItemWellnessProgramSessions = [];
-                await LoadDataOnSearchBoxChangedWellnessProgramSession();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
         }
 
         #endregion Schedule
@@ -562,15 +678,13 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             await LoadDataOnSearchBoxChangedWellnessProgramAttendance(newPageIndex, pageSizeWellnessProgramAttendance);
         }
 
-        private List<WellnessProgramAttendanceDto> WellnessProgramAttendances { get; set; } = [];
-
         private async Task LoadDataOnSearchBoxChangedWellnessProgramAttendance(int pageIndex = 0, int pageSizeWellnessProgramAttendance = 10)
         {
             try
             {
                 PanelVisible = true;
                 //SelectedDataItems = new ObservableRangeCollection<object>();
-                //var result = await Mediator.Send(new GetWellnessProgramSessionQuery
+                //var result = await Mediator.Send(new GetWellnessProgramDetailQuery
                 //{
                 //    PageIndex = pageIndex,
                 //    PageSize = pageSizeWellnessProgramAttendance,
@@ -681,7 +795,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             try
             {
                 PanelVisible = true;
-                SelectedDataItemWellnessProgramAttendances = new ObservableRangeCollection<object>();
                 var result = await Mediator.Send(new GetWellnessProgramAttendanceQuery
                 {
                     PageIndex = pageIndex,
@@ -703,5 +816,119 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         #endregion Searching
 
         #endregion Attendence
+
+        #region Participants
+
+        #region Searching
+
+        private int pageSizeParticipants { get; set; } = 10;
+        private int totalCountParticipants = 0;
+        private int activePageIndexParticipants { get; set; } = 0;
+        private string searchTermParticipants { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedParticipants(string searchText)
+        {
+            searchTermParticipants = searchText;
+            await LoadDataParticipants(0, pageSizeParticipants);
+        }
+
+        private async Task OnpageSizeParticipantsIndexChanged(int newpageSizeParticipants)
+        {
+            pageSizeParticipants = newpageSizeParticipants;
+            await LoadDataParticipants(0, newpageSizeParticipants);
+        }
+
+        private async Task OnPageIndexChangedParticipants(int newPageIndex)
+        {
+            await LoadDataParticipants(newPageIndex, pageSizeParticipants);
+        }
+
+        private IGrid GridParticipant { get; set; }
+        private IReadOnlyList<object> SelectedDataItemParticipants { get; set; } = [];
+        private List<WellnessProgramParticipantDto> WellnessProgramParticipants { get; set; } = [];
+
+        private async Task LoadDataParticipants(int pageIndex = 0, int pageSizeParticipants = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var a = await Mediator.Send(new GetWellnessProgramParticipantQuery
+                {
+                    Predicate = x => x.WellnessProgramId == WellnessProgram.Id,
+                    SearchTerm = searchTermParticipants,
+                    PageIndex = pageIndex,
+                    PageSize = pageSizeParticipants,
+                });
+                WellnessProgramParticipants = a.Item1;
+                totalCountParticipants = a.PageCount;
+                activePageIndexParticipants = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion Searching
+
+        #endregion Participants
+
+        #region Attendances
+
+        #region Searching
+
+        private int pageSizeAttendances { get; set; } = 10;
+        private int totalCountAttendances = 0;
+        private int activePageIndexAttendances { get; set; } = 0;
+        private string searchTermAttendances { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedAttendances(string searchText)
+        {
+            searchTermAttendances = searchText;
+            await LoadDataAttendances(0, pageSizeAttendances);
+        }
+
+        private async Task OnpageSizeAttendancesIndexChanged(int newpageSizeAttendances)
+        {
+            pageSizeAttendances = newpageSizeAttendances;
+            await LoadDataAttendances(0, newpageSizeAttendances);
+        }
+
+        private async Task OnPageIndexChangedAttendances(int newPageIndex)
+        {
+            await LoadDataAttendances(newPageIndex, pageSizeAttendances);
+        }
+
+        private IGrid GridAttendance { get; set; }
+        private IReadOnlyList<object> SelectedDataItemAttendances { get; set; } = [];
+        private List<WellnessProgramAttendanceDto> WellnessProgramAttendances { get; set; } = [];
+
+        private async Task LoadDataAttendances(int pageIndex = 0, int pageSizeAttendances = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var a = await Mediator.Send(new GetWellnessProgramAttendanceQuery
+                {
+                    Predicate = x => x.WellnessProgramDetailId == WellnessProgram.Id,
+                    SearchTerm = searchTermAttendances,
+                    PageIndex = pageIndex,
+                    PageSize = pageSizeAttendances,
+                });
+                WellnessProgramAttendances = a.Item1;
+                totalCountAttendances = a.PageCount;
+                activePageIndexAttendances = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion Searching
+
+        #endregion Attendances
     }
 }

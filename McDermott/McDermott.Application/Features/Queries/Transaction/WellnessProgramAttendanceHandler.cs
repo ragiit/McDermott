@@ -10,7 +10,8 @@ namespace McDermott.Application.Features.Queries.Transaction
 {
     public class WellnessProgramAttendanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
       IRequestHandler<GetWellnessProgramAttendanceQuery, (List<WellnessProgramAttendanceDto>, int pageIndex, int pageSize, int pageCount)>,
-      IRequestHandler<GetSingleWellnessProgramAttendanceQuery, WellnessProgramAttendanceDto>, IRequestHandler<ValidateWellnessProgramAttendance, bool>,
+      IRequestHandler<GetSingleWellnessProgramAttendanceQuery, WellnessProgramAttendanceDto>,
+        IRequestHandler<ValidateWellnessProgramAttendance, bool>,
       IRequestHandler<CreateWellnessProgramAttendanceRequest, WellnessProgramAttendanceDto>,
       IRequestHandler<BulkValidateWellnessProgramAttendance, List<WellnessProgramAttendanceDto>>,
       IRequestHandler<CreateListWellnessProgramAttendanceRequest, List<WellnessProgramAttendanceDto>>,
@@ -19,6 +20,16 @@ namespace McDermott.Application.Features.Queries.Transaction
       IRequestHandler<DeleteWellnessProgramAttendanceRequest, bool>
     {
         #region GET
+
+        public async Task<bool> Handle(ValidateWellnessProgramAttendance request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<WellnessProgramAttendance>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
         public async Task<List<WellnessProgramAttendanceDto>> Handle(BulkValidateWellnessProgramAttendance request, CancellationToken cancellationToken)
         {
             var CountryDtos = request.WellnessProgramAttendancesToValidate;
@@ -36,14 +47,6 @@ namespace McDermott.Application.Features.Queries.Transaction
             //return existingCountrys.Adapt<List<CountryDto>>();
 
             return [];
-        }
-        public async Task<bool> Handle(ValidateWellnessProgramAttendance request, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.Repository<WellnessProgramAttendance>()
-                .Entities
-                .AsNoTracking()
-                .Where(request.Predicate)  // Apply the Predicate for filtering
-                .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
         public async Task<(List<WellnessProgramAttendanceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramAttendanceQuery request, CancellationToken cancellationToken)
@@ -95,11 +98,22 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new WellnessProgramAttendance
                     {
                         Id = x.Id,
-                        WellnessProgramId = x.WellnessProgramId,
+                        WellnessProgramDetailId = x.WellnessProgramDetailId,
+                        WellnessProgramDetail = new WellnessProgramDetail
+                        {
+                            Name = x.WellnessProgramDetail != null ? x.WellnessProgramDetail.Name : ""
+                        },
                         PatientId = x.PatientId,
-                        AttendanceDate = x.AttendanceDate,
-                        AttendanceStatus = x.AttendanceStatus,
-                        Comments = x.Comments,
+                        Patient = new User
+                        {
+                            Name = x.Patient == null ? "" : x.Patient.Name,
+                            Email = x.Patient == null ? "" : x.Patient.Email,
+                            Department = x.Patient != null && x.Patient.Department == null ? new Department() : new Department
+                            {
+                                Name = x.Patient != null && x.Patient.Department != null ? x.Patient.Department.Name : ""
+                            }
+                        },
+                        Date = x.Date,
                     });
 
                 if (!request.IsGetAll)
@@ -149,7 +163,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                             : ((IOrderedQueryable<WellnessProgramAttendance>)query).ThenBy(additionalOrderBy.OrderBy);
                     }
                 }
-                        
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -174,11 +188,9 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new WellnessProgramAttendance
                     {
                         Id = x.Id,
-                        WellnessProgramId = x.WellnessProgramId,
+                        WellnessProgramDetailId = x.WellnessProgramDetailId,
                         PatientId = x.PatientId,
-                        AttendanceDate = x.AttendanceDate,
-                        AttendanceStatus = x.AttendanceStatus,
-                        Comments = x.Comments,
+                        Date = x.Date,
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramAttendanceDto>();

@@ -5,6 +5,8 @@ namespace McDermott.Application.Dtos.Medical
     public class DoctorScheduleDto : IMapFrom<DoctorSchedule>
     {
         public long Id { get; set; }
+
+        [Required]
         public long PhysicionId { get; set; }
 
         public User? Physicion { get; set; }
@@ -29,5 +31,18 @@ namespace McDermott.Application.Dtos.Medical
         //public string Physicions { get; set; } = string.Empty;
 
         //public ServiceDto? Service { get; set; }
+    }
+
+    public class CreateUpdateDoctorScheduleDto
+    {
+        public long Id { get; set; }
+
+        public long PhysicionId { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public long? ServiceId { get; set; }
+
+        public List<long>? PhysicionIds { get; set; }
     }
 }

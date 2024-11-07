@@ -1,14 +1,14 @@
-public class WellnessProgramDetailCommand
+public class GroupCommand
  {
      #region GET
 
-    public class GetSingleWellnessProgramDetailQuery : IRequest<WellnessProgramDetailDto>
+    public class GetSingleGroupQuery : IRequest<GroupDto>
     {
-        public List<Expression<Func<WellnessProgramDetail, object>>> Includes { get; set; }
-        public Expression<Func<WellnessProgramDetail, bool>> Predicate { get; set; }
-        public Expression<Func<WellnessProgramDetail, WellnessProgramDetail>> Select { get; set; }
+        public List<Expression<Func<Group, object>>> Includes { get; set; }
+        public Expression<Func<Group, bool>> Predicate { get; set; }
+        public Expression<Func<Group, Group>> Select { get; set; }
 
-        public List<(Expression<Func<WellnessProgramDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Group, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class WellnessProgramDetailCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetWellnessProgramDetailQuery : IRequest<(List<WellnessProgramDetailDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetGroupQuery : IRequest<(List<GroupDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<WellnessProgramDetail, object>>> Includes { get; set; }
-        public Expression<Func<WellnessProgramDetail, bool>> Predicate { get; set; }
-        public Expression<Func<WellnessProgramDetail, WellnessProgramDetail>> Select { get; set; }
+        public List<Expression<Func<Group, object>>> Includes { get; set; }
+        public Expression<Func<Group, bool>> Predicate { get; set; }
+        public Expression<Func<Group, Group>> Select { get; set; }
 
-        public List<(Expression<Func<WellnessProgramDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Group, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class WellnessProgramDetailCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateWellnessProgramDetail(Expression<Func<WellnessProgramDetail, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateGroup(Expression<Func<Group, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<WellnessProgramDetail, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<Group, bool>> Predicate { get; } = predicate!;
+     }
+
+     public class BulkValidateGroup(List<GroupDto> GroupsToValidate) : IRequest<List<GroupDto>>
+     {
+         public List<GroupDto> GroupsToValidate { get; } = GroupsToValidate;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateWellnessProgramDetailRequest(WellnessProgramDetailDto WellnessProgramDetailDto) : IRequest<WellnessProgramDetailDto>
+     public class CreateGroupRequest(GroupDto GroupDto) : IRequest<GroupDto>
      {
-         public WellnessProgramDetailDto WellnessProgramDetailDto { get; set; } = WellnessProgramDetailDto;
+         public GroupDto GroupDto { get; set; } = GroupDto;
      }
 
-     public class BulkValidateWellnessProgramDetail(List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate) : IRequest<List<WellnessProgramDetailDto>>
+     public class CreateListGroupRequest(List<GroupDto> GroupDtos) : IRequest<List<GroupDto>>
      {
-         public List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate { get; } = WellnessProgramDetailsToValidate;
-     }
-
-     public class CreateListWellnessProgramDetailRequest(List<WellnessProgramDetailDto> WellnessProgramDetailDtos) : IRequest<List<WellnessProgramDetailDto>>
-     {
-         public List<WellnessProgramDetailDto> WellnessProgramDetailDtos { get; set; } = WellnessProgramDetailDtos;
+         public List<GroupDto> GroupDtos { get; set; } = GroupDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateWellnessProgramDetailRequest(WellnessProgramDetailDto WellnessProgramDetailDto) : IRequest<WellnessProgramDetailDto>
+     public class UpdateGroupRequest(GroupDto GroupDto) : IRequest<GroupDto>
      {
-         public WellnessProgramDetailDto WellnessProgramDetailDto { get; set; } = WellnessProgramDetailDto;
+         public GroupDto GroupDto { get; set; } = GroupDto;
      }
 
-     public class UpdateListWellnessProgramDetailRequest(List<WellnessProgramDetailDto> WellnessProgramDetailDtos) : IRequest<List<WellnessProgramDetailDto>>
+     public class UpdateListGroupRequest(List<GroupDto> GroupDtos) : IRequest<List<GroupDto>>
      {
-         public List<WellnessProgramDetailDto> WellnessProgramDetailDtos { get; set; } = WellnessProgramDetailDtos;
+         public List<GroupDto> GroupDtos { get; set; } = GroupDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteWellnessProgramDetailRequest : IRequest<bool>
+     public class DeleteGroupRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,24 +83,25 @@ public class WellnessProgramDetailCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateWellnessProgramDetailQuery, List<WellnessProgramDetailDto>>,
+IRequestHandler<BulkValidateGroupQuery, List<GroupDto>>,
   
-IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>,
-public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>, IRequestHandler<ValidateWellnessProgramDetail, bool>,
-     IRequestHandler<CreateWellnessProgramDetailRequest, WellnessProgramDetailDto>,
-     IRequestHandler<BulkValidateWellnessProgramDetail, List<WellnessProgramDetailDto>>,
-     IRequestHandler<CreateListWellnessProgramDetailRequest, List<WellnessProgramDetailDto>>,
-     IRequestHandler<UpdateWellnessProgramDetailRequest, WellnessProgramDetailDto>,
-     IRequestHandler<UpdateListWellnessProgramDetailRequest, List<WellnessProgramDetailDto>>,
-     IRequestHandler<DeleteWellnessProgramDetailRequest, bool>
+IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleGroupQuery, GroupDto>,
+public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleGroupQuery, GroupDto>, 
+     IRequestHandler<ValidateGroup, bool>,
+     IRequestHandler<CreateGroupRequest, GroupDto>,
+     IRequestHandler<BulkValidateGroup, List<GroupDto>>,
+     IRequestHandler<CreateListGroupRequest, List<GroupDto>>,
+     IRequestHandler<UpdateGroupRequest, GroupDto>,
+     IRequestHandler<UpdateListGroupRequest, List<GroupDto>>,
+     IRequestHandler<DeleteGroupRequest, bool>
 {
     #region GET
-    public async Task<List<WellnessProgramDetailDto>> Handle(BulkValidateWellnessProgramDetail request, CancellationToken cancellationToken)
+    public async Task<List<GroupDto>> Handle(BulkValidateGroup request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.WellnessProgramDetailsToValidate;
+        var CountryDtos = request.GroupsToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
         //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -116,20 +117,20 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
 
         return [];
     }
-    public async Task<bool> Handle(ValidateWellnessProgramDetail request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateGroup request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<WellnessProgramDetail>()
+        return await _unitOfWork.Repository<Group>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramDetailQuery request, CancellationToken cancellationToken)
+    public async Task<(List<GroupDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGroupQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<WellnessProgramDetail>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<Group>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -145,8 +146,8 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<WellnessProgramDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<WellnessProgramDetail>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Group>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Group>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -163,7 +164,7 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.WellnessProgramDetail.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -171,7 +172,7 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new WellnessProgramDetail
+                query = query.Select(x => new Group
                 {
                     Id = x.Id, 
                 });
@@ -185,11 +186,11 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<WellnessProgramDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<GroupDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<WellnessProgramDetailDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<GroupDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -199,11 +200,11 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
         }
     }
  
-    public async Task<WellnessProgramDetailDto> Handle(GetSingleWellnessProgramDetailQuery request, CancellationToken cancellationToken)
+    public async Task<GroupDto> Handle(GetSingleGroupQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<WellnessProgramDetail>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<Group>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -219,8 +220,8 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<WellnessProgramDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<WellnessProgramDetail>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Group>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Group>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -237,7 +238,7 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.WellnessProgramDetail.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -245,12 +246,12 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new WellnessProgramDetail
+                query = query.Select(x => new Group
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramDetailDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GroupDto>();
         }
         catch (Exception ex)
         {
@@ -263,17 +264,17 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
 
      #region CREATE
 
-     public async Task<WellnessProgramDetailDto> Handle(CreateWellnessProgramDetailRequest request, CancellationToken cancellationToken)
+     public async Task<GroupDto> Handle(CreateGroupRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
+             var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDto.Adapt<CreateUpdateGroupDto>().Adapt<Group>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<WellnessProgramDetailDto>();
+             return result.Adapt<GroupDto>();
          }
          catch (Exception)
          {
@@ -281,16 +282,16 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
          }
      }
 
-     public async Task<List<WellnessProgramDetailDto>> Handle(CreateListWellnessProgramDetailRequest request, CancellationToken cancellationToken)
+     public async Task<List<GroupDto>> Handle(CreateListGroupRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDtos.Adapt<List<WellnessProgramDetail>>());
+             var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDtos.Adapt<List<Group>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<WellnessProgramDetailDto>>();
+             return result.Adapt<List<GroupDto>>();
          }
          catch (Exception)
          {
@@ -302,17 +303,17 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
 
      #region UPDATE
 
-     public async Task<WellnessProgramDetailDto> Handle(UpdateWellnessProgramDetailRequest request, CancellationToken cancellationToken)
+     public async Task<GroupDto> Handle(UpdateGroupRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<WellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
+             var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDto.Adapt<GroupDto>().Adapt<Group>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<WellnessProgramDetailDto>();
+             return result.Adapt<GroupDto>();
          }
          catch (Exception)
          {
@@ -320,16 +321,16 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
          }
      }
 
-     public async Task<List<WellnessProgramDetailDto>> Handle(UpdateListWellnessProgramDetailRequest request, CancellationToken cancellationToken)
+     public async Task<List<GroupDto>> Handle(UpdateListGroupRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDtos.Adapt<List<WellnessProgramDetail>>());
+             var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDtos.Adapt<List<Group>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<WellnessProgramDetailDto>>();
+             return result.Adapt<List<GroupDto>>();
          }
          catch (Exception)
          {
@@ -341,23 +342,23 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteWellnessProgramDetailRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<WellnessProgramDetail>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<WellnessProgramDetail>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<Group>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -371,20 +372,20 @@ public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache 
 }
 
  
-public class BulkValidateWellnessProgramDetailQuery(List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate) : IRequest<List<WellnessProgramDetailDto>>
+public class BulkValidateGroupQuery(List<GroupDto> GroupsToValidate) : IRequest<List<GroupDto>>
 {
-    public List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate { get; } = WellnessProgramDetailsToValidate;
+    public List<GroupDto> GroupsToValidate { get; } = GroupsToValidate;
 }a
 
 
-IRequestHandler<BulkValidateWellnessProgramDetailQuery, List<WellnessProgramDetailDto>>,
+IRequestHandler<BulkValidateGroupQuery, List<GroupDto>>,
   
-IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>,
+IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleGroupQuery, GroupDto>,
 
 
 
- var a = await Mediator.Send(new GetWellnessProgramDetailsQuery
+ var a = await Mediator.Send(new GetGroupsQuery
  {
      OrderByList =
      [
@@ -396,10 +397,10 @@ IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleWellnessProgramDetailQuery
+var patienss = (await Mediator.Send(new GetSingleGroupQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new WellnessProgramDetail
+    Select = x => new Group
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -412,13 +413,13 @@ var patienss = (await Mediator.Send(new GetSingleWellnessProgramDetailQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetWellnessProgramDetailQuery
+    var result = await Mediator.Send(new GetGroupQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    WellnessProgramDetails = result.Item1;
+    Groups = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -431,22 +432,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetWellnessProgramDetailQuery
+ var result = await Mediator.Send(new GetGroupQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refWellnessProgramDetailComboBox?.Text ?? "",
+     SearchTerm = refGroupComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- WellnessProgramDetails = result.Item1;
- totalCountWellnessProgramDetail = result.PageCount;
+ Groups = result.Item1;
+ totalCountGroup = result.PageCount;
 
- WellnessProgramDetails = (await Mediator.Send(new GetWellnessProgramDetailQuery
+ Groups = (await Mediator.Send(new GetGroupQuery
  {
-     Predicate = x => x.Id == WellnessProgramDetailForm.IdCardWellnessProgramDetailId,
+     Predicate = x => x.Id == GroupForm.IdCardGroupId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleWellnessProgramDetailsQuery
+var data = (await Mediator.Send(new GetSingleGroupsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -454,17 +455,17 @@ var data = (await Mediator.Send(new GetSingleWellnessProgramDetailsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new WellnessProgramDetail
+    Select = x => new Group
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new WellnessProgramDetail
+        Patient = new Group
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new WellnessProgramDetail
+        Pratitioner = new Group
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -477,55 +478,55 @@ var data = (await Mediator.Send(new GetSingleWellnessProgramDetailsQuery
 })) ?? new();
 
 
-#region ComboboxWellnessProgramDetail
+#region ComboboxGroup
 
- private DxComboBox<WellnessProgramDetailDto, long?> refWellnessProgramDetailComboBox { get; set; }
- private int WellnessProgramDetailComboBoxIndex { get; set; } = 0;
- private int totalCountWellnessProgramDetail = 0;
+ private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
+ private int GroupComboBoxIndex { get; set; } = 0;
+ private int totalCountGroup = 0;
 
- private async Task OnSearchWellnessProgramDetail()
+ private async Task OnSearchGroup()
  {
-     await LoadDataWellnessProgramDetail();
+     await LoadDataGroup();
  }
 
- private async Task OnSearchWellnessProgramDetailIndexIncrement()
+ private async Task OnSearchGroupIndexIncrement()
  {
-     if (WellnessProgramDetailComboBoxIndex < (totalCountWellnessProgramDetail - 1))
+     if (GroupComboBoxIndex < (totalCountGroup - 1))
      {
-         WellnessProgramDetailComboBoxIndex++;
-         await LoadDataWellnessProgramDetail(WellnessProgramDetailComboBoxIndex, 10);
+         GroupComboBoxIndex++;
+         await LoadDataGroup(GroupComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchWellnessProgramDetailIndexDecrement()
+ private async Task OnSearchGroupIndexDecrement()
  {
-     if (WellnessProgramDetailComboBoxIndex > 0)
+     if (GroupComboBoxIndex > 0)
      {
-         WellnessProgramDetailComboBoxIndex--;
-         await LoadDataWellnessProgramDetail(WellnessProgramDetailComboBoxIndex, 10);
+         GroupComboBoxIndex--;
+         await LoadDataGroup(GroupComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputWellnessProgramDetailChanged(string e)
+ private async Task OnInputGroupChanged(string e)
  {
-     WellnessProgramDetailComboBoxIndex = 0;
-     await LoadDataWellnessProgramDetail();
+     GroupComboBoxIndex = 0;
+     await LoadDataGroup();
  }
 
  
-  private async Task LoadDataWellnessProgramDetail(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetWellnessProgramDetailQuery
+          var result = await Mediator.Send(new GetGroupQuery
           {
-              SearchTerm = refWellnessProgramDetailComboBox?.Text ?? "",
+              SearchTerm = refGroupComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          WellnessProgramDetails = result.Item1;
-          totalCountWellnessProgramDetail = result.PageCount;
+          Groups = result.Item1;
+          totalCountGroup = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -535,47 +536,47 @@ var data = (await Mediator.Send(new GetSingleWellnessProgramDetailsQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxWellnessProgramDetail
+ #endregion ComboboxGroup
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="WellnessProgramDetail" ColSpanMd="12">
-    <MyDxComboBox Data="@WellnessProgramDetails"
-                  NullText="Select WellnessProgramDetail"
-                  @ref="refWellnessProgramDetailComboBox"
-                  @bind-Value="@a.WellnessProgramDetailId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Group" ColSpanMd="12">
+    <MyDxComboBox Data="@Groups"
+                  NullText="Select Group"
+                  @ref="refGroupComboBox"
+                  @bind-Value="@a.GroupId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputWellnessProgramDetailChanged(e))">
+                  TextChanged="((string e) => OnInputGroupChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchWellnessProgramDetailIndexDecrement"
+            <DxEditorButton Click="OnSearchGroupIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchWellnessProgramDetail"
+            <DxEditorButton Click="OnSearchGroup"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchWellnessProgramDetailIndexIncrement"
+            <DxEditorButton Click="OnSearchGroupIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(WellnessProgramDetailDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="WellnessProgramDetail.Name" Caption="WellnessProgramDetail" />
-            <DxListEditorColumn FieldName="@nameof(WellnessProgramDetailDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(GroupDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Group.Name" Caption="Group" />
+            <DxListEditorColumn FieldName="@nameof(GroupDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.WellnessProgramDetailId)" />
+    <ValidationMessage For="@(()=>a.GroupId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
-var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDtos.Adapt<List<CreateUpdateWellnessProgramDetailDto>>().Adapt<List<WellnessProgramDetail>>()); 
+var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDto.Adapt<CreateUpdateGroupDto>().Adapt<Group>());
+var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDtos.Adapt<List<CreateUpdateGroupDto>>().Adapt<List<Group>>()); 
 
-var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());  
-var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDtos.Adapt<List<CreateUpdateWellnessProgramDetailDto>>().Adapt<List<WellnessProgramDetail>>());
+var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDto.Adapt<CreateUpdateGroupDto>().Adapt<Group>());  
+var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDtos.Adapt<List<CreateUpdateGroupDto>>().Adapt<List<Group>>());
 
-list3 = (await Mediator.Send(new GetWellnessProgramDetailQuery
+list3 = (await Mediator.Send(new GetGroupQuery
 {
-    Predicate = x => WellnessProgramDetailNames.Contains(x.Name.ToLower()),
+    Predicate = x => GroupNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new WellnessProgramDetail
+    Select = x => new Group
     {
         Id = x.Id,
         Name = x.Name
@@ -585,42 +586,42 @@ list3 = (await Mediator.Send(new GetWellnessProgramDetailQuery
 
 #region Searching
 
-    private int pageSizeWellnessProgramDetailAttendance { get; set; } = 10;
-    private int totalCountWellnessProgramDetailAttendance = 0;
-    private int activePageIndexWellnessProgramDetailAttendance { get; set; } = 0;
-    private string searchTermWellnessProgramDetailAttendance { get; set; } = string.Empty;
+    private int pageSizeGroupAttendance { get; set; } = 10;
+    private int totalCountGroupAttendance = 0;
+    private int activePageIndexGroupAttendance { get; set; } = 0;
+    private string searchTermGroupAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedWellnessProgramDetailAttendance(string searchText)
+    private async Task OnSearchBoxChangedGroupAttendance(string searchText)
     {
-        searchTermWellnessProgramDetailAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeWellnessProgramDetailAttendance);
+        searchTermGroupAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeGroupAttendance);
     }
 
-    private async Task OnpageSizeWellnessProgramDetailAttendanceIndexChanged(int newpageSizeWellnessProgramDetailAttendance)
+    private async Task OnpageSizeGroupAttendanceIndexChanged(int newpageSizeGroupAttendance)
     {
-        pageSizeWellnessProgramDetailAttendance = newpageSizeWellnessProgramDetailAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeWellnessProgramDetailAttendance);
+        pageSizeGroupAttendance = newpageSizeGroupAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeGroupAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeWellnessProgramDetailAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeGroupAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeWellnessProgramDetailAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeGroupAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetWellnessProgramDetailAttendanceQuery
+        var result = await Mediator.Send(new GetGroupAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeWellnessProgramDetailAttendance,
-            SearchTerm = searchTermWellnessProgramDetailAttendance,
+            PageSize = pageSizeGroupAttendance,
+            SearchTerm = searchTermGroupAttendance,
         });
-        WellnessProgramDetailAttendances = result.Item1;
-        totalCountWellnessProgramDetailAttendance = result.PageCount;
-        activePageIndexWellnessProgramDetailAttendance = pageIndex;
+        GroupAttendances = result.Item1;
+        totalCountGroupAttendance = result.PageCount;
+        activePageIndexGroupAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
@@ -630,3 +631,29 @@ list3 = (await Mediator.Send(new GetWellnessProgramDetailQuery
     finally { PanelVisible = false; }
 }
     #endregion Searching
+
+        <div class="row">
+        <DxFormLayout>
+            <div class="col-md-9">
+                <DxFormLayoutItem>
+                    <DxPager PageCount="totalCount"
+                             ActivePageIndexChanged="OnPageIndexChanged"
+                             ActivePageIndex="activePageIndex"
+                             VisibleNumericButtonCount="10"
+                             SizeMode="SizeMode.Medium"
+                             NavigationMode="PagerNavigationMode.Auto">
+                    </DxPager>
+                </DxFormLayoutItem>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end">
+                <DxFormLayoutItem Caption="Page Size:">
+                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                  NullText="Select Page Size"
+                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                  @bind-Value="pageSize">
+                    </MyDxComboBox>
+                </DxFormLayoutItem>
+            </div>
+        </DxFormLayout>
+    </div>

@@ -1322,7 +1322,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             if (v)
                 User = new() { Name = "-" };
 
-            var result2 = await Mediator.Send(new GetGroupQuery(pageIndex: 0, pageSize: short.MaxValue));
+            var result2 = await Mediator.Send(new GetGroupQuery
+            {
+                PageIndex = 0,
+                IsGetAll = true
+            });
             var groups = result2.Item1;
 
             NameGroup = groups.FirstOrDefault(x => x.Id == UserAccessCRUID.GroupId) ?? new();

@@ -15,5 +15,7 @@ namespace McDermott.Domain.Entities
         public string? Slug { get; set; }
         public string? Content { get; set; }
         public EnumWellness Status { get; set; } = EnumWellness.Draft;
+
+        public List<WellnessProgramDetail>? WellnessProgramDetails { get; set; }
     }
 }

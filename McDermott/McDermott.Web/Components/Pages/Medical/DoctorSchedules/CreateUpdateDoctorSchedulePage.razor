@@ -19,7 +19,12 @@
                                         ApplyBackgroundShading="true"
                                         IndicatorAreaVisible="false"
                                         Text="Fetching Data...">
-                            <EditForm Model="@DoctorSchedule" @onkeypress="@KeyPressHandler" Context="EditFormContext22" Enhance OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                            <EditForm Model="@DoctorSchedule"
+                                      @onkeypress="@KeyPressHandler"
+                                      Context="EditFormContext22"
+                                      Enhance
+                                      OnValidSubmit="HandleValidSubmit"
+                                      OnInvalidSubmit="@HandleInvalidSubmit">
                                 <DataAnnotationsValidator />
                                 <ValidationSummary />
                                 <AntiforgeryToken />
@@ -46,16 +51,16 @@
                                                               @ref="refUserComboBox"
                                                               @bind-Value="@DoctorSchedule.PhysicionId"
                                                               TextFieldName="Name"
-                                                              ValueFieldName="Id" >
-                                                                <Columns>
-                                                                        <DxListEditorColumn FieldName="Name" />
-                                                                        <DxListEditorColumn FieldName="Email" />
-                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
-                                                                        <DxListEditorColumn FieldName="Gender" />
-                                                                        <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
-                                                                        <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
-                                                                        <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
-                                                                    </Columns>
+                                                              ValueFieldName="Id">
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="Name" />
+                                                        <DxListEditorColumn FieldName="Email" />
+                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                        <DxListEditorColumn FieldName="Gender" />
+                                                        <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+                                                        <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
+                                                        <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
+                                                    </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>DoctorSchedule.PhysicionId)" />
                                             </DxFormLayoutItem>
@@ -102,11 +107,10 @@
                                                     <DxGridDataColumn FieldName="Quota" />
                                                     <DxGridDataColumn FieldName="Service.Name" Caption="Service" />
                                                 </Columns>
-
-
+                                                 
                                                 <TotalSummary>
                                                     <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                                       FieldName="DayOfWeek.Name"
+                                                                       FieldName="DayOfWeek"
                                                                        Visible="true" />
                                                 </TotalSummary>
 
@@ -117,7 +121,9 @@
                                                     <DxFormLayout CssClass="w-100">
 
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Day of Week" ColSpanMd="12">
-                                                            <DxComboBox Data="@DayOfWeeks" @bind-Value="@a.DayOfWeek" FilteringMode="@DataGridFilteringMode.Contains" NullText="Day of Weeks" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            <MyDxComboBox Data="@DayOfWeeks" @bind-Value="@a.DayOfWeek" FilteringMode="@DataGridFilteringMode.Contains" NullText="Day of Weeks" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+
+                                                            <ValidationMessage For="@(()=>a.DayOfWeek)" />
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Work From" ColSpanMd="12">
@@ -125,6 +131,7 @@
                                                                         Format="@DisplayFormat"
                                                                         DisplayFormat="@DisplayFormat"
                                                                         CssClass="cw-320" />
+                                                            <ValidationMessage For="@(()=>a.WorkFrom)" />
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Work To" ColSpanMd="12">
@@ -132,10 +139,12 @@
                                                                         Format="@DisplayFormat"
                                                                         DisplayFormat="@DisplayFormat"
                                                                         CssClass="cw-320" />
+                                                            <ValidationMessage For="@(()=>a.WorkTo)" />
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Quota" ColSpanMd="12">
                                                             <DxSpinEdit @bind-Value="@a.Quota" NullText="Quota" MinValue="0" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                                                            <ValidationMessage For="@(()=>a.Quota)" />
                                                         </DxFormLayoutItem>
 
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">

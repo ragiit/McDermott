@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Transaction
 {
-    public class WellnessProgramAttendanceDto : IMapFrom<WellnessProgramAttendance>
+    public class WellnessProgramParticipantDto : IMapFrom<WellnessProgramParticipant>
     {
         public long Id { get; set; }
         public long WellnessProgramId { get; set; }
@@ -14,12 +14,11 @@ namespace McDermott.Application.Dtos.Transaction
         public long PatientId { get; set; }
         public DateTime Date { get; set; }
 
-        public User? Patient { get; set; }
         public WellnessProgramDto? WellnessProgram { get; set; }
-        public WellnessProgramDetailDto? WellnessProgramDetail { get; set; }
+        public UserDto? Patient { get; set; }
     }
 
-    public class CreateUpdateWellnessProgramAttendanceDto
+    public class CreateUpdateWellnessProgramParticipantDto
     {
         public long Id { get; set; }
         public long WellnessProgramId { get; set; }

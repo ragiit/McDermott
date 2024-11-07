@@ -98,9 +98,16 @@ namespace McDermott.Web.Components.Layout
                     return;
                 }
 
-                var menus = (await Mediator.QueryGetHelper<Menu, MenuDto>(0, short.MaxValue)).Item1;
-                var groups = (await Mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(0, short.MaxValue, predicate: x => x.GroupId == (long)User!.GroupId!)).Item1;
-
+                //var menus = (await Mediator.QueryGetHelper<Menu, MenuDto>(0, short.MaxValue)).Item1;
+                var menus = (await Mediator.Send(new GetMenuQuery
+                {
+                    IsGetAll = true,
+                })).Item1;
+                var groups = (await Mediator.Send(new GetGroupMenuQuery
+                {
+                    Predicate = x => x.GroupId == (long)User!.GroupId!,
+                    IsGetAll = true
+                })).Item1;
                 var groupMenuIds = groups.Select(x => x.MenuId).ToList();
                 var parentMenuIds = menus.Where(x => groups.Select(z => z.MenuId).Contains(x.Id)).Select(x => x.ParentId).Distinct().ToList();
                 //var childParentIds = groups.Where(x => menus.Any(m => m.Id == x.MenuId)).Select(x  => x.Menu.).Distinct().ToList();

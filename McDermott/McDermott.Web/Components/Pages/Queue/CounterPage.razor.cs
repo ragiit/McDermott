@@ -1,6 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
-using McDermott.Application.Dtos.Queue; 
+using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 
 namespace McDermott.Web.Components.Pages.Queue
@@ -378,7 +378,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
                 //    User = await oLocal.GetUserInfo();
                 //    userBy = User.Name;
-                NavigationManager.NavigateTo($"/queue/counter-view/{Id}");
+                NavigationManager.NavigateTo($"queue/counter-view/{Id}");
             }
             catch (Exception ex)
             {

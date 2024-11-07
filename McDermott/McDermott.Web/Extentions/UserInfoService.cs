@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using MailKit.Search;
+using MediatR;
 
 namespace McDermott.Web.Extentions
 {
@@ -46,22 +48,45 @@ namespace McDermott.Web.Extentions
                         IsDefaultData = x.IsDefaultData,
                         IsDoctor = x.IsDoctor,
                         IsEmployee = x.IsEmployee,
-                        IsHr    = x.IsHr,
+                        IsHr = x.IsHr,
                         IsNurse = x.IsNurse,
                         IsPatient = x.IsPatient,
                         IsPhysicion = x.IsPhysicion,
                         IsPharmacy = x.IsPharmacy,
                         IsUser = x.IsUser,
-                        IsMcu = x.IsMcu, 
+                        IsMcu = x.IsMcu,
                     }
                 });
 
-                var groups = (await _mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(0, short.MaxValue, predicate: x => x.GroupId == (long)user!.GroupId!,
-                    includes:
+                //var groups = (await _mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(0, short.MaxValue, predicate: x => x.GroupId == (long)user!.GroupId!,
+                //    includes:
+                //    [
+                //        x => x.Menu
+                //    ],
+                //    select: x => new GroupMenu
+                //    {
+                //        Id = x.Id,
+                //        GroupId = x.GroupId,
+                //        IsCreate = x.IsCreate,
+                //        IsDelete = x.IsDelete,
+                //        IsDefaultData = x.IsDefaultData,
+                //        IsImport = x.IsImport,
+                //        IsRead = x.IsRead,
+                //        IsUpdate = x.IsUpdate,
+                //        Menu = new Menu
+                //        {
+                //            Url = x.Menu.Url
+                //        }
+                //    })).Item1;
+
+                var groups = (await _mediator.Send(new GetGroupMenuQuery
+                {
+                    Predicate = x => x.GroupId == (long)user!.GroupId!,
+                    Includes =
                     [
                         x => x.Menu
                     ],
-                    select: x => new GroupMenu
+                    Select = x => new GroupMenu
                     {
                         Id = x.Id,
                         GroupId = x.GroupId,
@@ -75,7 +100,9 @@ namespace McDermott.Web.Extentions
                         {
                             Url = x.Menu.Url
                         }
-                    })).Item1;
+                    },
+                    IsGetAll = true
+                })).Item1;
 
                 url = url.ToLower().Replace(_navigationManager.BaseUri, "");
 

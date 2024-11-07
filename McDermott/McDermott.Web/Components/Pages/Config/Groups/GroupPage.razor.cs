@@ -139,8 +139,12 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            //var result = await MyQuery.GetMenus(HttpClientFactory, pageIndex, pageSize, refMenuComboBox?.Text ?? "");
-            var result = await Mediator.Send(new GetMenuQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refMenuComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetMenuQuery
+            {
+                SearchTerm = refMenuComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
             Menus = result.Item1;
             Menus.Insert(0, new MenuDto
             {
@@ -148,7 +152,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                 Name = "All",
             });
             Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.pageCount;
+            totalCountMenu = result.PageCount;
             PanelVisible = false;
         }
 
@@ -286,9 +290,14 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             Group = new();
             ShowForm = false;
             GroupMenus = [];
-            var result = await Mediator.QueryGetHelper<Group, GroupDto>(pageIndex, pageSize, searchTerm);
+            var result = await Mediator.Send(new GetGroupQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = searchTerm ?? "",
+            });
             Groups = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }

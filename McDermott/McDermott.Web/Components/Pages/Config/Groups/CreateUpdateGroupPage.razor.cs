@@ -97,9 +97,15 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.QueryGetHelper<GroupMenu, GroupMenuDto>(pageIndex, pageSize, searchTerm, predicate: x => x.GroupId == Group.Id);
+            var result = await Mediator.Send(new GetGroupMenuQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Predicate = x => x.GroupId == Group.Id,
+                SearchTerm = searchTerm ?? ""
+            });
             GroupMenus = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -156,10 +162,15 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.QueryGetHelper<Menu, MenuDto>(pageIndex, pageSize, refMenuComboBox?.Text ?? "");
+            var result = await Mediator.Send(new GetMenuQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refMenuComboBox?.Text ?? ""
+            });
             Menus = result.Item1;
             Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.pageCount;
+            totalCountMenu = result.PageCount;
             PanelVisible = false;
         }
 
@@ -230,10 +241,13 @@ namespace McDermott.Web.Components.Pages.Config.Groups
 
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMenuQuery(x => x.Id == a.MenuId));
+            var result = await Mediator.Send(new GetMenuQuery
+            {
+                Predicate = x => x.Id == a.MenuId
+            });
             Menus = result.Item1;
             Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.pageCount;
+            totalCountMenu = result.PageCount;
             PanelVisible = false;
 
             return;
@@ -298,23 +312,22 @@ namespace McDermott.Web.Components.Pages.Config.Groups
 
         private async Task LoadData()
         {
-            //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
-
-            //Id = McDermott.Extentions.SecureHelper.DecryptIdFromBase64(Ids);
-            var result = await Mediator.QueryGetHelper<Group, GroupDto>(0, 0, predicate: x => x.Id == Id);
-
+            var result = await Mediator.Send(new GetSingleGroupQuery
+            {
+                Predicate = x => x.Id == Id
+            });
             Group = new();
             GroupMenus.Clear();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
-                if (result.Item1.Count == 0 || !Id.HasValue)
+                if (result == null || !Id.HasValue)
                 {
                     NavigationManager.NavigateTo("configuration/groups");
                     return;
                 }
 
-                Group = result.Item1.FirstOrDefault() ?? new();
+                Group = result ?? new();
                 await LoadGroupMenus();
             }
         }
@@ -775,12 +788,14 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                             parentMenus.Add(b.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetMenuQuery(x => parentMenus.Contains(x.Parent.Name) && menus.Contains(x.Name.ToLower()), 0, 0,
-                        includes:
+                    list1 = (await Mediator.Send(new GetMenuQuery
+                    {
+                        Predicate = x => parentMenus.Contains(x.Parent.Name) && menus.Contains(x.Name.ToLower()),
+                        Includes =
                         [
                             x => x.Parent
                         ],
-                        select: x => new Menu
+                        Select = x => new Menu
                         {
                             Id = x.Id,
                             Name = x.Name,
@@ -788,7 +803,9 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                             {
                                 Name = x.Parent.Name
                             }
-                        }))).Item1;
+                        },
+                        IsGetAll = true
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

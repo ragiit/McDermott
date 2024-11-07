@@ -2,13 +2,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
 
-using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
-
 namespace McDermott.Application.Features.Queries.Config
 {
     public class GroupMenuQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-
         IRequestHandler<GetGroupMenuQuery, (List<GroupMenuDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleGroupMenuQuery, GroupMenuDto>,
         IRequestHandler<ValidateGroupMenuQuery, bool>,
         IRequestHandler<CreateGroupMenuRequest, GroupMenuDto>,
         IRequestHandler<BulkValidateGroupMenuQuery, List<GroupMenuDto>>,
@@ -62,6 +60,25 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 var query = _unitOfWork.Repository<GroupMenu>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<GroupMenu>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<GroupMenu>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -71,34 +88,134 @@ namespace McDermott.Application.Features.Queries.Config
                     }
                 }
 
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
-
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Menu.Name, $"%{request.SearchTerm}%")
-                        );
+                            EF.Functions.Like(v.Menu.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Menu.Parent.Name, $"%{request.SearchTerm}%")
+                            );
                 }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new GroupMenu
+                    {
+                        Id = x.Id,
+                        MenuId = x.MenuId,
+                        Menu = new Menu
+                        {
+                            Name = x.Menu.Name,
+                            Parent = new Menu
+                            {
+                                Name = x.Menu.Parent.Name
+                            }
+                        },
+
+                        IsCreate = x.IsCreate,
+                        IsDelete = x.IsDelete,
+                        IsDefaultData = x.IsDefaultData,
+                        IsImport = x.IsImport,
+                        IsRead = x.IsRead,
+                        IsUpdate = x.IsUpdate,
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<GroupMenuDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<GroupMenuDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<GroupMenuDto> Handle(GetSingleGroupMenuQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<GroupMenu>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<GroupMenu>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<GroupMenu>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Id), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                return (pagedItems.Adapt<List<GroupMenuDto>>(), request.PageIndex, request.PageSize, totalPages);
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    //query = query.Where(v =>
+                    //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.GroupMenu.Name, $"%{request.SearchTerm}%")
+                    //    );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new GroupMenu
+                    {
+                        Id = x.Id,
+                        MenuId = x.MenuId,
+                        Menu = new Menu
+                        {
+                            Name = x.Menu.Name,
+                            Parent = new Menu
+                            {
+                                Name = x.Menu.Parent.Name
+                            }
+                        },
+
+                        IsCreate = x.IsCreate,
+                        IsDelete = x.IsDelete,
+                        IsDefaultData = x.IsDefaultData,
+                        IsImport = x.IsImport,
+                        IsRead = x.IsRead,
+                        IsUpdate = x.IsUpdate,
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GroupMenuDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

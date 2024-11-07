@@ -47,7 +47,7 @@
 {
     <div class="wrapper">
 
-        @if (currentUrl.Contains("login") || currentUrl.Contains("chat") || currentUrl.Contains("chats") || currentUrl.Contains("queue/kiosk/") || currentUrl.Contains("queue/viewdisplay"))
+        @if (currentUrl.Contains("clinic-service/wellness/join-participant") || currentUrl.Contains("clinic-service/wellness/attendance") || currentUrl.Contains("login") || currentUrl.Contains("unauthorized") || currentUrl.Contains("chat") || currentUrl.Contains("chats") || currentUrl.Contains("queue/kiosk/") || currentUrl.Contains("queue/viewdisplay"))
         { 
             @Body
         }
@@ -98,7 +98,7 @@
                     </ul>
                 </nav>
                 <aside class="main-sidebar sidebar-light-info elevation-4">
-                    <a href="/" class="brand-link no-underline">
+                    <a href="" class="brand-link no-underline">
                         <img src="image/mcdermott_logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                         <span class="ms-2 brand-text font-weight-bold">McHealthCare</span>
                     </a>

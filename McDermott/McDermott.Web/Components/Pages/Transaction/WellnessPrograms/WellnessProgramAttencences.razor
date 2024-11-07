@@ -1,0 +1,317 @@
+﻿@page "/clinic-service/wellness/attendance/{Slug}"
+@using System.ComponentModel.DataAnnotations
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramParticipantCommand
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramDetailCommand
+
+<PageTitle>@Helper.APP_NAME - Wellness</PageTitle>
+
+<style>
+    .centered-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+</style>
+
+@if (IsFound)
+{
+    if (IsClosed)
+    {
+        <div class="wrapper">
+            <div class="container-fluid ">
+                <div class="row centered-container">
+                    <div class="col-md-10">
+                        <div class="card mt-5">
+                            <div class="card-header bg-primary">
+                                <div class="row justify-content-center">
+                                    <div class="col-auto align-self-center">
+                                        <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-center">Sorry, this program activity has ended.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <DxLoadingPanel @bind-Visible="PanelVisible"
+                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="false"
+                        Text="Fetching Data...">
+            <div class="wrapper">
+                <div class="container-fluid ">
+                    <div class="row centered-container">
+                        <div class="col-md-10">
+                            <div class="card mt-5">
+                                <div class="card-header bg-success">
+                                    <div class="row justify-content-center">
+                                        <div class="col-auto align-self-center">
+                                            <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <EditForm Model="ahe" Context="EditFormContext">
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem Caption="Employee Number" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
+                                                <Template>
+                                                    <DxGridLayout>
+                                                        <Rows>
+                                                            <DxGridLayoutRow />
+                                                        </Rows>
+                                                        <Columns>
+                                                            <DxGridLayoutColumn Width="25fr" />
+                                                            <DxGridLayoutColumn Width="5fr" />
+                                                        </Columns>
+                                                        <Items>
+                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
+                                                                <Template>
+                                                                    <DxTextBox @bind-Text="@PatientNumber" NullText="Employee Number" CssClass="" ShowValidationIcon="true"></DxTextBox>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                            <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                <Template>
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                              RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                                              IconCssClass="fa-solid fa-magnifying-glass"
+                                                                              Text="Search"
+                                                                              SubmitFormOnClick="true"
+                                                                              Click="OnSearchPatient"
+                                                                              CssClass="w-100 me-1">
+                                                                    </DxButton>
+                                                                </Template>
+                                                            </DxGridLayoutItem>
+                                                        </Items>
+                                                    </DxGridLayout>
+                                                </Template>
+                                            </DxFormLayoutItem>
+
+
+                                            @if (Patient is not null && Patient.Id != 0)
+                                            {
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@Patient.Name"
+                                                               ReadOnly
+                                                               NullText="Name" />
+                                                    <ValidationMessage For="@(() => Patient.Name)" />
+                                                </DxFormLayoutItem>
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Email" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@Patient.Email"
+                                                               ReadOnly
+                                                               NullText="Email" />
+                                                    <ValidationMessage For="@(() => Patient.Email)" />
+                                                </DxFormLayoutItem>
+
+                                                @if (Patient.Department is null)
+                                                {
+                                                    Patient.Department = new();
+                                                }
+
+                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
+                                                    <MyTextBox @bind-Text="@Patient.Department.Name"
+                                                               ReadOnly
+                                                               NullText="Department" />
+                                                    <ValidationMessage For="@(() => Patient.Department)" />
+                                                </DxFormLayoutItem>
+                                            }
+                                        </DxFormLayout>
+
+                                        @if (Patient is not null && Patient.Id != 0)
+                                        {
+                                            <div class="row mt-2">
+                                                <div class="col-12">
+                                                    <div class="row justify-content-end">
+                                                        <div class="col-md-12 d-flex justify-content-end">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                      RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                                      Text="Join"
+                                                                      CssClass="w-130"
+                                                                      SubmitFormOnClick="true"
+                                                                      Click="OnClickJoin">
+                                                            </DxButton>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </EditForm>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </DxLoadingPanel>
+    }
+}
+else
+{
+    <div class="wrapper">
+        <div class="container-fluid ">
+            <div class="row centered-container">
+                <div class="col-md-10">
+                    <div class="card mt-5">
+                        <div class="card-header bg-primary">
+                            <div class="row justify-content-center">
+                                <div class="col-auto align-self-center">
+                                    <h4 class="fw-bold">Slug</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-center"> Sorry, The Activity is not found, please check the URL.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private UserDto ahe { get; set; } = new();
+
+    private bool IsFound { get; set; } = true;
+    private bool PanelVisible { get; set; } = false;
+
+    [Required]
+    private string PatientNumber { get; set; } = string.Empty;
+
+    private WellnessProgramDetailDto WellnessProgramDetail { get; set; } = new();
+    private UserDto Patient { get; set; } = new();
+
+    private async Task OnClickJoin()
+    {
+        try
+        {
+            PanelVisible = true;
+
+            var cek = await Mediator.Send(new ValidateWellnessProgramAttendance(x => x.PatientId == Patient.Id && x.WellnessProgramDetailId == WellnessProgramDetail.Id));
+            if (cek)
+            {
+                ToastService.ShowInfo("The Employee is already joined the Wellness Program Activity!");
+                return;
+            }
+
+            await Mediator.Send(new CreateWellnessProgramAttendanceRequest(new WellnessProgramAttendanceDto
+                {
+                    Date = DateTime.Now,
+                    PatientId = Patient.Id,
+                    WellnessProgramId = WellnessProgramDetail.WellnessProgramId,
+                    WellnessProgramDetailId = WellnessProgramDetail.Id,
+                }));
+
+            ToastService.ShowSuccess("Successfully joined the Wellness Program Activity!");
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    private async Task OnSearchPatient()
+    {
+        try
+        {
+            PanelVisible = true;
+            var res = await Mediator.Send(new GetSingleWellnessProgramParticipantQuery
+                {
+                    Includes =
+                                    [
+                                        x => x.Patient
+                                    ],
+                    Predicate = x => x.WellnessProgramId == WellnessProgramDetail.WellnessProgramId && x.Patient != null && ((x.Patient.Legacy != null && x.Patient.Legacy.Equals(PatientNumber)) ||
+                                x.Patient.NIP != null && x.Patient.NIP.Equals(PatientNumber) ||
+                                x.Patient.Oracle != null && x.Patient.Oracle.Equals(PatientNumber) ||
+                                x.Patient.SAP != null && x.Patient.SAP.Equals(PatientNumber)),
+                    Select = x => new WellnessProgramParticipant
+                    {
+                        Id = x.Id,
+                        PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            Id = x.Patient.Id,
+                            Name = x.Patient.Name,
+                            Email = x.Patient.Email,
+                            Department = new Department
+                            {
+                                Name = x.Patient != null && x.Patient.Department != null ? x.Patient.Department.Name : "-"
+                            },
+                        }
+                    }
+                });
+
+            if (res is null || res.Id == 0)
+            {
+                ToastService.ShowInfo("The Employee Number is not Joined yet.");
+                return;
+            }
+
+            Patient = res.Patient ?? new();
+
+            // Patient = await Mediator.Send(new GetSingleUserQuery
+            //     {
+            //         Predicate = x => x.Id == res.PatientId,
+            //         Select = x => new User
+            //         {
+            //             Id = x.Id,
+            //             Name = x.Name,
+            //             Email = x.Email,
+            //             Department = new Department
+            //             {
+            //                 Name = x.Department != null ? x.Department.Name : "-"
+            //             },
+            //         }
+            //     });
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    private bool IsClosed { get; set; } = false;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PanelVisible = true;
+            WellnessProgramDetail = await Mediator.Send(new GetSingleWellnessProgramDetailQuery
+                {
+                    Predicate = x => x.Slug == Slug
+                });
+
+            if (WellnessProgramDetail is null)
+            {
+                IsFound = false;
+                return;
+            }
+
+            if (WellnessProgramDetail.EndDate is not null && WellnessProgramDetail.EndDate < DateTime.Now)
+            {
+                IsClosed = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+
+
+    }
+}

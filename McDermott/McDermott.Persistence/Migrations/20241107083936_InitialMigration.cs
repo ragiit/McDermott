@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace McDermott.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class initialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -646,6 +646,29 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WellnessPrograms",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WellnessPrograms", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EducationPrograms",
                 columns: table => new
                 {
@@ -661,6 +684,7 @@ namespace McDermott.Persistence.Migrations
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     MaterialContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Attendance = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -852,6 +876,63 @@ namespace McDermott.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WellnessProgramDetails",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WellnessProgramDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WellnessProgramDetails_WellnessPrograms_WellnessProgramId",
+                        column: x => x.WellnessProgramId,
+                        principalTable: "WellnessPrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WellnessProgramSessions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Time = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Day = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WellnessProgramSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WellnessProgramSessions_WellnessPrograms_WellnessProgramId",
+                        column: x => x.WellnessProgramId,
+                        principalTable: "WellnessPrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cities",
                 columns: table => new
                 {
@@ -871,38 +952,6 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_Cities_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WellnessPrograms",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DiagnosisId = table.Column<long>(type: "bigint", nullable: false),
-                    ProgramName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SelectedDiagnoses = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SeverityLevel = table.Column<int>(type: "int", nullable: false),
-                    ProgramContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    HasSpecialSessions = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WellnessPrograms", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WellnessPrograms_Diagnoses_DiagnosisId",
-                        column: x => x.DiagnosisId,
-                        principalTable: "Diagnoses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1063,35 +1112,6 @@ namespace McDermott.Persistence.Migrations
                         name: "FK_HealthCenters_Provinces_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Provinces",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WellnessProgramSessions",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Time = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Day = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WellnessProgramSessions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WellnessProgramSessions_WellnessPrograms_WellnessProgramId",
-                        column: x => x.WellnessProgramId,
-                        principalTable: "WellnessPrograms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2852,10 +2872,9 @@ namespace McDermott.Persistence.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
+                    WellnessProgramDetailId = table.Column<long>(type: "bigint", nullable: false),
                     PatientId = table.Column<long>(type: "bigint", nullable: false),
-                    AttendanceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AttendanceStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -2871,7 +2890,44 @@ namespace McDermott.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_WellnessProgramAttendances_WellnessProgramDetails_WellnessProgramDetailId",
+                        column: x => x.WellnessProgramDetailId,
+                        principalTable: "WellnessProgramDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_WellnessProgramAttendances_WellnessPrograms_WellnessProgramId",
+                        column: x => x.WellnessProgramId,
+                        principalTable: "WellnessPrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "wellnessProgramParticipants",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    WellnessProgramId = table.Column<long>(type: "bigint", nullable: false),
+                    PatientId = table.Column<long>(type: "bigint", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_wellnessProgramParticipants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_wellnessProgramParticipants_Users_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_wellnessProgramParticipants_WellnessPrograms_WellnessProgramId",
                         column: x => x.WellnessProgramId,
                         principalTable: "WellnessPrograms",
                         principalColumn: "Id",
@@ -5165,14 +5221,29 @@ namespace McDermott.Persistence.Migrations
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_WellnessProgramAttendances_WellnessProgramDetailId",
+                table: "WellnessProgramAttendances",
+                column: "WellnessProgramDetailId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WellnessProgramAttendances_WellnessProgramId",
                 table: "WellnessProgramAttendances",
                 column: "WellnessProgramId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WellnessPrograms_DiagnosisId",
-                table: "WellnessPrograms",
-                column: "DiagnosisId");
+                name: "IX_WellnessProgramDetails_WellnessProgramId",
+                table: "WellnessProgramDetails",
+                column: "WellnessProgramId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_wellnessProgramParticipants_PatientId",
+                table: "wellnessProgramParticipants",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_wellnessProgramParticipants_WellnessProgramId",
+                table: "wellnessProgramParticipants",
+                column: "WellnessProgramId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WellnessProgramSessions_WellnessProgramId",
@@ -5451,6 +5522,9 @@ namespace McDermott.Persistence.Migrations
                 name: "WellnessProgramAttendances");
 
             migrationBuilder.DropTable(
+                name: "wellnessProgramParticipants");
+
+            migrationBuilder.DropTable(
                 name: "WellnessProgramSessions");
 
             migrationBuilder.DropTable(
@@ -5467,6 +5541,9 @@ namespace McDermott.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "DoctorSchedules");
+
+            migrationBuilder.DropTable(
+                name: "Diagnoses");
 
             migrationBuilder.DropTable(
                 name: "NursingDiagnoses");
@@ -5502,7 +5579,7 @@ namespace McDermott.Persistence.Migrations
                 name: "TransferStocks");
 
             migrationBuilder.DropTable(
-                name: "WellnessPrograms");
+                name: "WellnessProgramDetails");
 
             migrationBuilder.DropTable(
                 name: "ConcoctionLines");
@@ -5517,6 +5594,12 @@ namespace McDermott.Persistence.Migrations
                 name: "HealthCenters");
 
             migrationBuilder.DropTable(
+                name: "CronisCategories");
+
+            migrationBuilder.DropTable(
+                name: "DiseaseCategories");
+
+            migrationBuilder.DropTable(
                 name: "GeneralConsultanServices");
 
             migrationBuilder.DropTable(
@@ -5529,7 +5612,7 @@ namespace McDermott.Persistence.Migrations
                 name: "StockProducts");
 
             migrationBuilder.DropTable(
-                name: "Diagnoses");
+                name: "WellnessPrograms");
 
             migrationBuilder.DropTable(
                 name: "Concoctions");
@@ -5557,12 +5640,6 @@ namespace McDermott.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
-
-            migrationBuilder.DropTable(
-                name: "CronisCategories");
-
-            migrationBuilder.DropTable(
-                name: "DiseaseCategories");
 
             migrationBuilder.DropTable(
                 name: "DrugDosages");

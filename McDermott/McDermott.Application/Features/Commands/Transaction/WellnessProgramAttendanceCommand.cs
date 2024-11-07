@@ -25,6 +25,16 @@ namespace McDermott.Application.Features.Commands.Transaction
             public string SearchTerm { get; set; }
         }
 
+        public class ValidateWellnessProgramAttendance(Expression<Func<WellnessProgramAttendance, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<WellnessProgramAttendance, bool>> Predicate { get; } = predicate!;
+        }
+
+        public class BulkValidateWellnessProgramAttendance(List<WellnessProgramAttendanceDto> WellnessProgramAttendancesToValidate) : IRequest<List<WellnessProgramAttendanceDto>>
+        {
+            public List<WellnessProgramAttendanceDto> WellnessProgramAttendancesToValidate { get; } = WellnessProgramAttendancesToValidate;
+        }
+
         public class GetWellnessProgramAttendanceQuery : IRequest<(List<WellnessProgramAttendanceDto>, int PageIndex, int PageSize, int PageCount)>
         {
             public List<Expression<Func<WellnessProgramAttendance, object>>> Includes { get; set; }
@@ -40,11 +50,6 @@ namespace McDermott.Application.Features.Commands.Transaction
             public string SearchTerm { get; set; }
         }
 
-        public class ValidateWellnessProgramAttendance(Expression<Func<WellnessProgramAttendance, bool>>? predicate = null) : IRequest<bool>
-        {
-            public Expression<Func<WellnessProgramAttendance, bool>> Predicate { get; } = predicate!;
-        }
-
         #endregion GET
 
         #region CREATE
@@ -52,11 +57,6 @@ namespace McDermott.Application.Features.Commands.Transaction
         public class CreateWellnessProgramAttendanceRequest(WellnessProgramAttendanceDto WellnessProgramAttendanceDto) : IRequest<WellnessProgramAttendanceDto>
         {
             public WellnessProgramAttendanceDto WellnessProgramAttendanceDto { get; set; } = WellnessProgramAttendanceDto;
-        }
-
-        public class BulkValidateWellnessProgramAttendance(List<WellnessProgramAttendanceDto> WellnessProgramAttendancesToValidate) : IRequest<List<WellnessProgramAttendanceDto>>
-        {
-            public List<WellnessProgramAttendanceDto> WellnessProgramAttendancesToValidate { get; } = WellnessProgramAttendancesToValidate;
         }
 
         public class CreateListWellnessProgramAttendanceRequest(List<WellnessProgramAttendanceDto> WellnessProgramAttendanceDtos) : IRequest<List<WellnessProgramAttendanceDto>>

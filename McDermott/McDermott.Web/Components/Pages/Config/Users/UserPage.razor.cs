@@ -111,12 +111,16 @@ namespace McDermott.Web.Components.Pages.Config.Users
                             religionNames.Add(b.ToLower());
                     }
 
-                    groups = (await Mediator.Send(new GetGroupQuery(x => groupNames.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new Group
+                    groups = (await Mediator.Send(new GetGroupQuery
+                    {
+                        Predicate = x => groupNames.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                        Select = x => new Group
                         {
                             Id = x.Id,
                             Name = x.Name
-                        }))).Item1;
+                        }
+                    })).Item1;
 
                     religions = (await Mediator.Send(new GetReligionQuery(x => religionNames.Contains(x.Name.ToLower()))));
 
@@ -490,16 +494,48 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(
-                searchTerm: searchTerm,
-                pageSize: pageSize,
-                pageIndex:
-                pageIndex,
-                includes:
+            //var result = await Mediator.Send(new GetUserQuery2(
+            //    searchTerm: searchTerm,
+            //    pageSize: pageSize,
+            //    pageIndex:
+            //    pageIndex,
+            //    includes:
+            //    [
+            //        user => user.Group
+            //    ],
+            //    select: x => new User
+            //    {
+            //        Id = x.Id,
+            //        Name = x.Name,
+            //        Email = x.Email,
+            //        MobilePhone = x.MobilePhone,
+            //        Gender = x.Gender,
+            //        DateOfBirth = x.DateOfBirth,
+            //        Group = new Domain.Entities.Group
+            //        {
+            //            Name = x.Group.Name
+            //        },
+            //        IsEmployee = x.IsEmployee,
+            //        IsPatient = x.IsPatient,
+            //        IsUser = x.IsUser,
+            //        IsPhysicion = x.IsPhysicion,
+            //        IsNurse = x.IsNurse,
+            //        IsPharmacy = x.IsPharmacy,
+            //        IsMcu = x.IsMcu,
+            //        IsHr = x.IsHr,
+            //    }
+            //));
+
+            var result = await Mediator.Send(new GetUserQueryNew
+            {
+                SearchTerm = searchTerm ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Includes =
                 [
-                    user => user.Group
+                    x => x.Group
                 ],
-                select: x => new User
+                Select = x => new User
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -520,9 +556,9 @@ namespace McDermott.Web.Components.Pages.Config.Users
                     IsMcu = x.IsMcu,
                     IsHr = x.IsHr,
                 }
-            ));
+            });
             Users = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
@@ -1138,9 +1174,14 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetGroupQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refGroupComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetGroupQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refGroupComboBox?.Text ?? ""
+            });
             Groups = result.Item1;
-            totalCountGroup = result.pageCount;
+            totalCountGroup = result.PageCount;
             PanelVisible = false;
         }
 

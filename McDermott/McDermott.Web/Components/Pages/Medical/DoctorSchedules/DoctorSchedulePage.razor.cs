@@ -117,12 +117,13 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
                 SelectedDataItems = [];
                 var a = await Mediator.Send(new GetDoctorScheduledQuery
                 {
-                    Includes = [
+                    Includes =
+                    [
                         x => x.Physicion
-                        ],
+                    ],
                     PageIndex = pageIndex,
                     PageSize = pageSize,
-                    SearchTerm = searchTerm,
+                    SearchTerm = searchTerm ?? "",
                 });
                 DoctorSchedules = a.Item1;
                 totalCount = a.PageCount;
@@ -295,7 +296,7 @@ namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
                                 WorkFrom = d.WorkFrom,
                                 WorkTo = d.WorkTo,
                                 Quota = d.Quota,
-                                ServiceId = d.ServiceId,
+                                ServiceId = d.ServiceId.GetValueOrDefault(),
                                 StartDate = date,
                             });
                         }

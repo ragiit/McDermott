@@ -6,9 +6,9 @@ namespace McDermott.Application.Features.Queries.Config
     public class MenuQueryHandler
         (IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetMenuQuery, (List<MenuDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleMenuQuery, MenuDto>,
         IRequestHandler<CreateMenuRequest, MenuDto>,
         IRequestHandler<BulkValidateMenuQuery, List<MenuDto>>,
-
         IRequestHandler<ValidateMenuQuery, bool>,
         IRequestHandler<CreateListMenuRequest, List<MenuDto>>,
         IRequestHandler<UpdateMenuRequest, MenuDto>,
@@ -53,6 +53,25 @@ namespace McDermott.Application.Features.Queries.Config
             {
                 var query = _unitOfWork.Repository<Menu>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Menu>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Menu>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -62,36 +81,126 @@ namespace McDermott.Application.Features.Queries.Config
                     }
                 }
 
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
-
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%") ||
-                        v.Sequence.Equals(request.SearchTerm) ||
-                        EF.Functions.Like(v.Url, $"%{request.SearchTerm}%")
-                        );
+                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%") ||
+                         v.Sequence.Equals(request.SearchTerm) ||
+                         EF.Functions.Like(v.Url, $"%{request.SearchTerm}%")
+                         );
                 }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Menu
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Sequence = x.Sequence,
+                        Url = x.Url,
+                        ParentId = x.ParentId,
+                        Icon = x.Icon,
+                        IsDefaultData = x.IsDefaultData,
+                        Parent = new Menu
+                        {
+                            Name = x.Parent.Name
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<MenuDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<MenuDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<MenuDto> Handle(GetSingleMenuQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Menu>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Menu>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Menu>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                return (pagedItems.Adapt<List<MenuDto>>(), request.PageIndex, request.PageSize, totalPages);
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                         EF.Functions.Like(v.Parent.Name, $"%{request.SearchTerm}%") ||
+                         v.Sequence.Equals(request.SearchTerm) ||
+                         EF.Functions.Like(v.Url, $"%{request.SearchTerm}%")
+                         );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Menu
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Sequence = x.Sequence,
+                        Url = x.Url,
+                        ParentId = x.ParentId,
+                        Icon = x.Icon,
+                        IsDefaultData = x.IsDefaultData,
+                        Parent = new Menu
+                        {
+                            Name = x.Parent.Name
+                        }
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<MenuDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

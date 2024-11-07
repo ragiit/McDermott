@@ -156,6 +156,7 @@ namespace McDermott.Persistence.Context
         public DbSet<WellnessProgram> WellnessPrograms { get; set; }
         public DbSet<WellnessProgramDetail> WellnessProgramDetails { get; set; }
         public DbSet<WellnessProgramAttendance> WellnessProgramAttendances { get; set; }
+        public DbSet<WellnessProgramParticipant> wellnessProgramParticipants { get; set; }
         public DbSet<WellnessProgramSession> WellnessProgramSessions { get; set; }
         public DbSet<GeneralConsultationServiceLog> GeneralConsultationServiceLogs { get; set; }
         public DbSet<InventoryAdjusment> InventoryAdjusments { get; set; }
@@ -165,10 +166,12 @@ namespace McDermott.Persistence.Context
         #endregion MyRegion
 
         #region AwarenessEvent
-        DbSet<EducationProgram> EducationPrograms { get; set; }
-        DbSet<AwarenessEduCategory> AwarenessEduCategories {  get; set; }
-        DbSet<ParticipanEdu> ParticipanEdus {  get; set; }
-        #endregion
+
+        private DbSet<EducationProgram> EducationPrograms { get; set; }
+        private DbSet<AwarenessEduCategory> AwarenessEduCategories { get; set; }
+        private DbSet<ParticipanEdu> ParticipanEdus { get; set; }
+
+        #endregion AwarenessEvent
 
         #endregion DbSet
 
@@ -334,6 +337,11 @@ namespace McDermott.Persistence.Context
                   .HasMany(m => m.GeneralConsultanCPPTs)
                   .WithOne(c => c.GeneralConsultanService)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<WellnessProgram>()
+                 .HasMany(m => m.WellnessProgramDetails)
+                 .WithOne(c => c.WellnessProgram)
+                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<GeneralConsultanService>()
                   .HasMany(m => m.GeneralConsultanCPPTs)
