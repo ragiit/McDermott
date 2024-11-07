@@ -1,14 +1,14 @@
-public class MaintenanceCommand
+public class WellnessProgramDetailCommand
  {
      #region GET
 
-    public class GetSingleMaintenanceQuery : IRequest<MaintenanceDto>
+    public class GetSingleWellnessProgramDetailQuery : IRequest<WellnessProgramDetailDto>
     {
-        public List<Expression<Func<Maintenance, object>>> Includes { get; set; }
-        public Expression<Func<Maintenance, bool>> Predicate { get; set; }
-        public Expression<Func<Maintenance, Maintenance>> Select { get; set; }
+        public List<Expression<Func<WellnessProgramDetail, object>>> Includes { get; set; }
+        public Expression<Func<WellnessProgramDetail, bool>> Predicate { get; set; }
+        public Expression<Func<WellnessProgramDetail, WellnessProgramDetail>> Select { get; set; }
 
-        public List<(Expression<Func<Maintenance, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<WellnessProgramDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class MaintenanceCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetMaintenanceQuery : IRequest<(List<MaintenanceDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetWellnessProgramDetailQuery : IRequest<(List<WellnessProgramDetailDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Maintenance, object>>> Includes { get; set; }
-        public Expression<Func<Maintenance, bool>> Predicate { get; set; }
-        public Expression<Func<Maintenance, Maintenance>> Select { get; set; }
+        public List<Expression<Func<WellnessProgramDetail, object>>> Includes { get; set; }
+        public Expression<Func<WellnessProgramDetail, bool>> Predicate { get; set; }
+        public Expression<Func<WellnessProgramDetail, WellnessProgramDetail>> Select { get; set; }
 
-        public List<(Expression<Func<Maintenance, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<WellnessProgramDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class MaintenanceCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateMaintenance(Expression<Func<Maintenance, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateWellnessProgramDetail(Expression<Func<WellnessProgramDetail, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Maintenance, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<WellnessProgramDetail, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateMaintenanceRequest(MaintenanceDto MaintenanceDto) : IRequest<MaintenanceDto>
+     public class CreateWellnessProgramDetailRequest(WellnessProgramDetailDto WellnessProgramDetailDto) : IRequest<WellnessProgramDetailDto>
      {
-         public MaintenanceDto MaintenanceDto { get; set; } = MaintenanceDto;
+         public WellnessProgramDetailDto WellnessProgramDetailDto { get; set; } = WellnessProgramDetailDto;
      }
 
-     public class BulkValidateMaintenance(List<MaintenanceDto> MaintenancesToValidate) : IRequest<List<MaintenanceDto>>
+     public class BulkValidateWellnessProgramDetail(List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate) : IRequest<List<WellnessProgramDetailDto>>
      {
-         public List<MaintenanceDto> MaintenancesToValidate { get; } = MaintenancesToValidate;
+         public List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate { get; } = WellnessProgramDetailsToValidate;
      }
 
-     public class CreateListMaintenanceRequest(List<MaintenanceDto> MaintenanceDtos) : IRequest<List<MaintenanceDto>>
+     public class CreateListWellnessProgramDetailRequest(List<WellnessProgramDetailDto> WellnessProgramDetailDtos) : IRequest<List<WellnessProgramDetailDto>>
      {
-         public List<MaintenanceDto> MaintenanceDtos { get; set; } = MaintenanceDtos;
+         public List<WellnessProgramDetailDto> WellnessProgramDetailDtos { get; set; } = WellnessProgramDetailDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateMaintenanceRequest(MaintenanceDto MaintenanceDto) : IRequest<MaintenanceDto>
+     public class UpdateWellnessProgramDetailRequest(WellnessProgramDetailDto WellnessProgramDetailDto) : IRequest<WellnessProgramDetailDto>
      {
-         public MaintenanceDto MaintenanceDto { get; set; } = MaintenanceDto;
+         public WellnessProgramDetailDto WellnessProgramDetailDto { get; set; } = WellnessProgramDetailDto;
      }
 
-     public class UpdateListMaintenanceRequest(List<MaintenanceDto> MaintenanceDtos) : IRequest<List<MaintenanceDto>>
+     public class UpdateListWellnessProgramDetailRequest(List<WellnessProgramDetailDto> WellnessProgramDetailDtos) : IRequest<List<WellnessProgramDetailDto>>
      {
-         public List<MaintenanceDto> MaintenanceDtos { get; set; } = MaintenanceDtos;
+         public List<WellnessProgramDetailDto> WellnessProgramDetailDtos { get; set; } = WellnessProgramDetailDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteMaintenanceRequest : IRequest<bool>
+     public class DeleteWellnessProgramDetailRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,24 +83,24 @@ public class MaintenanceCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateMaintenanceQuery, List<MaintenanceDto>>,
+IRequestHandler<BulkValidateWellnessProgramDetailQuery, List<WellnessProgramDetailDto>>,
   
-IRequestHandler<GetMaintenanceQuery, (List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleMaintenanceQuery, MaintenanceDto>,
-public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetMaintenanceQuery, (List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleMaintenanceQuery, MaintenanceDto>, IRequestHandler<ValidateMaintenance, bool>,
-     IRequestHandler<CreateMaintenanceRequest, MaintenanceDto>,
-     IRequestHandler<BulkValidateMaintenance, List<MaintenanceDto>>,
-     IRequestHandler<CreateListMaintenanceRequest, List<MaintenanceDto>>,
-     IRequestHandler<UpdateMaintenanceRequest, MaintenanceDto>,
-     IRequestHandler<UpdateListMaintenanceRequest, List<MaintenanceDto>>,
-     IRequestHandler<DeleteMaintenanceRequest, bool>
+IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>,
+public class WellnessProgramDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>, IRequestHandler<ValidateWellnessProgramDetail, bool>,
+     IRequestHandler<CreateWellnessProgramDetailRequest, WellnessProgramDetailDto>,
+     IRequestHandler<BulkValidateWellnessProgramDetail, List<WellnessProgramDetailDto>>,
+     IRequestHandler<CreateListWellnessProgramDetailRequest, List<WellnessProgramDetailDto>>,
+     IRequestHandler<UpdateWellnessProgramDetailRequest, WellnessProgramDetailDto>,
+     IRequestHandler<UpdateListWellnessProgramDetailRequest, List<WellnessProgramDetailDto>>,
+     IRequestHandler<DeleteWellnessProgramDetailRequest, bool>
 {
     #region GET
-    public async Task<List<MaintenanceDto>> Handle(BulkValidateMaintenance request, CancellationToken cancellationToken)
+    public async Task<List<WellnessProgramDetailDto>> Handle(BulkValidateWellnessProgramDetail request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.MaintenancesToValidate;
+        var CountryDtos = request.WellnessProgramDetailsToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
         //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -116,20 +116,20 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
         return [];
     }
-    public async Task<bool> Handle(ValidateMaintenance request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateWellnessProgramDetail request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Maintenance>()
+        return await _unitOfWork.Repository<WellnessProgramDetail>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMaintenanceQuery request, CancellationToken cancellationToken)
+    public async Task<(List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetWellnessProgramDetailQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Maintenance>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<WellnessProgramDetail>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -145,8 +145,8 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Maintenance>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Maintenance>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<WellnessProgramDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<WellnessProgramDetail>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -163,7 +163,7 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Maintenance.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.WellnessProgramDetail.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -171,7 +171,7 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Maintenance
+                query = query.Select(x => new WellnessProgramDetail
                 {
                     Id = x.Id, 
                 });
@@ -185,11 +185,11 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<MaintenanceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<WellnessProgramDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<MaintenanceDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<WellnessProgramDetailDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -199,11 +199,11 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<MaintenanceDto> Handle(GetSingleMaintenanceQuery request, CancellationToken cancellationToken)
+    public async Task<WellnessProgramDetailDto> Handle(GetSingleWellnessProgramDetailQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Maintenance>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<WellnessProgramDetail>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -219,8 +219,8 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Maintenance>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Maintenance>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<WellnessProgramDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<WellnessProgramDetail>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -237,7 +237,7 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Maintenance.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.WellnessProgramDetail.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -245,12 +245,12 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Maintenance
+                query = query.Select(x => new WellnessProgramDetail
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<MaintenanceDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<WellnessProgramDetailDto>();
         }
         catch (Exception ex)
         {
@@ -263,17 +263,17 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<MaintenanceDto> Handle(CreateMaintenanceRequest request, CancellationToken cancellationToken)
+     public async Task<WellnessProgramDetailDto> Handle(CreateWellnessProgramDetailRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Maintenance>().AddAsync(request.MaintenanceDto.Adapt<CreateUpdateMaintenanceDto>().Adapt<Maintenance>());
+             var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<MaintenanceDto>();
+             return result.Adapt<WellnessProgramDetailDto>();
          }
          catch (Exception)
          {
@@ -281,16 +281,16 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<MaintenanceDto>> Handle(CreateListMaintenanceRequest request, CancellationToken cancellationToken)
+     public async Task<List<WellnessProgramDetailDto>> Handle(CreateListWellnessProgramDetailRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Maintenance>().AddAsync(request.MaintenanceDtos.Adapt<List<Maintenance>>());
+             var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDtos.Adapt<List<WellnessProgramDetail>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<MaintenanceDto>>();
+             return result.Adapt<List<WellnessProgramDetailDto>>();
          }
          catch (Exception)
          {
@@ -302,17 +302,17 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<MaintenanceDto> Handle(UpdateMaintenanceRequest request, CancellationToken cancellationToken)
+     public async Task<WellnessProgramDetailDto> Handle(UpdateWellnessProgramDetailRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Maintenance>().UpdateAsync(request.MaintenanceDto.Adapt<MaintenanceDto>().Adapt<Maintenance>());
+             var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<WellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<MaintenanceDto>();
+             return result.Adapt<WellnessProgramDetailDto>();
          }
          catch (Exception)
          {
@@ -320,16 +320,16 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<MaintenanceDto>> Handle(UpdateListMaintenanceRequest request, CancellationToken cancellationToken)
+     public async Task<List<WellnessProgramDetailDto>> Handle(UpdateListWellnessProgramDetailRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Maintenance>().UpdateAsync(request.MaintenanceDtos.Adapt<List<Maintenance>>());
+             var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDtos.Adapt<List<WellnessProgramDetail>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<MaintenanceDto>>();
+             return result.Adapt<List<WellnessProgramDetailDto>>();
          }
          catch (Exception)
          {
@@ -341,23 +341,23 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteMaintenanceRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteWellnessProgramDetailRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Maintenance>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<WellnessProgramDetail>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Maintenance>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<WellnessProgramDetail>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetMaintenanceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetWellnessProgramDetailQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -371,20 +371,20 @@ public class MaintenanceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateMaintenanceQuery(List<MaintenanceDto> MaintenancesToValidate) : IRequest<List<MaintenanceDto>>
+public class BulkValidateWellnessProgramDetailQuery(List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate) : IRequest<List<WellnessProgramDetailDto>>
 {
-    public List<MaintenanceDto> MaintenancesToValidate { get; } = MaintenancesToValidate;
+    public List<WellnessProgramDetailDto> WellnessProgramDetailsToValidate { get; } = WellnessProgramDetailsToValidate;
 }a
 
 
-IRequestHandler<BulkValidateMaintenanceQuery, List<MaintenanceDto>>,
+IRequestHandler<BulkValidateWellnessProgramDetailQuery, List<WellnessProgramDetailDto>>,
   
-IRequestHandler<GetMaintenanceQuery, (List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleMaintenanceQuery, MaintenanceDto>,
+IRequestHandler<GetWellnessProgramDetailQuery, (List<WellnessProgramDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleWellnessProgramDetailQuery, WellnessProgramDetailDto>,
 
 
 
- var a = await Mediator.Send(new GetMaintenancesQuery
+ var a = await Mediator.Send(new GetWellnessProgramDetailsQuery
  {
      OrderByList =
      [
@@ -396,10 +396,10 @@ IRequestHandler<GetSingleMaintenanceQuery, MaintenanceDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleMaintenanceQuery
+var patienss = (await Mediator.Send(new GetSingleWellnessProgramDetailQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Maintenance
+    Select = x => new WellnessProgramDetail
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -412,13 +412,13 @@ var patienss = (await Mediator.Send(new GetSingleMaintenanceQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetMaintenanceQuery
+    var result = await Mediator.Send(new GetWellnessProgramDetailQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Maintenances = result.Item1;
+    WellnessProgramDetails = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -431,22 +431,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetMaintenanceQuery
+ var result = await Mediator.Send(new GetWellnessProgramDetailQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refMaintenanceComboBox?.Text ?? "",
+     SearchTerm = refWellnessProgramDetailComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Maintenances = result.Item1;
- totalCountMaintenance = result.PageCount;
+ WellnessProgramDetails = result.Item1;
+ totalCountWellnessProgramDetail = result.PageCount;
 
- Maintenances = (await Mediator.Send(new GetMaintenanceQuery
+ WellnessProgramDetails = (await Mediator.Send(new GetWellnessProgramDetailQuery
  {
-     Predicate = x => x.Id == MaintenanceForm.IdCardMaintenanceId,
+     Predicate = x => x.Id == WellnessProgramDetailForm.IdCardWellnessProgramDetailId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleMaintenancesQuery
+var data = (await Mediator.Send(new GetSingleWellnessProgramDetailsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -454,17 +454,17 @@ var data = (await Mediator.Send(new GetSingleMaintenancesQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Maintenance
+    Select = x => new WellnessProgramDetail
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Maintenance
+        Patient = new WellnessProgramDetail
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Maintenance
+        Pratitioner = new WellnessProgramDetail
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -477,55 +477,55 @@ var data = (await Mediator.Send(new GetSingleMaintenancesQuery
 })) ?? new();
 
 
-#region ComboboxMaintenance
+#region ComboboxWellnessProgramDetail
 
- private DxComboBox<MaintenanceDto, long?> refMaintenanceComboBox { get; set; }
- private int MaintenanceComboBoxIndex { get; set; } = 0;
- private int totalCountMaintenance = 0;
+ private DxComboBox<WellnessProgramDetailDto, long?> refWellnessProgramDetailComboBox { get; set; }
+ private int WellnessProgramDetailComboBoxIndex { get; set; } = 0;
+ private int totalCountWellnessProgramDetail = 0;
 
- private async Task OnSearchMaintenance()
+ private async Task OnSearchWellnessProgramDetail()
  {
-     await LoadDataMaintenance();
+     await LoadDataWellnessProgramDetail();
  }
 
- private async Task OnSearchMaintenanceIndexIncrement()
+ private async Task OnSearchWellnessProgramDetailIndexIncrement()
  {
-     if (MaintenanceComboBoxIndex < (totalCountMaintenance - 1))
+     if (WellnessProgramDetailComboBoxIndex < (totalCountWellnessProgramDetail - 1))
      {
-         MaintenanceComboBoxIndex++;
-         await LoadDataMaintenance(MaintenanceComboBoxIndex, 10);
+         WellnessProgramDetailComboBoxIndex++;
+         await LoadDataWellnessProgramDetail(WellnessProgramDetailComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchMaintenanceIndexDecrement()
+ private async Task OnSearchWellnessProgramDetailIndexDecrement()
  {
-     if (MaintenanceComboBoxIndex > 0)
+     if (WellnessProgramDetailComboBoxIndex > 0)
      {
-         MaintenanceComboBoxIndex--;
-         await LoadDataMaintenance(MaintenanceComboBoxIndex, 10);
+         WellnessProgramDetailComboBoxIndex--;
+         await LoadDataWellnessProgramDetail(WellnessProgramDetailComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputMaintenanceChanged(string e)
+ private async Task OnInputWellnessProgramDetailChanged(string e)
  {
-     MaintenanceComboBoxIndex = 0;
-     await LoadDataMaintenance();
+     WellnessProgramDetailComboBoxIndex = 0;
+     await LoadDataWellnessProgramDetail();
  }
 
  
-  private async Task LoadDataMaintenance(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataWellnessProgramDetail(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetMaintenanceQuery
+          var result = await Mediator.Send(new GetWellnessProgramDetailQuery
           {
-              SearchTerm = refMaintenanceComboBox?.Text ?? "",
+              SearchTerm = refWellnessProgramDetailComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Maintenances = result.Item1;
-          totalCountMaintenance = result.PageCount;
+          WellnessProgramDetails = result.Item1;
+          totalCountWellnessProgramDetail = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -535,47 +535,47 @@ var data = (await Mediator.Send(new GetSingleMaintenancesQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxMaintenance
+ #endregion ComboboxWellnessProgramDetail
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Maintenance" ColSpanMd="12">
-    <MyDxComboBox Data="@Maintenances"
-                  NullText="Select Maintenance"
-                  @ref="refMaintenanceComboBox"
-                  @bind-Value="@a.MaintenanceId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="WellnessProgramDetail" ColSpanMd="12">
+    <MyDxComboBox Data="@WellnessProgramDetails"
+                  NullText="Select WellnessProgramDetail"
+                  @ref="refWellnessProgramDetailComboBox"
+                  @bind-Value="@a.WellnessProgramDetailId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputMaintenanceChanged(e))">
+                  TextChanged="((string e) => OnInputWellnessProgramDetailChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchMaintenanceIndexDecrement"
+            <DxEditorButton Click="OnSearchWellnessProgramDetailIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchMaintenance"
+            <DxEditorButton Click="OnSearchWellnessProgramDetail"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchMaintenanceIndexIncrement"
+            <DxEditorButton Click="OnSearchWellnessProgramDetailIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(MaintenanceDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Maintenance.Name" Caption="Maintenance" />
-            <DxListEditorColumn FieldName="@nameof(MaintenanceDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(WellnessProgramDetailDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="WellnessProgramDetail.Name" Caption="WellnessProgramDetail" />
+            <DxListEditorColumn FieldName="@nameof(WellnessProgramDetailDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.MaintenanceId)" />
+    <ValidationMessage For="@(()=>a.WellnessProgramDetailId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Maintenance>().AddAsync(request.MaintenanceDto.Adapt<CreateUpdateMaintenanceDto>().Adapt<Maintenance>());
-var result = await _unitOfWork.Repository<Maintenance>().AddAsync(request.MaintenanceDtos.Adapt<List<CreateUpdateMaintenanceDto>>().Adapt<List<Maintenance>>()); 
+var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
+var result = await _unitOfWork.Repository<WellnessProgramDetail>().AddAsync(request.WellnessProgramDetailDtos.Adapt<List<CreateUpdateWellnessProgramDetailDto>>().Adapt<List<WellnessProgramDetail>>()); 
 
-var result = await _unitOfWork.Repository<Maintenance>().UpdateAsync(request.MaintenanceDto.Adapt<CreateUpdateMaintenanceDto>().Adapt<Maintenance>());  
-var result = await _unitOfWork.Repository<Maintenance>().UpdateAsync(request.MaintenanceDtos.Adapt<List<CreateUpdateMaintenanceDto>>().Adapt<List<Maintenance>>());
+var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());  
+var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDtos.Adapt<List<CreateUpdateWellnessProgramDetailDto>>().Adapt<List<WellnessProgramDetail>>());
 
-list3 = (await Mediator.Send(new GetMaintenanceQuery
+list3 = (await Mediator.Send(new GetWellnessProgramDetailQuery
 {
-    Predicate = x => MaintenanceNames.Contains(x.Name.ToLower()),
+    Predicate = x => WellnessProgramDetailNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Maintenance
+    Select = x => new WellnessProgramDetail
     {
         Id = x.Id,
         Name = x.Name
@@ -585,42 +585,42 @@ list3 = (await Mediator.Send(new GetMaintenanceQuery
 
 #region Searching
 
-    private int pageSizeMaintenanceAttendance { get; set; } = 10;
-    private int totalCountMaintenanceAttendance = 0;
-    private int activePageIndexMaintenanceAttendance { get; set; } = 0;
-    private string searchTermMaintenanceAttendance { get; set; } = string.Empty;
+    private int pageSizeWellnessProgramDetailAttendance { get; set; } = 10;
+    private int totalCountWellnessProgramDetailAttendance = 0;
+    private int activePageIndexWellnessProgramDetailAttendance { get; set; } = 0;
+    private string searchTermWellnessProgramDetailAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedMaintenanceAttendance(string searchText)
+    private async Task OnSearchBoxChangedWellnessProgramDetailAttendance(string searchText)
     {
-        searchTermMaintenanceAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeMaintenanceAttendance);
+        searchTermWellnessProgramDetailAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeWellnessProgramDetailAttendance);
     }
 
-    private async Task OnpageSizeMaintenanceAttendanceIndexChanged(int newpageSizeMaintenanceAttendance)
+    private async Task OnpageSizeWellnessProgramDetailAttendanceIndexChanged(int newpageSizeWellnessProgramDetailAttendance)
     {
-        pageSizeMaintenanceAttendance = newpageSizeMaintenanceAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeMaintenanceAttendance);
+        pageSizeWellnessProgramDetailAttendance = newpageSizeWellnessProgramDetailAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeWellnessProgramDetailAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeMaintenanceAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeWellnessProgramDetailAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeMaintenanceAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeWellnessProgramDetailAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetMaintenanceAttendanceQuery
+        var result = await Mediator.Send(new GetWellnessProgramDetailAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeMaintenanceAttendance,
-            SearchTerm = searchTermMaintenanceAttendance,
+            PageSize = pageSizeWellnessProgramDetailAttendance,
+            SearchTerm = searchTermWellnessProgramDetailAttendance,
         });
-        MaintenanceAttendances = result.Item1;
-        totalCountMaintenanceAttendance = result.PageCount;
-        activePageIndexMaintenanceAttendance = pageIndex;
+        WellnessProgramDetailAttendances = result.Item1;
+        totalCountWellnessProgramDetailAttendance = result.PageCount;
+        activePageIndexWellnessProgramDetailAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)

@@ -1,0 +1,12 @@
+{ 
+    "PCareBaseURL": "https://apijkn-dev.bpjs-kesehatan.go.id/pcare-rest-dev",
+    "AntreanFKTPBaseURL": "https://apijkn-dev.bpjs-kesehatan.go.id/antreanfktp_dev",
+    "ConsId": "15793",
+    "KdAplikasi": "095",
+    "Password": "BPJSKes2024**",
+    "PCareCodeProvider": "00010001",
+    "SecretKey": "8nDF24C2AD",
+    "UserKey": "6825c31715d8d748d5944f13b39ac431",
+    "Username": "dermott"
+  }
+  

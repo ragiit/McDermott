@@ -1,6 +1,4 @@
-﻿using DevExpress.XtraReports.Parameters;
-
-namespace McDermott.Web.Components.Pages.Bpjs
+﻿namespace McDermott.Web.Components.Pages.Bpjs
 {
     public partial class SystemParameterPage
     {
@@ -228,6 +226,37 @@ namespace McDermott.Web.Components.Pages.Bpjs
         }
 
         #endregion Grid
+
+        private async Task ImportSettings(InputFileChangeEventArgs e)
+        {
+            PanelVisible = true;
+            try
+            {
+                // Get the uploaded file
+                var file = e.File;
+
+                // Read the file content as a stream
+                using var stream = file.OpenReadStream();
+                using var reader = new StreamReader(stream);
+                var jsonContent = await reader.ReadToEndAsync();
+
+                // Deserialize JSON content into the model
+                var settings = System.Text.Json.JsonSerializer.Deserialize<SystemParameterDto>(jsonContent);
+
+                if (SystemParameter.Id == 0)
+                    SystemParameter = await Mediator.Send(new CreateSystemParameterRequest(settings));
+                else
+                    SystemParameter = await Mediator.Send(new UpdateSystemParameterRequest(settings));
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally
+            {
+                PanelVisible = false;
+            }
+        }
 
         private async Task OnValidSubmit()
         {

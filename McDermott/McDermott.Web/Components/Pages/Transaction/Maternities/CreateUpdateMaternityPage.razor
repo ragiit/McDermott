@@ -298,55 +298,6 @@
                                                                 <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))" @bind-Checked="@GeneralConsultanService.IsAlertInformationSpecialCase" />
                                                             </DxFormLayoutItem>
 
-                                                            @*       <DxFormLayoutItem Caption="Pregnancy Status" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusG"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="G" />
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption=" " CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusP"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="P" />
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption=" " CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusA"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="A" />
-                                                        </DxFormLayoutItem> *@
-
-                                                            @* <DxFormLayoutItem Context="abc" Caption="Pregnancy Status" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <DxFormLayout>
-                                                        <DxFormLayoutItem Caption="G" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusG"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="G" />
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem Caption="P" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusP"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="P" />
-                                                        </DxFormLayoutItem>
-
-                                                        <DxFormLayoutItem Caption="A" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.PregnancyStatusA"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="A" />
-                                                        </DxFormLayoutItem>
-                                                        </DxFormLayout>
-                                                        </DxFormLayoutItem>
-
-
-                                                        <DxFormLayoutItem Caption="HPHT" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.HPHT"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="HPHT" />
-                                                        </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption="HPL" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@GeneralConsultanService.HPL"
-                                                        ReadOnly="ReadOnlyForm()"
-                                                        NullText="HPL" />
-                                                        </DxFormLayoutItem> *@
                                                         </DxFormLayout>
                                                     </div>
                                                     <div class="col-md-6">
@@ -1062,9 +1013,9 @@
                                                                                                          Refresh_Click="@RefreshCPPT_Click"
                                                                                                          Grid="GridCppt"
                                                                                                          IsImport="false"
-                                                                                                         VisibleNew="IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician)"
-                                                                                                         VisibleEdit="IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician)"
-                                                                                                         VisibleDelete="IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician)" />
+                                                                                                         VisibleNew="IsStatus(EnumStatusGeneralConsultantService.Midwife)"
+                                                                                                         VisibleEdit="IsStatus(EnumStatusGeneralConsultantService.Midwife)"
+                                                                                                         VisibleDelete="IsStatus(EnumStatusGeneralConsultantService.Midwife)" />
                                                                                     </ToolbarTemplate>
 
                                                                                     <EditFormTemplate Context="EditFormContext">
@@ -1230,17 +1181,21 @@
                                                                                           @ref="refReferenceComboBox"
                                                                                           @bind-Value="@GeneralConsultanServiceAnc.Reference"
                                                                                           TextFieldName="Reference"
+                                                                                          ReadOnly="ReadOnlyForm()"
                                                                                           ValueFieldName="Reference"
                                                                                           TextChanged="((string e) => OnInputReferenceChanged(e))"
                                                                                           SelectedItemChanged="((GeneralConsultanServiceAncDto e) => OnSelectedReferenceChanged(e))">
                                                                                 <Buttons>
                                                                                     <DxEditorButton Click="OnSearchReferenceIndexDecrement"
+                                                                                                    Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
                                                                                                     IconCssClass="fa-solid fa-caret-left"
                                                                                                     Tooltip="Previous Index" />
                                                                                     <DxEditorButton Click="OnSearchReference"
                                                                                                     IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                    Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
                                                                                                     Tooltip="Search" />
                                                                                     <DxEditorButton Click="OnSearchReferenceIndexIncrement"
+                                                                                                    Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
                                                                                                     IconCssClass="fa-solid fa-caret-right"
                                                                                                     Tooltip="Next Index" />
                                                                                 </Buttons>
@@ -1286,16 +1241,19 @@
                                                                             <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.HPL)" />
                                                                         </DxFormLayoutItem>
 
-                                                                        <div class="mt-3 row w-100">
-                                                                            <div class="col-sm align-self-end">
-                                                                                <div class="row justify-content-end">
-                                                                                    <div class="col-auto">
-                                                                                        <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Clear"></DxButton>
+                                                                        @if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Midwife)
+                                                                        {
+                                                                            <div class="mt-3 row w-100">
+                                                                                <div class="col-sm align-self-end">
+                                                                                    <div class="row justify-content-end">
+                                                                                        <div class="col-auto">
+                                                                                            <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Clear"></DxButton>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
+                                                                        }
                                                                     </DxFormLayout>
                                                                 </EditForm>
 
@@ -1402,6 +1360,7 @@
                                                                                 </EditFormTemplate>
 
                                                                             </MyGridPaginate>
+
 
                                                                             <div class="row">
                                                                                 <DxFormLayout>

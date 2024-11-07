@@ -8,19 +8,12 @@ namespace McDermott.Domain.Entities
 {
     public partial class WellnessProgram : BaseAuditableEntity
     {
-        public long DiagnosisId { get; set; }
-        public string? ProgramName { get; set; }
-        public string? Category { get; set; }
-        public List<string> SelectedDiagnoses { get; set; } = [];
-        public int SeverityLevel { get; set; }
-        public string? ProgramContent { get; set; }
-        public string? Status { get; set; }
+        public string? Category { get; set; } // Id
+        public string Name { get; set; } = string.Empty;
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public bool HasSpecialSessions { get; set; }
-
-        public Diagnosis? Diagnosis { get; set; }
+        public string? Slug { get; set; }
+        public string? Content { get; set; }
+        public EnumWellness Status { get; set; } = EnumWellness.Draft;
     }
-
-     
 }

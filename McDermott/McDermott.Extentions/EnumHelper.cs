@@ -46,6 +46,21 @@ namespace McDermott.Application.Extentions
             Delete = 3,
         }
 
+        public enum EnumWellness
+        {
+            [Display(Name = "Draft")]
+            Draft = 1,
+
+            [Display(Name = "Active")]
+            Active = 2,
+
+            [Display(Name = "Completed")]
+            Completed = 3,
+
+            [Display(Name = "Inactive")]
+            Inactive = 0
+        }
+
         public enum EnumStatusInventoryAdjustment
         {
             [Display(Name = "Draft")]
@@ -125,7 +140,7 @@ namespace McDermott.Application.Extentions
         }
 
         public enum EnumStatusGeneralConsultantService
-        { 
+        {
             [Display(Name = "Canceled")]
             Canceled = 0,
 
@@ -152,7 +167,6 @@ namespace McDermott.Application.Extentions
 
             [Display(Name = "Midwife")]
             Midwife = 8,
-
         }
 
         public enum EnumStatusSickLeave
