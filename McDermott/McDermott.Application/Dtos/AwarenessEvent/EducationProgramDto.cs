@@ -25,6 +25,7 @@ namespace McDermott.Application.Dtos.AwarenessEvent
         public DateTime? EndDate { get; set; }
 
         public string? MaterialContent { get; set; }
+        public string? Slug { get; set; }
         public string? Attendance { get; set; }
         public EnumStatusEducationProgram? Status { get; set; }
 

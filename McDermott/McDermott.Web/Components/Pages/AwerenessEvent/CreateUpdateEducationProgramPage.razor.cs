@@ -1,4 +1,5 @@
-﻿using DevExpress.SpreadsheetSource.Xlsx.Import;
+﻿using Blazored.TextEditor;
+using DevExpress.SpreadsheetSource.Xlsx.Import;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using MailKit.Search;
 using McDermott.Application.Dtos.AwarenessEvent;
@@ -23,10 +24,14 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
+
+        BlazoredTextEditor richEditor = default!;
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; }
         private bool FormValidationState { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
+        string toolbar = """"...markup here..."""";
+        string body = """"...markup here..."""";
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         #endregion
 
@@ -100,6 +105,40 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             };
 
                 await Task.WhenAll(loadTasks);
+
+                toolbar = """"
+            <select class="ql-header">
+                <option selected=""></option>
+                <option value="1"></option>
+                <option value="2"></option>
+                <option value="3"></option>
+                <option value="4"></option>
+                <option value="5"></option>
+            </select>
+            <span class="ql-formats">
+                <button class="ql-bold"></button>
+                <button class="ql-italic"></button>
+                <button class="ql-underline"></button>
+                <button class="ql-strike"></button>
+            </span>
+            <span class="ql-formats">
+                <select class="ql-color"></select>
+                <select class="ql-background"></select>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-list" value="ordered"></button>
+                <button class="ql-list" value="bullet"></button>
+            </span>
+            <span class="ql-formats">
+                <button class="ql-link"></button>
+            </span>
+            """";
+
+                body = """"
+            <h4>This Toolbar works with HTML</h4>
+            <a href="https://BlazorHelpWebsite.com">BlazorHelpWebsite.com</a>
+            """";
+
             }
             catch (Exception ex)
             {

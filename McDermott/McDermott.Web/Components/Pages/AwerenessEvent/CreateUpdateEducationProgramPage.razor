@@ -58,50 +58,79 @@
                             <div class="card">
                                 <div class="card-body">
                                     <DxFormLayout CssClass="w-100">
-                                        <!-- Event Name (Kolom Kiri) -->
-                                        <DxFormLayoutItem Caption="Event Name" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                            <DxTextBox @bind-Text="postEducationPrograms.EventName" NullText="Input Event Name" Width="100%" />
-                                        </DxFormLayoutItem>
+                                        <DxFormLayoutGroup Caption="Event Information">
+                                            <!-- Name Event (TextBox) -->
+                                            <DxFormLayoutItem Caption="Name Event">
+                                                <MyTextBox @bind-Text="@postEducationPrograms.EventName" NullText="Input Name Event.." />
+                                                <ValidationMessage For="@(()=>postEducationPrograms.EventName)" />
+                                            </DxFormLayoutItem>
 
-                                        <!-- Event Category (Kolom Kanan) -->
-                                        <DxFormLayoutItem Caption="Event Category" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                            <MyDxComboBox Data="@getAwarenessEduCategories"
-                                                          NullText="Select Category"
-                                                          @ref="refCategoryComboBox"
-                                                          @bind-Value="@postEducationPrograms.EventCategoryId"
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"
-                                                          TextChanged="((string e) => OnInputCategoryChanged(e))">
-                                                <Buttons>
-                                                    <DxEditorButton Click="OnSearchCategoryIndexDecrement"
-                                                                    IconCssClass="fa-solid fa-caret-left"
-                                                                    Tooltip="Previous Index" />
-                                                    <DxEditorButton Click="OnSearchCategory"
-                                                                    IconCssClass="fa-solid fa-magnifying-glass"
-                                                                    Tooltip="Search" />
-                                                    <DxEditorButton Click="OnSearchCategoryIndexIncrement"
-                                                                    IconCssClass="fa-solid fa-caret-right"
-                                                                    Tooltip="Next Index" />
-                                                </Buttons>
-                                                
-                                            </MyDxComboBox>
-                                            <ValidationMessage For="@(()=>postEducationPrograms.EventCategoryId)" /> 
-                                        </DxFormLayoutItem>
+                                            <!-- CategoryId (ComboBox) -->
+                                            <DxFormLayoutItem Caption="Event Category" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <MyDxComboBox Data="@getAwarenessEduCategories"
+                                                              NullText="Select Category"
+                                                              @ref="refCategoryComboBox"
+                                                              @bind-Value="@postEducationPrograms.EventCategoryId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputCategoryChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchCategoryIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchCategory"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchCategoryIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
 
-                                        <!-- Start Date (Kolom Kiri) -->
-                                        <DxFormLayoutItem Caption="Start Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                            <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText="Select Start Date" Width="100%" />
-                                        </DxFormLayoutItem>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>postEducationPrograms.EventCategoryId)" />
+                                            </DxFormLayoutItem>
 
-                                        <!-- End Date (Kolom Kanan) -->
-                                        <DxFormLayoutItem Caption="End Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                            <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="Select End Date" Width="100%" />
-                                        </DxFormLayoutItem>
 
-                                        <!-- Content (Lebar Penuh) -->
-                                        <DxFormLayoutItem Caption="Content" CaptionCssClass="normal-caption" ColSpanMd="12">
-        @* <DxHtmlEditor @bind-Value="postEducationPrograms.Content" Width="100%" Height="300px" NullText="Input Content" /> *@
-                                        </DxFormLayoutItem>
+                                            <!-- StartDate (DateTime) -->
+                                            <DxFormLayoutItem Caption="Start Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText="Select Start Date" Width="100%" />
+                                            </DxFormLayoutItem>
+
+                                            <!-- EndDate (DateTime) -->
+                                            <DxFormLayoutItem Caption="End Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="Select End Date" Width="100%" />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
+                                        <DxFormLayoutGroup Caption="Content">
+                                            <DxFormLayoutItem Caption="Slug" ColSpanMd="6">
+                                                <DxTextBox @bind-Text="@postEducationPrograms.Slug" Width="100%" Placeholder="Enter Slug">
+                                                    <Buttons>
+                                                        <DxEditorButton IconCssClass="fa-solid fa-copy"
+                                                                        Tooltip="Copy"></DxEditorButton>
+                                                        <DxEditorButton IconCssClass="fa-solid fa-arrow-up-right-from-square"
+                                                                        Tooltip="Open To"></DxEditorButton>
+                                                    </Buttons>
+                                                </DxTextBox>
+                                                <ValidationMessage For="@(() => postEducationPrograms.Slug)" />
+                                            </DxFormLayoutItem>
+                                            <!-- Content (HTMLEditor) -->
+                                            <DxFormLayoutItem Caption="Content" ColSpanMd="12">
+                                                <BlazoredTextEditor @ref="@richEditor">
+                                                    <ToolbarContent>
+                                                        @((MarkupString)toolbar)
+                                                    </ToolbarContent>
+                                                    <EditorContent>
+                                                        @((MarkupString)body)
+                                                    </EditorContent>
+                                                </BlazoredTextEditor>
+                                            </DxFormLayoutItem>
+
+                                            <!-- Materi (HTMLEditor) -->
+                                            <DxFormLayoutItem Caption="Materi" ColSpanMd="12">
+                                                @* <BlazoredTextEditor  *@
+                                                @* <DxHtmlEditor @bind-Content="@postEducationPrograms.MaterialContent" /> *@
+                                            </DxFormLayoutItem>
+                                        </DxFormLayoutGroup>
                                     </DxFormLayout>
                                 </div>
                             </div>
