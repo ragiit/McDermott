@@ -12,6 +12,7 @@ namespace McDermott.Application.Dtos.AwarenessEvent
         public long Id { get; set; }
         public long? PatientId { get; set; }
         public long? EducationProgramId { get; set; }
+        public DateTime? Date { get; set; }
 
         [SetToNull]
         public UserDto? Patient { get; set; }
