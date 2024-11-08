@@ -49,7 +49,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion UserLoginAndAccessRole
 
         #region relation data
-        private List<AwarenessEduCategoryDto> getAwarenessEduCategory = [];
+        private List<AwarenessEduCategoryDto> getAwarenessEduCategory { get; set; } = [];
         private AwarenessEduCategoryDto postAwarenessEducategory = new();
         #endregion
 

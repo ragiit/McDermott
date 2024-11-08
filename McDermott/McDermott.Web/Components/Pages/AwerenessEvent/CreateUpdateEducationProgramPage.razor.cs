@@ -16,10 +16,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
     public partial class CreateUpdateEducationProgramPage
     {
         #region Relation  Data
-        private List<EducationProgramDto> getEducationPrograms = [];
-        private List<AwarenessEduCategoryDto> getAwarenessEduCategories = [];
+        private List<EducationProgramDto> getEducationPrograms { get; set; } = [];
+        private List<AwarenessEduCategoryDto> getAwarenessEduCategories { get; set; } = [];
         private EducationProgramDto postEducationPrograms = new();
-        private List<ParticipanEduDto> GetParticipanEdus = [];
+        private List<ParticipanEduDto> GetParticipanEdus { get; set; } = [];
         #endregion
 
         #region variable static
@@ -311,20 +311,12 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private async Task LoadDataCategory(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
             var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
             {
+                SearchTerm = refCategoryComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
-                SearchTerm = refCategoryComboBox?.Text ?? "",
-                Select = x => new AwarenessEduCategory
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                }
-
             });
-
             getAwarenessEduCategories = result.Item1;
             totalCount = result.PageCount;
             PanelVisible = false;

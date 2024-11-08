@@ -54,7 +54,7 @@
                                                     {
                                                         <DxButton Text="Active" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
                                                         <DxButton Text="InActive" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft || postEducationPrograms.Status == EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
-                                                        <DxButton Text="Send To Draft" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.InActive)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-rotate-left" Click="SendToDraft"></DxButton>
+                                                        <DxButton Text="Send To Draft" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.InActive)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-rotate-left" Click="SendToDraft"></DxButton>
                                                         <DxButton Text="Done" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onDone"></DxButton>
                                                     }
                                                 </div>
