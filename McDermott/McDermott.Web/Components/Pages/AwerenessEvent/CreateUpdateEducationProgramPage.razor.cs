@@ -1,6 +1,7 @@
 ﻿using Blazored.TextEditor;
 using DevExpress.SpreadsheetSource.Xlsx.Import;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Vml;
 using MailKit.Search;
 using McDermott.Application.Dtos.AwarenessEvent;
 using Microsoft.AspNetCore.Components.Forms;
@@ -200,6 +201,50 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         }
 
         #endregion HTML Editor
+
+        //private async Task SetupImageUpload()
+        //{
+        //    var options = new
+        //    {
+        //        placeholder = "Write something awesome...",
+        //        modules = new
+        //        {
+        //            toolbar = new
+        //            {
+        //                container = new object[]
+        //                {
+        //                new[] { "header", new[] { 1, 2, 3, 4, 5 } },
+        //                new[] { "bold", "italic", "underline", "strike" },
+        //                new[] { "color", "background" },
+        //                new[] { "list", "bullet" },
+        //                new[] { "link", "image", "video" }
+        //                }
+        //            },
+        //            imageResize = new
+        //            {
+        //                displaySize = true
+        //            }
+        //        }
+        //    };
+
+        //    await QuillHtml.SetOptionsAsync(options);
+        //    await SetupImageHandler();
+        //}
+
+        //private async Task SetupImageHandler()
+        //{
+        //    await QuillHtml.OnImageUpload(async (ImageFile[] files) =>
+        //    {
+        //        if (files != null && files.Length > 0)
+        //        {
+        //            var file = files[0];
+        //            var imageAsBase64 = Convert.ToBase64String(file.data);
+        //            var imageUrl = $"data:{file.type};base64,{imageAsBase64}";
+        //            return imageUrl;
+        //        }
+        //        return string.Empty;
+        //    });
+        //}
 
         #region select File
         private IBrowserFile BrowserFile;
