@@ -76,10 +76,12 @@ builder.Services.AddOptions();
 
 builder.Services.AddSignalR();
 
-#region For read base url href apps started 
+#region For read base url href apps started
+
 var baseHref = builder.Configuration.GetValue<string>("BaseHref");
 builder.Services.AddSingleton(new AppSettings { BaseHref = baseHref ?? "" });
-#endregion
+
+#endregion For read base url href apps started
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
@@ -235,7 +237,6 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapGraphQL();
     endpoints.MapHub<ChatHub>("/chathub");
-
 });
 //app.UseIpRateLimiting();
 //app.UseAuthentication(); // Gunakan autentikasi
@@ -274,7 +275,7 @@ using (var scope = app.Services.CreateScope())
         var databaseCreator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
 
         // Cek jika database sudah ada dan tabel utama sudah ada
-        if (await databaseCreator.ExistsAsync() && await databaseCreator.HasTablesAsync())
+        if (await databaseCreator.ExistsAsync() /*&& await databaseCreator.HasTablesAsync()*/)
         {
             Log.Information("=== Database and tables already exist, skipping migration. ===");
         }
@@ -301,7 +302,6 @@ using (var scope = app.Services.CreateScope())
     {
         Log.Information("=== ===");
     }
-
 }
 
 //app.UseMiddleware<RequestTimeoutMiddleware>();

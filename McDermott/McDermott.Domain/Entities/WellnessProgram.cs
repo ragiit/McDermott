@@ -13,6 +13,7 @@ namespace McDermott.Domain.Entities
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string? Slug { get; set; }
+        public string? Slugeeee { get; set; }
         public string? Content { get; set; }
         public EnumWellness Status { get; set; } = EnumWellness.Draft;
 
