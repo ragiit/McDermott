@@ -1,7 +1,9 @@
 ﻿using Blazored.TextEditor;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramDetailCommand;
@@ -38,7 +40,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         #region HTML Editor
 
         private bool IsShowPreviewOutput { get; set; } = false;
-        private BlazoredTextEditor QuillHtml;
+        private BlazoredTextEditor QuillHtml = new();
         private MarkupString preview;
 
         private async Task ShowAoutPutPreview(bool b)
@@ -180,7 +182,15 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                         break;
                 }
 
-                WellnessProgram.Content = await QuillHtml.GetHTML();
+                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                {
+                    WellnessProgram.Content = await QuillHtml.GetHTML();
+                }
+
+                if (WellnessProgram.EndDate is not null)
+                    WellnessProgram.EndDate = WellnessProgram.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                WellnessProgram.StartDate = WellnessProgram.StartDate.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
 
                 var temp = new WellnessProgramDto();
                 if (WellnessProgram.Id == 0)
@@ -229,10 +239,15 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                     return;
                 }
 
-                WellnessProgram.Content = await QuillHtml.GetHTML();
+                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                {
+                    WellnessProgram.Content = await QuillHtml.GetHTML();
+                }
 
                 if (WellnessProgram.EndDate is not null)
                     WellnessProgram.EndDate = WellnessProgram.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                WellnessProgram.StartDate = WellnessProgram.StartDate.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
 
                 var temp = new WellnessProgramDto();
                 if (WellnessProgram.Id == 0)
@@ -436,10 +451,13 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             if (!string.IsNullOrWhiteSpace(WellnessProgram.Content))
             {
                 await QuillHtml.LoadHTMLContent(WellnessProgram.Content);
+                StateHasChanged();
             }
 
             await GetUserInfo();
-            // return base.OnAfterRenderAsync(firstRender);
+            StateHasChanged();
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task LoadData()
@@ -463,6 +481,13 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 }
 
                 WellnessProgram = result ?? new();
+
+                var resultx = await Mediator.Send(new GetAwarenessEduCategoryQuery
+                {
+                    Predicate = x => x.Id == WellnessProgram.AwarenessEduCategoryId.GetValueOrDefault()
+                });
+                AwarenessEduCategories = resultx.Item1;
+                StateHasChanged();
 
                 switch (WellnessProgram.Status)
                 {
@@ -939,5 +964,65 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         #endregion Searching
 
         #endregion Attendances
+
+        #region ComboboxAwarenessEduCategory
+
+        private List<AwarenessEduCategoryDto> AwarenessEduCategories { get; set; } = [];
+        private DxComboBox<AwarenessEduCategoryDto, long?> refAwarenessEduCategoryComboBox { get; set; }
+        private int AwarenessEduCategoryComboBoxIndex { get; set; } = 0;
+        private int totalCountAwarenessEduCategory = 0;
+
+        private async Task OnSearchAwarenessEduCategory()
+        {
+            await LoadDataAwarenessEduCategory();
+        }
+
+        private async Task OnSearchAwarenessEduCategoryIndexIncrement()
+        {
+            if (AwarenessEduCategoryComboBoxIndex < (totalCountAwarenessEduCategory - 1))
+            {
+                AwarenessEduCategoryComboBoxIndex++;
+                await LoadDataAwarenessEduCategory(AwarenessEduCategoryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchAwarenessEduCategoryIndexDecrement()
+        {
+            if (AwarenessEduCategoryComboBoxIndex > 0)
+            {
+                AwarenessEduCategoryComboBoxIndex--;
+                await LoadDataAwarenessEduCategory(AwarenessEduCategoryComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputAwarenessEduCategoryChanged(string e)
+        {
+            AwarenessEduCategoryComboBoxIndex = 0;
+            await LoadDataAwarenessEduCategory();
+        }
+
+        private async Task LoadDataAwarenessEduCategory(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
+                {
+                    SearchTerm = refAwarenessEduCategoryComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                AwarenessEduCategories = result.Item1;
+                totalCountAwarenessEduCategory = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxAwarenessEduCategory
     }
 }

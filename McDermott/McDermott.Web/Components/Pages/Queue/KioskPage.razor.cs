@@ -324,6 +324,7 @@ namespace McDermott.Web.Components.Pages.Queue
         }
 
         private bool IsTelemedicine = false;
+        private bool IsReadOnlyService = false;
 
         private async Task LoadData()
         {
@@ -360,6 +361,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 Predicate = x => s.ServiceIds != null && s.ServiceIds.Contains(x.Id)
             });
             Services = resultServ.Item1;
+            IsReadOnlyService = resultServ.Item1.Count == 1;
 
             PanelVisible = false;
         }

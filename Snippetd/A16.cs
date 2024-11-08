@@ -1,14 +1,14 @@
-public class ServiceCommand
+public class AwarenessEduCategoryCommand
  {
      #region GET
 
-    public class GetSingleServiceQuery : IRequest<ServiceDto>
+    public class GetSingleAwarenessEduCategoryQuery : IRequest<AwarenessEduCategoryDto>
     {
-        public List<Expression<Func<Service, object>>> Includes { get; set; }
-        public Expression<Func<Service, bool>> Predicate { get; set; }
-        public Expression<Func<Service, Service>> Select { get; set; }
+        public List<Expression<Func<AwarenessEduCategory, object>>> Includes { get; set; }
+        public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; set; }
+        public Expression<Func<AwarenessEduCategory, AwarenessEduCategory>> Select { get; set; }
 
-        public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<AwarenessEduCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class ServiceCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetServiceQuery : IRequest<(List<ServiceDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetAwarenessEduCategoryQuery : IRequest<(List<AwarenessEduCategoryDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Service, object>>> Includes { get; set; }
-        public Expression<Func<Service, bool>> Predicate { get; set; }
-        public Expression<Func<Service, Service>> Select { get; set; }
+        public List<Expression<Func<AwarenessEduCategory, object>>> Includes { get; set; }
+        public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; set; }
+        public Expression<Func<AwarenessEduCategory, AwarenessEduCategory>> Select { get; set; }
 
-        public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<AwarenessEduCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class ServiceCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateService(Expression<Func<Service, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateAwarenessEduCategory(Expression<Func<AwarenessEduCategory, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; } = predicate!;
      }
 
-     public class BulkValidateService(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>
+     public class BulkValidateAwarenessEduCategory(List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate) : IRequest<List<AwarenessEduCategoryDto>>
      {
-         public List<ServiceDto> ServicesToValidate { get; } = ServicesToValidate;
+         public List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate { get; } = AwarenessEduCategorysToValidate;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateServiceRequest(ServiceDto ServiceDto) : IRequest<ServiceDto>
+     public class CreateAwarenessEduCategoryRequest(AwarenessEduCategoryDto AwarenessEduCategoryDto) : IRequest<AwarenessEduCategoryDto>
      {
-         public ServiceDto ServiceDto { get; set; } = ServiceDto;
+         public AwarenessEduCategoryDto AwarenessEduCategoryDto { get; set; } = AwarenessEduCategoryDto;
      }
 
-     public class CreateListServiceRequest(List<ServiceDto> ServiceDtos) : IRequest<List<ServiceDto>>
+     public class CreateListAwarenessEduCategoryRequest(List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos) : IRequest<List<AwarenessEduCategoryDto>>
      {
-         public List<ServiceDto> ServiceDtos { get; set; } = ServiceDtos;
+         public List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos { get; set; } = AwarenessEduCategoryDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateServiceRequest(ServiceDto ServiceDto) : IRequest<ServiceDto>
+     public class UpdateAwarenessEduCategoryRequest(AwarenessEduCategoryDto AwarenessEduCategoryDto) : IRequest<AwarenessEduCategoryDto>
      {
-         public ServiceDto ServiceDto { get; set; } = ServiceDto;
+         public AwarenessEduCategoryDto AwarenessEduCategoryDto { get; set; } = AwarenessEduCategoryDto;
      }
 
-     public class UpdateListServiceRequest(List<ServiceDto> ServiceDtos) : IRequest<List<ServiceDto>>
+     public class UpdateListAwarenessEduCategoryRequest(List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos) : IRequest<List<AwarenessEduCategoryDto>>
      {
-         public List<ServiceDto> ServiceDtos { get; set; } = ServiceDtos;
+         public List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos { get; set; } = AwarenessEduCategoryDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteServiceRequest : IRequest<bool>
+     public class DeleteAwarenessEduCategoryRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,25 +83,25 @@ public class ServiceCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
+IRequestHandler<BulkValidateAwarenessEduCategoryQuery, List<AwarenessEduCategoryDto>>,
   
-IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleServiceQuery, ServiceDto>,
-public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleServiceQuery, ServiceDto>, 
-     IRequestHandler<ValidateService, bool>,
-     IRequestHandler<CreateServiceRequest, ServiceDto>,
-     IRequestHandler<BulkValidateService, List<ServiceDto>>,
-     IRequestHandler<CreateListServiceRequest, List<ServiceDto>>,
-     IRequestHandler<UpdateServiceRequest, ServiceDto>,
-     IRequestHandler<UpdateListServiceRequest, List<ServiceDto>>,
-     IRequestHandler<DeleteServiceRequest, bool>
+IRequestHandler<GetAwarenessEduCategoryQuery, (List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>,
+public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetAwarenessEduCategoryQuery, (List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>, 
+     IRequestHandler<ValidateAwarenessEduCategory, bool>,
+     IRequestHandler<CreateAwarenessEduCategoryRequest, AwarenessEduCategoryDto>,
+     IRequestHandler<BulkValidateAwarenessEduCategory, List<AwarenessEduCategoryDto>>,
+     IRequestHandler<CreateListAwarenessEduCategoryRequest, List<AwarenessEduCategoryDto>>,
+     IRequestHandler<UpdateAwarenessEduCategoryRequest, AwarenessEduCategoryDto>,
+     IRequestHandler<UpdateListAwarenessEduCategoryRequest, List<AwarenessEduCategoryDto>>,
+     IRequestHandler<DeleteAwarenessEduCategoryRequest, bool>
 {
     #region GET
-    public async Task<List<ServiceDto>> Handle(BulkValidateService request, CancellationToken cancellationToken)
+    public async Task<List<AwarenessEduCategoryDto>> Handle(BulkValidateAwarenessEduCategory request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.ServicesToValidate;
+        var CountryDtos = request.AwarenessEduCategorysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
         //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -117,20 +117,20 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
         return [];
     }
-    public async Task<bool> Handle(ValidateService request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateAwarenessEduCategory request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Service>()
+        return await _unitOfWork.Repository<AwarenessEduCategory>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetServiceQuery request, CancellationToken cancellationToken)
+    public async Task<(List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetAwarenessEduCategoryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<AwarenessEduCategory>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -146,8 +146,8 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<AwarenessEduCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<AwarenessEduCategory>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -164,7 +164,7 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.AwarenessEduCategory.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -172,7 +172,7 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Service
+                query = query.Select(x => new AwarenessEduCategory
                 {
                     Id = x.Id, 
                 });
@@ -186,11 +186,11 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<ServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<AwarenessEduCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<ServiceDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<AwarenessEduCategoryDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -200,11 +200,11 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<ServiceDto> Handle(GetSingleServiceQuery request, CancellationToken cancellationToken)
+    public async Task<AwarenessEduCategoryDto> Handle(GetSingleAwarenessEduCategoryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<AwarenessEduCategory>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -220,8 +220,8 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<AwarenessEduCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<AwarenessEduCategory>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -238,7 +238,7 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.AwarenessEduCategory.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -246,12 +246,12 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Service
+                query = query.Select(x => new AwarenessEduCategory
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ServiceDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<AwarenessEduCategoryDto>();
         }
         catch (Exception ex)
         {
@@ -264,17 +264,17 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<ServiceDto> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
+     public async Task<AwarenessEduCategoryDto> Handle(CreateAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDto.Adapt<CreateUpdateServiceDto>().Adapt<Service>());
+             var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDto.Adapt<CreateUpdateAwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<ServiceDto>();
+             return result.Adapt<AwarenessEduCategoryDto>();
          }
          catch (Exception)
          {
@@ -282,16 +282,16 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<ServiceDto>> Handle(CreateListServiceRequest request, CancellationToken cancellationToken)
+     public async Task<List<AwarenessEduCategoryDto>> Handle(CreateListAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDtos.Adapt<List<Service>>());
+             var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDtos.Adapt<List<AwarenessEduCategory>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<ServiceDto>>();
+             return result.Adapt<List<AwarenessEduCategoryDto>>();
          }
          catch (Exception)
          {
@@ -303,17 +303,17 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<ServiceDto> Handle(UpdateServiceRequest request, CancellationToken cancellationToken)
+     public async Task<AwarenessEduCategoryDto> Handle(UpdateAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDto.Adapt<ServiceDto>().Adapt<Service>());
+             var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDto.Adapt<AwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<ServiceDto>();
+             return result.Adapt<AwarenessEduCategoryDto>();
          }
          catch (Exception)
          {
@@ -321,16 +321,16 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<ServiceDto>> Handle(UpdateListServiceRequest request, CancellationToken cancellationToken)
+     public async Task<List<AwarenessEduCategoryDto>> Handle(UpdateListAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDtos.Adapt<List<Service>>());
+             var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDtos.Adapt<List<AwarenessEduCategory>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<ServiceDto>>();
+             return result.Adapt<List<AwarenessEduCategoryDto>>();
          }
          catch (Exception)
          {
@@ -342,23 +342,23 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Service>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<AwarenessEduCategory>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Service>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<AwarenessEduCategory>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -372,20 +372,20 @@ public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateServiceQuery(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>
+public class BulkValidateAwarenessEduCategoryQuery(List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate) : IRequest<List<AwarenessEduCategoryDto>>
 {
-    public List<ServiceDto> ServicesToValidate { get; } = ServicesToValidate;
+    public List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate { get; } = AwarenessEduCategorysToValidate;
 }a
 
 
-IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
+IRequestHandler<BulkValidateAwarenessEduCategoryQuery, List<AwarenessEduCategoryDto>>,
   
-IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleServiceQuery, ServiceDto>,
+IRequestHandler<GetAwarenessEduCategoryQuery, (List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>,
 
 
 
- var a = await Mediator.Send(new GetServicesQuery
+ var a = await Mediator.Send(new GetAwarenessEduCategorysQuery
  {
      OrderByList =
      [
@@ -397,10 +397,10 @@ IRequestHandler<GetSingleServiceQuery, ServiceDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleServiceQuery
+var patienss = (await Mediator.Send(new GetSingleAwarenessEduCategoryQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Service
+    Select = x => new AwarenessEduCategory
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -413,41 +413,41 @@ var patienss = (await Mediator.Send(new GetSingleServiceQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetServiceQuery
+    var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Services = result.Item1;
+    AwarenessEduCategorys = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastService);
+    ex.HandleException(ToastAwarenessEduCategory);
 }
 finally
 { 
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetServiceQuery
+ var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refServiceComboBox?.Text ?? "",
+     SearchTerm = refAwarenessEduCategoryComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Services = result.Item1;
- totalCountService = result.PageCount;
+ AwarenessEduCategorys = result.Item1;
+ totalCountAwarenessEduCategory = result.PageCount;
 
- Services = (await Mediator.Send(new GetServiceQuery
+ AwarenessEduCategorys = (await Mediator.Send(new GetAwarenessEduCategoryQuery
  {
-     Predicate = x => x.Id == ServiceForm.IdCardServiceId,
+     Predicate = x => x.Id == AwarenessEduCategoryForm.IdCardAwarenessEduCategoryId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleServicesQuery
+var data = (await Mediator.Send(new GetSingleAwarenessEduCategorysQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -455,17 +455,17 @@ var data = (await Mediator.Send(new GetSingleServicesQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Service
+    Select = x => new AwarenessEduCategory
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Service
+        Patient = new AwarenessEduCategory
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Service
+        Pratitioner = new AwarenessEduCategory
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -478,105 +478,105 @@ var data = (await Mediator.Send(new GetSingleServicesQuery
 })) ?? new();
 
 
-#region ComboboxService
+#region ComboboxAwarenessEduCategory
 
- private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
- private int ServiceComboBoxIndex { get; set; } = 0;
- private int totalCountService = 0;
+ private DxComboBox<AwarenessEduCategoryDto, long?> refAwarenessEduCategoryComboBox { get; set; }
+ private int AwarenessEduCategoryComboBoxIndex { get; set; } = 0;
+ private int totalCountAwarenessEduCategory = 0;
 
- private async Task OnSearchService()
+ private async Task OnSearchAwarenessEduCategory()
  {
-     await LoadDataService();
+     await LoadDataAwarenessEduCategory();
  }
 
- private async Task OnSearchServiceIndexIncrement()
+ private async Task OnSearchAwarenessEduCategoryIndexIncrement()
  {
-     if (ServiceComboBoxIndex < (totalCountService - 1))
+     if (AwarenessEduCategoryComboBoxIndex < (totalCountAwarenessEduCategory - 1))
      {
-         ServiceComboBoxIndex++;
-         await LoadDataService(ServiceComboBoxIndex, 10);
+         AwarenessEduCategoryComboBoxIndex++;
+         await LoadDataAwarenessEduCategory(AwarenessEduCategoryComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchServiceIndexDecrement()
+ private async Task OnSearchAwarenessEduCategoryIndexDecrement()
  {
-     if (ServiceComboBoxIndex > 0)
+     if (AwarenessEduCategoryComboBoxIndex > 0)
      {
-         ServiceComboBoxIndex--;
-         await LoadDataService(ServiceComboBoxIndex, 10);
+         AwarenessEduCategoryComboBoxIndex--;
+         await LoadDataAwarenessEduCategory(AwarenessEduCategoryComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputServiceChanged(string e)
+ private async Task OnInputAwarenessEduCategoryChanged(string e)
  {
-     ServiceComboBoxIndex = 0;
-     await LoadDataService();
+     AwarenessEduCategoryComboBoxIndex = 0;
+     await LoadDataAwarenessEduCategory();
  }
 
  
-  private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataAwarenessEduCategory(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetServiceQuery
+          var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
           {
-              SearchTerm = refServiceComboBox?.Text ?? "",
+              SearchTerm = refAwarenessEduCategoryComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Services = result.Item1;
-          totalCountService = result.PageCount;
+          AwarenessEduCategorys = result.Item1;
+          totalCountAwarenessEduCategory = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastService);
+          ex.HandleException(ToastAwarenessEduCategory);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxService
+ #endregion ComboboxAwarenessEduCategory
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
-    <MyDxComboBox Data="@Services"
-                  NullText="Select Service"
-                  @ref="refServiceComboBox"
-                  @bind-Value="@a.ServiceId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="AwarenessEduCategory" ColSpanMd="12">
+    <MyDxComboBox Data="@AwarenessEduCategorys"
+                  NullText="Select AwarenessEduCategory"
+                  @ref="refAwarenessEduCategoryComboBox"
+                  @bind-Value="@a.AwarenessEduCategoryId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputServiceChanged(e))">
+                  TextChanged="((string e) => OnInputAwarenessEduCategoryChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchServiceIndexDecrement"
+            <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchService"
+            <DxEditorButton Click="OnSearchAwarenessEduCategory"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchServiceIndexIncrement"
+            <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Service.Name" Caption="Service" />
-            <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(AwarenessEduCategoryDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="AwarenessEduCategory.Name" Caption="AwarenessEduCategory" />
+            <DxListEditorColumn FieldName="@nameof(AwarenessEduCategoryDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.ServiceId)" />
+    <ValidationMessage For="@(()=>a.AwarenessEduCategoryId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDto.Adapt<CreateUpdateServiceDto>().Adapt<Service>());
-var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDtos.Adapt<List<CreateUpdateServiceDto>>().Adapt<List<Service>>()); 
+var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDto.Adapt<CreateUpdateAwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());
+var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDtos.Adapt<List<CreateUpdateAwarenessEduCategoryDto>>().Adapt<List<AwarenessEduCategory>>()); 
 
-var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDto.Adapt<CreateUpdateServiceDto>().Adapt<Service>());  
-var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDtos.Adapt<List<CreateUpdateServiceDto>>().Adapt<List<Service>>());
+var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDto.Adapt<CreateUpdateAwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());  
+var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDtos.Adapt<List<CreateUpdateAwarenessEduCategoryDto>>().Adapt<List<AwarenessEduCategory>>());
 
-list3 = (await Mediator.Send(new GetServiceQuery
+list3 = (await Mediator.Send(new GetAwarenessEduCategoryQuery
 {
-    Predicate = x => ServiceNames.Contains(x.Name.ToLower()),
+    Predicate = x => AwarenessEduCategoryNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Service
+    Select = x => new AwarenessEduCategory
     {
         Id = x.Id,
         Name = x.Name
@@ -586,47 +586,47 @@ list3 = (await Mediator.Send(new GetServiceQuery
 
 #region Searching
 
-    private int pageSizeServiceAttendance { get; set; } = 10;
-    private int totalCountServiceAttendance = 0;
-    private int activePageIndexServiceAttendance { get; set; } = 0;
-    private string searchTermServiceAttendance { get; set; } = string.Empty;
+    private int pageSizeAwarenessEduCategoryAttendance { get; set; } = 10;
+    private int totalCountAwarenessEduCategoryAttendance = 0;
+    private int activePageIndexAwarenessEduCategoryAttendance { get; set; } = 0;
+    private string searchTermAwarenessEduCategoryAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedServiceAttendance(string searchText)
+    private async Task OnSearchBoxChangedAwarenessEduCategoryAttendance(string searchText)
     {
-        searchTermServiceAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeServiceAttendance);
+        searchTermAwarenessEduCategoryAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeAwarenessEduCategoryAttendance);
     }
 
-    private async Task OnpageSizeServiceAttendanceIndexChanged(int newpageSizeServiceAttendance)
+    private async Task OnpageSizeAwarenessEduCategoryAttendanceIndexChanged(int newpageSizeAwarenessEduCategoryAttendance)
     {
-        pageSizeServiceAttendance = newpageSizeServiceAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeServiceAttendance);
+        pageSizeAwarenessEduCategoryAttendance = newpageSizeAwarenessEduCategoryAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeAwarenessEduCategoryAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeServiceAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeAwarenessEduCategoryAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeServiceAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeAwarenessEduCategoryAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetServiceAttendanceQuery
+        var result = await Mediator.Send(new GetAwarenessEduCategoryAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeServiceAttendance,
-            SearchTerm = searchTermServiceAttendance,
+            PageSize = pageSizeAwarenessEduCategoryAttendance,
+            SearchTerm = searchTermAwarenessEduCategoryAttendance,
         });
-        ServiceAttendances = result.Item1;
-        totalCountServiceAttendance = result.PageCount;
-        activePageIndexServiceAttendance = pageIndex;
+        AwarenessEduCategoryAttendances = result.Item1;
+        totalCountAwarenessEduCategoryAttendance = result.PageCount;
+        activePageIndexAwarenessEduCategoryAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastService);
+        ex.HandleException(ToastAwarenessEduCategory);
     }
     finally { PanelVisible = false; }
 }

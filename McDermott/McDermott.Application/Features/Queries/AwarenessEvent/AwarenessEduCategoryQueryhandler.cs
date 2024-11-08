@@ -128,7 +128,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                     {
                         Id = x.Id,
                         Name = x.Name
-                       
                     });
 
                 if (!request.IsGetAll)
@@ -213,8 +212,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
             }
         }
 
-
-
         #endregion GET Education Program
 
         #region CREATE Education Program
@@ -227,7 +224,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<AwarenessEduCategoryDto>();
             }
@@ -266,7 +263,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDto.Adapt<AwarenessEduCategory>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
                 _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
 
@@ -327,6 +323,5 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
         }
 
         #endregion DELETE Education Program
-
     }
 }

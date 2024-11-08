@@ -96,14 +96,31 @@
                                                            NullText="Name" />
                                                 <ValidationMessage For="@(() => WellnessProgram.Name)" />
                                             </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Categories"
-                                                              Enabled="EnableForm"
-                                                              @bind-Value="@WellnessProgram.Category"
+                                              
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Category" ColSpanMd="12">
+                                                <MyDxComboBox Data="@AwarenessEduCategories"
                                                               NullText="Select Category"
-                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never" />
-                                                <ValidationMessage For="@(() => WellnessProgram.Category)" />
+                                                              @ref="refAwarenessEduCategoryComboBox"
+                                                              @bind-Value="@WellnessProgram.AwarenessEduCategoryId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              TextChanged="((string e) => OnInputAwarenessEduCategoryChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchAwarenessEduCategory"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(WellnessProgramDto.Name)" Caption="Name" /> 
+                                                    </Columns>
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>WellnessProgram.AwarenessEduCategoryId)" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Date" ColSpanMd="12">
@@ -152,38 +169,54 @@
                                                         <span class="ql-formats">
                                                             <button class="ql-list" value="ordered"></button>
                                                             <button class="ql-list" value="bullet"></button>
+                                                            <button class="ql-indent" value="-1"></button>
+                                                            <button class="ql-indent" value="+1"></button>
+                                                            <select class="ql-align">
+                                                                <option selected=""></option>
+                                                                <option value="center"></option>
+                                                                <option value="right"></option>
+                                                                <option value="justify"></option>
+                                                            </select>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-list" value="ordered"></button>
+                                                            <button class="ql-list" value="bullet"></button>
                                                         </span>
                                                         <span class="ql-formats">
                                                             <button class="ql-link"></button>
                                                         </span>
                                                         <span class="ql-formats">
+                                                            @* <button class="ql-image"></button> *@
                                                             <button class="ql-video"></button>
                                                         </span>
-                                                    </ToolbarContent> 
+                                                    </ToolbarContent>
+                                                    <EditorContent>
+                                                        @((MarkupString)WellnessProgram.Content)
+                                                    </EditorContent>
                                                 </BlazoredTextEditor>
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Show Content Output?" ReadOnly ColSpanMd="12">
-                                                <DxCheckBox Checked="IsShowPreviewOutput"
-                                                            CheckedExpression="@(()=>IsShowPreviewOutput)" CheckedChanged="@((bool value) => ShowAoutPutPreview(value))"></DxCheckBox>
+                                            @* <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Show Content Output?" ReadOnly ColSpanMd="12">
+                                        <DxCheckBox Checked="IsShowPreviewOutput"
+                                        CheckedExpression="@(()=>IsShowPreviewOutput)" CheckedChanged="@((bool value) => ShowAoutPutPreview(value))"></DxCheckBox>
 
-                                            </DxFormLayoutItem>
+                                        </DxFormLayoutItem> *@
                                         </DxFormLayout>
                                     </div>
                                 </div>
-@* 
-                                @if (IsShowPreviewOutput)
-                                {
-                                    <div class="card w-100">
-                                        <div class="card-header">
-                                            The preview Of Content
-                                        </div>
-                                        <div class="card-body">
-                                            <DxButton @onclick=@(async ()=> await ShowAoutPutPreview(true))>Refresh</DxButton>
-                                            @preview
-                                        </div>
-                                    </div>
-                                } *@
+                                @*
+                            @if (IsShowPreviewOutput)
+                            {
+                            <div class="card w-100">
+                            <div class="card-header">
+                            The preview Of Content
+                            </div>
+                            <div class="card-body">
+                            <DxButton @onclick=@(async ()=> await ShowAoutPutPreview(true))>Refresh</DxButton>
+                            @preview
+                            </div>
+                            </div>
+                            } *@
 
                                 @if (WellnessProgram.Id != 0)
                                 {
@@ -226,7 +259,7 @@
                                                                         <Columns>
                                                                             <DxGridSelectionColumn Width="15px" />
                                                                             <DxGridDataColumn FieldName="Name" Caption="Name" />
-                                                                            <DxGridDataColumn FieldName="StartDate" Caption="Start Time" DisplayFormat="@Helper.DefaultFormatDateTime"/>
+                                                                            <DxGridDataColumn FieldName="StartDate" Caption="Start Time" DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                             <DxGridDataColumn FieldName="EndDate" Caption="End Time" DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                             <DxGridDataColumn FieldName="Notes" />
                                                                             <DxGridDataColumn FieldName="Slug" />
@@ -242,7 +275,7 @@
                                                                         <EditFormTemplate Context="EditFormContextz">
                                                                             @{
                                                                                 var a = (WellnessProgramDetailDto)EditFormContextz.EditModel;
-                                                                                
+
                                                                             }
                                                                             <DxFormLayout CssClass="w-100">
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
@@ -251,13 +284,13 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Start Time" ColSpanMd="12">
-                                                                                            <DxDateEdit @bind-Date="@a.StartDate" MinDate="WellnessProgram.StartDate" TimeSectionVisible="true"
+                                                                                    <DxDateEdit @bind-Date="@a.StartDate" MinDate="WellnessProgram.StartDate" TimeSectionVisible="true"
                                                                                                 DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Time" ColSpanMd="12">
                                                                                     <DxDateEdit @bind-Date="@a.EndDate" TimeSectionVisible="true"
-                                                                                                        DisplayFormat="@Helper.DefaultFormatDateTime" />
+                                                                                                DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Notes" ColSpanMd="12">
@@ -367,7 +400,7 @@
                                                             </DxLoadingPanel>
                                                         </div>
                                                     </DxTabPage>
-                                                            <DxTabPage CssClass="w-100" Text="Attendences" Click="(async () => await LoadDataAttendances())">
+                                                    <DxTabPage CssClass="w-100" Text="Attendences" Click="(async () => await LoadDataAttendances())">
                                                         <div class="card">
                                                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
