@@ -34,6 +34,9 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private bool PanelVisibleParticipan { get; set; }
         private bool FormValidationState { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
+
+        private bool IsReadOnly => postEducationPrograms.Status == EnumStatusEducationProgram.Draft || postEducationPrograms.Id != 0;
+
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsEducation { get; set; } = [];
         #endregion
@@ -127,7 +130,25 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             PanelVisible = true;
             var result = await Mediator.Send(new GetSingleEducationProgramQuery
             {
-                Predicate = x => x.Id == Id
+                Predicate = x => x.Id == Id,
+                Select = x=> new EducationProgram
+                {
+                    Id = x.Id,
+                    EventName = x.EventName,
+                    EventCategoryId = x.EventCategoryId,
+                    Slug = x.Slug,
+                    StartDate=x.StartDate,
+                    EndDate = x.EndDate,
+                    HTMLContent = x.HTMLContent,
+                    HTMLMaterial=x.HTMLMaterial,
+                    Attendance = x.Attendance,
+                    Status = x.Status,
+                    EventCategory= new AwarenessEduCategory
+                    {
+                        Name = x.EventCategory == null ? string.Empty : x.EventCategory.Name
+                    }
+                }
+                
             });
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -138,6 +159,9 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 }
                 postEducationPrograms = result ?? new();
 
+                if(postEducationPrograms.HTMLContent is not null){
+                    postEducationPrograms.HTMLContent = await this.QuillHtml.GetHTML();
+                }
                 var resultParticipan = await Mediator.Send(new GetParticipanEduQuery());
 
                 GetParticipanEdus = resultParticipan.Item1;
@@ -178,7 +202,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         }
 
         #endregion HTML Editor
-
 
         #region ComboBox Category
 
@@ -280,6 +303,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
                 if (postEducationPrograms.Id == 0)
                 {
+                    if (QuillHtml != null)
+                        postEducationPrograms.HTMLContent = await QuillHtml.GetContent();
+                    if (QuillHtml2 != null)
+                        postEducationPrograms.MaterialContent = await QuillHtml2.GetContent();
                     postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
                     data = await Mediator.Send(new CreateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Add Data Success...");
@@ -399,11 +426,33 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         private async Task ClickOpenTo()
         {
-           
-            if (Id.HasValue)
+            if (postEducationPrograms.Slug != null)
             {
-                NavigationManager.NavigateTo($"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}", true);
+                if (Id.HasValue)
+                {
+                    NavigationManager.NavigateTo($"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}", true);
+                }
             }
+        }
+
+        private async Task SendToDraft()
+        {
+
+            try
+            {
+                postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
+                await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
+                var currentUri = NavigationManager.Uri;
+                if (Id.HasValue)
+                {
+                    NavigationManager.NavigateTo($"{currentUri}", forceLoad: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to activate program: {ex.Message}");
+            }
+
         }
         #endregion
 

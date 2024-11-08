@@ -26,7 +26,6 @@
                                             <DxTab Text="Active" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Active)"></DxTab>
                                             <DxTab Text="Inactive" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.InActive)"></DxTab>
                                             <DxTab Text="Done" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Done)"></DxTab>
-                                            <DxTab Text="Cancel" Enabled="@(postEducationPrograms.Status == EnumStatusEducationProgram.Cancel)"></DxTab>
                                         </DxTabs>
                                     </div>
                                 </div>
@@ -41,85 +40,151 @@
                                                 <div class="col-auto align-self-start">
                                                     @if (postEducationPrograms.Id != 0)
                                                     {
-                                                        <DxButton Text="Active" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
-                                                        <DxButton Text="InActive" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.InActive)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                                                        <DxButton Text="Active" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
+                                                        <DxButton Text="InActive" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                                                        <DxButton Text="Send To Draft" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.InActive)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-rotate-left" Click="SendToDraft"></DxButton>
                                                         <DxButton Text="Done" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onDone"></DxButton>
-                                                        <DxButton Text="Cancel" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Cancel)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onCancel"></DxButton>
                                                     }
                                                 </div>
                                                 <div class="col-auto align-self-start">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Done)" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Done)" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Done || postEducationPrograms.Status != EnumStatusEducationProgram.InActive)" RenderStyleMode="@ButtonRenderStyleMode.Outline" CssClass="mr-1" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Visible="@( postEducationPrograms.Status != EnumStatusEducationProgram.Done || postEducationPrograms.Status != EnumStatusEducationProgram.InActive)" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-xmark" Text="Discard" Click="onDiscard"></DxButton>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             }
+
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutGroup Caption="Event Information">
+                                            <!-- Name Event (TextBox) -->
+                                            <DxFormLayoutItem Caption="Name Event" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@postEducationPrograms.EventName" NullText="Input Name Event.."
+                                                           ReadOnly="@IsReadOnly" />
+                                                <ValidationMessage For="@(()=>postEducationPrograms.EventName)" />
+                                            </DxFormLayoutItem>
+
+                                            <!-- CategoryId (ComboBox) -->
+                                            <DxFormLayoutItem Caption="Event Category" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <MyDxComboBox Data="@getAwarenessEduCategories"
+                                                              NullText="Select Category"
+                                                              @ref="refCategoryComboBox"
+                                                              @bind-Value="@postEducationPrograms.EventCategoryId"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              ReadOnly="@IsReadOnly"
+                                                              TextChanged="((string e) => OnInputCategoryChanged(e))">
+                                                    <Buttons>
+                                                        <DxEditorButton Click="OnSearchCategoryIndexDecrement"
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
+                                                        <DxEditorButton Click="OnSearchCategory"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
+                                                        <DxEditorButton Click="OnSearchCategoryIndexIncrement"
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
+                                                    </Buttons>
+
+                                                </MyDxComboBox>
+                                                <ValidationMessage For="@(()=>postEducationPrograms.EventCategoryId)" />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Slug" ColSpanMd="6" CaptionCssClass="normal-caption">
+                                                <DxTextBox @bind-Text="@postEducationPrograms.Slug" Width="100%" Placeholder="Enter Slug" ReadOnly>
+                                                    <Buttons>
+                                                        <DxEditorButton IconCssClass="fa-solid fa-copy"
+                                                                        Tooltip="Copy"></DxEditorButton>
+                                                        <DxEditorButton IconCssClass="fa-solid fa-arrow-up-right-from-square"
+                                                                        Tooltip="Open To" Click="ClickOpenTo"></DxEditorButton>
+                                                    </Buttons>
+                                                </DxTextBox>
+                                                <ValidationMessage For="@(() => postEducationPrograms.Slug)" />
+                                            </DxFormLayoutItem>
+
+                                            <!-- StartDate (DateTime) -->
+                                            <DxFormLayoutItem Caption="Start Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText=" Start Date" Width="100%" ReadOnly="@IsReadOnly" />
+                                            </DxFormLayoutItem>
+
+                                            <!-- EndDate (DateTime) -->
+                                            <DxFormLayoutItem Caption="End Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="End Date" Width="100%" ReadOnly="@IsReadOnly" />
+                                            </DxFormLayoutItem>
+
+                                            <!-- Content (HTMLEditor) -->
+                                            <DxFormLayoutItem Caption="Content" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                <BlazoredTextEditor @ref=QuillHtml Placeholder="write somthing..." ReadOnly="@IsReadOnly">
+                                                    <ToolbarContent>
+                                                        <select class="ql-header">
+                                                            <option selected=""></option>
+                                                            <option value="1"></option>
+                                                            <option value="2"></option>
+                                                            <option value="3"></option>
+                                                            <option value="4"></option>
+                                                            <option value="5"></option>
+                                                        </select>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-bold"></button>
+                                                            <button class="ql-italic"></button>
+                                                            <button class="ql-underline"></button>
+                                                            <button class="ql-strike"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <select class="ql-color"></select>
+                                                            <select class="ql-background"></select>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-list" value="ordered"></button>
+                                                            <button class="ql-list" value="bullet"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-link"></button>
+                                                        </span>
+                                                        <span class="ql-formats">
+                                                            <button class="ql-video"></button>
+                                                        </span>
+                                                    </ToolbarContent>
+                                                    <EditorContent >
+                                                        @((MarkupString)@postEducationPrograms.HTMLContent)
+                                                    </EditorContent>
+                                                </BlazoredTextEditor>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Show Content Output?" ReadOnly ColSpanMd="12">
+                                                <DxCheckBox Checked="IsShowPreviewOutput"
+                                                            CheckedExpression="@(()=>IsShowPreviewOutput)" CheckedChanged="@((bool value) => ShowAoutPutPreview(value))"></DxCheckBox>
+
+                                            </DxFormLayoutItem>
+
+                                            @if (IsShowPreviewOutput)
+                                            {
+                                                <div class="card w-100">
+                                                    <div class="card-header">
+                                                        The preview Of Content
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <DxButton @onclick=@(async ()=> await ShowAoutPutPreview(true))>Refresh</DxButton>
+                                                        @preview
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        </DxFormLayoutGroup>
+                                    </DxFormLayout>
+                                </div>
+                            </div>
                             <div class="cw-480">
-                             <DxTabs>
-                                <DxTabPage Text="Content Tab" TabIconCssClass="fa-solid fa-circle-info"> 
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <DxFormLayout CssClass="w-100">
-                                                <DxFormLayoutGroup Caption="Event Information">
-                                                    <!-- Name Event (TextBox) -->
-                                                    <DxFormLayoutItem Caption="Name Event" ColSpanMd="12">
-                                                        <MyTextBox @bind-Text="@postEducationPrograms.EventName" NullText="Input Name Event.." />
-                                                        <ValidationMessage For="@(()=>postEducationPrograms.EventName)" />
-                                                    </DxFormLayoutItem>
-
-                                                    <!-- CategoryId (ComboBox) -->
-                                                    <DxFormLayoutItem Caption="Event Category" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                        <MyDxComboBox Data="@getAwarenessEduCategories"
-                                                                      NullText="Select Category"
-                                                                      @ref="refCategoryComboBox"
-                                                                      @bind-Value="@postEducationPrograms.EventCategoryId"
-                                                                      TextFieldName="Name"
-                                                                      ValueFieldName="Id"
-                                                                      TextChanged="((string e) => OnInputCategoryChanged(e))">
-                                                            <Buttons>
-                                                                <DxEditorButton Click="OnSearchCategoryIndexDecrement"
-                                                                                IconCssClass="fa-solid fa-caret-left"
-                                                                                Tooltip="Previous Index" />
-                                                                <DxEditorButton Click="OnSearchCategory"
-                                                                                IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                Tooltip="Search" />
-                                                                <DxEditorButton Click="OnSearchCategoryIndexIncrement"
-                                                                                IconCssClass="fa-solid fa-caret-right"
-                                                                                Tooltip="Next Index" />
-                                                            </Buttons>
-
-                                                        </MyDxComboBox>
-                                                        <ValidationMessage For="@(()=>postEducationPrograms.EventCategoryId)" />
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem Caption="Slug" ColSpanMd="6">
-                                                        <DxTextBox @bind-Text="@postEducationPrograms.Slug" Width="100%" Placeholder="Enter Slug" ReadOnly>
-                                                            <Buttons>
-                                                                <DxEditorButton IconCssClass="fa-solid fa-copy"
-                                                                                Tooltip="Copy"></DxEditorButton>
-                                                                <DxEditorButton IconCssClass="fa-solid fa-arrow-up-right-from-square"
-                                                                                Tooltip="Open To" Click="ClickOpenTo"></DxEditorButton>
-                                                            </Buttons>
-                                                        </DxTextBox>
-                                                        <ValidationMessage For="@(() => postEducationPrograms.Slug)" />
-                                                    </DxFormLayoutItem>
-
-                                                    <!-- StartDate (DateTime) -->
-                                                    <DxFormLayoutItem Caption="Start Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                        <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText=" Start Date" Width="100%" />
-                                                    </DxFormLayoutItem>
-
-                                                    <!-- EndDate (DateTime) -->
-                                                    <DxFormLayoutItem Caption="End Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                        <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="End Date" Width="100%" />
-                                                    </DxFormLayoutItem>
-                                                </DxFormLayoutGroup>
-                                                <DxFormLayoutGroup Caption="Content">
-
+                                <DxTabs>
+                                    <DxTabPage Text="Content Tab" TabIconCssClass="fa-solid fa-circle-info">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <DxFormLayout CssClass="w-100">
                                                     <!-- Content (HTMLEditor) -->
                                                     <DxFormLayoutItem Caption="Content" ColSpanMd="12">
-                                                        <BlazoredTextEditor @ref=QuillHtml Placeholder="write somthing...">
+                                                        <BlazoredTextEditor @ref=QuillHtml2 Placeholder="write somthing..." ReadOnly="@IsReadOnly">
                                                             <ToolbarContent>
                                                                 <select class="ql-header">
                                                                     <option selected=""></option>
@@ -150,133 +215,85 @@
                                                                     <button class="ql-video"></button>
                                                                 </span>
                                                             </ToolbarContent>
-                                                            <EditorContent>
-                                                                @((MarkupString)@postEducationPrograms.HTMLContent)
-                                                            </EditorContent>
-                                                        </BlazoredTextEditor>
-                                                    </DxFormLayoutItem>
-                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Show Content Output?" ReadOnly ColSpanMd="12">
-                                                        <DxCheckBox Checked="IsShowPreviewOutput"
-                                                                    CheckedExpression="@(()=>IsShowPreviewOutput)" CheckedChanged="@((bool value) => ShowAoutPutPreview(value))"></DxCheckBox>
-
-                                                    </DxFormLayoutItem>
-
-                                                    @if (IsShowPreviewOutput)
-                                                    {
-                                                        <div class="card w-100">
-                                                            <div class="card-header">
-                                                                The preview Of Content
-                                                            </div>
-                                                            <div class="card-body">
-                                                                <DxButton @onclick=@(async ()=> await ShowAoutPutPreview(true))>Refresh</DxButton>
-                                                                @preview
-                                                            </div>
-                                                        </div>
-                                                    }
-
-                                                </DxFormLayoutGroup>
-                                                <DxFormLayoutGroup Caption="Material">
-
-                                                    <!-- Content (HTMLEditor) -->
-                                                    <DxFormLayoutItem Caption="Content" ColSpanMd="12">
-                                                        <BlazoredTextEditor @ref=QuillHtml2 Placeholder="write somthing...">
-                                                            <ToolbarContent>
-                                                                <select class="ql-header">
-                                                                    <option selected=""></option>
-                                                                    <option value="1"></option>
-                                                                    <option value="2"></option>
-                                                                    <option value="3"></option>
-                                                                    <option value="4"></option>
-                                                                    <option value="5"></option>
-                                                                </select>
-                                                                <span class="ql-formats">
-                                                                    <button class="ql-bold"></button>
-                                                                    <button class="ql-italic"></button>
-                                                                    <button class="ql-underline"></button>
-                                                                    <button class="ql-strike"></button>
-                                                                </span>
-                                                                <span class="ql-formats">
-                                                                    <select class="ql-color"></select>
-                                                                    <select class="ql-background"></select>
-                                                                </span>
-                                                                <span class="ql-formats">
-                                                                    <button class="ql-list" value="ordered"></button>
-                                                                    <button class="ql-list" value="bullet"></button>
-                                                                </span>
-                                                                <span class="ql-formats">
-                                                                    <button class="ql-link"></button>
-                                                                </span>
-                                                                <span class="ql-formats">
-                                                                    <button class="ql-video"></button>
-                                                                </span>
-                                                            </ToolbarContent>
-                                                            <EditorContent>
+                                                            <EditorContent >
                                                                 @((MarkupString)@postEducationPrograms.HTMLMaterial)
+                                                                @postEducationPrograms.HTMLMaterial
                                                             </EditorContent>
                                                         </BlazoredTextEditor>
+                                                    </DxFormLayoutItem>
+                                                    <DxFormLayoutItem Caption="Attedence" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <DxTextBox NullText="name Attedence" ReadOnly @bind-Text="@postEducationPrograms.Attendance"></DxTextBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Show Content Output?" ReadOnly ColSpanMd="12">
                                                         <DxCheckBox Checked="IsShowPreviewOutput2"
                                                                     CheckedExpression="@(()=>IsShowPreviewOutput2)" CheckedChanged="@((bool value) => ShowAoutPutPreview2(value))"></DxCheckBox>
 
                                                     </DxFormLayoutItem>
-
-                                                    @if (IsShowPreviewOutput2)
-                                                    {
-                                                        <div class="card w-100">
-                                                            <div class="card-header">
-                                                                The preview Of Content
-                                                            </div>
-                                                            <div class="card-body">
-                                                                <DxButton @onclick=@(async ()=> await ShowAoutPutPreview2(true))>Refresh</DxButton>
-                                                                @preview2
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                </DxFormLayoutGroup>
-                                            </DxFormLayout>
+                                                </DxFormLayout>
+                                            </div>
                                         </div>
-                                    </div>
-                                 </DxTabPage>
-                                <DxTabPage Text="PARTICIPAN INFORMATION" Visible="@(postEducationPrograms.Id ==0)" TabIconCssClass="fa-solid fa-circle-info">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <DxLoadingPanel @bind-Visible="PanelVisibleParticipan"
-                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                            IsContentBlocked="true"
-                                                            ApplyBackgroundShading="true"
-                                                            IndicatorAreaVisible="false"
-                                                            Text="Fetching Data...">
-                                                <MyGrid @ref="GridParticipan"
-                                                        Data="GetParticipanEdus"
-                                                        @bind-SelectedDataItems="@SelectedDataItems"                                                       
-                                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                                        KeyFieldName="Id">
+                                        <DxFormLayout>
 
-                                                    <ToolbarTemplate>
-                                                        <MyDxToolbarBase TItem="ParticipanEduDto"
-                                                                         Items="@GetParticipanEdus"
-                                                                         Grid="GridParticipan"
-                                                                         SelectedDataItems="@SelectedDataItemsEducation"
-                                                                         IsImport="false"/>
+                                            @if (IsShowPreviewOutput2)
+                                            {
+                                                <div class="card w-100">
+                                                    <div class="card-header">
+                                                        The preview Of Content
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <DxButton @onclick=@(async ()=> await ShowAoutPutPreview2(true))>Refresh</DxButton>
+                                                        @preview2
+                                                    </div>
+                                                </div>
+                                            }
+                                        </DxFormLayout>
 
-                                                    </ToolbarTemplate>
+                                    </DxTabPage>
+                                    <DxTabPage Text="PARTICIPAN INFORMATION" Visible="@(postEducationPrograms.Id !=0)" TabIconCssClass="fa-solid fa-circle-info">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <DxLoadingPanel @bind-Visible="PanelVisibleParticipan"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+                                                    <MyGrid @ref="GridParticipan"
+                                                            Data="GetParticipanEdus"
+                                                            @bind-SelectedDataItems="@SelectedDataItems"
+                                                            FocusedRowChanged="Grid_FocusedRowChanged"
+                                                            KeyFieldName="Id">
 
-                                                    <Columns>
-                                                        <DxGridSelectionColumn Width="15px" />
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" SortIndex="0" />
-                                                        @* <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" /> *@
-                                                        <DxGridDataColumn MinWidth="200" FieldName="Date" Caption="Start Date" />
-                                                    </Columns>
+                                                        <ToolbarTemplate>
+                                                            <MyDxToolbarBase TItem="ParticipanEduDto"
+                                                                             Items="@GetParticipanEdus"
+                                                                             Grid="GridParticipan"
+                                                                             SelectedDataItems="@SelectedDataItemsEducation"
+                                                                             IsImport="false"
+                                                                             VisibleNew="false"
+                                                                             VisibleDelete ="false"
+                                                                             VisibleEdit="false"/>
 
-                                                </MyGrid>
+                                                        </ToolbarTemplate>
 
-                                            </DxLoadingPanel>
+                                                        <Columns>
+                                                            <DxGridSelectionColumn Width="15px" />
+                                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Name" SortIndex="0" />
+                                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Email" Caption="Email" SortIndex="0" />
+                                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Departement.Name" Caption="Departement" SortIndex="0" />
+                                                            @* <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" /> *@
+                                                            <DxGridDataColumn MinWidth="200" FieldName="CreatedDate" Caption="Join Date" />
+                                                        </Columns>
+
+                                                    </MyGrid>
+
+                                                </DxLoadingPanel>
+                                            </div>
                                         </div>
-                                    </div>
-                                </DxTabPage>
-                            </DxTabs> 
+                                    </DxTabPage>
+                                </DxTabs>
                             </div>
+
                         </EditForm>
 
                     </div>

@@ -133,9 +133,16 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         Id = x.Id,
                         PatientId = x.PatientId,
                         EducationProgramId = x.EducationProgramId,
+                        CreatedDate= x.CreatedDate,
                         Patient = new User
                         {
-                            Name = x.Patient == null ? string.Empty : x.Patient.Name
+                            Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                            Email = x.Patient == null ? string.Empty : x.Patient.Email,
+                            DepartmentId = x.Patient.DepartmentId,
+                            Department = new Department
+                            {
+                                Name = x.Patient.Department.Name == null ? string.Empty : x.Patient.Department.Name
+                            }
                         },
                         EducationProgram = new EducationProgram
                         {
@@ -218,9 +225,16 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         Id = x.Id,
                         PatientId = x.PatientId,
                         EducationProgramId = x.EducationProgramId,
+                        CreatedDate = x.CreatedDate,
                         Patient = new User
                         {
-                            Name = x.Patient == null ? string.Empty : x.Patient.Name
+                            Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                            Email = x.Patient == null ? string.Empty : x.Patient.Email,
+                            DepartmentId = x.Patient.DepartmentId,
+                            Department = new Department
+                            {
+                                Name = x.Patient.Department.Name == null ? string.Empty : x.Patient.Department.Name
+                            }
                         },
                         EducationProgram = new EducationProgram
                         {

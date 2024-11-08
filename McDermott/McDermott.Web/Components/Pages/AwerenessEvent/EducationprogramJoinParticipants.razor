@@ -217,7 +217,7 @@ else
 
             await Mediator.Send(new CreateParticipanEduRequest(new ParticipanEduDto
                 {
-                    Date = DateTime.Now,
+                    
                     PatientId = Patient.Id,
                     EducationProgramId = EducationPrograms.Id,
                 }));

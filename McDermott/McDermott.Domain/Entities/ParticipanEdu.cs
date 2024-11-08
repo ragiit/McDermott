@@ -10,7 +10,6 @@ namespace McDermott.Domain.Entities
     {
         public long? PatientId {  get; set; }
         public long? EducationProgramId { get; set; }
-        public DateTime? Date {  get; set; }
 
         [SetToNull]
         public virtual User? Patient { get; set; }
