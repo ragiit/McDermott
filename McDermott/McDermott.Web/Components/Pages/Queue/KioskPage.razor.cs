@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Drawing.ChartDrawing;
-using McDermott.Application.Dtos.Queue;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -353,6 +351,16 @@ namespace McDermott.Web.Components.Pages.Queue
             });
             groups = result2.Item1;
 
+            var s = await Mediator.Send(new GetSingleKioskConfigQuery
+            {
+                Predicate = x => x.Id == Id
+            });
+            var resultServ = await Mediator.Send(new GetServiceQuery
+            {
+                Predicate = x => s.ServiceIds != null && s.ServiceIds.Contains(x.Id)
+            });
+            Services = resultServ.Item1;
+
             PanelVisible = false;
         }
 
@@ -521,6 +529,65 @@ namespace McDermott.Web.Components.Pages.Queue
                 return false;
             }
         }
+
+        #region ComboboxService
+
+        private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
+        private int ServiceComboBoxIndex { get; set; } = 0;
+        private int totalCountService = 0;
+
+        private async Task OnSearchService()
+        {
+            await LoadDataService();
+        }
+
+        private async Task OnSearchServiceIndexIncrement()
+        {
+            if (ServiceComboBoxIndex < (totalCountService - 1))
+            {
+                ServiceComboBoxIndex++;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchServiceIndexDecrement()
+        {
+            if (ServiceComboBoxIndex > 0)
+            {
+                ServiceComboBoxIndex--;
+                await LoadDataService(ServiceComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputServiceChanged(string e)
+        {
+            ServiceComboBoxIndex = 0;
+            await LoadDataService();
+        }
+
+        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
+        {
+            try
+            {
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetServiceQuery
+                {
+                    SearchTerm = refServiceComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                Services = result.Item1;
+                totalCountService = result.PageCount;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboboxService
 
         private async Task OnSearch()
         {

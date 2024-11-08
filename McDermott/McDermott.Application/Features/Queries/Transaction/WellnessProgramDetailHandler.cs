@@ -241,7 +241,9 @@ namespace McDermott.Application.Features.Queries.Transaction
         {
             try
             {
-                var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<WellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
+                var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<CreateUpdateWellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
+
+                //var result = await _unitOfWork.Repository<WellnessProgramDetail>().UpdateAsync(request.WellnessProgramDetailDto.Adapt<WellnessProgramDetailDto>().Adapt<WellnessProgramDetail>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

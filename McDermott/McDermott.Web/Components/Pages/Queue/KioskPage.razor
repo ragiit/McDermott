@@ -146,60 +146,93 @@
                                                                             ValueFieldName="Id" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"></DxComboBox>
                                                             </DxFormLayoutItem>
                                                         }
-                                                        @if (CountServiceId > 1)
-                                                        {
-                                                            <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                <DxComboBox Data="@serv"
-                                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                                            NullText="Select Service"
-                                                                            SelectedItemChanged="@((ServiceDto? e) => SelectedItemServiceChanged(e))"
-                                                                            @bind-Value="@ServiceId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
-                                                            </DxFormLayoutItem>
-                                                        }
-                                                        else
-                                                        {
-                                                            <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                <DxComboBox Data="@Services"
-                                                                            @bind-Value="@FormKios.ServiceId"
-                                                                            TextFieldName="Name"
-                                                                            ValueFieldName="Id"
-                                                                            ReadOnly="true"
-                                                                            ShowValidationIcon="true" />
 
-                                                            </DxFormLayoutItem>
-                                                        }
-                                                        @if (showPhysician)
-                                                        {
-                                                            <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@Phys"
-                                                                            @bind-Value="@FormKios.PhysicianId"
-                                                                            NullText="Select Physician.."
-                                                                            ValueFieldName="Id" 
-                                                                            SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
-                                                                            TextFieldName="Name" />
-                                                            </DxFormLayoutItem>
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@Services"
+                                                                          NullText="Select Service"
+                                                                          @ref="refServiceComboBox"
+                                                                          @bind-Value="@FormKios.ServiceId"
+                                                                          TextFieldName="Name"
+                                                                          ReadOnly="(Services.Count == 1)"
+                                                                          ValueFieldName="Id"
+                                                                          TextChanged="((string e) => OnInputServiceChanged(e))">
+                                                                <Buttons>
+                                                                    <DxEditorButton Click="OnSearchServiceIndexDecrement"
+                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                    Visible="(Services.Count != 1)"
+                                                                                    Tooltip="Previous Index" />
+                                                                    <DxEditorButton Click="OnSearchService"
+                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                    Visible="(Services.Count != 1)"
+                                                                                    Tooltip="Search" />
+                                                                    <DxEditorButton Click="OnSearchServiceIndexIncrement"
+                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                    Visible="(Services.Count != 1)"
+                                                                                    Tooltip="Next Index" />
+                                                                </Buttons>
+                                                                <Columns>
+                                                                    <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
+                                                                    <DxListEditorColumn FieldName="Service.Name" Caption="Service" />
+                                                                    <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                                                                </Columns>
+                                                            </MyDxComboBox>
+                                                            <ValidationMessage For="@(()=>FormKios.ServiceId)" />
+                                                        </DxFormLayoutItem>
 
-                                                            <DxFormLayoutItem Caption="Physician Schedule Slot" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                <DxComboBox Data="@DoctorScheduleSlots"
-                                                                            FilteringMode="DataGridFilteringMode.Contains"
-                                                                            @bind-Value="@SelectedScheduleSlot"
-                                                                            NullText="Select Physician Slot Time.."
-                                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"
-                                                                            EditFormat="{0}">
+                                                        @* @if (CountServiceId > 1)
+                                    {
+                                    <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                    <DxComboBox Data="@serv"
+                                    FilteringMode="@DataGridFilteringMode.Contains"
+                                    NullText="Select Service"
+                                    SelectedItemChanged="@((ServiceDto? e) => SelectedItemServiceChanged(e))"
+                                    @bind-Value="@ServiceId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id" ShowValidationIcon="true"></DxComboBox>
+                                    </DxFormLayoutItem>
+                                    }
+                                    else
+                                    {
+                                    <DxFormLayoutItem Caption="Service" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                    <DxComboBox Data="@Services"
+                                    @bind-Value="@FormKios.ServiceId"
+                                    TextFieldName="Name"
+                                    ValueFieldName="Id"
+                                    ReadOnly="true"
+                                    ShowValidationIcon="true" />
 
-                                                                    <Columns>
-                                                                        <DxListEditorColumn FieldName="@nameof(DoctorScheduleSlotDto.StartDate)"
-                                                                                            Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DoctorScheduleSlotDto.WorkFromFormatString)"
-                                                                                            Caption="Work From" />
-                                                                        <DxListEditorColumn FieldName="@nameof(DoctorScheduleSlotDto.WorkToFormatString)"
-                                                                                            Caption="Work To" />
-                                                                    </Columns>
-                                                                </DxComboBox>
-                                                            </DxFormLayoutItem>
-                                                        }
+                                    </DxFormLayoutItem>
+                                    } *@
+                                                        @*  @if (showPhysician)
+                                    {
+                                    <DxFormLayoutItem Caption="Physician" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Phys"
+                                    @bind-Value="@FormKios.PhysicianId"
+                                    NullText="Select Physician.."
+                                    ValueFieldName="Id"
+                                    SelectedItemChanged="@((UserDto req)=> ChangePhysician(req))"
+                                    TextFieldName="Name" />
+                                    </DxFormLayoutItem>
+
+                                    <DxFormLayoutItem Caption="Physician Schedule Slot" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                    <DxComboBox Data="@DoctorScheduleSlots"
+                                    FilteringMode="DataGridFilteringMode.Contains"
+                                    @bind-Value="@SelectedScheduleSlot"
+                                    NullText="Select Physician Slot Time.."
+                                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" ShowValidationIcon="true"
+                                    EditFormat="{0}">
+
+                                    <Columns>
+                                    <DxListEditorColumn FieldName="@nameof(DoctorScheduleSlotDto.StartDate)"
+                                    Caption="Name" />
+                                    <DxListEditorColumn FieldName="@nameof(DoctorScheduleSlotDto.WorkFromFormatString)"
+                                    Caption="Work From" />
+                                    <DxListEditorColumn FieldName="@nameof(DoctorScheduleSlotDto.WorkToFormatString)"
+                                    Caption="Work To" />
+                                    </Columns>
+                                    </DxComboBox>
+                                    </DxFormLayoutItem>
+                                    } *@
                                                     }
                                                     else
                                                     {

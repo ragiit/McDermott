@@ -159,10 +159,7 @@
                                                         <span class="ql-formats">
                                                             <button class="ql-video"></button>
                                                         </span>
-                                                    </ToolbarContent>
-                                                    <EditorContent>
-                                                        @((MarkupString)@WellnessProgram.Content)
-                                                    </EditorContent>
+                                                    </ToolbarContent> 
                                                 </BlazoredTextEditor>
                                             </DxFormLayoutItem>
 
@@ -174,7 +171,7 @@
                                         </DxFormLayout>
                                     </div>
                                 </div>
-
+@* 
                                 @if (IsShowPreviewOutput)
                                 {
                                     <div class="card w-100">
@@ -186,7 +183,7 @@
                                             @preview
                                         </div>
                                     </div>
-                                }
+                                } *@
 
                                 @if (WellnessProgram.Id != 0)
                                 {
@@ -245,6 +242,7 @@
                                                                         <EditFormTemplate Context="EditFormContextz">
                                                                             @{
                                                                                 var a = (WellnessProgramDetailDto)EditFormContextz.EditModel;
+                                                                                
                                                                             }
                                                                             <DxFormLayout CssClass="w-100">
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Name" ColSpanMd="12">
@@ -253,13 +251,13 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Start Time" ColSpanMd="12">
-                                                                                    <DxDateEdit @bind-Date="@a.StartDate" TimeSectionVisible="true"
-                                                                                                DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxDateEdit @bind-Date="@a.StartDate" MinDate="WellnessProgram.StartDate" TimeSectionVisible="true"
+                                                                                                DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Time" ColSpanMd="12">
                                                                                     <DxDateEdit @bind-Date="@a.EndDate" TimeSectionVisible="true"
-                                                                                                DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                                        DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Notes" ColSpanMd="12">
@@ -369,7 +367,7 @@
                                                             </DxLoadingPanel>
                                                         </div>
                                                     </DxTabPage>
-                                                    <DxTabPage CssClass="w-100" Text="Attendences">
+                                                            <DxTabPage CssClass="w-100" Text="Attendences" Click="(async () => await LoadDataAttendances())">
                                                         <div class="card">
                                                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                             IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"

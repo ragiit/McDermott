@@ -1,14 +1,14 @@
-public class GroupCommand
+public class ServiceCommand
  {
      #region GET
 
-    public class GetSingleGroupQuery : IRequest<GroupDto>
+    public class GetSingleServiceQuery : IRequest<ServiceDto>
     {
-        public List<Expression<Func<Group, object>>> Includes { get; set; }
-        public Expression<Func<Group, bool>> Predicate { get; set; }
-        public Expression<Func<Group, Group>> Select { get; set; }
+        public List<Expression<Func<Service, object>>> Includes { get; set; }
+        public Expression<Func<Service, bool>> Predicate { get; set; }
+        public Expression<Func<Service, Service>> Select { get; set; }
 
-        public List<(Expression<Func<Group, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class GroupCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetGroupQuery : IRequest<(List<GroupDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetServiceQuery : IRequest<(List<ServiceDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Group, object>>> Includes { get; set; }
-        public Expression<Func<Group, bool>> Predicate { get; set; }
-        public Expression<Func<Group, Group>> Select { get; set; }
+        public List<Expression<Func<Service, object>>> Includes { get; set; }
+        public Expression<Func<Service, bool>> Predicate { get; set; }
+        public Expression<Func<Service, Service>> Select { get; set; }
 
-        public List<(Expression<Func<Group, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Service, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class GroupCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateGroup(Expression<Func<Group, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateService(Expression<Func<Service, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Group, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<Service, bool>> Predicate { get; } = predicate!;
      }
 
-     public class BulkValidateGroup(List<GroupDto> GroupsToValidate) : IRequest<List<GroupDto>>
+     public class BulkValidateService(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>
      {
-         public List<GroupDto> GroupsToValidate { get; } = GroupsToValidate;
+         public List<ServiceDto> ServicesToValidate { get; } = ServicesToValidate;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateGroupRequest(GroupDto GroupDto) : IRequest<GroupDto>
+     public class CreateServiceRequest(ServiceDto ServiceDto) : IRequest<ServiceDto>
      {
-         public GroupDto GroupDto { get; set; } = GroupDto;
+         public ServiceDto ServiceDto { get; set; } = ServiceDto;
      }
 
-     public class CreateListGroupRequest(List<GroupDto> GroupDtos) : IRequest<List<GroupDto>>
+     public class CreateListServiceRequest(List<ServiceDto> ServiceDtos) : IRequest<List<ServiceDto>>
      {
-         public List<GroupDto> GroupDtos { get; set; } = GroupDtos;
+         public List<ServiceDto> ServiceDtos { get; set; } = ServiceDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateGroupRequest(GroupDto GroupDto) : IRequest<GroupDto>
+     public class UpdateServiceRequest(ServiceDto ServiceDto) : IRequest<ServiceDto>
      {
-         public GroupDto GroupDto { get; set; } = GroupDto;
+         public ServiceDto ServiceDto { get; set; } = ServiceDto;
      }
 
-     public class UpdateListGroupRequest(List<GroupDto> GroupDtos) : IRequest<List<GroupDto>>
+     public class UpdateListServiceRequest(List<ServiceDto> ServiceDtos) : IRequest<List<ServiceDto>>
      {
-         public List<GroupDto> GroupDtos { get; set; } = GroupDtos;
+         public List<ServiceDto> ServiceDtos { get; set; } = ServiceDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteGroupRequest : IRequest<bool>
+     public class DeleteServiceRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,25 +83,25 @@ public class GroupCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateGroupQuery, List<GroupDto>>,
+IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
   
-IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGroupQuery, GroupDto>,
-public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleGroupQuery, GroupDto>, 
-     IRequestHandler<ValidateGroup, bool>,
-     IRequestHandler<CreateGroupRequest, GroupDto>,
-     IRequestHandler<BulkValidateGroup, List<GroupDto>>,
-     IRequestHandler<CreateListGroupRequest, List<GroupDto>>,
-     IRequestHandler<UpdateGroupRequest, GroupDto>,
-     IRequestHandler<UpdateListGroupRequest, List<GroupDto>>,
-     IRequestHandler<DeleteGroupRequest, bool>
+IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleServiceQuery, ServiceDto>,
+public class ServiceHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleServiceQuery, ServiceDto>, 
+     IRequestHandler<ValidateService, bool>,
+     IRequestHandler<CreateServiceRequest, ServiceDto>,
+     IRequestHandler<BulkValidateService, List<ServiceDto>>,
+     IRequestHandler<CreateListServiceRequest, List<ServiceDto>>,
+     IRequestHandler<UpdateServiceRequest, ServiceDto>,
+     IRequestHandler<UpdateListServiceRequest, List<ServiceDto>>,
+     IRequestHandler<DeleteServiceRequest, bool>
 {
     #region GET
-    public async Task<List<GroupDto>> Handle(BulkValidateGroup request, CancellationToken cancellationToken)
+    public async Task<List<ServiceDto>> Handle(BulkValidateService request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.GroupsToValidate;
+        var CountryDtos = request.ServicesToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
         //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -117,20 +117,20 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
         return [];
     }
-    public async Task<bool> Handle(ValidateGroup request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateService request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Group>()
+        return await _unitOfWork.Repository<Service>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<GroupDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGroupQuery request, CancellationToken cancellationToken)
+    public async Task<(List<ServiceDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetServiceQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Group>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -146,8 +146,8 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Group>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Group>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -164,7 +164,7 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -172,7 +172,7 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Group
+                query = query.Select(x => new Service
                 {
                     Id = x.Id, 
                 });
@@ -186,11 +186,11 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<GroupDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<ServiceDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<GroupDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<ServiceDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -200,11 +200,11 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<GroupDto> Handle(GetSingleGroupQuery request, CancellationToken cancellationToken)
+    public async Task<ServiceDto> Handle(GetSingleServiceQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Group>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<Service>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -220,8 +220,8 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Group>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Group>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Service>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Service>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -238,7 +238,7 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Group.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Service.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -246,12 +246,12 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Group
+                query = query.Select(x => new Service
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GroupDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ServiceDto>();
         }
         catch (Exception ex)
         {
@@ -264,17 +264,17 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<GroupDto> Handle(CreateGroupRequest request, CancellationToken cancellationToken)
+     public async Task<ServiceDto> Handle(CreateServiceRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDto.Adapt<CreateUpdateGroupDto>().Adapt<Group>());
+             var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDto.Adapt<CreateUpdateServiceDto>().Adapt<Service>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GroupDto>();
+             return result.Adapt<ServiceDto>();
          }
          catch (Exception)
          {
@@ -282,16 +282,16 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<GroupDto>> Handle(CreateListGroupRequest request, CancellationToken cancellationToken)
+     public async Task<List<ServiceDto>> Handle(CreateListServiceRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDtos.Adapt<List<Group>>());
+             var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDtos.Adapt<List<Service>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GroupDto>>();
+             return result.Adapt<List<ServiceDto>>();
          }
          catch (Exception)
          {
@@ -303,17 +303,17 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<GroupDto> Handle(UpdateGroupRequest request, CancellationToken cancellationToken)
+     public async Task<ServiceDto> Handle(UpdateServiceRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDto.Adapt<GroupDto>().Adapt<Group>());
+             var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDto.Adapt<ServiceDto>().Adapt<Service>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GroupDto>();
+             return result.Adapt<ServiceDto>();
          }
          catch (Exception)
          {
@@ -321,16 +321,16 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<GroupDto>> Handle(UpdateListGroupRequest request, CancellationToken cancellationToken)
+     public async Task<List<ServiceDto>> Handle(UpdateListServiceRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDtos.Adapt<List<Group>>());
+             var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDtos.Adapt<List<Service>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GroupDto>>();
+             return result.Adapt<List<ServiceDto>>();
          }
          catch (Exception)
          {
@@ -342,23 +342,23 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteGroupRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteServiceRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Group>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<Service>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Group>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<Service>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGroupQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetServiceQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -372,20 +372,20 @@ public class GroupHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateGroupQuery(List<GroupDto> GroupsToValidate) : IRequest<List<GroupDto>>
+public class BulkValidateServiceQuery(List<ServiceDto> ServicesToValidate) : IRequest<List<ServiceDto>>
 {
-    public List<GroupDto> GroupsToValidate { get; } = GroupsToValidate;
+    public List<ServiceDto> ServicesToValidate { get; } = ServicesToValidate;
 }a
 
 
-IRequestHandler<BulkValidateGroupQuery, List<GroupDto>>,
+IRequestHandler<BulkValidateServiceQuery, List<ServiceDto>>,
   
-IRequestHandler<GetGroupQuery, (List<GroupDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGroupQuery, GroupDto>,
+IRequestHandler<GetServiceQuery, (List<ServiceDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleServiceQuery, ServiceDto>,
 
 
 
- var a = await Mediator.Send(new GetGroupsQuery
+ var a = await Mediator.Send(new GetServicesQuery
  {
      OrderByList =
      [
@@ -397,10 +397,10 @@ IRequestHandler<GetSingleGroupQuery, GroupDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleGroupQuery
+var patienss = (await Mediator.Send(new GetSingleServiceQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Group
+    Select = x => new Service
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -413,13 +413,13 @@ var patienss = (await Mediator.Send(new GetSingleGroupQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetGroupQuery
+    var result = await Mediator.Send(new GetServiceQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Groups = result.Item1;
+    Services = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -432,22 +432,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetGroupQuery
+ var result = await Mediator.Send(new GetServiceQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refGroupComboBox?.Text ?? "",
+     SearchTerm = refServiceComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Groups = result.Item1;
- totalCountGroup = result.PageCount;
+ Services = result.Item1;
+ totalCountService = result.PageCount;
 
- Groups = (await Mediator.Send(new GetGroupQuery
+ Services = (await Mediator.Send(new GetServiceQuery
  {
-     Predicate = x => x.Id == GroupForm.IdCardGroupId,
+     Predicate = x => x.Id == ServiceForm.IdCardServiceId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleGroupsQuery
+var data = (await Mediator.Send(new GetSingleServicesQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -455,17 +455,17 @@ var data = (await Mediator.Send(new GetSingleGroupsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Group
+    Select = x => new Service
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Group
+        Patient = new Service
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Group
+        Pratitioner = new Service
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -478,55 +478,55 @@ var data = (await Mediator.Send(new GetSingleGroupsQuery
 })) ?? new();
 
 
-#region ComboboxGroup
+#region ComboboxService
 
- private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
- private int GroupComboBoxIndex { get; set; } = 0;
- private int totalCountGroup = 0;
+ private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
+ private int ServiceComboBoxIndex { get; set; } = 0;
+ private int totalCountService = 0;
 
- private async Task OnSearchGroup()
+ private async Task OnSearchService()
  {
-     await LoadDataGroup();
+     await LoadDataService();
  }
 
- private async Task OnSearchGroupIndexIncrement()
+ private async Task OnSearchServiceIndexIncrement()
  {
-     if (GroupComboBoxIndex < (totalCountGroup - 1))
+     if (ServiceComboBoxIndex < (totalCountService - 1))
      {
-         GroupComboBoxIndex++;
-         await LoadDataGroup(GroupComboBoxIndex, 10);
+         ServiceComboBoxIndex++;
+         await LoadDataService(ServiceComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchGroupIndexDecrement()
+ private async Task OnSearchServiceIndexDecrement()
  {
-     if (GroupComboBoxIndex > 0)
+     if (ServiceComboBoxIndex > 0)
      {
-         GroupComboBoxIndex--;
-         await LoadDataGroup(GroupComboBoxIndex, 10);
+         ServiceComboBoxIndex--;
+         await LoadDataService(ServiceComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputGroupChanged(string e)
+ private async Task OnInputServiceChanged(string e)
  {
-     GroupComboBoxIndex = 0;
-     await LoadDataGroup();
+     ServiceComboBoxIndex = 0;
+     await LoadDataService();
  }
 
  
-  private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetGroupQuery
+          var result = await Mediator.Send(new GetServiceQuery
           {
-              SearchTerm = refGroupComboBox?.Text ?? "",
+              SearchTerm = refServiceComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Groups = result.Item1;
-          totalCountGroup = result.PageCount;
+          Services = result.Item1;
+          totalCountService = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -536,47 +536,47 @@ var data = (await Mediator.Send(new GetSingleGroupsQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxGroup
+ #endregion ComboboxService
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Group" ColSpanMd="12">
-    <MyDxComboBox Data="@Groups"
-                  NullText="Select Group"
-                  @ref="refGroupComboBox"
-                  @bind-Value="@a.GroupId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
+    <MyDxComboBox Data="@Services"
+                  NullText="Select Service"
+                  @ref="refServiceComboBox"
+                  @bind-Value="@a.ServiceId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputGroupChanged(e))">
+                  TextChanged="((string e) => OnInputServiceChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchGroupIndexDecrement"
+            <DxEditorButton Click="OnSearchServiceIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchGroup"
+            <DxEditorButton Click="OnSearchService"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchGroupIndexIncrement"
+            <DxEditorButton Click="OnSearchServiceIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(GroupDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Group.Name" Caption="Group" />
-            <DxListEditorColumn FieldName="@nameof(GroupDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Service.Name" Caption="Service" />
+            <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.GroupId)" />
+    <ValidationMessage For="@(()=>a.ServiceId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDto.Adapt<CreateUpdateGroupDto>().Adapt<Group>());
-var result = await _unitOfWork.Repository<Group>().AddAsync(request.GroupDtos.Adapt<List<CreateUpdateGroupDto>>().Adapt<List<Group>>()); 
+var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDto.Adapt<CreateUpdateServiceDto>().Adapt<Service>());
+var result = await _unitOfWork.Repository<Service>().AddAsync(request.ServiceDtos.Adapt<List<CreateUpdateServiceDto>>().Adapt<List<Service>>()); 
 
-var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDto.Adapt<CreateUpdateGroupDto>().Adapt<Group>());  
-var result = await _unitOfWork.Repository<Group>().UpdateAsync(request.GroupDtos.Adapt<List<CreateUpdateGroupDto>>().Adapt<List<Group>>());
+var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDto.Adapt<CreateUpdateServiceDto>().Adapt<Service>());  
+var result = await _unitOfWork.Repository<Service>().UpdateAsync(request.ServiceDtos.Adapt<List<CreateUpdateServiceDto>>().Adapt<List<Service>>());
 
-list3 = (await Mediator.Send(new GetGroupQuery
+list3 = (await Mediator.Send(new GetServiceQuery
 {
-    Predicate = x => GroupNames.Contains(x.Name.ToLower()),
+    Predicate = x => ServiceNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Group
+    Select = x => new Service
     {
         Id = x.Id,
         Name = x.Name
@@ -586,42 +586,42 @@ list3 = (await Mediator.Send(new GetGroupQuery
 
 #region Searching
 
-    private int pageSizeGroupAttendance { get; set; } = 10;
-    private int totalCountGroupAttendance = 0;
-    private int activePageIndexGroupAttendance { get; set; } = 0;
-    private string searchTermGroupAttendance { get; set; } = string.Empty;
+    private int pageSizeServiceAttendance { get; set; } = 10;
+    private int totalCountServiceAttendance = 0;
+    private int activePageIndexServiceAttendance { get; set; } = 0;
+    private string searchTermServiceAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedGroupAttendance(string searchText)
+    private async Task OnSearchBoxChangedServiceAttendance(string searchText)
     {
-        searchTermGroupAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeGroupAttendance);
+        searchTermServiceAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeServiceAttendance);
     }
 
-    private async Task OnpageSizeGroupAttendanceIndexChanged(int newpageSizeGroupAttendance)
+    private async Task OnpageSizeServiceAttendanceIndexChanged(int newpageSizeServiceAttendance)
     {
-        pageSizeGroupAttendance = newpageSizeGroupAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeGroupAttendance);
+        pageSizeServiceAttendance = newpageSizeServiceAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeServiceAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeGroupAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeServiceAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeGroupAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeServiceAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetGroupAttendanceQuery
+        var result = await Mediator.Send(new GetServiceAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeGroupAttendance,
-            SearchTerm = searchTermGroupAttendance,
+            PageSize = pageSizeServiceAttendance,
+            SearchTerm = searchTermServiceAttendance,
         });
-        GroupAttendances = result.Item1;
-        totalCountGroupAttendance = result.PageCount;
-        activePageIndexGroupAttendance = pageIndex;
+        ServiceAttendances = result.Item1;
+        totalCountServiceAttendance = result.PageCount;
+        activePageIndexServiceAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
