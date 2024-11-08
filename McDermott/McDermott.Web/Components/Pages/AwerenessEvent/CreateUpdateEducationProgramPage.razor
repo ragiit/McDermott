@@ -4,6 +4,18 @@
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Education Program</PageTitle>
+<style>
+    .ql-editor {
+        min-height: 300px;
+    }
+
+        .ql-editor img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1em 0;
+        }
+</style>
 
 @if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
 {
@@ -41,7 +53,7 @@
                                                     @if (postEducationPrograms.Id != 0)
                                                     {
                                                         <DxButton Text="Active" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
-                                                        <DxButton Text="InActive" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                                                        <DxButton Text="InActive" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Draft || postEducationPrograms.Status == EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
                                                         <DxButton Text="Send To Draft" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.InActive)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-rotate-left" Click="SendToDraft"></DxButton>
                                                         <DxButton Text="Done" Visible="@( postEducationPrograms.Status == EnumStatusEducationProgram.Active)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onDone"></DxButton>
                                                     }
@@ -224,10 +236,10 @@
                                                     <DxFormLayoutItem Caption="Attedence" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                         <DxMaskedInput @bind-Value="@postEducationPrograms.Attendance"
                                                                        ShowValidationIcon="true"
-                                                                       ReadOnly="true"
+                                                                       ReadOnly="IsReadOnly"
                                                                        MaskMode="MaskMode.RegEx">
                                                             <Buttons>
-                                                                <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                                <InputFile id="sipFile" accept=".xls, .pdf, .xlsx" OnChange="@SelectFiles" multiple="false" style="display:none" />
                                                                 <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
                                                                 <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
                                                                 <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />

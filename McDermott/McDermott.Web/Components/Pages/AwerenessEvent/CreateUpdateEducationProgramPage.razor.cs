@@ -36,7 +36,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private bool FormValidationState { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
-        private bool IsReadOnly => postEducationPrograms.Status == EnumStatusEducationProgram.Draft || postEducationPrograms.Id != 0;
+        private bool IsReadOnly => postEducationPrograms.Status == EnumStatusEducationProgram.Done;
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsEducation { get; set; } = [];
@@ -132,24 +132,24 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             var result = await Mediator.Send(new GetSingleEducationProgramQuery
             {
                 Predicate = x => x.Id == Id,
-                Select = x=> new EducationProgram
+                Select = x => new EducationProgram
                 {
                     Id = x.Id,
                     EventName = x.EventName,
                     EventCategoryId = x.EventCategoryId,
                     Slug = x.Slug,
-                    StartDate=x.StartDate,
+                    StartDate = x.StartDate,
                     EndDate = x.EndDate,
                     HTMLContent = x.HTMLContent,
-                    HTMLMaterial=x.HTMLMaterial,
+                    HTMLMaterial = x.HTMLMaterial,
                     Attendance = x.Attendance,
                     Status = x.Status,
-                    EventCategory= new AwarenessEduCategory
+                    EventCategory = new AwarenessEduCategory
                     {
                         Name = x.EventCategory == null ? string.Empty : x.EventCategory.Name
                     }
                 }
-                
+
             });
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -159,10 +159,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     return;
                 }
                 postEducationPrograms = result ?? new();
-
-                if(postEducationPrograms.HTMLContent is not null){
-                    postEducationPrograms.HTMLContent = await this.QuillHtml.GetHTML();
-                }
+                                
                 var resultParticipan = await Mediator.Send(new GetParticipanEduQuery());
 
                 GetParticipanEdus = resultParticipan.Item1;
@@ -332,15 +329,43 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 if (postEducationPrograms.Id == 0)
                 {
                     if (QuillHtml != null)
-                        postEducationPrograms.HTMLContent = await QuillHtml.GetContent();
+                        postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
                     if (QuillHtml2 != null)
-                        postEducationPrograms.MaterialContent = await QuillHtml2.GetContent();
+                        postEducationPrograms.MaterialContent = await QuillHtml2.GetHTML();
+                    await FileUploadService.UploadFileAsync(BrowserFile);
                     postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
                     data = await Mediator.Send(new CreateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Add Data Success...");
                 }
                 else
                 {
+
+                    if (QuillHtml != null)
+                        postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
+                    if (QuillHtml2 != null)
+                        postEducationPrograms.MaterialContent = await QuillHtml2.GetHTML();
+                    await FileUploadService.UploadFileAsync(BrowserFile);
+
+                    var cekdata = await Mediator.Send(new GetSingleEducationProgramQuery
+                    {
+                        Predicate = x=>x.Id == Id,
+                        
+                    });
+
+                    if (postEducationPrograms.Attendance != cekdata.Attendance )
+                    {
+                        if (postEducationPrograms.Attendance != null)
+                            Helper.DeleteFile(postEducationPrograms.Attendance);
+
+                        if (cekdata.Attendance != null)
+                            Helper.DeleteFile(cekdata.Attendance);
+                    }
+
+                    if (postEducationPrograms.Attendance != cekdata.Attendance)
+                    {
+                        if (postEducationPrograms.Attendance != null)
+                            _ = await FileUploadService.UploadFileAsync(BrowserFile);
+                    }
                     data = await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Update Data Success...");
                 }
@@ -362,7 +387,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #region Click
         private void onDiscard()
         {
-            NavigationManager.NavigateTo($"awerenessevent/education-program/{EnumPageMode.Create.GetDisplayName()}");
+            NavigationManager.NavigateTo($"awereness-event/education-program/{EnumPageMode.Create.GetDisplayName()}");
         }
 
         private async Task onActive()
