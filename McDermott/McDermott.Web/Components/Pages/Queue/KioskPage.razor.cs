@@ -325,6 +325,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private bool IsTelemedicine = false;
         private bool IsReadOnlyService = false;
+        private KioskConfigDto KioskConfig { get; set; } = new();
 
         private async Task LoadData()
         {
@@ -352,13 +353,13 @@ namespace McDermott.Web.Components.Pages.Queue
             });
             groups = result2.Item1;
 
-            var s = await Mediator.Send(new GetSingleKioskConfigQuery
+            KioskConfig = await Mediator.Send(new GetSingleKioskConfigQuery
             {
                 Predicate = x => x.Id == Id
             });
             var resultServ = await Mediator.Send(new GetServiceQuery
             {
-                Predicate = x => s.ServiceIds != null && s.ServiceIds.Contains(x.Id)
+                Predicate = x => KioskConfig.ServiceIds != null && KioskConfig.ServiceIds.Contains(x.Id)
             });
             Services = resultServ.Item1;
             IsReadOnlyService = resultServ.Item1.Count == 1;
@@ -574,6 +575,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 PanelVisible = true;
                 var result = await Mediator.Send(new GetServiceQuery
                 {
+                    Predicate = x => KioskConfig.ServiceIds != null && KioskConfig.ServiceIds.Contains(x.Id),
                     SearchTerm = refServiceComboBox?.Text ?? "",
                     PageIndex = pageIndex,
                     PageSize = pageSize,

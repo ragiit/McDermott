@@ -102,6 +102,10 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Id = x.Id,
                         Name = x.Name,
                         AwarenessEduCategoryId = x.AwarenessEduCategoryId,
+                        AwarenessEduCategory = new AwarenessEduCategory
+                        {
+                            Name = x.AwarenessEduCategory == null ? "" : x.AwarenessEduCategory.Name
+                        },
                         Content = x.Content,
                         Status = x.Status,
                         StartDate = x.StartDate,
