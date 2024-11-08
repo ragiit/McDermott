@@ -373,8 +373,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
                 if (postEducationPrograms.Id == 0)
                 {
-                    if (QuillHtml != null)
+                    if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                    {
                         postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
+                    }
                     if (QuillHtml2 != null)
                         postEducationPrograms.MaterialContent = await QuillHtml2.GetHTML();
                     await FileUploadService.UploadFileAsync(BrowserFile);
