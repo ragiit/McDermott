@@ -29,6 +29,6 @@ namespace McDermott.Application.Dtos.AwarenessEvent
         public string? Attendance { get; set; }
         public EnumStatusEducationProgram? Status { get; set; }
 
-        public AwarenessEduCategoryDto? EventCategoryDto { get; set; }
+        public AwarenessEduCategoryDto? EventCategory { get; set; }
     }
 }

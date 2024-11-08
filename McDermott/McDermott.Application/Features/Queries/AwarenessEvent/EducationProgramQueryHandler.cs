@@ -132,7 +132,11 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         Id = x.Id,
                         EventName = x.EventName,
                         EventCategoryId = x.EventCategoryId,
+                        StartDate = x.StartDate,
+                        EndDate=x.EndDate,
+                        Slug = x.Slug,
                         HTMLContent = x.HTMLContent,
+                        HTMLMaterial = x.HTMLMaterial,
                         Description = x.Description,
                         Status = x.Status,
                         EventCategory = new AwarenessEduCategory
@@ -215,7 +219,11 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         Id = x.Id,
                         EventName = x.EventName,
                         EventCategoryId = x.EventCategoryId,
+                        StartDate = x.StartDate,
+                        EndDate = x.EndDate,
+                        Slug = x.Slug,
                         HTMLContent = x.HTMLContent,
+                        HTMLMaterial = x.HTMLMaterial,
                         Description = x.Description,
                         Status = x.Status,
                         EventCategory = new AwarenessEduCategory
