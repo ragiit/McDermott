@@ -101,7 +101,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        Category = x.Category,
+                        AwarenessEduCategoryId = x.AwarenessEduCategoryId,
                         Content = x.Content,
                         Status = x.Status,
                         StartDate = x.StartDate,
@@ -182,7 +182,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        Category = x.Category,
+                        AwarenessEduCategoryId = x.AwarenessEduCategoryId,
                         Content = x.Content,
                         Status = x.Status,
                         StartDate = x.StartDate,

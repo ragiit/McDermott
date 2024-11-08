@@ -39,6 +39,42 @@
             </div>
         </div>
     }
+    else if (!IsActive)
+    {
+        <div class="wrapper">
+            <div class="container-fluid ">
+                <div class="row centered-container">
+                    <div class="col-md-10">
+                        <div class="card mt-5">
+                            <div class="card-header bg-primary">
+                                <div class="row justify-content-center">
+                                    <div class="col-auto align-self-center">
+                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-center">
+                                    @if (WellnessProgram.Status == EnumWellness.Completed)
+                                    {
+                                    <p class="text-center">This wellness program has been completed.</p>
+                                    }
+                                    else if (WellnessProgram.Status == EnumWellness.Inactive)
+                                    {
+                                    <p class="text-center">This wellness program is currently inactive.</p>
+                                    }
+                                    else
+                                    {
+                                    <p class="text-center">This wellness program is currently in the "@WellnessProgram.Status.GetDisplayName()" status.</p>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
     else if (IsStart)
     {
         <div class="wrapper">
@@ -50,7 +86,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
                                         <h4 class="fw-bold">@WellnessProgram.Name</h4>
-                                  @*       <div id="countdown" class="text-light mt-2"></div> *@
+                                        @*       <div id="countdown" class="text-light mt-2"></div> *@
                                     </div>
                                 </div>
                             </div>
@@ -177,24 +213,24 @@
                                     </div> *@
                                                 }
                                             </DxFormLayout>
-                                            @* @if (Patient is not null && Patient.Id != 0)
-                                {
-                                <div class="row mt-2">
-                                <div class="col-12">
-                                <div class="row justify-content-end">
-                                <div class="col-md-12 d-flex justify-content-end">
-                                <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                Text="Join"
-                                CssClass="w-130"
-                                SubmitFormOnClick="true"
-                                Click="OnClickJoin">
-                                </DxButton>
-                                </div>
-                                </div>
-                                </div>
-                                </div>
-                                } *@
+                                            @if (Patient is not null && Patient.Id != 0)
+                                            {
+                                                <div class="row mt-2">
+                                                    <div class="col-12">
+                                                        <div class="row justify-content-end">
+                                                            <div class="col-md-12 d-flex justify-content-end">
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                          RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                                          Text="Join"
+                                                                          CssClass="w-130"
+                                                                          SubmitFormOnClick="true"
+                                                                          Click="OnClickJoin">
+                                                                </DxButton>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
                                         </EditForm>
                                     }
 
@@ -239,7 +275,7 @@ else
         </div>
     </div>
 }
- 
+
 @code {
     [Parameter] public string Slug { get; set; } = string.Empty;
     private bool IsShowContent { get; set; } = true;
@@ -327,6 +363,7 @@ else
 
     private bool IsClosed { get; set; } = false;
     private bool IsStart { get; set; } = false;
+    private bool IsActive { get; set; } = false;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -343,9 +380,16 @@ else
                 return;
             }
 
+            if (WellnessProgram.Status == EnumWellness.Active)
+            {
+                IsActive = true;
+                return;
+            }
+
             if (WellnessProgram.EndDate is not null && WellnessProgram.EndDate < DateTime.Now)
             {
                 IsClosed = true;
+                return;
             }
 
             // if (timer is not null)
@@ -355,13 +399,14 @@ else
             {
                 // StartCountdown();
                 IsStart = true;
+                return;
             }
         }
         catch (Exception ex)
         {
             ex.HandleException(ToastService);
         }
-        finally { PanelVisible = false; } 
+        finally { PanelVisible = false; }
     }
 
     private string TimeRemaining { get; set; } = "Calculating...";
