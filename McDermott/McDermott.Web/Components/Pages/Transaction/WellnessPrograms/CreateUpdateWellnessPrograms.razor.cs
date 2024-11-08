@@ -180,20 +180,28 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                         break;
                 }
 
-                if (QuillHtml != null)
-                    WellnessProgram.Content = await QuillHtml.GetContent();
+                WellnessProgram.Content = await QuillHtml.GetHTML();
 
+                var temp = new WellnessProgramDto();
                 if (WellnessProgram.Id == 0)
                 {
-                    var ye = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
-                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true);
+                    temp = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={temp.Id}", true);
                 }
                 else
                 {
-                    WellnessProgram = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
+                    temp = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
 
-                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={temp.Id}");
                 }
+
+                Id = temp.Id;
+                var result = await Mediator.Send(new GetSingleWellnessProgramQuery
+                {
+                    Predicate = x => x.Id == Id
+                });
+
+                WellnessProgram = result ?? new();
             }
             catch (Exception ex)
             {
@@ -221,23 +229,30 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                     return;
                 }
 
-                if (QuillHtml != null)
-                    WellnessProgram.Content = await QuillHtml.GetContent();
+                WellnessProgram.Content = await QuillHtml.GetHTML();
 
                 if (WellnessProgram.EndDate is not null)
                     WellnessProgram.EndDate = WellnessProgram.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
+                var temp = new WellnessProgramDto();
                 if (WellnessProgram.Id == 0)
                 {
-                    var ye = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
-                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={ye.Id}", true);
+                    temp = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={temp.Id}", true);
                 }
                 else
                 {
-                    WellnessProgram = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
-
-                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={WellnessProgram.Id}");
+                    temp = await Mediator.Send(new UpdateWellnessProgramRequest(WellnessProgram));
+                    NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={temp.Id}");
                 }
+
+                Id = temp.Id;
+                var result = await Mediator.Send(new GetSingleWellnessProgramQuery
+                {
+                    Predicate = x => x.Id == Id
+                });
+
+                WellnessProgram = result ?? new();
             }
             catch (Exception ex)
             {
@@ -415,25 +430,16 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (firstRender)
+            if (!firstRender)
+                return;
+
+            if (!string.IsNullOrWhiteSpace(WellnessProgram.Content))
             {
-                //// Retry loading content until QuillHtml is ready
-                //while (QuillHtml == null && !isContentLoaded)
-                //{
-                //    await Task.Delay(50); // Small delay to wait for QuillHtml to initialize
-                //}
-
-                //if (!isContentLoaded && QuillHtml != null)
-                //{
-                //    if (!string.IsNullOrWhiteSpace(WellnessProgram.Content))
-                //    {
-                //        await QuillHtml.LoadContent(WellnessProgram.Content);
-                //    }
-                //    isContentLoaded = true;
-                //}
-
-                await GetUserInfo();
+                await QuillHtml.LoadHTMLContent(WellnessProgram.Content);
             }
+
+            await GetUserInfo();
+            // return base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task LoadData()
@@ -480,7 +486,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                         break;
                 }
 
-                await LoadDataOnSearchBoxChangedWellnessProgramAttendance();
+                //await LoadDataOnSearchBoxChangedWellnessProgramAttendance();
                 await LoadDataOnSearchBoxChangedWellnessProgramDetail();
             }
         }
@@ -594,9 +600,9 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             GridActivityDetail.ShowRowDeleteConfirmation(FocusedRowActivityDetailVisibleIndex);
         }
 
-        private void RefreshActivityDetails_Click()
+        private async Task RefreshActivityDetails_Click()
         {
-            // Logic to refresh session list
+            await LoadDataOnSearchBoxChangedWellnessProgramDetail();
         }
 
         private int pageSizeWellnessProgramDetail { get; set; } = 10;

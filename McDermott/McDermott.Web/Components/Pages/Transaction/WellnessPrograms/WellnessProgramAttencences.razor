@@ -1,5 +1,6 @@
 ﻿@page "/clinic-service/wellness/attendance/{Slug}"
 @using System.ComponentModel.DataAnnotations
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand
 @using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand
 @using static McDermott.Application.Features.Commands.Transaction.WellnessProgramParticipantCommand
 @using static McDermott.Application.Features.Commands.Transaction.WellnessProgramDetailCommand
@@ -19,163 +20,215 @@
 {
     if (IsClosed)
     {
-        <div class="wrapper">
-            <div class="container-fluid ">
-                <div class="row centered-container">
-                    <div class="col-md-10">
-                        <div class="card mt-5">
-                            <div class="card-header bg-primary">
-                                <div class="row justify-content-center">
-                                    <div class="col-auto align-self-center">
-                                        <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-center">Sorry, this program activity has ended.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                        <div class="wrapper">
+                                            <div class="container-fluid ">
+                                                <div class="row centered-container">
+                                                    <div class="col-md-10">
+                                                        <div class="card mt-5">
+                                                            <div class="card-header bg-primary">
+                                                                <div class="row justify-content-center">
+                                                                    <div class="col-auto align-self-center">
+                                                                        <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p class="text-center">Sorry, this program activity has ended.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
     }
-    else
+    else if (IsStartProgram)
     {
-        <DxLoadingPanel @bind-Visible="PanelVisible"
-                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                        IsContentBlocked="true"
-                        ApplyBackgroundShading="true"
-                        IndicatorAreaVisible="false"
-                        Text="Fetching Data...">
-            <div class="wrapper">
-                <div class="container-fluid ">
-                    <div class="row centered-container">
-                        <div class="col-md-10">
-                            <div class="card mt-5">
-                                <div class="card-header bg-success">
-                                    <div class="row justify-content-center">
-                                        <div class="col-auto align-self-center">
-                                            <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
+                                <div class="wrapper">
+                                    <div class="container-fluid">
+                                        <div class="row centered-container">
+                                            <div class="col-md-10">
+                                                <div class="card mt-5">
+                                                    <div class="card-header bg-primary">
+                                                        <div class="row justify-content-center">
+                                                            <div class="col-auto align-self-center">
+                                                                <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                        @*       <div id="countdown" class="text-light mt-2"></div> *@
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p class="text-center">This wellness program has not started yet. Please check back later.</p>
+
+                                                        <h5 class=" text-center mt-2">Start in: @WellnessProgram.StartDate.ToString("dd MMMM yyyy")</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body">
-                                    <EditForm Model="ahe" Context="EditFormContext">
-                                        <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem Caption="Employee Number" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
-                                                <Template>
-                                                    <DxGridLayout>
-                                                        <Rows>
-                                                            <DxGridLayoutRow />
-                                                        </Rows>
-                                                        <Columns>
-                                                            <DxGridLayoutColumn Width="25fr" />
-                                                            <DxGridLayoutColumn Width="5fr" />
-                                                        </Columns>
-                                                        <Items>
-                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
-                                                                <Template>
-                                                                    <DxTextBox @bind-Text="@PatientNumber" NullText="Employee Number" CssClass="" ShowValidationIcon="true"></DxTextBox>
-                                                                </Template>
-                                                            </DxGridLayoutItem>
-                                                            <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                                <Template>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                                              RenderStyleMode="@ButtonRenderStyleMode.Outline"
-                                                                              IconCssClass="fa-solid fa-magnifying-glass"
-                                                                              Text="Search"
-                                                                              SubmitFormOnClick="true"
-                                                                              Click="OnSearchPatient"
-                                                                              CssClass="w-100 me-1">
-                                                                    </DxButton>
-                                                                </Template>
-                                                            </DxGridLayoutItem>
-                                                        </Items>
-                                                    </DxGridLayout>
-                                                </Template>
-                                            </DxFormLayoutItem>
+    }
+    else if (IsStart)
+    {
+                                        <div class="wrapper">
+                                            <div class="container-fluid">
+                                                <div class="row centered-container">
+                                                    <div class="col-md-10">
+                                                        <div class="card mt-5">
+                                                            <div class="card-header bg-primary">
+                                                                <div class="row justify-content-center">
+                                                                    <div class="col-auto align-self-center">
+                                                                        <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
+                                        @*       <div id="countdown" class="text-light mt-2"></div> *@
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <p class="text-center">This program activity has not started yet. Please check back later.</p>
+
+                                                                        <h5 class=" text-center mt-2">Start in: @WellnessProgramDetail.StartDate.ToString("dd MMMM yyyy")</h5>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+    }
+    else
+    {
+                                        <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                        IsContentBlocked="true"
+                                                        ApplyBackgroundShading="true"
+                                                        IndicatorAreaVisible="false"
+                                                        Text="Fetching Data...">
+                                            <div class="wrapper">
+                                                <div class="container-fluid ">
+                                                    <div class="row centered-container">
+                                                        <div class="col-md-10">
+                                                            <div class="card mt-5">
+                                                                <div class="card-header bg-success">
+                                                                    <div class="row justify-content-center">
+                                                                        <div class="col-auto align-self-center">
+                                                                            <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-body">  
+                                                                    <EditForm Model="ahe" Context="EditFormContext">
+                                                                        <DxFormLayout CssClass="w-100">
+                                                                            <DxFormLayoutItem Caption="Employee Number" CaptionCssClass="normal-caption required-caption" ColSpanMd="12">
+                                                                                <Template>
+                                                                                    <DxGridLayout>
+                                                                                        <Rows>
+                                                                                            <DxGridLayoutRow />
+                                                                                        </Rows>
+                                                                                        <Columns>
+                                                                                            <DxGridLayoutColumn Width="25fr" />
+                                                                                            <DxGridLayoutColumn Width="5fr" />
+                                                                                        </Columns>
+                                                                                        <Items>
+                                                                                            <DxGridLayoutItem Row="0" Column="0" CssClass="mt ">
+                                                                                                <Template>
+                                                                                                    <DxTextBox @bind-Text="@PatientNumber" NullText="Employee Number" CssClass="" ShowValidationIcon="true"></DxTextBox>
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
+                                                                                                <Template>
+                                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                                                              RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                                                                              IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                              Text="Search"
+                                                                                                              SubmitFormOnClick="true"
+                                                                                                              Click="OnSearchPatient"
+                                                                                                              CssClass="w-100 me-1">
+                                                                                                    </DxButton>
+                                                                                                </Template>
+                                                                                            </DxGridLayoutItem>
+                                                                                        </Items>
+                                                                                    </DxGridLayout>
+                                                                                </Template>
+                                                                            </DxFormLayoutItem>
 
 
                                             @if (Patient is not null && Patient.Id != 0)
                                             {
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <MyTextBox @bind-Text="@Patient.Name"
-                                                               ReadOnly
-                                                               NullText="Name" />
-                                                    <ValidationMessage For="@(() => Patient.Name)" />
-                                                </DxFormLayoutItem>
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Email" ColSpanMd="12">
-                                                    <MyTextBox @bind-Text="@Patient.Email"
-                                                               ReadOnly
-                                                               NullText="Email" />
-                                                    <ValidationMessage For="@(() => Patient.Email)" />
-                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
+                                                                                                    <MyTextBox @bind-Text="@Patient.Name"
+                                                                                                               ReadOnly
+                                                                                                               NullText="Name" />
+                                                                                                    <ValidationMessage For="@(() => Patient.Name)" />
+                                                                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Email" ColSpanMd="12">
+                                                                                                    <MyTextBox @bind-Text="@Patient.Email"
+                                                                                                               ReadOnly
+                                                                                                               NullText="Email" />
+                                                                                                    <ValidationMessage For="@(() => Patient.Email)" />
+                                                                                                </DxFormLayoutItem>
 
                                                 @if (Patient.Department is null)
                                                 {
                                                     Patient.Department = new();
                                                 }
 
-                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
-                                                    <MyTextBox @bind-Text="@Patient.Department.Name"
-                                                               ReadOnly
-                                                               NullText="Department" />
-                                                    <ValidationMessage For="@(() => Patient.Department)" />
-                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
+                                                                                                    <MyTextBox @bind-Text="@Patient.Department.Name"
+                                                                                                               ReadOnly
+                                                                                                               NullText="Department" />
+                                                                                                    <ValidationMessage For="@(() => Patient.Department)" />
+                                                                                                </DxFormLayoutItem>
                                             }
-                                        </DxFormLayout>
+                                                                        </DxFormLayout>
 
                                         @if (Patient is not null && Patient.Id != 0)
                                         {
-                                            <div class="row mt-2">
-                                                <div class="col-12">
-                                                    <div class="row justify-content-end">
-                                                        <div class="col-md-12 d-flex justify-content-end">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                                      RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                                                      Text="Join"
-                                                                      CssClass="w-130"
-                                                                      SubmitFormOnClick="true"
-                                                                      Click="OnClickJoin">
-                                                            </DxButton>
+                                                                                            <div class="row mt-2">
+                                                                                                <div class="col-12">
+                                                                                                    <div class="row justify-content-end">
+                                                                                                        <div class="col-md-12 d-flex justify-content-end">
+                                                                                                            <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                                                                      RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                                                                                      Text="Join"
+                                                                                                                      CssClass="w-130"
+                                                                                                                      SubmitFormOnClick="true"
+                                                                                                                      Click="OnClickJoin">
+                                                                                                            </DxButton>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                        }
+                                                                    </EditForm>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        }
-                                    </EditForm>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </DxLoadingPanel>
+                                        </DxLoadingPanel>
     }
 }
 else
 {
-    <div class="wrapper">
-        <div class="container-fluid ">
-            <div class="row centered-container">
-                <div class="col-md-10">
-                    <div class="card mt-5">
-                        <div class="card-header bg-primary">
-                            <div class="row justify-content-center">
-                                <div class="col-auto align-self-center">
-                                    <h4 class="fw-bold">Slug</h4>
+                    <div class="wrapper">
+                        <div class="container-fluid ">
+                            <div class="row centered-container">
+                                <div class="col-md-10">
+                                    <div class="card mt-5">
+                                        <div class="card-header bg-primary">
+                                            <div class="row justify-content-center">
+                                                <div class="col-auto align-self-center">
+                                                    <h4 class="fw-bold">Slug</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-center"> Sorry, The Activity is not found, please check the URL.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <p class="text-center"> Sorry, The Activity is not found, please check the URL.</p>
-                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 }
 
 @code {
@@ -190,6 +243,7 @@ else
     private string PatientNumber { get; set; } = string.Empty;
 
     private WellnessProgramDetailDto WellnessProgramDetail { get; set; } = new();
+    private WellnessProgramDto WellnessProgram { get; set; } = new();
     private UserDto Patient { get; set; } = new();
 
     private async Task OnClickJoin()
@@ -230,10 +284,11 @@ else
             var res = await Mediator.Send(new GetSingleWellnessProgramParticipantQuery
                 {
                     Includes =
-                                    [
-                                        x => x.Patient
-                                    ],
-                    Predicate = x => x.WellnessProgramId == WellnessProgramDetail.WellnessProgramId && x.Patient != null && ((x.Patient.Legacy != null && x.Patient.Legacy.Equals(PatientNumber)) ||
+                    [
+                        x => x.Patient
+                    ],
+                    Predicate = x => x.WellnessProgramId == WellnessProgramDetail.WellnessProgramId && x.Patient != null &&
+                                (x.Patient.Legacy != null && x.Patient.Legacy.Equals(PatientNumber) ||
                                 x.Patient.NIP != null && x.Patient.NIP.Equals(PatientNumber) ||
                                 x.Patient.Oracle != null && x.Patient.Oracle.Equals(PatientNumber) ||
                                 x.Patient.SAP != null && x.Patient.SAP.Equals(PatientNumber)),
@@ -246,6 +301,10 @@ else
                             Id = x.Patient.Id,
                             Name = x.Patient.Name,
                             Email = x.Patient.Email,
+                            Legacy = x.Patient.Legacy,
+                            NIP = x.Patient.NIP,
+                            Oracle = x.Patient.Oracle,
+                            SAP = x.Patient.SAP,
                             Department = new Department
                             {
                                 Name = x.Patient != null && x.Patient.Department != null ? x.Patient.Department.Name : "-"
@@ -285,6 +344,8 @@ else
     }
 
     private bool IsClosed { get; set; } = false;
+    private bool IsStart { get; set; } = false;
+    private bool IsStartProgram { get; set; } = false;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -300,10 +361,27 @@ else
                 IsFound = false;
                 return;
             }
+            else
+                WellnessProgram = await Mediator.Send(new GetSingleWellnessProgramQuery
+                    {
+                        Predicate = x => x.Id == WellnessProgramDetail.WellnessProgramId
+                    });
 
             if (WellnessProgramDetail.EndDate is not null && WellnessProgramDetail.EndDate < DateTime.Now)
             {
                 IsClosed = true;
+            }
+
+            if (DateTime.Now.Date < WellnessProgramDetail.StartDate.Date)
+            {
+                // StartCountdown();
+                IsStart = true;
+            }
+
+            if (DateTime.Now.Date < WellnessProgram.StartDate.Date)
+            {
+                // StartCountdown();
+                IsStartProgram = true;
             }
         }
         catch (Exception ex)
@@ -311,7 +389,5 @@ else
             ex.HandleException(ToastService);
         }
         finally { PanelVisible = false; }
-
-
     }
 }
