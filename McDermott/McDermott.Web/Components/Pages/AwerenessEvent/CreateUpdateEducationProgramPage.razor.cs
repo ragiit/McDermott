@@ -205,16 +205,16 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion HTML Editor
 
         #region select File
-
+        private IBrowserFile BrowserFile;
         private void RemoveSelectedFile()
         {
-            UserForm.SipFile = null;
+            postEducationPrograms.Attendance = null;
         }
 
         private void SelectFiles(InputFileChangeEventArgs e)
         {
             BrowserFile = e.File;
-            UserForm.SipFile = e.File.Name;
+            postEducationPrograms.Attendance = e.File.Name;
         }
 
         private async Task SelectFile()
@@ -224,7 +224,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         private async Task DownloadFile()
         {
-            if (UserForm.Id != 0 && !string.IsNullOrWhiteSpace(postEducationPrograms.Attendance))
+            if (postEducationPrograms.Id != 0 && !string.IsNullOrWhiteSpace(postEducationPrograms.Attendance))
             {
                 await Helper.DownloadFile(postEducationPrograms.Attendance, HttpContextAccessor, HttpClient, JsRuntime);
             }
