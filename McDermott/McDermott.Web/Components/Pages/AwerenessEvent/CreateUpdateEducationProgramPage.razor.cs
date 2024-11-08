@@ -3,6 +3,7 @@ using DevExpress.SpreadsheetSource.Xlsx.Import;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using MailKit.Search;
 using McDermott.Application.Dtos.AwarenessEvent;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand;
@@ -202,6 +203,33 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         }
 
         #endregion HTML Editor
+
+        #region select File
+
+        private void RemoveSelectedFile()
+        {
+            UserForm.SipFile = null;
+        }
+
+        private void SelectFiles(InputFileChangeEventArgs e)
+        {
+            BrowserFile = e.File;
+            UserForm.SipFile = e.File.Name;
+        }
+
+        private async Task SelectFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+        }
+
+        private async Task DownloadFile()
+        {
+            if (UserForm.Id != 0 && !string.IsNullOrWhiteSpace(postEducationPrograms.Attendance))
+            {
+                await Helper.DownloadFile(postEducationPrograms.Attendance, HttpContextAccessor, HttpClient, JsRuntime);
+            }
+        }
+        #endregion
 
         #region ComboBox Category
 
