@@ -17,6 +17,8 @@ namespace McDermott.Domain.Entities
         public EnumWellness Status { get; set; } = EnumWellness.Draft;
 
         public List<WellnessProgramDetail>? WellnessProgramDetails { get; set; }
+
+        [SetToNull]
         public virtual AwarenessEduCategory? AwarenessEduCategory { get; set; }
     }
 }
