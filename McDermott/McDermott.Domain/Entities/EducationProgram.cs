@@ -26,6 +26,7 @@ namespace McDermott.Domain.Entities
         public string? Slug { get; set; }
         public EnumStatusEducationProgram? Status { get; set; }
 
+        [SetToNull]
         public AwarenessEduCategory? EventCategory { get; set; }
     }
 }

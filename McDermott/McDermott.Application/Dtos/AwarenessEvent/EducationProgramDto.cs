@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace McDermott.Application.Dtos.AwarenessEvent
         public string? Attendance { get; set; }
         public EnumStatusEducationProgram? Status { get; set; }
 
+        [NotNull]
         public AwarenessEduCategoryDto? EventCategory { get; set; }
     }
 }

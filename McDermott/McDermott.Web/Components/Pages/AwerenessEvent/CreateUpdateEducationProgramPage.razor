@@ -238,11 +238,11 @@
                                                                        ShowValidationIcon="true"
                                                                        ReadOnly="IsReadOnly"
                                                                        MaskMode="MaskMode.RegEx">
-                                                            <Buttons>
+                                                            <Buttons >
                                                                 <InputFile id="sipFile" accept=".xls, .pdf, .xlsx" OnChange="@SelectFiles" multiple="false" style="display:none" />
-                                                                <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
-                                                                <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
-                                                                <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                                                <DxEditorButton Click="SelectFile" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done)" IconCssClass="fa-solid fa-upload" />
+                                                                <DxEditorButton Click="DownloadFile" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done)" IconCssClass="fa-solid fa-download" />
+                                                                <DxEditorButton Click="RemoveSelectedFile" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done)" IconCssClass="fa-solid fa-trash" />
                                                             </Buttons>
                                                         </DxMaskedInput>
                                                     </DxFormLayoutItem>
