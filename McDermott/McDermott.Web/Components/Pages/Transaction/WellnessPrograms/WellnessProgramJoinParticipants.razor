@@ -122,16 +122,21 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="row mt-2 mb-3">
-                                        <div class="col-12">
-                                            <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                      RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                                      Text="@(IsShowContent ? "Join Participant" : "See Content")"
-                                                      CssClass="w-130"
-                                                      Click="OnClickContent">
-                                            </DxButton>
+
+                                    @if (!string.IsNullOrWhiteSpace(WellnessProgram.Content?.Trim()))
+                                    {
+                                        <div class="row mt-2 mb-3">
+                                            <div class="col-12">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                          RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                          Text="@(IsShowContent ? "Join Participant" : "See Content")"
+                                                          CssClass="w-130"
+                                                          Click="OnClickContent">
+                                                </DxButton>
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
+
                                     @if (!string.IsNullOrWhiteSpace(WellnessProgram.Content?.Trim()) && IsShowContent)
                                     {
                                         @((MarkupString)@WellnessProgram.Content)

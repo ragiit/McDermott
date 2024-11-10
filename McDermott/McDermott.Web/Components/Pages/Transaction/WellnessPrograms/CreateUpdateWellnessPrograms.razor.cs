@@ -40,7 +40,7 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
         #region HTML Editor
 
         private bool IsShowPreviewOutput { get; set; } = false;
-        private BlazoredTextEditor QuillHtml = new();
+        private BlazoredTextEditor QuillHtml;
         private MarkupString preview;
 
         private async Task ShowAoutPutPreview(bool b)
@@ -182,9 +182,15 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                         break;
                 }
 
-                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                var content = await QuillHtml.GetContent();
+                // Cek apakah konten kosong atau hanya berisi newline
+                if (!string.IsNullOrWhiteSpace(content) && content != "{\"ops\":[{\"insert\":\" \\n\"}]}")
                 {
                     WellnessProgram.Content = await QuillHtml.GetHTML();
+                }
+                else
+                {
+                    // Jika konten kosong atau hanya newline, tidak melakukan apa-apa
                 }
 
                 if (WellnessProgram.EndDate is not null)
@@ -197,6 +203,11 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 {
                     temp = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
                     NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={temp.Id}", true);
+                    //var resultx = await Mediator.Send(new GetAwarenessEduCategoryQuery
+                    //{
+                    //    Predicate = x => x.Id == WellnessProgram.AwarenessEduCategoryId.GetValueOrDefault()
+                    //});
+                    //AwarenessEduCategories = resultx.Item1;
                 }
                 else
                 {
@@ -239,9 +250,21 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                     return;
                 }
 
-                if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                //if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                //{
+                //    WellnessProgram.Content = await QuillHtml.GetHTML();
+                //}
+
+                var content = await QuillHtml.GetContent();
+
+                // Cek apakah konten kosong atau hanya berisi newline
+                if (!string.IsNullOrWhiteSpace(content) && content != "{\"ops\":[{\"insert\":\" \\n\"}]}")
                 {
                     WellnessProgram.Content = await QuillHtml.GetHTML();
+                }
+                else
+                {
+                    // Jika konten kosong atau hanya newline, tidak melakukan apa-apa
                 }
 
                 if (WellnessProgram.EndDate is not null)
@@ -254,6 +277,11 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 {
                     temp = await Mediator.Send(new CreateWellnessProgramRequest(WellnessProgram));
                     NavigationManager.NavigateTo($"clinic-service/wellness/{EnumPageMode.Update.GetDisplayName()}?Id={temp.Id}", true);
+                    var resultx = await Mediator.Send(new GetAwarenessEduCategoryQuery
+                    {
+                        Predicate = x => x.Id == WellnessProgram.AwarenessEduCategoryId.GetValueOrDefault()
+                    });
+                    AwarenessEduCategories = resultx.Item1;
                 }
                 else
                 {

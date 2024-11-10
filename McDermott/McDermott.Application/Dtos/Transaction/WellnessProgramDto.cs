@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
+using McDermott.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace McDermott.Application.Dtos.Transaction
         public EnumWellness Status { get; set; } = EnumWellness.Draft;
         public string StatusString => Status.GetDisplayName();
 
+        [SetToNull]
         public virtual AwarenessEduCategoryDto? AwarenessEduCategory { get; set; }
     }
 

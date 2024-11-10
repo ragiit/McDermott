@@ -407,27 +407,23 @@ else
             if (WellnessProgram.Status == EnumWellness.Active)
             {
                 IsActive = true;
-                return;
             }
 
             if (WellnessProgramDetail.EndDate is not null && WellnessProgramDetail.EndDate < DateTime.Now)
             {
                 IsClosed = true;
-                return;
             }
 
             if (DateTime.Now.Date < WellnessProgramDetail.StartDate.Date)
             {
                 // StartCountdown();
                 IsStart = true;
-                return;
             }
 
             if (DateTime.Now.Date < WellnessProgram.StartDate.Date)
             {
                 // StartCountdown();
                 IsStartProgram = true;
-                return;
             }
         }
         catch (Exception ex)
