@@ -267,10 +267,49 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         private async Task onActive()
         {
             var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
-            if(data.Id == 0)
+            if (data.Id == 0)
             {
-                
+                ToastService.ShowError("Data Not Found. Try Check Again!");
+                return;
             }
+
+            data.Status = EnumBenefitStatus.Active;
+            await Mediator.Send(new UpdateBenefitConfigurationRequest(data));
+
+            ToastService.ShowSuccess("Update Status Success");
+            await LoadData();
+        }
+
+        private async Task onInActive()
+        {
+            var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
+            if (data.Id == 0)
+            {
+                ToastService.ShowError("Data Not Found. Try Check Again!");
+                return;
+            }
+
+            data.Status = EnumBenefitStatus.InActive;
+            await Mediator.Send(new UpdateBenefitConfigurationRequest(data));
+
+            ToastService.ShowSuccess("Update Status Success");
+            await LoadData();
+        }
+
+        private async Task sendToDraft()
+        {
+            var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
+            if (data.Id == 0)
+            {
+                ToastService.ShowError("Data Not Found. Try Check Again!");
+                return;
+            }
+
+            data.Status = EnumBenefitStatus.Draft;
+            await Mediator.Send(new UpdateBenefitConfigurationRequest(data));
+
+            ToastService.ShowSuccess("Back To Draft Success");
+            await LoadData();
         }
         #endregion
 

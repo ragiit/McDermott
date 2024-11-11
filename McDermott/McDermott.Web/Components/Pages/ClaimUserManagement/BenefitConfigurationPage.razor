@@ -34,7 +34,7 @@
                                                 {
                                                 <DxButton Text="Active" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
                                                 <DxButton Text="InActive" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.Draft || PostBenefitConfigurations.Status == EnumBenefitStatus.Active)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
-                                                    <DxButton Text="Send To Draft" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-rotate-left" Click="SendToDraft"></DxButton>
+                                                    <DxButton Text="Send To Draft" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-rotate-left" Click="sendToDraft"></DxButton>
                                                 }
                                             </div>
                                             
