@@ -1,15 +1,16 @@
-﻿using System;
+﻿using McDermott.Domain.Common;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace McDermott.Domain.Entities
+namespace McDermott.Application.Dtos.ClaimUserManagement
 {
-    public class ClaimRequest:BaseAuditableEntity
+    public class ClaimRequestDto:IMapFrom<ClaimRequest>
     {
-       
+        public long Id { get; set; }
+
         public long? PatientId { get; set; }
 
         public long? PhycisianId { get; set; }
@@ -24,11 +25,10 @@ namespace McDermott.Domain.Entities
 
         public bool? IsNotificationSent { get; set; } // Status notifikasi otomatis
         [SetToNull]
-        public BenefitConfiguration? Benefit { get; set; } // Navigation property untuk data benefit
+        public BenefitConfigurationDto? Benefit { get; set; } // Navigation property untuk data benefit
         [SetToNull]
-        public User? Patient { get; set; } // Navigation property untuk data pasien
+        public UserDto? Patient { get; set; } // Navigation property untuk data pasien
         [SetToNull]
-        public User? Phycisian { get; set; } // Navigation property untuk data dokter
-
+        public UserDto? Phycisian { get; set; } // Navigation property untuk data dokter
     }
 }
