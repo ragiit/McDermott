@@ -1,7 +1,11 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
+using Document = iTextSharp.text.Document;
+using DevExpress.Printing.Core.Native;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -213,9 +217,16 @@ namespace McDermott.Web.Components.Pages.Config
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
+        [Inject]
+        private IHttpClientFactory ClientFactory { get; set; }
+
         private async Task NewItem_Click()
         {
-            await Grid.StartEditNewRowAsync();
+            //await Grid.StartEditNewRowAsync();
+            //CreatePdf("ohYeah.pff");
+
+            var client = ClientFactory.CreateClient("ServerAPI");
+            var response = await client.GetAsync($"api/file/download-pdf");
         }
 
         private async Task EditItem_Click()
@@ -285,5 +296,104 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Grid Events
+
+        public void CreatePdf(string outputPath)
+        {
+            // Step 1: Create Document and set page size
+            Document doc = new Document(PageSize.A4);
+
+            // Step 2: Set up PdfWriter
+            PdfWriter.GetInstance(doc, new FileStream(outputPath, FileMode.Create));
+
+            // Step 3: Open Document
+            doc.Open();
+
+            // Step 4: Add elements to the document
+            // Define fonts
+            var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+            var regularFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+            var smallFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
+
+            // Add clinic information
+            doc.Add(new Paragraph("KLINIK PRATAMA", headerFont));
+            doc.Add(new Paragraph("PT. MCDERMOTT INDONESIA", headerFont));
+            doc.Add(new Paragraph("Jl. Bawal, Batu Ampar, Batam 29452", regularFont));
+            doc.Add(new Paragraph("Tel: (62) 778 414 001, Fax: (62) 778 411 913", regularFont));
+
+            doc.Add(new Paragraph("\n"));
+
+            // Add Date Section
+            doc.Add(new Paragraph($"Tgl./Date: %Date%", regularFont));
+            doc.Add(new Paragraph("MC: - Days", regularFont));
+            doc.Add(new Paragraph("Refer to:", regularFont));
+
+            doc.Add(new Paragraph("\n"));
+
+            // Add Medical Report Title
+            var reportTitle = new Paragraph("MEDICAL REPORT\nBUKTI PELAYANAN RAWAT JALAN", headerFont);
+            reportTitle.Alignment = Element.ALIGN_CENTER;
+            doc.Add(reportTitle);
+
+            doc.Add(new Paragraph("\n"));
+
+            // Add Patient Information
+            doc.Add(new Paragraph("Name : %NamePatient%", regularFont));
+            doc.Add(new Paragraph("Department : %Department%   Emp No: %NIP%", regularFont));
+            doc.Add(new Paragraph("Diagnosis :    BPJS No:", regularFont));
+            doc.Add(new Paragraph("Treatment :", regularFont));
+
+            doc.Add(new Paragraph("\n"));
+
+            // Add Placeholder for Signature Lines
+            doc.Add(new Paragraph("_________________", regularFont));
+
+            doc.Add(new Paragraph("\n"));
+
+            // Add Checklist Table
+            PdfPTable checklistTable = new PdfPTable(3);
+            checklistTable.WidthPercentage = 100;
+            checklistTable.SetWidths(new float[] { 5, 1, 1 }); // Column widths
+
+            checklistTable.AddCell(new PdfPCell(new Phrase("NO", headerFont)));
+            checklistTable.AddCell(new PdfPCell(new Phrase("Aspek Telaah", headerFont)));
+            checklistTable.AddCell(new PdfPCell(new Phrase("Ya", headerFont)));
+            checklistTable.AddCell(new PdfPCell(new Phrase("Tidak", headerFont)));
+
+            string[] aspects = new string[]
+            {
+            "Kejelasan tulisan resep", "Tepat nama obat bentuk, kekuatan sediaan",
+            "Tepat waktu dan frekuensi pemberian", "Tepat rute pemberian",
+            "Tepat dosis", "Tepat indikasi", "Ada atau tidaknya duplikasi",
+            "Interaksi obat", "Kontraindikasi", "Polifarmasi", "Alergi"
+            };
+
+            for (int i = 0; i < aspects.Length; i++)
+            {
+                checklistTable.AddCell(new PdfPCell(new Phrase((i + 1).ToString(), regularFont)));
+                checklistTable.AddCell(new PdfPCell(new Phrase(aspects[i], regularFont)));
+                checklistTable.AddCell(new PdfPCell(new Phrase("", regularFont))); // Placeholder for "Ya"
+                checklistTable.AddCell(new PdfPCell(new Phrase("", regularFont))); // Placeholder for "Tidak"
+            }
+
+            doc.Add(checklistTable);
+
+            doc.Add(new Paragraph("\n"));
+
+            // Add Signature Section
+            doc.Add(new Paragraph("Tanda Tangan", headerFont));
+            doc.Add(new Paragraph("Petugas      : _______________", smallFont));
+            doc.Add(new Paragraph("Pasien       : _______________", smallFont));
+
+            doc.Add(new Paragraph("\n"));
+
+            // Additional Information
+            doc.Add(new Paragraph("Perubahan Resep", headerFont));
+            doc.Add(new Paragraph("Petugas Farmasi Dokter Tertulis Menjadi", regularFont));
+
+            // Add second checklist table for Obat Telaah section if needed.
+
+            // Step 5: Close Document
+            doc.Close();
+        }
     }
 }

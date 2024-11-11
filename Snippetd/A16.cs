@@ -1,14 +1,14 @@
-public class AwarenessEduCategoryCommand
+public class BpjsWebServiceTemporaryCommand
  {
      #region GET
 
-    public class GetSingleAwarenessEduCategoryQuery : IRequest<AwarenessEduCategoryDto>
+    public class GetSingleBpjsWebServiceTemporaryQuery : IRequest<BpjsWebServiceTemporaryDto>
     {
-        public List<Expression<Func<AwarenessEduCategory, object>>> Includes { get; set; }
-        public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; set; }
-        public Expression<Func<AwarenessEduCategory, AwarenessEduCategory>> Select { get; set; }
+        public List<Expression<Func<BpjsWebServiceTemporary, object>>> Includes { get; set; }
+        public Expression<Func<BpjsWebServiceTemporary, bool>> Predicate { get; set; }
+        public Expression<Func<BpjsWebServiceTemporary, BpjsWebServiceTemporary>> Select { get; set; }
 
-        public List<(Expression<Func<AwarenessEduCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<BpjsWebServiceTemporary, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class AwarenessEduCategoryCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetAwarenessEduCategoryQuery : IRequest<(List<AwarenessEduCategoryDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetBpjsWebServiceTemporaryQuery : IRequest<(List<BpjsWebServiceTemporaryDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<AwarenessEduCategory, object>>> Includes { get; set; }
-        public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; set; }
-        public Expression<Func<AwarenessEduCategory, AwarenessEduCategory>> Select { get; set; }
+        public List<Expression<Func<BpjsWebServiceTemporary, object>>> Includes { get; set; }
+        public Expression<Func<BpjsWebServiceTemporary, bool>> Predicate { get; set; }
+        public Expression<Func<BpjsWebServiceTemporary, BpjsWebServiceTemporary>> Select { get; set; }
 
-        public List<(Expression<Func<AwarenessEduCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<BpjsWebServiceTemporary, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class AwarenessEduCategoryCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateAwarenessEduCategory(Expression<Func<AwarenessEduCategory, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateBpjsWebServiceTemporary(Expression<Func<BpjsWebServiceTemporary, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<BpjsWebServiceTemporary, bool>> Predicate { get; } = predicate!;
      }
 
-     public class BulkValidateAwarenessEduCategory(List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate) : IRequest<List<AwarenessEduCategoryDto>>
+     public class BulkValidateBpjsWebServiceTemporary(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate) : IRequest<List<BpjsWebServiceTemporaryDto>>
      {
-         public List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate { get; } = AwarenessEduCategorysToValidate;
+         public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate { get; } = BpjsWebServiceTemporarysToValidate;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateAwarenessEduCategoryRequest(AwarenessEduCategoryDto AwarenessEduCategoryDto) : IRequest<AwarenessEduCategoryDto>
+     public class CreateBpjsWebServiceTemporaryRequest(BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto) : IRequest<BpjsWebServiceTemporaryDto>
      {
-         public AwarenessEduCategoryDto AwarenessEduCategoryDto { get; set; } = AwarenessEduCategoryDto;
+         public BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto { get; set; } = BpjsWebServiceTemporaryDto;
      }
 
-     public class CreateListAwarenessEduCategoryRequest(List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos) : IRequest<List<AwarenessEduCategoryDto>>
+     public class CreateListBpjsWebServiceTemporaryRequest(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos) : IRequest<List<BpjsWebServiceTemporaryDto>>
      {
-         public List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos { get; set; } = AwarenessEduCategoryDtos;
+         public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos { get; set; } = BpjsWebServiceTemporaryDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateAwarenessEduCategoryRequest(AwarenessEduCategoryDto AwarenessEduCategoryDto) : IRequest<AwarenessEduCategoryDto>
+     public class UpdateBpjsWebServiceTemporaryRequest(BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto) : IRequest<BpjsWebServiceTemporaryDto>
      {
-         public AwarenessEduCategoryDto AwarenessEduCategoryDto { get; set; } = AwarenessEduCategoryDto;
+         public BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto { get; set; } = BpjsWebServiceTemporaryDto;
      }
 
-     public class UpdateListAwarenessEduCategoryRequest(List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos) : IRequest<List<AwarenessEduCategoryDto>>
+     public class UpdateListBpjsWebServiceTemporaryRequest(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos) : IRequest<List<BpjsWebServiceTemporaryDto>>
      {
-         public List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos { get; set; } = AwarenessEduCategoryDtos;
+         public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos { get; set; } = BpjsWebServiceTemporaryDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteAwarenessEduCategoryRequest : IRequest<bool>
+     public class DeleteBpjsWebServiceTemporaryRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,25 +83,25 @@ public class AwarenessEduCategoryCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateAwarenessEduCategoryQuery, List<AwarenessEduCategoryDto>>,
+IRequestHandler<BulkValidateBpjsWebServiceTemporaryQuery, List<BpjsWebServiceTemporaryDto>>,
   
-IRequestHandler<GetAwarenessEduCategoryQuery, (List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>,
-public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetAwarenessEduCategoryQuery, (List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>, 
-     IRequestHandler<ValidateAwarenessEduCategory, bool>,
-     IRequestHandler<CreateAwarenessEduCategoryRequest, AwarenessEduCategoryDto>,
-     IRequestHandler<BulkValidateAwarenessEduCategory, List<AwarenessEduCategoryDto>>,
-     IRequestHandler<CreateListAwarenessEduCategoryRequest, List<AwarenessEduCategoryDto>>,
-     IRequestHandler<UpdateAwarenessEduCategoryRequest, AwarenessEduCategoryDto>,
-     IRequestHandler<UpdateListAwarenessEduCategoryRequest, List<AwarenessEduCategoryDto>>,
-     IRequestHandler<DeleteAwarenessEduCategoryRequest, bool>
+IRequestHandler<GetBpjsWebServiceTemporaryQuery, (List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDto>,
+public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetBpjsWebServiceTemporaryQuery, (List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDto>, 
+     IRequestHandler<ValidateBpjsWebServiceTemporary, bool>,
+     IRequestHandler<CreateBpjsWebServiceTemporaryRequest, BpjsWebServiceTemporaryDto>,
+     IRequestHandler<BulkValidateBpjsWebServiceTemporary, List<BpjsWebServiceTemporaryDto>>,
+     IRequestHandler<CreateListBpjsWebServiceTemporaryRequest, List<BpjsWebServiceTemporaryDto>>,
+     IRequestHandler<UpdateBpjsWebServiceTemporaryRequest, BpjsWebServiceTemporaryDto>,
+     IRequestHandler<UpdateListBpjsWebServiceTemporaryRequest, List<BpjsWebServiceTemporaryDto>>,
+     IRequestHandler<DeleteBpjsWebServiceTemporaryRequest, bool>
 {
     #region GET
-    public async Task<List<AwarenessEduCategoryDto>> Handle(BulkValidateAwarenessEduCategory request, CancellationToken cancellationToken)
+    public async Task<List<BpjsWebServiceTemporaryDto>> Handle(BulkValidateBpjsWebServiceTemporary request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.AwarenessEduCategorysToValidate;
+        var CountryDtos = request.BpjsWebServiceTemporarysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
         //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -117,20 +117,20 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
 
         return [];
     }
-    public async Task<bool> Handle(ValidateAwarenessEduCategory request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateBpjsWebServiceTemporary request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<AwarenessEduCategory>()
+        return await _unitOfWork.Repository<BpjsWebServiceTemporary>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetAwarenessEduCategoryQuery request, CancellationToken cancellationToken)
+    public async Task<(List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBpjsWebServiceTemporaryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<AwarenessEduCategory>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<BpjsWebServiceTemporary>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -146,8 +146,8 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<AwarenessEduCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<AwarenessEduCategory>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -164,7 +164,7 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.AwarenessEduCategory.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.BpjsWebServiceTemporary.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -172,7 +172,7 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new AwarenessEduCategory
+                query = query.Select(x => new BpjsWebServiceTemporary
                 {
                     Id = x.Id, 
                 });
@@ -186,11 +186,11 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<AwarenessEduCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<BpjsWebServiceTemporaryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<AwarenessEduCategoryDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<BpjsWebServiceTemporaryDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -200,11 +200,11 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
         }
     }
  
-    public async Task<AwarenessEduCategoryDto> Handle(GetSingleAwarenessEduCategoryQuery request, CancellationToken cancellationToken)
+    public async Task<BpjsWebServiceTemporaryDto> Handle(GetSingleBpjsWebServiceTemporaryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<AwarenessEduCategory>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<BpjsWebServiceTemporary>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -220,8 +220,8 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<AwarenessEduCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<AwarenessEduCategory>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -238,7 +238,7 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.AwarenessEduCategory.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.BpjsWebServiceTemporary.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -246,12 +246,12 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new AwarenessEduCategory
+                query = query.Select(x => new BpjsWebServiceTemporary
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<AwarenessEduCategoryDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BpjsWebServiceTemporaryDto>();
         }
         catch (Exception ex)
         {
@@ -264,17 +264,17 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
 
      #region CREATE
 
-     public async Task<AwarenessEduCategoryDto> Handle(CreateAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<BpjsWebServiceTemporaryDto> Handle(CreateBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDto.Adapt<CreateUpdateAwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());
+             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDto.Adapt<CreateUpdateBpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<AwarenessEduCategoryDto>();
+             return result.Adapt<BpjsWebServiceTemporaryDto>();
          }
          catch (Exception)
          {
@@ -282,16 +282,16 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
          }
      }
 
-     public async Task<List<AwarenessEduCategoryDto>> Handle(CreateListAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<List<BpjsWebServiceTemporaryDto>> Handle(CreateListBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDtos.Adapt<List<AwarenessEduCategory>>());
+             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<BpjsWebServiceTemporary>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<AwarenessEduCategoryDto>>();
+             return result.Adapt<List<BpjsWebServiceTemporaryDto>>();
          }
          catch (Exception)
          {
@@ -303,17 +303,17 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
 
      #region UPDATE
 
-     public async Task<AwarenessEduCategoryDto> Handle(UpdateAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<BpjsWebServiceTemporaryDto> Handle(UpdateBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDto.Adapt<AwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());
+             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDto.Adapt<BpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<AwarenessEduCategoryDto>();
+             return result.Adapt<BpjsWebServiceTemporaryDto>();
          }
          catch (Exception)
          {
@@ -321,16 +321,16 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
          }
      }
 
-     public async Task<List<AwarenessEduCategoryDto>> Handle(UpdateListAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<List<BpjsWebServiceTemporaryDto>> Handle(UpdateListBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDtos.Adapt<List<AwarenessEduCategory>>());
+             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<BpjsWebServiceTemporary>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<AwarenessEduCategoryDto>>();
+             return result.Adapt<List<BpjsWebServiceTemporaryDto>>();
          }
          catch (Exception)
          {
@@ -342,23 +342,23 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteAwarenessEduCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<AwarenessEduCategory>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<BpjsWebServiceTemporary>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<AwarenessEduCategory>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<BpjsWebServiceTemporary>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetAwarenessEduCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -372,20 +372,20 @@ public class AwarenessEduCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _
 }
 
  
-public class BulkValidateAwarenessEduCategoryQuery(List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate) : IRequest<List<AwarenessEduCategoryDto>>
+public class BulkValidateBpjsWebServiceTemporaryQuery(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate) : IRequest<List<BpjsWebServiceTemporaryDto>>
 {
-    public List<AwarenessEduCategoryDto> AwarenessEduCategorysToValidate { get; } = AwarenessEduCategorysToValidate;
+    public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate { get; } = BpjsWebServiceTemporarysToValidate;
 }a
 
 
-IRequestHandler<BulkValidateAwarenessEduCategoryQuery, List<AwarenessEduCategoryDto>>,
+IRequestHandler<BulkValidateBpjsWebServiceTemporaryQuery, List<BpjsWebServiceTemporaryDto>>,
   
-IRequestHandler<GetAwarenessEduCategoryQuery, (List<AwarenessEduCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>,
+IRequestHandler<GetBpjsWebServiceTemporaryQuery, (List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDto>,
 
 
 
- var a = await Mediator.Send(new GetAwarenessEduCategorysQuery
+ var a = await Mediator.Send(new GetBpjsWebServiceTemporarysQuery
  {
      OrderByList =
      [
@@ -397,10 +397,10 @@ IRequestHandler<GetSingleAwarenessEduCategoryQuery, AwarenessEduCategoryDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleAwarenessEduCategoryQuery
+var patienss = (await Mediator.Send(new GetSingleBpjsWebServiceTemporaryQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new AwarenessEduCategory
+    Select = x => new BpjsWebServiceTemporary
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -413,41 +413,41 @@ var patienss = (await Mediator.Send(new GetSingleAwarenessEduCategoryQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
+    var result = await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    AwarenessEduCategorys = result.Item1;
+    BpjsWebServiceTemporarys = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastAwarenessEduCategory);
+    ex.HandleException(ToastBpjsWebServiceTemporary);
 }
 finally
 { 
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
+ var result = await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refAwarenessEduCategoryComboBox?.Text ?? "",
+     SearchTerm = refBpjsWebServiceTemporaryComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- AwarenessEduCategorys = result.Item1;
- totalCountAwarenessEduCategory = result.PageCount;
+ BpjsWebServiceTemporarys = result.Item1;
+ totalCountBpjsWebServiceTemporary = result.PageCount;
 
- AwarenessEduCategorys = (await Mediator.Send(new GetAwarenessEduCategoryQuery
+ BpjsWebServiceTemporarys = (await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
  {
-     Predicate = x => x.Id == AwarenessEduCategoryForm.IdCardAwarenessEduCategoryId,
+     Predicate = x => x.Id == BpjsWebServiceTemporaryForm.IdCardBpjsWebServiceTemporaryId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleAwarenessEduCategorysQuery
+var data = (await Mediator.Send(new GetSingleBpjsWebServiceTemporarysQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -455,17 +455,17 @@ var data = (await Mediator.Send(new GetSingleAwarenessEduCategorysQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new AwarenessEduCategory
+    Select = x => new BpjsWebServiceTemporary
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new AwarenessEduCategory
+        Patient = new BpjsWebServiceTemporary
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new AwarenessEduCategory
+        Pratitioner = new BpjsWebServiceTemporary
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -478,105 +478,105 @@ var data = (await Mediator.Send(new GetSingleAwarenessEduCategorysQuery
 })) ?? new();
 
 
-#region ComboboxAwarenessEduCategory
+#region ComboboxBpjsWebServiceTemporary
 
- private DxComboBox<AwarenessEduCategoryDto, long?> refAwarenessEduCategoryComboBox { get; set; }
- private int AwarenessEduCategoryComboBoxIndex { get; set; } = 0;
- private int totalCountAwarenessEduCategory = 0;
+ private DxComboBox<BpjsWebServiceTemporaryDto, long?> refBpjsWebServiceTemporaryComboBox { get; set; }
+ private int BpjsWebServiceTemporaryComboBoxIndex { get; set; } = 0;
+ private int totalCountBpjsWebServiceTemporary = 0;
 
- private async Task OnSearchAwarenessEduCategory()
+ private async Task OnSearchBpjsWebServiceTemporary()
  {
-     await LoadDataAwarenessEduCategory();
+     await LoadDataBpjsWebServiceTemporary();
  }
 
- private async Task OnSearchAwarenessEduCategoryIndexIncrement()
+ private async Task OnSearchBpjsWebServiceTemporaryIndexIncrement()
  {
-     if (AwarenessEduCategoryComboBoxIndex < (totalCountAwarenessEduCategory - 1))
+     if (BpjsWebServiceTemporaryComboBoxIndex < (totalCountBpjsWebServiceTemporary - 1))
      {
-         AwarenessEduCategoryComboBoxIndex++;
-         await LoadDataAwarenessEduCategory(AwarenessEduCategoryComboBoxIndex, 10);
+         BpjsWebServiceTemporaryComboBoxIndex++;
+         await LoadDataBpjsWebServiceTemporary(BpjsWebServiceTemporaryComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchAwarenessEduCategoryIndexDecrement()
+ private async Task OnSearchBpjsWebServiceTemporaryIndexDecrement()
  {
-     if (AwarenessEduCategoryComboBoxIndex > 0)
+     if (BpjsWebServiceTemporaryComboBoxIndex > 0)
      {
-         AwarenessEduCategoryComboBoxIndex--;
-         await LoadDataAwarenessEduCategory(AwarenessEduCategoryComboBoxIndex, 10);
+         BpjsWebServiceTemporaryComboBoxIndex--;
+         await LoadDataBpjsWebServiceTemporary(BpjsWebServiceTemporaryComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputAwarenessEduCategoryChanged(string e)
+ private async Task OnInputBpjsWebServiceTemporaryChanged(string e)
  {
-     AwarenessEduCategoryComboBoxIndex = 0;
-     await LoadDataAwarenessEduCategory();
+     BpjsWebServiceTemporaryComboBoxIndex = 0;
+     await LoadDataBpjsWebServiceTemporary();
  }
 
  
-  private async Task LoadDataAwarenessEduCategory(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataBpjsWebServiceTemporary(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
+          var result = await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
           {
-              SearchTerm = refAwarenessEduCategoryComboBox?.Text ?? "",
+              SearchTerm = refBpjsWebServiceTemporaryComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          AwarenessEduCategorys = result.Item1;
-          totalCountAwarenessEduCategory = result.PageCount;
+          BpjsWebServiceTemporarys = result.Item1;
+          totalCountBpjsWebServiceTemporary = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastAwarenessEduCategory);
+          ex.HandleException(ToastBpjsWebServiceTemporary);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxAwarenessEduCategory
+ #endregion ComboboxBpjsWebServiceTemporary
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="AwarenessEduCategory" ColSpanMd="12">
-    <MyDxComboBox Data="@AwarenessEduCategorys"
-                  NullText="Select AwarenessEduCategory"
-                  @ref="refAwarenessEduCategoryComboBox"
-                  @bind-Value="@a.AwarenessEduCategoryId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="BpjsWebServiceTemporary" ColSpanMd="12">
+    <MyDxComboBox Data="@BpjsWebServiceTemporarys"
+                  NullText="Select BpjsWebServiceTemporary"
+                  @ref="refBpjsWebServiceTemporaryComboBox"
+                  @bind-Value="@a.BpjsWebServiceTemporaryId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputAwarenessEduCategoryChanged(e))">
+                  TextChanged="((string e) => OnInputBpjsWebServiceTemporaryChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexDecrement"
+            <DxEditorButton Click="OnSearchBpjsWebServiceTemporaryIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchAwarenessEduCategory"
+            <DxEditorButton Click="OnSearchBpjsWebServiceTemporary"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexIncrement"
+            <DxEditorButton Click="OnSearchBpjsWebServiceTemporaryIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(AwarenessEduCategoryDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="AwarenessEduCategory.Name" Caption="AwarenessEduCategory" />
-            <DxListEditorColumn FieldName="@nameof(AwarenessEduCategoryDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(BpjsWebServiceTemporaryDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="BpjsWebServiceTemporary.Name" Caption="BpjsWebServiceTemporary" />
+            <DxListEditorColumn FieldName="@nameof(BpjsWebServiceTemporaryDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.AwarenessEduCategoryId)" />
+    <ValidationMessage For="@(()=>a.BpjsWebServiceTemporaryId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDto.Adapt<CreateUpdateAwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());
-var result = await _unitOfWork.Repository<AwarenessEduCategory>().AddAsync(request.AwarenessEduCategoryDtos.Adapt<List<CreateUpdateAwarenessEduCategoryDto>>().Adapt<List<AwarenessEduCategory>>()); 
+var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDto.Adapt<CreateUpdateBpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());
+var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<CreateUpdateBpjsWebServiceTemporaryDto>>().Adapt<List<BpjsWebServiceTemporary>>()); 
 
-var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDto.Adapt<CreateUpdateAwarenessEduCategoryDto>().Adapt<AwarenessEduCategory>());  
-var result = await _unitOfWork.Repository<AwarenessEduCategory>().UpdateAsync(request.AwarenessEduCategoryDtos.Adapt<List<CreateUpdateAwarenessEduCategoryDto>>().Adapt<List<AwarenessEduCategory>>());
+var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDto.Adapt<CreateUpdateBpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());  
+var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<CreateUpdateBpjsWebServiceTemporaryDto>>().Adapt<List<BpjsWebServiceTemporary>>());
 
-list3 = (await Mediator.Send(new GetAwarenessEduCategoryQuery
+list3 = (await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
 {
-    Predicate = x => AwarenessEduCategoryNames.Contains(x.Name.ToLower()),
+    Predicate = x => BpjsWebServiceTemporaryNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new AwarenessEduCategory
+    Select = x => new BpjsWebServiceTemporary
     {
         Id = x.Id,
         Name = x.Name
@@ -586,47 +586,47 @@ list3 = (await Mediator.Send(new GetAwarenessEduCategoryQuery
 
 #region Searching
 
-    private int pageSizeAwarenessEduCategoryAttendance { get; set; } = 10;
-    private int totalCountAwarenessEduCategoryAttendance = 0;
-    private int activePageIndexAwarenessEduCategoryAttendance { get; set; } = 0;
-    private string searchTermAwarenessEduCategoryAttendance { get; set; } = string.Empty;
+    private int pageSizeBpjsWebServiceTemporaryAttendance { get; set; } = 10;
+    private int totalCountBpjsWebServiceTemporaryAttendance = 0;
+    private int activePageIndexBpjsWebServiceTemporaryAttendance { get; set; } = 0;
+    private string searchTermBpjsWebServiceTemporaryAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedAwarenessEduCategoryAttendance(string searchText)
+    private async Task OnSearchBoxChangedBpjsWebServiceTemporaryAttendance(string searchText)
     {
-        searchTermAwarenessEduCategoryAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeAwarenessEduCategoryAttendance);
+        searchTermBpjsWebServiceTemporaryAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeBpjsWebServiceTemporaryAttendance);
     }
 
-    private async Task OnpageSizeAwarenessEduCategoryAttendanceIndexChanged(int newpageSizeAwarenessEduCategoryAttendance)
+    private async Task OnpageSizeBpjsWebServiceTemporaryAttendanceIndexChanged(int newpageSizeBpjsWebServiceTemporaryAttendance)
     {
-        pageSizeAwarenessEduCategoryAttendance = newpageSizeAwarenessEduCategoryAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeAwarenessEduCategoryAttendance);
+        pageSizeBpjsWebServiceTemporaryAttendance = newpageSizeBpjsWebServiceTemporaryAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeBpjsWebServiceTemporaryAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeAwarenessEduCategoryAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeBpjsWebServiceTemporaryAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeAwarenessEduCategoryAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeBpjsWebServiceTemporaryAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetAwarenessEduCategoryAttendanceQuery
+        var result = await Mediator.Send(new GetBpjsWebServiceTemporaryAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeAwarenessEduCategoryAttendance,
-            SearchTerm = searchTermAwarenessEduCategoryAttendance,
+            PageSize = pageSizeBpjsWebServiceTemporaryAttendance,
+            SearchTerm = searchTermBpjsWebServiceTemporaryAttendance,
         });
-        AwarenessEduCategoryAttendances = result.Item1;
-        totalCountAwarenessEduCategoryAttendance = result.PageCount;
-        activePageIndexAwarenessEduCategoryAttendance = pageIndex;
+        BpjsWebServiceTemporaryAttendances = result.Item1;
+        totalCountBpjsWebServiceTemporaryAttendance = result.PageCount;
+        activePageIndexBpjsWebServiceTemporaryAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastAwarenessEduCategory);
+        ex.HandleException(ToastBpjsWebServiceTemporary);
     }
     finally { PanelVisible = false; }
 }

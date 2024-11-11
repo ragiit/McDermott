@@ -1,6 +1,8 @@
 ﻿using DevExpress.Blazor.Internal;
 using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Data.Helpers;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
 using McDermott.Persistence.Context;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Text.Json;
 using Path = System.IO.Path;
+using Document = iTextSharp.text.Document;
 
 namespace McDermott.Web.Controllers
 {
@@ -83,6 +86,40 @@ namespace McDermott.Web.Controllers
             }
             memory.Position = 0;
             return File(memory, contentType, fileName);
+        }
+
+        [HttpGet("download-pdf")]
+        public IActionResult DownloadPdf()
+        {
+            // Step 1: Create a memory stream to store the PDF
+            using var stream = new MemoryStream();
+
+            // Step 2: Initialize the PDF document and writer
+            Document doc = new Document(PageSize.A4);
+            PdfWriter writer = PdfWriter.GetInstance(doc, stream);
+            writer.CloseStream = false; // Prevent the writer from closing the stream
+
+            // Step 3: Open the document
+            doc.Open();
+
+            // Add content to the document
+            var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+            var regularFont = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+
+            doc.Add(new Paragraph("KLINIK PRATAMA", headerFont));
+            doc.Add(new Paragraph("PT. MCDERMOTT INDONESIA", headerFont));
+            doc.Add(new Paragraph("Jl. Bawal, Batu Ampar, Batam 29452", regularFont));
+            doc.Add(new Paragraph("Tel: (62) 778 414 001, Fax: (62) 778 411 913", regularFont));
+            doc.Add(new Paragraph("\n"));
+
+            // Step 4: Close the Document (finalizes content)
+            doc.Close();
+
+            // Step 5: Reset stream position to beginning
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Return the PDF file as a download
+            return File(stream.ToArray(), "application/pdf", "MedicalReport.pdf");
         }
     }
 }
