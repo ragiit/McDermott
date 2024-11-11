@@ -266,7 +266,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         private async Task onActive()
         {
-            var data = SelectedDataItems[0].Adapt(BenefitConfigurationDto);
+            var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
+            if(data.Id == 0)
+            {
+                
+            }
         }
         #endregion
 
