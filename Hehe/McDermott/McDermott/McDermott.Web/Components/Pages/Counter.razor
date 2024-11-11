@@ -1,0 +1,92 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+@using McDermott.Domain.Entities
+@using McDermott.Persistence.Context
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
+@inject ApplicationDbContext dbContext
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpContextAccessor HttpContextAccessor
+
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<EditForm Model="@userModel"  FormName="A" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="userModel.Email" />
+        <ValidationMessage For="@(() => userModel.Email)" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <InputText id="password" type="password" class="form-control" @bind-Value="userModel.Password" />
+        <ValidationMessage For="@(() => userModel.Password)" />
+    </div>
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="userModel.Name" />
+        <ValidationMessage For="@(() => userModel.Name)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create User</button>
+</EditForm>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    // User creation form model
+    [SupplyParameterFromForm]
+    private UserModel userModel { get; set; } = new();
+    private async Task HandleSubmit()
+    {
+        var newUser = new User
+            {
+                Email = userModel.Email,
+                Password = userModel.Password,
+                Name = userModel.Name,
+                CreatedBy = "Admin", // Adjust as necessary
+                CreatedDate = DateTime.UtcNow
+            };
+
+        // Add user to the DbContext and save changes
+        dbContext.Users.Add(newUser);
+         dbContext.SaveChanges();
+
+        // Navigate to user list after success
+        Navigation.NavigateTo("/user-list");
+    }
+
+
+    public class UserModel
+    {
+        [Required]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+
+        [Required]
+        public string Name { get; set; } = string.Empty;
+    }
+}
