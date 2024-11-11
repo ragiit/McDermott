@@ -55,6 +55,19 @@ namespace McDermott.Web.Extentions
             "Risiko sedang 7-11",
             "Risiko Tinggi >= 12"
         ];
+        public static List<string> BenefitOfType = new List<string>
+        {
+            "Qty",
+            "Amount"
+        };
+
+        public static List<string> RepeatWork = new List<string>()
+        {
+            "Days",
+            "Weeks",
+            "Months",
+            "Years"
+        };
 
         public static string DisplayFormat { get; } = "HH:mm";
         public static List<string> Hospitals { get; set; } = new List<string> { "RSBK", "RSE", "RSHB", "RSBP", "RSAB", "RSGH", "RSMA", "RSHBH", "RSSD" };
@@ -280,7 +293,10 @@ namespace McDermott.Web.Extentions
 
             //AwarenessEvent
             "awareness-event/awareness-edu-category",
-            "awereness-event/education-program"
+            "awereness-event/education-program",
+
+            //Claim Management User
+            "claim-user-management/benefit-configuration",
         ];
 
         public class HomeStatusTemp

@@ -204,13 +204,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             postMaintenance.LocationId = value.Id;
         }
 
-        private List<string> RepeatWork = new List<string>()
-        {
-            "Days",
-            "Weeks",
-            "Months",
-            "Years"
-        };
+       
 
         #endregion Boolean Data
 

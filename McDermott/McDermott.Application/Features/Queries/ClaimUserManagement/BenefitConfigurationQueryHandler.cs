@@ -130,11 +130,10 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         BenefitName = x.BenefitName,
                         DurationOfBenefit = x.DurationOfBenefit,
                         Status = x.Status,
-                        TypeOfBenefit=x.TypeOfBenefit,
-                        Eligibility=x.Eligibility,
-                        BenefitValue=x.BenefitValue,
-                        BenefitDuration=x.BenefitDuration,
-
+                        TypeOfBenefit = x.TypeOfBenefit,
+                        IsEmployee = x.IsEmployee,
+                        BenefitValue = x.BenefitValue,
+                        BenefitDuration = x.BenefitDuration,
 
                     });
 
@@ -211,7 +210,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         DurationOfBenefit = x.DurationOfBenefit,
                         Status = x.Status,
                         TypeOfBenefit = x.TypeOfBenefit,
-                        Eligibility = x.Eligibility,
+                        IsEmployee = x.IsEmployee,
                         BenefitValue = x.BenefitValue,
                         BenefitDuration = x.BenefitDuration,
 
