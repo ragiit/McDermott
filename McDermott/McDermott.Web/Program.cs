@@ -36,6 +36,8 @@ builder.Services
     .AddQueryableCursorPagingProvider()
     .AddQueryableOffsetPagingProvider();
 
+builder.Services.AddPersistenceLayer(builder.Configuration);
+
 builder.Services.AddAntiforgery();
 
 // Tambahkan layanan kompresi respons
@@ -196,8 +198,6 @@ builder.Services.AddScoped<UserInfoService>();
 //});
 //builder.Services.AddAuthorization();
 
-builder.Services.AddPersistenceLayer(builder.Configuration);
-
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
@@ -268,27 +268,31 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        Log.Information("=== ===");
-        Log.Information("=== Starting migration check for the database. ===");
+        Console.WriteLine();
+        //Log.Information("=== Starting migration check for the database. ===");
 
         var context = services.GetRequiredService<ApplicationDbContext>();
         var databaseCreator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
 
         // Cek jika database sudah ada dan tabel utama sudah ada
-        if (await databaseCreator.ExistsAsync() /*&& await databaseCreator.HasTablesAsync()*/)
-        {
-            Log.Information("=== Database and tables already exist, skipping migration. ===");
-        }
-        else
-        {
-            Log.Information("=== Applying Migrations ===");
-            await context.Database.MigrateAsync();
-            Console.WriteLine("=== Success Migrated ===");
-        }
+        //if (!await databaseCreator.ExistsAsync())
+        //{
+        //    Log.Information("=== Database and tables already exist, skipping migration. ===");
+        //}
+        //else
+        //{
+        //    Log.Information("=== Applying Migrations ===");
+        //    Console.WriteLine("=== Success Migrated ===");
+        //}
+
+        Log.Information("=== Applying Migrations ===");
+        await context.Database.MigrateAsync();
+        Console.WriteLine("=== Success Migrated ===");
 
         Console.WriteLine("=== Starting Seeding the data. ===");
         await new SeedData().Initialize(services);
         Console.WriteLine("=== Success Seeding ===");
+        Console.WriteLine();
     }
     catch (Exception ex)
     {
