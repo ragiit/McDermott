@@ -91,6 +91,7 @@ namespace McDermott.Persistence.Context
 
         public DbSet<Accident> Accidents { get; set; }
         public DbSet<LabResultDetail> LabResultDetails { get; set; }
+        public DbSet<BpjsWebServiceTemporary> BpjsWebServiceTemporaries { get; set; }
         public DbSet<GeneralConsultanService> GeneralConsultanServices { get; set; }
         public DbSet<GeneralConsultationLog> GeneralConsultanServiceLogs { get; set; }
         public DbSet<GeneralConsultantClinicalAssesment> GeneralConsultantClinicalAssesments { get; set; }
@@ -174,10 +175,12 @@ namespace McDermott.Persistence.Context
         #endregion AwarenessEvent
 
         #region Claim User Management
-        DbSet<BenefitConfiguration> BenefitConfigurations {  get; set; }
-        DbSet<ClaimHistory> ClaimHistories {  get; set; }
-        DbSet<ClaimRequest> ClaimRequests {  get; set; }
-        #endregion
+
+        private DbSet<BenefitConfiguration> BenefitConfigurations { get; set; }
+        private DbSet<ClaimHistory> ClaimHistories { get; set; }
+        private DbSet<ClaimRequest> ClaimRequests { get; set; }
+
+        #endregion Claim User Management
 
         #endregion DbSet
 
