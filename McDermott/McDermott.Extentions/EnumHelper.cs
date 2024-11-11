@@ -300,5 +300,37 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Cancel")]
             Cancel = 4,
         }
+
+        public enum EnumBenefitType
+        {
+            Qty,
+            Amount
+        }
+
+        public enum EnumBenefitDurationType
+        {
+            Days,
+            Months,
+            Years
+        }
+
+        public enum EnumEligibilityType
+        {
+            Employee,
+            NonEmployee
+        }
+
+        public enum EnumBenefitStatus
+        {
+            Draft,
+            Active,
+            NonActive
+        }
+
+        public enum EnumClaimRequestStatus
+        {
+            Draft,
+            Done
+        }
     }
 }

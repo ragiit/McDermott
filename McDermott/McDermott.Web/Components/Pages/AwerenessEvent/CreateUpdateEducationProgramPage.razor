@@ -280,7 +280,7 @@
                                                                 ApplyBackgroundShading="true"
                                                                 IndicatorAreaVisible="false"
                                                                 Text="Fetching Data...">
-                                                    <MyGrid @ref="GridParticipan"
+                                                    <MyGridPaginate @ref="GridParticipan"
                                                             Data="GetParticipanEdus"
                                                             @bind-SelectedDataItems="@SelectedDataItems"
                                                             FocusedRowChanged="Grid_FocusedRowChanged"
@@ -307,7 +307,7 @@
                                                             <DxGridDataColumn MinWidth="200" FieldName="CreatedDate" Caption="Join Date" />
                                                         </Columns>
 
-                                                    </MyGrid>
+                                                    </MyGridPaginate>
 
                                                 </DxLoadingPanel>
                                             </div>

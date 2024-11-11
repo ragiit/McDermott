@@ -173,6 +173,12 @@ namespace McDermott.Persistence.Context
 
         #endregion AwarenessEvent
 
+        #region Claim User Management
+        DbSet<BenefitConfiguration> BenefitConfigurations {  get; set; }
+        DbSet<ClaimHistory> ClaimHistories {  get; set; }
+        DbSet<ClaimRequest> ClaimRequests {  get; set; }
+        #endregion
+
         #endregion DbSet
 
         #region OnModelCreating
