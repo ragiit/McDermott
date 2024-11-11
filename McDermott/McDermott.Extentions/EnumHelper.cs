@@ -313,36 +313,28 @@ namespace McDermott.Application.Extentions
             Cancel = 4,
         }
 
-        public enum EnumBenefitType
-        {
-            Qty,
-            Amount
-        }
-
-        public enum EnumBenefitDurationType
-        {
-            Days,
-            Months,
-            Years
-        }
-
-        public enum EnumEligibilityType
-        {
-            Employee,
-            NonEmployee
-        }
-
         public enum EnumBenefitStatus
         {
-            Draft,
-            Active,
-            NonActive
+            [Display(Name = "Draft")]
+            Draft = 0,
+
+            [Display(Name = "Active")]
+            Active = 1,
+
+            [Display(Name = "InActive")]
+            InActive = 2,
+
         }
 
         public enum EnumClaimRequestStatus
         {
-            Draft,
-            Done
+
+            [Display(Name = "Draft")]
+            Draft = 0,
+
+            [Display(Name = "Done")]
+            Done = 1,
+
         }
     }
 }

@@ -6,12 +6,42 @@
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
-        <BaseHeaderPage Title="Category Awareness" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+        <BaseHeaderPage Title="Benefit Configuration" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
+                        @if (PostBenefitConfigurations.Id != 0)
+                        {
+                            <div class="row justify-content-end mb-3">
+                                <div class="col-auto align-self-end">
+                                    <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                                        <DxTab Text="Draft" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.Draftt)"></DxTab>
+                                        <DxTab Text="Active" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.Active)"></DxTab>
+                                        <DxTab Text="Inactive" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)"></DxTab>
+                                    </DxTabs>
+                                </div>
+                            </div>
+                        }
+                       
+                            <div class="sticky">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="row justify-content-between">
+                                            <div class="col-auto align-self-start">
+                                            @if (PostBenefitConfigurations.Id != 0)
+                                                {
+                                                <DxButton Text="Active" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
+                                                <DxButton Text="InActive" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.Draft || PostBenefitConfigurations.Status == EnumBenefitStatus.Active)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                                                    <DxButton Text="Send To Draft" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-rotate-left" Click="SendToDraft"></DxButton>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
                         <div class="card">
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
@@ -50,12 +80,12 @@
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn MinWidth="200" FieldName="BenefitName" Caption="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="TypeOfBenefit" Caption="Type Benefit" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="BenefitValue" Caption="Benefit Value" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="DurationOfBenefit" Caption="Type Duration" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="BenefitDuration" Caption="Duration" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Eligibility" Caption="isEmploye" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="TypeOfBenefit" Caption="Type Benefit" />
+                                        <DxGridDataColumn FieldName="BenefitValue" Caption="Benefit Value" />
+                                        <DxGridDataColumn FieldName="DurationOfBenefit" Caption="Type Duration" />
+                                        <DxGridDataColumn FieldName="BenefitDuration" Caption="Duration" />
+                                        <DxGridDataColumn FieldName="IsEmployee" Caption="isEmploye" />
+                                        <DxGridDataColumn FieldName="Status" Caption="Status" />
                                     </Columns>
                                     <TotalSummary>
                                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -63,18 +93,31 @@
                                                            Visible="true" />
                                     </TotalSummary>
                                     <EditFormTemplate Context="EditFormContext">
+                                        <AntiforgeryToken />
                                         @{
-                                            var a = (BenefitConfigurationDto)EditFormContext.EditModel;
+                                            var PostBenefitConfigurations = (BenefitConfigurationDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.BenefitName" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
-                                                <ValidationMessage For="@(()=> a.BenefitName)"   />
+                                                <DxTextBox @bind-Text="@PostBenefitConfigurations.BenefitName" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> PostBenefitConfigurations.BenefitName)"   />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="Required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                @* <MyDxComboBox Data="@EnumBenefitType" *@
+                                            <DxFormLayoutItem CaptionCssClass="Required-caption normal-caption" Caption="Benefit Type" ColSpanMd="6">
+                                                <MyDxComboBox Data="@BenefitOfType" @bind-Value="@PostBenefitConfigurations.TypeOfBenefit" NullText="Select Benefit Type"></MyDxComboBox>
+                                                <ValidationMessage For="@(()=> PostBenefitConfigurations.TypeOfBenefit)"   />
                                             </DxFormLayoutItem>
-
+                                            <DxFormLayoutItem Caption="Benefit Value" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxSpinEdit @bind-Value="@PostBenefitConfigurations.BenefitValue" NullText="Input Benefit Value"></DxSpinEdit>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Duration Of Benefit" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <MyDxComboBox Data="@RepeatWork" @bind-Value="@PostBenefitConfigurations.DurationOfBenefit" NullText="select Duration"></MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Duration Value" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                <DxSpinEdit @bind-Value="@PostBenefitConfigurations.BenefitDuration" NullText="Input Duration value"></DxSpinEdit>
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem Caption="Is Employee" CaptionCssClass="normal-caption">
+                                                <DxCheckBox @bind-Checked="@PostBenefitConfigurations.IsEmployee" CssClass="w-100"/>
+                                            </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
                                 </MyGridPaginate>

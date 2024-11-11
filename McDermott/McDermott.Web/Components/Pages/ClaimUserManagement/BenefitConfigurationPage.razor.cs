@@ -108,6 +108,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             GetBenefitConfigurations = result.Item1;
             totalCount = result.PageCount;
             activePageIndex = pageIndex;
+
+            PostBenefitConfigurations = result.Item1.FirstOrDefault();
+
             PanelVisible = false;
         }
         #endregion
@@ -178,23 +181,14 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                         var status = ws.Cells[row, 7].Value?.ToString()?.Trim();
 
                         // Parse enum values
-                        if (!Enum.TryParse<EnumBenefitType>(typeOfBenefit, true, out var parsedTypeOfBenefit))
-                        {
-                            ToastService.ShowErrorImport(row, 2, typeOfBenefit ?? string.Empty);
-                            isValid = false;
-                        }
 
-                        if (!Enum.TryParse<EnumBenefitDurationType>(durationOfBenefit, true, out var parsedDurationOfBenefit))
+
+                        if (!Enum.TryParse<EnumWorksDays>(durationOfBenefit, true, out var parsedDurationOfBenefit))
                         {
                             ToastService.ShowErrorImport(row, 4, durationOfBenefit ?? string.Empty);
                             isValid = false;
                         }
 
-                        if (!Enum.TryParse<EnumEligibilityType>(eligibility, true, out var parsedEligibility))
-                        {
-                            ToastService.ShowErrorImport(row, 6, eligibility ?? string.Empty);
-                            isValid = false;
-                        }
 
                         if (!Enum.TryParse<EnumBenefitStatus>(status, true, out var parsedStatus))
                         {
@@ -221,11 +215,8 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                         var benefit = new BenefitConfigurationDto
                         {
                             BenefitName = benefitName,
-                            TypeOfBenefit = parsedTypeOfBenefit,
                             BenefitValue = parsedBenefitValue,
-                            DurationOfBenefit = parsedDurationOfBenefit,
                             BenefitDuration = parsedBenefitDuration,
-                            Eligibility = parsedEligibility,
                             Status = parsedStatus
                         };
 
@@ -272,25 +263,46 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
+
+        private async Task onActive()
+        {
+            var data = SelectedDataItems[0].Adapt(BenefitConfigurationDto);
+        }
         #endregion
 
         #region Save & Delete
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            bool validate = await Mediator.Send(new ValidateBenefitConfigurationQuery(x => x.Id != PostBenefitConfigurations.Id && x.BenefitName == PostBenefitConfigurations.BenefitName ));
-
-            if (validate)
+            try
             {
-                ToastService.ShowInfo($"Benefit with name '{PostBenefitConfigurations.BenefitName}");
-                e.Cancel = true;
-                return;
-            }
+                PostBenefitConfigurations = (BenefitConfigurationDto)e.EditModel;
+                var data = new BenefitConfigurationDto();
 
-            if(PostBenefitConfigurations.Id == 0)
+                bool validate = await Mediator.Send(new ValidateBenefitConfigurationQuery(x => x.Id != PostBenefitConfigurations.Id && x.BenefitName == PostBenefitConfigurations.BenefitName));
+
+                if (validate)
+                {
+                    ToastService.ShowInfo($"Benefit with name '{PostBenefitConfigurations.BenefitName}");
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (PostBenefitConfigurations.Id == 0)
+                {
+                    PostBenefitConfigurations.Status = EnumBenefitStatus.Draft;
+                    data = await Mediator.Send(new CreateBenefitConfigurationRequest(PostBenefitConfigurations));
+                    ToastService.ShowSuccess($"Add Data Benefit Name {data.BenefitName} Success");
+                }
+                else
+                {
+                    data = await Mediator.Send(new UpdateBenefitConfigurationRequest(PostBenefitConfigurations));
+                    ToastService.ShowSuccess($"Update Data Benefit Name {data.BenefitName} Success");
+                }
+            }
+            catch (Exception ex)
             {
-
+                ex.HandleException(ToastService);
             }
-
         }
 
         private async Task OnDelete()
