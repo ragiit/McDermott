@@ -144,9 +144,16 @@ builder.Services.AddControllersWithViews();
 //    // Or you can use a configuration setting
 //    // client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"]);
 //});
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorClient",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 builder.Services.AddHttpClient("ServerAPI", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"] ?? "http://localhost:5001/");
+    client.BaseAddress = new Uri(builder.Configuration["ServerAPI:BaseUrl"] ?? "http://localhost:5000/");
 });
 // Add services to the container.
 //builder.WebHost.UseUrls("http://*:5001");
@@ -233,6 +240,8 @@ if (!string.IsNullOrEmpty(baseHref))
 app.UseSerilogRequestLogging();
 app.UseRouting();
 app.UseAntiforgery();
+app.UseCors("AllowBlazorClient");
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapGraphQL();

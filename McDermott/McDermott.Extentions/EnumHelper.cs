@@ -34,6 +34,18 @@ namespace McDermott.Application.Extentions
             return null;
         }
 
+        public enum EnumBpjsWebServiceTemporary
+        {
+            [Display(Name = "Failed")]
+            Failed = 0,
+
+            [Display(Name = "Pending")]
+            Pending = 1,
+
+            [Display(Name = "Success")]
+            Success = 2,
+        }
+
         public enum EnumPageMode
         {
             [Display(Name = "create")]

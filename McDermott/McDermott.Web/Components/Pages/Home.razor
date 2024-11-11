@@ -14,6 +14,10 @@
 @using Microsoft.Extensions.Hosting
 @using System.Net.Http.Headers
 @using static McDermott.Web.Components.Pages.Transaction.GeneralConsultanServicePage
+@using iTextSharp.text
+@using iTextSharp.text.pdf
+@using System.IO
+
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 @inject IHttpClientFactory ClientFactory
@@ -84,6 +88,8 @@ else
 @code {
     private string meetLink { get; set; }
     private string meetLink2;
+
+ 
 
     private async Task CreateTeamsLink()
     {
