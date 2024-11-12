@@ -10,6 +10,8 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
 using DocumentFormat.OpenXml.Bibliography;
+using McDermott.Application.Dtos.ClaimUserManagement;
+using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
 
 namespace McDermott.Web.Components.Pages.Patient.Patients
 {
@@ -18,11 +20,14 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         #region Family Relation
 
         private List<PatientFamilyRelationDto> PatientFamilyRelations { get; set; } = [];
+        private List<ClaimHistoryDto> getClaimHistory { get; set; } = [];
         private List<UserDto> UserPatients { get; set; } = [];
         private List<FamilyDto> Families { get; set; } = [];
         public IGrid GridFamilyRelation { get; set; }
+        public IGrid GridUserClaim { get; set; }
         private IReadOnlyList<object> SelectedDataItemsFamilyRelation { get; set; } = [];
         private int FocusedRowVisibleIndexFamilyRelation { get; set; }
+        private int FocusedRowVisibleIndexUserClaim { get; set; }
 
         private async Task NewItemFamilyRelation_Click()
         {
@@ -72,11 +77,17 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             FocusedRowVisibleIndexFamilyRelation = args.VisibleIndex;
         }
-
+        
         private void DeleteItemFamilyRelation_Click()
         {
             GridFamilyRelation.ShowRowDeleteConfirmation(FocusedRowVisibleIndexFamilyRelation);
         }
+
+        private void GridUserClaim_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexUserClaim = args.VisibleIndex;
+        }
+
 
         #region Searching
 
@@ -400,6 +411,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         #region Grid Vaccination
 
         private bool IsLoadingGeneralConsultantServiceVaccinations = false;
+        private bool IsLoadingUserClaim = false;
         private IGrid GridVaccinations { get; set; }
         private List<GeneralConsultanServiceDto> GeneralConsultanServiceVaccinations { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemVaccinations { get; set; } = [];
@@ -525,6 +537,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
         [Parameter]
         public long InsurancePoliciesCount { get; set; } = 0;
+        public long UserClaimCount { get; set; } = 0;
 
         [Parameter]
         public long PrescriptionCount { get; set; } = 0;
@@ -534,6 +547,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         private bool PrescriptionPopUp = false;
         private bool DiseasePopUp = false;
         private bool IsVaccinations = false;
+        private bool IsUserClaim = false;
 
         private async Task OnClickSmartButton(string text)
         {
@@ -562,6 +576,11 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 IsLoadingGeneralConsultantServiceVaccinations = true;
                 //GeneralConsultanServiceVaccinations = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"))).Item1;
                 IsLoadingGeneralConsultantServiceVaccinations = false;
+                return;
+            }else if(text.Equals("User Claim"))
+            {
+                IsUserClaim = true;
+                await LoadData_userClaim();
                 return;
             }
             //TabIndex = text.ToInt32();
@@ -602,6 +621,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         private char Placeholder { get; set; } = '_';
 
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
+        private IReadOnlyList<object> SelectedUserClaimDataItems { get; set; } = new ObservableRangeCollection<object>();
         private IReadOnlyList<object> SelectedDataItemsGroupMenu { get; set; } = new ObservableRangeCollection<object>();
         private int FocusedRowVisibleIndexGroupMenu { get; set; }
         private int FocusedRowVisibleIndexGroupMenuGroupMenu { get; set; }
@@ -786,6 +806,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 InsurancePoliciesCount = await Mediator.Send(new GetInsurancePolicyCountQuery(x => x.UserId == UserForm.Id));
                 PrescriptionCount = await Mediator.Send(new GetPrescriptionCountQuery(x => x.PatientId == UserForm.Id));
                 VaccinationCount = await Mediator.Send(new GetGeneralConsultationCountQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"));
+                UserClaimCount = await Mediator.Send(new GetClaimHistoryCountQuery(x => x.PatientId == UserForm.Id));
             }
         }
 
@@ -1937,5 +1958,27 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         #endregion ComboboxDistrictResidence
 
         #endregion Residence Address
+
+        private async Task LoadData_userClaim()
+        {
+            IsLoadingUserClaim = true;
+            var result = await Mediator.Send(new GetClaimHistoryQuery
+            {
+                Predicate = x => x.PatientId == Id,
+                SearchTerm = searchTerm,
+                PageIndex = 0,
+                PageSize = 10,
+            });
+
+            getClaimHistory = result.Item1;
+            totalCount = result.PageCount;
+            activePageIndex = 0;
+            IsLoadingUserClaim = false;
+        }
+
+        private async Task Refresh_UserClaim_Click()
+        {
+            await LoadData_userClaim();
+        }
     }
 }

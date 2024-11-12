@@ -15,7 +15,7 @@ namespace McDermott.Application.Dtos.ClaimUserManagement
 
         public long? PhycisianId { get; set; }
 
-        public DateTime ClaimDate { get; set; }
+        public DateTime ClaimDate { get; set; } = DateTime.Now;
 
         public long? BenefitId { get; set; }
 

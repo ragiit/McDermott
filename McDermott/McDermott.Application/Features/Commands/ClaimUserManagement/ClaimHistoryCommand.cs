@@ -55,6 +55,11 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         {
             public Expression<Func<ClaimHistory, bool>> Predicate { get; } = predicate!;
         }
+        public class GetClaimHistoryCountQuery(Expression<Func<ClaimHistory, bool>>? predicate = null) : IRequest<int>
+        {
+            public Expression<Func<ClaimHistory, bool>> Predicate { get; } = predicate!;
+        }
+
         #endregion GET Claim History Detail
 
         #region CREATE Claim History

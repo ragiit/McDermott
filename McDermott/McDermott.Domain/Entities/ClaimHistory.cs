@@ -13,12 +13,15 @@ namespace McDermott.Domain.Entities
         public long? BenefitId { get; set; }
 
         public long? PatientId { get; set; }
+        public long? PyhicisianId { get; set; }
 
         public DateTime ClaimDate { get; set; }
 
         public int ClaimedValue { get; set; } // Bisa berupa qty atau amount sesuai dengan konfigurasi benefit
         [SetToNull]
-        public User? Patient { get; set; } // Navigation property
+        public User? Patient { get; set; } 
+        [SetToNull]
+        public User? Phycisian { get; set; } // Navigation property
         [SetToNull]
         public BenefitConfiguration? Benefit { get; set; } // Navigation property
     }
