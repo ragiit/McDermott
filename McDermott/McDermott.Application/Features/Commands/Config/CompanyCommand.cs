@@ -4,16 +4,34 @@ namespace McDermott.Application.Features.Commands.Config
     {
         #region
 
-        public class GetCompanyQuery(Expression<Func<Company, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Company, object>>>? includes = null, Expression<Func<Company, Company>>? select = null) : IRequest<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleCompanyQuery : IRequest<CompanyDto>
         {
-            public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Company, object>>> Includes { get; set; }
+            public Expression<Func<Company, bool>> Predicate { get; set; }
+            public Expression<Func<Company, Company>> Select { get; set; }
 
-            public List<Expression<Func<Company, object>>> Includes { get; } = includes!;
-            public Expression<Func<Company, Company>>? Select { get; } = select!;
+            public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetCompanyQuery : IRequest<(List<CompanyDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Company, object>>> Includes { get; set; }
+            public Expression<Func<Company, bool>> Predicate { get; set; }
+            public Expression<Func<Company, Company>> Select { get; set; }
+
+            public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateCompanyQuery(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>

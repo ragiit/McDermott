@@ -3,7 +3,7 @@
     /*
      *  Cara pakai Cookie:
      *  1. Perlu panggil method SetCookie() nya dulu di method OnInitializedAsync() sebelum di pakai
-     *  2. 
+     *  2.
      */
 
     public static class CookieHelper
@@ -79,6 +79,4 @@
             }
         }
     }
-
-
 }

@@ -18,6 +18,7 @@ using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
@@ -359,6 +360,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
                     ReferVerticalSpesialisParentSubSpesialisName = x.ReferVerticalSpesialisParentSubSpesialisName,
                     ReferReason = x.ReferReason,
+                    VisitNumber = x.VisitNumber
                 }
             });
 
@@ -423,6 +425,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                         Email = x.Email,
                                         MobilePhone = x.MobilePhone,
                                         Gender = x.Gender,
+                                        PhysicanCode = x.PhysicanCode,
                                         DateOfBirth = x.DateOfBirth,
                                         NoId = x.NoId,
                                         CurrentMobile = x.CurrentMobile
@@ -430,6 +433,26 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 })).Item1;
                                 GeneralConsultanService.PratitionerId = UserLogin.Id;
                             }
+                        }
+                        else
+                        {
+                            Physicions = (await Mediator.Send(new GetUserQueryNew
+                            {
+                                Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
+                                Select = x => new User
+                                {
+                                    Id = x.Id,
+                                    Name = x.Name,
+                                    NoRm = x.NoRm,
+                                    Email = x.Email,
+                                    MobilePhone = x.MobilePhone,
+                                    PhysicanCode = x.PhysicanCode,
+                                    Gender = x.Gender,
+                                    DateOfBirth = x.DateOfBirth,
+                                    NoId = x.NoId,
+                                    CurrentMobile = x.CurrentMobile
+                                }
+                            })).Item1;
                         }
                         break;
 
@@ -499,6 +522,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             NoRm = x.NoRm,
                             Email = x.Email,
                             MobilePhone = x.MobilePhone,
+                            PhysicanCode = x.PhysicanCode,
                             Gender = x.Gender,
                             DateOfBirth = x.DateOfBirth,
                             NoId = x.NoId,
@@ -521,6 +545,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 Name = x.Insurance == null ? "" : x.Insurance.Name,
                             },
                             PolicyNumber = x.PolicyNumber,
+                            NoKartu = x.NoKartu,
+                            KdProviderPstKdProvider = x.KdProviderPstKdProvider,
                             PstPrb = x.PstPrb,
                             PstProl = x.PstProl
                         }
@@ -696,6 +722,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        NoKartu = x.NoKartu,
+                        KdProviderPstKdProvider = x.KdProviderPstKdProvider,
                         PstPrb = x.PstPrb,
                         PstProl = x.PstProl
                     }
@@ -900,6 +928,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        NoKartu = x.NoKartu,
+                        KdProviderPstKdProvider = x.KdProviderPstKdProvider,
                         PolicyNumber = x.PolicyNumber,
                         PstPrb = x.PstPrb,
                         PstProl = x.PstProl
@@ -1031,6 +1061,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         Id = x.Id,
                         Name = x.Name,
                         Email = x.Email,
+                        PhysicanCode = x.PhysicanCode,
                         MobilePhone = x.MobilePhone,
                         Gender = x.Gender,
                         DateOfBirth = x.DateOfBirth
@@ -1067,6 +1098,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     {
                         Name = x.Insurance == null ? "" : x.Insurance.Name,
                     },
+                    NoKartu = x.NoKartu,
+                    KdProviderPstKdProvider = x.KdProviderPstKdProvider,
                     PolicyNumber = x.PolicyNumber,
                     PstPrb = x.PstPrb,
                     PstProl = x.PstProl
@@ -1276,7 +1309,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         };
 
                         res = await Mediator.Send(createRequest);
-                        if(res is not null)
+                        if (res is not null)
                         {
                             postGeneralConsultationServiceLog.GeneralConsultationServiceId = res.Id;
                             postGeneralConsultationServiceLog.UserById = UserLogin.Id;
@@ -1466,27 +1499,16 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))
                 {
-                    //var isSuccess = await SendPcareRequestRegistration();
-                    //if (!isSuccess)
-                    //{
-                    //    IsLoading = false;
-                    //    return;
-                    //}
-                    //else
-                    //{
-                    //    await SendPCareRequestUpdateStatusPanggilAntrean(1);
-                    //}
-                }
-
-                if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
-                {
-                    //var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
-
-                    //if (!isSuccessAddKunjungan)
-                    //{
-                    //    IsLoading = false;
-                    //    return;
-                    //}
+                    var isSuccess = await SendPcareRequestRegistration();
+                    if (!isSuccess)
+                    {
+                        IsLoading = false;
+                        return;
+                    }
+                    else
+                    {
+                        //await SendPCareRequestUpdateStatusPanggilAntrean(1);
+                    }
                 }
 
                 if (IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
@@ -1509,6 +1531,17 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if ((!PopUpConfirmation && IsContinueCPPT) || IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
                 {
+                    if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                    {
+                        var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+
+                        if (!isSuccessAddKunjungan)
+                        {
+                            IsLoading = false;
+                            return;
+                        }
+                    }
+
                     // Fetch existing patient with planned status
                     if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Planned)
                     {
@@ -1606,7 +1639,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 CurrentMobile = UserForm.CurrentMobile
                             }
                         });
-                        if(newGC is not null)
+                        if (newGC is not null)
                         {
                             postGeneralConsultationServiceLog.GeneralConsultationServiceId = newGC.Id;
                             postGeneralConsultationServiceLog.UserById = UserLogin.Id;
@@ -1690,6 +1723,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                     NoRm = x.NoRm,
                                     Email = x.Email,
                                     MobilePhone = x.MobilePhone,
+                                    PhysicanCode = x.PhysicanCode,
                                     Gender = x.Gender,
                                     DateOfBirth = x.DateOfBirth,
                                     NoId = x.NoId,
@@ -1730,6 +1764,223 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private async Task<bool> SendPcareRequestKunjungan()
+        {
+            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
+            {
+                var ins = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                if (ins is null)
+                {
+                    ToastService.ShowInfo("Please select the Insurance Policy");
+                    return false;
+                }
+
+                var g = (await Mediator.Send(new GetSingleGeneralConsultanCPPTsQuery
+                {
+                    OrderByList =
+                    [
+                        (x => x.CreatedDate, true),
+                    ],
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id,
+                    Select = x => new GeneralConsultanCPPT
+                    {
+                        Diagnosis = new Diagnosis
+                        {
+                            Code = x.Diagnosis == null ? "" : x.Diagnosis.Code,
+                        }
+                    }
+                }));
+
+                if (g is null)
+                {
+                    ToastService.ShowInfo("Please add the CPPT");
+                    return false;
+                }
+
+                //if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))
+                //{
+                //    if (GeneralConsultanCPPTs.Count > 0)
+                //    {
+                //        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
+                //        if (g is not null)
+                //        {
+                //            diag1 = NursingDiagnoses.FirstOrDefault(x => x.Problem.Equals(g.Body))!.Code ?? null!;
+                //        }
+                //    }
+                //}
+
+                //if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
+                //{
+                //    if (GeneralConsultanCPPTs.Count > 0)
+                //    {
+                //        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
+                //        if (g is not null)
+                //        {
+                //            diag1 = Diagnoses.FirstOrDefault(x => x.Name.Equals(g.Body))!.Code ?? null!;
+                //        }
+                //    }
+                //}
+
+                var statusTemp = Helper._homeStatusTemps.FirstOrDefault(x => x.Code == GeneralConsultanService.HomeStatus);
+
+                if (statusTemp is null)
+                {
+                    ToastService.ShowInfo("Please select the Return Status");
+                    return false;
+                }
+
+                var kunj = new KunjunganRequest();
+
+                if (statusTemp.Code == "3")
+                {
+                    kunj = new KunjunganRequest
+                    {
+                        NoKunjungan = GeneralConsultanService.SerialNo ?? string.Empty,
+                        NoKartu = ins.NoKartu ?? "",
+                        TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
+                        KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
+                        Keluhan = "",
+                        KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultanService.AwarenessId)!.KdSadar,
+                        Sistole = GeneralConsultanService.Systolic.ToInt32(),
+                        Diastole = GeneralConsultanService.DiastolicBP.ToInt32(),
+                        BeratBadan = GeneralConsultanService.Weight.ToInt32(),
+                        TinggiBadan = GeneralConsultanService.Height.ToInt32(),
+                        RespRate = GeneralConsultanService.RR.ToInt32(),
+                        HeartRate = GeneralConsultanService.HR.ToInt32(),
+                        LingkarPerut = GeneralConsultanService.WaistCircumference.ToInt32(),
+                        KdStatusPulang = statusTemp.Code,
+                        TglPulang = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
+                        KdDokter = Physicions.FirstOrDefault(x => x.Id == GeneralConsultanService.PratitionerId)!.PhysicanCode,
+                        KdDiag1 = g.Diagnosis?.Code ?? null,
+                        KdDiag2 = null,
+                        KdDiag3 = null,
+                        KdTacc = -1,
+                        AlergiMakan = SelectedFoodAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        AlergiObat = SelectedPharmacologyAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        AlergiUdara = SelectedWeatherAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        Suhu = GeneralConsultanService.Temp.ToString(),
+                    };
+                }
+
+                Console.WriteLine(JsonConvert.SerializeObject(kunj, (Newtonsoft.Json.Formatting)System.Xml.Formatting.Indented));
+
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
+
+                if (responseApi.Item2 != 201)
+                {
+                    ToastService.ShowError($"{responseApi.Item1}");
+
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                {
+                    if (responseApi.Item1 is not null)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                        //if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber)) // Check if the serial no is not getting from kiosk
+                        GeneralConsultanService.VisitNumber = data.response.message;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private async Task<bool> SendPcareRequestRegistration()
+        {
+            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
+            {
+                var ins = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                if (ins is null)
+                {
+                    ToastService.ShowInfo("Please select the Insurance Policy");
+                    return false;
+                }
+
+                var regis = new PendaftaranRequest
+                {
+                    kdProviderPeserta = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId)?.KdProviderPstKdProvider ?? "",
+                    tglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
+                    noKartu = ins.NoKartu ?? "",
+                    kdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
+                    keluhan = null,
+                    kunjSakit = true,
+                    kdTkp = "10"
+                };
+
+                Console.WriteLine("Sending pendaftaran...");
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"pendaftaran", HttpMethod.Post, regis);
+
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+
+                if (responseApi.Item2 != 201)
+                {
+                    if (responseApi.Item2 == 412)
+                        ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
+                    else
+                        ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+
+                    Console.WriteLine(JsonConvert.SerializeObject(regis, (Newtonsoft.Json.Formatting)System.Xml.Formatting.Indented));
+
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                    GeneralConsultanService.SerialNo = data.message;
+            }
+            return true;
+        }
+
+        private async Task<bool> SendPCareRequestUpdateStatusPanggilAntrean(int status)
+        {
+            try
+            {
+                var ins = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+                if (ins is null)
+                {
+                    ToastService.ShowInfo("Please select the Insurance Policy");
+                    return false;
+                }
+
+                var service = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId);
+
+                var antreanRequest = new UpdateStatusPanggilAntreanRequestPCare
+                {
+                    Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
+                    Kodepoli = service!.Code ?? string.Empty,
+                    Nomorkartu = ins.NoKartu ?? string.Empty,
+                    Status = status, // 1 -> Hadir, 2 -> Tidak Hadir
+                    Waktu = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                };
+
+                Console.WriteLine("Sending antrean/panggil...");
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.AntreanFKTPBaseURL), $"antrean/panggil", HttpMethod.Post, antreanRequest);
+
+                if (responseApi.Item2 != 200)
+                {
+                    ToastService.ShowError($"{responseApi.Item1}, Code: {responseApi.Item2}");
+                    Console.WriteLine(JsonConvert.SerializeObject(antreanRequest, (Newtonsoft.Json.Formatting)System.Xml.Formatting.Indented));
+                    Console.WriteLine("ResponseAPI antrean/panggil " + Convert.ToString(responseApi.Item1));
+                    IsLoading = false;
+                    return false;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                    if (data is not null)
+                        Console.WriteLine(Convert.ToString(data));
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+                return false;
             }
         }
 
@@ -1977,10 +2228,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private bool IsPopUpPainScale = false;
+
         private void OnClickPainScalePopUp()
         {
             IsPopUpPainScale = true;
         }
+
         private void OnClosePopup()
         {
             IsPopUpPainScale = false;

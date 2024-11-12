@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Home</PageTitle>
 
@@ -9,15 +11,15 @@
         <h1>@context.User.Identity.Name</h1>
     </Authorized>
     <NotAuthorized>
-        Asu
+        Logout
     </NotAuthorized>
 </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
 
 @code {
     private System.Security.Claims.ClaimsPrincipal? user;
 
-    [CascadingParameter]
-    private Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    // [CascadingParameter]
+    // private Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

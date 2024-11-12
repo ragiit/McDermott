@@ -55,6 +55,7 @@ namespace McDermott.Web.Extentions
             "Risiko sedang 7-11",
             "Risiko Tinggi >= 12"
         ];
+
         public static List<string> BenefitOfType = new List<string>
         {
             "Qty",
@@ -326,6 +327,11 @@ namespace McDermott.Web.Extentions
             {
                 Code = "6",
                 Name = "Rujuk Horizontal",
+            },
+            new()
+            {
+                Code = "A",
+                Name = "Rujuk Atas Permintaan Sendiri (APS)",
             },
         ];
 

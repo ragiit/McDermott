@@ -567,7 +567,7 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
             var ax = SelectedServices.Select(x => x.Id).ToList();
             UserForm.DoctorServiceIds?.AddRange(ax);
 
-            UserForm.DoctorServiceIds.Distinct();
+            UserForm.DoctorServiceIds?.Distinct();
 
             if (UserForm.Id == 0)
             {

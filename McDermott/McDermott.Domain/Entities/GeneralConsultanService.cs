@@ -27,8 +27,10 @@ namespace McDermott.Domain.Entities
         public DateTime? StartMaternityLeave { get; set; }
         public DateTime? EndMaternityLeave { get; set; }
         public DateTime? RegistrationDate { get; set; }
+
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? PatientNextVisitSchedule { get; set; }  // this field for Maternities -> Anc form
+
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
 
@@ -39,6 +41,7 @@ namespace McDermott.Domain.Entities
         public TimeSpan? WorkFrom { get; set; }
         public TimeSpan? WorkTo { get; set; }
         public string? SerialNo { get; set; } // NoUrut
+        public string? VisitNumber { get; set; } // NO Kunjungan
 
         /// <BPJS Rujukan>
         public string? ReferVerticalKhususCategoryName { get; set; }
@@ -123,14 +126,16 @@ namespace McDermott.Domain.Entities
 
         #endregion Telemedic
 
-        #region ANC 
+        #region ANC
+
         public string? PregnancyStatusG { get; set; }
         public string? PregnancyStatusP { get; set; }
         public string? PregnancyStatusA { get; set; }
         public string? HPHT { get; set; }
-        public string? HPL { get; set; } 
+        public string? HPL { get; set; }
         public int? LILA { get; set; }    // CM
-        #endregion
+
+        #endregion ANC
 
         public long? ProjectId { get; set; }
         public bool IsAccident { get; set; }

@@ -77,9 +77,14 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var countries = await Mediator.Send(new GetCompanyQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-                Companys = countries.Item1;
-                totalCount = countries.pageCount;
+                var result = await Mediator.Send(new GetCompanyQuery
+                {
+                    SearchTerm = searchTerm ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
+                Companys = result.Item1;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
                 PanelVisible = false;
             }

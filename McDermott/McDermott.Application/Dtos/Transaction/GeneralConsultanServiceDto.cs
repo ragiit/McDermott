@@ -69,6 +69,7 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
+
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? PatientNextVisitSchedule { get; set; }  // this field for Maternities -> Anc form
 
@@ -132,6 +133,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
         public string? SerialNo { get; set; } // NoUrut
+        public string? VisitNumber { get; set; } // NoUrut
 
         /// <BPJS Rujukan>
         public string? ReferVerticalKhususCategoryName { get; set; }
@@ -145,7 +147,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool? IsSarana { get; set; } = false;
         public string? ReferVerticalSpesialisSaranaName { get; set; }
         public string? ReferVerticalSpesialisSaranaCode { get; set; }
-        public string? PPKRujukanName { get; set; }
+        public string? PPKRujukanName { get; set; } = "-";
         public string? PPKRujukanCode { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         /// </BPJS Rujukan>
@@ -247,14 +249,16 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion Vaccination
 
-        #region ANC 
+        #region ANC
+
         public string? PregnancyStatusG { get; set; }
         public string? PregnancyStatusP { get; set; }
         public string? PregnancyStatusA { get; set; }
         public string? HPHT { get; set; }
         public string? HPL { get; set; }
         public int? LILA { get; set; }    // CM
-        #endregion
+
+        #endregion ANC
 
         public string Number { get; set; }
         public DateTime Date { get; set; }
@@ -293,7 +297,7 @@ namespace McDermott.Application.Dtos.Transaction
     public class GeneralConsultanServiceValidator : AbstractValidator<GeneralConsultanServiceDto>
     {
         public GeneralConsultanServiceValidator()
-        {  
+        {
             // Validation for IsMaternity field
             RuleFor(x => x.PatientNextVisitSchedule)
                 .NotEmpty().WithMessage("Patient's next visit schedule is required for maternity cases")
@@ -400,6 +404,7 @@ namespace McDermott.Application.Dtos.Transaction
         [Required]
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
+
         [DisplayFormat(DataFormatString = "dd MMMM yyyy")]
         public DateTime? PatientNextVisitSchedule { get; set; }  // this field for Maternities -> Anc form
 
@@ -461,6 +466,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsFood { get; set; } = false;
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public string? SerialNo { get; set; } // NoUrut
+        public string? VisitNumber { get; set; } // NO Kunjungan
 
         /// <BPJS Rujukan>
         public string? ReferVerticalKhususCategoryName { get; set; }

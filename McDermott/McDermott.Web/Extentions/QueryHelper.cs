@@ -431,53 +431,7 @@ namespace McDermott.Web.Extentions
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(CompanyDto))
-            {
-                var result = await mediator.Send(new GetCompanyQuery(
-                    predicate as Expression<Func<Company, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Country,
-                        x => x.Province,
-                        x => x.City,
-                    ] : includes as List<Expression<Func<Company, object>>>,
-                    select: select is null ? x => new Company
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Phone = x.Phone,
-                        Email = x.Email,
-                        Website = x.Website,
-                        VAT = x.VAT,
-                        Street1 = x.Street1,
-                        Street2 = x.Street2,
-                        Zip = x.Zip,
-                        CurrencyId = x.CurrencyId,
-                        Logo = x.Logo,
-                        CityId = x.CityId,
-                        ProvinceId = x.ProvinceId,
-                        CountryId = x.CountryId,
-                        Country = new Country
-                        {
-                            Name = x.Country.Name
-                        },
-                        Province = new Province
-                        {
-                            Name = x.Province.Name
-                        },
-                        City = new City
-                        {
-                            Name = x.City.Name
-                        },
-                    } : select as Expression<Func<Company, Company>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
+            } 
             else if (typeof(TDto) == typeof(DepartmentDto))
             {
                 var result = await mediator.Send(new GetDepartmentQuery(

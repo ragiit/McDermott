@@ -1151,6 +1151,16 @@
                                                                         <div class="row w-100">
                                                                             <div class="col-md-12">
                                                                                 <DxFormLayout CssClass="w-100">
+                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Visit Number" ColSpanMd="12">
+                                                                                        @if (GeneralConsultanService.VisitNumber is not null)
+                                                                                        {
+                                                                                            <label>@GeneralConsultanService.VisitNumber</label>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <label>-</label>
+                                                                                        }
+                                                                                    </DxFormLayoutItem>
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Number" ColSpanMd="12">
                                                                                         <label>-</label>
                                                                                     </DxFormLayoutItem>
@@ -1164,7 +1174,14 @@
                                                                                         <label>@GeneralConsultanService.ReferReason</label>
                                                                                     </DxFormLayoutItem>
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="12">
+                                                                                        @if (GeneralConsultanService.ReferDateVisit.HasValue)
+                                                                                        {
                                                                                         <label>@GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")</label>
+                                                                                        }
+                                                                                        else 
+                                                                                        {
+                                                                                            <label>-</label>
+                                                                                        }
                                                                                     </DxFormLayoutItem>
                                                                                 </DxFormLayout>
                                                                             </div>
