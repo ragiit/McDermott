@@ -147,7 +147,7 @@ namespace McDermott.Application.Dtos.Transaction
         public bool? IsSarana { get; set; } = false;
         public string? ReferVerticalSpesialisSaranaName { get; set; }
         public string? ReferVerticalSpesialisSaranaCode { get; set; }
-        public string? PPKRujukanName { get; set; }
+        public string? PPKRujukanName { get; set; } = "-";
         public string? PPKRujukanCode { get; set; }
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         /// </BPJS Rujukan>

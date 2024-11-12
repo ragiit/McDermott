@@ -360,6 +360,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
                     ReferVerticalSpesialisParentSubSpesialisName = x.ReferVerticalSpesialisParentSubSpesialisName,
                     ReferReason = x.ReferReason,
+                    VisitNumber = x.VisitNumber
                 }
             });
 
