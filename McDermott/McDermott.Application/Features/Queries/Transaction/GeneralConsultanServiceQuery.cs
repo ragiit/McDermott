@@ -226,6 +226,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                         ClassType = x.ClassType,
                         SerialNo = x.SerialNo,
                         Reference = x.Reference,
+                        VisitNumber = x.VisitNumber,
+                        KioskQueue = new KioskQueue
+                        {
+                            QueueNumber = x.KioskQueue == null ? null : x.KioskQueue.QueueNumber
+                        }
                     });
 
                 if (!request.IsGetAll)
@@ -1267,6 +1272,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().Attach(entity);
 
                     entity.Status = request.GeneralConsultanServiceDto.Status;
+                    entity.SerialNo = request.GeneralConsultanServiceDto.SerialNo;
                     entity.PatientId = request.GeneralConsultanServiceDto.PatientId;
                     entity.TypeRegistration = request.GeneralConsultanServiceDto.TypeRegistration;
                     entity.IsAlertInformationSpecialCase = request.GeneralConsultanServiceDto.IsAlertInformationSpecialCase;
@@ -1278,6 +1284,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.PatientNextVisitSchedule = request.GeneralConsultanServiceDto.PatientNextVisitSchedule;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.SerialNo));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PatientId));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.TypeRegistration));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.IsAlertInformationSpecialCase));
@@ -1378,6 +1385,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.IsMaternityLeave = request.GeneralConsultanServiceDto.IsMaternityLeave;
                     entity.StartMaternityLeave = request.GeneralConsultanServiceDto.StartMaternityLeave;
                     entity.EndMaternityLeave = request.GeneralConsultanServiceDto.EndMaternityLeave;
+                    entity.VisitNumber = request.GeneralConsultanServiceDto.VisitNumber;
 
                     entity.InformationFrom = request.GeneralConsultanServiceDto.InformationFrom;
                     entity.AwarenessId = request.GeneralConsultanServiceDto.AwarenessId;
@@ -1402,6 +1410,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.RiskOfFalling = request.GeneralConsultanServiceDto.RiskOfFalling;
                     entity.RiskOfFallingDetail = request.GeneralConsultanServiceDto.RiskOfFallingDetail;
 
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.VisitNumber));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PratitionerId));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PratitionerId));

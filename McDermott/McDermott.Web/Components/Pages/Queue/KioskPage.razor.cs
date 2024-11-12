@@ -53,20 +53,20 @@ namespace McDermott.Web.Components.Pages.Queue
             [JsonProperty("nohp")]
             public string Nohp { get; set; }
 
-            //[JsonProperty("namapoli")]
-            //public string Namapoli { get; set; }
+            [JsonProperty("namapoli")]
+            public string Namapoli { get; set; }
 
-            //[JsonProperty("namadokter")]
-            //public string Namadokter { get; set; }
+            [JsonProperty("namadokter")]
+            public string Namadokter { get; set; }
 
-            //[JsonProperty("nomorantrean")]
-            //public string Nomorantrean { get; set; }
+            [JsonProperty("nomorantrean")]
+            public string Nomorantrean { get; set; }
 
-            //[JsonProperty("angkaantrean")]
-            //public int Angkaantrean { get; set; }
+            [JsonProperty("angkaantrean")]
+            public int Angkaantrean { get; set; }
 
-            //[JsonProperty("keterangan")]
-            //public string Keterangan { get; set; }
+            [JsonProperty("keterangan")]
+            public string Keterangan { get; set; }
         }
 
         public class UpdateStatusPanggilAntreanRequestPCare
@@ -1047,6 +1047,7 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormGeneral.TypeRegistration = "Telemedicine";
                     }
 
+                    FormGeneral.IsGC = true;
                     await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormGeneral));
                 }
                 else
@@ -1138,29 +1139,29 @@ namespace McDermott.Web.Components.Pages.Queue
                     return false;
                 }
 
-                var antreanRequest = new AntreanRequestBPJS2
+                var antreanRequest = new AntreanRequestBPJS
                 {
                     Nomorkartu = bpjs.NoKartu ?? string.Empty,
                     Nik = bpjs.NoKTP ?? string.Empty,
+                    Nohp = bpjs.NoHP ?? string.Empty,
                     Kodepoli = service?.Code ?? string.Empty,
+                    Namapoli = service?.Name ?? string.Empty,
+                    Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
                     Tanggalperiksa = DateTime.Now.ToString("yyyy-MM-dd"),
-                    Keluhan = "",
-                    //Kodedokter = "440939",
+                    Kodedokter = "440939",
+                    Namadokter = "Tenaga Medis 440939",
+                    Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
+                    Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
+                    Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
+                    Keterangan = ""
+                    //Keluhan = "",
+                    //Namadokter = physician.Name ?? null,
                     //Kodedokter = physician?.PhysicanCode ?? null,
                     //Jampraktek = "00:00:00",
-                    //Norm = Patients.FirstOrDefault(x => x.Id == FormKios.PatientId)!.NoRm ?? string.Empty,
-                    //Nohp = bpjs.NoHP ?? string.Empty,
-
-                    //Jampraktek = SelectedScheduleSlot?.ResultWorkFormatStringKiosk ?? "00:00:00",
-                    //Namapoli = service?.Name ?? string.Empty,
-                    //Namadokter = physician.Name ?? null,
-                    //Nomorantrean = ViewQueue!.QueueNumber!.ToString()! ?? "",
-                    //Angkaantrean = ViewQueue.QueueNumber.ToInt32(),
-                    //Keterangan = ""
                 };
 
                 Console.WriteLine("Sending antrean...");
-                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.AntreanFKTPBaseURL), $"antrean", HttpMethod.Post, antreanRequest);
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.AntreanFKTPBaseURL), $"antrean/add", HttpMethod.Post, antreanRequest);
 
                 if (responseApi.Item2 != 200)
                 {

@@ -78,7 +78,7 @@ namespace McDermott.Application.Extentions
             [Display(Name = "Draft")]
             Draft = 1,
 
-            [Display(Name = "In-Progress")]
+            [Display(Name = "Start Inventory")]
             InProgress = 2,
 
             [Display(Name = "Canceled")]
@@ -323,18 +323,15 @@ namespace McDermott.Application.Extentions
 
             [Display(Name = "InActive")]
             InActive = 2,
-
         }
 
         public enum EnumClaimRequestStatus
         {
-
             [Display(Name = "Draft")]
             Draft = 0,
 
             [Display(Name = "Done")]
             Done = 1,
-
         }
     }
 }

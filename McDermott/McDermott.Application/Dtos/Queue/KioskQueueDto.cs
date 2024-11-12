@@ -7,6 +7,11 @@
         public long? ServiceId { get; set; }
         public long? ServiceKId { get; set; }
         public long? QueueNumber { get; set; }
+
+        public string? QueueNumberString => QueueNumber.HasValue
+            ? QueueNumber.Value.ToString().PadLeft(3, '0')
+            : null;
+
         public DateTime? CreatedDate { get; set; }
         public string? Queues { get; set; }
         public string? QueueStage { get; set; }

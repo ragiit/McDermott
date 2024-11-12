@@ -1,14 +1,14 @@
-public class BpjsWebServiceTemporaryCommand
+public class CompanyCommand
  {
      #region GET
 
-    public class GetSingleBpjsWebServiceTemporaryQuery : IRequest<BpjsWebServiceTemporaryDto>
+    public class GetSingleCompanyQuery : IRequest<CompanyDto>
     {
-        public List<Expression<Func<BpjsWebServiceTemporary, object>>> Includes { get; set; }
-        public Expression<Func<BpjsWebServiceTemporary, bool>> Predicate { get; set; }
-        public Expression<Func<BpjsWebServiceTemporary, BpjsWebServiceTemporary>> Select { get; set; }
+        public List<Expression<Func<Company, object>>> Includes { get; set; }
+        public Expression<Func<Company, bool>> Predicate { get; set; }
+        public Expression<Func<Company, Company>> Select { get; set; }
 
-        public List<(Expression<Func<BpjsWebServiceTemporary, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -17,13 +17,13 @@ public class BpjsWebServiceTemporaryCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetBpjsWebServiceTemporaryQuery : IRequest<(List<BpjsWebServiceTemporaryDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetCompanyQuery : IRequest<(List<CompanyDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<BpjsWebServiceTemporary, object>>> Includes { get; set; }
-        public Expression<Func<BpjsWebServiceTemporary, bool>> Predicate { get; set; }
-        public Expression<Func<BpjsWebServiceTemporary, BpjsWebServiceTemporary>> Select { get; set; }
+        public List<Expression<Func<Company, object>>> Includes { get; set; }
+        public Expression<Func<Company, bool>> Predicate { get; set; }
+        public Expression<Func<Company, Company>> Select { get; set; }
 
-        public List<(Expression<Func<BpjsWebServiceTemporary, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -32,49 +32,49 @@ public class BpjsWebServiceTemporaryCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateBpjsWebServiceTemporary(Expression<Func<BpjsWebServiceTemporary, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateCompany(Expression<Func<Company, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<BpjsWebServiceTemporary, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
      }
 
-     public class BulkValidateBpjsWebServiceTemporary(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate) : IRequest<List<BpjsWebServiceTemporaryDto>>
+     public class BulkValidateCompany(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
      {
-         public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate { get; } = BpjsWebServiceTemporarysToValidate;
+         public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateBpjsWebServiceTemporaryRequest(BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto) : IRequest<BpjsWebServiceTemporaryDto>
+     public class CreateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
      {
-         public BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto { get; set; } = BpjsWebServiceTemporaryDto;
+         public CompanyDto CompanyDto { get; set; } = CompanyDto;
      }
 
-     public class CreateListBpjsWebServiceTemporaryRequest(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos) : IRequest<List<BpjsWebServiceTemporaryDto>>
+     public class CreateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
      {
-         public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos { get; set; } = BpjsWebServiceTemporaryDtos;
+         public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateBpjsWebServiceTemporaryRequest(BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto) : IRequest<BpjsWebServiceTemporaryDto>
+     public class UpdateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
      {
-         public BpjsWebServiceTemporaryDto BpjsWebServiceTemporaryDto { get; set; } = BpjsWebServiceTemporaryDto;
+         public CompanyDto CompanyDto { get; set; } = CompanyDto;
      }
 
-     public class UpdateListBpjsWebServiceTemporaryRequest(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos) : IRequest<List<BpjsWebServiceTemporaryDto>>
+     public class UpdateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
      {
-         public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporaryDtos { get; set; } = BpjsWebServiceTemporaryDtos;
+         public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteBpjsWebServiceTemporaryRequest : IRequest<bool>
+     public class DeleteCompanyRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -83,25 +83,25 @@ public class BpjsWebServiceTemporaryCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateBpjsWebServiceTemporaryQuery, List<BpjsWebServiceTemporaryDto>>,
+IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
   
-IRequestHandler<GetBpjsWebServiceTemporaryQuery, (List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDto>,
-public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetBpjsWebServiceTemporaryQuery, (List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDto>, 
-     IRequestHandler<ValidateBpjsWebServiceTemporary, bool>,
-     IRequestHandler<CreateBpjsWebServiceTemporaryRequest, BpjsWebServiceTemporaryDto>,
-     IRequestHandler<BulkValidateBpjsWebServiceTemporary, List<BpjsWebServiceTemporaryDto>>,
-     IRequestHandler<CreateListBpjsWebServiceTemporaryRequest, List<BpjsWebServiceTemporaryDto>>,
-     IRequestHandler<UpdateBpjsWebServiceTemporaryRequest, BpjsWebServiceTemporaryDto>,
-     IRequestHandler<UpdateListBpjsWebServiceTemporaryRequest, List<BpjsWebServiceTemporaryDto>>,
-     IRequestHandler<DeleteBpjsWebServiceTemporaryRequest, bool>
+IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
+public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleCompanyQuery, CompanyDto>, 
+     IRequestHandler<ValidateCompany, bool>,
+     IRequestHandler<CreateCompanyRequest, CompanyDto>,
+     IRequestHandler<BulkValidateCompany, List<CompanyDto>>,
+     IRequestHandler<CreateListCompanyRequest, List<CompanyDto>>,
+     IRequestHandler<UpdateCompanyRequest, CompanyDto>,
+     IRequestHandler<UpdateListCompanyRequest, List<CompanyDto>>,
+     IRequestHandler<DeleteCompanyRequest, bool>
 {
     #region GET
-    public async Task<List<BpjsWebServiceTemporaryDto>> Handle(BulkValidateBpjsWebServiceTemporary request, CancellationToken cancellationToken)
+    public async Task<List<CompanyDto>> Handle(BulkValidateCompany request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.BpjsWebServiceTemporarysToValidate;
+        var CountryDtos = request.CompanysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
         //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
@@ -117,20 +117,20 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
 
         return [];
     }
-    public async Task<bool> Handle(ValidateBpjsWebServiceTemporary request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateCompany request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<BpjsWebServiceTemporary>()
+        return await _unitOfWork.Repository<Company>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetBpjsWebServiceTemporaryQuery request, CancellationToken cancellationToken)
+    public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<BpjsWebServiceTemporary>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<Company>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -146,8 +146,8 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Company>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Company>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -164,7 +164,7 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.BpjsWebServiceTemporary.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -172,7 +172,7 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new BpjsWebServiceTemporary
+                query = query.Select(x => new Company
                 {
                     Id = x.Id, 
                 });
@@ -186,11 +186,11 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<BpjsWebServiceTemporaryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<CompanyDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<BpjsWebServiceTemporaryDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<CompanyDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -200,11 +200,11 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
         }
     }
  
-    public async Task<BpjsWebServiceTemporaryDto> Handle(GetSingleBpjsWebServiceTemporaryQuery request, CancellationToken cancellationToken)
+    public async Task<CompanyDto> Handle(GetSingleCompanyQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<BpjsWebServiceTemporary>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<Company>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -220,8 +220,8 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<BpjsWebServiceTemporary>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Company>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Company>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -238,7 +238,7 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.BpjsWebServiceTemporary.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -246,12 +246,12 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new BpjsWebServiceTemporary
+                query = query.Select(x => new Company
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BpjsWebServiceTemporaryDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CompanyDto>();
         }
         catch (Exception ex)
         {
@@ -264,17 +264,17 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
 
      #region CREATE
 
-     public async Task<BpjsWebServiceTemporaryDto> Handle(CreateBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
+     public async Task<CompanyDto> Handle(CreateCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDto.Adapt<CreateUpdateBpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());
+             var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<BpjsWebServiceTemporaryDto>();
+             return result.Adapt<CompanyDto>();
          }
          catch (Exception)
          {
@@ -282,16 +282,16 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
          }
      }
 
-     public async Task<List<BpjsWebServiceTemporaryDto>> Handle(CreateListBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
+     public async Task<List<CompanyDto>> Handle(CreateListCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<BpjsWebServiceTemporary>>());
+             var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<Company>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<BpjsWebServiceTemporaryDto>>();
+             return result.Adapt<List<CompanyDto>>();
          }
          catch (Exception)
          {
@@ -303,17 +303,17 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
 
      #region UPDATE
 
-     public async Task<BpjsWebServiceTemporaryDto> Handle(UpdateBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
+     public async Task<CompanyDto> Handle(UpdateCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDto.Adapt<BpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());
+             var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<CompanyDto>().Adapt<Company>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<BpjsWebServiceTemporaryDto>();
+             return result.Adapt<CompanyDto>();
          }
          catch (Exception)
          {
@@ -321,16 +321,16 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
          }
      }
 
-     public async Task<List<BpjsWebServiceTemporaryDto>> Handle(UpdateListBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
+     public async Task<List<CompanyDto>> Handle(UpdateListCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<BpjsWebServiceTemporary>>());
+             var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<Company>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<BpjsWebServiceTemporaryDto>>();
+             return result.Adapt<List<CompanyDto>>();
          }
          catch (Exception)
          {
@@ -342,23 +342,23 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteBpjsWebServiceTemporaryRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<BpjsWebServiceTemporary>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<BpjsWebServiceTemporary>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<Company>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetBpjsWebServiceTemporaryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -372,20 +372,20 @@ public class BpjsWebServiceTemporaryHandler(IUnitOfWork _unitOfWork, IMemoryCach
 }
 
  
-public class BulkValidateBpjsWebServiceTemporaryQuery(List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate) : IRequest<List<BpjsWebServiceTemporaryDto>>
+public class BulkValidateCompanyQuery(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
 {
-    public List<BpjsWebServiceTemporaryDto> BpjsWebServiceTemporarysToValidate { get; } = BpjsWebServiceTemporarysToValidate;
+    public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
 }a
 
 
-IRequestHandler<BulkValidateBpjsWebServiceTemporaryQuery, List<BpjsWebServiceTemporaryDto>>,
+IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
   
-IRequestHandler<GetBpjsWebServiceTemporaryQuery, (List<BpjsWebServiceTemporaryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDto>,
+IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
 
 
 
- var a = await Mediator.Send(new GetBpjsWebServiceTemporarysQuery
+ var a = await Mediator.Send(new GetCompanysQuery
  {
      OrderByList =
      [
@@ -397,10 +397,10 @@ IRequestHandler<GetSingleBpjsWebServiceTemporaryQuery, BpjsWebServiceTemporaryDt
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleBpjsWebServiceTemporaryQuery
+var patienss = (await Mediator.Send(new GetSingleCompanyQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new BpjsWebServiceTemporary
+    Select = x => new Company
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -413,41 +413,41 @@ var patienss = (await Mediator.Send(new GetSingleBpjsWebServiceTemporaryQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
+    var result = await Mediator.Send(new GetCompanyQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    BpjsWebServiceTemporarys = result.Item1;
+    Companys = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastBpjsWebServiceTemporary);
+    ex.HandleException(ToastCompany);
 }
 finally
 { 
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
+ var result = await Mediator.Send(new GetCompanyQuery
  {
      Predicate = x => x.CityId == cityId,
-     SearchTerm = refBpjsWebServiceTemporaryComboBox?.Text ?? "",
+     SearchTerm = refCompanyComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- BpjsWebServiceTemporarys = result.Item1;
- totalCountBpjsWebServiceTemporary = result.PageCount;
+ Companys = result.Item1;
+ totalCountCompany = result.PageCount;
 
- BpjsWebServiceTemporarys = (await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
+ Companys = (await Mediator.Send(new GetCompanyQuery
  {
-     Predicate = x => x.Id == BpjsWebServiceTemporaryForm.IdCardBpjsWebServiceTemporaryId,
+     Predicate = x => x.Id == CompanyForm.IdCardCompanyId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleBpjsWebServiceTemporarysQuery
+var data = (await Mediator.Send(new GetSingleCompanysQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -455,17 +455,17 @@ var data = (await Mediator.Send(new GetSingleBpjsWebServiceTemporarysQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new BpjsWebServiceTemporary
+    Select = x => new Company
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new BpjsWebServiceTemporary
+        Patient = new Company
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new BpjsWebServiceTemporary
+        Pratitioner = new Company
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -478,105 +478,106 @@ var data = (await Mediator.Send(new GetSingleBpjsWebServiceTemporarysQuery
 })) ?? new();
 
 
-#region ComboboxBpjsWebServiceTemporary
+#region ComboboxCompany
 
- private DxComboBox<BpjsWebServiceTemporaryDto, long?> refBpjsWebServiceTemporaryComboBox { get; set; }
- private int BpjsWebServiceTemporaryComboBoxIndex { get; set; } = 0;
- private int totalCountBpjsWebServiceTemporary = 0;
+ private DxComboBox<CompanyDto, long?> refCompanyComboBox { get; set; }
+ private List<CompanyDto> Companies { get; set; } = [];
+ private int CompanyComboBoxIndex { get; set; } = 0;
+ private int totalCountCompany = 0;
 
- private async Task OnSearchBpjsWebServiceTemporary()
+ private async Task OnSearchCompany()
  {
-     await LoadDataBpjsWebServiceTemporary();
+     await LoadDataCompany();
  }
 
- private async Task OnSearchBpjsWebServiceTemporaryIndexIncrement()
+ private async Task OnSearchCompanyIndexIncrement()
  {
-     if (BpjsWebServiceTemporaryComboBoxIndex < (totalCountBpjsWebServiceTemporary - 1))
+     if (CompanyComboBoxIndex < (totalCountCompany - 1))
      {
-         BpjsWebServiceTemporaryComboBoxIndex++;
-         await LoadDataBpjsWebServiceTemporary(BpjsWebServiceTemporaryComboBoxIndex, 10);
+         CompanyComboBoxIndex++;
+         await LoadDataCompany(CompanyComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchBpjsWebServiceTemporaryIndexDecrement()
+ private async Task OnSearchCompanyIndexDecrement()
  {
-     if (BpjsWebServiceTemporaryComboBoxIndex > 0)
+     if (CompanyComboBoxIndex > 0)
      {
-         BpjsWebServiceTemporaryComboBoxIndex--;
-         await LoadDataBpjsWebServiceTemporary(BpjsWebServiceTemporaryComboBoxIndex, 10);
+         CompanyComboBoxIndex--;
+         await LoadDataCompany(CompanyComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputBpjsWebServiceTemporaryChanged(string e)
+ private async Task OnInputCompanyChanged(string e)
  {
-     BpjsWebServiceTemporaryComboBoxIndex = 0;
-     await LoadDataBpjsWebServiceTemporary();
+     CompanyComboBoxIndex = 0;
+     await LoadDataCompany();
  }
 
  
-  private async Task LoadDataBpjsWebServiceTemporary(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
+          var result = await Mediator.Send(new GetCompanyQuery
           {
-              SearchTerm = refBpjsWebServiceTemporaryComboBox?.Text ?? "",
+              SearchTerm = refCompanyComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          BpjsWebServiceTemporarys = result.Item1;
-          totalCountBpjsWebServiceTemporary = result.PageCount;
+          Companies = result.Item1;
+          totalCountCompany = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastBpjsWebServiceTemporary);
+          ex.HandleException(ToastService);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxBpjsWebServiceTemporary
+ #endregion ComboboxCompany
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="BpjsWebServiceTemporary" ColSpanMd="12">
-    <MyDxComboBox Data="@BpjsWebServiceTemporarys"
-                  NullText="Select BpjsWebServiceTemporary"
-                  @ref="refBpjsWebServiceTemporaryComboBox"
-                  @bind-Value="@a.BpjsWebServiceTemporaryId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
+    <MyDxComboBox Data="@Companies"
+                  NullText="Select Company"
+                  @ref="refCompanyComboBox"
+                  @bind-Value="@a.CompanyId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputBpjsWebServiceTemporaryChanged(e))">
+                  TextChanged="((string e) => OnInputCompanyChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchBpjsWebServiceTemporaryIndexDecrement"
+            <DxEditorButton Click="OnSearchCompanyIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchBpjsWebServiceTemporary"
+            <DxEditorButton Click="OnSearchCompany"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchBpjsWebServiceTemporaryIndexIncrement"
+            <DxEditorButton Click="OnSearchCompanyIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(BpjsWebServiceTemporaryDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="BpjsWebServiceTemporary.Name" Caption="BpjsWebServiceTemporary" />
-            <DxListEditorColumn FieldName="@nameof(BpjsWebServiceTemporaryDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(CompanyDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
+            <DxListEditorColumn FieldName="@nameof(CompanyDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.BpjsWebServiceTemporaryId)" />
+    <ValidationMessage For="@(()=>a.CompanyId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDto.Adapt<CreateUpdateBpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());
-var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().AddAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<CreateUpdateBpjsWebServiceTemporaryDto>>().Adapt<List<BpjsWebServiceTemporary>>()); 
+var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());
+var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<CreateUpdateCompanyDto>>().Adapt<List<Company>>()); 
 
-var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDto.Adapt<CreateUpdateBpjsWebServiceTemporaryDto>().Adapt<BpjsWebServiceTemporary>());  
-var result = await _unitOfWork.Repository<BpjsWebServiceTemporary>().UpdateAsync(request.BpjsWebServiceTemporaryDtos.Adapt<List<CreateUpdateBpjsWebServiceTemporaryDto>>().Adapt<List<BpjsWebServiceTemporary>>());
+var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());  
+var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<CreateUpdateCompanyDto>>().Adapt<List<Company>>());
 
-list3 = (await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
+list3 = (await Mediator.Send(new GetCompanyQuery
 {
-    Predicate = x => BpjsWebServiceTemporaryNames.Contains(x.Name.ToLower()),
+    Predicate = x => CompanyNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new BpjsWebServiceTemporary
+    Select = x => new Company
     {
         Id = x.Id,
         Name = x.Name
@@ -586,47 +587,47 @@ list3 = (await Mediator.Send(new GetBpjsWebServiceTemporaryQuery
 
 #region Searching
 
-    private int pageSizeBpjsWebServiceTemporaryAttendance { get; set; } = 10;
-    private int totalCountBpjsWebServiceTemporaryAttendance = 0;
-    private int activePageIndexBpjsWebServiceTemporaryAttendance { get; set; } = 0;
-    private string searchTermBpjsWebServiceTemporaryAttendance { get; set; } = string.Empty;
+    private int pageSizeCompanyAttendance { get; set; } = 10;
+    private int totalCountCompanyAttendance = 0;
+    private int activePageIndexCompanyAttendance { get; set; } = 0;
+    private string searchTermCompanyAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedBpjsWebServiceTemporaryAttendance(string searchText)
+    private async Task OnSearchBoxChangedCompanyAttendance(string searchText)
     {
-        searchTermBpjsWebServiceTemporaryAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeBpjsWebServiceTemporaryAttendance);
+        searchTermCompanyAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeCompanyAttendance);
     }
 
-    private async Task OnpageSizeBpjsWebServiceTemporaryAttendanceIndexChanged(int newpageSizeBpjsWebServiceTemporaryAttendance)
+    private async Task OnpageSizeCompanyAttendanceIndexChanged(int newpageSizeCompanyAttendance)
     {
-        pageSizeBpjsWebServiceTemporaryAttendance = newpageSizeBpjsWebServiceTemporaryAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeBpjsWebServiceTemporaryAttendance);
+        pageSizeCompanyAttendance = newpageSizeCompanyAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeCompanyAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeBpjsWebServiceTemporaryAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeCompanyAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeBpjsWebServiceTemporaryAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeCompanyAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetBpjsWebServiceTemporaryAttendanceQuery
+        var result = await Mediator.Send(new GetCompanyAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeBpjsWebServiceTemporaryAttendance,
-            SearchTerm = searchTermBpjsWebServiceTemporaryAttendance,
+            PageSize = pageSizeCompanyAttendance,
+            SearchTerm = searchTermCompanyAttendance,
         });
-        BpjsWebServiceTemporaryAttendances = result.Item1;
-        totalCountBpjsWebServiceTemporaryAttendance = result.PageCount;
-        activePageIndexBpjsWebServiceTemporaryAttendance = pageIndex;
+        CompanyAttendances = result.Item1;
+        totalCountCompanyAttendance = result.PageCount;
+        activePageIndexCompanyAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastBpjsWebServiceTemporary);
+        ex.HandleException(ToastCompany);
     }
     finally { PanelVisible = false; }
 }

@@ -4,20 +4,45 @@ namespace McDermott.Application.Features.Commands.Inventory
 {
     public class InventoryAdjusmentCommand
     {
-        #region GET 
+        #region GET
 
-        public class GetInventoryAdjusmentQuery(Expression<Func<InventoryAdjusment, bool>>? predicate = null, bool removeCache = false) : IRequest<List<InventoryAdjusmentDto>>
+        public class GetSingleInventoryAdjusmentQuery : IRequest<InventoryAdjusmentDto>
         {
-            public Expression<Func<InventoryAdjusment, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-        } 
+            public List<Expression<Func<InventoryAdjusment, object>>> Includes { get; set; }
+            public Expression<Func<InventoryAdjusment, bool>> Predicate { get; set; }
+            public Expression<Func<InventoryAdjusment, InventoryAdjusment>> Select { get; set; }
+
+            public List<(Expression<Func<InventoryAdjusment, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetInventoryAdjusmentQuery : IRequest<(List<InventoryAdjusmentDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<InventoryAdjusment, object>>> Includes { get; set; }
+            public Expression<Func<InventoryAdjusment, bool>> Predicate { get; set; }
+            public Expression<Func<InventoryAdjusment, InventoryAdjusment>> Select { get; set; }
+
+            public List<(Expression<Func<InventoryAdjusment, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
         public class GetInventoryAdjusmentLogQuery(Expression<Func<InventoryAdjusmentLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<InventoryAdjustmentLogDto>>
         {
             public Expression<Func<InventoryAdjusmentLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion
+        #endregion GET
 
         #region CREATE
 

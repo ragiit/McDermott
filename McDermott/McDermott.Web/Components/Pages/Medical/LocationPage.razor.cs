@@ -238,9 +238,14 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetCompanyQuery(searchTerm: refCompaniesComboBox?.Text ?? "", pageSize: pageSize, pageIndex: pageIndex));
+                var result = await Mediator.Send(new GetCompanyQuery
+                {
+                    SearchTerm = refCompaniesComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 Companies = result.Item1;
-                totalCountCompanies = result.pageCount;
+                totalCountCompanies = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -406,12 +411,16 @@ namespace McDermott.Web.Components.Pages.Medical
                         IsGetAll = true,
                     })).Item1;
 
-                    list2 = (await Mediator.Send(new GetCompanyQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
-                      select: x => new Company
-                      {
-                          Id = x.Id,
-                          Name = x.Name
-                      }))).Item1;
+                    list2 = (await Mediator.Send(new GetCompanyQuery
+                    {
+                        Predicate = x => b.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                        Select = x => new Company
+                        {
+                            Id = x.Id,
+                            Name = x.Name
+                        }
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

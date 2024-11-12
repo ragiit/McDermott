@@ -688,6 +688,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                 var ax = SelectedServices.Select(x => x.Id).ToList();
                 UserForm.DoctorServiceIds?.AddRange(ax);
+                UserForm.DoctorServiceIds?.Distinct();
 
                 UserForm.Password = tempPassword;
 

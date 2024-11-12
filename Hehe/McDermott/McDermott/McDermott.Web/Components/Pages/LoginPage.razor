@@ -59,7 +59,9 @@
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Name)
+                new Claim(ClaimTypes.Name, user.Name),
+                    new Claim("TokenExpiration", DateTime.UtcNow.AddSeconds(10).ToString("o")) // Waktu kedaluwarsa token
+
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);

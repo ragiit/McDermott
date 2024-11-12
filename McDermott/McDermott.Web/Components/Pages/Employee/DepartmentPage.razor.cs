@@ -280,12 +280,16 @@ namespace McDermott.Web.Components.Pages.Employee
                             Id = x.Id,
                             Name = x.Name
                         }))).Item1;
-                    list2 = (await Mediator.Send(new GetCompanyQuery(x => companyNames.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new Company
+                    list2 = (await Mediator.Send(new GetCompanyQuery
+                    {
+                        Predicate = x => companyNames.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                        Select = x => new Company
                         {
                             Id = x.Id,
                             Name = x.Name
-                        }))).Item1;
+                        }
+                    })).Item1;
                     list3 = (await Mediator.Send(new GetUserQuery2(x => managerNames.Contains(x.Name.ToLower()), 0, 0,
                         select: x => new User
                         {
