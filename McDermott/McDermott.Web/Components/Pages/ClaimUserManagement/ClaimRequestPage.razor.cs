@@ -58,6 +58,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #region Variable Static
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
+        private bool VisibleButton { get; set; } = true;
         private bool FormValidationState { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
@@ -198,7 +199,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         {
             var result = await Mediator.Send(new GetUserQueryNew
             {
-                Predicate = x=>x.IsPatient== true,
+                Predicate = x => x.IsPatient == true,
                 SearchTerm = refPatientComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
@@ -350,15 +351,26 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-
+        private ClaimHistoryDto postClaimhistory = new();
         private async Task OnDone(ClaimRequestDto Data)
         {
-            if(Data.Id != 0)
+            var item = new ClaimRequestDto();
+            if (Data.Id != 0)
             {
                 Data.Status = EnumClaimRequestStatus.Done;
-                await Mediator.Send(new UpdateClaimRequestRequest(Data));
+                item = await Mediator.Send(new UpdateClaimRequestRequest(Data));
 
                 ToastService.ShowSuccess("Update Status Success");
+
+                postClaimhistory.PatientId = item.PatientId;
+                postClaimhistory.BenefitId = item.BenefitId;
+                postClaimhistory.PhycisianId = item.PhycisianId;
+                postClaimhistory.ClaimDate = item.ClaimDate;
+                postClaimhistory.ClaimedValue = 1;
+
+                await Mediator.Send(new CreateClaimHistoryRequest(postClaimhistory));
+
+
             }
 
             await LoadData();
@@ -374,6 +386,29 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion
 
         #region save
+        private async Task OnSave()
+        {
+            try
+            {
+                var item = new ClaimRequestDto();
+                if (PostClaimRequests.Id == 0)
+                {
+                    PostClaimRequests.Status = EnumClaimRequestStatus.Draft;
+                    item = await Mediator.Send(new CreateClaimRequestRequest(PostClaimRequests));
+                    ToastService.ShowSuccess($"Add Data Patient {item.Patient.Name} Success");
+                }
+                else
+                {
+                    item = await Mediator.Send(new UpdateClaimRequestRequest(PostClaimRequests));
+                    ToastService.ShowSuccess($"Update Data Patient {item.Patient.Name} Success");
+                }
+                await LoadData();
+            }
+            catch (Exception Ex)
+            {
+                Ex.HandleException(ToastService);
+            }
+        }
         #endregion
 
         #region Validasi
@@ -399,7 +434,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         }
 
-        public async Task<string> ValidateClaimRequest(long? patientId, long? benefitId)
+        public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
             // Dapatkan konfigurasi benefit
             var benefitConfig = await Mediator.Send(new GetSingleBenefitConfigurationQuery
@@ -408,18 +443,20 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             });
             if (benefitConfig == null)
             {
-                return "Benefit configuration not found.";
+                ToastService.ClearAll();
+                ToastService.ShowInfo("Benefit configuration not found.");
+                return;
             }
 
             // Dapatkan riwayat klaim pasien untuk benefit yang sama
             var lastClaims = await Mediator.Send(new GetSingleClaimHistoryQuery
             {
-                Predicate= c=>c.PatientId == patientId && c.BenefitId == benefitId,
+                Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,
                 OrderByList = [
                     (x=>x.ClaimDate, true)
                     ]
             });
-           
+
 
             // Cek apakah klaim melebihi durasi yang diizinkan
             if (lastClaims != null)
@@ -427,7 +464,10 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 var nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
                 if (DateTime.Now < nextEligibleDate)
                 {
-                    ToastService.ShowInfo($"Benefit Pasien hanya bisa diklaim lagi setelah {nextEligibleDate.ToShortDateString()}");
+                    ToastService.ClearAll();
+                    ToastService.ShowInfo($"Patient benefits can only be claimed again after {nextEligibleDate.ToString("dd MMMM yyyy")}");
+                    VisibleButton = false;
+                    return;
                 }
             }
 
@@ -437,20 +477,28 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 case ("Qty"):
                     if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
                     {
-                        return "Benefit Pasien Telah Habis untuk jumlah klaim yang diperbolehkan.";
+                        ToastService.ClearAll();
+                        ToastService.ShowInfo("Patient Benefits Have Been Exhausted for the number of claims allowed.");
+                        VisibleButton = false;
+                        return;
                     }
                     break;
 
                 case ("Amount"):
                     if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
                     {
-                        return "Benefit Pasien Telah Habis untuk nilai uang klaim yang diperbolehkan.";
+                        ToastService.ClearAll();
+                        ToastService.ShowInfo("Patient Benefit Has Been Exhausted for the value of the allowable claim money.");
+                        VisibleButton = false;
+                        return;
                     }
                     break;
             }
 
             // Jika validasi berhasil
-            return "Validasi berhasil. Klaim dapat diajukan.";
+            ToastService.ClearAll();
+            ToastService.ShowSuccess("Validation was successful. Claims can be filed.");
+            VisibleButton = true;
         }
 
         private DateTime CalculateNextEligibleDate(DateTime lastClaimDate, BenefitConfigurationDto benefitConfig)

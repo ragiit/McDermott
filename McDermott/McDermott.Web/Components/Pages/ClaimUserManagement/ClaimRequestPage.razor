@@ -23,6 +23,8 @@
                                     <MyGridPaginate @ref="Grid"
                                                     Data="GetClaimRequests"
                                                     @bind-SelectedDataItems="@SelectedDataItems"
+                                                    EditModelSaving="OnSave"
+                                                    EditFormButtonsVisible="@VisibleButton"
                                                     DataItemDeleting="OnDelete"
                                                     FocusedRowChanged="Grid_FocusedRowChanged"
                                                     KeyFieldName="Id">

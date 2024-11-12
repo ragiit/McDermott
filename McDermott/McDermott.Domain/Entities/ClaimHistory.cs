@@ -13,7 +13,7 @@ namespace McDermott.Domain.Entities
         public long? BenefitId { get; set; }
 
         public long? PatientId { get; set; }
-        public long? PyhicisianId { get; set; }
+        public long? PhycisianId { get; set; }
 
         public DateTime ClaimDate { get; set; }
 

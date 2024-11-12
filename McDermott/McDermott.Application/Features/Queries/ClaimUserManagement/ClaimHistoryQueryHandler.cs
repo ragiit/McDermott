@@ -150,7 +150,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         ClaimedValue = x.ClaimedValue,
                         PatientId = x.PatientId,
                         BenefitId = x.BenefitId,
-                        PyhicisianId = x.PyhicisianId,                        
+                        PhycisianId = x.PhycisianId,                        
                         Patient = new User
                         {
                             Name = x.Patient == null ? string.Empty : x.Patient.Name,
@@ -242,9 +242,14 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         ClaimedValue = x.ClaimedValue,
                         PatientId = x.PatientId,
                         BenefitId = x.BenefitId,
+                        PhycisianId = x.PhycisianId,
                         Patient = new User
                         {
                             Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                        },
+                        Phycisian = new User
+                        {
+                            Name = x.Phycisian == null ? string.Empty : x.Phycisian.Name,
                         },
                         Benefit = new BenefitConfiguration
                         {
