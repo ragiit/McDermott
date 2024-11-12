@@ -7,13 +7,18 @@ using FluentValidation.Results;
 using GreenDonut;
 using MailKit.Search;
 using McDermott.Application.Dtos.BpjsIntegration;
+using McDermott.Application.Dtos.ClaimUserManagement;
 using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
+using NuGet.Protocol.Plugins;
 using QuestPDF.Fluent;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
+using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
+using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
+using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimRequestCommand;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
@@ -87,8 +92,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         #region CPPT
 
         private IGrid GridCppt { get; set; }
+        private IGrid GridClaim { get; set; }
         private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = [];
+        private IReadOnlyList<object> SelectedDataItemsClaim { get; set; } = [];
         private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
+        private int FocusedGridTabClaimRowVisibleIndex { get; set; }
         private List<DiagnosisDto> Diagnoses = [];
         private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs = [];
         private List<NursingDiagnosesDto> NursingDiagnoses = [];
@@ -102,6 +110,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             await LoadDataCPPT();
         }
+
 
         #region Searching
 
@@ -240,6 +249,484 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         #endregion CPPT
 
+        #region Claim User
+
+        private List<ClaimRequestDto> GetClaimRequests { get; set; } = [];
+        private List<UserDto> GetPatient { get; set; } = [];
+        private List<UserDto> GetPhycisian { get; set; } = [];
+        private List<BenefitConfigurationDto> GetBenefitConfigurations { get; set; } = [];
+        private ClaimRequestDto PostClaimRequests = new();
+        private ClaimHistoryDto postClaimhistory = new();
+        private int FocusedRowVisibleClaimIndex { get; set; }
+        private bool VisibleButton { get; set; } = true;
+        private bool PanelVisibleClaim { get; set; } = false;
+
+        private async Task OnClickTabClaim()
+        {
+            
+            await LoadDataBenefit();
+            await LoadDataPatients();
+            await LoadDataPhycisian();
+            await LoadDataClaim();
+
+        }
+        private void GridClaim_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleClaimIndex = args.VisibleIndex;
+        }
+        #region Searching
+
+        private int pageSizeGridClaim { get; set; } = 10;
+        private int totalCountGridClaim = 0;
+        private int activePageIndexTotalCountGridClaim { get; set; } = 0;
+        private string searchTermGridClaim { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedGridClaim(string searchText)
+        {
+            searchTermGridClaim = searchText;
+            await LoadDataClaim(0, pageSizeGridClaim);
+        }
+
+        private async Task OnpageSizeGridClaimIndexChangedGridClaim(int newpageSizeGridClaim)
+        {
+            pageSizeGridClaim = newpageSizeGridClaim;
+            await LoadDataClaim(0, newpageSizeGridClaim);
+        }
+
+        private async Task OnPageIndexChangedGridClaim(int newPageIndex)
+        {
+            await LoadDataClaim(newPageIndex, pageSizeGridClaim);
+        }
+
+        #endregion Searching
+
+        #region LoadData
+        private async Task LoadDataClaim(int pageIndex = 0, int pageSizeGridClaim = 10)
+        {
+            try
+            {
+                PanelVisibleClaim = true;
+                SelectedDataItemsClaim = [];
+                var ab = await Mediator.Send(new GetClaimRequestQuery
+                {
+                    SearchTerm = searchTermGridClaim ?? "",
+                    Predicate = x => x.PatientId == GeneralConsultanService.PatientId
+                });
+                GetClaimRequests = ab.Item1;
+                totalCountGridClaim = ab.PageCount;
+                activePageIndexTotalCountGridClaim = pageIndex;
+                
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisibleClaim = false; }
+        }
+        #endregion
+        #region Click
+        private async Task NewItemClaim_Click()
+        {
+            await GridClaim.StartEditNewRowAsync();
+            
+        }
+
+        private async Task EditItemClaim_Click()
+        {
+            await GridClaim.StartEditRowAsync(FocusedRowVisibleClaimIndex);
+        }
+
+        private void DeleteItemClaim_Click()
+        {
+            GridClaim.ShowRowDeleteConfirmation(FocusedRowVisibleClaimIndex);
+        }
+
+        private async Task RefreshClaim_Click()
+        {
+            await LoadDataClaim();
+        }
+        private async Task OnDeleteClaim(GridDataItemDeletingEventArgs e)
+        {
+            try
+            {
+                PanelVisibleClaim = true;
+                if (SelectedDataItemsClaim == null || !SelectedDataItemsClaim.Any())
+                {
+                    await Mediator.Send(new DeleteClaimRequestRequest(((ClaimRequestDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var countriesToDelete = SelectedDataItemsClaim.Adapt<List<ClaimRequestDto>>();
+                    await Mediator.Send(new DeleteClaimRequestRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
+                }
+
+                SelectedDataItemsClaim = [];
+                await LoadDataClaim();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisibleClaim = false; }
+        }
+
+        private async Task OnSaveClaim()
+        {
+            try
+            {
+                var item = new ClaimRequestDto();
+                if (PostClaimRequests.Id == 0)
+                {
+                    PostClaimRequests.Status = EnumClaimRequestStatus.Draft;
+                    item = await Mediator.Send(new CreateClaimRequestRequest(PostClaimRequests));
+                    ToastService.ShowSuccess($"Add Data Patient {item.Patient.Name} Success");
+                }
+                else
+                {
+                    item = await Mediator.Send(new UpdateClaimRequestRequest(PostClaimRequests));
+                    ToastService.ShowSuccess($"Update Data Patient {item.Patient.Name} Success");
+                }
+                await LoadDataClaim();
+            }
+            catch (Exception Ex)
+            {
+                Ex.HandleException(ToastService);
+            }
+        }
+        private async Task OnDone(ClaimRequestDto Data)
+        {
+            var item = new ClaimRequestDto();
+            if (Data.Id != 0)
+            {
+                Data.Status = EnumClaimRequestStatus.Done;
+                item = await Mediator.Send(new UpdateClaimRequestRequest(Data));
+
+                ToastService.ShowSuccess("Update Status Success");
+
+                postClaimhistory.PatientId = item.PatientId;
+                postClaimhistory.BenefitId = item.BenefitId;
+                postClaimhistory.PhycisianId = item.PhycisianId;
+                postClaimhistory.ClaimDate = item.ClaimDate;
+                postClaimhistory.ClaimedValue = 1;
+
+                await Mediator.Send(new CreateClaimHistoryRequest(postClaimhistory));
+
+
+            }
+
+            await LoadDataClaim();
+        }
+        private async Task cekValidasi(BenefitConfigurationDto data)
+        {
+            if (data is not null)
+            {
+                if (PostClaimRequests.PatientId is null)
+                {
+                    PostClaimRequests.BenefitId = null;
+                    ToastService.ClearAll();
+                    ToastService.ShowInfo("Patient is not null");
+                    return;
+                }
+                PostClaimRequests.BenefitId = data.Id;
+
+                await ValidateClaimRequest(PostClaimRequests.PatientId, PostClaimRequests.BenefitId);
+            }
+            else
+            {
+                PostClaimRequests.BenefitId = null;
+            }
+
+        }
+
+        public async Task ValidateClaimRequest(long? patientId, long? benefitId)
+        {
+            // Dapatkan konfigurasi benefit
+            var benefitConfig = await Mediator.Send(new GetSingleBenefitConfigurationQuery
+            {
+                Predicate = x => x.Id == benefitId,
+            });
+            if (benefitConfig == null)
+            {
+                ToastService.ClearAll();
+                ToastService.ShowInfo("Benefit configuration not found.");
+                return;
+            }
+
+            // Dapatkan riwayat klaim pasien untuk benefit yang sama
+            var lastClaims = await Mediator.Send(new GetSingleClaimHistoryQuery
+            {
+                Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,
+                OrderByList = [
+                    (x=>x.ClaimDate, true)
+                    ]
+            });
+
+
+            // Cek apakah klaim melebihi durasi yang diizinkan
+            if (lastClaims != null)
+            {
+                var nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
+                if (DateTime.Now < nextEligibleDate)
+                {
+                    ToastService.ClearAll();
+                    ToastService.ShowInfo($"Patient benefits can only be claimed again after {nextEligibleDate.ToString("dd MMMM yyyy")}");
+                    VisibleButton = false;
+                    return;
+                }
+            }
+
+            // Validasi berdasarkan jenis benefit
+            switch (benefitConfig.TypeOfBenefit)
+            {
+                case ("Qty"):
+                    if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
+                    {
+                        ToastService.ClearAll();
+                        ToastService.ShowInfo("Patient Benefits Have Been Exhausted for the number of claims allowed.");
+                        VisibleButton = false;
+                        return;
+                    }
+                    break;
+
+                case ("Amount"):
+                    if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
+                    {
+                        ToastService.ClearAll();
+                        ToastService.ShowInfo("Patient Benefit Has Been Exhausted for the value of the allowable claim money.");
+                        VisibleButton = false;
+                        return;
+                    }
+                    break;
+            }
+
+            // Jika validasi berhasil
+            ToastService.ClearAll();
+            ToastService.ShowSuccess("Validation was successful. Claims can be filed.");
+            VisibleButton = true;
+        }
+
+        private DateTime CalculateNextEligibleDate(DateTime lastClaimDate, BenefitConfigurationDto benefitConfig)
+        {
+            int duration = benefitConfig.BenefitDuration.GetValueOrDefault();
+
+            return benefitConfig.DurationOfBenefit switch
+            {
+                "Days" => lastClaimDate.AddDays(duration),
+                "Months" => lastClaimDate.AddMonths(duration),
+                "Years" => lastClaimDate.AddYears(duration),
+                _ => lastClaimDate
+            };
+        }
+
+
+
+        public MarkupString GetIssueStatusIconHtml(EnumClaimRequestStatus? status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case EnumClaimRequestStatus.Draft:
+                    priorityClass = "info";
+                    title = "Draft";
+                    break;
+
+                case EnumClaimRequestStatus.Done:
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+
+                //case EnumClaimRequestStatus.Active:
+                //    priorityClass = "success";
+                //    title = "Active";
+                //    break;
+
+                //case EnumClaimRequestStatus.InActive:
+                //    priorityClass = "danger";
+                //    title = "InActive";
+                //    break;
+
+                default:
+                    return new MarkupString("");
+            }
+            string html = $"<div class='row '><div class='col-3'>" +
+                         $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+
+        #region ComboBox
+        #region ComboBox Patient
+
+        private DxComboBox<UserDto, long?> refPatientsComboBox { get; set; }
+        private int PatientsComboBoxIndex { get; set; } = 0;
+        private int totalCountPatients = 0;
+
+        private async Task OnSearchPatients()
+        {
+            await LoadDataPatient(0, 10);
+        }
+
+        private async Task OnSearchPatientsIndexIncrement()
+        {
+            if (PatientsComboBoxIndex < (totalCountPatients - 1))
+            {
+                PatientsComboBoxIndex++;
+                await LoadDataPatients(PatientsComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchPatientsIndexDecrement()
+        {
+            if (PatientsComboBoxIndex > 0)
+            {
+                PatientsComboBoxIndex--;
+                await LoadDataPatients(PatientsComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputPatientsChanged(string e)
+        {
+            PatientsComboBoxIndex = 0;
+            await LoadDataPatients(0, 10);
+        }
+
+        private async Task LoadDataPatients(int pageIndex = 0, int pageSize = 10)
+        {
+            var result = await Mediator.Send(new GetUserQueryNew
+            {
+                Predicate = x => x.IsPatient == true,
+                SearchTerm = refPatientComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Select = x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth
+                }
+            });
+            GetPatient = result.Item1;
+            totalCountGridClaim = result.PageCount;
+        }
+
+        #endregion ComboBox Patient
+
+        #region ComboBox Benefit
+
+        private DxComboBox<BenefitConfigurationDto, long?> refBenefitComboBox { get; set; }
+        private int BenefitComboBoxIndex { get; set; } = 0;
+        private int totalCountBenefit = 0;
+
+        private async Task OnSearchBenefit()
+        {
+            await LoadDataBenefit(0, 10);
+        }
+
+        private async Task OnSearchBenefitIndexIncrement()
+        {
+            if (BenefitComboBoxIndex < (totalCountBenefit - 1))
+            {
+                BenefitComboBoxIndex++;
+                await LoadDataBenefit(BenefitComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchBenefitIndexDecrement()
+        {
+            if (BenefitComboBoxIndex > 0)
+            {
+                BenefitComboBoxIndex--;
+                await LoadDataBenefit(BenefitComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputBenefitChanged(string e)
+        {
+            BenefitComboBoxIndex = 0;
+            await LoadDataBenefit(0, 10);
+        }
+
+        private async Task LoadDataBenefit(int pageIndex = 0, int pageSize = 10)
+        {
+            var result = await Mediator.Send(new GetBenefitConfigurationQuery
+            {
+                SearchTerm = refBenefitComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            });
+            GetBenefitConfigurations = result.Item1;
+            totalCountGridClaim = result.PageCount;
+        }
+
+        #endregion
+
+        #region ComboBox Phycisian
+
+        private DxComboBox<UserDto, long?> refPhycisianComboBox { get; set; }
+        private int PhycisianComboBoxIndex { get; set; } = 0;
+        private int totalCountPhycisian = 0;
+
+        private async Task OnSearchPhycisian()
+        {
+            await LoadDataPhycisian(0, 10);
+        }
+
+        private async Task OnSearchPhycisianIndexIncrement()
+        {
+            if (PhycisianComboBoxIndex < (totalCountPhycisian - 1))
+            {
+                PhycisianComboBoxIndex++;
+                await LoadDataPhycisian(PhycisianComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnSearchPhycisianIndexDecrement()
+        {
+            if (PhycisianComboBoxIndex > 0)
+            {
+                PhycisianComboBoxIndex--;
+                await LoadDataPhycisian(PhycisianComboBoxIndex, 10);
+            }
+        }
+
+        private async Task OnInputPhycisianChanged(string e)
+        {
+            PhycisianComboBoxIndex = 0;
+            await LoadDataPhycisian(0, 10);
+        }
+
+        private async Task LoadDataPhycisian(int pageIndex = 0, int pageSize = 10)
+        {
+            var result = await Mediator.Send(new GetUserQueryNew
+            {
+                Predicate = x => x.IsPhysicion == true && x.IsDoctor == true,
+                SearchTerm = refPhycisianComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                Select = x => new User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth
+                }
+            });
+            GetPhycisian = result.Item1;
+            totalCountGridClaim = result.PageCount;
+        }
+
+        #endregion
+
+        #endregion
+        #endregion
+        #endregion
         private void KeyPressHandler(KeyboardEventArgs args)
         {
             if (args.Key == "Enter")
@@ -252,6 +739,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             PanelVisible = true;
             await GetUserInfo();
+
             await LoadData();
 
             PanelVisible = false;

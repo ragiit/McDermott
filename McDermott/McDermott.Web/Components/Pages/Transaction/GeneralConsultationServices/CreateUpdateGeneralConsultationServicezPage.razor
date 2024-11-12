@@ -1,5 +1,6 @@
 ﻿@page "/clinic-service/general-consultation-services/{PageMode}"
 
+@using McDermott.Application.Dtos.ClaimUserManagement
 @using McDermott.Web.Components.Layout
 @using McDermott.Web.Components.Popups
 @rendermode InteractiveServer
@@ -1176,9 +1177,9 @@
                                                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="12">
                                                                                         @if (GeneralConsultanService.ReferDateVisit.HasValue)
                                                                                         {
-                                                                                        <label>@GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")</label>
+                                                                                            <label>@GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")</label>
                                                                                         }
-                                                                                        else 
+                                                                                        else
                                                                                         {
                                                                                             <label>-</label>
                                                                                         }
@@ -1186,6 +1187,219 @@
                                                                                 </DxFormLayout>
                                                                             </div>
 
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </DxTabPage>
+                                                        <DxTabPage Text="Claim Request" Click="OnClickTabClaim">
+                                                            <div class="w-100 mt-2">
+                                                                <div class="card w-100">
+                                                                    <div class="card-header">
+                                                                        <span class="fw-bolder">Claim Request</span>
+                                                                    </div>
+
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-12 w-100">
+                                                                            <DxFormLayout CssClass="w-100">
+                                                                                <DxLoadingPanel @bind-Visible="PanelVisibleClaim"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGridPaginate @ref="GridClaim"
+                                                                                                    Data="GetClaimRequests"
+                                                                                                    @bind-SelectedDataItems="@SelectedDataItemsClaim"
+                                                                                                    EditModelSaving="OnSaveClaim"
+                                                                                                    EditFormButtonsVisible="@VisibleButton"
+                                                                                                    DataItemDeleting="OnDeleteClaim"
+                                                                                                    FocusedRowChanged="GridClaim_FocusedRowChanged"
+                                                                                                    KeyFieldName="Id">
+
+                                                                                        <ToolbarTemplate>
+                                                                                            <MyDxToolbarBase TItem="ClaimRequestDto"
+                                                                                                             Items="@GetClaimRequests"
+                                                                                                             Grid="GridClaim"
+                                                                                                             SelectedDataItems="@SelectedDataItemsClaim"
+                                                                                                             NewItem_Click="@NewItemClaim_Click"
+                                                                                                             EditItem_Click="@(async () => await EditItemClaim_Click())"
+                                                                                                             DeleteItem_Click="@DeleteItemClaim_Click"
+                                                                                                             Refresh_Click="@RefreshClaim_Click"
+                                                                                                             IsImport="false"
+                                                                                                             IsExport="false"
+                                                                                                             VisibleNew="UserAccessCRUID.IsCreate"
+                                                                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
+
+                                                                                        </ToolbarTemplate>
+                                                                                        <Columns>
+                                                                                            <DxGridSelectionColumn Width="30px" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Phycisian.Name" Caption="Phycisian Name" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Benefit.BenefitName" Caption="Benefit Name" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Remark" Caption="Remark" />
+                                                                                            <DxGridDataColumn FieldName="Status" MinWidth="100" Width="auto" Caption="Status">
+                                                                                                <CellDisplayTemplate>
+                                                                                                    @GetIssueStatusIconHtml((context.DataItem as ClaimRequestDto).Status)
+                                                                                                </CellDisplayTemplate>
+                                                                                            </DxGridDataColumn>
+                                                                                            <DxGridDataColumn FieldName="Id" MinWidth="200" AllowSort="false" Width="auto" TextAlignment="GridTextAlignment.Center">
+                                                                                                <CellDisplayTemplate>
+                                                                                                    @{
+                                                                                                        var dataItem = (context.DataItem as ClaimRequestDto);
+                                                                                                    }
+
+                                                                                                    @if (dataItem.Status == EnumClaimRequestStatus.Draft)
+                                                                                                    {
+                                                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success"
+                                                                                                                  title="Done"
+                                                                                                                  Text="Done"
+                                                                                                                  IconCssClass="fa-solid fa-check"
+                                                                                                                  Click="@(() => OnDone(dataItem))"
+                                                                                                                  CssClass="btn-icon-undo me-1" />
+                                                                                                    }
+
+                                                                                                </CellDisplayTemplate>
+                                                                                                <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                                                                                            </DxGridDataColumn>
+                                                                                        </Columns>
+                                                                                        <TotalSummary>
+                                                                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                                                               FieldName="ClaimDate"
+                                                                                                               Visible="true" />
+                                                                                        </TotalSummary>
+                                                                                        <EditFormTemplate Context="EditFormContext">
+                                                                                            @{
+                                                                                                PostClaimRequests = (ClaimRequestDto)EditFormContext.EditModel;
+                                                                                                PostClaimRequests.PatientId = GeneralConsultanService.PatientId;
+                                                                                                PostClaimRequests.PhycisianId = GeneralConsultanService.PratitionerId;
+                                                                                            }
+                                                                                            <DxFormLayout CssClass="w-100">
+                                                                                                <DxFormLayoutItem Caption="Patient" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                                                    <MyDxComboBox Data="@GetPatient"
+                                                                                                                  NullText="Select Patient"
+                                                                                                                  @ref="refPatientsComboBox"
+                                                                                                                  @bind-Value="@PostClaimRequests.PatientId"
+                                                                                                                  TextFieldName="Name"
+                                                                                                                  ValueFieldName="Id"
+                                                                                                                  TextChanged="((string e) => OnInputPatientsChanged(e))">
+                                                                                                        <Buttons>
+                                                                                                            <DxEditorButton Click="OnSearchPatientsIndexDecrement"
+                                                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                                                            Tooltip="Previous Index" />
+                                                                                                            <DxEditorButton Click="OnSearchPatients"
+                                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                            Tooltip="Search" />
+                                                                                                            <DxEditorButton Click="OnSearchPatientsIndexIncrement"
+                                                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                                                            Tooltip="Next Index" />
+                                                                                                        </Buttons>
+                                                                                                        <Columns>
+                                                                                                            <DxListEditorColumn FieldName="@nameof(User.Name)" Caption="Name" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(User.Email)" Caption="Email" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(User.MobilePhone)" Caption="Phone Number" />
+                                                                                                        </Columns>
+                                                                                                    </MyDxComboBox>
+                                                                                                    <ValidationMessage For="@(()=>PostClaimRequests.PatientId)" />
+                                                                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem Caption="Phycisian" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                                                    <MyDxComboBox Data="@GetPhycisian"
+                                                                                                                  NullText="Select Phycisian"
+                                                                                                                  @ref="refPhycisianComboBox"
+                                                                                                                  @bind-Value="@PostClaimRequests.PhycisianId"
+                                                                                                                  TextFieldName="Name"
+                                                                                                                  ValueFieldName="Id"
+                                                                                                                  TextChanged="((string e) => OnInputPhycisianChanged(e))">
+                                                                                                        <Buttons>
+                                                                                                            <DxEditorButton Click="OnSearchPhycisianIndexDecrement"
+                                                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                                                            Tooltip="Previous Index" />
+                                                                                                            <DxEditorButton Click="OnSearchPhycisian"
+                                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                            Tooltip="Search" />
+                                                                                                            <DxEditorButton Click="OnSearchPhycisianIndexIncrement"
+                                                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                                                            Tooltip="Next Index" />
+                                                                                                        </Buttons>
+                                                                                                        <Columns>
+                                                                                                            <DxListEditorColumn FieldName="@nameof(User.Name)" Caption="Name" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(User.Email)" Caption="Email" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(User.MobilePhone)" Caption="Phone Number" />
+                                                                                                        </Columns>
+                                                                                                    </MyDxComboBox>
+                                                                                                    <ValidationMessage For="@(()=>PostClaimRequests.PhycisianId)" />
+                                                                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem Caption="Benefit" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                                                    <MyDxComboBox Data="@GetBenefitConfigurations"
+                                                                                                                  NullText="Select Benefit"
+                                                                                                                  @ref="refBenefitComboBox"
+                                                                                                                  @bind-Value="@PostClaimRequests.BenefitId"
+                                                                                                                  SelectedItemChanged="@((BenefitConfigurationDto data)=>cekValidasi(data))"
+                                                                                                                  TextFieldName="BenefitName"
+                                                                                                                  ValueFieldName="Id"
+                                                                                                                  TextChanged="((string e) => OnInputBenefitChanged(e))">
+                                                                                                        <Buttons>
+                                                                                                            <DxEditorButton Click="OnSearchBenefitIndexDecrement"
+                                                                                                                            IconCssClass="fa-solid fa-caret-left"
+                                                                                                                            Tooltip="Previous Index" />
+                                                                                                            <DxEditorButton Click="OnSearchBenefit"
+                                                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                                                            Tooltip="Search" />
+                                                                                                            <DxEditorButton Click="OnSearchBenefitIndexIncrement"
+                                                                                                                            IconCssClass="fa-solid fa-caret-right"
+                                                                                                                            Tooltip="Next Index" />
+                                                                                                        </Buttons>
+                                                                                                        <Columns>
+
+                                                                                                            <DxListEditorColumn FieldName="@nameof(BenefitConfiguration.BenefitName)" Caption="Name" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(BenefitConfiguration.TypeOfBenefit)" Caption="Type Benefit" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(BenefitConfiguration.BenefitValue)" Caption="Value Benefit" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(BenefitConfiguration.DurationOfBenefit)" Caption="Duration" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(BenefitConfiguration.BenefitDuration)" Caption="Value Duration" />
+                                                                                                            <DxListEditorColumn FieldName="@nameof(BenefitConfiguration.IsEmployee)" Caption="Is Employee" />
+                                                                                                        </Columns>
+
+                                                                                                    </MyDxComboBox>
+                                                                                                    <ValidationMessage For="@(()=>PostClaimRequests.BenefitId)" />
+                                                                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem Caption="Date" CaptionCssClass="normal-caption" ColSpanMd="6">
+                                                                                                    <DxDateEdit @bind-Date="@PostClaimRequests.ClaimDate"></DxDateEdit>
+                                                                                                </DxFormLayoutItem>
+                                                                                                <DxFormLayoutItem Caption="Remark" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                                    <DxMemo @bind-Text="@PostClaimRequests.Remark" NullText="Input Remark in Here"></DxMemo>
+                                                                                                </DxFormLayoutItem>
+                                                                                            </DxFormLayout>
+                                                                                        </EditFormTemplate>
+                                                                                    </MyGridPaginate>
+                                                                                    <div class="row">
+                                                                                        <DxFormLayout>
+                                                                                            <div class="col-md-9">
+                                                                                                <DxFormLayoutItem>
+                                                                                                    <DxPager PageCount="totalCountGridClaim"
+                                                                                                             ActivePageIndexChanged="OnPageIndexChangedGridClaim"
+                                                                                                             ActivePageIndex="activePageIndexTotalCountGridClaim"
+                                                                                                             VisibleNumericButtonCount="10"
+                                                                                                             SizeMode="SizeMode.Medium"
+                                                                                                             NavigationMode="PagerNavigationMode.Auto">
+                                                                                                    </DxPager>
+                                                                                                </DxFormLayoutItem>
+                                                                                            </div>
+                                                                                            <div class="col-md-3 d-flex justify-content-end">
+                                                                                                <DxFormLayoutItem Caption="Page Size:">
+                                                                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                                                                  NullText="Select Page Size"
+                                                                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                                                                  SelectedItemChanged="((int e ) => OnpageSizeGridClaimIndexChangedGridClaim(e))"
+                                                                                                                  @bind-Value="pageSizeGridClaim">
+                                                                                                    </MyDxComboBox>
+                                                                                                </DxFormLayoutItem>
+                                                                                            </div>
+                                                                                        </DxFormLayout>
+                                                                                    </div>
+                                                                                </DxLoadingPanel>
+                                                                            </DxFormLayout>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1264,15 +1478,15 @@
                                                                                                             priorityClass = "warning";
                                                                                                             title = "Waiting";
                                                                                                             break;
-                                                                                                            
+
                                                                                                         case EnumStatusGeneralConsultantService.Physician:
                                                                                                             priorityClass = "primary";
                                                                                                             title = "Physician";
-                                                                                                            break; 
+                                                                                                            break;
                                                                                                         case EnumStatusGeneralConsultantService.Finished:
                                                                                                             priorityClass = "success";
                                                                                                             title = "Finished";
-                                                                                                            break; 
+                                                                                                            break;
                                                                                                         case EnumStatusGeneralConsultantService.Canceled:
                                                                                                             priorityClass = "danger";
                                                                                                             title = "Canceled";
@@ -1297,14 +1511,14 @@
                                                                                                 </div>
 
                                                                                                 @* <div class="row w-100">
-                                                                                                    <div class="col-md-2">
-                                                                                                        Destination
-                                                                                                    </div>
+                                                                                <div class="col-md-2">
+                                                                                Destination
+                                                                                </div>
 
-                                                                                                    <div class="col-md-10">
-                                                                                                        : @item.Source?.Name
-                                                                                                    </div>
-                                                                                                </div> *@
+                                                                                <div class="col-md-10">
+                                                                                : @item.Source?.Name
+                                                                                </div>
+                                                                                </div> *@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>

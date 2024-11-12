@@ -1,4 +1,6 @@
-﻿using McDermott.Application.Dtos.ClaimUserManagement;
+﻿using McDermott.Application.Dtos.AwarenessEvent;
+using McDermott.Application.Dtos.ClaimUserManagement;
+using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimRequestCommand;
@@ -379,9 +381,29 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion
 
         #region Delete
-        private async Task OnDelete()
+        private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
+            try
+            {
+                PanelVisible = true;
+                if (SelectedDataItems == null || !SelectedDataItems.Any())
+                {
+                    await Mediator.Send(new DeleteClaimRequestRequest(((ClaimRequestDto)e.DataItem).Id));
+                }
+                else
+                {
+                    var countriesToDelete = SelectedDataItems.Adapt<List<ClaimRequestDto>>();
+                    await Mediator.Send(new DeleteClaimRequestRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
+                }
 
+                SelectedDataItems = [];
+                await LoadData(activePageIndex, pageSize);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
         #endregion
 
