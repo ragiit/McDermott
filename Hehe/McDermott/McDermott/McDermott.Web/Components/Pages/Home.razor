@@ -1,0 +1,35 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+ 
+<Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+    <Authorized>
+        <h1>@context.User.Identity.Name</h1>
+    </Authorized>
+    <NotAuthorized>
+        Asu
+    </NotAuthorized>
+</Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+
+@code {
+    private System.Security.Claims.ClaimsPrincipal? user;
+
+    [CascadingParameter]
+    private Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationStateProvider != null)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            user = authState.User;
+        }
+        else
+        {
+            // Handle case where AuthenticationStateProvider is not available
+            Console.WriteLine("AuthenticationStateProvider is null");
+        }
+    }
+}
