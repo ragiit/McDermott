@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
 
 namespace McDermott.Application.Features.Queries.ClaimUserManagement
@@ -12,6 +13,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
     public class ClaimHistoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetAllClaimHistoryQuery, List<ClaimHistoryDto>>,//ClaimHistory
         IRequestHandler<GetClaimHistoryQuery, (List<ClaimHistoryDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetClaimHistoryCountQuery, int>,
         IRequestHandler<GetSingleClaimHistoryQuery, ClaimHistoryDto>, IRequestHandler<ValidateClaimHistoryQuery, bool>,
         IRequestHandler<BulkValidateClaimHistoryQuery, List<ClaimHistoryDto>>,
         IRequestHandler<CreateClaimHistoryRequest, ClaimHistoryDto>,
@@ -21,7 +23,22 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
         IRequestHandler<DeleteClaimHistoryRequest, bool>
     {
         #region GET Education Program
+        public async Task<int> Handle(GetClaimHistoryCountQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = await _unitOfWork.Repository<ClaimHistory>().Entities
+                   .AsNoTracking()
+                   .Where(request.Predicate)
+                   .CountAsync(cancellationToken);
 
+                return query;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async Task<List<ClaimHistoryDto>> Handle(GetAllClaimHistoryQuery request, CancellationToken cancellationToken)
         {
             try
@@ -133,9 +150,14 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         ClaimedValue = x.ClaimedValue,
                         PatientId = x.PatientId,
                         BenefitId = x.BenefitId,
+                        PyhicisianId = x.PyhicisianId,                        
                         Patient = new User
                         {
                             Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                        },
+                        Phycisian = new User
+                        {
+                            Name = x.Phycisian == null ? string.Empty : x.Phycisian.Name,
                         },
                         Benefit = new BenefitConfiguration
                         {

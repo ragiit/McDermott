@@ -47,6 +47,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         }
 
         #endregion UserLoginAndAccessRole
+
         #region Relation Data
         private List<BenefitConfigurationDto> GetBenefitConfigurations { get; set; } = [];
         private BenefitConfigurationDto PostBenefitConfigurations = new();
@@ -58,6 +59,40 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         private bool FormValidationState { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        #region Enum Status
+        public MarkupString GetIssueStatusIconHtml(EnumBenefitStatus? status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case EnumBenefitStatus.Draft:
+                    priorityClass = "info";
+                    title = "Draft";
+                    break;
+
+                case EnumBenefitStatus.Active:
+                    priorityClass = "success";
+                    title = "Active";
+                    break;
+
+
+                case EnumBenefitStatus.InActive:
+                    priorityClass = "danger";
+                    title = "InActive";
+                    break;
+
+                default:
+                    return new MarkupString("");
+            }
+            string html = $"<div class='row '><div class='col-3'>" +
+                         $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+        #endregion
         #endregion
 
         #region Searching
@@ -264,9 +299,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
-        private async Task onActive()
+        private async Task onActive(BenefitConfigurationDto? data)
         {
-            var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
+          
             if (data.Id == 0)
             {
                 ToastService.ShowError("Data Not Found. Try Check Again!");
@@ -280,9 +315,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             await LoadData();
         }
 
-        private async Task onInActive()
+        private async Task onInActive(BenefitConfigurationDto? data)
         {
-            var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
+            //var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
             if (data.Id == 0)
             {
                 ToastService.ShowError("Data Not Found. Try Check Again!");
@@ -296,9 +331,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             await LoadData();
         }
 
-        private async Task sendToDraft()
+        private async Task sendToDraft(BenefitConfigurationDto? data)
         {
-            var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
+            //var data = SelectedDataItems[0].Adapt<BenefitConfigurationDto>();
             if (data.Id == 0)
             {
                 ToastService.ShowError("Data Not Found. Try Check Again!");
@@ -341,6 +376,8 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                     data = await Mediator.Send(new UpdateBenefitConfigurationRequest(PostBenefitConfigurations));
                     ToastService.ShowSuccess($"Update Data Benefit Name {data.BenefitName} Success");
                 }
+
+                await LoadData();
             }
             catch (Exception ex)
             {

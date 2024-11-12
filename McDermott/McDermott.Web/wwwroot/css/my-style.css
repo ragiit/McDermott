@@ -112,6 +112,23 @@
         background-color: #e0e0e0;
     }
 
+.btn-icon-undo {
+    width: 5em;
+    height: 2em;
+    opacity: 0.8;
+}
+
+.btn-icon-redo {
+    width: 6em;
+    height: 2em;
+    opacity: 0.8;
+}
+.btn-icon-draft {
+    width: 8em;
+    height: 2em;
+    opacity: 0.8;
+}
+
 .dxbl-btn-standalone {
     border-radius: 10px !important;
     padding-inline-start: 25px !important;
@@ -154,4 +171,9 @@
 .drop-file-label {
     font-weight: 500;
     font-size: 1rem;
+}
+
+.small-button {
+    padding: 2px 8px;
+    font-size: 0.8rem;
 }

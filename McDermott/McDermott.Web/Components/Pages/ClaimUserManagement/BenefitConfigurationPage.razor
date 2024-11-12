@@ -2,6 +2,7 @@
 @using McDermott.Application.Dtos.AwarenessEvent
 @using McDermott.Application.Dtos.ClaimUserManagement
 @rendermode InteractiveServer
+<PageTitle>McHealtCare - Benefit Configuration</PageTitle>
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
@@ -12,37 +13,47 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-                        @if (PostBenefitConfigurations.Id != 0)
-                        {
-                            <div class="row justify-content-end mb-3">
-                                <div class="col-auto align-self-end">
-                                    <DxTabs RenderMode="TabsRenderMode.AllTabs">
-                                        <DxTab Text="Draft" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.Draft)"></DxTab>
-                                        <DxTab Text="Active" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.Active)"></DxTab>
-                                        <DxTab Text="Inactive" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)"></DxTab>
-                                    </DxTabs>
-                                </div>
-                            </div>
-                        }
-                       
-                            <div class="sticky">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row justify-content-between">
-                                            <div class="col-auto align-self-start">
-                                            @if (PostBenefitConfigurations.Id != 0)
-                                                {
-                                                <DxButton Text="Active" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.Draft)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
-                                                <DxButton Text="InActive" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.Draft || PostBenefitConfigurations.Status == EnumBenefitStatus.Active)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
-                                                    <DxButton Text="Send To Draft" Visible="@( PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-rotate-left" Click="sendToDraft"></DxButton>
-                                                }
-                                            </div>
-                                            
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
+                        @* @if (PostBenefitConfigurations != null && PostBenefitConfigurations.Id != 0)
+                    {
+                    <div class="row justify-content-end mb-3">
+                    <div class="col-auto align-self-end">
+                    <DxTabs RenderMode="TabsRenderMode.AllTabs">
+                    <DxTab Text="Draft" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.Draft)"></DxTab>
+                    <DxTab Text="Active" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.Active)"></DxTab>
+                    <DxTab Text="Inactive" Enabled="@(PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)"></DxTab>
+                    </DxTabs>
+                    </div>
+                    </div>
+                    } *@
+
+                        @*  <div class="sticky">
+                    <div class="card">
+                    <div class="card-body">
+                    <div class="row justify-content-between">
+                    <div class="col-auto align-self-start">
+                    @if (PostBenefitConfigurations != null && PostBenefitConfigurations.Id != 0)
+                    {
+                    @if (PostBenefitConfigurations.Status == EnumBenefitStatus.Draft)
+                    {
+                    <DxButton Text="Active" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-circle-check" Click="onActive"></DxButton>
+                    <DxButton Text="InActive" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                    }
+                    else if (PostBenefitConfigurations.Status == EnumBenefitStatus.Active)
+                    {
+                    <DxButton Text="InActive" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-circle-xmark" Click="onInActive"></DxButton>
+                    }
+                    else if (PostBenefitConfigurations.Status == EnumBenefitStatus.InActive)
+                    {
+                    <DxButton Text="Send To Draft" RenderStyle="ButtonRenderStyle.Success" IconCssClass="fa-solid fa-rotate-left" Click="sendToDraft"></DxButton>
+                    }
+                    }
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    </div> *@
+
+
                         <div class="card">
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
@@ -77,17 +88,76 @@
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
 
                                     </ToolbarTemplate>
-
                                     <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="BenefitName" Caption="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="TypeOfBenefit" Caption="Type Benefit" />
-                                        <DxGridDataColumn FieldName="BenefitValue" Caption="Benefit Value" />
-                                        <DxGridDataColumn FieldName="DurationOfBenefit" Caption="Type Duration" />
-                                        <DxGridDataColumn FieldName="BenefitDuration" Caption="Duration" />
-                                        <DxGridDataColumn FieldName="IsEmployee" Caption="isEmploye" />
-                                        <DxGridDataColumn FieldName="Status" Caption="Status" />
+                                        <DxGridSelectionColumn Width="30px" />
+
+                                        <DxGridDataColumn MinWidth="150" Width="auto" FieldName="BenefitName" Caption="Name" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="150" FieldName="TypeOfBenefit" Width="auto" Caption="Type Benefit" />
+
+                                        <!-- Set a limited width for BenefitValue column -->
+                                        <DxGridDataColumn MinWidth="140" FieldName="BenefitValue" Caption="Benefit Value" Width="auto" />
+
+                                        <DxGridDataColumn MinWidth="140" FieldName="DurationOfBenefit" Width="auto" Caption="Type Duration" />
+                                        <DxGridDataColumn MinWidth="100" FieldName="BenefitDuration" Width="auto" Caption="Duration" />
+
+                                        <!-- Set a limited width for IsEmployee column -->
+                                        <DxGridDataColumn MinWidth="130" FieldName="IsEmployee" Width="auto" Caption="Is Employee" TextAlignment="GridTextAlignment.Center" />
+
+                                        <!-- Set a limited width for Status column -->
+                                        <DxGridDataColumn FieldName="Status" MinWidth="100" Width="auto" Caption="Status">
+                                            <CellDisplayTemplate>
+                                                @GetIssueStatusIconHtml((context.DataItem as BenefitConfigurationDto).Status)
+                                            </CellDisplayTemplate>
+                                        </DxGridDataColumn>
+
+                                        <DxGridDataColumn FieldName="Id" MinWidth="200" AllowSort="false" Width="auto" TextAlignment="GridTextAlignment.Center">
+                                            <CellDisplayTemplate>
+                                                @{
+                                                    var dataItem = (context.DataItem as BenefitConfigurationDto);
+                                                }
+
+                                                @if (dataItem.Status == EnumBenefitStatus.Draft)
+                                                {
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Success"
+                                                              title="Active"
+                                                              Text="Active"
+                                                              IconCssClass="fa-solid fa-check"
+                                                              Click="@(() => onActive(dataItem))"
+                                                              CssClass="btn-icon-undo me-1" />
+
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger"
+                                                              title="InActive"
+                                                              Text="In Active"
+                                                              IconCssClass="fa-solid fa-xmark"
+                                                              Click="@(() => onInActive(dataItem))"
+                                                              IconPosition="ButtonIconPosition.BeforeText"
+                                                              CssClass="btn-icon-redo" />
+                                                }
+                                                else if (dataItem.Status == EnumBenefitStatus.InActive)
+                                                {
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Warning"
+                                                              title="Send To Draft"
+                                                              Text="Send To Draft"
+                                                              IconCssClass="fa-solid fa-rotate-left"
+                                                              Click="@(() => sendToDraft(dataItem))"
+                                                              IconPosition="ButtonIconPosition.BeforeText"
+                                                              CssClass="btn-icon-draft" />
+                                                }
+                                                else
+                                                {
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger"
+                                                              title="InActive"
+                                                              Text="In Active"
+                                                              IconCssClass="fa-solid fa-xmark"
+                                                              Click="@(() => onInActive(dataItem))"
+                                                              IconPosition="ButtonIconPosition.BeforeText"
+                                                              CssClass="btn-icon-redo" />
+                                                }
+                                            </CellDisplayTemplate>
+                                            <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
+                                        </DxGridDataColumn>
                                     </Columns>
+
                                     <TotalSummary>
                                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
                                                            FieldName="Name"
@@ -117,7 +187,7 @@
                                                 <DxSpinEdit @bind-Value="@PostBenefitConfigurations.BenefitDuration" NullText="Input Duration value"></DxSpinEdit>
                                             </DxFormLayoutItem>
                                             <DxFormLayoutItem Caption="Is Employee" CaptionCssClass="normal-caption">
-                                                <DxCheckBox @bind-Checked="@PostBenefitConfigurations.IsEmployee" CssClass="w-100"/>
+                                                <DxCheckBox @bind-Checked="@PostBenefitConfigurations.IsEmployee" CssClass="w-100" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>

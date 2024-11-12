@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.ClaimUserManagement
 {
-    public class BenefitConfigurationDto
+    public class BenefitConfigurationDto:IMapFrom<BenefitConfiguration>
     {
         public long Id { get; set; }
         [Required(ErrorMessage = "Benefit Name is required")]

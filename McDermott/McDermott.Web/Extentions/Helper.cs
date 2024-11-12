@@ -298,6 +298,7 @@ namespace McDermott.Web.Extentions
 
             //Claim Management User
             "claim-user-management/benefit-configuration",
+            "claim-user-management/claim-request",
         ];
 
         public class HomeStatusTemp
