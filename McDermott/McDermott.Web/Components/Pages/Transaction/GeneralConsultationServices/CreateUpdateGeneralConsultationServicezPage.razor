@@ -1228,6 +1228,7 @@
                                                                                                              Refresh_Click="@RefreshClaim_Click"
                                                                                                              IsImport="false"
                                                                                                              IsExport="false"
+                                                                                                             EnableDelete="isActiveButton"
                                                                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
                                                                                                              VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -1376,7 +1377,7 @@
                                                                                                     <DxButton Visible="@VisibleButton" SubmitFormOnClick="true" Text="Save" />
                                                                                                 </div>
                                                                                                 <div class="col-auto">
-                                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Click="@(() => Grid.CancelEditAsync())" Text="Cancel" />
+                                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Click="@(() => GridClaim.CancelEditAsync())" Text="Cancel" />
                                                                                                 </div>
                                                                                             </div>
                                                                                         </EditFormTemplate>
