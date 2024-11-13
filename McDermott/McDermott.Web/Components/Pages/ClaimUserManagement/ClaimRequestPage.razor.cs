@@ -1,5 +1,7 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Application.Dtos.ClaimUserManagement;
+using McDermott.Domain.Entities;
+using MediatR;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
@@ -147,7 +149,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             PanelVisible = true;
             var result = await Mediator.Send(new GetClaimRequestQuery
             {
-
+                OrderByList = [
+                    (x=>x.ClaimDate, true)
+                    ],
                 SearchTerm = searchTerm,
                 PageSize = pageSize,
                 PageIndex = pageIndex,
@@ -260,6 +264,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         {
             var result = await Mediator.Send(new GetBenefitConfigurationQuery
             {
+                Predicate = x=>x.Status == EnumBenefitStatus.Active,
                 SearchTerm = refBenefitComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
@@ -336,7 +341,17 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         }
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                
+                PanelVisible = false;
+            }
+            catch(Exception e)
+            {
+                e.HandleException(ToastService);
+            }
         }
 
         private void DeleteItem_Click()
@@ -349,13 +364,36 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             await LoadData();
         }
 
+        private bool isActiveButton { get; set; } = true;
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+            try
+            {
+                if ((ClaimRequestDto)args.DataItem is null)
+                    return;
+
+                isActiveButton = ((ClaimRequestDto)args.DataItem)!.Status!.Equals(EnumClaimRequestStatus.Draft);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
         private ClaimHistoryDto postClaimhistory = new();
         private async Task OnDone(ClaimRequestDto Data)
         {
+            // Lakukan validasi klaim terlebih dahulu
+            await ValidateClaimRequest(Data.PatientId, Data.BenefitId);
+
+            // Jika tombol tidak terlihat setelah validasi, artinya klaim tidak bisa diajukan
+            if (!VisibleButton)
+            {
+                ToastService.ClearAll();
+                ToastService.ShowInfo($"Patient benefits can only be claimed again after {nextEligibleDate.ToString("dd MMMM yyyy")}");
+                return;
+            }
+
             var item = new ClaimRequestDto();
             if (Data.Id != 0)
             {
@@ -371,12 +409,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 postClaimhistory.ClaimedValue = 1;
 
                 await Mediator.Send(new CreateClaimHistoryRequest(postClaimhistory));
-
-
             }
 
             await LoadData();
         }
+
 
         #endregion
 
@@ -417,11 +454,13 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 {
                     PostClaimRequests.Status = EnumClaimRequestStatus.Draft;
                     item = await Mediator.Send(new CreateClaimRequestRequest(PostClaimRequests));
+                    ToastService.ClearAll();
                     ToastService.ShowSuccess($"Add Data Claim request Success");
                 }
                 else
                 {
                     item = await Mediator.Send(new UpdateClaimRequestRequest(PostClaimRequests));
+                    ToastService.ClearAll();
                     ToastService.ShowSuccess($"Update Data Claim Request Success");
                 }
                 await LoadData();
@@ -455,7 +494,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             }
 
         }
-
+        private DateTime nextEligibleDate { get; set; }
         public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
             // Dapatkan konfigurasi benefit
@@ -478,43 +517,38 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                     (x=>x.ClaimDate, true)
                     ]
             });
-
+            
+            var lastClaimCount = await Mediator.Send(new GetClaimHistoryQuery
+            {
+                Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,              
+                
+            });
+            int counts = 0;
+            if (benefitConfig.TypeOfBenefit == "Amount")
+            {
+                 counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
+            }
+            else if(benefitConfig.TypeOfBenefit == "Qty")
+            {
+                counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
+            }
+            
 
             // Cek apakah klaim melebihi durasi yang diizinkan
             if (lastClaims != null)
             {
-                var nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
-                if (DateTime.Now < nextEligibleDate)
+                 nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
+
+                bool isEligibleForClaim = DateTime.Now <= nextEligibleDate && counts >= benefitConfig.BenefitValue ;
+
+                if (isEligibleForClaim)
                 {
                     ToastService.ClearAll();
                     ToastService.ShowInfo($"Patient benefits can only be claimed again after {nextEligibleDate.ToString("dd MMMM yyyy")}");
                     VisibleButton = false;
                     return;
                 }
-            }
 
-            // Validasi berdasarkan jenis benefit
-            switch (benefitConfig.TypeOfBenefit)
-            {
-                case ("Qty"):
-                    if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
-                    {
-                        ToastService.ClearAll();
-                        ToastService.ShowInfo("Patient Benefits Have Been Exhausted for the number of claims allowed.");
-                        VisibleButton = false;
-                        return;
-                    }
-                    break;
-
-                case ("Amount"):
-                    if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
-                    {
-                        ToastService.ClearAll();
-                        ToastService.ShowInfo("Patient Benefit Has Been Exhausted for the value of the allowable claim money.");
-                        VisibleButton = false;
-                        return;
-                    }
-                    break;
             }
 
             // Jika validasi berhasil
