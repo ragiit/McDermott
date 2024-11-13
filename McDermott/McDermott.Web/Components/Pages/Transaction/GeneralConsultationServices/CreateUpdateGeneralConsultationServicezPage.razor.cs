@@ -205,6 +205,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 editModel.GeneralConsultanServiceId = GeneralConsultanService.Id;
 
+                editModel.Planning = $"{editModel.MedicationTherapy} {editModel.NonMedicationTherapy}";
+
                 if (editModel.Id == 0)
                 {
                     await Mediator.Send(new CreateGeneralConsultanCPPTRequest(editModel));
@@ -263,7 +265,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private async Task OnClickTabClaim()
         {
-            
+
             await LoadDataBenefit();
             await LoadDataPatients();
             await LoadDataPhycisian();
@@ -315,7 +317,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 GetClaimRequests = ab.Item1;
                 totalCountGridClaim = ab.PageCount;
                 activePageIndexTotalCountGridClaim = pageIndex;
-                
+
             }
             catch (Exception ex)
             {
@@ -328,7 +330,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private async Task NewItemClaim_Click()
         {
             await GridClaim.StartEditNewRowAsync();
-            
+
         }
 
         private async Task EditItemClaim_Click()
@@ -739,9 +741,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             PanelVisible = true;
             await GetUserInfo();
-
             await LoadData();
-
             PanelVisible = false;
         }
 
@@ -848,7 +848,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
                     ReferVerticalSpesialisParentSubSpesialisName = x.ReferVerticalSpesialisParentSubSpesialisName,
                     ReferReason = x.ReferReason,
-                    VisitNumber = x.VisitNumber
+                    VisitNumber = x.VisitNumber,
+                    BMHP = x.BMHP,
+                    KdPrognosa = x.KdPrognosa,
+                    Anamnesa = x.Anamnesa,
                 }
             });
 
@@ -860,6 +863,41 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             return result;
         }
 
+        private List<PrognosaRequest> PrognosaRequests { get; set; } = [];
+        private async Task<List<PrognosaRequest>> GetPrognosaData()
+        {
+            try
+            {
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"prognosa", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    var dynamicList = (IEnumerable<dynamic>)data.list;
+
+                    var a = dynamicList.Select(item => new PrognosaRequest
+                    {
+                        KdPrognosa = item.kdPrognosa,
+                        NmPrognosa = item.nmPrognosa,
+                    }).ToList();
+
+                    PrognosaRequests.Clear();
+                    PrognosaRequests = a;
+                }
+                else
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+
+            return [];
+        }
         private async Task LoadData()
         {
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -897,6 +935,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                     case EnumStatusGeneralConsultantService.Physician:
                         StagingText = EnumStatusGeneralConsultantService.Finished;
+
+                        PrognosaRequests = await GetPrognosaData();
 
                         if (GeneralConsultanService.PratitionerId is null)
                         {
@@ -2330,7 +2370,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         NoKartu = ins.NoKartu ?? "",
                         TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
                         KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
-                        Keluhan = "",
+                        Keluhan = g.Subjective ?? "",
                         KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultanService.AwarenessId)!.KdSadar,
                         Sistole = GeneralConsultanService.Systolic.ToInt32(),
                         Diastole = GeneralConsultanService.DiastolicBP.ToInt32(),
@@ -2346,9 +2386,15 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         KdDiag2 = null,
                         KdDiag3 = null,
                         KdTacc = -1,
+                        AlasanTacc = null,
+                        Anamnesa = g.Anamnesa,
                         AlergiMakan = SelectedFoodAllergies.FirstOrDefault()?.KdAllergy ?? null,
-                        AlergiObat = SelectedPharmacologyAllergies.FirstOrDefault()?.KdAllergy ?? null,
                         AlergiUdara = SelectedWeatherAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        AlergiObat = SelectedPharmacologyAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        KdPrognosa = GeneralConsultanService.KdPrognosa ?? "",
+                        TerapiObat = g.MedicationTherapy ?? "",
+                        TerapiNonObat = g.NonMedicationTherapy ?? "",
+                        Bmhp = GeneralConsultanService.BMHP ?? "",
                         Suhu = GeneralConsultanService.Temp.ToString(),
                     };
                 }
@@ -2369,8 +2415,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     if (responseApi.Item1 is not null)
                     {
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                        //if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber)) // Check if the serial no is not getting from kiosk
-                        GeneralConsultanService.VisitNumber = data.response.message;
+                        var dynamicList = (IEnumerable<dynamic>)data;
+
+                        var xz = dynamicList.Select(item => new
+                        {
+                            message = item.message
+                        }).ToList();
+
+                        GeneralConsultanService.VisitNumber = xz[0].message;
                     }
                 }
             }
@@ -2408,7 +2460,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 if (responseApi.Item2 != 201)
                 {
                     if (responseApi.Item2 == 412)
+                    {
                         ToastService.ShowError($"{data.message}\n Code: {responseApi.Item2}");
+                        return true;
+                    }
                     else
                         ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
 

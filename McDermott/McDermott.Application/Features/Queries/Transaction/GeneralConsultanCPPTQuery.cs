@@ -90,7 +90,9 @@ namespace McDermott.Application.Features.Queries.Transaction
                         {
                             Name = x.User != null ? x.User.Name : "",
                         },
-                        Planning = x.Planning
+                        Planning = x.Planning,
+                        MedicationTherapy = x.MedicationTherapy,
+                        NonMedicationTherapy = x.NonMedicationTherapy
                     });
 
                 if (!request.IsGetAll)

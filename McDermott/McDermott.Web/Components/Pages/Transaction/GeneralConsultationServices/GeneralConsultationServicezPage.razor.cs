@@ -55,7 +55,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        private List<StatusMcuData> StatusMcus = [];
+        private List<StatusMcuData> StatusMcus = []; 
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -71,6 +71,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
+
             }
             catch { }
         }
@@ -78,6 +79,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+
         }
 
         private async Task Refresh_Click()

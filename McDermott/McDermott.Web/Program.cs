@@ -181,6 +181,9 @@ builder.Services.AddMemoryCache(); // Menambahkan layanan memory cache
 builder.Services.AddDistributedMemoryCache(); // Menambahkan layanan distributed memory cache (opsional, digunakan jika Anda memerlukan cache di beberapa instance server)
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddDevExpressBlazor(configure => configure.BootstrapVersion = BootstrapVersion.v5);
+builder.Services.AddDevExpressServerSideBlazorReportViewer();
+builder.WebHost.UseWebRoot("wwwroot");
+builder.WebHost.UseStaticWebAssets();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
 builder.Services.AddHttpClient();

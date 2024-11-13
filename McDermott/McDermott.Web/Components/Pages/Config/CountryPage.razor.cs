@@ -222,11 +222,11 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
-            //await Grid.StartEditNewRowAsync();
+            await Grid.StartEditNewRowAsync();
             //CreatePdf("ohYeah.pff");
 
-            var client = ClientFactory.CreateClient("ServerAPI");
-            var response = await client.GetAsync($"api/file/download-pdf");
+            //var client = ClientFactory.CreateClient("ServerAPI");
+            //var response = await client.GetAsync($"api/file/download-pdf");
         }
 
         private async Task EditItem_Click()
