@@ -1212,7 +1212,7 @@
                                                                                                     Data="GetClaimRequests"
                                                                                                     @bind-SelectedDataItems="@SelectedDataItemsClaim"
                                                                                                     EditModelSaving="OnSaveClaim"
-                                                                                                    EditFormButtonsVisible="@VisibleButton"
+                                                                                                    EditFormButtonsVisible="false"
                                                                                                     DataItemDeleting="OnDeleteClaim"
                                                                                                     FocusedRowChanged="GridClaim_FocusedRowChanged"
                                                                                                     KeyFieldName="Id">
@@ -1371,6 +1371,14 @@
                                                                                                     <DxMemo @bind-Text="@PostClaimRequests.Remark" NullText="Input Remark in Here"></DxMemo>
                                                                                                 </DxFormLayoutItem>
                                                                                             </DxFormLayout>
+                                                                                            <div class="row justify-content-end mt-2">
+                                                                                                <div class="col-auto">
+                                                                                                    <DxButton Visible="@VisibleButton" SubmitFormOnClick="true" Text="Save" />
+                                                                                                </div>
+                                                                                                <div class="col-auto">
+                                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Click="@(() => Grid.CancelEditAsync())" Text="Cancel" />
+                                                                                                </div>
+                                                                                            </div>
                                                                                         </EditFormTemplate>
                                                                                     </MyGridPaginate>
                                                                                     <div class="row">

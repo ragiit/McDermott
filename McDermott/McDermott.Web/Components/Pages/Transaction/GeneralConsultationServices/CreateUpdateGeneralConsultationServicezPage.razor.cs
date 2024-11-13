@@ -395,6 +395,15 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
         private async Task OnDone(ClaimRequestDto Data)
         {
+            await ValidateClaimRequest(Data.PatientId, Data.BenefitId);
+
+            // Jika tombol tidak terlihat setelah validasi, artinya klaim tidak bisa diajukan
+            if (!VisibleButton)
+            {
+                ToastService.ClearAll();
+                ToastService.ShowInfo($"Patient benefits can only be claimed again after {nextEligibleDate.ToString("dd MMMM yyyy")}");
+                return;
+            }
             var item = new ClaimRequestDto();
             if (Data.Id != 0)
             {
@@ -438,6 +447,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         }
 
+        private DateTime nextEligibleDate { get; set; }
         public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
             // Dapatkan konfigurasi benefit
@@ -461,42 +471,37 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     ]
             });
 
+            var lastClaimCount = await Mediator.Send(new GetClaimHistoryQuery
+            {
+                Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,
+
+            });
+            int counts = 0;
+            if (benefitConfig.TypeOfBenefit == "Amount")
+            {
+                counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
+            }
+            else if (benefitConfig.TypeOfBenefit == "Qty")
+            {
+                counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
+            }
+
 
             // Cek apakah klaim melebihi durasi yang diizinkan
             if (lastClaims != null)
             {
-                var nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
-                if (DateTime.Now < nextEligibleDate)
+                nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
+
+                bool isEligibleForClaim = DateTime.Now <= nextEligibleDate && counts >= benefitConfig.BenefitValue;
+
+                if (isEligibleForClaim)
                 {
                     ToastService.ClearAll();
                     ToastService.ShowInfo($"Patient benefits can only be claimed again after {nextEligibleDate.ToString("dd MMMM yyyy")}");
                     VisibleButton = false;
                     return;
                 }
-            }
 
-            // Validasi berdasarkan jenis benefit
-            switch (benefitConfig.TypeOfBenefit)
-            {
-                case ("Qty"):
-                    if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
-                    {
-                        ToastService.ClearAll();
-                        ToastService.ShowInfo("Patient Benefits Have Been Exhausted for the number of claims allowed.");
-                        VisibleButton = false;
-                        return;
-                    }
-                    break;
-
-                case ("Amount"):
-                    if (lastClaims != null && lastClaims.ClaimedValue >= benefitConfig.BenefitValue)
-                    {
-                        ToastService.ClearAll();
-                        ToastService.ShowInfo("Patient Benefit Has Been Exhausted for the value of the allowable claim money.");
-                        VisibleButton = false;
-                        return;
-                    }
-                    break;
             }
 
             // Jika validasi berhasil
