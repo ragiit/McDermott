@@ -1,5 +1,7 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Application.Dtos.ClaimUserManagement;
+using McDermott.Domain.Entities;
+using MediatR;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
@@ -147,7 +149,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             PanelVisible = true;
             var result = await Mediator.Send(new GetClaimRequestQuery
             {
-
+                OrderByList = [
+                    (x=>x.ClaimDate, true)
+                    ],
                 SearchTerm = searchTerm,
                 PageSize = pageSize,
                 PageIndex = pageIndex,
@@ -337,7 +341,17 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         }
         private async Task EditItem_Click()
         {
-            await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+            try
+            {
+                PanelVisible = true;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                
+                PanelVisible = false;
+            }
+            catch(Exception e)
+            {
+                e.HandleException(ToastService);
+            }
         }
 
         private void DeleteItem_Click()

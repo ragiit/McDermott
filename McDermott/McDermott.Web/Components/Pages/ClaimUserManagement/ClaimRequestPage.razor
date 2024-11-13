@@ -94,6 +94,7 @@
                                                                   @ref="refPatientComboBox"
                                                                   @bind-Value="@PostClaimRequests.PatientId"
                                                                   TextFieldName="Name"
+                                                                  ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"
                                                                   ValueFieldName="Id"
                                                                   TextChanged="((string e) => OnInputPatientChanged(e))">
                                                         <Buttons>
@@ -122,6 +123,7 @@
                                                                   @bind-Value="@PostClaimRequests.PhycisianId"
                                                                   TextFieldName="Name"
                                                                   ValueFieldName="Id"
+                                                                  ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"
                                                                   TextChanged="((string e) => OnInputPhycisianChanged(e))">
                                                         <Buttons>
                                                             <DxEditorButton Click="OnSearchPhycisianIndexDecrement"
@@ -150,6 +152,7 @@
                                                                   SelectedItemChanged="@((BenefitConfigurationDto data)=>cekValidasi(data))"
                                                                   TextFieldName="BenefitName"
                                                                   ValueFieldName="Id"
+                                                                  ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"
                                                                   TextChanged="((string e) => OnInputBenefitChanged(e))">
                                                         <Buttons>
                                                             <DxEditorButton Click="OnSearchBenefitIndexDecrement"
@@ -176,18 +179,18 @@
                                                     <ValidationMessage For="@(()=>PostClaimRequests.BenefitId)" />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxDateEdit @bind-Date="@PostClaimRequests.ClaimDate"></DxDateEdit>
+                                                    <DxDateEdit @bind-Date="@PostClaimRequests.ClaimDate" ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"></DxDateEdit>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Remark" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                    <DxMemo @bind-Text="@PostClaimRequests.Remark" NullText="Input Remark in Here"></DxMemo>
+                                                    <DxMemo @bind-Text="@PostClaimRequests.Remark" NullText="Input Remark in Here" ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"></DxMemo>
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
                                             <div class="row justify-content-end mt-2">
                                                 <div class="col-auto">
-                                                    <DxButton Visible="@VisibleButton" SubmitFormOnClick="true" Text="Save" />
+                                                    <DxButton Visible="@(PostClaimRequests.Status != EnumClaimRequestStatus.Done && VisibleButton)" SubmitFormOnClick="true" Text="Save" />
                                                 </div>
                                                 <div class="col-auto">
-                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Click="@(() => Grid.CancelEditAsync())" Text="Cancel" />
+                                                    <DxButton  RenderStyle="ButtonRenderStyle.Danger" Click="@(() => Grid.CancelEditAsync())" Text="Cancel" />
                                                 </div>
                                             </div>
 
