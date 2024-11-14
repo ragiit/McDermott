@@ -1,7 +1,11 @@
 ﻿ @page "/awereness-event/education-program/"
 @using McDermott.Application.Dtos.AwarenessEvent
 @rendermode InteractiveServer
-
+<style>
+    .text-center {
+        text-align: center !important
+    }
+</style>
 @if (IsAccess)
 {
     <div class="wrapper">
@@ -18,11 +22,11 @@
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
                                     <MyGridPaginate @ref="Grid"
-                                            Data="getEducationPrograms"
-                                            @bind-SelectedDataItems="@SelectedDataItems"
-                                            DataItemDeleting="OnDelete"
-                                            FocusedRowChanged="Grid_FocusedRowChanged"
-                                            KeyFieldName="Id">
+                                                    Data="getEducationPrograms"
+                                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                                    DataItemDeleting="OnDelete"
+                                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                                    KeyFieldName="Id">
 
                                         <ToolbarTemplate>
                                             <MyDxToolbarBase TItem="EducationProgramDto"
@@ -44,30 +48,35 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="EventName" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="StartDate" Caption="Start Date" DisplayFormat="@Helper.DefaultFormatDate" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="EndDate" Caption="End date" DisplayFormat="@Helper.DefaultFormatDate" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">
+                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="StartDate" Caption="Start Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="EndDate" Caption="End date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                            <DxGridDataColumn MinWidth="100" Width="auto" FieldName="Status" Caption="Status" CaptionAlignment="GridTextAlignment.Right">
                                                 <CellDisplayTemplate>
-                                                    @GetIssueStatusIconHtml((context.DataItem as EducationProgramDto).Status)
+                                                   
+                                                        @GetIssueStatusIconHtml((context.DataItem as EducationProgramDto).Status)
+                                                   
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
-                                            <DxGridDataColumn MinWidth="200" FieldName="Slug" Caption="Slug" >
+                                            <DxGridDataColumn MinWidth="200" FieldName="Slug" Caption="Slug">
                                                 <CellDisplayTemplate>
+                                                    @{
+                                                        var dataItem = (context.DataItem as EducationProgramDto);
+                                                    }
                                                     <div class="row">
-                                                        <div class="col-6 me-1">
+                                                        <div class="col-4 me-1">
                                                             <DxButton RenderStyle="ButtonRenderStyle.Secondary"
                                                                       title="Copy"
                                                                       Text="Copy"
                                                                       IconCssClass="fa-solid fa-copy"
-                                                                      Click="@(() => ClickCopy())"
+                                                                      Click="@(() => ClickCopy(dataItem))"
                                                                       CssClass="btn-icon-undo me-1" />
                                                         </div>
-                                                        <div class="col-6">
+                                                        <div class="col-5">
                                                             <DxButton RenderStyle="ButtonRenderStyle.Secondary"
                                                                       title="Open To"
                                                                       Text="Open To"
                                                                       IconCssClass="fa-solid fa-arrow-up-right-from-square"
-                                                                      Click="@(() => ClickOpenTo())"
+                                                                      Click="@(() => ClickOpenTo(dataItem))"
                                                                       CssClass="btn-icon-redo" />
                                                         </div>
                                                     </div>

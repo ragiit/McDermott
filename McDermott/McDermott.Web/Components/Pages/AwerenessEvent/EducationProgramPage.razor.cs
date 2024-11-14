@@ -146,6 +146,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             getEducationPrograms = result.Item1;
             totalCount = result.PageCount;
             activePageIndex = pageIndex;
+
             PanelVisible = false;
         }
         #endregion
@@ -203,23 +204,25 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             finally { PanelVisible = false; }
         }
 
-        private async Task ClickCopy()
+        private async Task ClickCopy(EducationProgramDto data)
         {
-            var url = $"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
-            JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", NavigationManager.ToAbsoluteUri(url).ToString());
-
-            ToastService.ClearAll();
-            ToastService.ShowSuccess("Copy link Success");
-        }
-        private async Task ClickOpenTo()
-        {
-            if (postEducationPrograms.Slug != null)
+            if (data.Slug != null)
             {
-                if (Id.HasValue)
-                {
-                    var url = $"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
+                var url = $"awereness-event/education-program/join-participant/{data.Slug}";
+                JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", NavigationManager.ToAbsoluteUri(url).ToString());
+
+                ToastService.ClearAll();
+                ToastService.ShowSuccess("Copy link Success");
+            }
+        }
+        private async Task ClickOpenTo(EducationProgramDto data)
+        {
+            if (data.Slug != null)
+            {
+                
+                    var url = $"awereness-event/education-program/join-participant/{data.Slug}";
                     await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
-                }
+                
             }
         }
 
