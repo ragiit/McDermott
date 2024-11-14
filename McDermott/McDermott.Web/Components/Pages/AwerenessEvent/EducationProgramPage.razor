@@ -44,12 +44,33 @@
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="EventName" SortIndex="0" />
                                             <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="StartDate" Caption="Start Date" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="EndDate" Caption="End date" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Slug" Caption="Slug" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="StartDate" Caption="Start Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EndDate" Caption="End date" DisplayFormat="@Helper.DefaultFormatDate" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">
                                                 <CellDisplayTemplate>
                                                     @GetIssueStatusIconHtml((context.DataItem as EducationProgramDto).Status)
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
+                                            <DxGridDataColumn MinWidth="200" FieldName="Slug" Caption="Slug" >
+                                                <CellDisplayTemplate>
+                                                    <div class="row">
+                                                        <div class="col-6 me-1">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+                                                                      title="Copy"
+                                                                      Text="Copy"
+                                                                      IconCssClass="fa-solid fa-copy"
+                                                                      Click="@(() => ClickCopy())"
+                                                                      CssClass="btn-icon-undo me-1" />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+                                                                      title="Open To"
+                                                                      Text="Open To"
+                                                                      IconCssClass="fa-solid fa-arrow-up-right-from-square"
+                                                                      Click="@(() => ClickOpenTo())"
+                                                                      CssClass="btn-icon-redo" />
+                                                        </div>
+                                                    </div>
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                         </Columns>

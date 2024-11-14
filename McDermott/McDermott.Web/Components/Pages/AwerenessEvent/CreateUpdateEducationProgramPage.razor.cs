@@ -535,6 +535,15 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             }
         }
 
+        private async Task ClickCopy()
+        {
+            var url = $"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
+            JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", NavigationManager.ToAbsoluteUri(url).ToString());
+
+            ToastService.ClearAll();
+            ToastService.ShowSuccess("Copy link Success");
+        }
+
         private async Task SendToDraft()
         {
 

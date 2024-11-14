@@ -203,6 +203,25 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             finally { PanelVisible = false; }
         }
 
+        private async Task ClickCopy()
+        {
+            var url = $"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
+            JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", NavigationManager.ToAbsoluteUri(url).ToString());
+
+            ToastService.ClearAll();
+            ToastService.ShowSuccess("Copy link Success");
+        }
+        private async Task ClickOpenTo()
+        {
+            if (postEducationPrograms.Slug != null)
+            {
+                if (Id.HasValue)
+                {
+                    var url = $"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
+                    await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
+                }
+            }
+        }
 
         #endregion Grid Events
 
