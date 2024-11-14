@@ -44,6 +44,9 @@ namespace McDermott.Domain.Entities
         public string? VisitNumber { get; set; } // NO Kunjungan
 
         /// <BPJS Rujukan>
+        public string? KdPrognosa { get; set; }
+        public string? Anamnesa { get; set; }
+        public string? BMHP { get; set; }
         public string? ReferVerticalKhususCategoryName { get; set; }
 
         public string? ReferVerticalKhususCategoryCode { get; set; }

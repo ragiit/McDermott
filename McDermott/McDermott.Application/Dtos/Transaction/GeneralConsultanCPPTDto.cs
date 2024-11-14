@@ -15,6 +15,9 @@
         public long? DiagnosisId { get; set; }
         public long? NursingDiagnosesId { get; set; }
         public string? Planning { get; set; }
+        public string? Anamnesa { get; set; }
+        public string? MedicationTherapy { get; set; }
+        public string? NonMedicationTherapy { get; set; }
         public UserDto? User { get; set; }
         public DiagnosisDto? Diagnosis { get; set; }
         public NursingDiagnosesDto? NursingDiagnoses { get; set; }
@@ -36,5 +39,8 @@
         public long? DiagnosisId { get; set; }
         public long? NursingDiagnosesId { get; set; }
         public string? Planning { get; set; }
+        public string? Anamnesa { get; set; }
+        public string? MedicationTherapy { get; set; }
+        public string? NonMedicationTherapy { get; set; }
     }
 }

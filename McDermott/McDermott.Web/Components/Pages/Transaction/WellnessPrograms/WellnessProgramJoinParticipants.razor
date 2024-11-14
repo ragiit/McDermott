@@ -14,8 +14,6 @@
     }
 </style>
 
-@((MarkupString)@WellnessProgram.Content)
-
 @if (IsFound)
 {
     if (IsClosed)
@@ -387,17 +385,18 @@ else
                 return;
             }
 
+            if (WellnessProgram.EndDate is not null && WellnessProgram.EndDate < DateTime.Now)
+            {
+                IsClosed = true;
+                return;
+            }
+
             if (WellnessProgram.Status == EnumWellness.Active)
             {
                 IsActive = true;
                 return;
             }
 
-            if (WellnessProgram.EndDate is not null && WellnessProgram.EndDate < DateTime.Now)
-            {
-                IsClosed = true;
-                return;
-            }
 
             // if (timer is not null)
             //     timer?.Dispose();

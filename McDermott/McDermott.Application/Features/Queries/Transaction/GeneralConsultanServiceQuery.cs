@@ -1019,11 +1019,17 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.IsMaternityLeave = dto.IsMaternityLeave;
                 entity.StartMaternityLeave = dto.StartMaternityLeave;
                 entity.EndMaternityLeave = dto.EndMaternityLeave;
+                entity.Anamnesa = dto.Anamnesa;
+                entity.BMHP = dto.BMHP;
+                entity.KdPrognosa = dto.KdPrognosa;
 
                 UpdateNurseStationFields(entity, dto); // Including NurseStation fields
 
                 SetPropertiesModified(entity, nameof(entity.PratitionerId), nameof(entity.HomeStatus), nameof(entity.IsSickLeave),
                     nameof(entity.LocationId),
+                    nameof(entity.Anamnesa),
+                    nameof(entity.BMHP),
+                    nameof(entity.KdPrognosa),
                     nameof(entity.PPKRujukanCode),
                     nameof(entity.PPKRujukanName),
                     nameof(entity.ReferVerticalSpesialisParentSpesialisName),

@@ -46,7 +46,9 @@ namespace McDermott.Application.Dtos.Transaction
         public string? HomeStatus { get; set; }
 
         public string? TypeMedical { get; set; }
-
+        public string? Anamnesa { get; set; }
+        public string? BMHP { get; set; }
+        public string? KdPrognosa { get; set; } 
         public string? ScheduleTime { get; set; }
 
         [NotMapped]
@@ -396,6 +398,9 @@ namespace McDermott.Application.Dtos.Transaction
 
         public string? TypeMedical { get; set; }
 
+        public string? KdPrognosa { get; set; }
+        public string? Anamnesa { get; set; }
+        public string? BMHP { get; set; }
         public string? ScheduleTime { get; set; }
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
