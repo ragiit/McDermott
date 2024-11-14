@@ -1084,9 +1084,7 @@
                                                                                                 <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
                                                                                             </DxFormLayoutItem>
 
-                                                                                            @*  }
-                                                                                    else if (IsStatus(EnumStatusGeneralConsultantService.Physician))
-                                                                                    { *@
+                                                                                            
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnoses" ColSpanMd="12">
                                                                                                 <MyDxComboBox Data="@Diagnoses"
                                                                                                               NullText="Select Diagnoses"
@@ -1268,10 +1266,10 @@
                                                                                         </ToolbarTemplate>
                                                                                         <Columns>
                                                                                             <DxGridSelectionColumn Width="30px" />
-                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name"  />
                                                                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Phycisian.Name" Caption="Phycisian Name" />
                                                                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Benefit.BenefitName" Caption="Benefit Name" />
-                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" DisplayFormat="@Helper.DefaultFormatDate"/>
                                                                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Remark" Caption="Remark" />
                                                                                             <DxGridDataColumn FieldName="Status" MinWidth="100" Width="auto" Caption="Status">
                                                                                                 <CellDisplayTemplate>
@@ -1317,6 +1315,7 @@
                                                                                                                   @bind-Value="@PostClaimRequests.PatientId"
                                                                                                                   TextFieldName="Name"
                                                                                                                   ValueFieldName="Id"
+                                                                                                                  SelectedItemChanged="@((UserDto data)=>CekPatient(data))"
                                                                                                                   ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"
                                                                                                                   TextChanged="((string e) => OnInputPatientsChanged(e))">
                                                                                                         <Buttons>

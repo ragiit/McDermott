@@ -393,12 +393,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     PostClaimRequests.Status = EnumClaimRequestStatus.Draft;
                     item = await Mediator.Send(new CreateClaimRequestRequest(PostClaimRequests));
-                    ToastService.ShowSuccess($"Add Data Patient {item.Patient.Name} Success");
+                    ToastService.ShowSuccess($"Add Data Claim Request Success");
                 }
                 else
                 {
                     item = await Mediator.Send(new UpdateClaimRequestRequest(PostClaimRequests));
-                    ToastService.ShowSuccess($"Update Data Patient {item.Patient.Name} Success");
+                    ToastService.ShowSuccess($"Update Data Claim Request Success");
                 }
                 await LoadDataClaim();
             }
@@ -462,7 +462,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
 
         }
-
+        private async Task CekPatient(UserDto data)
+        {
+            VisibleButton = true;
+        }
         public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
             var benefitConfig = await Mediator.Send(new GetSingleBenefitConfigurationQuery

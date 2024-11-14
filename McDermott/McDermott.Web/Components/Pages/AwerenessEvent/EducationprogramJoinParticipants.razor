@@ -13,17 +13,10 @@
         min-height: 100vh;
     }
 
-    .contents-wrapper img {
-        max-width: 100%;
-        height: auto;
-    }
-    .contents-wrapper {
-        max-width: 750px; /* Sesuaikan nilai ini sesuai dengan lebar kolom yang diinginkan */
-        overflow-wrap: break-word; /* Untuk menghindari teks melebar */
-        word-wrap: break-word;
-    }
 
-    .dxbl-row{
+    
+
+    .dxbl-row {
         justify-content: center !important;
     }
 </style>
@@ -90,7 +83,7 @@
                                             @if (!string.IsNullOrWhiteSpace(EducationPrograms.HTMLContent?.Trim()) && IsShowContent)
                                             {
                                                 <div class="row justify-content-center">
-                                                    <div class="col-auto contents-wrapper">
+                                                    <div class="col-auto content-wrappers">
                                                         @((MarkupString)@EducationPrograms.HTMLContent)
                                                     </div>
                                                 </div>

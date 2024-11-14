@@ -136,8 +136,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             {
                 OrderByList =
                     [
-                        (x => x.CreatedDate, true),  // ThenByDescending Created
-                        (x => x.Status, true),               // OrderByDescending Status
+                        (x => x.StartDate, true)
                     ],
                 SearchTerm = searchTerm,
                 PageSize = pageSize,
@@ -152,10 +151,21 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion
 
         #region Grid Events
-
+        private bool isActiveButton { get; set; } = true
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+            try
+            {
+                if ((EducationProgramDto)args.DataItem is null)
+                    return;
+
+                isActiveButton = ((EducationProgramDto)args.DataItem)!.Status!.Equals(EnumStatusEducationProgram.Draft);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
         }
 
         private async Task NewItem_Click()

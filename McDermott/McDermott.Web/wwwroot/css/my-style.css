@@ -177,3 +177,26 @@
     padding: 2px 8px;
     font-size: 0.8rem;
 }
+
+.content-wrappers {
+    max-width: 600px; /* Lebar maksimum pada layar besar */
+    width: 100%; /* Lebar 100% pada layar kecil */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+    /* Responsif untuk gambar dan video */
+    .content-wrappers img,
+    .content-wrappers iframe,
+    .content-wrappers video {
+        max-width: 100%;
+        height: auto;
+    }
+
+/* Media query untuk layar kecil */
+@media (max-width: 768px) {
+    .content-wrappers {
+        max-width: 100%; /* Menyesuaikan lebar penuh layar kecil */
+        padding: 0 15px; /* Memberikan sedikit padding agar tidak terlalu mepet */
+    }
+}

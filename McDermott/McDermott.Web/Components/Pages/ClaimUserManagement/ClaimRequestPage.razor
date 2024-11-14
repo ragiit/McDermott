@@ -48,10 +48,10 @@
                                         </ToolbarTemplate>
                                         <Columns>
                                             <DxGridSelectionColumn Width="30px" />
-                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name" />
                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Phycisian.Name" Caption="Phycisian Name" />
                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Benefit.BenefitName" Caption="Benefit Name" />
-                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" />
+                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" DisplayFormat="@Helper.DefaultFormatDate"/>
                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Remark" Caption="Remark" />
                                             <DxGridDataColumn FieldName="Status" MinWidth="100" Width="auto" Caption="Status">
                                                 <CellDisplayTemplate>
@@ -94,6 +94,7 @@
                                                                   @ref="refPatientComboBox"
                                                                   @bind-Value="@PostClaimRequests.PatientId"
                                                                   TextFieldName="Name"
+                                                                  SelectedItemChanged="@((UserDto data)=>CekPatient(data))"
                                                                   ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"
                                                                   ValueFieldName="Id"
                                                                   TextChanged="((string e) => OnInputPatientChanged(e))">

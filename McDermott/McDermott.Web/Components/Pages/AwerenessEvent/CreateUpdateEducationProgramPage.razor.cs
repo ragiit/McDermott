@@ -38,8 +38,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private bool FormValidationState { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
-        private bool IsReadOnly => postEducationPrograms.Status == EnumStatusEducationProgram.Done;
-
+        private bool IsReadOnly => postEducationPrograms.Status != EnumStatusEducationProgram.Draft || postEducationPrograms.Id == 0;
+        private bool IsReadOnlyEvent => postEducationPrograms.Status != EnumStatusEducationProgram.Draft && postEducationPrograms.Status != EnumStatusEducationProgram.Active;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsEducation { get; set; } = [];
         #endregion
@@ -70,6 +70,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         }
 
         #endregion UserLoginAndAccessRole
+
 
         #region Searching
 
@@ -115,8 +116,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
                 await Task.WhenAll(loadTasks);
 
-
-
             }
             catch (Exception ex)
             {
@@ -161,13 +160,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     return;
                 }
                 postEducationPrograms = result ?? new();
-                                
-                var resultParticipan = await Mediator.Send(new GetParticipanEduQuery
-                {
-                    Predicate=x=>x.EducationProgramId==postEducationPrograms.Id,
-                });
 
-                GetParticipanEdus = resultParticipan.Item1;
+                await LoadData_Participant();
                 // log
 
             }
@@ -206,50 +200,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         #endregion HTML Editor
 
-        //private async Task SetupImageUpload()
-        //{
-        //    var options = new
-        //    {
-        //        placeholder = "Write something awesome...",
-        //        modules = new
-        //        {
-        //            toolbar = new
-        //            {
-        //                container = new object[]
-        //                {
-        //                new[] { "header", new[] { 1, 2, 3, 4, 5 } },
-        //                new[] { "bold", "italic", "underline", "strike" },
-        //                new[] { "color", "background" },
-        //                new[] { "list", "bullet" },
-        //                new[] { "link", "image", "video" }
-        //                }
-        //            },
-        //            imageResize = new
-        //            {
-        //                displaySize = true
-        //            }
-        //        }
-        //    };
-
-        //    await QuillHtml.SetOptionsAsync(options);
-        //    await SetupImageHandler();
-        //}
-
-        //private async Task SetupImageHandler()
-        //{
-        //    await QuillHtml.OnImageUpload(async (ImageFile[] files) =>
-        //    {
-        //        if (files != null && files.Length > 0)
-        //        {
-        //            var file = files[0];
-        //            var imageAsBase64 = Convert.ToBase64String(file.data);
-        //            var imageUrl = $"data:{file.type};base64,{imageAsBase64}";
-        //            return imageUrl;
-        //        }
-        //        return string.Empty;
-        //    });
-        //}
-
         #region select File
         private IBrowserFile BrowserFile;
         private void RemoveSelectedFile()
@@ -285,7 +235,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         private async Task OnSearchCategory()
         {
-            await LoadDataCategory(0, 10);
+            await LoadDataCategory();
         }
 
         private async Task OnSearchCategoryIndexIncrement()
@@ -375,7 +325,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     }
                     if (!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
                     {
-                        postEducationPrograms.MaterialContent = await QuillHtml2.GetHTML();
+                        postEducationPrograms.HTMLMaterial = await QuillHtml2.GetHTML();
                     }
                     await FileUploadService.UploadFileAsync(BrowserFile);
                     postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
@@ -384,23 +334,19 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 }
                 else
                 {
-                    if(!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                    if (!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
                     {
-                        postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
-                    }
-                    if(!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
-                    {
-                        postEducationPrograms.MaterialContent = await QuillHtml2.GetHTML();
+                        postEducationPrograms.HTMLMaterial = await QuillHtml2.GetHTML();
                     }
                     await FileUploadService.UploadFileAsync(BrowserFile);
 
                     var cekdata = await Mediator.Send(new GetSingleEducationProgramQuery
                     {
-                        Predicate = x=>x.Id == Id,
-                        
+                        Predicate = x => x.Id == Id,
+
                     });
 
-                    if (postEducationPrograms.Attendance != cekdata.Attendance )
+                    if (postEducationPrograms.Attendance != cekdata.Attendance)
                     {
                         if (postEducationPrograms.Attendance != null)
                             Helper.DeleteFile(postEducationPrograms.Attendance);
@@ -414,6 +360,9 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                         if (postEducationPrograms.Attendance != null)
                             _ = await FileUploadService.UploadFileAsync(BrowserFile);
                     }
+
+
+
                     data = await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Update Data Success...");
                 }
@@ -428,6 +377,38 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             }
         }
 
+        private async Task SaveEvent()
+        {
+            if (!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
+            {
+                postEducationPrograms.HTMLMaterial= await QuillHtml2.GetHTML();
+            }
+            await FileUploadService.UploadFileAsync(BrowserFile);
+
+            var cekdata = await Mediator.Send(new GetSingleEducationProgramQuery
+            {
+                Predicate = x => x.Id == Id,
+
+            });
+
+            if (postEducationPrograms.Attendance != cekdata.Attendance)
+            {
+                if (postEducationPrograms.Attendance != null)
+                    Helper.DeleteFile(postEducationPrograms.Attendance);
+
+                if (cekdata.Attendance != null)
+                    Helper.DeleteFile(cekdata.Attendance);
+            }
+
+            if (postEducationPrograms.Attendance != cekdata.Attendance)
+            {
+                if (postEducationPrograms.Attendance != null)
+                    _ = await FileUploadService.UploadFileAsync(BrowserFile);
+            }
+
+            await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
+            ToastService.ShowSuccess("Save Material Data Success...");
+        }
         #endregion
 
         #region Click
@@ -562,6 +543,21 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 Console.WriteLine($"Failed to activate program: {ex.Message}");
             }
 
+        }
+
+        private async Task LoadData_Participant()
+        {
+            var resultParticipan = await Mediator.Send(new GetParticipanEduQuery
+            {
+                Predicate = x => x.EducationProgramId == postEducationPrograms.Id,
+            });
+
+            GetParticipanEdus = resultParticipan.Item1;
+        }
+
+        private async Task RefreshParticipan_Click()
+        {
+            await LoadData_Participant();
         }
         #endregion
 

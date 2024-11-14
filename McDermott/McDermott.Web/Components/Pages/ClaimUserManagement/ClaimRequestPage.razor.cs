@@ -143,7 +143,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             await LoadData();
             PanelVisible = false;
         }
-
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -494,6 +493,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             }
 
         }
+
+        private async Task CekPatient(UserDto data)
+        {
+            VisibleButton = true;
+        }
         private DateTime nextEligibleDate { get; set; }
         public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
@@ -571,5 +575,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         }
 
         #endregion
+
+
     }
 }

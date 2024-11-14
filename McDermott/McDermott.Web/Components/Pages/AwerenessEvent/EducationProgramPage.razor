@@ -4,7 +4,7 @@
 <PageTitle>McHealtCare - Education and Awareness</PageTitle>
 <style>
     .text-center {
-        text-align: center !important
+    text-align: center !important
     }
 </style>
 @if (IsAccess)
@@ -19,45 +19,46 @@
                         <div class="card">
                             <div class="card-body">
                                 <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
+                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                IsContentBlocked="true"
+                                ApplyBackgroundShading="true"
+                                IndicatorAreaVisible="false"
+                                Text="Fetching Data...">
                                     <MyGridPaginate @ref="Grid"
-                                                    Data="getEducationPrograms"
-                                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                                    DataItemDeleting="OnDelete"
-                                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                                    KeyFieldName="Id">
+                                    Data="getEducationPrograms"
+                                    @bind-SelectedDataItems="@SelectedDataItems"
+                                    DataItemDeleting="OnDelete"
+                                    FocusedRowChanged="Grid_FocusedRowChanged"
+                                    KeyFieldName="Id">
 
                                         <ToolbarTemplate>
                                             <MyDxToolbarBase TItem="EducationProgramDto"
-                                                             Items="@getEducationPrograms"
-                                                             Grid="Grid"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@(async () => await EditItem_Click())"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@Refresh_Click"
-                                                             IsImport="false"
-                                                             VisibleNew="UserAccessCRUID.IsCreate"
-                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
+                                            Items="@getEducationPrograms"
+                                            Grid="Grid"
+                                            SelectedDataItems="@SelectedDataItems"
+                                            NewItem_Click="@NewItem_Click"
+                                            EditItem_Click="@(async () => await EditItem_Click())"
+                                            DeleteItem_Click="@DeleteItem_Click"
+                                            Refresh_Click="@Refresh_Click"
+                                            IsImport="false"
+                                           EnableDelete = "isActiveButton"
+                                            VisibleNew="UserAccessCRUID.IsCreate"
+                                            VisibleEdit="UserAccessCRUID.IsUpdate"
+                                            VisibleDelete="UserAccessCRUID.IsDelete" />
 
                                         </ToolbarTemplate>
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="EventName" SortIndex="0" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EventName"  />
                                             <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" />
-                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="StartDate" Caption="Start Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="StartDate" Caption="Start Date" DisplayFormat="@Helper.DefaultFormatDate"  />
                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="EndDate" Caption="End date" DisplayFormat="@Helper.DefaultFormatDate" />
                                             <DxGridDataColumn MinWidth="100" Width="auto" FieldName="Status" Caption="Status" CaptionAlignment="GridTextAlignment.Right">
                                                 <CellDisplayTemplate>
-                                                   
-                                                        @GetIssueStatusIconHtml((context.DataItem as EducationProgramDto).Status)
-                                                   
+
+                                                    @GetIssueStatusIconHtml((context.DataItem as EducationProgramDto).Status)
+
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                             <DxGridDataColumn MinWidth="200" FieldName="Slug" Caption="Slug">
@@ -65,24 +66,27 @@
                                                     @{
                                                         var dataItem = (context.DataItem as EducationProgramDto);
                                                     }
-                                                    <div class="row">
-                                                        <div class="col-4 me-1">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Secondary"
-                                                                      title="Copy"
-                                                                      Text="Copy"
-                                                                      IconCssClass="fa-solid fa-copy"
-                                                                      Click="@(() => ClickCopy(dataItem))"
-                                                                      CssClass="btn-icon-undo me-1" />
+                                                    @if (dataItem.Status == EnumStatusEducationProgram.Active)
+                                                    {
+                                                        <div class="row">
+                                                            <div class="col-4 me-1">
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+                                                                title="Copy"
+                                                                Text="Copy"
+                                                                IconCssClass="fa-solid fa-copy"
+                                                                Click="@(() => ClickCopy(dataItem))"
+                                                                CssClass="btn-icon-undo me-1" />
+                                                            </div>
+                                                            <div class="col-5">
+                                                                <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+                                                                title="Open To"
+                                                                Text="Open To"
+                                                                IconCssClass="fa-solid fa-arrow-up-right-from-square"
+                                                                Click="@(() => ClickOpenTo(dataItem))"
+                                                                CssClass="btn-icon-redo" />
+                                                            </div>
                                                         </div>
-                                                        <div class="col-5">
-                                                            <DxButton RenderStyle="ButtonRenderStyle.Secondary"
-                                                                      title="Open To"
-                                                                      Text="Open To"
-                                                                      IconCssClass="fa-solid fa-arrow-up-right-from-square"
-                                                                      Click="@(() => ClickOpenTo(dataItem))"
-                                                                      CssClass="btn-icon-redo" />
-                                                        </div>
-                                                    </div>
+                                                    }
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
                                         </Columns>
