@@ -12,6 +12,12 @@
         align-items: center;
         min-height: 100vh;
     }
+
+    .img-fluid {
+        width: 100%;
+        height: auto;
+    }
+
 </style>
 
 @if (IsFound)
@@ -139,7 +145,8 @@
 
                                     @if (!string.IsNullOrWhiteSpace(WellnessProgram.Content?.Trim()) && IsShowContent)
                                     {
-                                        @((MarkupString)@WellnessProgram.Content)
+                                        @* @((MarkupString)@WellnessProgram.Content) *@
+                                        <p><img src="https://assets.isu.pub/document-structure/230227082348-d35b50a8a48a0cb3d74b6be82497fbf1/v1/40cca39ffaf378bc50142582f8237332.jpeg" alt="Udah work-life balance belum? Yuk lihat skema terbaru Wellness Program di  Magz ini! #RapidGrowth by People Engagement - Issuu"></p>
                                     }
                                     else
                                     {
