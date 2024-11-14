@@ -6,6 +6,7 @@ using MailKit.Search;
 using McDermott.Application.Dtos.AwarenessEvent;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using System.Security.Policy;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand;
 using static McDermott.Application.Features.Commands.AwarenessEvent.ParticipanEduCommand;
@@ -161,7 +162,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 }
                 postEducationPrograms = result ?? new();
                                 
-                var resultParticipan = await Mediator.Send(new GetParticipanEduQuery());
+                var resultParticipan = await Mediator.Send(new GetParticipanEduQuery
+                {
+                    Predicate=x=>x.EducationProgramId==postEducationPrograms.Id,
+                });
 
                 GetParticipanEdus = resultParticipan.Item1;
                 // log
@@ -525,7 +529,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             {
                 if (Id.HasValue)
                 {
-                    NavigationManager.NavigateTo($"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}", true);
+                    var url =$"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
+                    await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
                 }
             }
         }

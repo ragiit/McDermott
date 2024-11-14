@@ -17,7 +17,7 @@
                                                 ApplyBackgroundShading="true"
                                                 IndicatorAreaVisible="false"
                                                 Text="Fetching Data...">
-                                    <MyGrid @ref="Grid"
+                                    <MyGridPaginate @ref="Grid"
                                             Data="getEducationPrograms"
                                             @bind-SelectedDataItems="@SelectedDataItems"
                                             DataItemDeleting="OnDelete"
@@ -32,7 +32,7 @@
                                                              NewItem_Click="@NewItem_Click"
                                                              EditItem_Click="@(async () => await EditItem_Click())"
                                                              DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@Refresh_Click"                                                            
+                                                             Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
@@ -43,14 +43,43 @@
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
                                             <DxGridDataColumn MinWidth="200" FieldName="EventName" SortIndex="0" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category"  />
+                                            <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" />
                                             <DxGridDataColumn MinWidth="200" FieldName="StartDate" Caption="Start Date" />
                                             <DxGridDataColumn MinWidth="200" FieldName="EndDate" Caption="End date" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Slug" Caption="Slug" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">
+                                                <CellDisplayTemplate>
+                                                    @GetIssueStatusIconHtml((context.DataItem as EducationProgramDto).Status)
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
                                         </Columns>
-                                        
-                                    </MyGrid>
 
+                                    </MyGridPaginate>
+                                    <div class="row">
+                                        <DxFormLayout>
+                                            <div class="col-md-9">
+                                                <DxFormLayoutItem>
+                                                    <DxPager PageCount="totalCount"
+                                                             ActivePageIndexChanged="OnPageIndexChanged"
+                                                             ActivePageIndex="activePageIndex"
+                                                             VisibleNumericButtonCount="10"
+                                                             SizeMode="SizeMode.Medium"
+                                                             NavigationMode="PagerNavigationMode.Auto">
+                                                    </DxPager>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                            <div class="col-md-3 d-flex justify-content-end">
+                                                <DxFormLayoutItem Caption="Page Size:">
+                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                  NullText="Select Page Size"
+                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                                  @bind-Value="pageSize">
+                                                    </MyDxComboBox>
+                                                </DxFormLayoutItem>
+                                            </div>
+                                        </DxFormLayout>
+                                    </div>
                                 </DxLoadingPanel>
                             </div>
                         </div>

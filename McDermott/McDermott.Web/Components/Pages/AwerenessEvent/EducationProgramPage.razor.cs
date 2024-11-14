@@ -24,6 +24,46 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private bool FormValidationState { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+        #region Enum Status
+        public MarkupString GetIssueStatusIconHtml(EnumStatusEducationProgram? status)
+        {
+            string priorityClass;
+            string title;
+
+            switch (status)
+            {
+                case EnumStatusEducationProgram.Draft:
+                    priorityClass = "info";
+                    title = "Draft";
+                    break;
+
+                case EnumStatusEducationProgram.Active:
+                    priorityClass = "success";
+                    title = "Active";
+                    break;
+
+                case EnumStatusEducationProgram.InActive:
+                    priorityClass = "danger";
+                    title = "InActive";
+                    break;
+                case EnumStatusEducationProgram.Done:
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+
+               
+
+                default:
+                    return new MarkupString("");
+            }
+            string html = $"<div class='row '><div class='col-3'>" +
+                         $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+        #endregion
+
         #endregion
 
         #region Searching
@@ -94,7 +134,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             PanelVisible = true;
             var result = await Mediator.Send(new GetEducationProgramQuery
             {
-
+                OrderByList =
+                    [
+                        (x => x.CreatedDate, true),  // ThenByDescending Created
+                        (x => x.Status, true),               // OrderByDescending Status
+                    ],
                 SearchTerm = searchTerm,
                 PageSize = pageSize,
                 PageIndex = pageIndex,
