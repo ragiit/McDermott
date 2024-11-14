@@ -897,15 +897,15 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         KdPrognosa = item.kdPrognosa,
                         NmPrognosa = item.nmPrognosa,
                     }).ToList();
-
-                    PrognosaRequests.Clear();
-                    PrognosaRequests = a;
+                     
+                    return a;
                 }
                 else
                 {
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-
                     ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+
+                    return [];
                 }
             }
             catch (Exception ex)
@@ -2132,7 +2132,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                         case EnumStatusGeneralConsultantService.Waiting:
                             GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Waiting;
-                            StagingText = EnumStatusGeneralConsultantService.Physician;
+                            PrognosaRequests = await GetPrognosaData();
+                            StagingText = EnumStatusGeneralConsultantService.Physician; 
                             break;
 
                         case EnumStatusGeneralConsultantService.Physician:
