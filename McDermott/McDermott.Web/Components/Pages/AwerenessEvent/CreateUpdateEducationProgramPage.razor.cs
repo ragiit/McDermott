@@ -38,7 +38,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private bool FormValidationState { get; set; } = true;
         private int FocusedRowVisibleIndex { get; set; }
 
-        private bool IsReadOnly => postEducationPrograms.Status != EnumStatusEducationProgram.Draft || postEducationPrograms.Id == 0;
+        private bool IsReadOnly => !(postEducationPrograms.Status == EnumStatusEducationProgram.Done || postEducationPrograms.Status == EnumStatusEducationProgram.InActive);
+
         private bool IsReadOnlyEvent => postEducationPrograms.Status != EnumStatusEducationProgram.Draft && postEducationPrograms.Status != EnumStatusEducationProgram.Active;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsEducation { get; set; } = [];
@@ -323,17 +324,17 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     {
                         postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
                     }
-                    if (!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
-                    {
-                        postEducationPrograms.HTMLMaterial = await QuillHtml2.GetHTML();
-                    }
-                    await FileUploadService.UploadFileAsync(BrowserFile);
+                    
                     postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
                     data = await Mediator.Send(new CreateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Add Data Success...");
                 }
                 else
                 {
+                    if (!string.IsNullOrWhiteSpace(await QuillHtml.GetContent()))
+                    {
+                        postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
+                    }
                     if (!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
                     {
                         postEducationPrograms.HTMLMaterial = await QuillHtml2.GetHTML();

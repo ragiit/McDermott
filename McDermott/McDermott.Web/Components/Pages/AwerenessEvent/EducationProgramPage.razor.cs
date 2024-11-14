@@ -151,7 +151,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion
 
         #region Grid Events
-        private bool isActiveButton { get; set; } = true
+        private bool isActiveButton { get; set; } = true;
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;

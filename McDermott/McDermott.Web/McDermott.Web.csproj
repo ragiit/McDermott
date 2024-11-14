@@ -61,7 +61,10 @@
     <Folder Include="Logs\" />
     <Folder Include="wwwroot\files\" />
     <Folder Include="wwwroot\Dokumen\" />
-    <Folder Include="wwwroot\Reports\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Reports\TestReport.repx" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="https://json.schemastore.org/appveyor.json" /></VisualStudio></ProjectExtensions>

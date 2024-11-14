@@ -76,7 +76,7 @@
                                             <!-- Name Event (TextBox) -->
                                             <DxFormLayoutItem Caption="Name Event" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                 <MyTextBox @bind-Text="@postEducationPrograms.EventName" NullText="Input Name Event.."
-                                                           ReadOnly="@IsReadOnly" />
+                                                           ReadOnly="@(!IsReadOnly)" />
                                                 <ValidationMessage For="@(()=>postEducationPrograms.EventName)" />
                                             </DxFormLayoutItem>
 
@@ -88,7 +88,7 @@
                                                               @bind-Value="@postEducationPrograms.EventCategoryId"
                                                               TextFieldName="Name"
                                                               ValueFieldName="Id"
-                                                              ReadOnly="@IsReadOnly"
+                                                              ReadOnly="@(!IsReadOnly)"
                                                               TextChanged="((string e) => OnInputCategoryChanged(e))">
                                                     <Buttons>
                                                         <DxEditorButton Click="OnSearchCategoryIndexDecrement"
@@ -121,17 +121,17 @@
 
                                             <!-- StartDate (DateTime) -->
                                             <DxFormLayoutItem Caption="Start Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText=" Start Date" Width="100%" ReadOnly="@IsReadOnly" />
+                                                <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText=" Start Date" Width="100%" ReadOnly="@(!IsReadOnly)" />
                                             </DxFormLayoutItem>
 
                                             <!-- EndDate (DateTime) -->
                                             <DxFormLayoutItem Caption="End Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="End Date" Width="100%" ReadOnly="@IsReadOnly" />
+                                                <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="End Date" Width="100%" ReadOnly="@(!IsReadOnly)" />
                                             </DxFormLayoutItem>
 
                                             <!-- Content (HTMLEditor) -->
                                             <DxFormLayoutItem Caption="Content" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                <BlazoredTextEditor @ref=QuillHtml Placeholder="write somthing..." ReadOnly="@IsReadOnly">
+                                                <BlazoredTextEditor @ref=QuillHtml Placeholder="write somthing..." ReadOnly="@(!IsReadOnly)">
                                                     <ToolbarContent>
                                                         <select class="ql-header">
                                                             <option selected=""></option>
@@ -239,7 +239,7 @@
                                                         <DxFormLayoutItem Caption="Attedence" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@postEducationPrograms.Attendance"
                                                                            ShowValidationIcon="true"
-                                                                           ReadOnly="IsReadOnly"
+                                                                           ReadOnly="IsReadOnlyEvent"
                                                                            MaskMode="MaskMode.RegEx">
                                                                 <Buttons>
                                                                     <InputFile id="sipFile" accept=".xls, .pdf, .xlsx" OnChange="@SelectFiles" multiple="false" style="display:none" />
@@ -256,14 +256,6 @@
                                                         </DxFormLayoutItem>
                                                     </DxFormLayout>
                                                     
-                                                        <div class="row justify-content-end mt-2">
-                                                            <div class="col-auto">
-                                                                <DxButton Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done || postEducationPrograms.Status != EnumStatusEducationProgram.Done)" onclick="@(()=>SaveEvent())" Text="Save" />
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                <DxButton RenderStyle="ButtonRenderStyle.Danger" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done || postEducationPrograms.Status != EnumStatusEducationProgram.Done)" Click="@(() => Grid.CancelEditAsync())" Text="Cancel" />
-                                                            </div>
-                                                        </div>
                                                     
                                                 </div>
                                             </div>

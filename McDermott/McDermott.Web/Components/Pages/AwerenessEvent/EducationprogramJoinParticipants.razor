@@ -33,12 +33,74 @@
                             <div class="card-header bg-primary">
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
-                                        <h4 class="fw-bold">@EducationPrograms.EventName</h4>
+                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="text-center">Sorry, this Education Awaraness program has ended.</p>
+                                <p class="text-center">Sorry, this wellness program has ended.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!IsActive)
+    {
+        <div class="wrapper">
+            <div class="container-fluid ">
+                <div class="row centered-container">
+                    <div class="col-md-10">
+                        <div class="card mt-5">
+                            <div class="card-header bg-primary">
+                                <div class="row justify-content-center">
+                                    <div class="col-auto align-self-center">
+                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-center">
+                                    @if (WellnessProgram.Status == EnumWellness.Completed)
+                                    {
+                                    <p class="text-center">This wellness program has been completed.</p>
+                                    }
+                                    else if (WellnessProgram.Status == EnumWellness.Inactive)
+                                    {
+                                    <p class="text-center">This wellness program is currently inactive.</p>
+                                    }
+                                    else
+                                    {
+                                    <p class="text-center">This wellness program is currently in the "@WellnessProgram.Status.GetDisplayName()" status.</p>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (IsStart)
+    {
+        <div class="wrapper">
+            <div class="container-fluid">
+                <div class="row centered-container">
+                    <div class="col-md-10">
+                        <div class="card mt-5">
+                            <div class="card-header bg-primary">
+                                <div class="row justify-content-center">
+                                    <div class="col-auto align-self-center">
+                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                        @*       <div id="countdown" class="text-light mt-2"></div> *@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-center">This wellness program has not started yet. Please check back later.</p>
+
+                                <h5 class=" text-center mt-2">Start in: @WellnessProgram.StartDate.ToString("dd MMMM yyyy")</h5>
                             </div>
                         </div>
                     </div>
@@ -172,19 +234,26 @@
                 </div>
             </div>
         </DxLoadingPanel>
+
     }
 }
 else
 {
-    <div class="container-fluid mt-5">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h4>Slug</h4>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-center">Sorry, the program is not found, please check the URL.</p>
+    <div class="wrapper">
+        <div class="container-fluid ">
+            <div class="row centered-container">
+                <div class="col-md-10">
+                    <div class="card mt-5">
+                        <div class="card-header bg-primary">
+                            <div class="row justify-content-center">
+                                <div class="col-auto align-self-center">
+                                    <h4 class="fw-bold">Slug</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-center"> Sorry, The Program is not found, please check the URL.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,6 +270,9 @@ else
 
     private bool IsFound { get; set; } = true;
     private bool PanelVisible { get; set; } = false;
+    private bool IsClosed { get; set; } = false;
+    private bool IsStart { get; set; } = false;
+    private bool IsActive { get; set; } = false;
 
     [Required]
     private string PatientNumber { get; set; } = string.Empty;
@@ -277,7 +349,6 @@ else
         finally { PanelVisible = false; }
     }
 
-    private bool IsClosed { get; set; } = false;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -285,7 +356,7 @@ else
             PanelVisible = true;
             EducationPrograms = await Mediator.Send(new GetSingleEducationProgramQuery
                 {
-                    Predicate = x => x.Slug == Slug
+                    Predicate = x => x.Slug == Slug 
                 });
 
             if (EducationPrograms is null)
@@ -294,9 +365,16 @@ else
                 return;
             }
 
-            if (EducationPrograms.EndDate is not null && EducationPrograms.EndDate < DateTime.Today)
+            if (EducationPrograms.EndDate is not null && EducationPrograms.EndDate < DateTime.Now)
             {
                 IsClosed = true;
+                return;
+            }
+
+            if (EducationPrograms.Status == EnumStatusEducationProgram.Active)
+            {
+                IsActive = true;
+                return;
             }
         }
         catch (Exception ex)

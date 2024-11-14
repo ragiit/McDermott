@@ -6,12 +6,16 @@
 <link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css">
 
-<DxReportViewer @ref="DxReportViewer" /> 
+
+<DxReportViewer @ref="reportViewer" Report="@Report">
+</DxReportViewer>
 
 @code {
-    DxReportViewer? DxReportViewer;
-    // XtraReport Report
-    // {
+    DxReportViewer? reportViewer;
 
-    // };
+         XtraReport Report { get{
+        return XtraReport.FromFile(System.IO.Path.Combine(Directory.GetCurrentDirectory(),
+         @"wwwroot\Reports\TestReport.repx"));
+        }
+    }
 }

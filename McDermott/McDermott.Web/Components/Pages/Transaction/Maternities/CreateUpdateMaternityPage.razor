@@ -428,17 +428,18 @@
                                                             }
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
                                                                 <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                            @bind-Date="@GeneralConsultanService.RegistrationDate"
-                                                                            Mask="@DateTimeMask.ShortDate"
+                                                                            @bind-Date="@GeneralConsultanService.RegistrationDate" 
+                                                                            DisplayFormat="@Helper.DefaultFormatDate"
                                                                             NullText="Select Registration Date">
                                                                 </DxDateEdit>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.RegistrationDate)" />
                                                             </DxFormLayoutItem>
 
-                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient Next Visit Schedule" ColSpanMd="12">
+                                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Next Visit Schedule" ColSpanMd="12">
                                                                 <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                             @bind-Date="@GeneralConsultanService.PatientNextVisitSchedule"
                                                                             Mask="@DateTimeMask.ShortDate"
+                                                                            DisplayFormat="@Helper.DefaultFormatDate"
                                                                             NullText="Select Patient Next Visit Schedule">
                                                                 </DxDateEdit>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.PatientNextVisitSchedule)" />
