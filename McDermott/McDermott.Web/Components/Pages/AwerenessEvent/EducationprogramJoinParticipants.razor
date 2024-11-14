@@ -33,7 +33,7 @@
                             <div class="card-header bg-primary">
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
-                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                        <h4 class="fw-bold">@EducationPrograms.EventName</h4>
                                     </div>
                                 </div>
                             </div>
@@ -56,23 +56,23 @@
                             <div class="card-header bg-primary">
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
-                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                        <h4 class="fw-bold">@EducationPrograms.EventName</h4>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <p class="text-center">
-                                    @if (WellnessProgram.Status == EnumWellness.Completed)
+                                    @if (EducationPrograms.Status == EnumStatusEducationProgram.Done)
                                     {
                                     <p class="text-center">This wellness program has been completed.</p>
                                     }
-                                    else if (WellnessProgram.Status == EnumWellness.Inactive)
+                                    else if (EducationPrograms.Status == EnumStatusEducationProgram.InActive)
                                     {
                                     <p class="text-center">This wellness program is currently inactive.</p>
                                     }
                                     else
                                     {
-                                    <p class="text-center">This wellness program is currently in the "@WellnessProgram.Status.GetDisplayName()" status.</p>
+                                    <p class="text-center">This wellness program is currently in the "@EducationPrograms.Status.GetDisplayName()" status.</p>
                                     }
                                 </p>
                             </div>
@@ -92,7 +92,7 @@
                             <div class="card-header bg-primary">
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
-                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                        <h4 class="fw-bold">@EducationPrograms.EventName</h4>
                                         @*       <div id="countdown" class="text-light mt-2"></div> *@
                                     </div>
                                 </div>
@@ -100,7 +100,7 @@
                             <div class="card-body">
                                 <p class="text-center">This wellness program has not started yet. Please check back later.</p>
 
-                                <h5 class=" text-center mt-2">Start in: @WellnessProgram.StartDate.ToString("dd MMMM yyyy")</h5>
+                                <h5 class=" text-center mt-2">Start in: @EducationPrograms.StartDate.GetValueOrDefault().ToString("dd MMMM yyyy")</h5>
                             </div>
                         </div>
                     </div>
