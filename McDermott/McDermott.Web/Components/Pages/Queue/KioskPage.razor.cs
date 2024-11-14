@@ -1007,16 +1007,16 @@ namespace McDermott.Web.Components.Pages.Queue
                     FormQueue.ClassTypeId = FormKios.ClassTypeId;
                     FormQueue.QueueStatus = "waiting";
 
-                    if (bpjs is not null && !string.IsNullOrWhiteSpace(FormKios.BPJS))
-                    {
-                        var isSuccess = await SendPCareRequestAntrean(bpjs ?? new());
-                        if (!isSuccess)
-                        {
-                            BPJSIntegration = new();
-                            showQueue = false;
-                            IsLoading = false;
-                        }
-                    }
+                    //if (bpjs is not null && !string.IsNullOrWhiteSpace(FormKios.BPJS))
+                    //{
+                    //    var isSuccess = await SendPCareRequestAntrean(bpjs ?? new());
+                    //    if (!isSuccess)
+                    //    {
+                    //        BPJSIntegration = new();
+                    //        showQueue = false;
+                    //        IsLoading = false;
+                    //    }
+                    //}
 
                     // Membuat KioskQueue baru
                     var QueueKioskId = await Mediator.Send(new CreateKioskQueueRequest(FormQueue));

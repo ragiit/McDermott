@@ -92,7 +92,7 @@
                                         <DxFormLayout CssClass="w-100">
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Program Name" ColSpanMd="12">
                                                 <MyTextBox @bind-Text="@WellnessProgram.Name"
-                                                           Enabled="EnableForm"
+                                                           ReadOnly="!EnableForm"
                                                            NullText="Name" />
                                                 <ValidationMessage For="@(() => WellnessProgram.Name)" />
                                             </DxFormLayoutItem>
@@ -100,6 +100,7 @@
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Category" ColSpanMd="12">
                                                 <MyDxComboBox Data="@AwarenessEduCategories"
                                                               NullText="Select Category"
+                                                              ReadOnly="!EnableForm"
                                                               @ref="refAwarenessEduCategoryComboBox"
                                                               @bind-Value="@WellnessProgram.AwarenessEduCategoryId"
                                                               TextFieldName="Name"
@@ -108,12 +109,15 @@
                                                     <Buttons>
                                                         <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexDecrement"
                                                                         IconCssClass="fa-solid fa-caret-left"
+                                                                        Visible="EnableForm"
                                                                         Tooltip="Previous Index" />
                                                         <DxEditorButton Click="OnSearchAwarenessEduCategory"
+                                                                        Visible="EnableForm"
                                                                         IconCssClass="fa-solid fa-magnifying-glass"
                                                                         Tooltip="Search" />
                                                         <DxEditorButton Click="OnSearchAwarenessEduCategoryIndexIncrement"
                                                                         IconCssClass="fa-solid fa-caret-right"
+                                                                        Visible="EnableForm"
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
                                                     <Columns>
@@ -126,13 +130,13 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Start Date" ColSpanMd="12">
                                                 <DxDateEdit @bind-Date="@WellnessProgram.StartDate"
                                                             DisplayFormat="@Helper.DefaultFormatDate"
-                                                            Enabled="EnableForm" />
+                                                            ReadOnly="!EnableForm" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="End Date" ColSpanMd="12">
                                                 <DxDateEdit @bind-Date="@WellnessProgram.EndDate"
                                                             DisplayFormat="@Helper.DefaultFormatDate"
-                                                            Enabled="EnableForm" />
+                                                            ReadOnly="!EnableForm" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Slug" ReadOnly ColSpanMd="12">
@@ -146,7 +150,7 @@
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Content" ColSpanMd="12">
-                                                <BlazoredTextEditor @ref=QuillHtml Placeholder="write somthing...">
+                                                <BlazoredTextEditor ReadOnly="!EnableForm" @ref=QuillHtml Placeholder="write somthing...">
                                                     <ToolbarContent>
                                                         <select class="ql-header">
                                                             <option selected=""></option>
@@ -190,9 +194,9 @@
                                                             <button class="ql-video"></button>
                                                         </span>
                                                     </ToolbarContent>
-                                                    <EditorContent>
+                                                   @*  <EditorContent>
                                                         @((MarkupString)WellnessProgram.Content)
-                                                    </EditorContent>
+                                                    </EditorContent> *@
                                                 </BlazoredTextEditor>
                                             </DxFormLayoutItem>
 
@@ -259,7 +263,7 @@
                                                                         <Columns>
                                                                             <DxGridSelectionColumn Width="15px" />
                                                                             <DxGridDataColumn FieldName="Name" Caption="Name" />
-                                                                            <DxGridDataColumn FieldName="StartDate" Caption="Start Time" DisplayFormat="@Helper.DefaultFormatDateTime" />
+                                                                            <DxGridDataColumn FieldName="StartDate" Caption="Start Time" DisplayFormat="@Helper.DefaultFormatDateTime"   />
                                                                             <DxGridDataColumn FieldName="EndDate" Caption="End Time" DisplayFormat="@Helper.DefaultFormatDateTime" />
                                                                             <DxGridDataColumn FieldName="Notes" />
                                                                             <DxGridDataColumn FieldName="Slug" />

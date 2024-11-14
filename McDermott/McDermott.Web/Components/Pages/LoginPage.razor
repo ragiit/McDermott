@@ -46,7 +46,7 @@
                 @text
                 </div> *@
 
-              @*   <form method="POST" action="/login">
+                @*   <form method="POST" action="/login">
                     <div class="input-group mb-3">
                         <input @bind="LoginForm.Email" id="exampleInputEmail1" type="email" class="form-control" placeholder="Email">
                         <div class="input-group-append">
@@ -80,7 +80,7 @@
                     <input type="submit" value="Submit">
                 </form> *@
 
-               @*  <DxComboBox @bind-Value="SelectedValue"
+                @*  <DxComboBox @bind-Value="SelectedValue"
                             @bind-Text="Hehehe"
                             Data="@Villages"
                             ValueFieldName="Id"
@@ -368,7 +368,16 @@
             // ToastService.ClearErrorToasts();
 
             // var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == LoginForm.Password));
-            var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == Helper.HashMD5(LoginForm.Password)));
+            var abvc = Helper.HashMD5(LoginForm.Password);
+            // var user = await Mediator.Send(new GetUserQuery(x => x.Email == LoginForm.Email && x.Password == Helper.HashMD5(LoginForm.Password)));
+            var user = await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.IsUser == true && x.Email == LoginForm.Email && x.Password == Helper.HashMD5(LoginForm.Password),
+                    Select = x => new User
+                    {
+                        Id = x.Id
+                    }
+                });
 
             if (!FormValidationState)
             {
@@ -377,7 +386,7 @@
                 return;
             }
 
-            if (user.Count > 0 && !string.IsNullOrWhiteSpace(LoginForm!.Email) && !string.IsNullOrWhiteSpace(LoginForm.Password))
+            if (user is not null && !string.IsNullOrWhiteSpace(LoginForm!.Email) && !string.IsNullOrWhiteSpace(LoginForm.Password))
             {
                 // Helper.UserLogin = user;
 
@@ -407,7 +416,7 @@
                 // await _protectedSessionStorage.SetAsync("UserSession", b);
                 // await _protectedSessionStorage.SetAsync("UserMenuSession", DetailMenuDtos);
 
-                string serialize = JsonConvert.SerializeObject(user[0]);
+                string serialize = JsonConvert.SerializeObject(user);
                 var encrypt = Helper.Encrypt(serialize);
 
                 // await oLocal.SetItemAsync("dotnet", encrypt);

@@ -92,7 +92,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                         },
                         Planning = x.Planning,
                         MedicationTherapy = x.MedicationTherapy,
-                        NonMedicationTherapy = x.NonMedicationTherapy
+                        NonMedicationTherapy = x.NonMedicationTherapy,
+                        Anamnesa = x.Anamnesa,
                     });
 
                 if (!request.IsGetAll)
@@ -190,7 +191,10 @@ namespace McDermott.Application.Features.Queries.Transaction
                         {
                             Name = x.Diagnosis != null ? x.Diagnosis.Name : "",
                         },
-                        Planning = x.Planning
+                        Planning = x.Planning,
+                        MedicationTherapy = x.MedicationTherapy,
+                        NonMedicationTherapy = x.NonMedicationTherapy,
+                        Anamnesa = x.Anamnesa,
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanCPPTDto>();

@@ -85,12 +85,22 @@ namespace McDermott.Web.Components.Layout
                 var userJson = await CookieHelper.GetCookie(JsRuntime, CookieHelper.USER_INFO);
 
                 User = JsonConvert.DeserializeObject<User>(userJson);
-                _isInitComplete = true;
-
-                StateHasChanged();
 
                 if (User is null)
                     return;
+
+                User = (await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.Id == User.Id,
+                    Select = x => new User
+                    {
+                        GroupId = x.GroupId,
+                        Name = x.Name
+                    }
+                })).Adapt<User>();
+                _isInitComplete = true;
+
+                StateHasChanged();
 
                 if (User.GroupId is null)
                 {

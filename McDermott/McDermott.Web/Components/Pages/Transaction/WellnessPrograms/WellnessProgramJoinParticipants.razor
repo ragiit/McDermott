@@ -3,7 +3,7 @@
 @using static McDermott.Application.Features.Commands.Transaction.WellnessProgramParticipantCommand
 @using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand
 
-<PageTitle>@Helper.APP_NAME - Wellness</PageTitle>
+<PageTitle>@Helper.APP_NAME - Wellness Join Participant</PageTitle>
 
 <style>
     .centered-container {
@@ -13,11 +13,20 @@
         min-height: 100vh;
     }
 
-    .img-fluid {
-        width: 100%;
+    .contents-wrapper img {
+        max-width: 100%;
         height: auto;
     }
 
+    .contents-wrapper {
+        max-width: 600px; /* Sesuaikan nilai ini sesuai dengan lebar kolom yang diinginkan */
+        overflow-wrap: break-word; /* Untuk menghindari teks melebar */
+        word-wrap: break-word;
+    }
+
+    .dxbl-row {
+        justify-content: center !important;
+    }
 </style>
 
 @if (IsFound)
@@ -131,8 +140,8 @@
 
                                     @if (!string.IsNullOrWhiteSpace(WellnessProgram.Content?.Trim()))
                                     {
-                                        <div class="row mt-2 mb-3">
-                                            <div class="col-12">
+                                        <div class="row mt-2 mb-3 justify-content-center">
+                                            <div class="col-12 d-flex justify-content-center">
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary"
                                                           RenderStyleMode="@ButtonRenderStyleMode.Contained"
                                                           Text="@(IsShowContent ? "Join Participant" : "See Content")"
@@ -145,8 +154,11 @@
 
                                     @if (!string.IsNullOrWhiteSpace(WellnessProgram.Content?.Trim()) && IsShowContent)
                                     {
-                                        @* @((MarkupString)@WellnessProgram.Content) *@
-                                        <p><img src="https://assets.isu.pub/document-structure/230227082348-d35b50a8a48a0cb3d74b6be82497fbf1/v1/40cca39ffaf378bc50142582f8237332.jpeg" alt="Udah work-life balance belum? Yuk lihat skema terbaru Wellness Program di  Magz ini! #RapidGrowth by People Engagement - Issuu"></p>
+                                        <div class="row justify-content-center">
+                                            <div class="col-auto contents-wrapper">
+                                                @((MarkupString)@WellnessProgram.Content)
+                                            </div>
+                                        </div>
                                     }
                                     else
                                     {

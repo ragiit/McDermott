@@ -86,7 +86,7 @@ namespace McDermott.Domain.Entities
         public double Weight { get; set; }
         public double Height { get; set; }
         public long RR { get; set; }
-        public long Temp { get; set; }
+        public decimal Temp { get; set; }
         public long HR { get; set; }
         public long PainScale { get; set; }
         public long Systolic { get; set; }

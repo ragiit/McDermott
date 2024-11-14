@@ -217,7 +217,7 @@ namespace McDermott.Application.Dtos.Transaction
         }
 
         public long RR { get; set; }
-        public long Temp { get; set; }
+        public decimal Temp { get; set; }
 
         [Required]
         public long HR { get; set; }
@@ -558,7 +558,7 @@ namespace McDermott.Application.Dtos.Transaction
         }
 
         public long RR { get; set; }
-        public long Temp { get; set; }
+        public decimal Temp { get; set; }
 
         [Required]
         public long HR { get; set; }

@@ -884,6 +884,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private List<PrognosaRequest> PrognosaRequests { get; set; } = [];
+        private async Task LoadPrognosaData()
+        {
+            PrognosaRequests = await GetPrognosaData();
+        }
         private async Task<List<PrognosaRequest>> GetPrognosaData()
         {
             try
@@ -2387,7 +2391,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     kunj = new KunjunganRequest
                     {
-                        NoKunjungan = GeneralConsultanService.SerialNo ?? string.Empty,
+                        NoKunjungan = GeneralConsultanService.VisitNumber ?? string.Empty,
                         NoKartu = ins.NoKartu ?? "",
                         TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
                         KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
