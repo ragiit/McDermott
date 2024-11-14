@@ -2716,8 +2716,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("Systolic")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Temp")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("Temp")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TypeMedical")
                         .HasColumnType("nvarchar(max)");

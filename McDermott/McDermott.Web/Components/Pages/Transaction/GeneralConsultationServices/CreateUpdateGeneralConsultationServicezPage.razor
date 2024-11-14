@@ -832,7 +832,11 @@
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temp" ColSpanMd="12">
-                                                                                    <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.Temp" NullText="Temp" />
+                                                                                    <DxSpinEdit Increment="0.1M"
+                                                                                                ReadOnly="ReadOnlyForm()"
+                                                                                                MinValue="0"
+                                                                                                @bind-Value="@GeneralConsultanService.Temp"
+                                                                                                NullText="Temp" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="HR" ColSpanMd="12">
@@ -949,6 +953,13 @@
                                                                                                   @bind-Value="@GeneralConsultanService.KdPrognosa"
                                                                                                   TextFieldName="NmPrognosa"
                                                                                                   ValueFieldName="KdPrognosa">
+
+                                                                                        <Buttons>
+                                                                                            <DxEditorButton Click="LoadPrognosaData"
+                                                                                                            IconCssClass="fa-solid fa-arrows-rotate"
+                                                                                                            Visible="!ReadOnlyForm()"
+                                                                                                            Tooltip="Refresh" />
+                                                                                        </Buttons>
                                                                                     </MyDxComboBox>
 
                                                                                 </DxFormLayoutItem>
@@ -971,7 +982,7 @@
                                                                     <div class="col-md-12 w-100">
                                                                         <DxFormLayout CssClass="w-100">
                                                                             @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption=" " Context="esa" ColSpanMd="12"> *@
-                                                                              
+
                                                                             @* </DxFormLayoutItem> *@
 
                                                                             <DxLoadingPanel @bind-Visible="PanelVisible"
@@ -1119,7 +1130,7 @@
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
                                                                                                 @*  <MyTextBox @bind-Text="@a.Planning"
                                                                                                                NullText="Name" /> *@ 
-                                                                                                        </DxFormLayoutItem>
+                                                                                                                                </DxFormLayoutItem>
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medication Therapy" ColSpanMd="12">
                                                                                                 <MyTextBox @bind-Text="@a.MedicationTherapy"
                                                                                                            NullText="Medication Therapy" />
@@ -1602,7 +1613,7 @@ else
 
 
 <PopUpShowConfirmation Visible="PopUpConfirmation"
-                       ConfirmationMessage="There are items with a CPPT's 0. Do you want to continue?"
+                       ConfirmationMessage="You have not filled in the CPPT! Do you want to continue?"
                        OnConfirmed="OnPopupConfirmed">
 
 </PopUpShowConfirmation>

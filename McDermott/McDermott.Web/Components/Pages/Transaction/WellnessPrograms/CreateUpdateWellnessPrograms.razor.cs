@@ -688,6 +688,10 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 SelectedDataItemWellnessProgramDetails = [];
                 var result = await Mediator.Send(new GetWellnessProgramDetailQuery
                 {
+                    OrderByList =
+                    [
+                        (x => x.StartDate, true)
+                    ],
                     Predicate = x => x.WellnessProgramId == WellnessProgram.Id,
                     PageIndex = pageIndex,
                     PageSize = pageSizeWellnessProgramDetail,
@@ -916,6 +920,10 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 PanelVisible = true;
                 var a = await Mediator.Send(new GetWellnessProgramParticipantQuery
                 {
+                    OrderByList =
+                    [
+                        (x => x.Date, true)
+                    ],
                     Predicate = x => x.WellnessProgramId == WellnessProgram.Id,
                     SearchTerm = searchTermParticipants,
                     PageIndex = pageIndex,
@@ -973,7 +981,11 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
                 PanelVisible = true;
                 var a = await Mediator.Send(new GetWellnessProgramAttendanceQuery
                 {
-                    Predicate = x => x.WellnessProgramDetailId == WellnessProgram.Id,
+                    OrderByList =
+                    [
+                        (x => x.Date, true)
+                    ],
+                    Predicate = x => x.WellnessProgramId == WellnessProgram.Id,
                     SearchTerm = searchTermAttendances,
                     PageIndex = pageIndex,
                     PageSize = pageSizeAttendances,

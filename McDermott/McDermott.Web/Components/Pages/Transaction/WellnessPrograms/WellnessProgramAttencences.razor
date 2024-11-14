@@ -51,7 +51,7 @@
                             <div class="card-header bg-primary">
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
-                                        <h4 class="fw-bold">@WellnessProgram.Name</h4>
+                                        <h4 class="fw-bold">@WellnessProgramDetail.Name</h4>
                                     </div>
                                 </div>
                             </div>
@@ -289,7 +289,7 @@ else
             var cek = await Mediator.Send(new ValidateWellnessProgramAttendance(x => x.PatientId == Patient.Id && x.WellnessProgramDetailId == WellnessProgramDetail.Id));
             if (cek)
             {
-                ToastService.ShowInfo("The Employee is already joined the Wellness Program Activity!");
+                ToastService.ShowInfo("The Employee has already recorded attendance in this program!");
                 return;
             }
 

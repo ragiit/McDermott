@@ -46,12 +46,12 @@
 
                                         <Columns>
                                             <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
+                                            <DxGridDataColumn FieldName="Name" MinWidth="200" />
                                             <DxGridDataColumn FieldName="AwarenessEduCategory.Name" Caption="Category" MinWidth="200" />
                                             <DxGridDataColumn FieldName="StartDate" MinWidth="100" DisplayFormat="@Helper.DefaultFormatDate" />
                                             <DxGridDataColumn FieldName="EndDate" MinWidth="100" DisplayFormat="@Helper.DefaultFormatDate" />
                                             <DxGridDataColumn FieldName="Slug" />
-                                            <DxGridDataColumn FieldName="StatusString" MinWidth="100" />
+                                            <DxGridDataColumn FieldName="StatusString" MinWidth="100" Caption="Status" />
                                         </Columns>
                                         <TotalSummary>
                                             <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -192,6 +192,11 @@ else
             SelectedDataItems = [];
             var a = await Mediator.Send(new GetWellnessProgramQuery
                 {
+                    OrderByList =
+                        [
+                              (x => x.StartDate, true),
+                          (x => x.Name, false),
+                    ],
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,
