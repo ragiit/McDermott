@@ -139,6 +139,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         HTMLMaterial = x.HTMLMaterial,
                         Description = x.Description,
                         Status = x.Status,
+                        Attendance = x.Attendance,
                         EventCategory = new AwarenessEduCategory
                         {
                             Name =x.EventCategory == null ? string.Empty : x.EventCategory.Name,
@@ -226,6 +227,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         HTMLMaterial = x.HTMLMaterial,
                         Description = x.Description,
                         Status = x.Status,
+                        Attendance = x.Attendance,
                         EventCategory = new AwarenessEduCategory
                         {
                             Name = x.EventCategory == null ? string.Empty : x.EventCategory.Name,

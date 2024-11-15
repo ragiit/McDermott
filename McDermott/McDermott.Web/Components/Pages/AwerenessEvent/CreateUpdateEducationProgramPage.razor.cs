@@ -334,7 +334,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     {
                         postEducationPrograms.HTMLMaterial = await QuillHtml2.GetHTML();
                     }
-                    await FileUploadService.UploadFileAsync(BrowserFile);
 
                     var cekdata = await Mediator.Send(new GetSingleEducationProgramQuery
                     {
@@ -361,10 +360,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                         postEducationPrograms.EndDate = postEducationPrograms.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
                     postEducationPrograms.StartDate = postEducationPrograms.StartDate.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
-
+                    await FileUploadService.UploadFileAsync(BrowserFile);
 
                     data = await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Update Data Success...");
+
                 }
 
                 ToastService.ClearSuccessToasts();

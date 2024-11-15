@@ -173,7 +173,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         private async Task OnSearchPatient()
         {
-            await LoadDataPatient(0, 10);
+            await LoadDataPatient();
         }
 
         private async Task OnSearchPatientIndexIncrement()
