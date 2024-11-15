@@ -7,25 +7,25 @@
 
 <style>
     .centered-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     }
 
     .contents-wrapper img {
-        max-width: 100%;
-        height: auto;
+    max-width: 100%;
+    height: auto;
     }
 
     .contents-wrapper {
-        max-width: 600px; /* Sesuaikan nilai ini sesuai dengan lebar kolom yang diinginkan */
-        overflow-wrap: break-word; /* Untuk menghindari teks melebar */
-        word-wrap: break-word;
+    max-width: 600px; /* Sesuaikan nilai ini sesuai dengan lebar kolom yang diinginkan */
+    overflow-wrap: break-word; /* Untuk menghindari teks melebar */
+    word-wrap: break-word;
     }
 
     .dxbl-row {
-        justify-content: center !important;
+    justify-content: center !important;
     }
 </style>
 
@@ -72,15 +72,15 @@
                                 <p class="text-center">
                                     @if (WellnessProgram.Status == EnumWellness.Completed)
                                     {
-                                    <p class="text-center">This wellness program has been completed.</p>
+                                        <p class="text-center">This wellness program has been completed.</p>
                                     }
                                     else if (WellnessProgram.Status == EnumWellness.Inactive)
                                     {
-                                    <p class="text-center">This wellness program is currently inactive.</p>
+                                        <p class="text-center">This wellness program is currently inactive.</p>
                                     }
                                     else
                                     {
-                                    <p class="text-center">This wellness program is currently in the "@WellnessProgram.Status.GetDisplayName()" status.</p>
+                                        <p class="text-center">This wellness program is currently in the "@WellnessProgram.Status.GetDisplayName()" status.</p>
                                     }
                                 </p>
                             </div>
@@ -119,11 +119,11 @@
     else
     {
         <DxLoadingPanel @bind-Visible="PanelVisible"
-                        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                        IsContentBlocked="true"
-                        ApplyBackgroundShading="true"
-                        IndicatorAreaVisible="false"
-                        Text="Fetching Data...">
+        IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+        IsContentBlocked="true"
+        ApplyBackgroundShading="true"
+        IndicatorAreaVisible="false"
+        Text="Fetching Data...">
             <div class="wrapper">
                 <div class="container-fluid ">
                     <div class="row centered-container">
@@ -143,10 +143,10 @@
                                         <div class="row mt-2 mb-3 justify-content-center">
                                             <div class="col-12 d-flex justify-content-center">
                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                          RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                                          Text="@(IsShowContent ? "Join Participant" : "See Content")"
-                                                          CssClass="w-130"
-                                                          Click="OnClickContent">
+                                                RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                Text="@(IsShowContent ? "Join Participant" : "See Content")"
+                                                CssClass="w-130"
+                                                Click="OnClickContent">
                                                 </DxButton>
                                             </div>
                                         </div>
@@ -183,12 +183,12 @@
                                                                 <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
                                                                     <Template>
                                                                         <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                                                  RenderStyleMode="@ButtonRenderStyleMode.Outline"
-                                                                                  IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                  Text="Search"
-                                                                                  SubmitFormOnClick="true"
-                                                                                  Click="OnSearchPatient"
-                                                                                  CssClass="w-100 me-1">
+                                                                        RenderStyleMode="@ButtonRenderStyleMode.Outline"
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Text="Search"
+                                                                        SubmitFormOnClick="true"
+                                                                        Click="OnSearchPatient"
+                                                                        CssClass="w-100 me-1">
                                                                         </DxButton>
                                                                     </Template>
                                                                 </DxGridLayoutItem>
@@ -202,14 +202,14 @@
                                                 {
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
                                                         <MyTextBox @bind-Text="@Patient.Name"
-                                                                   ReadOnly
-                                                                   NullText="Name" />
+                                                        ReadOnly
+                                                        NullText="Name" />
                                                         <ValidationMessage For="@(() => Patient.Name)" />
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Email" ColSpanMd="12">
                                                         <MyTextBox @bind-Text="@Patient.Email"
-                                                                   ReadOnly
-                                                                   NullText="Email" />
+                                                        ReadOnly
+                                                        NullText="Email" />
                                                         <ValidationMessage For="@(() => Patient.Email)" />
                                                     </DxFormLayoutItem>
 
@@ -220,8 +220,8 @@
 
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Department" ColSpanMd="12">
                                                         <MyTextBox @bind-Text="@Patient.Department.Name"
-                                                                   ReadOnly
-                                                                   NullText="Department" />
+                                                        ReadOnly
+                                                        NullText="Department" />
                                                         <ValidationMessage For="@(() => Patient.Department)" />
                                                     </DxFormLayoutItem>
 
@@ -244,11 +244,11 @@
                                                         <div class="row justify-content-end">
                                                             <div class="col-md-12 d-flex justify-content-end">
                                                                 <DxButton RenderStyle="ButtonRenderStyle.Primary"
-                                                                          RenderStyleMode="@ButtonRenderStyleMode.Contained"
-                                                                          Text="Join"
-                                                                          CssClass="w-130"
-                                                                          SubmitFormOnClick="true"
-                                                                          Click="OnClickJoin">
+                                                                RenderStyleMode="@ButtonRenderStyleMode.Contained"
+                                                                Text="Join"
+                                                                CssClass="w-130"
+                                                                SubmitFormOnClick="true"
+                                                                Click="OnClickJoin">
                                                                 </DxButton>
                                                             </div>
                                                         </div>
@@ -404,28 +404,32 @@ else
                 return;
             }
 
-            if (WellnessProgram.EndDate is not null && WellnessProgram.EndDate < DateTime.Now)
-            {
-                IsClosed = true;
-                return;
-            }
-
             if (WellnessProgram.Status == EnumWellness.Active)
             {
                 IsActive = true;
-                return;
             }
 
+            if (IsActive)
+            {
+
+                if (DateTime.Now.Date < WellnessProgram.StartDate.Date)
+                {
+                    // StartCountdown();
+                    IsStart = true;
+                    return;
+                }
+
+                else if (WellnessProgram.EndDate is not null && WellnessProgram.EndDate < DateTime.Now)
+                {
+                    IsClosed = true;
+                    return;
+                }
+            }
 
             // if (timer is not null)
             //     timer?.Dispose();
 
-            if (DateTime.Now.Date < WellnessProgram.StartDate.Date)
-            {
-                // StartCountdown();
-                IsStart = true;
-                return;
-            }
+            
         }
         catch (Exception ex)
         {
