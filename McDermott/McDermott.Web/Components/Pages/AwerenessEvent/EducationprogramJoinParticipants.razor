@@ -1,9 +1,12 @@
 ﻿@page "/awereness-event/education-program/join-participant/{Slug}"
 @using System.ComponentModel.DataAnnotations
 @using McDermott.Application.Dtos.AwarenessEvent
-@using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand
 @using static McDermott.Application.Features.Commands.AwarenessEvent.ParticipanEduCommand
-<PageTitle>@Helper.APP_NAME - Education Program</PageTitle>
+@using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramParticipantCommand
+@using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand
+
+<PageTitle>@Helper.APP_NAME - Wellness Join Participant</PageTitle>
 
 <style>
     .centered-container {
@@ -13,8 +16,16 @@
         min-height: 100vh;
     }
 
+    .contents-wrapper img {
+        max-width: 100%;
+        height: auto;
+    }
 
-
+    .contents-wrapper {
+        max-width: 600px; /* Sesuaikan nilai ini sesuai dengan lebar kolom yang diinginkan */
+        overflow-wrap: break-word; /* Untuk menghindari teks melebar */
+        word-wrap: break-word;
+    }
 
     .dxbl-row {
         justify-content: center !important;
@@ -93,14 +104,14 @@
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
                                         <h4 class="fw-bold">@EducationPrograms.EventName</h4>
-                                        <div id="countdown" class="text-light mt-2"></div>
+                                        @*       <div id="countdown" class="text-light mt-2"></div> *@
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="text-center">This Education Awareness program has not started yet. Please check back later.</p>
+                                <p class="text-center">This wellness program has not started yet. Please check back later.</p>
 
-                                <h5 class=" text-center mt-2">Start in: @EducationPrograms.StartDate.GetValueOrDefault().ToString("dd MMMM yyyy")</h5>
+                                <h5 class=" text-center mt-2">Start in: @EducationPrograms.StartDate.ToString("dd MMMM yyyy")</h5>
                             </div>
                         </div>
                     </div>
@@ -234,7 +245,6 @@
                 </div>
             </div>
         </DxLoadingPanel>
-
     }
 }
 else
@@ -261,7 +271,6 @@ else
     </div>
 }
 
-
 @code {
     [Parameter] public string Slug { get; set; } = string.Empty;
     private bool IsShowContent { get; set; } = true;
@@ -270,9 +279,6 @@ else
 
     private bool IsFound { get; set; } = true;
     private bool PanelVisible { get; set; } = false;
-    private bool IsClosed { get; set; } = false;
-    private bool IsStart { get; set; } = false;
-    private bool IsActive { get; set; } = false;
 
     [Required]
     private string PatientNumber { get; set; } = string.Empty;
@@ -294,13 +300,13 @@ else
             var cek = await Mediator.Send(new ValidateParticipanEduQuery(x => x.PatientId == Patient.Id && x.EducationProgramId == EducationPrograms.Id));
             if (cek)
             {
-                ToastService.ShowInfo("The Employee is already joined the Education & Awareness Program!");
+                ToastService.ShowInfo("The Employee is already joined the Wellness Program!");
                 return;
             }
 
             await Mediator.Send(new CreateParticipanEduRequest(new ParticipanEduDto
                 {
-
+                    CreatedDate = DateTime.Now,
                     PatientId = Patient.Id,
                     EducationProgramId = EducationPrograms.Id,
                 }));
@@ -321,10 +327,11 @@ else
             PanelVisible = true;
             Patient = await Mediator.Send(new GetSingleUserQuery
                 {
-                    Predicate = x => x.IsPatient == true && x.IsEmployee == true && (x.Legacy != null && x.Legacy.Equals(PatientNumber)) ||
+                    Predicate = x => x.IsPatient == true && x.IsEmployee == true &&
+                                (x.Legacy != null && x.Legacy.Equals(PatientNumber) ||
                                 x.NIP != null && x.NIP.Equals(PatientNumber) ||
                                 x.Oracle != null && x.Oracle.Equals(PatientNumber) ||
-                                x.SAP != null && x.SAP.Equals(PatientNumber),
+                                x.SAP != null && x.SAP.Equals(PatientNumber)),
                     Select = x => new User
                     {
                         Id = x.Id,
@@ -349,6 +356,9 @@ else
         finally { PanelVisible = false; }
     }
 
+    private bool IsClosed { get; set; } = false;
+    private bool IsStart { get; set; } = false;
+    private bool IsActive { get; set; } = false;
     protected override async Task OnInitializedAsync()
     {
         try
@@ -365,25 +375,31 @@ else
                 return;
             }
 
-            if (EducationPrograms.EndDate is not null && EducationPrograms.EndDate <= DateTime.Now)
-            {
-                IsClosed = true;
-                return;
-            }
-
             if (EducationPrograms.Status == EnumStatusEducationProgram.Active)
             {
                 IsActive = true;
-                return;
             }
 
-
-            if (DateTime.Now.Date < EducationPrograms.StartDate)
+            if (IsActive)
             {
-                // StartCountdown();
-                IsStart = true;
-                return;
+
+                if (DateTime.Now.Date < EducationPrograms.StartDate.Date)
+                {
+                    // StartCountdown();
+                    IsStart = true;
+                    return;
+                }
+
+                else if (EducationPrograms.EndDate is not null && EducationPrograms.EndDate < DateTime.Now)
+                {
+                    IsClosed = true;
+                    return;
+                }
             }
+
+            // if (timer is not null)
+            //     timer?.Dispose();
+
 
         }
         catch (Exception ex)
@@ -391,9 +407,8 @@ else
             ex.HandleException(ToastService);
         }
         finally { PanelVisible = false; }
-
-
     }
+
     private string TimeRemaining { get; set; } = "Calculating...";
     private bool isStarted = false;
     private System.Threading.Timer timer;
@@ -410,7 +425,7 @@ else
 
     private void UpdateCountdown(object state)
     {
-        var targetDateTime = EducationPrograms.StartDate.Value.Date;  // Gunakan tanggal tanpa waktu (00:00:00)
+        var targetDateTime = EducationPrograms.StartDate.Date;  // Gunakan tanggal tanpa waktu (00:00:00)
         var timeSpan = targetDateTime - DateTime.Now;
 
         if (timeSpan.TotalSeconds <= 0)

@@ -202,6 +202,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         private async Task LoadDataPatient(int pageIndex = 0, int pageSize = 10)
         {
+
             var result = await Mediator.Send(new GetUserQueryNew
             {
                 Predicate = x => x.IsPatient == true,
@@ -411,6 +412,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             }
 
             await LoadData();
+            StateHasChanged();
         }
 
 

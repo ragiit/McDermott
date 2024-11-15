@@ -314,7 +314,12 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     {
                         postEducationPrograms.HTMLContent = await QuillHtml.GetHTML();
                     }
-                    
+
+                    if (postEducationPrograms.EndDate is not null)
+                        postEducationPrograms.EndDate = postEducationPrograms.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                    postEducationPrograms.StartDate = postEducationPrograms.StartDate.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
+
                     postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
                     data = await Mediator.Send(new CreateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Add Data Success...");
@@ -352,6 +357,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                             _ = await FileUploadService.UploadFileAsync(BrowserFile);
                     }
 
+                    if (postEducationPrograms.EndDate is not null)
+                        postEducationPrograms.EndDate = postEducationPrograms.EndDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                    postEducationPrograms.StartDate = postEducationPrograms.StartDate.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
 
 
                     data = await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
@@ -454,6 +463,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 {
                     NavigationManager.NavigateTo($"{currentUri}", forceLoad: true);
                 }
+                
             }
             catch (Exception ex)
             {
