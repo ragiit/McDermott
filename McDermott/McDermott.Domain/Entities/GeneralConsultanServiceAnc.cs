@@ -14,9 +14,9 @@ namespace McDermott.Domain.Entities
         public string? PregnancyStatusG { get; set; }
         public string? PregnancyStatusP { get; set; }
         public string? PregnancyStatusA { get; set; }
-        public string? HPHT { get; set; }
-        public string? HPL { get; set; }
-        public int? LILA { get; set; }  
+        public DateTime? HPHT { get; set; }
+        public DateTime? HPL { get; set; }
+        public string? LILA { get; set; }  
 
         public GeneralConsultanService? GeneralConsultanService { get; set; }
         public User? Patient { get; set; }

@@ -428,7 +428,7 @@
                                                             }
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Registration Date" ColSpanMd="12">
                                                                 <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                            @bind-Date="@GeneralConsultanService.RegistrationDate" 
+                                                                            @bind-Date="@GeneralConsultanService.RegistrationDate"
                                                                             DisplayFormat="@Helper.DefaultFormatDate"
                                                                             NullText="Select Registration Date">
                                                                 </DxDateEdit>
@@ -1229,17 +1229,40 @@
                                                                             </DxFormLayout>
                                                                         </DxFormLayoutItem>
 
-                                                                        <DxFormLayoutItem Caption="HPHT" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                        @*   <DxFormLayoutItem Caption="HPHT" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                             <MyTextBox @bind-Text="@GeneralConsultanServiceAnc.HPHT"
                                                                                        ReadOnly="ReadOnlyForm()"
                                                                                        NullText="HPHT" />
                                                                             <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.HPHT)" />
                                                                         </DxFormLayoutItem>
+
                                                                         <DxFormLayoutItem Caption="HPL" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                             <MyTextBox @bind-Text="@GeneralConsultanServiceAnc.HPL"
                                                                                        ReadOnly="ReadOnlyForm()"
                                                                                        NullText="HPL" />
                                                                             <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.HPL)" />
+                                                                        </DxFormLayoutItem> *@
+
+                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPHT" ColSpanMd="12">
+                                                                            <DxDateEdit ReadOnly="ReadOnlyForm()"
+                                                                                        Date="@GeneralConsultanServiceAnc.HPHT"
+                                                                                        DisplayFormat="@Helper.DefaultFormatDate"
+                                                                                        DateExpression="@(() => GeneralConsultanServiceAnc.HPHT)"
+                                                                                        NullText="Select HPHT"
+                                                                                        ShowValidationIcon="true"
+                                                                                        DateChanged="((DateTime? e) => DateChangedHPHT(e))">
+                                                                            </DxDateEdit>
+                                                                            <ValidationMessage For="@(() => GeneralConsultanServiceAnc.HPHT)" />
+                                                                        </DxFormLayoutItem>
+
+                                                                          <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPL" ColSpanMd="12">
+                                                                            <DxDateEdit ReadOnly="ReadOnlyForm()"
+                                                                                        @bind-Date="@GeneralConsultanServiceAnc.HPL"
+                                                                                        ShowValidationIcon="true"
+                                                                                        DisplayFormat="@Helper.DefaultFormatDate"
+                                                                                        NullText="Select HPL" >
+                                                                            </DxDateEdit>
+                                                                            <ValidationMessage For="@(() => GeneralConsultanServiceAnc.HPL)" />
                                                                         </DxFormLayoutItem>
 
                                                                         @if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Midwife)

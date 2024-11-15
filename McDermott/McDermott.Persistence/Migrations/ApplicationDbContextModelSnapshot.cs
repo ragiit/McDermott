@@ -2512,11 +2512,11 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("EndMaternityLeave")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HPHT")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("HPHT")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("HPL")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("HPL")
+                        .HasColumnType("datetime2");
 
                     b.Property<long>("HR")
                         .HasColumnType("bigint");
@@ -2788,14 +2788,14 @@ namespace McDermott.Persistence.Migrations
                     b.Property<long>("GeneralConsultanServiceId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("HPHT")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("HPHT")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("HPL")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("HPL")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("LILA")
-                        .HasColumnType("int");
+                    b.Property<string>("LILA")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("PatientId")
                         .HasColumnType("bigint");

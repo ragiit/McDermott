@@ -256,8 +256,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? PregnancyStatusG { get; set; }
         public string? PregnancyStatusP { get; set; }
         public string? PregnancyStatusA { get; set; }
-        public string? HPHT { get; set; }
-        public string? HPL { get; set; }
+        public DateTime? HPHT { get; set; }
+        public DateTime? HPL { get; set; }
         public int? LILA { get; set; }    // CM
 
         #endregion ANC
@@ -301,9 +301,9 @@ namespace McDermott.Application.Dtos.Transaction
         public GeneralConsultanServiceValidator()
         {
             // Validation for IsMaternity field
-            RuleFor(x => x.PatientNextVisitSchedule)
-                .NotEmpty().WithMessage("Patient's next visit schedule is required for maternity cases")
-                .When(x => x.IsMaternity == true);
+            //RuleFor(x => x.PatientNextVisitSchedule)
+            //    .NotEmpty().WithMessage("Patient's next visit schedule is required for maternity cases")
+            //    .When(x => x.IsMaternity == true);
 
             // Validation for Patient field
             RuleFor(x => x.PatientId)
@@ -359,6 +359,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Reference { get; set; }
         public string? ReferenceAnc { get; set; } = string.Empty; // For Anc Form
 
+        public DateTime? HPHT { get; set; }
+        public DateTime? HPL { get; set; }
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
         public long? KioskQueueId { get; set; }
