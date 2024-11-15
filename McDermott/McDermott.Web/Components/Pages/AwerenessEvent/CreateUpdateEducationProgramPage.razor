@@ -121,12 +121,12 @@
 
                                             <!-- StartDate (DateTime) -->
                                             <DxFormLayoutItem Caption="Start Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText=" Start Date" Width="100%" ReadOnly="@(!IsReadOnly)" />
+                                                <DxDateEdit @bind-Date="postEducationPrograms.StartDate" NullText=" Start Date" Width="100%" ReadOnly="@(!IsReadOnly)" DisplayFormat="@Helper.DefaultFormatDate" />
                                             </DxFormLayoutItem>
 
                                             <!-- EndDate (DateTime) -->
                                             <DxFormLayoutItem Caption="End Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="End Date" Width="100%" ReadOnly="@(!IsReadOnly)" />
+                                                <DxDateEdit @bind-Date="postEducationPrograms.EndDate" NullText="End Date" Width="100%" ReadOnly="@(!IsReadOnly)" DisplayFormat="@Helper.DefaultFormatDate"/>
                                             </DxFormLayoutItem>
 
                                             <!-- Content (HTMLEditor) -->
