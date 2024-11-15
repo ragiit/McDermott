@@ -93,12 +93,12 @@
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
                                         <h4 class="fw-bold">@EducationPrograms.EventName</h4>
-                                        @*       <div id="countdown" class="text-light mt-2"></div> *@
+                                              <div id="countdown" class="text-light mt-2"></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="text-center">This wellness program has not started yet. Please check back later.</p>
+                                <p class="text-center">This Education Awareness program has not started yet. Please check back later.</p>
 
                                 <h5 class=" text-center mt-2">Start in: @EducationPrograms.StartDate.GetValueOrDefault().ToString("dd MMMM yyyy")</h5>
                             </div>
@@ -271,7 +271,7 @@ else
     private bool IsFound { get; set; } = true;
     private bool PanelVisible { get; set; } = false;
     private bool IsClosed { get; set; } = false;
-    private bool IsStart { get; set; } = false;
+    private bool IsStart { get; set; } = true;
     private bool IsActive { get; set; } = false;
 
     [Required]
@@ -376,6 +376,13 @@ else
                 IsActive = true;
                 return;
             }
+
+            if (DateTime.Now.Date < EducationPrograms.StartDate.Value.Date)
+            {
+                // StartCountdown();
+                IsStart = false;
+                return;
+            }
         }
         catch (Exception ex)
         {
@@ -384,5 +391,52 @@ else
         finally { PanelVisible = false; }
 
 
+    }
+    private string TimeRemaining { get; set; } = "Calculating...";
+    private bool isStarted = false;
+    private System.Threading.Timer timer;
+    private void StartCountdown()
+    {
+        // if (WellnessProgram.StartDate <= DateTime.Now)
+        // {
+        //     isStarted = true;
+        //     return;
+        // }
+
+        timer = new System.Threading.Timer(UpdateCountdown, null, 0, 1000);
+    }
+
+    private void UpdateCountdown(object state)
+    {
+        var targetDateTime = EducationPrograms.StartDate.Value.Date;  // Gunakan tanggal tanpa waktu (00:00:00)
+        var timeSpan = targetDateTime - DateTime.Now;
+
+        if (timeSpan.TotalSeconds <= 0)
+        {
+            isStarted = true;
+            TimeRemaining = "Starts in: 00:00:00";
+            timer?.Dispose();
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        // Menampilkan waktu tersisa dalam format "X day(s) left hh:mm:ss"
+        if (timeSpan.Days > 0)
+        {
+            TimeRemaining = $"{timeSpan.Days} day{(timeSpan.Days > 1 ? "s" : "")} left {timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
+        }
+        else
+        {
+            TimeRemaining = $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+
+
+    public void Dispose()
+    {
+        timer?.Dispose();
     }
 }
