@@ -473,19 +473,26 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender)
-                return;
+            //if (!firstRender)
+            //    return;
 
-            if (!string.IsNullOrWhiteSpace(WellnessProgram.Content))
-            {
-                await QuillHtml.LoadHTMLContent(WellnessProgram.Content);
-                StateHasChanged();
-            }
+            ////if (!string.IsNullOrWhiteSpace(WellnessProgram.Content))
+            ////{
+            ////    await QuillHtml.LoadHTMLContent(WellnessProgram.Content);
+            ////    StateHasChanged();
+            ////}
 
-            await GetUserInfo();
-            StateHasChanged();
+            //if (QuillHtml != null && WellnessProgram != null && !string.IsNullOrWhiteSpace(WellnessProgram.Content))
+            //{
+            //    await QuillHtml.LoadHTMLContent(WellnessProgram.Content);
+            //    StateHasChanged();
+            //}
 
-            await base.OnAfterRenderAsync(firstRender);
+
+            //await GetUserInfo();
+            //StateHasChanged();
+
+            //await base.OnAfterRenderAsync(firstRender);
         }
 
         private async Task LoadData()

@@ -1,4 +1,5 @@
 ﻿@page "/login"
+@using DevExtreme.AspNet.Data.ResponseModel
 @using McDermott.Application.Features.Services
 @using McDermott.Domain.Entities
 @using McDermott.Persistence.Context
@@ -100,6 +101,17 @@
                     <DataAnnotationsValidator />
                     <AntiforgeryToken />
                     <DxFormLayout CssClass="col-md">
+                      @*   <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
+                            <DxComboBox TData="CountryDto"
+                                        TValue="long"
+                                        CustomData="LoadDataz"
+                                        TextFieldName="Name"
+                                        ValueFieldName="Id"
+                                        Id="comboBoxElement"
+                                        ListRenderMode="ListRenderMode.Virtual"
+                                        @bind-Value="selectedVillageId" />
+                        </DxFormLayoutItem> *@
+
                         <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
                             <DxMaskedInput Mask="@EmailMask"
                                            NullText="mail@domain.com"
@@ -156,7 +168,92 @@
 </style>
 
 
+@* <DxComboBox Data="@Villages"
+            TextFieldName="VillageName"
+            ValueFieldName="VillageId"
+            ListRenderMode="ListRenderMode.Virtual"
+            @bind-Value="@selectedVillageId"
+            @ref="comboBoxRef"
+            FilteringMode="DataGridFilteringMode.Contains" /> *@
+
+@* <DxComboBox TData="VillageDto" TValue="string" CustomData="this.LoadDataz" ListRenderMode="ListRenderMode.Virtual"> *@
+
+
+<script>
+//             window.attachComboBoxScrollEvent = (elementId, dotNetHelper) => {
+//     const element = document.getElementById(elementId);
+//     if (element) {
+//         element.addEventListener('scroll', () => {
+//             if (element.scrollTop + element.clientHeight >= element.scrollHeight) {
+//                 dotNetHelper.invokeMethodAsync('OnScrollToBottom');
+//             }
+//         });
+//     }
+// };
+
+
+</script>
 @code {
+
+    // private long selectedVillageId;
+    // private DotNetObjectReference<LoginPage> objRef;
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         objRef = DotNetObjectReference.Create(this);
+    //         await JsRuntime.InvokeVoidAsync("attachComboBoxScrollEvent", "comboBoxElement", objRef);
+    //     }
+    // }
+    // public void Dispose()
+    // {
+    //     objRef?.Dispose();
+    // }
+    // private int pageSize = 10;
+    // private int pageIndex = 0;
+    // [JSInvokable]
+    // public async Task OnScrollToBottom()
+    // {
+    //     pageSize += 10; // Tambah PageSize
+    //     await LoadDataz(new DevExtreme.AspNet.Data.DataSourceLoadOptionsBase(), CancellationToken.None); // Muat ulang data
+    //     StateHasChanged(); // Memicu render ulang
+    // }
+
+     
+    // public async Task<LoadResult> LoadDataz(DevExtreme.AspNet.Data.DataSourceLoadOptionsBase optionsBase, CancellationToken cancellationToken)
+    // { 
+    //     var s = Convert.ToInt32(optionsBase.Skip / optionsBase.Take);
+    //     var t = optionsBase.Take;
+    //     var result = await Mediator.Send(new GetCountryQuery
+    //         {
+    //             PageIndex = pageIndex,
+    //             PageSize = pageSize
+    //         }, cancellationToken);
+
+    //     var loadResult = DevExtreme.AspNet.Data.DataSourceLoader.Load(result.Item1, optionsBase);
+
+    //     return loadResult;
+    // }
+
+    // private DxComboBox<VillageDto, long> comboBoxRef;
+    // private List<VillageDto> Villages = [];
+    // private string comboBoxElementId = "comboBoxElement";
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // await LoadData(1, 20);
+        //Helper.DeleteFile("Hasil-Ronsen.jpg");
+        // try
+        // {
+        //     var result = await NavigationManager.CheckAccessUser(oLocal);
+        //     IsAccess = result.Item1;
+        //     UserAccessCRUID = result.Item2;
+        // }
+        // catch { }
+
+    }
     private async Task PerformSearch()
     {
         // ToastService.ShowInfo("dawd");
@@ -219,7 +316,6 @@
     }
 
     private bool PanelVisible { get; set; } = false;
-    private List<VillageDto> Villages = [];
     private string searchTerm = string.Empty;
     private string FilterText { get; set; }
 
@@ -244,7 +340,7 @@
             };
 
         var result = await Mediator.Send(query);
-        Villages = result.Data;
+        // Villages = result.Data;
         PanelVisible = false;
         await InvokeAsync(StateHasChanged);
     }
@@ -252,23 +348,11 @@
     private Expression<Func<Village, bool>> BuildSearchPredicate()
     {
         return string.IsNullOrWhiteSpace(Hehehe)
-            ? village => true
-            : village => village.Name.Contains(Hehehe);
+        ? village => true
+        : village => village.Name.Contains(Hehehe);
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData(1, 20);
-        //Helper.DeleteFile("Hasil-Ronsen.jpg");
-        // try
-        // {
-        //     var result = await NavigationManager.CheckAccessUser(oLocal);
-        //     IsAccess = result.Item1;
-        //     UserAccessCRUID = result.Item2;
-        // }
-        // catch { }
 
-    }
     private async Task DownloadFile()
     {
         try
@@ -308,20 +392,20 @@
             // You might want to show an error message or log the exception
         }
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     await base.OnAfterRenderAsync(firstRender);
 
-        if (firstRender)
-        {
-            try
-            {
+    //     if (firstRender)
+    //     {
+    //         try
+    //         {
 
-                await DownloadFile();
-            }
-            catch { }
-        }
-    }
+    //             await DownloadFile();
+    //         }
+    //         catch { }
+    //     }
+    // }
 
     private void ClickLogin()
     {
