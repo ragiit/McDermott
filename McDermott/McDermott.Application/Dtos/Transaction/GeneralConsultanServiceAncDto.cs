@@ -13,9 +13,9 @@
         [Required]
         public string? PregnancyStatusA { get; set; }
         [Required]
-        public string? HPHT { get; set; }
+        public DateTime? HPHT { get; set; }
         [Required]
-        public string? HPL { get; set; } 
+        public DateTime? HPL { get; set; } 
 
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public User? Patient { get; set; }

@@ -530,6 +530,16 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             }
         }
 
+        protected void DateChangedHPHT(DateTime? d)
+        {
+            if (d is null)
+            {
+                GeneralConsultanService.HPL = DateTime.Now;
+                return;
+            }
+            GeneralConsultanServiceAnc.HPHT = d;
+            GeneralConsultanServiceAnc.HPL = d.GetValueOrDefault().AddDays(280); 
+        }
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
