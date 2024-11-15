@@ -72,7 +72,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         #endregion UserLoginAndAccessRole
 
-
         #region Searching
 
         private int pageSize { get; set; } = 10;
@@ -133,24 +132,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             PanelVisible = true;
             var result = await Mediator.Send(new GetSingleEducationProgramQuery
             {
-                Predicate = x => x.Id == Id,
-                Select = x => new EducationProgram
-                {
-                    Id = x.Id,
-                    EventName = x.EventName,
-                    EventCategoryId = x.EventCategoryId,
-                    Slug = x.Slug,
-                    StartDate = x.StartDate,
-                    EndDate = x.EndDate,
-                    HTMLContent = x.HTMLContent,
-                    HTMLMaterial = x.HTMLMaterial,
-                    Attendance = x.Attendance,
-                    Status = x.Status,
-                    EventCategory = new AwarenessEduCategory
-                    {
-                        Name = x.EventCategory == null ? string.Empty : x.EventCategory.Name
-                    }
-                }
+                Predicate = x => x.Id == Id,                
 
             });
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -161,6 +143,14 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     return;
                 }
                 postEducationPrograms = result ?? new();
+
+                var result_category = await Mediator.Send(new GetAwarenessEduCategoryQuery
+                {
+                    Predicate = x => x.Id == postEducationPrograms.EventCategoryId.GetValueOrDefault()
+                });
+
+                getAwarenessEduCategories = result_category.Item1;
+                StateHasChanged();
 
                 await LoadData_Participant();
                 // log
@@ -509,11 +499,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         {
             if (postEducationPrograms.Slug != null)
             {
-                if (Id.HasValue)
-                {
+               
                     var url =$"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
                     await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
-                }
+                
             }
         }
 
