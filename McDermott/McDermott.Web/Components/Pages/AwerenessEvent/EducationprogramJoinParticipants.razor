@@ -365,7 +365,7 @@ else
                 return;
             }
 
-            if (EducationPrograms.EndDate is not null && EducationPrograms.EndDate < DateTime.Now)
+            if (EducationPrograms.EndDate is not null && EducationPrograms.EndDate <= DateTime.Now)
             {
                 IsClosed = true;
                 return;
