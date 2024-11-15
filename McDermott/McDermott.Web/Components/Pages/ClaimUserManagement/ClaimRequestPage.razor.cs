@@ -220,7 +220,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 }
             });
             GetPatient = result.Item1;
-            totalCount = result.PageCount;
+            totalCountPatient = result.PageCount;
         }
 
         #endregion ComboBox Patient
@@ -270,7 +270,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 PageSize = pageSize,
             });
             GetBenefitConfigurations = result.Item1;
-            totalCount = result.PageCount;
+            totalCountBenefit = result.PageCount;
         }
 
         #endregion
@@ -329,7 +329,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 }
             });
             GetPhycisian = result.Item1;
-            totalCount = result.PageCount;
+            totalCountPhycisian = result.PageCount;
         }
 
         #endregion
