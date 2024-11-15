@@ -14,7 +14,7 @@
     }
 
 
-    
+
 
     .dxbl-row {
         justify-content: center !important;
@@ -93,7 +93,7 @@
                                 <div class="row justify-content-center">
                                     <div class="col-auto align-self-center">
                                         <h4 class="fw-bold">@EducationPrograms.EventName</h4>
-                                              <div id="countdown" class="text-light mt-2"></div>
+                                        <div id="countdown" class="text-light mt-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@ else
     private bool IsFound { get; set; } = true;
     private bool PanelVisible { get; set; } = false;
     private bool IsClosed { get; set; } = false;
-    private bool IsStart { get; set; } = true;
+    private bool IsStart { get; set; } = false;
     private bool IsActive { get; set; } = false;
 
     [Required]
@@ -356,7 +356,7 @@ else
             PanelVisible = true;
             EducationPrograms = await Mediator.Send(new GetSingleEducationProgramQuery
                 {
-                    Predicate = x => x.Slug == Slug 
+                    Predicate = x => x.Slug == Slug
                 });
 
             if (EducationPrograms is null)
@@ -377,12 +377,14 @@ else
                 return;
             }
 
-            if (DateTime.Now.Date < EducationPrograms.StartDate.Value.Date)
+
+            if (DateTime.Now.Date < EducationPrograms.StartDate)
             {
                 // StartCountdown();
-                IsStart = false;
+                IsStart = true;
                 return;
             }
+
         }
         catch (Exception ex)
         {
