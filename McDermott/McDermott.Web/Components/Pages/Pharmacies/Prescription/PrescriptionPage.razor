@@ -1,4 +1,4 @@
-﻿@page "/pharmacy/presciptions"
+﻿@page "/pharmacy/prescriptions/"
 @using McDermott.Application.Dtos.Pharmacies
 @rendermode InteractiveServer
 
@@ -11,7 +11,7 @@
 {
     <div class="wrapper">
 
-        <BaseHeaderPage Title="Pharmacy" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+        <BaseHeaderPage Title="Pharmacy" OnClickBack="@(async () => await LoadData())" ShowBackButton="true" />
 
         <section class="content">
             <div class="container-fluid">

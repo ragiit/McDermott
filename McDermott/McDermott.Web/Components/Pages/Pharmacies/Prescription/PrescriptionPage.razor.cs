@@ -853,7 +853,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private async Task EditItem_Click()
         {
             var data = SelectedDataItems[0].Adapt<PharmacyDto>();
-            NavigationManager.NavigateTo($"pharmacy/presciptions/{EnumPageMode.Update.GetDisplayName()}/?Id={data.Id}");
+            NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}/?Id={data.Id}");
         }
 
         #endregion function Edit Click

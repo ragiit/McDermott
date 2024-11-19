@@ -2592,7 +2592,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"/pharmacy/presciptions/{GeneralConsultanService.Id}");
+            NavigationManager.NavigateTo($"/pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}?GcId={GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()

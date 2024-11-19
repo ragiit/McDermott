@@ -227,7 +227,7 @@ namespace McDermott.Web.Extentions
             "patient/disease-history",
 
             // Pharmacies
-            "pharmacy/presciptions",
+            "pharmacy/prescriptions",
             "pharmacy/medicament-groups",
             "pharmacy/signas",
             "pharmacy/medicine-dosages",
