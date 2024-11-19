@@ -1,6 +1,7 @@
-﻿using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Application.Features.Services;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class DrugRouteQueryHandler
         (IUnitOfWork _unitOfWork, IMemoryCache _cache) :

@@ -1,19 +1,27 @@
-﻿using McDermott.Domain.Entities;
+﻿using McDermott.Application.Dtos.AwarenessEvent;
+using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Domain.Entities;
 using System.Linq;
-using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
-using P = McDermott.Domain.Entities.Pharmacy;
+using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
+using McDermott.Application.Features.Services;
 
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class PharmacyQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetPharmacyQuery, List<PharmacyDto>>,
+        IRequestHandler<GetAllPharmacyQuery, List<PharmacyDto>>,//Pharmacy
+        IRequestHandler<GetPharmacyQuery, (List<PharmacyDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSinglePharmacyQuery, PharmacyDto>, IRequestHandler<ValidatePharmacyQuery, bool>,
+        IRequestHandler<BulkValidatePharmacyQuery, List<PharmacyDto>>,
         IRequestHandler<CreatePharmacyRequest, PharmacyDto>,
         IRequestHandler<CreateListPharmacyRequest, List<PharmacyDto>>,
         IRequestHandler<UpdatePharmacyRequest, PharmacyDto>,
         IRequestHandler<UpdateListPharmacyRequest, List<PharmacyDto>>,
         IRequestHandler<DeletePharmacyRequest, bool>,
-        IRequestHandler<GetPharmacyLogQuery, List<PharmacyLogDto>>,
+        IRequestHandler<GetAllPharmacyLogQuery, List<PharmacyLogDto>>,//PharmacyLog
+        IRequestHandler<GetPharmacyLogQuery, (List<PharmacyLogDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSinglePharmacyLogQuery, PharmacyLogDto>, IRequestHandler<ValidatePharmacyLogQuery, bool>,
+        IRequestHandler<BulkValidatePharmacyLogQuery, List<PharmacyLogDto>>,
         IRequestHandler<CreatePharmacyLogRequest, PharmacyLogDto>,
         IRequestHandler<CreateListPharmacyLogRequest, List<PharmacyLogDto>>,
         IRequestHandler<UpdatePharmacyLogRequest, PharmacyLogDto>,
@@ -21,29 +29,25 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         IRequestHandler<DeletePharmacyLogRequest, bool>
     {
         #region Pharmacy
-        #region GET
+        #region GET Education Program
 
-        public async Task<List<PharmacyDto>> Handle(GetPharmacyQuery request, CancellationToken cancellationToken)
+        public async Task<List<PharmacyDto>> Handle(GetAllPharmacyQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetPharmacyQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                string cacheKey = $"GetAllPharmacyQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
-                if (!_cache.TryGetValue(cacheKey, out List<P>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<Pharmacy>? result))
                 {
-                    result = await _unitOfWork.Repository<P>().Entities
-                       .AsNoTracking()
-                       .Include(x => x.Location)
-                       .Include(x => x.MedicamentGroup)
-                       .Include(x => x.Service)
-                       .Include(x => x.Practitioner)
-                       .Include(x => x.Patient)
-                       .ToListAsync(cancellationToken);
+                    result = await _unitOfWork.Repository<Pharmacy>().Entities
 
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
                 result ??= [];
@@ -60,7 +64,232 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             }
         }
 
-        #endregion GET
+        public async Task<List<PharmacyDto>> Handle(BulkValidatePharmacyQuery request, CancellationToken cancellationToken)
+        {
+            var PharmacyDtos = request.PharmacyToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var PharmacyNames = PharmacyDtos.Select(x => x.Patient.Name).Distinct().ToList();
+
+            var existingPharmacys = await _unitOfWork.Repository<Pharmacy>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => PharmacyNames.Contains(v.Patient.Name))
+                .ToListAsync(cancellationToken);
+
+            return existingPharmacys.Adapt<List<PharmacyDto>>();
+        }
+
+        public async Task<bool> Handle(ValidatePharmacyQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Pharmacy>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<(List<PharmacyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPharmacyQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Pharmacy>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Pharmacy>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Pharmacy>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Practitioner.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Pharmacy
+                    {
+                        Id = x.Id,
+                        PatientId = x.PatientId,
+                        PractitionerId = x.PractitionerId,
+                        LocationId = x.LocationId,
+                        ServiceId = x.ServiceId,
+                        PaymentMethod = x.PaymentMethod,
+                        MedicamentGroupId = x.MedicamentGroupId,
+                        Status = x.Status,
+                        ReceiptDate = x.ReceiptDate,
+                        IsFarmacologi = x.IsFarmacologi,
+                        IsFood = x.IsFood,
+                        IsWeather = x.IsWeather,
+                        Patient = new User
+                        {
+                            Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                        },
+                        Practitioner = new User
+                        {
+                            Name = x.Practitioner == null ? string.Empty : x.Practitioner.Name,
+                        },
+                        Location = new Locations
+                        {
+                            Name = x.Location == null ? string.Empty : x.Location.Name,
+                        },
+                        Service = new Service
+                        {
+                            Name = x.Service == null ? string.Empty : x.Service.Name,
+                        },
+                        MedicamentGroup = new MedicamentGroup
+                        {
+                            Name = x.MedicamentGroup == null ? string.Empty : x.MedicamentGroup.Name,
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<PharmacyDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<PharmacyDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<PharmacyDto> Handle(GetSinglePharmacyQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Pharmacy>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Pharmacy>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Pharmacy>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Practitioner.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Pharmacy
+                    {
+                        Id = x.Id,
+                        PatientId = x.PatientId,
+                        PractitionerId = x.PractitionerId,
+                        LocationId = x.LocationId,
+                        ServiceId = x.ServiceId,
+                        PaymentMethod = x.PaymentMethod,
+                        MedicamentGroupId = x.MedicamentGroupId,
+                        Status = x.Status,
+                        ReceiptDate = x.ReceiptDate,
+                        IsFarmacologi = x.IsFarmacologi,
+                        IsFood = x.IsFood,
+                        IsWeather = x.IsWeather,
+                        Patient = new User
+                        {
+                            Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                        },
+                        Practitioner = new User
+                        {
+                            Name = x.Practitioner == null ? string.Empty : x.Practitioner.Name,
+                        },
+                        Location = new Locations
+                        {
+                            Name = x.Location == null ? string.Empty : x.Location.Name,
+                        },
+                        Service = new Service
+                        {
+                            Name = x.Service == null ? string.Empty : x.Service.Name,
+                        },
+                        MedicamentGroup = new MedicamentGroup
+                        {
+                            Name = x.MedicamentGroup == null ? string.Empty : x.MedicamentGroup.Name,
+                        }
+
+
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<PharmacyDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+
+
+        #endregion GET Education Program
 
         #region CREATE
 
@@ -68,7 +297,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                var result = await _unitOfWork.Repository<P>().AddAsync(request.PharmacyDto.Adapt<P>());
+                var result = await _unitOfWork.Repository<Pharmacy>().AddAsync(request.PharmacyDto.Adapt<Pharmacy>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -86,7 +315,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                var result = await _unitOfWork.Repository<P>().AddAsync(request.PharmacyDtos.Adapt<List<P>>());
+                var result = await _unitOfWork.Repository<Pharmacy>().AddAsync(request.PharmacyDtos.Adapt<List<Pharmacy>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -108,7 +337,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                var result = await _unitOfWork.Repository<P>().UpdateAsync(request.PharmacyDto.Adapt<P>());
+                var result = await _unitOfWork.Repository<Pharmacy>().UpdateAsync(request.PharmacyDto.Adapt<Pharmacy>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -126,7 +355,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         {
             try
             {
-                var result = await _unitOfWork.Repository<P>().UpdateAsync(request.PharmacyDtos.Adapt<List<P>>());
+                var result = await _unitOfWork.Repository<Pharmacy>().UpdateAsync(request.PharmacyDtos.Adapt<List<Pharmacy>>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -150,12 +379,12 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             {
                 if (request.Id > 0)
                 {
-                    await _unitOfWork.Repository<P>().DeleteAsync(request.Id);
+                    await _unitOfWork.Repository<Pharmacy>().DeleteAsync(request.Id);
                 }
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<P>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<Pharmacy>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -174,29 +403,30 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         #endregion
 
         #region Pharmacy Log
-        #region GET
-        public async Task<List<PharmacyLogDto>> Handle(GetPharmacyLogQuery request, CancellationToken cancellationToken)
+        #region GET Education Program
+
+        public async Task<List<PharmacyLogDto>> Handle(GetAllPharmacyLogQuery request, CancellationToken cancellationToken)
         {
             try
             {
-
-                string cacheKey = $"GetPharmacyLogQuery";
+                string cacheKey = $"GetAllPharmacyLogQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
 
-                if(!_cache.TryGetValue(cacheKey,out List<PharmacyLog>? result))
+                if (!_cache.TryGetValue(cacheKey, out List<PharmacyLog>? result))
                 {
                     result = await _unitOfWork.Repository<PharmacyLog>().Entities
-                        .Include(x => x.Pharmacy)
-                        .Include(x => x.UserBy)
+
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 
                     _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
+
                 result ??= [];
 
+                // Filter result based on request.Predicate if it's not null
                 if (request.Predicate is not null)
                     result = [.. result.AsQueryable().Where(request.Predicate)];
 
@@ -207,7 +437,202 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 throw;
             }
         }
-        #endregion
+
+        public async Task<List<PharmacyLogDto>> Handle(BulkValidatePharmacyLogQuery request, CancellationToken cancellationToken)
+        {
+            var PharmacyLogDtos = request.PharmacyLogToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var PharmacyLogNames = PharmacyLogDtos.Select(x => x.status).Distinct().ToList();
+
+            var existingPharmacyLogs = await _unitOfWork.Repository<PharmacyLog>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => PharmacyLogNames.Contains(v.status))
+                .ToListAsync(cancellationToken);
+
+            return existingPharmacyLogs.Adapt<List<PharmacyLogDto>>();
+        }
+
+        public async Task<bool> Handle(ValidatePharmacyLogQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<PharmacyLog>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<(List<PharmacyLogDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPharmacyLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<PharmacyLog>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<PharmacyLog>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<PharmacyLog>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                //if (!string.IsNullOrEmpty(request.SearchTerm))
+                //{
+                //    query = query.Where(v =>
+                //            EF.Functions.Like(v.status, $"%{request.SearchTerm}%") ||
+                //            EF.Functions.Like(v.EventCategory.Name, $"%{request.SearchTerm}%")
+                //            );
+                //}
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new PharmacyLog
+                    {
+                        Id = x.Id,
+                        PharmacyId = x.PharmacyId,
+                        status = x.status,
+                        UserById = x.UserById,
+                        Pharmacy = new Pharmacy
+                        {
+                            PatientId = x.Pharmacy.PatientId,
+                            PractitionerId = x.Pharmacy.PractitionerId,
+                            Patient = new User
+                            {
+                                Name = x.Pharmacy.Patient == null ? string.Empty : x.Pharmacy.Patient.Name,
+                            },
+                            Practitioner = new User
+                            {
+                                Name = x.Pharmacy.Practitioner == null ? string.Empty : x.Pharmacy.Practitioner.Name,
+                            },
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<PharmacyLogDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<PharmacyLogDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<PharmacyLogDto> Handle(GetSinglePharmacyLogQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<PharmacyLog>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<PharmacyLog>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<PharmacyLog>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                //if (!string.IsNullOrEmpty(request.SearchTerm))
+                //{
+                //    query = query.Where(v =>
+                //            EF.Functions.Like(v.EventName, $"%{request.SearchTerm}%") ||
+                //            EF.Functions.Like(v.EventCategory.Name, $"%{request.SearchTerm}%")
+                //            );
+                //}
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new PharmacyLog
+                    {
+                        Id = x.Id,
+                        PharmacyId = x.PharmacyId,
+                        status = x.status,
+                        UserById = x.UserById,
+                        Pharmacy = new Pharmacy
+                        {
+                            PatientId = x.Pharmacy.PatientId,
+                            PractitionerId = x.Pharmacy.PractitionerId,
+                            Patient = new User
+                            {
+                                Name = x.Pharmacy.Patient == null ? string.Empty : x.Pharmacy.Patient.Name,
+                            },
+                            Practitioner = new User
+                            {
+                                Name = x.Pharmacy.Practitioner == null ? string.Empty : x.Pharmacy.Practitioner.Name,
+                            },
+                        }
+
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<PharmacyLogDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+
+
+        #endregion GET Education Program
 
         #region CREATE
         public async Task<PharmacyLogDto> Handle(CreatePharmacyLogRequest request, CancellationToken cancellationToken)
@@ -297,7 +722,7 @@ namespace McDermott.Application.Features.Queries.Pharmacy
 
                 if (request.Ids.Count > 0)
                 {
-                    await _unitOfWork.Repository<P>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                    await _unitOfWork.Repository<Pharmacy>().DeleteAsync(x => request.Ids.Contains(x.Id));
                 }
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

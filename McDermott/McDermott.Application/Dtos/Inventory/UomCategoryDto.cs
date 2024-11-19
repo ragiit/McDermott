@@ -1,4 +1,4 @@
-﻿namespace McDermott.Application.Dtos.Pharmacy
+﻿namespace McDermott.Application.Dtos.Pharmacies
 {
     public class UomCategoryDto : IMapFrom<UomCategory>
     {

@@ -1,8 +1,9 @@
-﻿using McDermott.Domain.Entities;
+﻿using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.Products
 {

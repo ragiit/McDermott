@@ -9,7 +9,7 @@ namespace McDermott.Application.Features.Commands.AwarenessEvent
 {
     public class EducationProgramCommand
     {
-        #region GET Education Program Detail
+        #region GET Education Program 
 
         public class GetAllEducationProgramQuery(Expression<Func<EducationProgram, bool>>? predicate = null, bool removeCache = false) : IRequest<List<EducationProgramDto>>
         {

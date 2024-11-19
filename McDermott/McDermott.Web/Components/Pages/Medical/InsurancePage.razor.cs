@@ -1,6 +1,6 @@
 ﻿using McDermott.Application.Dtos.Medical;
 using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

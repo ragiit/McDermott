@@ -1,9 +1,9 @@
-﻿using McDermott.Application.Dtos.Pharmacy;
+﻿using McDermott.Application.Dtos.Pharmacies;
 using McDermott.Application.Dtos.Queue;
 using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     //public class SignaQueryHandler
     //{

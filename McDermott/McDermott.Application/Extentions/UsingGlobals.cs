@@ -2,7 +2,7 @@
 global using McDermott.Application.Dtos.Employee;
 global using McDermott.Application.Dtos.Medical;
 global using McDermott.Application.Dtos.Patient;
-global using McDermott.Application.Dtos.Pharmacy;
+global using McDermott.Application.Dtos.Pharmacies;
 global using McDermott.Application.Dtos.Inventory;
 global using McDermott.Application.Dtos.Transaction;
 global using McDermott.Application.Dtos.Bpjs;
@@ -29,7 +29,7 @@ global using static McDermott.Application.Features.Commands.Bpjs.BpjsClassificat
 global using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 global using static McDermott.Application.Features.Commands.Medical.BuildingLocationCommand;
 global using static McDermott.Application.Features.Commands.Medical.LocationCommand;
-global using static McDermott.Application.Features.Commands.Pharmacy.ReorderingRuleCommand;
+global using static McDermott.Application.Features.Commands.Pharmacies.ReorderingRuleCommand;
 global using static McDermott.Application.Features.Commands.Inventory.ProductCategoryCommand;
 global using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 global using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
@@ -52,5 +52,5 @@ global using static McDermott.Application.Features.Commands.Transaction.GeneralC
 global using static McDermott.Application.Features.Commands.Patient.ClassTypeCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabUomCommand;
 global using static McDermott.Application.Features.Commands.Medical.LabTestDetailCommand;
-global using static McDermott.Application.Features.Commands.Pharmacy.DrugDosageCommand;
-global using static McDermott.Application.Features.Commands.Pharmacy.DrugRouteCommand;
+global using static McDermott.Application.Features.Commands.Pharmacies.DrugDosageCommand;
+global using static McDermott.Application.Features.Commands.Pharmacies.DrugRouteCommand;

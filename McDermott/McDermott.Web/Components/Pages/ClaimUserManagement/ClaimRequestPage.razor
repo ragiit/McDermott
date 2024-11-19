@@ -180,7 +180,7 @@
                                                     <ValidationMessage For="@(()=>PostClaimRequests.BenefitId)" />
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Date" CaptionCssClass="normal-caption" ColSpanMd="6">
-                                                    <DxDateEdit @bind-Date="@PostClaimRequests.ClaimDate" ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"></DxDateEdit>
+                                                    <DxDateEdit @bind-Date="@PostClaimRequests.ClaimDate" ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)" DisplayFormat="@Helper.DefaultFormatDate"></DxDateEdit>
                                                 </DxFormLayoutItem>
                                                 <DxFormLayoutItem Caption="Remark" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                     <DxMemo @bind-Text="@PostClaimRequests.Remark" NullText="Input Remark in Here" ReadOnly="@(PostClaimRequests.Status == EnumClaimRequestStatus.Done)"></DxMemo>

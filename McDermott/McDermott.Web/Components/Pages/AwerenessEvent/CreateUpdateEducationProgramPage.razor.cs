@@ -208,14 +208,35 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
         }
-
+        private bool isShowPopUp { get; set; } = false;
         private async Task DownloadFile()
         {
             if (postEducationPrograms.Id != 0 && !string.IsNullOrWhiteSpace(postEducationPrograms.Attendance))
             {
-                await Helper.DownloadFile(postEducationPrograms.Attendance, HttpContextAccessor, HttpClient, JsRuntime);
+                //await Helper.DownloadFile(postEducationPrograms.Attendance, HttpContextAccessor, HttpClient, JsRuntime);
+                isShowPopUp = true;
             }
         }
+
+        private async Task YesDownload()
+        {
+            try
+            {
+                // Generate the absolute URL for the file
+                var url = $"new/files/{postEducationPrograms.Attendance}";
+                var absoluteUrl = NavigationManager.ToAbsoluteUri(url).ToString();
+
+                // Invoke JavaScript to open and close the tab
+                await JsRuntime.InvokeVoidAsync("openAndCloseTab", absoluteUrl);
+                isShowPopUp= false;
+            }
+            catch (Exception ex)
+            {
+                // Handle any errors that might occur
+                Console.Error.WriteLine($"Error during file download: {ex.Message}");
+            }
+        }
+
         #endregion
 
         #region ComboBox Category

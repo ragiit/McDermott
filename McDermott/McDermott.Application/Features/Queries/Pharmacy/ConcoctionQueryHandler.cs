@@ -1,35 +1,35 @@
-﻿using System;
+﻿using McDermott.Application.Dtos.AwarenessEvent;
+using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Application.Features.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.ConcoctionLineCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class ConcoctionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetConcoctionQuery, List<ConcoctionDto>>,
+        IRequestHandler<GetAllConcoctionQuery, List<ConcoctionDto>>,//Concoction
+        IRequestHandler<GetConcoctionQuery, (List<ConcoctionDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleConcoctionQuery, ConcoctionDto>, IRequestHandler<ValidateConcoctionQuery, bool>,
+        IRequestHandler<BulkValidateConcoctionQuery, List<ConcoctionDto>>,
         IRequestHandler<CreateConcoctionRequest, ConcoctionDto>,
         IRequestHandler<CreateListConcoctionRequest, List<ConcoctionDto>>,
         IRequestHandler<UpdateConcoctionRequest, ConcoctionDto>,
         IRequestHandler<UpdateListConcoctionRequest, List<ConcoctionDto>>,
-        IRequestHandler<DeleteConcoctionRequest, bool>,
-        IRequestHandler<GetStockOutLineQuery, List<StockOutLinesDto>>,
-        IRequestHandler<CreateStockOutLinesRequest, StockOutLinesDto>,
-        IRequestHandler<CreateListStockOutLinesRequest, List<StockOutLinesDto>>,
-        IRequestHandler<UpdateStockOutLinesRequest, StockOutLinesDto>,
-        IRequestHandler<UpdateListStockOutLinesRequest, List<StockOutLinesDto>>,
-        IRequestHandler<DeleteStockOutLinesRequest, bool>
+        IRequestHandler<DeleteConcoctionRequest, bool>
     {
-        #region ConcoctionLine
-        #region GET
+        #region Concoction
+        #region GET Concoction
 
-        public async Task<List<ConcoctionDto>> Handle(GetConcoctionQuery request, CancellationToken cancellationToken)
+        public async Task<List<ConcoctionDto>> Handle(GetAllConcoctionQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetConcoctionQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                string cacheKey = $"GetAllConcoctionQuery_";
 
                 if (request.RemoveCache)
                     _cache.Remove(cacheKey);
@@ -37,14 +37,11 @@ namespace McDermott.Application.Features.Queries.Pharmacy
                 if (!_cache.TryGetValue(cacheKey, out List<Concoction>? result))
                 {
                     result = await _unitOfWork.Repository<Concoction>().Entities
-                       .AsNoTracking()
-                       .Include(x=>x.Pharmacy)
-                       .Include(x => x.MedicamentGroup)
-                       .Include(x => x.Practitioner)
-                       .Include(x => x.DrugForm)
-                       .ToListAsync(cancellationToken);
 
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                        .AsNoTracking()
+                        .ToListAsync(cancellationToken);
+
+                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10));
                 }
 
                 result ??= [];
@@ -61,7 +58,216 @@ namespace McDermott.Application.Features.Queries.Pharmacy
             }
         }
 
-        #endregion GET
+        public async Task<List<ConcoctionDto>> Handle(BulkValidateConcoctionQuery request, CancellationToken cancellationToken)
+        {
+            var ConcoctionDtos = request.ConcoctionToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var ConcoctionNames = ConcoctionDtos.Select(x => x.ConcoctionQty).Distinct().ToList();
+
+            var existingConcoctions = await _unitOfWork.Repository<Concoction>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => ConcoctionNames.Contains((long)v.ConcoctionQty))
+                .ToListAsync(cancellationToken);
+
+            return existingConcoctions.Adapt<List<ConcoctionDto>>();
+        }
+
+        public async Task<bool> Handle(ValidateConcoctionQuery request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<Concoction>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
+
+        public async Task<(List<ConcoctionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetConcoctionQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Concoction>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Concoction>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Concoction>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                //if (!string.IsNullOrEmpty(request.SearchTerm))
+                //{
+                //    query = query.Where(v =>
+                //            EF.Functions.Like(v.EventName, $"%{request.SearchTerm}%") ||
+                //            EF.Functions.Like(v.EventCategory.Name, $"%{request.SearchTerm}%")
+                //            );
+                //}
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Concoction
+                    {
+                        Id = x.Id,
+                        PharmacyId = x.PharmacyId,
+                        PractitionerId = x.PractitionerId,
+                        DrugDosageId = x.DrugDosageId,
+                        DrugFormId = x.DrugFormId,
+                        DrugRouteId = x.DrugRouteId,
+                        MedicamentGroupId = x.MedicamentGroupId,
+                        ConcoctionQty = x.ConcoctionQty,
+                        Practitioner = new User
+                        {
+                            Name = x.Practitioner == null ? string.Empty : x.Practitioner.Name,
+                        },
+                        DrugDosage = new DrugDosage
+                        {
+                            Frequency = x.DrugDosage == null ? string.Empty : x.DrugDosage.Frequency,
+                        },
+                        DrugForm = new DrugForm
+                        {
+                            Name = x.DrugForm == null ? string.Empty : x.DrugForm.Name,
+                        },
+                        DrugRoute = new DrugRoute
+                        {
+                            Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
+                        },
+
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<ConcoctionDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<ConcoctionDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<ConcoctionDto> Handle(GetSingleConcoctionQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Concoction>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Concoction>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Concoction>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                //if (!string.IsNullOrEmpty(request.SearchTerm))
+                //{
+                //    query = query.Where(v =>
+                //            EF.Functions.Like(v.EventName, $"%{request.SearchTerm}%") ||
+                //            EF.Functions.Like(v.EventCategory.Name, $"%{request.SearchTerm}%")
+                //            );
+                //}
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Concoction
+                    {
+                        Id = x.Id,
+                        PharmacyId = x.PharmacyId,
+                        PractitionerId = x.PractitionerId,
+                        DrugDosageId = x.DrugDosageId,
+                        DrugFormId = x.DrugFormId,
+                        DrugRouteId = x.DrugRouteId,
+                        MedicamentGroupId = x.MedicamentGroupId,
+                        ConcoctionQty = x.ConcoctionQty,
+                        Practitioner = new User
+                        {
+                            Name = x.Practitioner == null ? string.Empty : x.Practitioner.Name,
+                        },
+                        DrugDosage = new DrugDosage
+                        {
+                            Frequency = x.DrugDosage == null ? string.Empty : x.DrugDosage.Frequency,
+                        },
+                        DrugForm = new DrugForm
+                        {
+                            Name = x.DrugForm == null ? string.Empty : x.DrugForm.Name,
+                        },
+                        DrugRoute = new DrugRoute
+                        {
+                            Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
+                        },
+
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ConcoctionDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+
+
+        #endregion GET Education Program
 
         #region CREATE
 
@@ -174,155 +380,5 @@ namespace McDermott.Application.Features.Queries.Pharmacy
         #endregion DELETE
         #endregion
 
-        #region Stock Out ConcoctionLine
-        #region GET
-
-        public async Task<List<StockOutLinesDto>> Handle(GetStockOutLineQuery request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                string cacheKey = $"GetStockOutLinesQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
-
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
-
-                if (!_cache.TryGetValue(cacheKey, out List<StockOutLines>? result))
-                {
-                    result = await _unitOfWork.Repository<StockOutLines>().Entities
-                       .AsNoTracking()
-                       .Include(x => x.Lines)
-                       .Include(x => x.TransactionStock)
-
-                       .ToListAsync(cancellationToken);
-
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
-                }
-
-                result ??= [];
-
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
-
-                return result.ToList().Adapt<List<StockOutLinesDto>>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        #endregion GET
-
-        #region CREATE
-
-        public async Task<StockOutLinesDto> Handle(CreateStockOutLinesRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await _unitOfWork.Repository<StockOutLines>().AddAsync(request.StockOutLinesDto.Adapt<StockOutLines>());
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _cache.Remove("GetStockOutLinesQuery_"); // Ganti dengan key yang sesuai
-
-                return result.Adapt<StockOutLinesDto>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<List<StockOutLinesDto>> Handle(CreateListStockOutLinesRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await _unitOfWork.Repository<StockOutLines>().AddAsync(request.StockOutLinesDtos.Adapt<List<StockOutLines>>());
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _cache.Remove("GetStockOutLinesQuery_"); // Ganti dengan key yang sesuai
-
-                return result.Adapt<List<StockOutLinesDto>>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        #endregion CREATE
-
-        #region UPDATE
-
-        public async Task<StockOutLinesDto> Handle(UpdateStockOutLinesRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await _unitOfWork.Repository<StockOutLines>().UpdateAsync(request.StockOutLinesDto.Adapt<StockOutLines>());
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _cache.Remove("GetStockOutLinesQuery_"); // Ganti dengan key yang sesuai
-
-                return result.Adapt<StockOutLinesDto>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<List<StockOutLinesDto>> Handle(UpdateListStockOutLinesRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                var result = await _unitOfWork.Repository<StockOutLines>().UpdateAsync(request.StockOutLinesDto.Adapt<List<StockOutLines>>());
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _cache.Remove("GetStockOutLinesQuery_"); // Ganti dengan key yang sesuai
-
-                return result.Adapt<List<StockOutLinesDto>>();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        #endregion UPDATE
-
-        #region DELETE
-
-        public async Task<bool> Handle(DeleteStockOutLinesRequest request, CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (request.Id > 0)
-                {
-                    await _unitOfWork.Repository<StockOutLines>().DeleteAsync(request.Id);
-                }
-
-                if (request.Ids.Count > 0)
-                {
-                    await _unitOfWork.Repository<StockOutLines>().DeleteAsync(x => request.Ids.Contains(x.Id));
-                }
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-                _cache.Remove("GetStockOutLinesQuery_"); // Ganti dengan key yang sesuai
-
-                return true;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        #endregion DELETE
-        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Inventory.UomCategoryCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory

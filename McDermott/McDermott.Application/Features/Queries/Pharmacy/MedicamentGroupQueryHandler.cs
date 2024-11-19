@@ -1,7 +1,8 @@
-﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentGroupCommand;
+﻿using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupCommand;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class MedicamentGroupQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetMedicamentGroupQuery, (List<MedicamentGroupDto>, int pageIndex, int pageSize, int pageCount)>,
