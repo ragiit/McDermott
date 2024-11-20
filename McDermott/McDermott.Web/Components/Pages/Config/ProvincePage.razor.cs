@@ -108,22 +108,33 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region ComboBox Country
 
-        private Subject<ChangeEventArgs> testSearchTerm = new();
+        private CountryDto SelectedCountry { get; set; } = new();
+        async Task SelectedItemChanged(CountryDto e)
+        {
+            if (e is null)
+            {
+                SelectedCountry = new();
+                await LoadCounty();
+            }
+            else
+                SelectedCountry = e;
+        }
+
         private CancellationTokenSource? _cts;
         private async Task OnInputCountry(ChangeEventArgs e)
         {
             try
             {
                 PanelVisible = true;
-                 
+
                 _cts?.Cancel();
                 _cts?.Dispose();
                 _cts = new CancellationTokenSource();
-                 
+
                 await Task.Delay(Helper.CBX_DELAY, _cts.Token);
-                 
+
                 await LoadCounty(e.Value?.ToString() ?? "");
-            } 
+            }
             finally
             {
                 PanelVisible = false;
@@ -131,14 +142,14 @@ namespace McDermott.Web.Components.Pages.Config
                 // Untuk menghindari kebocoran memori (memory leaks).
                 _cts?.Dispose();
                 _cts = null;
-            } 
+            }
         }
 
         private async Task LoadCounty(string? e = "", Expression<Func<Country, bool>>? predicate = null)
         {
             try
             {
-                //PanelVisible = true;
+                PanelVisible = true;
                 Countries = await Mediator.QueryGetComboBox<Country, CountryDto>(e, predicate);
                 PanelVisible = false;
             }
@@ -187,13 +198,13 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData(); 
-            await LoadCounty();
+            await LoadData();
             PanelVisible = false;
         }
 
         private async Task NewItem_Click()
         {
+            await LoadCounty();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -205,10 +216,10 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             try
-            { 
+            {
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()); 
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
                 await LoadCounty(predicate: x => x.Id == a.CountryId);
                 PanelVisible = false;
             }

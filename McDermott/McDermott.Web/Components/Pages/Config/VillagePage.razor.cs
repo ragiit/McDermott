@@ -117,6 +117,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            await LoadProvince();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -417,6 +418,18 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #region ComboBox Province
+        private ProvinceDto SelectedProvince { get; set; } = new();
+        async Task SelectedItemChanged(ProvinceDto e)
+        {
+            if (e is null)
+                SelectedProvince = new();
+            else
+            {
+                SelectedProvince = e;
+
+                await LoadCity();
+            }
+        }
 
         private CancellationTokenSource? _ctsProvince;
         private async Task OnInputProvince(ChangeEventArgs e)
@@ -461,7 +474,18 @@ namespace McDermott.Web.Components.Pages.Config
         #endregion
 
         #region ComboBox City
+        private CityDto SelectedCity { get; set; } = new();
+        async Task SelectedItemCityChanged(CityDto e)
+        {
+            if (e is null)
+                SelectedCity = new();
+            else
+            {
+                SelectedCity = e;
 
+                await LoadDistrict();
+            }
+        }
         private CancellationTokenSource? _ctsCity;
         private async Task OnInputCity(ChangeEventArgs e)
         {
@@ -548,22 +572,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion
 
-        private ProvinceDto SelectedProvince { get; set; } = new();
-        void SelectedItemChanged(ProvinceDto e)
-        {
-            if (e is null)
-                SelectedProvince = new();
-            else
-                SelectedProvince = e;
-        }
-
-        private CityDto SelectedCity { get; set; } = new();
-        void SelectedItemCityChanged(CityDto e)
-        {
-            if (e is null)
-                SelectedCity = new();
-            else
-                SelectedCity = e;
-        }
+       
+       
     }
 }

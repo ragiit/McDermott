@@ -7,7 +7,7 @@ using System.Reactive.Subjects;
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
-    { 
+    {
 
         private DxUpload MyUpload { get; set; }
 
@@ -69,7 +69,6 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadProvince();
             PanelVisible = false;
         }
 
@@ -128,6 +127,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            await LoadProvince();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -354,8 +354,17 @@ namespace McDermott.Web.Components.Pages.Config
         #endregion Default Grid Components
 
         #region ComboBox Province
-
-        private Subject<ChangeEventArgs> testSearchTerm = new();
+        private ProvinceDto SelectedProvince { get; set; } = new();
+        async Task SelectedItemChanged(ProvinceDto e)
+        {
+            if (e is null)
+            {
+                SelectedProvince = new();
+                await LoadProvince();
+            }
+            else
+                SelectedProvince = e;
+        }
         private CancellationTokenSource? _cts;
         private async Task OnInputProvince(ChangeEventArgs e)
         {

@@ -254,6 +254,8 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
+            await LoadLocation();
+            await LoadCompany();
             await Grid.StartEditNewRowAsync();
         }
 

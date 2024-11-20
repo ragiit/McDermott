@@ -17,35 +17,35 @@
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
                             <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="true"
-                                            Text="Fetching Data">
+                            IsContentBlocked="true"
+                            ApplyBackgroundShading="true"
+                            IndicatorAreaVisible="true"
+                            Text="Fetching Data">
 
                                 <MyGridPaginate @ref="Grid"
-                                                Data="Villages"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                EditModelSaving="OnSave"
-                                                DataItemDeleting="OnDelete"
-                                                SearchTextChanged="OnSearchBoxChanged"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                KeyFieldName="Id">
+                                Data="Villages"
+                                @bind-SelectedDataItems="@SelectedDataItems"
+                                EditModelSaving="OnSave"
+                                DataItemDeleting="OnDelete"
+                                SearchTextChanged="OnSearchBoxChanged"
+                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                KeyFieldName="Id">
 
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="VillageDto"
-                                                         Items="Villages"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         Grid="Grid"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
-                                                         IsImport="UserAccessCRUID.IsImport"
-                                                         VisibleNew="UserAccessCRUID.IsCreate"
-                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                        Items="Villages"
+                                        SelectedDataItems="@SelectedDataItems"
+                                        NewItem_Click="@NewItem_Click"
+                                        EditItem_Click="@EditItem_Click"
+                                        DeleteItem_Click="@DeleteItem_Click"
+                                        Refresh_Click="@Refresh_Click"
+                                        Grid="Grid"
+                                        ImportFile="ImportFile"
+                                        ExportToExcel="ExportToExcel"
+                                        IsImport="UserAccessCRUID.IsImport"
+                                        VisibleNew="UserAccessCRUID.IsCreate"
+                                        VisibleEdit="UserAccessCRUID.IsUpdate"
+                                        VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
 
                                     <Columns>
@@ -62,11 +62,16 @@
                                             var a = (VillageDto)EditFormContext.EditModel;
                                             if (a.ProvinceId is null)
                                             {
+                                                Cities = [];
+                                                Districts = [];
+
                                                 a.CityId = null;
                                                 a.DistrictId = null;
                                             }
                                             if (a.CityId is null)
                                             {
+                                                Districts = [];
+
                                                 a.DistrictId = null;
                                             }
                                         }
@@ -82,9 +87,8 @@
                                             </DxFormLayoutItem> 
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-                                                <DxComboBox Data="Provinces"
-                                                            AllowUserInput="true"
-                                                            NullText="Select Province"
+                                                <MyDxComboBox Data="Provinces" 
+                                                            NullText="Select Province" 
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id"
                                                             @oninput="OnInputProvince"
@@ -94,14 +98,13 @@
                                                         <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="Country.Name" Caption="Country" /> 
                                                     </Columns>
-                                                </DxComboBox>
+                                                </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
-                                                <DxComboBox Data="Cities"
-                                                            AllowUserInput="true"
-                                                            NullText="Select City"
+                                                <MyDxComboBox Data="Cities" 
+                                                            NullText="Select City" 
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id"
                                                             @oninput="OnInputCity"
@@ -111,14 +114,13 @@
                                                         <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
                                                     </Columns>
-                                                </DxComboBox>
+                                                </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CityId)" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
-                                                <DxComboBox Data="Districts"
-                                                            AllowUserInput="true"
-                                                            NullText="Select District"
+                                                <MyDxComboBox Data="Districts" 
+                                                            NullText="Select District" 
                                                             TextFieldName="Name"
                                                             ValueFieldName="Id"
                                                             @oninput="OnInputDistrict"
@@ -128,7 +130,7 @@
                                                         <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
                                                         <DxListEditorColumn FieldName="City.Name" Caption="City" />
                                                     </Columns>
-                                                </DxComboBox>
+                                                </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.DistrictId)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>

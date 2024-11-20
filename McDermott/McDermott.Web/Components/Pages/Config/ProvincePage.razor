@@ -63,21 +63,21 @@
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
-                                             
+
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
-                                                <DxComboBox Data="Countries"
-                                                            AllowUserInput="true"
-                                                            NullText="Select Country"
-                                                            TextFieldName="Name"
-                                                            ValueFieldName="Id"
-                                                            @oninput="OnInputCountry"
-                                                            @bind-Value="a.CountryId">
+                                                <MyDxComboBox Data="Countries"
+                                                              NullText="Select Country"
+                                                              TextFieldName="Name"
+                                                              ValueFieldName="Id"
+                                                              @oninput="OnInputCountry"
+                                                              SelectedItemChanged="((CountryDto e) => SelectedItemChanged(e))"
+                                                              @bind-Value="a.CountryId">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
                                                     </Columns>
-                                                </DxComboBox>
+                                                </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.CountryId)" />
                                             </DxFormLayoutItem>
 

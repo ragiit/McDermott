@@ -1,16 +1,16 @@
-Country
+Company
 
-public class CountryCommand
+public class CompanyCommand
  {
      #region GET
 
-    public class GetSingleCountryQuery : IRequest<CountryDto>
+    public class GetSingleCompanyQuery : IRequest<CompanyDto>
     {
-        public List<Expression<Func<Country, object>>> Includes { get; set; }
-        public Expression<Func<Country, bool>> Predicate { get; set; }
-        public Expression<Func<Country, Country>> Select { get; set; }
+        public List<Expression<Func<Company, object>>> Includes { get; set; }
+        public Expression<Func<Company, bool>> Predicate { get; set; }
+        public Expression<Func<Company, Company>> Select { get; set; }
 
-        public List<(Expression<Func<Country, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -19,13 +19,13 @@ public class CountryCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetCountryQuery : IRequest<(List<CountryDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetCompanyQuery : IRequest<(List<CompanyDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Country, object>>> Includes { get; set; }
-        public Expression<Func<Country, bool>> Predicate { get; set; }
-        public Expression<Func<Country, Country>> Select { get; set; }
+        public List<Expression<Func<Company, object>>> Includes { get; set; }
+        public Expression<Func<Company, bool>> Predicate { get; set; }
+        public Expression<Func<Company, Company>> Select { get; set; }
 
-        public List<(Expression<Func<Country, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -34,49 +34,49 @@ public class CountryCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateCountry(Expression<Func<Country, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateCompany(Expression<Func<Company, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Country, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateCountryRequest(CountryDto CountryDto) : IRequest<CountryDto>
+     public class CreateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
      {
-         public CountryDto CountryDto { get; set; } = CountryDto;
+         public CompanyDto CompanyDto { get; set; } = CompanyDto;
      }
 
-     public class BulkValidateCountry(List<CountryDto> CountrysToValidate) : IRequest<List<CountryDto>>
+     public class BulkValidateCompany(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
      {
-         public List<CountryDto> CountrysToValidate { get; } = CountrysToValidate;
+         public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
      }
 
-     public class CreateListCountryRequest(List<CountryDto> CountryDtos) : IRequest<List<CountryDto>>
+     public class CreateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
      {
-         public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
+         public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateCountryRequest(CountryDto CountryDto) : IRequest<CountryDto>
+     public class UpdateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
      {
-         public CountryDto CountryDto { get; set; } = CountryDto;
+         public CompanyDto CompanyDto { get; set; } = CompanyDto;
      }
 
-     public class UpdateListCountryRequest(List<CountryDto> CountryDtos) : IRequest<List<CountryDto>>
+     public class UpdateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
      {
-         public List<CountryDto> CountryDtos { get; set; } = CountryDtos;
+         public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteCountryRequest : IRequest<bool>
+     public class DeleteCompanyRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -85,54 +85,54 @@ public class CountryCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateCountryQuery, List<CountryDto>>,
+IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
   
-IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleCountryQuery, CountryDto>,
-public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleCountryQuery, CountryDto>, 
-     IRequestHandler<ValidateCountry, bool>,
-     IRequestHandler<CreateCountryRequest, CountryDto>,
-     IRequestHandler<BulkValidateCountry, List<CountryDto>>,
-     IRequestHandler<CreateListCountryRequest, List<CountryDto>>,
-     IRequestHandler<UpdateCountryRequest, CountryDto>,
-     IRequestHandler<UpdateListCountryRequest, List<CountryDto>>,
-     IRequestHandler<DeleteCountryRequest, bool>
+IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
+public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleCompanyQuery, CompanyDto>, 
+     IRequestHandler<ValidateCompany, bool>,
+     IRequestHandler<CreateCompanyRequest, CompanyDto>,
+     IRequestHandler<BulkValidateCompany, List<CompanyDto>>,
+     IRequestHandler<CreateListCompanyRequest, List<CompanyDto>>,
+     IRequestHandler<UpdateCompanyRequest, CompanyDto>,
+     IRequestHandler<UpdateListCompanyRequest, List<CompanyDto>>,
+     IRequestHandler<DeleteCompanyRequest, bool>
 {
     #region GET
-    public async Task<List<CountryDto>> Handle(BulkValidateCountry request, CancellationToken cancellationToken)
+    public async Task<List<CompanyDto>> Handle(BulkValidateCompany request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.CountrysToValidate;
+        var CompanyDtos = request.CompanysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = CountryDtos.Select(x => x.Code).Distinct().ToList();
+        //var CompanyNames = CompanyDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = CompanyDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingCountrys = await _unitOfWork.Repository<Country>()
+        //var existingCompanys = await _unitOfWork.Repository<Company>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => CountryNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => CompanyNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingCountrys.Adapt<List<CountryDto>>();
+        //return existingCompanys.Adapt<List<CompanyDto>>();
 
         return [];
     }
-    public async Task<bool> Handle(ValidateCountry request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateCompany request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Country>()
+        return await _unitOfWork.Repository<Company>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<CountryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCountryQuery request, CancellationToken cancellationToken)
+    public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Country>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<Company>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -148,8 +148,8 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Country>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Country>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Company>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Company>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -166,7 +166,7 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -174,7 +174,7 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Country
+                query = query.Select(x => new Company
                 {
                     Id = x.Id, 
                 });
@@ -188,11 +188,11 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<CountryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<CompanyDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<CountryDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<CompanyDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -202,11 +202,11 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<CountryDto> Handle(GetSingleCountryQuery request, CancellationToken cancellationToken)
+    public async Task<CompanyDto> Handle(GetSingleCompanyQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Country>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<Company>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -222,8 +222,8 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Country>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Country>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Company>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Company>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -240,7 +240,7 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Country.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -248,12 +248,12 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Country
+                query = query.Select(x => new Company
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CountryDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CompanyDto>();
         }
         catch (Exception ex)
         {
@@ -266,17 +266,17 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<CountryDto> Handle(CreateCountryRequest request, CancellationToken cancellationToken)
+     public async Task<CompanyDto> Handle(CreateCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDto.Adapt<CreateUpdateCountryDto>().Adapt<Country>());
+             var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<CountryDto>();
+             return result.Adapt<CompanyDto>();
          }
          catch (Exception)
          {
@@ -284,16 +284,16 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<CountryDto>> Handle(CreateListCountryRequest request, CancellationToken cancellationToken)
+     public async Task<List<CompanyDto>> Handle(CreateListCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDtos.Adapt<List<Country>>());
+             var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<Company>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<CountryDto>>();
+             return result.Adapt<List<CompanyDto>>();
          }
          catch (Exception)
          {
@@ -305,17 +305,17 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<CountryDto> Handle(UpdateCountryRequest request, CancellationToken cancellationToken)
+     public async Task<CompanyDto> Handle(UpdateCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDto.Adapt<CountryDto>().Adapt<Country>());
+             var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<CompanyDto>().Adapt<Company>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<CountryDto>();
+             return result.Adapt<CompanyDto>();
          }
          catch (Exception)
          {
@@ -323,16 +323,16 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<CountryDto>> Handle(UpdateListCountryRequest request, CancellationToken cancellationToken)
+     public async Task<List<CompanyDto>> Handle(UpdateListCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDtos.Adapt<List<Country>>());
+             var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<Company>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<CountryDto>>();
+             return result.Adapt<List<CompanyDto>>();
          }
          catch (Exception)
          {
@@ -344,23 +344,23 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteCountryRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteCompanyRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Country>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Country>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<Company>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCountryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -374,20 +374,20 @@ public class CountryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateCountryQuery(List<CountryDto> CountrysToValidate) : IRequest<List<CountryDto>>
+public class BulkValidateCompanyQuery(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
 {
-    public List<CountryDto> CountrysToValidate { get; } = CountrysToValidate;
+    public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
 }a
 
 
-IRequestHandler<BulkValidateCountryQuery, List<CountryDto>>,
+IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
   
-IRequestHandler<GetCountryQuery, (List<CountryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleCountryQuery, CountryDto>,
+IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
 
 
 
- var a = await Mediator.Send(new GetCountrysQuery
+ var a = await Mediator.Send(new GetCompanysQuery
  {
      OrderByList =
      [
@@ -399,10 +399,10 @@ IRequestHandler<GetSingleCountryQuery, CountryDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleCountryQuery
+var patienss = (await Mediator.Send(new GetSingleCompanyQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Country
+    Select = x => new Company
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -415,13 +415,13 @@ var patienss = (await Mediator.Send(new GetSingleCountryQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetCountryQuery
+    var result = await Mediator.Send(new GetCompanyQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Countrys = result.Item1;
+    Companys = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -434,22 +434,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetCountryQuery
+ var result = await Mediator.Send(new GetCompanyQuery
  {
-     Predicate = x => x.CountryId == CountryId,
-     SearchTerm = refCountryComboBox?.Text ?? "",
+     Predicate = x => x.CompanyId == CompanyId,
+     SearchTerm = refCompanyComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Countrys = result.Item1;
- totalCountCountry = result.PageCount;
+ Companys = result.Item1;
+ totalCountCompany = result.PageCount;
 
- Countrys = (await Mediator.Send(new GetCountryQuery
+ Companys = (await Mediator.Send(new GetCompanyQuery
  {
-     Predicate = x => x.Id == CountryForm.IdCardCountryId,
+     Predicate = x => x.Id == CompanyForm.IdCardCompanyId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleCountrysQuery
+var data = (await Mediator.Send(new GetSingleCompanysQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -457,17 +457,17 @@ var data = (await Mediator.Send(new GetSingleCountrysQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Country
+    Select = x => new Company
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Country
+        Patient = new Company
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Country
+        Pratitioner = new Company
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -480,55 +480,55 @@ var data = (await Mediator.Send(new GetSingleCountrysQuery
 })) ?? new();
 
 
-#region ComboboxCountry
+#region ComboboxCompany
 
- private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
- private int CountryComboBoxIndex { get; set; } = 0;
- private int totalCountCountry = 0;
+ private DxComboBox<CompanyDto, long?> refCompanyComboBox { get; set; }
+ private int CompanyComboBoxIndex { get; set; } = 0;
+ private int totalCountCompany = 0;
 
- private async Task OnSearchCountry()
+ private async Task OnSearchCompany()
  {
-     await LoadDataCountry();
+     await LoadDataCompany();
  }
 
- private async Task OnSearchCountryIndexIncrement()
+ private async Task OnSearchCompanyIndexIncrement()
  {
-     if (CountryComboBoxIndex < (totalCountCountry - 1))
+     if (CompanyComboBoxIndex < (totalCountCompany - 1))
      {
-         CountryComboBoxIndex++;
-         await LoadDataCountry(CountryComboBoxIndex, 10);
+         CompanyComboBoxIndex++;
+         await LoadDataCompany(CompanyComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchCountryIndexDecrement()
+ private async Task OnSearchCompanyIndexDecrement()
  {
-     if (CountryComboBoxIndex > 0)
+     if (CompanyComboBoxIndex > 0)
      {
-         CountryComboBoxIndex--;
-         await LoadDataCountry(CountryComboBoxIndex, 10);
+         CompanyComboBoxIndex--;
+         await LoadDataCompany(CompanyComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputCountryChanged(string e)
+ private async Task OnInputCompanyChanged(string e)
  {
-     CountryComboBoxIndex = 0;
-     await LoadDataCountry();
+     CompanyComboBoxIndex = 0;
+     await LoadDataCompany();
  }
 
  
-  private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetCountryQuery
+          var result = await Mediator.Send(new GetCompanyQuery
           {
-              SearchTerm = refCountryComboBox?.Text ?? "",
+              SearchTerm = refCompanyComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Countrys = result.Item1;
-          totalCountCountry = result.PageCount;
+          Companys = result.Item1;
+          totalCountCompany = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -538,47 +538,47 @@ var data = (await Mediator.Send(new GetSingleCountrysQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxCountry
+ #endregion ComboboxCompany
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
-    <MyDxComboBox Data="@Countrys"
-                  NullText="Select Country"
-                  @ref="refCountryComboBox"
-                  @bind-Value="@a.CountryId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
+    <MyDxComboBox Data="@Companys"
+                  NullText="Select Company"
+                  @ref="refCompanyComboBox"
+                  @bind-Value="@a.CompanyId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputCountryChanged(e))">
+                  TextChanged="((string e) => OnInputCompanyChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchCountryIndexDecrement"
+            <DxEditorButton Click="OnSearchCompanyIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchCountry"
+            <DxEditorButton Click="OnSearchCompany"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchCountryIndexIncrement"
+            <DxEditorButton Click="OnSearchCompanyIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(CountryDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
-            <DxListEditorColumn FieldName="@nameof(CountryDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(CompanyDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
+            <DxListEditorColumn FieldName="@nameof(CompanyDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.CountryId)" />
+    <ValidationMessage For="@(()=>a.CompanyId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDto.Adapt<CreateUpdateCountryDto>().Adapt<Country>());
-var result = await _unitOfWork.Repository<Country>().AddAsync(request.CountryDtos.Adapt<List<CreateUpdateCountryDto>>().Adapt<List<Country>>()); 
+var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());
+var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<CreateUpdateCompanyDto>>().Adapt<List<Company>>()); 
 
-var result = await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDto.Adapt<CreateUpdateCountryDto>().Adapt<Country>());  
-var result = await _unitOfWork.Repository<Country>().UpdateAsync(request.CountryDtos.Adapt<List<CreateUpdateCountryDto>>().Adapt<List<Country>>());
+var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());  
+var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<CreateUpdateCompanyDto>>().Adapt<List<Company>>());
 
-list3 = (await Mediator.Send(new GetCountryQuery
+list3 = (await Mediator.Send(new GetCompanyQuery
 {
-    Predicate = x => CountryNames.Contains(x.Name.ToLower()),
+    Predicate = x => CompanyNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Country
+    Select = x => new Company
     {
         Id = x.Id,
         Name = x.Name
@@ -588,42 +588,42 @@ list3 = (await Mediator.Send(new GetCountryQuery
 
 #region Searching
 
-    private int pageSizeCountryAttendance { get; set; } = 10;
-    private int totalCountCountryAttendance = 0;
-    private int activePageIndexCountryAttendance { get; set; } = 0;
-    private string searchTermCountryAttendance { get; set; } = string.Empty;
+    private int pageSizeCompanyAttendance { get; set; } = 10;
+    private int totalCountCompanyAttendance = 0;
+    private int activePageIndexCompanyAttendance { get; set; } = 0;
+    private string searchTermCompanyAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedCountryAttendance(string searchText)
+    private async Task OnSearchBoxChangedCompanyAttendance(string searchText)
     {
-        searchTermCountryAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeCountryAttendance);
+        searchTermCompanyAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeCompanyAttendance);
     }
 
-    private async Task OnpageSizeCountryAttendanceIndexChanged(int newpageSizeCountryAttendance)
+    private async Task OnpageSizeCompanyAttendanceIndexChanged(int newpageSizeCompanyAttendance)
     {
-        pageSizeCountryAttendance = newpageSizeCountryAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeCountryAttendance);
+        pageSizeCompanyAttendance = newpageSizeCompanyAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeCompanyAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeCountryAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeCompanyAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeCountryAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeCompanyAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetCountryAttendanceQuery
+        var result = await Mediator.Send(new GetCompanyAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeCountryAttendance,
-            SearchTerm = searchTermCountryAttendance,
+            PageSize = pageSizeCompanyAttendance,
+            SearchTerm = searchTermCompanyAttendance,
         });
-        CountryAttendances = result.Item1;
-        totalCountCountryAttendance = result.PageCount;
-        activePageIndexCountryAttendance = pageIndex;
+        CompanyAttendances = result.Item1;
+        totalCountCompanyAttendance = result.PageCount;
+        activePageIndexCompanyAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
@@ -696,7 +696,7 @@ list3 = (await Mediator.Send(new GetCountryQuery
 
 
    <MyGridPaginate @ref="GridDetail"
-                 Data="Countrys"
+                 Data="Companys"
                  @bind-SelectedDataItems="@SelectedDetailDataItems"
                  EditModelSaving="OnSaveInventoryAdjumentDetail"
                  DataItemDeleting="OnDeleteInventoryAdjumentDetail"
@@ -707,8 +707,8 @@ list3 = (await Mediator.Send(new GetCountryQuery
 
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="CountryDto"
-                          Items="@Countrys"
+         <MyDxToolbarBase TItem="CompanyDto"
+                          Items="@Companys"
                           Grid="GridDetail"
                           SelectedDataItems="@SelectedDetailDataItems"
                           NewItem_Click="@NewItem_Click"
@@ -724,53 +724,53 @@ list3 = (await Mediator.Send(new GetCountryQuery
 
      <Columns>
          <DxGridSelectionColumn Width="15px" />
-         <DxGridDataColumn FieldName="Country.Name" Caption="Country"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="Company.Name" Caption="Company"></DxGridDataColumn>
          <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
          <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
          <DxGridDataColumn FieldName="Difference" Caption="Difference" />
          <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
          <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
-         <DxGridDataColumn FieldName="Country.Country.Name" Caption="Country" />
+         <DxGridDataColumn FieldName="Company.Company.Name" Caption="Company" />
      </Columns>
      <EditFormTemplate Context="EditFormContext">
          @{
              if (EditFormContext.DataItem is null)
              {
-                 FormCountry = (CountryDto)EditFormContext.EditModel;
+                 FormCompany = (CompanyDto)EditFormContext.EditModel;
              }
-             var IsBatch = Countrys.FirstOrDefault(x => x.Id == FormCountry.CountryId)?.TraceAbility ?? false;
+             var IsBatch = Companys.FirstOrDefault(x => x.Id == FormCompany.CompanyId)?.TraceAbility ?? false;
 
-             ActiveButton = FormCountry.CountryId is null ||
-             string.IsNullOrWhiteSpace(FormCountry.Batch) && IsBatch ||
-             FormCountry.ExpiredDate is null ||
-             FormCountry.CountryId is null;
+             ActiveButton = FormCompany.CompanyId is null ||
+             string.IsNullOrWhiteSpace(FormCompany.Batch) && IsBatch ||
+             FormCompany.ExpiredDate is null ||
+             FormCompany.CompanyId is null;
          }
          <div class="row w-100">
              <DxFormLayout CssClass="w-100">
                  <div class="col-md-4">
-                     <DxFormLayoutItem Caption="Country" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox Data="@Countrys"
-                                     @bind-Value="@FormCountry.CountryId"
+                     <DxFormLayoutItem Caption="Company" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@Companys"
+                                     @bind-Value="@FormCompany.CompanyId"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     NullText="Select Country..."
+                                     NullText="Select Company..."
                                      TextFieldName="Name"
-                                     ReadOnly="@(FormCountry.Id != 0)"
+                                     ReadOnly="@(FormCompany.Id != 0)"
                                      ValueFieldName="Id"
-                                     SelectedItemChanged="@(async (CountryDto freq) => await OnSelectCountry(freq))"
+                                     SelectedItemChanged="@(async (CompanyDto freq) => await OnSelectCompany(freq))"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      ShowValidationIcon="true" />
-                         <ValidationMessage For="@(()=> FormCountry.CountryId)"   />
+                         <ValidationMessage For="@(()=> FormCompany.CompanyId)"   />
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem Caption="Batch" Enabled="FormCountry.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormCompany.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <MyDxComboBox Data="@Batch"
-                                       ReadOnly="@(FormCountry.Id != 0)"
+                                       ReadOnly="@(FormCompany.Id != 0)"
                                        NullText="Select Batch..."
                                        AllowUserInput="true"
-                                       @bind-Value="@FormCountry.Batch"
-                                       @bind-Text="@FormCountry.Batch"
+                                       @bind-Value="@FormCompany.Batch"
+                                       @bind-Text="@FormCompany.Batch"
                                        SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
-                         <ValidationMessage For="@(() => FormCountry.Batch)" />
+                         <ValidationMessage For="@(() => FormCompany.Batch)" />
 
                      </DxFormLayoutItem>
                  </div>
@@ -780,43 +780,43 @@ list3 = (await Mediator.Send(new GetCountryQuery
                          <DxSpinEdit ShowValidationIcon="true"
                                      ReadOnly
                                      MinValue="0"
-                                     @bind-Value="@FormCountry.TeoriticalQty"
+                                     @bind-Value="@FormCompany.TeoriticalQty"
                                      NullText="Teoritical Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormCountry.TeoriticalQty)"   />
+                         <ValidationMessage For="@(()=> FormCompany.TeoriticalQty)"   />
                      </DxFormLayoutItem>
 
                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxSpinEdit ShowValidationIcon="true"
                                      MinValue="0"
-                                     @bind-Value="@FormCountry.RealQty"
+                                     @bind-Value="@FormCompany.RealQty"
                                      NullText="Real Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormCountry.RealQty)"   />
+                         <ValidationMessage For="@(()=> FormCompany.RealQty)"   />
                      </DxFormLayoutItem>
                  </div>
 
                  <div class="col-md-4">
                      <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxDateEdit ShowValidationIcon="true"
-                                     ReadOnly="@(FormCountry.Id != 0)"
+                                     ReadOnly="@(FormCompany.Id != 0)"
                                      DisplayFormat="@Helper.DefaultFormatDate"
-                                     @bind-Date="@FormCountry.ExpiredDate"
+                                     @bind-Date="@FormCompany.ExpiredDate"
                                      NullText="Expired Date">
                          </DxDateEdit>
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Country" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox ShowValidationIcon="true" Data="@Countrys"
-                                     NullText="Country"
-                                     ReadOnly="@(FormCountry.Id != 0)"
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Company" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@Companys"
+                                     NullText="Company"
+                                     ReadOnly="@(FormCompany.Id != 0)"
                                      TextFieldName="Name"
                                      ValueFieldName="Id"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     @bind-Value="FormCountry.CountryId">
+                                     @bind-Value="FormCompany.CompanyId">
                          </DxComboBox>
-                         <ValidationMessage For="@(() => FormCountry.CountryId)" />
+                         <ValidationMessage For="@(() => FormCompany.CompanyId)" />
                      </DxFormLayoutItem>
                  </div>
              </DxFormLayout>
@@ -835,57 +835,141 @@ list3 = (await Mediator.Send(new GetCountryQuery
 
  NEW COMBOBOX VIRAL 2024
 
-Country
+Company
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
-    <DxComboBox Data="Countrys"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
+    <DxComboBox Data="Companys"
                 AllowUserInput="true"
-                NullText="Select Country"
+                NullText="Select Company"
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputCountry"
-                @bind-Value="a.CountryId">
+                @oninput="OnInputCompany"
+                @bind-Value="a.CompanyId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(Company.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Company.Code)" Caption="Code" />
         </Columns>
     </DxComboBox>
-    <ValidationMessage For="@(()=>a.CountryId)" />
+    <ValidationMessage For="@(()=>a.CompanyId)" />
 </DxFormLayoutItem>
 
-#region ComboBox Country
+#region ComboBox Company
  
-private CancellationTokenSource? _ctsCountry;
-private async Task OnInputCountry(ChangeEventArgs e)
+private CancellationTokenSource? _ctsCompany;
+private async Task OnInputCompany(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
             
-        _ctsCountry?.Cancel();
-        _ctsCountry?.Dispose();
-        _ctsCountry = new CancellationTokenSource();
+        _ctsCompany?.Cancel();
+        _ctsCompany?.Dispose();
+        _ctsCompany = new CancellationTokenSource();
             
-        await Task.Delay(700, _ctsCountry.Token);
+        await Task.Delay(700, _ctsCompany.Token);
             
-        await LoadCountry(e.Value?.ToString() ?? "");
+        await LoadCompany(e.Value?.ToString() ?? "");
     } 
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsCountry?.Dispose();
-        _ctsCountry = null;
+        _ctsCompany?.Dispose();
+        _ctsCompany = null;
     } 
 }
 
-private async Task LoadCountry(string? e = "", long? id = null)
+ private async Task LoadCompany(string? e = "", Expression<Func<Company, bool>>? predicate = null)
+ {
+     try
+     {
+         PanelVisible = true;
+         Companys = await Mediator.QueryGetComboBox<Company, CompanyDto>(e, predicate);
+         PanelVisible = false;
+     }
+     catch (Exception ex)
+     {
+         ex.HandleException(ToastService);
+     }
+     finally { PanelVisible = false; }
+ }
+
+#endregion
+
+
+// Ini buat di EditItemClick
+await LoadCompany(id:  a.CompanyId);
+
+Company
+
+
+
+VIRAL 2025
+
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
+    <MyDxComboBox Data="Countries"
+                NullText="Select Province"
+                TextFieldName="Name"
+                ValueFieldName="Id"
+                @oninput="OnInputProvince"
+                SelectedItemChanged="((ProvinceDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.ProvinceId">
+        <Columns>
+            <DxListEditorColumn FieldName="@nameof(Province.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Province.Code)" Caption="Code" />
+        </Columns>
+    </MyDxComboBox>
+    <ValidationMessage For="@(()=>a.ProvinceId)" />
+</DxFormLayoutItem>
+
+
+#region ComboBox Province
+
+private ProvinceDto SelectedProvince { get; set; } = new();
+async Task SelectedItemChanged(ProvinceDto e)
+{
+    if (e is null)
+    {
+        SelectedProvince = new();
+        await LoadCounty(); 
+    }
+    else
+        SelectedProvince = e;
+}
+
+private CancellationTokenSource? _cts;
+private async Task OnInputProvince(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
-        Countrys = await Mediator.QueryGetComboBox<Country, CountryDto>(e, x => x.Id == id);
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+
+        await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+        await LoadCounty(e.Value?.ToString() ?? "");
+    }
+    finally
+    {
+        PanelVisible = false;
+
+        // Untuk menghindari kebocoran memori (memory leaks).
+        _cts?.Dispose();
+        _cts = null;
+    }
+}
+
+private async Task LoadCounty(string? e = "", Expression<Func<Province, bool>>? predicate = null)
+{
+    try
+    {
+        PanelVisible = true;
+        Countries = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
         PanelVisible = false;
     }
     catch (Exception ex)
@@ -896,7 +980,3 @@ private async Task LoadCountry(string? e = "", long? id = null)
 }
 
 #endregion
-
-await LoadCountry(id:  a.CountryId);
-
-Country

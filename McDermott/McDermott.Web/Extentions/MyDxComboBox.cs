@@ -13,7 +13,7 @@ namespace McDermott.Web.Extentions
                 NullText = "Select Name...";
                 ShowValidationIcon = true;
                 ClearButtonDisplayMode = DataEditorClearButtonDisplayMode.Auto;
-                FilteringMode = DataGridFilteringMode.Contains;
+                //FilteringMode = DataGridFilteringMode.Contains;
                 ListRenderMode = ListRenderMode.Virtual;
                 AllowUserInput = true;
                 ShowValidationIcon = true;
