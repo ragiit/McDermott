@@ -11,6 +11,7 @@ using static McDermott.Application.Features.Commands.Config.VillageCommand;
 namespace McDermott.Application.Features.Queries.Config
 {
     public class VillageQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+        IRequestHandler<GetVillageQueryNew, (List<VillageDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetVillageQuery, (List<VillageDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<ValidateVillageQuery, bool>,
         IRequestHandler<BulkValidateVillageQuery, List<VillageDto>>,
@@ -25,6 +26,98 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteVillageRequest, bool>
     {
         #region GET
+        public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQueryNew request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Village>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Village>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Village>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.District.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.City.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Province.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Village
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        PostalCode = x.PostalCode,
+                        ProvinceId = x.ProvinceId,
+                        CityId = x.CityId,
+                        DistrictId = x.DistrictId,
+                        Province = new Domain.Entities.Province
+                        {
+                            Name = x.Province.Name
+                        },
+                        City = new Domain.Entities.City
+                        {
+                            Name = x.City.Name
+                        },
+                        District = new Domain.Entities.District
+                        {
+                            Name = x.District.Name
+                        },
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<VillageDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<VillageDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
 
         //public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQuery request, CancellationToken cancellationToken)
         //{

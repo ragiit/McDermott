@@ -14,7 +14,9 @@ namespace McDermott.Web.Extentions
     }
 
     public static class Helper
-    {
+    { 
+        public static readonly short CBX_DELAY = 700;
+
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {
             ToastService.ShowInfo($"Data with name \"{val}\" in row {row} and column {col} is invalid");

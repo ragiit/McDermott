@@ -206,36 +206,7 @@ namespace McDermott.Web.Extentions
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(UomDto))
-            {
-                var result = await mediator.Send(new GetUomQuery(
-                    predicate as Expression<Func<Uom, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.UomCategory
-                    ] : includes as List<Expression<Func<Uom, object>>>,
-                    select: select is null ? x => new Uom
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        UomCategoryId = x.UomCategoryId,
-                        UomCategory = new UomCategory
-                        {
-                            Name = x.UomCategory.Name
-                        },
-                        BiggerRatio = x.BiggerRatio,
-                        Type = x.Type,
-                        Active = x.Active,
-                        RoundingPrecision = x.RoundingPrecision
-                    } : select as Expression<Func<Uom, Uom>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
+            } 
             else if (typeof(TDto) == typeof(PatientFamilyRelationDto))
             {
                 var result = await mediator.Send(new GetPatientFamilyRelationQuery(

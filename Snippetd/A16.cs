@@ -1,3 +1,5 @@
+Company
+
 public class CompanyCommand
  {
      #region GET
@@ -37,11 +39,6 @@ public class CompanyCommand
          public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
      }
 
-     public class BulkValidateCompany(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
-     {
-         public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
-     }
-
      #endregion GET
 
      #region CREATE
@@ -49,6 +46,11 @@ public class CompanyCommand
      public class CreateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
      {
          public CompanyDto CompanyDto { get; set; } = CompanyDto;
+     }
+
+     public class BulkValidateCompany(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
+     {
+         public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
      }
 
      public class CreateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
@@ -101,19 +103,19 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
     #region GET
     public async Task<List<CompanyDto>> Handle(BulkValidateCompany request, CancellationToken cancellationToken)
     {
-        var CountryDtos = request.CompanysToValidate;
+        var CompanyDtos = request.CompanysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var CountryNames = CountryDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = CountryDtos.Select(x => x.Code).Distinct().ToList();
+        //var CompanyNames = CompanyDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = CompanyDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingCountrys = await _unitOfWork.Repository<Country>()
+        //var existingCompanys = await _unitOfWork.Repository<Company>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => CountryNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => CompanyNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingCountrys.Adapt<List<CountryDto>>();
+        //return existingCompanys.Adapt<List<CompanyDto>>();
 
         return [];
     }
@@ -425,7 +427,7 @@ try
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastCompany);
+    ex.HandleException(ToastService);
 }
 finally
 { 
@@ -434,7 +436,7 @@ finally
 
  var result = await Mediator.Send(new GetCompanyQuery
  {
-     Predicate = x => x.CityId == cityId,
+     Predicate = x => x.CompanyId == CompanyId,
      SearchTerm = refCompanyComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
@@ -481,7 +483,6 @@ var data = (await Mediator.Send(new GetSingleCompanysQuery
 #region ComboboxCompany
 
  private DxComboBox<CompanyDto, long?> refCompanyComboBox { get; set; }
- private List<CompanyDto> Companies { get; set; } = [];
  private int CompanyComboBoxIndex { get; set; } = 0;
  private int totalCountCompany = 0;
 
@@ -526,7 +527,7 @@ var data = (await Mediator.Send(new GetSingleCompanysQuery
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Companies = result.Item1;
+          Companys = result.Item1;
           totalCountCompany = result.PageCount;
           PanelVisible = false;
       }
@@ -540,7 +541,7 @@ var data = (await Mediator.Send(new GetSingleCompanysQuery
  #endregion ComboboxCompany
 
  <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
-    <MyDxComboBox Data="@Companies"
+    <MyDxComboBox Data="@Companys"
                   NullText="Select Company"
                   @ref="refCompanyComboBox"
                   @bind-Value="@a.CompanyId"
@@ -627,34 +628,355 @@ list3 = (await Mediator.Send(new GetCompanyQuery
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastCompany);
+        ex.HandleException(ToastService);
     }
     finally { PanelVisible = false; }
 }
     #endregion Searching
 
-        <div class="row">
-        <DxFormLayout>
-            <div class="col-md-9">
-                <DxFormLayoutItem>
-                    <DxPager PageCount="totalCount"
-                             ActivePageIndexChanged="OnPageIndexChanged"
-                             ActivePageIndex="activePageIndex"
-                             VisibleNumericButtonCount="10"
-                             SizeMode="SizeMode.Medium"
-                             NavigationMode="PagerNavigationMode.Auto">
-                    </DxPager>
-                </DxFormLayoutItem>
-            </div>
-            <div class="col-md-3 d-flex justify-content-end">
-                <DxFormLayoutItem Caption="Page Size:">
-                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                  NullText="Select Page Size"
-                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                  @bind-Value="pageSize">
-                    </MyDxComboBox>
-                </DxFormLayoutItem>
-            </div>
-        </DxFormLayout>
-    </div>
+
+
+
+      #region Searching
+
+  private int pageSize { get; set; } = 10;
+  private int totalCount = 0;
+  private int activePageIndex { get; set; } = 0;
+  private string searchTerm { get; set; } = string.Empty;
+
+  private async Task OnSearchBoxChanged(string searchText)
+  {
+      searchTerm = searchText;
+      await LoadData(0, pageSize);
+  }
+
+  private async Task OnPageSizeIndexChanged(int newPageSize)
+  {
+      pageSize = newPageSize;
+      await LoadData(0, newPageSize);
+  }
+
+  private async Task OnPageIndexChanged(int newPageIndex)
+  {
+      await LoadData(newPageIndex, pageSize);
+  }
+
+  private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+  {
+      try
+      {
+          PanelVisible = true;
+          SelectedDataItems = [];
+          var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+          {
+              OrderByList =
+              [
+                  (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
+                  (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
+                  (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
+              ],
+              Predicate = x => x.IsVaccination == true,
+              PageIndex = pageIndex,
+              PageSize = pageSize,
+              SearchTerm = searchTerm,
+          });
+
+          GeneralConsultanServices = a.Item1;
+          totalCount = a.PageCount;
+          activePageIndex = pageIndex;
+      }
+      catch (Exception ex)
+      {
+          ex.HandleException(ToastService);
+      }
+      finally { PanelVisible = false; }
+  }
+
+  #endregion Searching
+
+
+   <MyGridPaginate @ref="GridDetail"
+                 Data="Companys"
+                 @bind-SelectedDataItems="@SelectedDetailDataItems"
+                 EditModelSaving="OnSaveInventoryAdjumentDetail"
+                 DataItemDeleting="OnDeleteInventoryAdjumentDetail"
+                 EditFormButtonsVisible="false"
+                 FocusedRowChanged="GridDetail_FocusedRowChanged"
+                 SearchTextChanged="OnSearchBoxChanged"
+                 KeyFieldName="Id">
+
+
+     <ToolbarTemplate>
+         <MyDxToolbarBase TItem="CompanyDto"
+                          Items="@Companys"
+                          Grid="GridDetail"
+                          SelectedDataItems="@SelectedDetailDataItems"
+                          NewItem_Click="@NewItem_Click"
+                          EditItem_Click="@EditItem_Click"
+                          DeleteItem_Click="@DeleteItem_Click"
+                          Refresh_Click="@(async () => await LoadData())"
+                          IsImport="UserAccessCRUID.IsImport"
+                          VisibleNew="UserAccessCRUID.IsCreate"
+                          VisibleEdit="UserAccessCRUID.IsUpdate"
+                          VisibleDelete="UserAccessCRUID.IsDelete" />
+     </ToolbarTemplate>
+
+
+     <Columns>
+         <DxGridSelectionColumn Width="15px" />
+         <DxGridDataColumn FieldName="Company.Name" Caption="Company"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
+         <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
+         <DxGridDataColumn FieldName="Difference" Caption="Difference" />
+         <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
+         <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
+         <DxGridDataColumn FieldName="Company.Company.Name" Caption="Company" />
+     </Columns>
+     <EditFormTemplate Context="EditFormContext">
+         @{
+             if (EditFormContext.DataItem is null)
+             {
+                 FormCompany = (CompanyDto)EditFormContext.EditModel;
+             }
+             var IsBatch = Companys.FirstOrDefault(x => x.Id == FormCompany.CompanyId)?.TraceAbility ?? false;
+
+             ActiveButton = FormCompany.CompanyId is null ||
+             string.IsNullOrWhiteSpace(FormCompany.Batch) && IsBatch ||
+             FormCompany.ExpiredDate is null ||
+             FormCompany.CompanyId is null;
+         }
+         <div class="row w-100">
+             <DxFormLayout CssClass="w-100">
+                 <div class="col-md-4">
+                     <DxFormLayoutItem Caption="Company" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@Companys"
+                                     @bind-Value="@FormCompany.CompanyId"
+                                     FilteringMode="@DataGridFilteringMode.Contains"
+                                     NullText="Select Company..."
+                                     TextFieldName="Name"
+                                     ReadOnly="@(FormCompany.Id != 0)"
+                                     ValueFieldName="Id"
+                                     SelectedItemChanged="@(async (CompanyDto freq) => await OnSelectCompany(freq))"
+                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                     ShowValidationIcon="true" />
+                         <ValidationMessage For="@(()=> FormCompany.CompanyId)"   />
+                     </DxFormLayoutItem>
+
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormCompany.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <MyDxComboBox Data="@Batch"
+                                       ReadOnly="@(FormCompany.Id != 0)"
+                                       NullText="Select Batch..."
+                                       AllowUserInput="true"
+                                       @bind-Value="@FormCompany.Batch"
+                                       @bind-Text="@FormCompany.Batch"
+                                       SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
+                         <ValidationMessage For="@(() => FormCompany.Batch)" />
+
+                     </DxFormLayoutItem>
+                 </div>
+
+                 <div class="col-md-4">
+                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Teoritical Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxSpinEdit ShowValidationIcon="true"
+                                     ReadOnly
+                                     MinValue="0"
+                                     @bind-Value="@FormCompany.TeoriticalQty"
+                                     NullText="Teoritical Qty"
+                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                         <ValidationMessage For="@(()=> FormCompany.TeoriticalQty)"   />
+                     </DxFormLayoutItem>
+
+                     <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxSpinEdit ShowValidationIcon="true"
+                                     MinValue="0"
+                                     @bind-Value="@FormCompany.RealQty"
+                                     NullText="Real Qty"
+                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                         <ValidationMessage For="@(()=> FormCompany.RealQty)"   />
+                     </DxFormLayoutItem>
+                 </div>
+
+                 <div class="col-md-4">
+                     <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxDateEdit ShowValidationIcon="true"
+                                     ReadOnly="@(FormCompany.Id != 0)"
+                                     DisplayFormat="@Helper.DefaultFormatDate"
+                                     @bind-Date="@FormCompany.ExpiredDate"
+                                     NullText="Expired Date">
+                         </DxDateEdit>
+                     </DxFormLayoutItem>
+
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Company" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@Companys"
+                                     NullText="Company"
+                                     ReadOnly="@(FormCompany.Id != 0)"
+                                     TextFieldName="Name"
+                                     ValueFieldName="Id"
+                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                     FilteringMode="@DataGridFilteringMode.Contains"
+                                     @bind-Value="FormCompany.CompanyId">
+                         </DxComboBox>
+                         <ValidationMessage For="@(() => FormCompany.CompanyId)" />
+                     </DxFormLayoutItem>
+                 </div>
+             </DxFormLayout>
+
+             <div class="col-md-12 d-flex justify-content-end">
+                 <DxButton Enabled="@(!ActiveButton)" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
+                 <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(() => GridDetail.CancelEditAsync())"></DxButton>
+             </div>
+
+         </div>
+     </EditFormTemplate>
+ </MyGridPaginate>
+
+
+
+
+ NEW COMBOBOX VIRAL 2024
+
+Company
+
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
+    <DxComboBox Data="Companys"
+                AllowUserInput="true"
+                NullText="Select Company"
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                TextFieldName="Name"
+                ValueFieldName="Id"
+                @oninput="OnInputCompany"
+                @bind-Value="a.CompanyId">
+        <Columns>
+            <DxListEditorColumn FieldName="@nameof(Company.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Company.Code)" Caption="Code" />
+        </Columns>
+    </DxComboBox>
+    <ValidationMessage For="@(()=>a.CompanyId)" />
+</DxFormLayoutItem>
+
+#region ComboBox Company
+ 
+private CancellationTokenSource? _ctsCompany;
+private async Task OnInputCompany(ChangeEventArgs e)
+{
+    try
+    {
+        PanelVisible = true;
+            
+        _ctsCompany?.Cancel();
+        _ctsCompany?.Dispose();
+        _ctsCompany = new CancellationTokenSource();
+            
+        await Task.Delay(700, _ctsCompany.Token);
+            
+        await LoadCompany(e.Value?.ToString() ?? "");
+    } 
+    finally
+    {
+        PanelVisible = false;
+
+        // Untuk menghindari kebocoran memori (memory leaks).
+        _ctsCompany?.Dispose();
+        _ctsCompany = null;
+    } 
+}
+
+ private async Task LoadCompany(string? e = "", Expression<Func<Company, bool>>? predicate = null)
+ {
+     try
+     {
+         PanelVisible = true;
+         Companys = await Mediator.QueryGetComboBox<Company, CompanyDto>(e, predicate);
+         PanelVisible = false;
+     }
+     catch (Exception ex)
+     {
+         ex.HandleException(ToastService);
+     }
+     finally { PanelVisible = false; }
+ }
+
+#endregion
+
+
+// Ini buat di EditItemClick
+await LoadCompany(id:  a.CompanyId);
+
+Company
+
+
+
+VIRAL 2025
+
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
+    <MyDxComboBox Data="Countries"
+                NullText="Select Province"
+                TextFieldName="Name"
+                ValueFieldName="Id"
+                @oninput="OnInputProvince"
+                SelectedItemChanged="((ProvinceDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.ProvinceId">
+        <Columns>
+            <DxListEditorColumn FieldName="@nameof(Province.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Province.Code)" Caption="Code" />
+        </Columns>
+    </MyDxComboBox>
+    <ValidationMessage For="@(()=>a.ProvinceId)" />
+</DxFormLayoutItem>
+
+
+#region ComboBox Province
+
+private ProvinceDto SelectedProvince { get; set; } = new();
+async Task SelectedItemChanged(ProvinceDto e)
+{
+    if (e is null)
+    {
+        SelectedProvince = new();
+        await LoadCounty(); 
+    }
+    else
+        SelectedProvince = e;
+}
+
+private CancellationTokenSource? _cts;
+private async Task OnInputProvince(ChangeEventArgs e)
+{
+    try
+    {
+        PanelVisible = true;
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+
+        await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+        await LoadCounty(e.Value?.ToString() ?? "");
+    }
+    finally
+    {
+        PanelVisible = false;
+
+        // Untuk menghindari kebocoran memori (memory leaks).
+        _cts?.Dispose();
+        _cts = null;
+    }
+}
+
+private async Task LoadCounty(string? e = "", Expression<Func<Province, bool>>? predicate = null)
+{
+    try
+    {
+        PanelVisible = true;
+        Countries = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
+        PanelVisible = false;
+    }
+    catch (Exception ex)
+    {
+        ex.HandleException(ToastService);
+    }
+    finally { PanelVisible = false; }
+}
+
+#endregion

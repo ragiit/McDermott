@@ -6,6 +6,8 @@ using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
 using Document = iTextSharp.text.Document;
 using DevExpress.Printing.Core.Native;
+using System.Reactive.Subjects;
+using System.Reactive.Linq;
 
 namespace McDermott.Web.Components.Pages.Config
 {

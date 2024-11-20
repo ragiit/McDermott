@@ -489,9 +489,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUomQuery(searchTerm: refUomComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetUomQuery
+            {
+                SearchTerm = refUomComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             GetUoms = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -536,10 +541,15 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private async Task LoadDataUomPurchase(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUomQuery(searchTerm: refUomPurchaseComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            SelectedDataItems = []; 
+            var result = await Mediator.Send(new GetUomQuery
+            {
+                SearchTerm = refUomPurchaseComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             GetUomPurchases = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 

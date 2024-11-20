@@ -190,7 +190,8 @@ namespace McDermott.Application.Features.Queries.Config
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
                             );
                 }
 
@@ -265,7 +266,8 @@ namespace McDermott.Application.Features.Queries.Config
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%")
                         );
                 }
 

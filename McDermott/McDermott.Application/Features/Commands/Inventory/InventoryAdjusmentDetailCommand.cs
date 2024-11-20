@@ -4,10 +4,34 @@
     {
         #region GET 
 
-        public class GetInventoryAdjusmentDetailQuery(Expression<Func<InventoryAdjusmentDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<InventoryAdjusmentDetailDto>>
+        public class GetSingleInventoryAdjusmentDetailQuery : IRequest<InventoryAdjusmentDetailDto>
         {
-            public Expression<Func<InventoryAdjusmentDetail, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
+            public List<Expression<Func<InventoryAdjusmentDetail, object>>> Includes { get; set; }
+            public Expression<Func<InventoryAdjusmentDetail, bool>> Predicate { get; set; }
+            public Expression<Func<InventoryAdjusmentDetail, InventoryAdjusmentDetail>> Select { get; set; }
+
+            public List<(Expression<Func<InventoryAdjusmentDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetInventoryAdjusmentDetailQuery : IRequest<(List<InventoryAdjusmentDetailDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<InventoryAdjusmentDetail, object>>> Includes { get; set; }
+            public Expression<Func<InventoryAdjusmentDetail, bool>> Predicate { get; set; }
+            public Expression<Func<InventoryAdjusmentDetail, InventoryAdjusmentDetail>> Select { get; set; }
+
+            public List<(Expression<Func<InventoryAdjusmentDetail, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         #endregion

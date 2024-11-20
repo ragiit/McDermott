@@ -1,5 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Web.Extentions;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Medical.LocationCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -94,8 +96,8 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadDataParentLocations();
-            await LoadDataCompanies();
+            await LoadLocation(); 
+            await LoadCompany(); 
             PanelVisible = false;
 
             return;
@@ -139,66 +141,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region Load ComboBox
 
-        private DxComboBox<LocationDto, long?> refParentLocationsComboBox { get; set; }
-        private int ParentLocationsComboBoxIndex { get; set; } = 0;
-        private int totalCountParentLocations = 0;
-
-        private async Task OnSearchParentLocations()
-        {
-            await LoadDataParentLocations(0, 10);
-        }
-
-        private async Task OnSearchParentLocationsIndexIncrement()
-        {
-            if (ParentLocationsComboBoxIndex < (totalCountParentLocations - 1))
-            {
-                ParentLocationsComboBoxIndex++;
-                await LoadDataParentLocations(ParentLocationsComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchParentLocationsndexDecrement()
-        {
-            if (ParentLocationsComboBoxIndex > 0)
-            {
-                ParentLocationsComboBoxIndex--;
-                await LoadDataParentLocations(ParentLocationsComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputParentLocationsChanged(string e)
-        {
-            ParentLocationsComboBoxIndex = 0;
-            await LoadDataParentLocations(0, 10);
-        }
-
-        private async Task LoadDataParentLocations(int pageIndex = 0, int pageSize = 10)
-        {
-            try
-            {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetLocationQuery
-                {
-                    Predicate = x => x.ParentLocationId != null,
-                    SearchTerm = refParentLocationsComboBox?.Text ?? "",
-                    PageSize = pageSize,
-                    PageIndex = pageIndex
-                });
-
-                if (result.Item1 != null)
-                {
-                    ParentLocations = [.. result.Item1.Where(x => x.ParentLocationId is not null).OrderBy(x => x.Name)];
-                    totalCountParentLocations = result.PageCount;
-                }
-                PanelVisible = false;
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
+      
         private DxComboBox<CompanyDto, long?> refCompaniesComboBox { get; set; }
         private int CompaniesComboBoxIndex { get; set; } = 0;
         private int totalCountCompanies = 0;
@@ -311,6 +254,8 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
+            await LoadLocation();
+            await LoadCompany();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -326,14 +271,8 @@ namespace McDermott.Web.Components.Pages.Medical
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as LocationDto ?? new());
-                ParentLocations = (await Mediator.QueryGetHelper<Locations, LocationDto>(predicate: x => x.Id == a.ParentLocationId)).Item1;
-
-                ParentLocations = (await Mediator.Send(new GetLocationQuery
-                {
-                    Predicate = x => x.Id == a.ParentLocationId
-                })).Item1;
-
-                Companies = (await Mediator.QueryGetHelper<Company, CompanyDto>(predicate: x => x.Id == a.ParentLocationId)).Item1;
+                await LoadLocation(predicate: x => x.Id == a.ParentLocationId); 
+                await LoadCompany(predicate: x => x.Id == a.CompanyId);  
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -518,5 +457,93 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             await Helper.GenerateColumnImportTemplateExcelFileAsync(JsRuntime, FileExportService, "location_template.xlsx", ExportTemp);
         }
+
+        #region ComboBox Location
+
+        private CancellationTokenSource? _ctsLocation;
+        private async Task OnInputLocation(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _ctsLocation?.Cancel();
+                _ctsLocation?.Dispose();
+                _ctsLocation = new CancellationTokenSource();
+
+                await Task.Delay(700, _ctsLocation.Token);
+
+                await LoadLocation(e.Value?.ToString() ?? "", x => x.ParentLocationId == null);
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _ctsLocation?.Dispose();
+                _ctsLocation = null;
+            }
+        }
+
+        private async Task LoadLocation(string? e = "", Expression<Func<Locations, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                ParentLocations = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
+
+        #region ComboBox Company
+
+        private CancellationTokenSource? _ctsCompany;
+        private async Task OnInputCompany(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _ctsCompany?.Cancel();
+                _ctsCompany?.Dispose();
+                _ctsCompany = new CancellationTokenSource();
+
+                await Task.Delay(700, _ctsCompany.Token);
+
+                await LoadCompany(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _ctsCompany?.Dispose();
+                _ctsCompany = null;
+            }
+        }
+
+        private async Task LoadCompany(string? e = "", Expression<Func<Company, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                Companies = await Mediator.QueryGetComboBox<Company, CompanyDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
     }
 }

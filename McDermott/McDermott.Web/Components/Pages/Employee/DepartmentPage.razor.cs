@@ -162,15 +162,21 @@ namespace McDermott.Web.Components.Pages.Employee
 
         private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            var result = await Mediator.QueryGetHelper<Company, CompanyDto>(pageIndex, pageSize, refCompanyComboBox?.Text ?? "", includes: [], select: x => new Company
+            PanelVisible = true; 
+            var result = await Mediator.Send(new GetCompanyQuery
             {
-                Id = x.Id,
-                Name = x.Name,
-                Email = x.Email
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refCompanyComboBox?.Text ?? "",
+                Select = x => new Company
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Email = x.Email
+                }
             });
             Companies = result.Item1;
-            totalCountCompany = result.pageCount;
+            totalCountCompany = result.PageCount;
             PanelVisible = false;
         }
 
@@ -208,7 +214,33 @@ namespace McDermott.Web.Components.Pages.Employee
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.QueryGetHelper<Department, DepartmentDto>(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex);
+                //var a = await Mediator.QueryGetHelper<Department, DepartmentDto>(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex);
+
+                var a = (await Mediator.Send(new GetDepartmentQuery(
+                includes:
+                [
+                    x => x.Manager,
+                    x => x.ParentDepartment,
+                    x => x.Company,
+                ],
+                select: x => new Department
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ParentDepartment = new Domain.Entities.Department
+                    {
+                        Name = x.ParentDepartment.Name
+                    },
+                    Company = new Domain.Entities.Company
+                    {
+                        Name = x.Company.Name
+                    },
+                    Manager = new Domain.Entities.User
+                    {
+                        Name = x.Manager.Name
+                    },
+                    DepartmentCategory = x.DepartmentCategory
+                })));
                 Departments = a.Item1;
                 totalCount = a.pageCount;
                 activePageIndex = pageIndex;
@@ -499,8 +531,38 @@ namespace McDermott.Web.Components.Pages.Employee
 
         private async Task LoadComboboxEdit(DepartmentDto a)
         {
-            ParentDepartments = (await Mediator.QueryGetHelper<Department, DepartmentDto>(predicate: x => x.Id == a.ParentDepartmentId)).Item1;
-            Companies = (await Mediator.QueryGetHelper<Company, CompanyDto>(predicate: x => x.Id == a.CompanyId)).Item1;
+            //ParentDepartments = (await Mediator.QueryGetHelper<Department, DepartmentDto>(predicate: x => x.Id == a.ParentDepartmentId)).Item1;
+            ParentDepartments = (await Mediator.Send(new GetDepartmentQuery(
+                predicate: a => a.Id == a.ParentDepartmentId,
+                   includes:
+                   [
+                       x => x.Manager,
+                        x => x.ParentDepartment,
+                        x => x.Company,
+                   ],
+                   select: x => new Department
+                   {
+                       Id = x.Id,
+                       Name = x.Name,
+                       ParentDepartment = new Domain.Entities.Department
+                       {
+                           Name = x.ParentDepartment.Name
+                       },
+                       Company = new Domain.Entities.Company
+                       {
+                           Name = x.Company.Name
+                       },
+                       Manager = new Domain.Entities.User
+                       {
+                           Name = x.Manager.Name
+                       },
+                       DepartmentCategory = x.DepartmentCategory
+                   }))).Item1;
+            //Companies = (await Mediator.QueryGetHelper<Company, CompanyDto>(predicate: x => x.Id == a.CompanyId)).Item1;
+            Companies = (await Mediator.Send(new GetCompanyQuery
+            {
+                Predicate = x => x.Id == a.CompanyId
+            })).Item1;
             Users = (await Mediator.Send(new GetUserQuery2(x => x.Id == a.ManagerId,
             select: x => new User
             {
@@ -557,7 +619,33 @@ namespace McDermott.Web.Components.Pages.Employee
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.QueryGetHelper<Department, DepartmentDto>(pageIndex, pageSize, refParentDepartmentComboBox?.Text ?? "", x => x.ParentDepartmentId == null);
+                var result = (await Mediator.Send(new GetDepartmentQuery(
+                  predicate: a => a.Id == a.ParentDepartmentId,
+                  searchTerm: refParentDepartmentComboBox?.Text ?? "",
+                     includes:
+                     [
+                         x => x.Manager,
+                            x => x.ParentDepartment,
+                            x => x.Company,
+                     ],
+                     select: x => new Department
+                     {
+                         Id = x.Id,
+                         Name = x.Name,
+                         ParentDepartment = new Domain.Entities.Department
+                         {
+                             Name = x.ParentDepartment.Name
+                         },
+                         Company = new Domain.Entities.Company
+                         {
+                             Name = x.Company.Name
+                         },
+                         Manager = new Domain.Entities.User
+                         {
+                             Name = x.Manager.Name
+                     },
+                     DepartmentCategory = x.DepartmentCategory
+                 })));
                 ParentDepartments = result.Item1;
                 totalCountParentDepartment = result.pageCount;
                 PanelVisible = false;

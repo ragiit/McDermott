@@ -12,15 +12,18 @@
 
         public long TeoriticalQty { get; set; } = 0;
         public string? Batch { get; set; }
+
         [NotMapped]
+        [Required]
         public long? UomId { get; set; }
 
+        [Required]
         public DateTime? ExpiredDate { get; set; } = null;
 
         [NotMapped]
         public string LotSerialNumber { get; set; } = "-";
-
-        public long RealQty { get; set; }
+        [Required]
+        public long? RealQty { get; set; } = 0;
 
         // Gunakan Lazy untuk properti Difference
         private readonly Lazy<long> _difference;
@@ -35,7 +38,7 @@
 
         private long CalculateDifference()
         {
-            return RealQty - TeoriticalQty;
+            return RealQty.GetValueOrDefault() - TeoriticalQty;
             //return difference switch
             //{
             //    > 0 => $"+{difference}",
