@@ -1,68 +1,13 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DevExpress.XtraRichEdit.Model;
+using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
+using System.Linq.Expressions;
+using System.Reactive.Subjects;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
-    {
-        #region ComboboxProvince
-
-        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
-        private int ProvinceComboBoxIndex { get; set; } = 0;
-        private int totalCountProvince = 0;
-
-        private async Task OnSearchProvince()
-        {
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task OnSearchProvinceIndexIncrement()
-        {
-            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
-            {
-                ProvinceComboBoxIndex++;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchProvincendexDecrement()
-        {
-            if (ProvinceComboBoxIndex > 0)
-            {
-                ProvinceComboBoxIndex--;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputProvinceChanged(string e)
-        {
-            ProvinceComboBoxIndex = 0;
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10, long? provinceId = null)
-        {
-            try
-            {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetProvinceQuery
-                {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = refProvinceComboBox?.Text ?? ""
-                });
-                Provinces = result.Item1;
-                totalCountProvince = result.PageCount;
-                PanelVisible = false;
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        #endregion ComboboxProvince
+    { 
 
         private DxUpload MyUpload { get; set; }
 
@@ -124,7 +69,7 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadDataProvince();
+            await LoadProvince();
             PanelVisible = false;
         }
 
@@ -341,10 +286,7 @@ namespace McDermott.Web.Components.Pages.Config
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
-                Provinces = (await Mediator.Send(new GetProvinceQuery
-                {
-                    Predicate = x => x.Id == a.ProvinceId,
-                })).Item1;
+                await LoadProvince(predicate: x => x.Id == a.ProvinceId);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -390,7 +332,7 @@ namespace McDermott.Web.Components.Pages.Config
 
                 if (validate)
                 {
-                    ToastService.ShowInfo($"City with name '{editModel.Name}' and province '{refProvinceComboBox.Text}' is already exists");
+                    ToastService.ShowInfo($"City with name '{editModel.Name}' and province is already exists");
                     e.Cancel = true;
                     return;
                 }
@@ -410,5 +352,50 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Default Grid Components
+
+        #region ComboBox Province
+
+        private Subject<ChangeEventArgs> testSearchTerm = new();
+        private CancellationTokenSource? _cts;
+        private async Task OnInputProvince(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadProvince(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadProvince(string? e = "", Expression<Func<Province, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
     }
 }

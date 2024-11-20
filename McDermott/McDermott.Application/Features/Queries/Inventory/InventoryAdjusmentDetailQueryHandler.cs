@@ -1,7 +1,10 @@
-﻿namespace McDermott.Application.Features.Queries.Inventory
+﻿using McDermott.Application.Features.Services;
+
+namespace McDermott.Application.Features.Queries.Inventory
 {
     public class InventoryAdjusmentDetailQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetInventoryAdjusmentDetailQuery, List<InventoryAdjusmentDetailDto>>,
+    IRequestHandler<GetInventoryAdjusmentDetailQuery, (List<InventoryAdjusmentDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleInventoryAdjusmentDetailQuery, InventoryAdjusmentDetailDto>, 
         IRequestHandler<CreateInventoryAdjusmentDetailRequest, InventoryAdjusmentDetailDto>,
         IRequestHandler<CreateListInventoryAdjusmentDetailRequest, List<InventoryAdjusmentDetailDto>>,
         IRequestHandler<UpdateInventoryAdjusmentDetailRequest, InventoryAdjusmentDetailDto>,
@@ -10,43 +13,173 @@
     {
         #region GET
 
-        public async Task<List<InventoryAdjusmentDetailDto>> Handle(GetInventoryAdjusmentDetailQuery request, CancellationToken cancellationToken)
+        public async Task<(List<InventoryAdjusmentDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetInventoryAdjusmentDetailQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                string cacheKey = $"GetInventoryAdjusmentDetailQuery_"; // Gunakan nilai Predicate dalam pembuatan kunci cache &&  harus Unique
+                var query = _unitOfWork.Repository<InventoryAdjusmentDetail>().Entities.AsNoTracking();
 
-                if (request.RemoveCache)
-                    _cache.Remove(cacheKey);
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
 
-                if (!_cache.TryGetValue(cacheKey, out List<InventoryAdjusmentDetail>? result))
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
                 {
-                    result = await _unitOfWork.Repository<InventoryAdjusmentDetail>().Entities
-                        .Include(x => x.InventoryAdjusment)
-                        .Include(x => x.Product)
-                        .ThenInclude(z => z.Uom)
-                        .Include(x => x.StockProduct)
-                        .Include(x => x.TransactionStock)
-                        .AsNoTracking()
-                        .ToListAsync(cancellationToken);
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
 
-                    _cache.Set(cacheKey, result, TimeSpan.FromMinutes(10)); // Simpan data dalam cache selama 10 menit
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<InventoryAdjusmentDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<InventoryAdjusmentDetail>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                result ??= [];
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                // Filter result based on request.Predicate if it's not null
-                if (request.Predicate is not null)
-                    result = [.. result.AsQueryable().Where(request.Predicate)];
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    //query = query.Where(v =>
+                    //        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                    //        EF.Functions.Like(v.InventoryAdjusmentDetail.Name, $"%{request.SearchTerm}%")
+                    //        );
+                }
 
-                return result.ToList().Adapt<List<InventoryAdjusmentDetailDto>>();
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new InventoryAdjusmentDetail
+                    {
+                        Id = x.Id,
+                        StockProductId = x.StockProductId,
+                        Batch = x.Batch,
+                        InventoryAdjusmentId = x.InventoryAdjusmentId,
+                        ProductId = x.ProductId,
+                        Product = new Product
+                        {
+                            Name = x.Product == null ? "" : x.Product.Name,
+                            Uom = new Uom
+                            {
+                                Name = x.Product.Uom == null ? "" : x.Product.Uom.Name
+                            }
+                        },
+                        ExpiredDate = x.ExpiredDate,
+                        RealQty = x.RealQty,
+                        StockProduct = x.StockProduct,
+                        TransactionStockId = x.TransactionStockId,
+                        TeoriticalQty = x.TeoriticalQty,    
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<InventoryAdjusmentDetailDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<InventoryAdjusmentDetailDto>>(), 0, 1, 1);
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }
 
+        public async Task<InventoryAdjusmentDetailDto> Handle(GetSingleInventoryAdjusmentDetailQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<InventoryAdjusmentDetail>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<InventoryAdjusmentDetail>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<InventoryAdjusmentDetail>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    //query = query.Where(v =>
+                    //    EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                    //    EF.Functions.Like(v.InventoryAdjusmentDetail.Name, $"%{request.SearchTerm}%")
+                    //    );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new InventoryAdjusmentDetail
+                    {
+                        Id = x.Id,
+                        StockProductId = x.StockProductId,
+                        Batch = x.Batch,
+                        InventoryAdjusmentId = x.InventoryAdjusmentId,
+                        ProductId = x.ProductId,
+                        Product = new Product
+                        {
+                            Name = x.Product == null ? "" : x.Product.Name,
+                            Uom = new Uom
+                            {
+                                Name = x.Product.Uom == null ? "" : x.Product.Uom.Name
+                            }
+                        },
+                        ExpiredDate = x.ExpiredDate,
+                        RealQty = x.RealQty,
+                        StockProduct = x.StockProduct,
+                        TransactionStockId = x.TransactionStockId,
+                        TeoriticalQty = x.TeoriticalQty, 
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<InventoryAdjusmentDetailDto>();
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
         #endregion GET
 
         #region CREATE

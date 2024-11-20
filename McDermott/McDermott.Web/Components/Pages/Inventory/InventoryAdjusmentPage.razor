@@ -259,19 +259,21 @@
                                                                     }
                                                                     <div class="row w-100">
                                                                         <DxFormLayout CssClass="w-100">
-                                                                            <div class="col-md-4">
-                                                                                <DxFormLayoutItem Caption="Product" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                    <DxComboBox Data="@Products"
-                                                                                                @bind-Value="@FormInventoryAdjusmentDetail.ProductId"
-                                                                                                FilteringMode="@DataGridFilteringMode.Contains"
-                                                                                                NullText="Select Product..."
+                                                                            <div class="col-md-4"> 
+                                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Product" aptionPosition="CaptionPosition.Vertical" ColSpanMd="12">
+                                                                                    <DxComboBox Data="Products"
+                                                                                                AllowUserInput="true"
+                                                                                                NullText="Select Product"
                                                                                                 TextFieldName="Name"
-                                                                                                ReadOnly="@(FormInventoryAdjusmentDetail.Id != 0)"
                                                                                                 ValueFieldName="Id"
+                                                                                                @oninput="OnInputProduct"
                                                                                                 SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
-                                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                                ShowValidationIcon="true" />
-                                                                                    <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.ProductId)"   />
+                                                                                                @bind-Value="FormInventoryAdjusmentDetail.ProductId">
+                                                                                        <Columns>
+                                                                                            <DxListEditorColumn FieldName="@nameof(Product.Name)" Caption="Name" /> 
+                                                                                        </Columns>
+                                                                                    </DxComboBox>
+                                                                                    <ValidationMessage For="@(()=>FormInventoryAdjusmentDetail.ProductId)" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem Caption="Batch" Enabled="FormInventoryAdjusmentDetail.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">

@@ -96,20 +96,38 @@
                 </DxComboBox>
  *@
 
+                @if (IsLoading)
+
+                {
+                    <LoadingIndicatorLayout>
+
+                    </LoadingIndicatorLayout>
+                }
+                else
+                {
+                    <h1>ID: @selectedVillageId</h1>
+
+                }
+
                 <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                           OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">
                     <DataAnnotationsValidator />
                     <AntiforgeryToken />
                     <DxFormLayout CssClass="col-md">
-                      @*   <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
-                            <DxComboBox TData="CountryDto"
-                                        TValue="long"
-                                        CustomData="LoadDataz"
+                        @* <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Password" ColSpanMd="12" BeginRow="true">
+                            <DxComboBox Data="Villages"
                                         TextFieldName="Name"
                                         ValueFieldName="Id"
-                                        Id="comboBoxElement"
-                                        ListRenderMode="ListRenderMode.Virtual"
-                                        @bind-Value="selectedVillageId" />
+                                        @oninput="OnInput"
+                                        AllowUserInput="true"
+                                        @bind-Value="selectedVillageId">
+                                <Columns>
+                                    <DxListEditorColumn FieldName="@nameof(Village.Name)" Caption="Name" />
+                                    <DxListEditorColumn FieldName="Province.Name" Caption="Province" /> 
+                                    <DxListEditorColumn FieldName="City.Name" Caption="City" />
+                                    <DxListEditorColumn FieldName="District.Name" Caption="District" />
+                                </Columns>
+                            </DxComboBox>
                         </DxFormLayoutItem> *@
 
                         <DxFormLayoutItem CaptionCssClass="required-caption" CaptionPosition="CaptionPosition.Vertical" Caption="Email" ColSpanMd="12" BeginRow="true">
@@ -180,22 +198,72 @@
 
 
 <script>
-//             window.attachComboBoxScrollEvent = (elementId, dotNetHelper) => {
-//     const element = document.getElementById(elementId);
-//     if (element) {
-//         element.addEventListener('scroll', () => {
-//             if (element.scrollTop + element.clientHeight >= element.scrollHeight) {
-//                 dotNetHelper.invokeMethodAsync('OnScrollToBottom');
-//             }
-//         });
-//     }
-// };
+    //             window.attachComboBoxScrollEvent = (elementId, dotNetHelper) => {
+    //     const element = document.getElementById(elementId);
+    //     if (element) {
+    //         element.addEventListener('scroll', () => {
+    //             if (element.scrollTop + element.clientHeight >= element.scrollHeight) {
+    //                 dotNetHelper.invokeMethodAsync('OnScrollToBottom');
+    //             }
+    //         });
+    //     }
+    // };
 
 
 </script>
 @code {
 
-    // private long selectedVillageId;
+    private long selectedVillageId;
+    private bool IsLoading = false;
+    private List<VillageDto> Villages { get; set; } = [];
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        IsLoading = true;
+        if (e is not null)
+        {
+            Villages = (await Mediator.Send(new GetVillageQueryNew
+                {
+                    Select = x => new Village
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    },
+                    SearchTerm = e.Value.ToString(),
+                    PageIndex = 0,
+                    PageSize = 10
+                })).Item1;
+        }
+        IsLoading = false;
+    }
+
+    private async Task GetVillage()
+    {
+        IsLoading = true;
+        Villages = (await Mediator.Send(new GetVillageQueryNew
+            {
+                PageIndex = 0,
+                PageSize = 10
+            })).Item1;
+        IsLoading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        await GetVillage();
+        IsLoading = false;
+        // await LoadData(1, 20);
+        //Helper.DeleteFile("Hasil-Ronsen.jpg");
+        // try
+        // {
+        //     var result = await NavigationManager.CheckAccessUser(oLocal);
+        //     IsAccess = result.Item1;
+        //     UserAccessCRUID = result.Item2;
+        // }
+        // catch { }
+
+    }
     // private DotNetObjectReference<LoginPage> objRef;
     // protected override async Task OnAfterRenderAsync(bool firstRender)
     // {
@@ -219,9 +287,9 @@
     //     StateHasChanged(); // Memicu render ulang
     // }
 
-     
+
     // public async Task<LoadResult> LoadDataz(DevExtreme.AspNet.Data.DataSourceLoadOptionsBase optionsBase, CancellationToken cancellationToken)
-    // { 
+    // {
     //     var s = Convert.ToInt32(optionsBase.Skip / optionsBase.Take);
     //     var t = optionsBase.Take;
     //     var result = await Mediator.Send(new GetCountryQuery
@@ -241,19 +309,7 @@
 
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        // await LoadData(1, 20);
-        //Helper.DeleteFile("Hasil-Ronsen.jpg");
-        // try
-        // {
-        //     var result = await NavigationManager.CheckAccessUser(oLocal);
-        //     IsAccess = result.Item1;
-        //     UserAccessCRUID = result.Item2;
-        // }
-        // catch { }
 
-    }
     private async Task PerformSearch()
     {
         // ToastService.ShowInfo("dawd");

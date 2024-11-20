@@ -1,5 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Web.Components.Layout;
+using System.Linq.Expressions;
+using System.Reactive.Subjects;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -103,56 +105,51 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #region ComboboxCountry
 
-        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
-        private int CountryComboBoxIndex { get; set; } = 0;
-        private int totalCountCountry = 0;
+        #region ComboBox Country
 
-        private async Task OnSearchCountry()
+        private Subject<ChangeEventArgs> testSearchTerm = new();
+        private CancellationTokenSource? _cts;
+        private async Task OnInputCountry(ChangeEventArgs e)
         {
-            await LoadDataCountries(0, 10);
+            try
+            {
+                PanelVisible = true;
+                 
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+                 
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+                 
+                await LoadCounty(e.Value?.ToString() ?? "");
+            } 
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            } 
         }
 
-        private async Task OnSearchCountryIndexIncrement()
+        private async Task LoadCounty(string? e = "", Expression<Func<Country, bool>>? predicate = null)
         {
-            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            try
             {
-                CountryComboBoxIndex++;
-                await LoadDataCountries(CountryComboBoxIndex, 10);
+                //PanelVisible = true;
+                Countries = await Mediator.QueryGetComboBox<Country, CountryDto>(e, predicate);
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnSearchCountryIndexDecrement()
-        {
-            if (CountryComboBoxIndex > 0)
+            catch (Exception ex)
             {
-                CountryComboBoxIndex--;
-                await LoadDataCountries(CountryComboBoxIndex, 10);
+                ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
 
-        private async Task OnInputCountryChanged(string e)
-        {
-            CountryComboBoxIndex = 0;
-            await LoadDataCountries(0, 10);
-        }
-
-        private async Task LoadDataCountries(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            var result = (await Mediator.Send(new GetCountryQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = searchTerm
-            }));
-            Countries = result.Item1;
-            totalCountCountry = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCountry
+        #endregion
 
         public IGrid Grid { get; set; }
 
@@ -190,8 +187,8 @@ namespace McDermott.Web.Components.Pages.Config
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
-            await LoadDataCountries();
+            await LoadData(); 
+            await LoadCounty();
             PanelVisible = false;
         }
 
@@ -208,15 +205,11 @@ namespace McDermott.Web.Components.Pages.Config
         private async Task EditItem_Click()
         {
             try
-            {
-                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-
+            { 
                 PanelVisible = true;
-                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
-                Countries = (await Mediator.Send(new GetCountryQuery
-                {
-                    Predicate = x => x.Id == a.CountryId,
-                })).Item1;
+                await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new()); 
+                await LoadCounty(predicate: x => x.Id == a.CountryId);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -246,7 +239,7 @@ namespace McDermott.Web.Components.Pages.Config
                 bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.CountryId == editModel.CountryId));
                 if (exists)
                 {
-                    ToastService.ShowInfo($"Province with name '{editModel.Name}' and country '{refCountryComboBox.Text}' already exists.");
+                    ToastService.ShowInfo($"Province with name '{editModel.Name}' and country is already exists.");
                     e.Cancel = true;
                     return;
                 }

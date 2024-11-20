@@ -10,16 +10,34 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class GetUomQuery(Expression<Func<Uom, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<Uom, object>>>? includes = null, Expression<Func<Uom, Uom>>? select = null) : IRequest<(List<UomDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleUomQuery : IRequest<UomDto>
         {
-            public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Uom, object>>> Includes { get; set; }
+            public Expression<Func<Uom, bool>> Predicate { get; set; }
+            public Expression<Func<Uom, Uom>> Select { get; set; }
 
-            public List<Expression<Func<Uom, object>>> Includes { get; } = includes!;
-            public Expression<Func<Uom, Uom>>? Select { get; } = select!;
+            public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetUomQuery : IRequest<(List<UomDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Uom, object>>> Includes { get; set; }
+            public Expression<Func<Uom, bool>> Predicate { get; set; }
+            public Expression<Func<Uom, Uom>> Select { get; set; }
+
+            public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateUomQuery(List<UomDto> UomToValidate) : IRequest<List<UomDto>>

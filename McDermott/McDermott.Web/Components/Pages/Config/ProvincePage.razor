@@ -50,7 +50,7 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" /> 
+                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Country.Name" Caption="Country" />
                                     </Columns>
 
@@ -63,31 +63,21 @@
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
+                                             
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Countries"
-                                                              NullText="Select Country"
-                                                              @ref="refCountryComboBox"
-                                                              @bind-Value="@a.CountryId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputCountryChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchCountryIndexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchCountry"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchCountryIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
+                                                <DxComboBox Data="Countries"
+                                                            AllowUserInput="true"
+                                                            NullText="Select Country"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            @oninput="OnInputCountry"
+                                                            @bind-Value="a.CountryId">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
                                                     </Columns>
-                                                </MyDxComboBox>
+                                                </DxComboBox>
                                                 <ValidationMessage For="@(()=>a.CountryId)" />
                                             </DxFormLayoutItem>
 

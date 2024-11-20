@@ -113,7 +113,9 @@
                                         <div class="w-100">
                                             <DxToolbar Title="Actions" ItemRenderStyleMode="ToolbarRenderStyleMode.Contained" AdaptivityMinRootItemCount="2" AdaptivityAutoHideRootItems="true" AdaptivityAutoCollapseItemsToIcons="true">
                                                 <Items>
-                                                    <DxToolbarItem Visible="@(GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Physician)" Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
+                                                    <DxToolbarItem Visible="@(GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Midwife)" 
+                                                    Alignment="ToolbarItemAlignment.Left" 
+                                                    BeginGroup="true"
                                                                    IconCssClass="fa-solid fa-notes-medical"
                                                                    Click="OnReferToClick"
                                                                    Text="Refer To" />
@@ -133,17 +135,13 @@
                                                                    Click="OnClickPopUpAppoimentPending"
                                                                    Text="Appointment pending in patient alert" />
 
-                                                    @if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Physician)
+                                                    @if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Midwife)
                                                     {
                                                         <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
                                                                        IconCssClass="fa-solid fa-notes-medical"
                                                                        Click="OnClickReferralPrescriptionConcoction"
                                                                        Text="Referral Prescription & Concoction" />
-
-                                                        <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
-                                                                       IconCssClass="fa-solid fa-notes-medical"
-                                                                       Click="OnClickPopUpPopUpProcedureRoom"
-                                                                       Text="Procedure Room" />
+                                                                        
                                                     }
 
                                                     <DxToolbarItem Alignment="ToolbarItemAlignment.Left" BeginGroup="true"
@@ -1243,7 +1241,7 @@
                                                                             <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.HPL)" />
                                                                         </DxFormLayoutItem> *@
 
-                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPHT" ColSpanMd="12">
+                                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPHT" ColSpanMd="6">
                                                                             <DxDateEdit ReadOnly="ReadOnlyForm()"
                                                                                         Date="@GeneralConsultanServiceAnc.HPHT"
                                                                                         DisplayFormat="@Helper.DefaultFormatDate"
@@ -1255,7 +1253,7 @@
                                                                             <ValidationMessage For="@(() => GeneralConsultanServiceAnc.HPHT)" />
                                                                         </DxFormLayoutItem>
 
-                                                                          <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPL" ColSpanMd="12">
+                                                                          <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPL" ColSpanMd="6">
                                                                             <DxDateEdit ReadOnly="ReadOnlyForm()"
                                                                                         @bind-Date="@GeneralConsultanServiceAnc.HPL"
                                                                                         ShowValidationIcon="true"

@@ -18,6 +18,21 @@ namespace McDermott.Application.Features.Commands.Config
             public Expression<Func<Village, Village>>? Select { get; } = select!;
         }
 
+        public class GetVillageQueryNew : IRequest<(List<VillageDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Village, object>>> Includes { get; set; }
+            public Expression<Func<Village, bool>> Predicate { get; set; }
+            public Expression<Func<Village, Village>> Select { get; set; }
+
+            public List<(Expression<Func<Village, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
         public class ValidateVillageQuery(Expression<Func<Village, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<Village, bool>> Predicate { get; } = predicate!;

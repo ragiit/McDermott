@@ -1,6 +1,7 @@
 ﻿using DevExpress.Blazor.Internal;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
@@ -110,30 +111,30 @@ namespace McDermott.Web.Components.Pages.Inventory
             PanelVisible = true;
             try
             {
-                if (SelectedDataItems is null || SelectedDataItems.Count == 1)
-                {
-                    long adjId = ((InventoryAdjusmentDto)e.DataItem).Id;
+                //if (SelectedDataItems is null || SelectedDataItems.Count == 1)
+                //{
+                //    long adjId = ((InventoryAdjusmentDto)e.DataItem).Id;
 
-                    var detailIds = (await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == adjId))).Select(x => x.Id).ToList();
-                    var stockIds = (await Mediator.Send(new GetTransactionStockQuery(x => detailIds.Contains(x.SourcTableId.GetValueOrDefault()) && x.SourceTable == nameof(InventoryAdjusment)))).Select(x => x.Id).ToList();
+                //    var detailIds = (await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == adjId))).Select(x => x.Id).ToList();
+                //    var stockIds = (await Mediator.Send(new GetTransactionStockQuery(x => detailIds.Contains(x.SourcTableId.GetValueOrDefault()) && x.SourceTable == nameof(InventoryAdjusment)))).Select(x => x.Id).ToList();
 
-                    await Mediator.Send(new DeleteTransactionStockRequest(ids: stockIds));
-                    await Mediator.Send(new DeleteInventoryAdjusmentRequest(((InventoryAdjusmentDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var ids = SelectedDataItems.Adapt<List<InventoryAdjusmentDto>>().Select(x => x.Id).ToList();
+                //    await Mediator.Send(new DeleteTransactionStockRequest(ids: stockIds));
+                //    await Mediator.Send(new DeleteInventoryAdjusmentRequest(((InventoryAdjusmentDto)e.DataItem).Id));
+                //}
+                //else
+                //{
+                //    var ids = SelectedDataItems.Adapt<List<InventoryAdjusmentDto>>().Select(x => x.Id).ToList();
 
-                    foreach (var adjId in ids)
-                    {
-                        var detailIds = (await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == adjId))).Select(x => x.Id).ToList();
-                        var stockIds = (await Mediator.Send(new GetTransactionStockQuery(x => detailIds.Contains(x.SourcTableId.GetValueOrDefault()) && x.SourceTable == nameof(InventoryAdjusment)))).Select(x => x.Id).ToList();
+                //    foreach (var adjId in ids)
+                //    {
+                //        var detailIds = (await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == adjId))).Select(x => x.Id).ToList();
+                //        var stockIds = (await Mediator.Send(new GetTransactionStockQuery(x => detailIds.Contains(x.SourcTableId.GetValueOrDefault()) && x.SourceTable == nameof(InventoryAdjusment)))).Select(x => x.Id).ToList();
 
-                        await Mediator.Send(new DeleteTransactionStockRequest(ids: stockIds));
-                    }
+                //        await Mediator.Send(new DeleteTransactionStockRequest(ids: stockIds));
+                //    }
 
-                    await Mediator.Send(new DeleteInventoryAdjusmentRequest(ids: ids));
-                }
+                //    await Mediator.Send(new DeleteInventoryAdjusmentRequest(ids: ids));
+                //}
 
                 await LoadData();
             }
@@ -524,7 +525,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private async Task LoadInventoryAdjustmentDetails()
         {
             PanelVisible = true;
-            InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
+            //InventoryAdjusmentDetails = await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.InventoryAdjusmentId == InventoryAdjusment.Id));
 
             //var tasks = InventoryAdjusmentDetails.Select(async x =>
             //{
@@ -606,7 +607,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             // Ensure the context is not null and has selected data item
             if (context.SelectedDataItem != null)
             {
-                FormInventoryAdjusmentDetail = (await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.Id == context.SelectedDataItem.Adapt<InventoryAdjusmentDetailDto>().Id))).FirstOrDefault() ?? new();
+                //FormInventoryAdjusmentDetail = (await Mediator.Send(new GetInventoryAdjusmentDetailQuery(x => x.Id == context.SelectedDataItem.Adapt<InventoryAdjusmentDetailDto>().Id))).FirstOrDefault() ?? new();
 
                 // Check if Product and StockProduct are not null before accessing their properties
                 if (FormInventoryAdjusmentDetail.Product != null)
@@ -1051,6 +1052,49 @@ namespace McDermott.Web.Components.Pages.Inventory
                 //FormInventoryAdjusmentDetail.ExpiredDate = stockProduct.Expired;
             }
         }
+
+        #region Products Combobox
+        private CancellationTokenSource? _ctsProduct;
+        private async Task OnInputProduct(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _ctsProduct?.Cancel();
+                _ctsProduct?.Dispose();
+                _ctsProduct = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsProduct.Token);
+
+                await LoadProduct(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _ctsProduct?.Dispose();
+                _ctsProduct = null;
+            }
+        }
+        private async Task LoadProduct(string? e = "", Expression<Func<Product, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                Products = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+
+        #endregion
 
         private async Task OnSelectProduct(ProductDto e)
         {

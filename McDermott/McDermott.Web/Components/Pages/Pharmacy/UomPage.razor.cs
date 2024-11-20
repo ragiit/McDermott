@@ -114,9 +114,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.QueryGetHelper<Uom, UomDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetUomQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm ?? ""
+                });
                 Uoms = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 activePageIndex = pageIndex;
                 PanelVisible = false;
             }

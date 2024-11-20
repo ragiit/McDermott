@@ -138,8 +138,11 @@ namespace McDermott.Web.Components.Pages.Pharmacy
         {
             PanelVisible = true;
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ActiveComponentDto ?? new());
-            Uoms = (await Mediator.QueryGetHelper<Uom, UomDto>(predicate: x => x.Id == a.UomId)).Item1;
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ActiveComponentDto ?? new()); 
+            Uoms = (await Mediator.Send(new GetUomQuery
+            {
+                Predicate = x => x.Id == a.UomId
+            })).Item1;
             PanelVisible = false;
         }
 
@@ -242,13 +245,18 @@ namespace McDermott.Web.Components.Pages.Pharmacy
                         if (!string.IsNullOrEmpty(a))
                             aa.Add(a.ToLower());
                     }
+                     
 
-                    list1 = (await Mediator.Send(new GetUomQuery(x => aa.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new Uom
+                    list1 = (await Mediator.Send(new GetUomQuery
+                    {
+                        Predicate = x => aa.Contains(x.Name.ToLower()),
+                        IsGetAll = true,
+                        Select = x => new Uom
                         {
                             Id = x.Id,
                             Name = x.Name,
-                        }))).Item1;
+                        }
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -365,9 +373,14 @@ namespace McDermott.Web.Components.Pages.Pharmacy
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetUomQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refUomComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetUomQuery
+                {
+                    SearchTerm = refUomComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
                 Uoms = result.Item1;
-                totalCountUom = result.pageCount;
+                totalCountUom = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)

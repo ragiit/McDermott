@@ -66,7 +66,7 @@
                                                 a.DistrictId = null;
                                             }
                                             if (a.CityId is null)
-                                            { 
+                                            {
                                                 a.DistrictId = null;
                                             }
                                         }
@@ -75,89 +75,60 @@
                                                 <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
+
                                             <DxFormLayoutItem CaptionCssClass="normal-caption normal-caption" Caption="Postal Code" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.PostalCode" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Postal Code" />
                                                 <ValidationMessage For="@(()=> a.PostalCode)"   />
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem> 
+
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Provinces"
-                                                              NullText="Select Province"
-                                                              @ref="refProvinceComboBox"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              @bind-Value="@a.ProvinceId"
-                                                              SelectedItemChanged="((ProvinceDto? e) => OnProvinceChanged(e))"
-                                                              TextChanged="((string e) => OnInputProvinceChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchProvincendexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchProvince"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchProvinceIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
+                                                <DxComboBox Data="Provinces"
+                                                            AllowUserInput="true"
+                                                            NullText="Select Province"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            @oninput="OnInputProvince"
+                                                            SelectedItemChanged="((ProvinceDto e) => SelectedItemChanged(e))"
+                                                            @bind-Value="a.ProvinceId">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
-                                                        <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
-                                                        <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                        <DxListEditorColumn FieldName="Country.Name" Caption="Country" /> 
                                                     </Columns>
-                                                </MyDxComboBox>
+                                                </DxComboBox>
                                                 <ValidationMessage For="@(()=>a.ProvinceId)" />
                                             </DxFormLayoutItem>
+
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Cities"
-                                                              NullText="Select City"
-                                                              @ref="refCityComboBox"
-                                                              @bind-Value="@a.CityId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputCityChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchCityndexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchCity"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchCityIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
+                                                <DxComboBox Data="Cities"
+                                                            AllowUserInput="true"
+                                                            NullText="Select City"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            @oninput="OnInputCity"
+                                                            SelectedItemChanged="((CityDto e) => SelectedItemCityChanged(e))"
+                                                            @bind-Value="a.CityId">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
                                                     </Columns>
-                                                </MyDxComboBox>
+                                                </DxComboBox>
                                                 <ValidationMessage For="@(()=>a.CityId)" />
                                             </DxFormLayoutItem>
+
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="District" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Districts"
-                                                              NullText="Select District"
-                                                              @bind-Value="@a.DistrictId"
-                                                              @ref="refDistrictComboBox"
-                                                              TextFieldName="Name"
-                                                              SelectedItemChanged="((DistrictDto? e) => OnDistrictChanged(e))"
-                                                              ValueFieldName="Id" TextChanged="((string e) => OnInputDistrictChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchDistrictndexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchDistrict"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchDistrictIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
+                                                <DxComboBox Data="Districts"
+                                                            AllowUserInput="true"
+                                                            NullText="Select District"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            @oninput="OnInputDistrict"
+                                                            @bind-Value="a.DistrictId">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(District.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
                                                         <DxListEditorColumn FieldName="City.Name" Caption="City" />
                                                     </Columns>
-                                                </MyDxComboBox>
+                                                </DxComboBox>
                                                 <ValidationMessage For="@(()=>a.DistrictId)" />
                                             </DxFormLayoutItem>
                                         </DxFormLayout>

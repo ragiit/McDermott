@@ -14,7 +14,9 @@ namespace McDermott.Web.Extentions
     }
 
     public static class Helper
-    {
+    { 
+        public static readonly short CBX_DELAY = 700;
+
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
         {
             ToastService.ShowInfo($"Data with name \"{val}\" in row {row} and column {col} is invalid");
@@ -658,7 +660,7 @@ namespace McDermott.Web.Extentions
                 var currentHost = HttpContextAccessor.HttpContext.Request.Host.Value;
                 var baseUrl = $"{currentProtocol}://{currentHost}";
 
-                var apiUrl = $"{baseUrl}/files/{file}";
+                var apiUrl = $"{baseUrl}/{file}";
                 var response = await Http.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
