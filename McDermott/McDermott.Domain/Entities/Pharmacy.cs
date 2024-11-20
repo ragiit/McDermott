@@ -4,7 +4,7 @@
     {
         public long? PatientId { get; set; }
         public long? PractitionerId { get; set; }
-        public long? PrescriptionLocationId { get; set; }
+        public long? LocationId { get; set; }
         public long? MedicamentGroupId { get; set; }
         public long? ServiceId { get; set; }
         public string? PaymentMethod { get; set; }

@@ -47,7 +47,7 @@
                                                          VisibleEdit="UserAccessCRUID.IsUpdate"
                                                          VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
-                                 
+
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn FieldName="NameAndParent" Caption="Name" SortIndex="0" />
@@ -67,17 +67,20 @@
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Location" ColSpanMd="12">
-                                                <MyDxComboBox Data="@ParentLocations"
-                                                              NullText="Select Parent Locations..."
-                                                              @ref="refParentLocationsComboBox"
-                                                              @bind-Value="@a.ParentLocationId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputParentLocationsChanged(e))">
-                                                    
-                                                </MyDxComboBox>
-                                                <ValidationMessage For="@(()=> a.ParentLocationId)"   />
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Parent Location" ColSpanMd="12">
+                                                <DxComboBox Data="ParentLocations"
+                                                            AllowUserInput="true"
+                                                            NullText="Select Parent Location"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            @oninput="OnInputLocation"
+                                                            @bind-Value="a.ParentLocationId">
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="Name" Caption="Name" />
+                                                    </Columns>
+                                                </DxComboBox>
+                                                <ValidationMessage For="@(()=>a.ParentLocationId)" />
                                             </DxFormLayoutItem>
 
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Type" ColSpanMd="12">
@@ -87,19 +90,22 @@
                                                             ShowValidationIcon="true" />
                                                 <ValidationMessage For="@(()=>a.Type)"   />
                                             </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Company" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Companies"
-                                                              NullText="Select Companies..."
-                                                              @ref="refCompaniesComboBox"
-                                                              @bind-Value="@a.CompanyId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputCompaniesChanged(e))">
-                                                    >
-                                                </MyDxComboBox>
-                                                <ValidationMessage For="@(()=> a.CompanyId)"   />
-                                            </DxFormLayoutItem>
+                                             
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
+                                                <DxComboBox Data="Companies"
+                                                            AllowUserInput="true"
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            NullText="Select Company"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            @oninput="OnInputCompany"
+                                                            @bind-Value="a.CompanyId">
+                                                    <Columns>
+                                                        <DxListEditorColumn FieldName="@nameof(Company.Name)" Caption="Name" /> 
+                                                    </Columns>
+                                                </DxComboBox>
+                                                <ValidationMessage For="@(()=>a.CompanyId)" />
+                                            </DxFormLayoutItem> 
                                         </DxFormLayout>
                                     </EditFormTemplate>
                                     <TotalSummary>

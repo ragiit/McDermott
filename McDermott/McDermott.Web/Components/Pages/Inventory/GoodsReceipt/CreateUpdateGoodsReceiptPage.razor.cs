@@ -7,7 +7,7 @@ using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 {

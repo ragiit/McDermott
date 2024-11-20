@@ -2,8 +2,8 @@
 using MediatR;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.DrugFormCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 
 namespace McDermott.Web.Extentions
 {

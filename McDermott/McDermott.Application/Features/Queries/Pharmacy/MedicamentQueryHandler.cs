@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Pharmacy.MedicamentCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class MedicamentQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetMedicamentQuery, (List<MedicamentDto>, int pageIndex, int pageSize, int pageCount)>,

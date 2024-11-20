@@ -8,6 +8,7 @@
         public long? DrugDosageId { get; set; }
         public long? ProductId { get; set; }
         public long? UomId { get; set; }
+        public long? SignaId { get; set; }
         public List<long>? ActiveComponentId { get; set; } = [];
         public string? DosageFrequency { get; set; }
         public long? Stock { get; set; } // product stock

@@ -1,5 +1,5 @@
 ﻿using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -397,8 +397,11 @@ namespace McDermott.Web.Components.Pages.Patient
         {
             if (UserForm.Id != 0)
             {
-                var count = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == UserForm.Id));
-                PrescriptionCount = count.Count;
+                var count = await Mediator.Send(new GetPharmacyQuery
+                {
+                    Predicate = x => x.PatientId == UserForm.Id
+                });
+                PrescriptionCount = count.Item1.Count;
             }
         }
 
@@ -690,8 +693,11 @@ namespace McDermott.Web.Components.Pages.Patient
                 //var count = await Mediator.Send(new GetInsurancePolicyQuery(x => x.UserId == UserForm.Id));
                 //SelectedAllergies = Allergies.Where(x => UserForm.PatientAllergyIds is not null && UserForm.PatientAllergyIds.Contains(x.Id)).ToList();
                 //InsurancePoliciesCount = count.Count;
-                var counts = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == UserForm.Id));
-                PrescriptionCount = counts.Count;
+                var counts = await Mediator.Send(new GetPharmacyQuery
+                {
+                    Predicate = x => x.PatientId == UserForm.Id
+                });
+                PrescriptionCount = counts.Item1.Count;
                 var alergy = await Mediator.Send(new GetPatientAllergyQuery(x => x.UserId == UserForm.Id));
                 if (alergy.Count == 0)
                 {

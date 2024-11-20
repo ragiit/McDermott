@@ -229,7 +229,7 @@ namespace McDermott.Web.Extentions
             "patient/disease-history",
 
             // Pharmacies
-            "pharmacy/presciptions",
+            "pharmacy/prescriptions",
             "pharmacy/medicament-groups",
             "pharmacy/signas",
             "pharmacy/medicine-dosages",
@@ -656,11 +656,14 @@ namespace McDermott.Web.Extentions
             try
             {
                 var currentProtocol = HttpContextAccessor.HttpContext.Request.Scheme;
-
                 var currentHost = HttpContextAccessor.HttpContext.Request.Host.Value;
-                var baseUrl = $"{currentProtocol}://{currentHost}";
+                var pathBase = HttpContextAccessor.HttpContext.Request.PathBase.Value;
 
-                var apiUrl = $"{baseUrl}/{file}";
+                // Base URL includes pathBase to handle sub-folder hosting
+                var baseUrl = $"{currentProtocol}://{currentHost}{pathBase}";
+
+                // Generate the file URL
+                var apiUrl = $"{baseUrl}/files/{file}";
                 var response = await Http.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
@@ -683,13 +686,13 @@ namespace McDermott.Web.Extentions
                 else
                 {
                     // Handle error
-                    // You might want to show an error message or log the error
+                    Console.WriteLine($"Error: {response.StatusCode}");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Handle exception
-                // You might want to show an error message or log the exception
+                Console.WriteLine($"Exception: {ex.Message}");
             }
         }
 

@@ -242,7 +242,7 @@
                                                                            ReadOnly="IsReadOnlyEvent"
                                                                            MaskMode="MaskMode.RegEx">
                                                                 <Buttons>
-                                                                    <InputFile id="sipFile" accept=".xls, .pdf, .xlsx" OnChange="@SelectFiles" multiple="false" style="display:none" />
+                                                                    <InputFile id="sipFile" accept=".xls, .pdf, .xlsx" OnChange="@SelectFiles" multiple="false" style="display:none" ReadOnly/>
                                                                     <DxEditorButton Click="SelectFile" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done ||postEducationPrograms.Status != EnumStatusEducationProgram.Done )" IconCssClass="fa-solid fa-upload" />
                                                                     <DxEditorButton Click="DownloadFile" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done || postEducationPrograms.Status != EnumStatusEducationProgram.Done)" IconCssClass="fa-solid fa-download" />
                                                                     <DxEditorButton Click="RemoveSelectedFile" Visible="@(postEducationPrograms.Status != EnumStatusEducationProgram.Done || postEducationPrograms.Status != EnumStatusEducationProgram.Done)" IconCssClass="fa-solid fa-trash" />
@@ -255,8 +255,8 @@
 
                                                         </DxFormLayoutItem>
                                                     </DxFormLayout>
-                                                    
-                                                    
+
+
                                                 </div>
                                             </div>
                                             <DxFormLayout>
@@ -307,7 +307,7 @@
                                                             <Columns>
                                                                 <DxGridSelectionColumn Width="15px" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Name" SortIndex="0" />
-                                                                <DxGridDataColumn MinWidth="200" FieldName="Patient.Email" Caption="Email"  />
+                                                                <DxGridDataColumn MinWidth="200" FieldName="Patient.Email" Caption="Email" />
                                                                 <DxGridDataColumn MinWidth="200" FieldName="Patient.Department.Name" Caption="Departement" />
                                                                 @* <DxGridDataColumn MinWidth="200" FieldName="EventCategory.Name" Caption="Category" /> *@
                                                                 <DxGridDataColumn MinWidth="200" FieldName="CreatedDate" Caption="Join Date" DisplayFormat="@Helper.DefaultFormatDate" />
@@ -330,3 +330,17 @@
         </section>
     </div>
 }
+
+<DxPopup HeaderText="Download Files" @bind-Visible="@isShowPopUp" Closed="( () => isShowPopUp = false)" HeaderCssClass="fw-bold" CloseOnOutsideClick="false" Width="65%">
+    <div>
+      <h5>Are you sure you want to download the file <strong>@postEducationPrograms.Attendance</strong>?</h5>
+    </div>
+    <div class="row justify-content-end">
+        <div class="col-auto">
+            <DxButton Click="YesDownload" IconCssClass="fa-solid fa-file-arrow-down" Text="Save" />
+        </div>
+        <div class="col-auto">
+            <DxButton RenderStyle="ButtonRenderStyle.Danger" Click="@(() => Grid.CancelEditAsync())" Text="Cancel" />
+        </div>
+    </div>
+</DxPopup>

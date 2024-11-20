@@ -1,7 +1,8 @@
-﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Pharmacy.ActiveComponentCommand;
+﻿using McDermott.Application.Dtos.Pharmacies;
+using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Pharmacies.ActiveComponentCommand;
 
-namespace McDermott.Application.Features.Queries.Pharmacy
+namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class ActiveComponentQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetActiveComponentQuery, (List<ActiveComponentDto>, int pageIndex, int pageSize, int pageCount)>,

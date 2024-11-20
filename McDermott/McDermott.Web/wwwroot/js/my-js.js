@@ -11,6 +11,22 @@ function downloadFileFromStream(fileName, streamReference) {
     });
 }
 
+//Download File Education Awarenes
+function openAndCloseTab(fileUrl) {
+    // Open a new tab
+    const newTab = window.open(fileUrl, "_blank");
+
+    // Check if the tab opened successfully
+    if (newTab) {
+        // Close the tab after a short delay
+        setTimeout(() => {
+            newTab.close();
+        }, 1000); // Adjust the delay as needed
+    } else {
+        alert("Unable to open a new tab. Please check your browser settings.");
+    }
+}
+
 // ini Kepae
 function saveFileExcellExporrt(fileName, streamReference) {
     streamReference.arrayBuffer().then(function (arrayBuffer) {

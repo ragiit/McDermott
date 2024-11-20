@@ -1,4 +1,6 @@
-﻿namespace McDermott.Application.Features.Commands.Inventory
+﻿using McDermott.Application.Dtos.Pharmacies;
+
+namespace McDermott.Application.Features.Commands.Inventory
 {
     public class UomCategoryCommand
     {

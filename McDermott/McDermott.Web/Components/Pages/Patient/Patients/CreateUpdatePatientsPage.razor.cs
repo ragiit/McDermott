@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using McDermott.Domain.Entities;
 using DocumentFormat.OpenXml.Spreadsheet;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.PharmacyCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using DocumentFormat.OpenXml.Bibliography;
 using McDermott.Application.Dtos.ClaimUserManagement;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
@@ -471,8 +471,11 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             if (UserForm.Id != 0)
             {
-                var count = await Mediator.Send(new GetPharmacyQuery(x => x.PatientId == UserForm.Id));
-                PrescriptionCount = count.Count;
+                var count = await Mediator.Send(new GetPharmacyQuery
+                {
+                    Predicate = x=>x.PatientId == UserForm.Id
+                });
+                PrescriptionCount = count.Item1.Count;
             }
         }
 

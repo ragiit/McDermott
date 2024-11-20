@@ -229,6 +229,23 @@ namespace McDermott.Web.Extentions
 
                 return result.Cast<TDto>().ToList();
             }
+            if (typeof(TDto) == typeof(LocationDto))
+            {
+                var result = (await mediator.Send(new GetLocationQuery
+                {
+                    Predicate = predicate as Expression<Func<Locations, bool>> ?? (x => true),
+                    Select = x => new Locations
+                    {
+                        Id = x.Id,
+                        Name = x.Name, 
+                        ParentLocationId = x.ParentLocationId,
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
             #endregion
 
             throw new NotSupportedException($"Query for type {typeof(T)} is not supported.");

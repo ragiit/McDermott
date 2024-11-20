@@ -21,7 +21,7 @@ using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHi
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimRequestCommand;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
-using static McDermott.Application.Features.Commands.Pharmacy.SignaCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
@@ -677,6 +677,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             var result = await Mediator.Send(new GetBenefitConfigurationQuery
             {
+                Predicate = x=>x.Status == EnumBenefitStatus.Active,
                 SearchTerm = refBenefitComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
@@ -2591,7 +2592,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"pharmacy/presciptions/{GeneralConsultanService.Id}");
+            NavigationManager.NavigateTo($"/pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}?GcId={GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()
