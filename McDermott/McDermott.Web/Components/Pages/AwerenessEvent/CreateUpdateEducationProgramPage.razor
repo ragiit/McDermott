@@ -236,7 +236,7 @@
                                                                 </EditorContent>
                                                             </BlazoredTextEditor>
                                                         </DxFormLayoutItem>
-                                                        <DxFormLayoutItem Caption="Attedence" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                        <DxFormLayoutItem Caption="Attendances" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@postEducationPrograms.Attendance"
                                                                            ShowValidationIcon="true"
                                                                            ReadOnly="IsReadOnlyEvent"
@@ -276,7 +276,7 @@
                                             </DxFormLayout>
 
                                         </DxTabPage>
-                                        <DxTabPage Text="PARTICIPAN INFORMATION" Visible="@(postEducationPrograms.Id !=0)" TabIconCssClass="fa-solid fa-circle-info">
+                                        <DxTabPage Text="PARTICIPANTS INFORMATION" Visible="@(postEducationPrograms.Id !=0)" TabIconCssClass="fa-solid fa-circle-info">
                                             <div class="card">
                                                 <div class="card-body">
                                                     <DxLoadingPanel @bind-Visible="PanelVisibleParticipan"

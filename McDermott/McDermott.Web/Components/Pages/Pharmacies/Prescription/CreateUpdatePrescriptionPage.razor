@@ -222,6 +222,7 @@
                                                                     @bind-SelectedDataItems="@SelectedDataItemsPrescription"
                                                                     EditModelSaving="OnSavePrescription"
                                                                     DataItemDeleting="OnDeletePrescription"
+                                                                    EditFormButtonsVisible="false"
                                                                     FocusedRowChanged="GridPrescription_FocusedRowChanged"
                                                                     KeyFieldName="Id">
                                                         <ToolbarTemplate>
@@ -289,7 +290,6 @@
                                                                               @bind-Values="@selectedActiveComponentPrescriptions"
                                                                               NullText="Select Active Component.."
                                                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                              Enabled="isActiveButton"
                                                                               ReadOnly
                                                                               TextFieldName="Name" />
                                                                     <ValidationMessage For="@(()=> postPrescription.ActiveComponentId)" />
@@ -322,7 +322,6 @@
                                                                                 MinValue="0"
                                                                                 ValueExpression="@(()=>postPrescription.GivenAmount)"
                                                                                 ValueChanged="@((long value)=>checkStock(value))"
-                                                                                Enabled="isActiveButton"
                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
                                                                     <ValidationMessage For="@(()=> postPrescription.GivenAmount)"   />
                                                                 </DxFormLayoutItem>
@@ -364,7 +363,6 @@
                                                                                                     TextFieldName="Frequency"
                                                                                                     ValueFieldName="Id"
                                                                                                     ReadOnly
-                                                                                                    Enabled="isActiveButton"
                                                                                                     ShowValidationIcon="true"
                                                                                                     ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                     FilteringMode="@DataGridFilteringMode.Contains"></DxComboBox>

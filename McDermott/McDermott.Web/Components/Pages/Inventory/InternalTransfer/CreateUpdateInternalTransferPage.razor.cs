@@ -680,7 +680,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
                 PanelVisible = false;
                 await LoadData();
-                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -759,7 +758,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
                 PanelVisible = false;
                 await LoadData();
-                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -789,7 +787,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
 
                 PanelVisible = false;
-                StateHasChanged();
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -831,7 +829,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
 
-                StateHasChanged();
+                await LoadData();
 
                 PanelVisible = false;
             }
@@ -862,6 +860,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 postTransferStockLogs.Status = EnumStatusInternalTransfer.Cancel;
 
                 await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
+                await LoadData();
             }
             catch (Exception ex)
             {
