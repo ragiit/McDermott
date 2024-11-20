@@ -720,10 +720,8 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetPharmacyQuery
-                {
-
-                });
+                var result = await Mediator.Send(new GetPharmacyQuery());
+                getPharmacy = result.Item1;
 
                 PanelVisible = false;
             }
@@ -741,11 +739,11 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             try
             {
                 var data_delete = (PharmacyDto)e.DataItem;
-                var Prescriptions = (await Mediator.Send(new GetPrescriptionQuery())).Item1;
-                var Concoctions = (await Mediator.Send(new GetConcoctionQuery())).Item1;
-                var ConcoctionLines = (await Mediator.Send(new GetConcoctionLineQuery())).Item1;
-                var StockOutPrescriptions = (await Mediator.Send(new GetStockOutPrescriptionQuery())).Item1;
-                var Logs = (await Mediator.Send(new GetPharmacyLogQuery())).Item1;
+                var Prescriptions = await Mediator.Send(new GetAllPrescriptionQuery());
+                var Concoctions = await Mediator.Send(new GetAllConcoctionQuery());
+                var ConcoctionLines = await Mediator.Send(new GetAllConcoctionLineQuery());
+                var StockOutPrescriptions = await Mediator.Send(new GetAllStockOutPrescriptionQuery());
+                var Logs = await Mediator.Send(new GetAllPharmacyLogQuery());
                 if (SelectedDataItems is null || SelectedDataItems.Count == 1)
                 {
                     var prescription_data = Prescriptions.Where(x => x.PharmacyId == data_delete.Id).ToList();

@@ -9,6 +9,8 @@ using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupC
 using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
 using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 {
@@ -217,33 +219,34 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             SelectedWeatherAllergies = [];
             SelectedPharmacologyAllergies = [];
 
-            // Filter allergies by type
-            FoodAllergies = allergies.Where(x => x.Type == "01").ToList();
-            WeatherAllergies = allergies.Where(x => x.Type == "02").ToList();
-            PharmacologyAllergies = allergies.Where(x => x.Type == "03").ToList();
 
-            var p = Patients.FirstOrDefault(z => z.Id == postPharmacy.PatientId || z.Id == q);
+            var p = await Mediator.Send(new GetSingleUserQuery
+            {
+                Predicate = z => z.Id == postPharmacy.PatientId || z.Id == q
+            });
 
             if (p is null || p.PatientAllergyIds is null)
                 return;
 
-            var Allergies = await Mediator.Send(new GetAllergyQuery(x => p.PatientAllergyIds.Contains(x.Id)));
-            //if (Allergies.Count > 0)
-            //{
-                // Assuming you have another list of selected allergies IDs
-                var selectedAllergyIds = Allergies.Where(x => x.Type == "01" || x.Type == "02" || x.Type == "03").Select(x => x.Id).ToList();
+            #region Get Patient Allergies
 
-                // Select specific allergies by their IDs
-                SelectedFoodAllergies = FoodAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
-                SelectedWeatherAllergies = WeatherAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
-                SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => selectedAllergyIds.Contains(x.Id)).ToList();
+            var alergy = (await Mediator.Send(new GetAllergyQuery()));
+            FoodAllergies = alergy.Where(x => x.Type == "01").ToList();
+            WeatherAllergies = alergy.Where(x => x.Type == "02").ToList();
+            PharmacologyAllergies = alergy.Where(x => x.Type == "03").ToList();
 
-                if (SelectedFoodAllergies.Count() > 0)
-                    postPharmacy.IsFood = true;
-                if (SelectedWeatherAllergies.Count() > 0)
-                    postPharmacy.IsWeather = true;
-                if (SelectedPharmacologyAllergies.Count() > 0)
-                    postPharmacy.IsFarmacologi = true;
+            SelectedFoodAllergies = FoodAllergies.Where(x => p.FoodPatientAllergyIds.Contains(x.Id));
+            SelectedWeatherAllergies = WeatherAllergies.Where(x => p.WeatherPatientAllergyIds.Contains(x.Id));
+            SelectedPharmacologyAllergies = PharmacologyAllergies.Where(x => p.PharmacologyPatientAllergyIds.Contains(x.Id));
+
+            if (SelectedFoodAllergies.Count() > 0)
+                postPharmacy.IsFood = true;
+            if (SelectedWeatherAllergies.Count() > 0)
+                postPharmacy.IsWeather = true;
+            if (SelectedPharmacologyAllergies.Count() > 0)
+                postPharmacy.IsFarmacologi = true;
+
+            #endregion Get Patient Allergies
             //}
         }
 
@@ -453,7 +456,10 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
                 return;
             }
-            var checkMedicament = Medicaments.Where(x => x.ProductId == value.Id).FirstOrDefault();
+            var checkMedicament = await Mediator.Send(new GetSingleMedicamentQuery
+            {
+                Predicate = x=>x.ProductId == value.Id
+            });
             if (checkMedicament is not null)
             {
                 postPrescription.PriceUnit = value.Cost;
@@ -789,9 +795,17 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             PanelVisible = true;
             await GetUserInfo();
             await LoadDataLocation();
+            await LoadDataProduct();
+            await LoadDataTransaction();
+            await LoadDataActiveComponent();
+            await LoadDataDrugDosage();
+            await LoadDataDrugRoute();
+            await LoadDataSigna();
+            await LoadDataDrugForm();
+            await LoadData();
             await LoadDataPatient();
             await LoadDataPractitioner();
-            await LoadData();
+
             PanelVisible = false;
         }
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -816,40 +830,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                     postPharmacy.PatientId = postGeneralConsultantService.PatientId;
 
                     postPharmacy.PractitionerId = postGeneralConsultantService.PratitionerId;
+
+
+                    
                     postPharmacy.ServiceId = postGeneralConsultantService.ServiceId;
                     postPharmacy.PaymentMethod = postGeneralConsultantService.Payment;
-                    var resultUser = await Mediator.Send(new GetUserQueryNew
-                    {
-                        Predicate = x => x.Id == postGeneralConsultantService.PatientId,
-
-                        Select = x => new User
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            NoRm = x.NoRm,
-                            Email = x.Email,
-                            MobilePhone = x.MobilePhone,
-                            Gender = x.Gender,
-                            DateOfBirth = x.DateOfBirth,
-                        }
-                    });
-                    Patients = resultUser.Item1;
-                    var resultPractitioner = await Mediator.Send(new GetUserQueryNew
-                    {
-                        Predicate = x => x.Id == postGeneralConsultantService.PratitionerId,
-
-                        Select = x => new User
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            NoRm = x.NoRm,
-                            Email = x.Email,
-                            MobilePhone = x.MobilePhone,
-                            Gender = x.Gender,
-                            DateOfBirth = x.DateOfBirth,
-                        }
-                    });
-                    Practitioners = resultPractitioner.Item1;
+                    
                     await SelectedChangePractition(postGeneralConsultantService.PratitionerId);
                     allergies = await Mediator.Send(new GetAllergyQuery());
 
@@ -865,12 +851,13 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                         });
                         if (result is null || !Id.HasValue)
                         {
-                            NavigationManager.NavigateTo("awereness-event/education-program");
+                            NavigationManager.NavigateTo("pharmacy/prescriptions");
                             return;
                         }
 
                         postPharmacy = result ?? new();
                         await GetPatientAllergy(postPharmacy.PatientId);
+                        await LoadDataPrescription();
                     }
                 }
                 PanelVisible = false;
@@ -879,18 +866,22 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         }
         private async Task LoadDataPrescription(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisiblePrescription = true;
-            var result = await Mediator.Send(new GetPrescriptionQuery
+            try
             {
-                Predicate = x => x.PharmacyId == postPharmacy.Id,
-                SearchTerm = searchTerm,
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            });
-            getPrescriptions = result.Item1;
-            totalCountPrescription = result.PageCount;
-            activePageIndexPrescription = result.PageIndex;
-            PanelVisiblePrescription = false;
+                PanelVisiblePrescription = true;
+                var result = await Mediator.Send(new GetPrescriptionQuery
+                {
+                    Predicate = x => x.PharmacyId == postPharmacy.Id,
+                    SearchTerm = searchTerm,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
+                getPrescriptions = result.Item1;
+                totalCountPrescription = result.PageCount;
+                activePageIndexPrescription = result.PageIndex;
+                PanelVisiblePrescription = false;
+            }
+            catch { }
 
         }
         #endregion
@@ -958,7 +949,8 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                     await Mediator.Send(new UpdatePharmacyRequest(postPharmacy));
                     ToastService.ShowSuccess("Update Pharmacy Data Success");
                 }
-                NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}/?Id={data.Id}");
+                NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}/?Id={data.Id}", true);
+                StateHasChanged();
             }
             catch (Exception ex)
             {
@@ -1022,6 +1014,40 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         #endregion
 
         #region ComboBox
+        private async Task LoadDataDrugForm()
+        {
+            var result = await Mediator.Send(new GetDrugFormQuery());
+            DrugForms = result.Item1;
+        }
+        private async Task LoadDataDrugDosage()
+        {
+            var result = await Mediator.Send(new GetDrugDosageQuery());
+            DrugDosages = result.Item1;
+        }
+        private async Task LoadDataDrugRoute()
+        {
+            var result = await Mediator.Send(new GetDrugRouteQuery());
+            DrugRoutes = result.Item1;
+        }
+        private async Task LoadDataSigna()
+        {
+            var result = await Mediator.Send(new GetSignaQuery());
+            Signas = result.Item1;
+        }
+        private async Task LoadDataActiveComponent()
+        {
+            var result = await Mediator.Send(new GetActiveComponentQuery());
+            ActiveComponents = result.Item1;
+        }
+        private async Task LoadDataTransaction()
+        {
+            TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
+        }
+        private async Task LoadDataProduct()
+        {
+            var getProducts = await Mediator.Send(new GetProductQuery());
+            Products = getProducts.Item1;
+        }
         private async Task LoadDataLocation()
         {
             var getLocation = await Mediator.Send(new GetLocationQuery());
@@ -1032,14 +1058,32 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
         private async Task LoadDataPatient()
         {
-            var getPatients = await Mediator.Send(new GetUserQueryNew());
+            var getPatients = await Mediator.Send(new GetUserQueryNew
+            {
+               Predicate = x=>x.Id == postPharmacy.PatientId,
+               Select= x=>new User
+               {
+                   Id =x.Id,
+                   Name=x.Name,
+                   IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                   FoodPatientAllergyIds=x.FoodPatientAllergyIds,
+                   IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                   WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                   IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                   PharmacologyPatientAllergyIds=x.PharmacologyPatientAllergyIds
+               }
+            });
 
             Patients = getPatients.Item1; ;
 
         }
         private async Task LoadDataPractitioner()
         {
-            var getPractitioner = await Mediator.Send(new GetUserQueryNew());
+            var getPractitioner = await Mediator.Send(new GetUserQueryNew
+            {
+                Predicate = x => x.Id == postPharmacy.PractitionerId,
+                
+            });
 
             Practitioners = getPractitioner.Item1;
 

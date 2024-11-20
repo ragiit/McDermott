@@ -100,6 +100,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
+        private bool PanelVisibleDetail { get; set; } = false;
         private bool FormValidationState { get; set; } = true;
         private bool isGrChecked { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
@@ -203,7 +204,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         {
             try
             {
-                PanelVisible = true;
+                PanelVisibleDetail = true;
                 var result = await Mediator.Send(new GetGoodsReceiptDetailQuery
                 {
                     Predicate = x => x.GoodsReceiptId == postGoodsReceipt.Id,
@@ -218,7 +219,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 getGoodsReceiptDetails = result.Item1 ?? new();
                 totalCount = result.PageCount;
                 activePageIndex = pageIndex;
-                PanelVisible = false;
+                PanelVisibleDetail = false;
             }
             catch
             {
@@ -797,26 +798,43 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
                 string referenceNumber = $"GN#{NextReferenceNumber:D3}";
 
-                var CheckReceivedProduct = getGoodsReceiptDetails.Where(x => x.GoodsReceiptId == postGoodsReceipt.Id).ToList()!;
-                foreach (var a in CheckReceivedProduct)
+                var checkReceivedProduct = getGoodsReceiptDetails
+    .Where(x => x.GoodsReceiptId == postGoodsReceipt.Id)
+    .ToList();
+
+                foreach (var a in checkReceivedProduct)
                 {
-                    var Cek_Uom = getUoms.Where(x => x.Id == a.Product?.UomId).FirstOrDefault();
+                    // Cari UOM untuk produk dan validasi null
+                    var cekUom = getUoms.FirstOrDefault(x => x.Id == a.Product?.UomId);
+                    var purchaseUom = getUoms.FirstOrDefault(x => x.Id == a.Product?.PurchaseUomId);
 
-                    var x = getUoms.Where(x => x.Id == a?.Product?.UomId).FirstOrDefault();
+                    if (cekUom == null || purchaseUom == null || a.ProductId == null)
+                    {
+                        // Log atau abaikan jika data tidak lengkap
+                        continue;
+                    }
 
+                    // Hitung kuantitas dengan validasi null-safe
+                    var quantity = cekUom.BiggerRatio.HasValue && purchaseUom.BiggerRatio.HasValue
+                        ? (a.Qty * purchaseUom.BiggerRatio.Value) / cekUom.BiggerRatio.Value
+                        : 0;
+
+                    // Buat instance baru untuk setiap transaksi
                     postTransaction.SourceTable = nameof(GoodsReceipt);
                     postTransaction.SourcTableId = postGoodsReceipt.Id;
                     postTransaction.ProductId = a.ProductId;
                     postTransaction.Batch = a.Batch;
                     postTransaction.ExpiredDate = a.ExpiredDate;
                     postTransaction.Reference = referenceNumber;
-                    postTransaction.Quantity = a.Qty * Cek_Uom?.BiggerRatio?.ToLong() ?? 0;
+                    postTransaction.Quantity =quantity.ToLong();
                     postTransaction.LocationId = postGoodsReceipt.DestinationId;
                     postTransaction.UomId = a.Product?.UomId;
                     postTransaction.Validate = false;
 
+                    // Kirim transaksi menggunakan Mediator
                     await Mediator.Send(new CreateTransactionStockRequest(postTransaction));
                 }
+
 
                 //UpdateReceiving Stock
                 postGoodsReceipt.Status = EnumStatusGoodsReceipt.Process;
