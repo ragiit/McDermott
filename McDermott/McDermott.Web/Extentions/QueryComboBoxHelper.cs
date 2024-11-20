@@ -21,8 +21,9 @@ namespace McDermott.Web.Extentions
         /// <param name="searchTerm">The optional search term for filtering.</param>
         /// <returns>A list of DTOs matching the search criteria.</returns>
         /// <exception cref="NotSupportedException">Thrown if the type is not supported.</exception>
-        public static async Task<List<TDto>> QueryGetComboBox<T, TDto>(this IMediator mediator, string? searchTerm = "", Expression<Func<T, bool>>? predicate = null)
+        public static async Task<List<TDto>> QueryGetComboBox<T, TDto>(this IMediator mediator, string? searchTerm = "", Expression<Func<T, bool>>? predicate = null, List<(Expression<Func<T, object>> OrderBy, bool IsDescending)>? orderBy = null)
         {
+            orderBy ??= [];
             searchTerm ??= string.Empty;
 
             #region Configurations
@@ -66,10 +67,18 @@ namespace McDermott.Web.Extentions
                 var result = (await mediator.Send(new GetMenuQuery
                 {
                     Predicate = predicate as Expression<Func<Menu, bool>> ?? (x => true),
+                    OrderByList = orderBy as List<(Expression<Func<Menu, object>> OrderBy, bool IsDescending)>,
                     Select = x => new Menu
                     {
                         Id = x.Id,
-                        Name = x.Name
+                        Name = x.Name,
+                        ParentId = x.ParentId,
+                        Parent = new Menu
+                        {
+                            Name = x.Parent == null ? "" : x.Parent.Name,
+                        },
+                        Sequence = x.Sequence,
+                        Url = x.Url,
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,

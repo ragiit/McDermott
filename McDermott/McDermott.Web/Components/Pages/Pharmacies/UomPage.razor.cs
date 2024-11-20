@@ -247,8 +247,20 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                 if (exists)
                 {
                     ToastService.ShowWarning($"Uom with name '{editModel.Name}' already exists.");
+                    e.Cancel = true;
                     return;
                 }
+
+                bool b = await Mediator.Send(new ValidateUomQuery(x => x.Id != editModel.Id && editModel.UomCategory != null && x.UomCategory != null && x.UomCategory.Name == editModel.UomCategory.Name && x.Type == "Reference Unit of Measure for this category"));
+                if (b)
+                {
+                    ToastService.ShowWarning($"Uom with category '{editModel.UomCategory.Name}' and type 'Reference Unit of Measure for this category' already exists.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                editModel.BiggerRatio ??= 1;
+
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateUomRequest(editModel));
                 else
@@ -333,7 +345,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                         var type = ws.Cells[row, 3].Value?.ToString()?.Trim();
                         var ratio = ws.Cells[row, 4].Value?.ToString()?.Trim();
                         var active = ws.Cells[row, 5].Value?.ToString()?.Trim();
-                        var roundingPrecision = ws.Cells[row, 6].Value?.ToString()?.Trim();
+                        //var roundingPrecision = ws.Cells[row, 6].Value?.ToString()?.Trim();
 
                         long? CategoryUomId = null;
                         if (!string.IsNullOrEmpty(uomCategory))
@@ -361,16 +373,16 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                             ToastService.ShowErrorImport(row, 3, type ?? string.Empty);
                         }
 
-                        // Parse string to float
-                        if (float.TryParse(roundingPrecision, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
-                        {
-                            roundingPrecision = result.ToString();
-                        }
-                        else
-                        {
-                            // Handle the case when the string cannot be parsed
-                            roundingPrecision = null; // or set to a default value if needed
-                        }
+                        //// Parse string to float
+                        //if (float.TryParse(roundingPrecision, NumberStyles.Float, CultureInfo.InvariantCulture, out var result))
+                        //{
+                        //    roundingPrecision = result.ToString();
+                        //}
+                        //else
+                        //{
+                        //    // Handle the case when the string cannot be parsed
+                        //    roundingPrecision = null; // or set to a default value if needed
+                        //}
 
                         if (float.TryParse(ratio, NumberStyles.Float, CultureInfo.InvariantCulture, out var rr))
                         {
@@ -392,7 +404,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                             Type = type,
                             BiggerRatio = type == "Reference Unit of Measure for this category" ? 0 : ratio.ToLong(),
                             Active = active == "Yes",
-                            RoundingPrecision = float.Parse(roundingPrecision)
+                            //RoundingPrecision = float.Parse(roundingPrecision)
                         });
                     }
 
@@ -409,6 +421,16 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                                 ev.Name == Uom.Name &&
                                 ev.Type == Uom.Type &&
                                 ev.UomCategoryId == Uom.UomCategoryId
+                            )
+                        ).ToList();
+
+                        var existingLabTests2 = await Mediator.Send(new BulkValidateUomNameTypeQuery(list));
+
+                        // Filter LabTest baru yang tidak ada di database
+                        list = list.Where(Uom =>
+                            !existingLabTests2.Any(ev =>
+                                ev.Name == Uom.Name &&
+                                ev.Type == Uom.Type 
                             )
                         ).ToList();
 

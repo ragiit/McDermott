@@ -2,8 +2,9 @@
 {
     public partial class Diagnosis : BaseAuditableEntity
     {
-        [StringLength(200)]
         public string Name { get; set; }
+
+        public string? NameInd { get; set; }
 
         [StringLength(50)]
         public string? Code { get; set; }

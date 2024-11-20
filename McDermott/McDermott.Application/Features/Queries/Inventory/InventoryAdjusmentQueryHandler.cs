@@ -172,7 +172,8 @@ namespace McDermott.Application.Features.Queries.Inventory
                             Name = x.Company == null ? "" : x.Company.Name
                         },
                         Date = x.Date,
-                        Status = x.Status
+                        Status = x.Status,
+                        Reference = x.Reference
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<InventoryAdjusmentDto>();

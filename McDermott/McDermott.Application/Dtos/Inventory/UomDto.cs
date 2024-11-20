@@ -23,7 +23,7 @@ namespace McDermott.Application.Dtos.Inventory
                 _type = value;
                 if (value is not null && value == "Reference Unit of Measure for this category")
                 {
-                    BiggerRatio = null;
+                    BiggerRatio = 1;
                 }
             }
         }
