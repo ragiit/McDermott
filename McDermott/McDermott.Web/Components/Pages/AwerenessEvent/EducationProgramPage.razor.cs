@@ -200,8 +200,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 }
                 else
                 {
-                    var countriesToDelete = SelectedDataItems.Adapt<List<EducationProgramDto>>();
-                    await Mediator.Send(new DeleteEducationProgramRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
+                    var EduToDelete = SelectedDataItems.Adapt<List<EducationProgramDto>>();
+                    await Mediator.Send(new DeleteEducationProgramRequest(ids: EduToDelete.Select(x => x.Id).ToList()));
                 }
 
                 SelectedDataItems = [];

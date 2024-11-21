@@ -7,7 +7,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class PrescriptionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
        IRequestHandler<GetAllPrescriptionQuery, List<PrescriptionDto>>,//Prescription
-        IRequestHandler<GetPrescriptionQuery, (List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetConcoctionLinesQuery, (List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetSinglePrescriptionQuery, PrescriptionDto>, IRequestHandler<ValidatePrescriptionQuery, bool>,
         IRequestHandler<BulkValidatePrescriptionQuery, List<PrescriptionDto>>,
         IRequestHandler<CreatePrescriptionRequest, PrescriptionDto>,
@@ -85,7 +85,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
-        public async Task<(List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPrescriptionQuery request, CancellationToken cancellationToken)
+        public async Task<(List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetConcoctionLinesQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -134,14 +134,17 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Select(x => new Prescription
                     {
                         Id = x.Id,
+                        PharmacyId = x.PharmacyId,
                         ProductId = x.ProductId,
                         SignaId = x.SignaId,
+                        Dosage=x.Dosage,
                         DrugDosageId = x.DrugDosageId,
                         DrugFromId = x.DrugFromId,
                         DrugRouteId = x.DrugRouteId,
                         ActiveComponentId = x.ActiveComponentId,
                         DosageFrequency = x.DosageFrequency,
                         Stock = x.Stock,
+                        GivenAmount=x.GivenAmount,
                         Product = new Product
                         {
                             Name = x.Product == null ? string.Empty : x.Product.Name,
@@ -162,10 +165,10 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
                         },
-                        ActiveComponent = x.ActiveComponent == null ? null : x.ActiveComponent.Select(ac => new ActiveComponent
-                        {
-                            Name = ac.Name
-                        }).ToList()
+                        //ActiveComponent = x.ActiveComponent == null ? null : x.ActiveComponent.Select(ac => new ActiveComponent
+                        //{
+                        //    Name = ac.Name
+                        //}).ToList()
 
                     });
 
@@ -241,13 +244,16 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Select(x => new Prescription
                     {
                         Id = x.Id,
+                        PharmacyId=x.PharmacyId,
                         ProductId = x.ProductId,
                         SignaId = x.SignaId,
+                        Dosage=x.Dosage,
                         DrugDosageId = x.DrugDosageId,
                         DrugFromId = x.DrugFromId,
                         DrugRouteId = x.DrugRouteId,
                         ActiveComponentId = x.ActiveComponentId,
                         DosageFrequency = x.DosageFrequency,
+                        GivenAmount = x.GivenAmount,
                         Stock = x.Stock,
                         Product = new Product
                         {
@@ -269,10 +275,10 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
                         },
-                        ActiveComponent = x.ActiveComponent == null ? null : x.ActiveComponent.Select(ac => new ActiveComponent
-                        {
-                            Name = ac.Name
-                        }).ToList(),
+                        //ActiveComponent = x.ActiveComponent == null ? null : x.ActiveComponent.Select(ac => new ActiveComponent
+                        //{
+                        //    Name = ac.Name
+                        //}).ToList(),
 
                     });
 

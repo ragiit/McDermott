@@ -1,4 +1,7 @@
-﻿namespace McDermott.Application.Dtos.Pharmacies
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using McDermott.Domain.Common;
+
+namespace McDermott.Application.Dtos.Pharmacies
 {
     public class PrescriptionDto : IMapFrom<Prescription>
     {
@@ -20,12 +23,30 @@
         public long GivenAmount { get; set; } = 0; // jumlah yg diberikan
         public long? PriceUnit { get; set; }
 
+        [NotMapped]
+        public string DosageAndFrequency
+        {
+            get
+            {
+                return $"{Dosage.ToString()}/{DrugDosage.Frequency}";
+            }
+
+            set { }
+        }
+
+        [SetToNull]
         public DrugFormDto? DrugForm { get; set; }
+        [SetToNull]
         public PharmacyDto? Pharmacy { get; set; }
+        [SetToNull]
         public ProductDto? Product { get; set; }
+        [SetToNull]
         public SignaDto? Signa { get; set; }
+        [SetToNull]
         public DrugRouteDto? DrugRoute { get; set; }
+        [SetToNull]
         public DrugDosageDto? DrugDosage { get; set; }
+        [SetToNull]
         public MedicamentGroupDto? MedicamentGroup { get; set; }
     }
 }

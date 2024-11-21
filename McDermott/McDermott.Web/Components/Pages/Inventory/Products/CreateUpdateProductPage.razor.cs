@@ -272,7 +272,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             await GetUserInfo();
-
+            ActiveComponents = (await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>()).Item1;
             // Run multiple load tasks concurrently
             var loadTasks = new List<Task>
             {
@@ -282,6 +282,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 LoadDataDrugForm(),
                 LoadDataDrugRoute(),
                 LoadDataDrugDosage(),
+                
+
                 LoadData(),
                 // LoadDataBPJSCl(),
                 // LoadDataLocation(),
@@ -341,9 +343,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     {
                         // Update specific medicament details instead of replacing the entire object
                         UpdateMedicamentDetails(PostProductDetails, PostMedicaments);
-
-                        selectedActiveComponents = ActiveComponents
-                            .Where(a => PostMedicaments.ActiveComponentId?.Contains(a.Id) == true).ToList();
+                        if (PostMedicaments.ActiveComponentId != null)
+                        {
+                            selectedActiveComponents = ActiveComponents.Where(a => PostMedicaments.ActiveComponentId.Contains(a.Id)).ToList();
+                        }
 
                         TotalQty = getTransactionStocks
                             .Where(x => x.ProductId == PostProduct.Id && x.Validate == true)
@@ -370,7 +373,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             // Fetch additional data
             //GetBPJSCl = await Mediator.Send(new GetBpjsClassificationQuery());
-            ActiveComponents = (await Mediator.QueryGetHelper<ActiveComponent, ActiveComponentDto>()).Item1;
         }
 
         private void UpdateMedicamentDetails(ProductDetailDto postProductDetails, MedicamentDto medicament)
@@ -541,7 +543,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private async Task LoadDataUomPurchase(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            SelectedDataItems = []; 
+            SelectedDataItems = [];
             var result = await Mediator.Send(new GetUomQuery
             {
                 SearchTerm = refUomPurchaseComboBox?.Text ?? "",
@@ -929,7 +931,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 PanelVisible = true;
                 showScrapProduct = true;
-                GetMaintenanceScrap = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintenance.Scrap) .ToList();
+                GetMaintenanceScrap = GetMaintenanceProduct.Where(x => x.ProductId == Id && x.Status == EnumStatusMaintenance.Scrap).ToList();
                 NameProduct = GetMaintenanceScrap[0].Product.Name;
                 PanelVisible = false;
             }

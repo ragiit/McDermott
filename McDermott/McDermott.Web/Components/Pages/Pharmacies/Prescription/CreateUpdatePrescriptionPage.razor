@@ -235,6 +235,7 @@
                                                                              DeleteItem_Click="@DeleteItemPrescription_Click"
                                                                              Refresh_Click="@RefreshPrescription_Click"
                                                                              IsImport="UserAccessCRUID.IsImport"
+                                                                             EnableDelete="isActiveButton"
                                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
                                                                              VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -260,7 +261,7 @@
                                                             <DxGridDataColumn MinWidth="200" FieldName="GivenAmount" Caption="Prescription Quantity" />
                                                             <DxGridDataColumn MinWidth="200" Visible="false" FieldName="ActiveComponentNames" Caption="Active Component" />
                                                             <DxGridDataColumn MinWidth="200" FieldName="Stock" Caption="Stock" />
-                                                            <DxGridDataColumn MinWidth="200" FieldName="DosageFrequency" Caption="Dosage/Intruction" />
+                                                            <DxGridDataColumn MinWidth="200" FieldName="DosageAndFrequency" Caption="Dosage/Intruction" />
                                                             @* <DxGridDataColumn MinWidth="200" FieldName="PriceUnit" Caption="Price Unit" /> *@
                                                             <DxGridDataColumn MinWidth="200" FieldName="DrugRoute.Route" Caption="Route" />
 
@@ -400,8 +401,8 @@
                                                                              Items="@getConcoctions"
                                                                              Grid="GridPrescription"
                                                                              SelectedDataItems="@SelectedDataItemsPrescription"
-                                                                             NewItem_Click="@NewItemPrescription_Click"
-                                                                             EditItem_Click="@(async () => await EditItemPrescription_Click())"
+                                                                             NewItem_Click="@NewItemConcoction_Click"
+                                                                             EditItem_Click="@(async () => await EditItemConcoction_Click())"
                                                                              DeleteItem_Click="@DeleteItemPrescription_Click"
                                                                              Refresh_Click="@RefreshPrescription_Click"
                                                                              IsImport="UserAccessCRUID.IsImport"
