@@ -1,13 +1,8 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.AwarenessEvent
 {
-    public class ParticipanEduDto:IMapFrom<ParticipanEdu>
+    public class ParticipanEduDto : IMapFrom<ParticipanEdu>
     {
         public long Id { get; set; }
         public long? PatientId { get; set; }
@@ -16,6 +11,7 @@ namespace McDermott.Application.Dtos.AwarenessEvent
 
         [SetToNull]
         public UserDto? Patient { get; set; }
+
         [SetToNull]
         public EducationProgramDto? EducationProgram { get; set; }
     }

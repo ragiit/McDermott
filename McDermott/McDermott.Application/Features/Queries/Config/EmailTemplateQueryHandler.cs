@@ -25,7 +25,7 @@ namespace McDermott.Application.Features.Queries.Config
                 {
                     result = await _unitOfWork.Repository<EmailTemplate>().Entities
                         .Include(x => x.By)
-                        .Include(x=>x.EmailFrom)
+                        .Include(x => x.EmailFrom)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 

@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Config.GroupCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {

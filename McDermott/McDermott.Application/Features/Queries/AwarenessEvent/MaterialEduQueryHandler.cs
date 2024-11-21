@@ -1,10 +1,5 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.AwarenessEvent.MaterialEduCommand;
 
 namespace McDermott.Application.Features.Queries.AwarenessEvent
@@ -114,12 +109,11 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         Id = x.Id,
                         MaterialContent = x.MaterialContent,
                         EducationProgramId = x.EducationProgramId,
-                       Attendance =x.Attendance,
+                        Attendance = x.Attendance,
                         EducationProgram = new EducationProgram
                         {
                             EventName = x.EducationProgram == null ? string.Empty : x.EducationProgram.EventName
                         }
-
                     });
 
                 if (!request.IsGetAll)
@@ -201,7 +195,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         {
                             EventName = x.EducationProgram == null ? string.Empty : x.EducationProgram.EventName
                         }
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<MaterialEduDto>();
@@ -212,8 +205,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -227,7 +218,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetMaterialEduQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetMaterialEduQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<MaterialEduDto>();
             }
@@ -266,7 +257,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 var result = await _unitOfWork.Repository<MaterialEdu>().UpdateAsync(request.MaterialEduDto.Adapt<MaterialEdu>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
                 _cache.Remove("GetMaterialEduQuery_"); // Ganti dengan key yang sesuai
 
@@ -327,6 +317,5 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
         }
 
         #endregion DELETE Education Program
-
     }
 }

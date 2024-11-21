@@ -1,10 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction

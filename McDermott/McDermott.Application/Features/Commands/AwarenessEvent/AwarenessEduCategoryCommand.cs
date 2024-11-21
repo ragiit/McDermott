@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands.AwarenessEvent
 {
@@ -16,6 +11,7 @@ namespace McDermott.Application.Features.Commands.AwarenessEvent
             public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleAwarenessEduCategoryQuery : IRequest<AwarenessEduCategoryDto>
         {
             public List<Expression<Func<AwarenessEduCategory, object>>> Includes { get; set; }
@@ -55,6 +51,7 @@ namespace McDermott.Application.Features.Commands.AwarenessEvent
         {
             public Expression<Func<AwarenessEduCategory, bool>> Predicate { get; } = predicate!;
         }
+
         #endregion GET Education Program Detail
 
         #region CREATE Education Program
@@ -83,7 +80,7 @@ namespace McDermott.Application.Features.Commands.AwarenessEvent
             public List<AwarenessEduCategoryDto> AwarenessEduCategoryDtos { get; set; } = AwarenessEduCategoryDtos;
         }
 
-        #endregion Update Education Program
+        #endregion UPDATE Education Program
 
         #region DELETE Education Program
 
@@ -94,6 +91,5 @@ namespace McDermott.Application.Features.Commands.AwarenessEvent
         }
 
         #endregion DELETE Education Program
-
     }
 }

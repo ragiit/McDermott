@@ -1,11 +1,5 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using MailKit.Search;
-using MapsterMapper;
-using McDermott.Application.Dtos;
+﻿using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
-using System.Linq;
 using static McDermott.Application.Features.Commands.Config.VillageCommand;
 
 namespace McDermott.Application.Features.Queries.Config
@@ -26,6 +20,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<DeleteVillageRequest, bool>
     {
         #region GET
+
         public async Task<(List<VillageDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetVillageQueryNew request, CancellationToken cancellationToken)
         {
             try

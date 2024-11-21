@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using Microsoft.EntityFrameworkCore;
 
 using static McDermott.Application.Features.Commands.Medical.DoctorScheduleSlotCommand;
 

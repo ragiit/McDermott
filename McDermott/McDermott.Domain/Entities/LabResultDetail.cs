@@ -11,7 +11,6 @@
         public string? ResultValueType { get; set; }
         public string? Remark { get; set; }
 
-
         [SetToNull]
         public LabUom? LabUom { get; set; }
 
@@ -19,4 +18,3 @@
         public GeneralConsultanMedicalSupport? GeneralConsultanMedicalSupport { get; set; }
     }
 }
-

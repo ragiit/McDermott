@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using Microsoft.EntityFrameworkCore.Internal;
 using static McDermott.Application.Features.Commands.Config.DistrictCommand;
 
 namespace McDermott.Application.Features.Queries.Config

@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class EducationProgram : BaseAuditableEntity
     {
-       
-        public string? EventName { get; set; } 
-               
-        public long? EventCategoryId { get; set; } 
+        public string? EventName { get; set; }
+
+        public long? EventCategoryId { get; set; }
         public string? HTMLContent { get; set; }
 
         public string? Description { get; set; }
 
-        public string? HTMLMaterial {  get; set; }
+        public string? HTMLMaterial { get; set; }
 
         public string? EventLink { get; set; }
         public DateTime? StartDate { get; set; }

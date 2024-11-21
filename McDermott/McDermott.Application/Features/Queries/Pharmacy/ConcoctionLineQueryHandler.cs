@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
@@ -25,6 +23,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         IRequestHandler<DeleteStockOutLinesRequest, bool>
     {
         #region Concoction Line
+
         #region GET CoctionLine
 
         public async Task<List<ConcoctionLineDto>> Handle(GetAllConcoctionLineQuery request, CancellationToken cancellationToken)
@@ -250,7 +249,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Name = ac.Name
                         }).ToList(),
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ConcoctionLineDto>();
@@ -262,9 +260,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
             }
         }
 
-
-
-        #endregion GET Education Program
+        #endregion GET CoctionLine
 
         #region CREATE
 
@@ -375,9 +371,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Concoction Line
 
         #region Stock Out ConcoctionLine
+
         #region GET Concoction
 
         public async Task<List<StockOutLinesDto>> Handle(GetAllStockOutLinesQuery request, CancellationToken cancellationToken)
@@ -497,13 +495,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                             {
                                 Name = x.Lines.Product == null ? string.Empty : x.Lines.Product.Name
                             }
-
                         },
                         TransactionStock = new TransactionStock
                         {
-                            Batch = x.TransactionStock == null ? string.Empty :x.TransactionStock.Batch
+                            Batch = x.TransactionStock == null ? string.Empty : x.TransactionStock.Batch
                         }
-
                     });
 
                 if (!request.IsGetAll)
@@ -578,7 +574,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Select(x => new StockOutLines
                     {
                         Id = x.Id,
-                        
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<StockOutLinesDto>();
@@ -590,9 +585,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
             }
         }
 
-
-
-        #endregion GET Education Program
+        #endregion GET Concoction
 
         #region CREATE
 
@@ -703,7 +696,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
 
+        #endregion Stock Out ConcoctionLine
     }
 }

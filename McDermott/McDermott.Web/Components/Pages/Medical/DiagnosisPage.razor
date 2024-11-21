@@ -51,9 +51,9 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                         <DxGridDataColumn FieldName="Code" />
-                                        <DxGridDataColumn FieldName="DiseaseCategory.Name" Caption="Disease Category" />
+                                        <DxGridDataColumn FieldName="Name" Caption="Name (en)" />
+                                        <DxGridDataColumn FieldName="NameInd" Caption="Name (id)" />
                                         <DxGridDataColumn FieldName="CronisCategory.Name" Caption="Chronic Category" />
                                     </Columns>
 
@@ -62,43 +62,18 @@
                                             var a = (DiagnosisDto)EditFormContext.EditModel;
                                         }
                                         <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                <MyTextBox @bind-Text="@a.Name" NullText="Name" />
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name (en)" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.Name" NullText="Name (en)" />
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Code" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name (id)" ColSpanMd="12">
+                                                <MyTextBox @bind-Text="@a.NameInd" NullText="Name (id)" />
+                                                <ValidationMessage For="@(()=> a.NameInd)"   />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Code" ColSpanMd="12">
                                                 <MyTextBox @bind-Text="@a.Code" NullText="Code" />
                                                 <ValidationMessage For="@(()=> a.Code)"   />
                                             </DxFormLayoutItem>
-                                             
-
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="DiseaseCategory" ColSpanMd="12">
-                                                <MyDxComboBox Data="@Diseases"
-                                                              NullText="Select Disease Category"
-                                                              @ref="refDiseaseCategoryComboBox"
-                                                              @bind-Value="@a.DiseaseCategoryId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputDiseaseCategoryChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchDiseaseCategoryndexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchDiseaseCategory"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchDiseaseCategoryIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
-                                                    <Columns>
-                                                        <DxListEditorColumn FieldName="@nameof(DiseaseCategoryDto.Name)" Caption="Name" />
-                                                        <DxListEditorColumn FieldName="ParentDiseaseCategory.Name" Caption="Parent Category" /> 
-                                                    </Columns>
-                                                </MyDxComboBox>
-                                                <ValidationMessage For="@(()=>a.DiseaseCategoryId)" />
-                                            </DxFormLayoutItem>
-                                             
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Chronic Category" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Cronises"
                                                               NullText="Select Chronic"
@@ -119,7 +94,7 @@
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
                                                     <Columns>
-                                                        <DxListEditorColumn FieldName="@nameof(CronisCategoryDto.Name)" Caption="Name" /> 
+                                                        <DxListEditorColumn FieldName="@nameof(CronisCategoryDto.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="@nameof(CronisCategoryDto.Description)" Caption="Description" />
                                                     </Columns>
                                                 </MyDxComboBox>

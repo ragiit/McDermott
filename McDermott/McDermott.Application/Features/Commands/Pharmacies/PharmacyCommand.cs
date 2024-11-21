@@ -1,11 +1,9 @@
-﻿
-using McDermott.Application.Dtos.Pharmacies;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class PharmacyCommand
     {
         #region Pharmacy
+
         #region GET Pharmacy
 
         public class GetAllPharmacyQuery(Expression<Func<Pharmacy, bool>>? predicate = null, bool removeCache = false) : IRequest<List<PharmacyDto>>
@@ -13,6 +11,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<Pharmacy, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSinglePharmacyQuery : IRequest<PharmacyDto>
         {
             public List<Expression<Func<Pharmacy, object>>> Includes { get; set; }
@@ -52,7 +51,8 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<Pharmacy, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
+
+        #endregion GET Pharmacy
 
         #region CREATE
 
@@ -91,10 +91,13 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Pharmacy
 
         #region PharmacyLog
+
         #region Get
+
         #region GET Pharmacy
 
         public class GetAllPharmacyLogQuery(Expression<Func<PharmacyLog, bool>>? predicate = null, bool removeCache = false) : IRequest<List<PharmacyLogDto>>
@@ -102,6 +105,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<PharmacyLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSinglePharmacyLogQuery : IRequest<PharmacyLogDto>
         {
             public List<Expression<Func<PharmacyLog, object>>> Includes { get; set; }
@@ -141,11 +145,13 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<PharmacyLog, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
 
-        #endregion
+        #endregion GET Pharmacy
+
+        #endregion Get
 
         #region Create
+
         public class CreatePharmacyLogRequest(PharmacyLogDto PharmacyLogDto) : IRequest<PharmacyLogDto>
         {
             public PharmacyLogDto PharmacyLogDto { get; set; } = PharmacyLogDto;
@@ -156,9 +162,10 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public List<PharmacyLogDto> PharmacyLogDtos { get; set; } = PharmacyLogDtos;
         }
 
-        #endregion
+        #endregion Create
 
         #region Update
+
         public class UpdatePharmacyLogRequest(PharmacyLogDto PharmacyLogDto) : IRequest<PharmacyLogDto>
         {
             public PharmacyLogDto PharmacyLogDto { get; set; } = PharmacyLogDto;
@@ -168,16 +175,19 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public List<PharmacyLogDto> PharmacyLogDtos { get; set; } = PharmacyLogDtos;
         }
-        #endregion
+
+        #endregion Update
 
         #region Delete
+
         public class DeletePharmacyLogRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
 
-        #endregion
+        #endregion Delete
+
+        #endregion PharmacyLog
     }
 }

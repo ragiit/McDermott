@@ -66,32 +66,22 @@
                                                 <ValidationMessage For="@(()=> a.Name)"   />
                                             </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Parent Menu" ColSpanMd="12">
-                                                <MyDxComboBox Data="@ParentMenuDto"
-                                                              NullText="Select Parent Menu..."
-                                                              @ref="refParentMenuComboBox"
-                                                              @bind-Value="@a.ParentId"
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Parent Menu" ColSpanMd="12">
+                                                <MyDxComboBox Data="ParentMenus"
+                                                              NullText="Select Parent Menu"
                                                               TextFieldName="Name"
                                                               ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputParentMenuChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchParentMenundexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchParentMenu"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchParentMenuIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
+                                                              @oninput="OnInputMenu"
+                                                              SelectedItemChanged="((MenuDto e) => SelectedItemChanged(e))"
+                                                              @bind-Value="a.ParentId">
                                                     <Columns>
-                                                        <DxListEditorColumn FieldName="@nameof(MenuDto.Name)" Caption="Name" /> 
-                                                        <DxListEditorColumn FieldName="@nameof(MenuDto.Sequence)" Caption="Sequence" /> 
+                                                        <DxListEditorColumn FieldName="@nameof(MenuDto.Name)" Caption="Name" />
+                                                        <DxListEditorColumn FieldName="@nameof(MenuDto.Sequence)" Caption="Sequence" />
                                                     </Columns>
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=>a.ParentId)" />
                                             </DxFormLayoutItem>
+
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Sequence" ColSpanMd="12">
                                                 <DxSpinEdit ShowValidationIcon="true" MinValue="0" @bind-Value="@a.Sequence" NullText="Sequence" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
@@ -99,7 +89,8 @@
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Url" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Helper.URLS"
-                                                              NullText="Select URL..."
+                                                              NullText="Select URL"
+                                                              FilteringMode="DataGridFilteringMode.Contains"
                                                               @bind-Value="@a.Url">
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=> a.Url)"   />

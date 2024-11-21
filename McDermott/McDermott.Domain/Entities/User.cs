@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public partial class User : BaseAuditableEntity
     {

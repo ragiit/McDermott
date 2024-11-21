@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class MaintenanceRecordCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetAllMaintenanceRecordQuery(Expression<Func<MaintenanceRecord, bool>>? predicate = null, bool removeCache = false) : IRequest<List<MaintenanceRecordDto>>
         {
             public Expression<Func<MaintenanceRecord, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleMaintenanceRecordQuery : IRequest<MaintenanceRecordDto>
         {
             public List<Expression<Func<MaintenanceRecord, object>>> Includes { get; set; }

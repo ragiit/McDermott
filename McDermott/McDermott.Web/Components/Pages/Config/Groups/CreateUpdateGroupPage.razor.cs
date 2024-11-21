@@ -1,9 +1,7 @@
-﻿using DevExpress.Data.Access;
-using DocumentFormat.OpenXml.Spreadsheet;
-using GreenDonut;
-using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 using Group = McDermott.Domain.Entities.Group;
 
 namespace McDermott.Web.Components.Pages.Config.Groups
@@ -114,67 +112,70 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             PanelVisible = true;
             await GetUserInfo();
-            await LoadComboBox();
             await LoadData();
             PanelVisible = false;
-            return;
-            await GetUserInfo();
-            await LoadData();
-            await LoadComboBox();
         }
 
-        #region ComboboxMenu
 
-        private DxComboBox<MenuDto, long?> refMenuComboBox { get; set; }
-        private int MenuComboBoxIndex { get; set; } = 0;
-        private int totalCountMenu = 0;
+        #region ComboBox Menu
 
-        private async Task OnSearchMenu()
+        private MenuDto SelectedMenu { get; set; } = new();
+        async Task SelectedItemChanged(MenuDto e)
         {
-            await LoadComboBox(0, 10);
-        }
-
-        private async Task OnSearchMenuIndexIncrement()
-        {
-            if (MenuComboBoxIndex < (totalCountMenu - 1))
+            if (e is null)
             {
-                MenuComboBoxIndex++;
-                await LoadComboBox(MenuComboBoxIndex, 10);
+                SelectedMenu = new();
+                await LoadMenu();
+            }
+            else
+                SelectedMenu = e;
+        }
+
+        private CancellationTokenSource? _cts;
+        private async Task OnInputMenu(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadMenu(e.Value?.ToString() ?? "", x => x.ParentId != null || x.Name.Equals("All"));
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 
-        private async Task OnSearchMenundexDecrement()
+        private async Task LoadMenu(string? e = "", Expression<Func<Menu, bool>>? predicate = null)
         {
-            if (MenuComboBoxIndex > 0)
+            try
             {
-                MenuComboBoxIndex--;
-                await LoadComboBox(MenuComboBoxIndex, 10);
+                PanelVisible = true;
+
+                predicate ??= x => x.ParentId == null || x.Name.Equals("All");
+
+                Menus = await Mediator.QueryGetComboBox<Menu, MenuDto>(e, predicate);
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnInputMenuChanged(string e)
-        {
-            MenuComboBoxIndex = 0;
-            await LoadComboBox(0, 10);
-        }
-
-        private async Task LoadComboBox(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMenuQuery
+            catch (Exception ex)
             {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refMenuComboBox?.Text ?? ""
-            });
-            Menus = result.Item1;
-            Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.PageCount;
-            PanelVisible = false;
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxMenu
+        #endregion
+
 
         private async Task Refresh_Click()
         {
@@ -230,24 +231,17 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             GroupMenu = new();
             IsAddMenu = true;
+            await LoadMenu();
             await GridGropMenu.StartEditNewRowAsync();
         }
 
         private async Task EditItemGroup_Click(IGrid context)
         {
-            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenuGroupMenu);
-
-            var a = (GridGropMenu.GetDataItem(FocusedRowVisibleIndexGroupMenuGroupMenu) as GroupMenuDto ?? new());
-
             PanelVisible = true;
+            await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenuGroupMenu);
+            var a = (GridGropMenu.GetDataItem(FocusedRowVisibleIndexGroupMenuGroupMenu) as GroupMenuDto ?? new());
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMenuQuery
-            {
-                Predicate = x => x.Id == a.MenuId
-            });
-            Menus = result.Item1;
-            Menus = Menus.Where(x => x.ParentId != null || x.Name.Equals("All")).ToList();
-            totalCountMenu = result.PageCount;
+            await LoadMenu(predicate: x => x.Id == a.MenuId);
             PanelVisible = false;
 
             return;

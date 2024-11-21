@@ -1,11 +1,9 @@
-﻿
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
-    public class TransactionStockQueryhandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) : 
+    public class TransactionStockQueryhandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetTransactionStockQuery, List<TransactionStockDto>>,
         IRequestHandler<GetTransactionStockQueryNew, (List<TransactionStockDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetSingleTransactionStockQueryNew, TransactionStockDto>,
@@ -90,7 +88,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-
         public async Task<TransactionStockDto> Handle(GetSingleTransactionStockQueryNew request, CancellationToken cancellationToken)
         {
             try
@@ -149,7 +146,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-
         public async Task<List<TransactionStockDto>> Handle(GetTransactionStockQuery request, CancellationToken cancellationToken)
         {
             try
@@ -161,7 +157,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 if (!_cache.TryGetValue(cacheKey, out List<TransactionStock>? result))
                 {
-                    result = await _unitOfWork.Repository<TransactionStock>().Entities                      
+                    result = await _unitOfWork.Repository<TransactionStock>().Entities
                       .Include(x => x.Product)
                       .Include(x => x.Location)
                       .Include(x => x.Uom)
@@ -293,7 +289,5 @@ namespace McDermott.Application.Features.Queries.Inventory
         }
 
         #endregion DELETE
-
-
     }
 }

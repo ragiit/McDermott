@@ -1,7 +1,9 @@
-﻿ using DocumentFormat.OpenXml.Spreadsheet; 
-using Microsoft.AspNetCore.Components.Web; 
-using System.Linq.Expressions; 
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand; 
+﻿using DevExpress.Pdf.Native.BouncyCastle.Utilities;
+using DevExpress.XtraRichEdit.Model;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Components.Web;
+using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
 {
@@ -46,7 +48,53 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
         private InventoryAdjustmentLogDto postInventoryAdjusmentLog { get; set; } = new();
         private List<ProductDto> AllProducts { get; set; } = [];
         private List<ProductDto> Products { get; set; } = [];
+
+        #region ComboBox Uom
+
         private List<UomDto> Uoms { get; set; } = [];
+
+        private CancellationTokenSource? _ctsUom;
+
+        private async Task OnInputUom(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _ctsUom?.Cancel();
+                _ctsUom?.Dispose();
+                _ctsUom = new CancellationTokenSource();
+
+                await Task.Delay(700, _ctsUom.Token);
+
+                await LoadUom(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _ctsUom?.Dispose();
+                _ctsUom = null;
+            }
+        }
+
+        private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                Uoms = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Uom
 
         private bool IsStatus(EnumStatusInventoryAdjustment status) => InventoryAdjusment.Status == status;
 
@@ -131,7 +179,23 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
 
         private async Task CancelItem_Click()
         {
-            await LoadData();
+            try
+            {
+                PanelVisible = true;
+                InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Cancel;
+                StagingText = EnumStatusInventoryAdjustment.Cancel;
+                await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                await RefreshInventoryAdjsument();
+                PanelVisible = false;
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+            }
+            finally
+            {
+                IsLoadingConfirm = false;
+            }
         }
 
         private async Task OnCancelStatus()
@@ -176,71 +240,55 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             PanelVisible = false;
         }
 
-        #region ComboboxLocations
+        #region ComboBox Location
 
-        private DxComboBox<LocationDto, long?> refLocationsComboBox { get; set; }
+        private LocationDto SelectedLocation { get; set; } = new();
+
+        private async Task SelectedItemChanged(LocationDto e)
+        {
+            if (e is null)
+            {
+                SelectedLocation = new();
+                await LoadLocation();
+            }
+            else
+                SelectedLocation = e;
+        }
+
+        private CancellationTokenSource? _cts;
+
+        private async Task OnInputLocation(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadLocation(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
         private List<LocationDto> Locations { get; set; } = [];
-        private int LocationsComboBoxIndex { get; set; } = 0;
-        private int totalCountLocations = 0;
 
-        private async Task OnSearchLocations()
-        {
-            await LoadDataLocations();
-        }
-
-        private async Task OnSearchLocationsIndexIncrement()
-        {
-            if (LocationsComboBoxIndex < (totalCountLocations - 1))
-            {
-                LocationsComboBoxIndex++;
-                await LoadDataLocations(LocationsComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchLocationsIndexDecrement()
-        {
-            if (LocationsComboBoxIndex > 0)
-            {
-                LocationsComboBoxIndex--;
-                await LoadDataLocations(LocationsComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputLocationsChanged(string e)
-        {
-            LocationsComboBoxIndex = 0;
-            await LoadDataLocations();
-        }
-
-        private async Task LoadDataLocations(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadLocation(string? e = "", Expression<Func<Locations, bool>>? predicate = null)
         {
             try
             {
                 PanelVisible = true;
-
-                var a = refLocationsComboBox?.Text?.Split("/");
-
-                var search = string.Empty;
-                if (a is not null)
-                    search = a.Length == 1 ? a[0] : a[1];
-
-                var result = await Mediator.Send(new GetLocationQuery
-                {
-                    SearchTerm = search ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Select = x => new Locations
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        ParentLocation = new Locations
-                        {
-                            Name = x.ParentLocation == null ? "" : x.ParentLocation.Name
-                        }
-                    }
-                });
-                Locations = result.Item1;
-                totalCountLocations = result.PageCount;
+                Locations = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -250,62 +298,56 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxLocations
+        #endregion ComboBox Location
 
-        #region ComboboxCompany
+        #region ComboBox Company
 
-        private DxComboBox<CompanyDto, long?> refCompanyComboBox { get; set; }
         private List<CompanyDto> Companies { get; set; } = [];
-        private int CompanyComboBoxIndex { get; set; } = 0;
-        private int totalCountCompany = 0;
+        private CompanyDto SelectedCompany { get; set; } = new();
 
-        private async Task OnSearchCompany()
+        private async Task SelectedItemChanged(CompanyDto e)
         {
-            await LoadDataCompany();
-        }
-
-        private async Task OnSearchCompanyIndexIncrement()
-        {
-            if (CompanyComboBoxIndex < (totalCountCompany - 1))
+            if (e is null)
             {
-                CompanyComboBoxIndex++;
-                await LoadDataCompany(CompanyComboBoxIndex, 10);
+                SelectedCompany = new();
+                await LoadCompany();
             }
+            else
+                SelectedCompany = e;
         }
 
-        private async Task OnSearchCompanyIndexDecrement()
-        {
-            if (CompanyComboBoxIndex > 0)
-            {
-                CompanyComboBoxIndex--;
-                await LoadDataCompany(CompanyComboBoxIndex, 10);
-            }
-        }
+        private CancellationTokenSource? _ctsCompany;
 
-        private async Task OnInputCompanyChanged(string e)
-        {
-            CompanyComboBoxIndex = 0;
-            await LoadDataCompany();
-        }
-
-        private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10)
+        private async Task OnInputCompany(ChangeEventArgs e)
         {
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetCompanyQuery
-                {
-                    SearchTerm = refCompanyComboBox?.Text ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Select = x => new Company
-                    {
-                        Id = x.Id,
-                        Name = x.Name
-                    }
-                });
-                Companies = result.Item1;
-                totalCountCompany = result.PageCount;
+
+                _ctsCompany?.Cancel();
+                _ctsCompany?.Dispose();
+                _ctsCompany = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsCompany.Token);
+
+                await LoadCompany(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _ctsCompany?.Dispose();
+                _ctsCompany = null;
+            }
+        }
+
+        private async Task LoadCompany(string? e = "", Expression<Func<Company, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                Companies = await Mediator.QueryGetComboBox<Company, CompanyDto>(e, predicate);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -315,7 +357,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxCompany
+        #endregion ComboBox Company
 
         private async Task LoadData()
         {
@@ -337,30 +379,9 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
 
                     InventoryAdjusment = result ?? new();
 
-                    Companies = (await Mediator.Send(new GetCompanyQuery
-                    {
-                        Predicate = x => x.Id == InventoryAdjusment.CompanyId,
-                        Select = x => new Company
-                        {
-                            Id = x.Id,
-                            Name = x.Name
-                        }
-                    })).Item1;
-
-                    Locations = (await Mediator.Send(new GetLocationQuery
-                    {
-                        Predicate = x => x.Id == InventoryAdjusment.LocationId,
-                        Select = x => new Locations
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            ParentLocation = new Locations
-                            {
-                                Name = x.ParentLocation == null ? "" : x.ParentLocation.Name
-                            }
-                        }
-                    })).Item1;
-
+                    await LoadUom();
+                    await LoadCompany(predicate: x => x.Id == InventoryAdjusment.CompanyId);
+                    await LoadLocation(predicate: x => x.Id == InventoryAdjusment.LocationId);
 
                     StateHasChanged();
 
@@ -392,9 +413,9 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                 }
                 else
                 {
-                    await LoadDataCompany();
+                    await LoadLocation();
                     await LoadProduct();
-                    await LoadDataCompany();
+                    await LoadCompany();
 
                     if (Companies.Count == 1)
                         InventoryAdjusment.CompanyId = Companies.FirstOrDefault()?.Id;
@@ -409,7 +430,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                 PanelVisible = false;
             }
         }
-
 
         private bool IsLoadingConfirm { get; set; } = false;
         private bool YesConfirm { get; set; } = false;
@@ -449,28 +469,62 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
 
                 if ((!ShowConfirmation && YesConfirm) || IsStatus(EnumStatusInventoryAdjustment.Draft))
                 {
-                    switch (StagingText)
+                    switch (InventoryAdjusment.Status)
                     {
-                        case EnumStatusInventoryAdjustment.InProgress:
+                        case EnumStatusInventoryAdjustment.Draft:
                             InventoryAdjusment.Status = EnumStatusInventoryAdjustment.InProgress;
                             StagingText = EnumStatusInventoryAdjustment.Invalidate;
 
-                            //await SelectLocation(new LocationDto { Id = InventoryAdjusment.LocationId.GetValueOrDefault(), });
-
-                            var a = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
-
-                            if (a is not null)
+                            if (InventoryAdjusment is not null)
                             {
-                                postInventoryAdjusmentLog.InventoryAdjusmentId = a.Id;
+                                postInventoryAdjusmentLog.InventoryAdjusmentId = InventoryAdjusment.Id;
                                 postInventoryAdjusmentLog.UserById = UserLogin.Id;
-                                postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
+                                postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.Draft;
+
                                 await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
                             }
 
+                            await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+
                             var temps = new List<InventoryAdjusmentDetailDto>();
-                            foreach (var o in Products)
+
+                            var p = (await Mediator.Send(new GetTransactionStockQueryNew
                             {
-                                var sp = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == o.Id && s.LocationId == InventoryAdjusment.LocationId && s.Validate == true));
+                                Predicate = x => x.LocationId == InventoryAdjusment.LocationId && x.Validate == true,
+                                Select = x => new TransactionStock
+                                {
+                                    ProductId = x.ProductId,
+                                },
+                                IsGetAll = true,
+                            })).Item1;
+
+                            var ps = (await Mediator.Send(new GetProductQueryNew
+                            {
+                                Predicate = x => p.Select(s => s.ProductId).Contains(x.Id),
+                                Select = x => new Product
+                                {
+                                    UomId = x.UomId,
+                                    TraceAbility = x.TraceAbility,
+                                    Id = x.Id
+                                },
+                                IsGetAll = true
+                            })).Item1;
+
+                            foreach (var o in ps)
+                            {
+                                var sp = (await Mediator.Send(new GetTransactionStockQueryNew
+                                {
+                                    Predicate = s => s.ProductId == o.Id && s.LocationId == InventoryAdjusment.LocationId && s.Validate == true,
+                                    Select = x => new TransactionStock
+                                    {
+                                        ProductId = x.ProductId,
+                                        Batch = x.Batch,
+                                        ExpiredDate = x.ExpiredDate,
+                                        Quantity = x.Quantity,
+                                        UomId = x.UomId
+                                    },
+                                    IsGetAll = true
+                                })).Item1;
 
                                 if (o.TraceAbility)
                                 {
@@ -519,116 +573,58 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                                     Reference = InventoryAdjusment.Reference,
                                     Batch = item.Batch,
                                     ExpiredDate = item.ExpiredDate,
+
                                     Quantity = item.Difference,
                                     LocationId = InventoryAdjusment.LocationId,
-                                    UomId = Products.FirstOrDefault(x => item.ProductId == x.Id)?.UomId,
+                                    UomId = ps.FirstOrDefault(x => item.ProductId == x.Id)?.UomId,
                                     Validate = false
                                 });
                             }
 
-                            await Mediator.Send(new CreateListTransactionStockRequest(list));
-                            //await LoadInventoryAdjustmentDetails();
-                            //if (inventoryAdjusmentDetail.Difference != 0)
-                            //{
-                            //    // Map InventoryAdjusmentDetail to TransactionStockDto using Mapster
-                            //    var transactionStockDto = inventoryAdjusmentDetail.Adapt<TransactionStockDto>();
-                            //    transactionStockDto.LocationId = InventoryAdjusment.LocationId;
-                            //    transactionStockDto.Validate = false;
-                            //    transactionStockDto.Quantity = inventoryAdjusmentDetail.Difference;
-                            //    transactionStockDto.SourcTableId = inventoryAdjusmentDetail.InventoryAdjusmentId;
-                            //    transactionStockDto.SourceTable = nameof(InventoryAdjusment);
+                            list = await Mediator.Send(new CreateListTransactionStockRequest(list));
 
-                            //    await Mediator.Send(new CreateTransactionStockRequest(transactionStockDto));
-                            //}
+                            foreach (var item in temps)
+                            {
+                                item.TransactionStockId = list.FirstOrDefault(x => x.SourceTable == nameof(InventoryAdjusment) && x.SourcTableId == item.Id)?.Id ?? null;
+                            }
+
+                            await Mediator.Send(new UpdateListInventoryAdjusmentDetailRequest(temps));
+
+                            Id = InventoryAdjusment.Id;
+
+                            NavigationManager.NavigateTo($"inventory/inventory-adjusments/{EnumPageMode.Update.GetDisplayName()}?Id={InventoryAdjusment.Id}", true);
 
                             break;
 
-                            //case "In-Progress":
-                            //    InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
-                            //    StagingText = EnumStatusInventoryAdjustment.Invalidate.GetDisplayName();
+                        case EnumStatusInventoryAdjustment.InProgress:
+                            InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
+                            StagingText = EnumStatusInventoryAdjustment.Invalidate;
 
-                            //    var i = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
+                            var i = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
 
-                            //    if (i is not null)
-                            //    {
-                            //        postInventoryAdjusmentLog.InventoryAdjusmentId = i.Id;
-                            //        postInventoryAdjusmentLog.UserById = UserLogin.Id;
-                            //        postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
-                            //        await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
-                            //    }
+                            if (i is not null)
+                            {
+                                postInventoryAdjusmentLog.InventoryAdjusmentId = i.Id;
+                                postInventoryAdjusmentLog.UserById = UserLogin.Id;
+                                postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
+                                await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
+                            }
 
-                            //    if (StagingText == EnumStatusInventoryAdjustment.Invalidate.GetDisplayName())
-                            //    {
-                            //        var update = await Mediator.Send(new GetTransactionStockQuery(x => x.Reference == InventoryAdjusment.Reference));
-                            //        foreach (var item in update)
-                            //        {
-                            //            item.Validate = true;
-                            //        }
+                            if (StagingText == EnumStatusInventoryAdjustment.Invalidate)
+                            {
+                                var update = await Mediator.Send(new GetTransactionStockQuery(x => x.Reference == InventoryAdjusment.Reference));
+                                foreach (var item in update)
+                                {
+                                    item.Validate = true;
+                                }
 
-                            //        await Mediator.Send(new UpdateListTransactionStockRequest(update));
-
-                            //        return;
-                            //        var stockProductsToUpdate = new List<TransactionStockDto>();
-                            //        var adjustmentDetailsToUpdate = new List<InventoryAdjusmentDetailDto>();
-
-                            //        foreach (var detail in InventoryAdjusmentDetails)
-                            //        {
-                            //            var stockProduct = (await Mediator.Send(new GetTransactionStockQuery(s => s.Id == detail.TransactionStockId))).FirstOrDefault();
-
-                            //            if (stockProduct != null)
-                            //            {
-                            //                //detail.TeoriticalQty = detail.RealQty;
-                            //                //stockProduct.Qty = detail.RealQty;
-                            //                //stockProductsToUpdate.Add(stockProduct);
-                            //            }
-
-                            //            adjustmentDetailsToUpdate.Add(detail);
-                            //        }
-
-                            //        //foreach (var stockProduct in stockProductsToUpdate)
-                            //        //{
-                            //        //    await Mediator.Send(new UpdateStockProductRequest(stockProduct));
-                            //        //}
-
-                            //        //foreach (var detail in adjustmentDetailsToUpdate)
-                            //        //{
-                            //        //    await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(detail));
-                            //        //}
-
-                            //        //await Mediator.Send(new UpdateListStockProductRequest(stockProductsToUpdate));
-                            //        //await Mediator.Send(new UpdateListTransactionStockRequest());
-                            //        //await Mediator.Send(new UpdateListInventoryAdjusmentDetailRequest(adjustmentDetailsToUpdate));
-
-                            //        //await LoadInventoryAdjustmentDetails();
-                            //    }
-                            //    break;
-
-                            //case "Invalidate":
-                            //    InventoryAdjusment.Status = EnumStatusInventoryAdjustment.Invalidate;
-                            //    var x = await Mediator.Send(new UpdateInventoryAdjusmentRequest(InventoryAdjusment));
-                            //    if (x is not null)
-                            //    {
-                            //        postInventoryAdjusmentLog.InventoryAdjusmentId = x.Id;
-                            //        postInventoryAdjusmentLog.UserById = UserLogin.Id;
-                            //        postInventoryAdjusmentLog.Status = EnumStatusInventoryAdjustment.InProgress;
-                            //        await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
-                            //    }
-
-                            //    if (StagingText == EnumStatusInventoryAdjustment.Invalidate.GetDisplayName())
-                            //    {
-                            //        var update = await Mediator.Send(new GetTransactionStockQuery(x => x.Reference == InventoryAdjusment.Reference));
-                            //        foreach (var item in update)
-                            //        {
-                            //            item.Validate = true;
-                            //        }
-
-                            //        await Mediator.Send(new UpdateListTransactionStockRequest(update));
-                            //    }
-                            //    break;
-
-                            //default:
-                            //    return;
+                                await Mediator.Send(new UpdateListTransactionStockRequest(update));
+                            }
+                            break;
                     }
+
+                    await RefreshInventoryAdjsument();
+                    await LoadDataInventoryAdjusmentDetail();
                 }
             }
             catch (Exception ex)
@@ -642,12 +638,12 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             }
         }
 
-
-        #region Inventory Adjusment Detail 
+        #region Inventory Adjusment Detail
 
         public IGrid GridDetail { get; set; }
         private IReadOnlyList<object> SelectedDetailDataItems { get; set; } = [];
         private List<InventoryAdjusmentDetailDto> InventoryAdjusmentDetails { get; set; } = [];
+
         private void GridDetail_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -660,12 +656,21 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                 PanelVisible = true;
                 if (SelectedDetailDataItems == null || !SelectedDetailDataItems.Any())
                 {
+                    var id = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDetailDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
+                    await Mediator.Send(new DeleteTransactionStockRequest(id.Id));
                     await Mediator.Send(new DeleteInventoryAdjusmentDetailRequest(((InventoryAdjusmentDetailDto)e.DataItem).Id));
                 }
                 else
                 {
-                    var countriesToDelete = SelectedDetailDataItems.Adapt<List<InventoryAdjusmentDetailDto>>();
-                    await Mediator.Send(new DeleteInventoryAdjusmentDetailRequest(ids: countriesToDelete.Select(x => x.Id).ToList()));
+                    var a = SelectedDetailDataItems.Adapt<List<InventoryAdjusmentDetailDto>>();
+
+                    foreach (var id in a)
+                    {
+                        var idd = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourcTableId == ((InventoryAdjusmentDetailDto)e.DataItem).Id && x.SourceTable == nameof(InventoryAdjusment)))).FirstOrDefault() ?? new();
+                        await Mediator.Send(new DeleteTransactionStockRequest(idd.Id));
+                    }
+
+                    await Mediator.Send(new DeleteInventoryAdjusmentDetailRequest(ids: a.Select(x => x.Id).ToList()));
                 }
 
                 SelectedDetailDataItems = [];
@@ -679,6 +684,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
         }
 
         private InventoryAdjusmentDetailDto FormInventoryAdjusmentDetail { get; set; } = new();
+
         private async Task OnSaveInventoryAdjumentDetail(GridEditModelSavingEventArgs e)
         {
             try
@@ -699,15 +705,47 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                     return;
                 }
 
-
                 var editModel = (InventoryAdjusmentDetailDto)e.EditModel;
+
+                var check = await Mediator.Send(new ValidateInventoryAdjusmentDetail(x => x.InventoryAdjusmentId == InventoryAdjusment.Id && x.Id != editModel.Id && x.ProductId == editModel.ProductId && x.Batch == editModel.Batch));
+                if (check)
+                {
+                    ToastService.ShowInfo($"The Product with name '{editModel.Product.Name}' and Batch '{editModel.Batch}' is already exist");
+                    e.Cancel = true;
+                    return;
+                }
 
                 editModel.InventoryAdjusmentId = InventoryAdjusment.Id;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateInventoryAdjusmentDetailRequest(editModel));
+                {
+                    var ez = await Mediator.Send(new CreateInventoryAdjusmentDetailRequest(editModel));
+                    var temp = await Mediator.Send(new CreateTransactionStockRequest(new TransactionStockDto
+                    {
+                        Reference = InventoryAdjusment.Reference,
+                        Batch = editModel.Batch,
+                        ExpiredDate = editModel.ExpiredDate,
+                        LocationId = InventoryAdjusment.LocationId,
+                        Quantity = editModel.Difference,
+                        UomId = editModel.UomId,
+                        Validate = false,
+                        SourceTable = nameof(InventoryAdjusment),
+                        SourcTableId = ez.Id,
+                        ProductId = editModel.ProductId,
+                    }));
+
+                    ez.TransactionStockId = temp.Id;
+                    await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(ez));
+                }
                 else
+                {
+                    var updtStock = (await Mediator.Send(new GetTransactionStockQuery(x => x.SourceTable == nameof(InventoryAdjusment) && x.SourcTableId == editModel.Id))).FirstOrDefault() ?? new();
+                    updtStock.Quantity = editModel.Difference;
+                    updtStock.UomId = editModel.UomId;
+
+                    await Mediator.Send(new UpdateTransactionStockRequest(updtStock));
                     await Mediator.Send(new UpdateInventoryAdjusmentDetailRequest(editModel));
+                }
 
                 SelectedDetailDataItems = [];
                 await LoadDataInventoryAdjusmentDetail();
@@ -718,7 +756,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             }
             finally { PanelVisible = false; }
         }
-
 
         #region Searching
 
@@ -743,6 +780,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
         {
             await LoadDataInventoryAdjusmentDetail(newPageIndex, pageSize);
         }
+
         private async Task LoadDataInventoryAdjusmentDetail(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -764,6 +802,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             }
             finally { PanelVisible = false; }
         }
+
         #endregion Searching
 
         private async Task NewItem_Click()
@@ -786,9 +825,11 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                     Predicate = x => x.Id == a.Id
                 });
                 await LoadProduct(predicate: x => x.Id == FormInventoryAdjusmentDetail.ProductId);
+                var id = FormInventoryAdjusmentDetail.Product?.UomId;
+                FormInventoryAdjusmentDetail.UomId = id;
                 Uoms = (await Mediator.Send(new GetUomQuery
                 {
-                    Predicate = x => x.Id == a.UomId,
+                    Predicate = x => x.Id == id,
                     Select = x => new Uom
                     {
                         Id = x.Id,
@@ -796,6 +837,23 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                     },
                     IsGetAll = true
                 })).Item1;
+
+                var stocks = (await Mediator.Send(new GetTransactionStockQueryNew
+                {
+                    Predicate = s => s.ProductId == FormInventoryAdjusmentDetail.ProductId && s.LocationId == InventoryAdjusment.LocationId,
+                    Select = x => new TransactionStock
+                    {
+                        Quantity = x.Quantity,
+                        Batch = x.Batch,
+                        Id = x.Id,
+                        UomId = x.UomId,
+                        ExpiredDate = x.ExpiredDate
+                    },
+                    IsGetAll = true
+                })).Item1;
+
+                Batch = stocks?.Select(x => x.Batch)?.ToList() ?? [];
+                Batch = Batch.Distinct().ToList();
             }
             catch (Exception ex)
             {
@@ -809,8 +867,8 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             GridDetail.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-
         private List<string> Batch = [];
+
         private void ResetFormInventoryAdjustmentDetail()
         {
             FormInventoryAdjusmentDetail.ExpiredDate = null;
@@ -819,6 +877,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             FormInventoryAdjusmentDetail.UomId = null;
             FormInventoryAdjusmentDetail.TeoriticalQty = 0;
         }
+
         private async Task UpdateFormInventoryAdjustmentDetail2(TransactionStockDto stockProduct, long qty)
         {
             if (stockProduct != null)
@@ -843,10 +902,10 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             }
         }
 
-
-
         #region Products Combobox
+
         private CancellationTokenSource? _ctsProduct;
+
         private async Task OnInputProduct(ChangeEventArgs e)
         {
             try
@@ -886,8 +945,8 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             finally { PanelVisible = false; }
         }
 
+        #endregion Products Combobox
 
-        #endregion
         private async Task OnSelectProduct(ProductDto e)
         {
             try
@@ -903,7 +962,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
 
                 FormInventoryAdjusmentDetail.ProductId = e.Id;
 
-
                 var stocks = (await Mediator.Send(new GetTransactionStockQueryNew
                 {
                     Predicate = s => s.ProductId == e.Id && s.LocationId == InventoryAdjusment.LocationId,
@@ -917,6 +975,9 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
                     },
                     IsGetAll = true
                 })).Item1;
+
+                if (stocks is null || stocks.Count == 0)
+                    return;
 
                 if (e.TraceAbility)
                 {
@@ -984,6 +1045,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InventoryAdjusments
             }
         }
 
-        #endregion
+        #endregion Inventory Adjusment Detail
     }
 }

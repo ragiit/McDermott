@@ -106,8 +106,8 @@
         }
 
         public class UpdateGCReferenceAnc : IRequest<bool>
-        { 
-            public long Id {  get; set; }
+        {
+            public long Id { get; set; }
             public string ReferenceAnc { get; set; } = string.Empty;
         }
 

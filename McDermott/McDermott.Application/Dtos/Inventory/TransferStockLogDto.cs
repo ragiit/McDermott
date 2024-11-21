@@ -22,7 +22,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual LocationDto? Destination { get; set; }
-        
+
         [SetToNull]
         public virtual UserDto? UserBy { get; set; }
     }

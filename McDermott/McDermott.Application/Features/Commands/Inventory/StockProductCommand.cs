@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class StockProductCommand
     {

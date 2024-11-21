@@ -9,6 +9,7 @@ namespace McDermott.Domain.Entities
 
         [NotMapped]
         private string? _type;
+
         public string? Type
         {
             get { return _type; }

@@ -56,9 +56,9 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private List<ExportFileData> ExportTemp =
         [
-            new() { Column = "Name", Notes = "Mandatory" },
             new() { Column = "Code"},
-            new() { Column = "Disease Category"},
+            new() { Column = "Name (en)", Notes = "Mandatory" },
+            new() { Column = "Name (id)" }, 
             new() { Column = "Chronic Category"},
         ];
 
@@ -75,12 +75,13 @@ namespace McDermott.Web.Components.Pages.Medical
         public async Task ImportExcelFile(InputFileChangeEventArgs e)
         {
             PanelVisible = true;
+            long maxAllowedSize = 3 * 1024 * 1024; // 2MB
             foreach (var file in e.GetMultipleFiles(1))
             {
                 try
                 {
                     using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
+                    await file.OpenReadStream(maxAllowedSize).CopyToAsync(ms);
                     ms.Position = 0;
 
                     ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -96,30 +97,30 @@ namespace McDermott.Web.Components.Pages.Medical
 
                     var list = new List<DiagnosisDto>();
 
-                    var a = new HashSet<string>();
+                    //var a = new HashSet<string>();
                     var b = new HashSet<string>();
 
-                    var list1 = new List<DiseaseCategoryDto>();
+                    //var list1 = new List<DiseaseCategoryDto>();
                     var list2 = new List<CronisCategoryDto>();
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
-                        var aa = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        //var aa = ws.Cells[row, 3].Value?.ToString()?.Trim();
                         var bb = ws.Cells[row, 4].Value?.ToString()?.Trim();
 
-                        if (!string.IsNullOrEmpty(aa))
-                            a.Add(aa.ToLower());
+                        //if (!string.IsNullOrEmpty(aa))
+                        //    a.Add(aa.ToLower());
 
                         if (!string.IsNullOrEmpty(bb))
                             b.Add(bb.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDiseaseCategoryQuery(x => a.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new DiseaseCategory
-                        {
-                            Id = x.Id,
-                            Name = x.Name
-                        }))).Item1;
+                    //list1 = (await Mediator.Send(new GetDiseaseCategoryQuery(x => a.Contains(x.Name.ToLower()), 0, 0,
+                    //    select: x => new DiseaseCategory
+                    //    {
+                    //        Id = x.Id,
+                    //        Name = x.Name
+                    //    }))).Item1;
 
                     list2 = (await Mediator.Send(new GetCronisCategoryQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
                         select: x => new CronisCategory
@@ -132,23 +133,23 @@ namespace McDermott.Web.Components.Pages.Medical
                     {
                         bool isValid = true;
 
-                        var aaa = ws.Cells[row, 3].Value?.ToString()?.Trim();
+                        //var aaa = ws.Cells[row, 3].Value?.ToString()?.Trim();
                         var bbb = ws.Cells[row, 4].Value?.ToString()?.Trim();
 
-                        long? aId = null;
-                        if (!string.IsNullOrEmpty(aaa))
-                        {
-                            var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(aaa, StringComparison.CurrentCultureIgnoreCase));
-                            if (cachedParent is null)
-                            {
-                                isValid = false;
-                                ToastService.ShowErrorImport(row, 3, aaa ?? string.Empty);
-                            }
-                            else
-                            {
-                                aId = cachedParent.Id;
-                            }
-                        }
+                        //long? aId = null;
+                        //if (!string.IsNullOrEmpty(aaa))
+                        //{
+                        //    var cachedParent = list1.FirstOrDefault(x => x.Name.Equals(aaa, StringComparison.CurrentCultureIgnoreCase));
+                        //    if (cachedParent is null)
+                        //    {
+                        //        isValid = false;
+                        //        ToastService.ShowErrorImport(row, 3, aaa ?? string.Empty);
+                        //    }
+                        //    else
+                        //    {
+                        //        aId = cachedParent.Id;
+                        //    }
+                        //}
 
                         long? bId = null;
                         if (!string.IsNullOrEmpty(bbb))
@@ -170,9 +171,10 @@ namespace McDermott.Web.Components.Pages.Medical
 
                         var country = new DiagnosisDto
                         {
-                            Name = ws.Cells[row, 1].Value?.ToString()?.Trim() ?? "",
-                            Code = ws.Cells[row, 2].Value?.ToString()?.Trim(),
-                            DiseaseCategoryId = aId,
+                            Code = ws.Cells[row, 1].Value?.ToString()?.Trim(),
+                            Name = ws.Cells[row, 2].Value?.ToString()?.Trim() ?? "",
+                            NameInd = ws.Cells[row, 3].Value?.ToString()?.Trim() ?? "",
+                            //DiseaseCategoryId = aId,
                             CronisCategoryId = bId,
                         };
 
@@ -181,7 +183,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
                     if (list.Count > 0)
                     {
-                        list = list.DistinctBy(x => new { x.Name, x.Code, x.DiseaseCategoryId, x.CronisCategoryId }).ToList();
+                        list = list.DistinctBy(x => new { x.Name, x.NameInd, x.Code, x.CronisCategoryId }).ToList();
 
                         // Panggil BulkValidateVillageQuery untuk validasi bulk
                         var existingVillages = await Mediator.Send(new BulkValidateDiagnosisQuery(list));
@@ -190,8 +192,8 @@ namespace McDermott.Web.Components.Pages.Medical
                         list = list.Where(village =>
                             !existingVillages.Any(ev =>
                                 ev.Name == village.Name &&
-                                ev.Code == village.Code &&
-                                ev.DiseaseCategoryId == village.DiseaseCategoryId &&
+                                ev.NameInd == village.NameInd &&
+                                ev.Code == village.Code && 
                                 ev.CronisCategoryId == village.CronisCategoryId
                             )
                         ).ToList();
@@ -423,6 +425,24 @@ namespace McDermott.Web.Components.Pages.Medical
             try
             {
                 var editModel = (DiagnosisDto)e.EditModel;
+
+                var checkNameEn = await Mediator.Send(new ValidateDiagnosisQuery(x
+                    => x.Id != editModel.Id && x.Name == editModel.Name));
+                if (checkNameEn)
+                {
+                    ToastService.ShowInfo($"The diagnosis name (English) '{editModel.Name}' is already in use. Please enter a different name.");
+                    e.Cancel = true;
+                    return;
+                }
+
+                var checkNameIdn = await Mediator.Send(new ValidateDiagnosisQuery(x
+                    => x.Id != editModel.Id && x.NameInd == editModel.NameInd));
+                if (checkNameEn)
+                {
+                    ToastService.ShowInfo($"The diagnosis name (Indonesian) '{editModel.NameInd}' is already in use. Please enter a different name.");
+                    e.Cancel = true;
+                    return;
+                }
 
                 if (editModel.Id == 0)
                     await Mediator.Send(new CreateDiagnosisRequest(editModel));

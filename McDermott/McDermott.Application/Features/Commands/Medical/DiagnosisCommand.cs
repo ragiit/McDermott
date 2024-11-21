@@ -25,8 +25,6 @@
 
         #endregion GET
 
-
-
         #region CREATE
 
         public class CreateDiagnosisRequest(DiagnosisDto DiagnosisDto) : IRequest<DiagnosisDto>

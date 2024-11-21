@@ -1,15 +1,9 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class MedicamentCommand
     {
-        #region GET 
+        #region GET
+
         public class GetSingleMedicamentQuery : IRequest<MedicamentDto>
         {
             public List<Expression<Func<Medicament, object>>> Includes { get; set; }
@@ -18,6 +12,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<Medicament, object>> OrderBy { get; set; }
             public bool IsDescending { get; set; } = false; // default to ascending
         }
+
         public class GetMedicamentQuery : IRequest<(List<MedicamentDto>, int PageIndex, int PageSize, int PageCount)>
         {
             public List<Expression<Func<Medicament, object>>> Includes { get; set; }
@@ -40,7 +35,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<Medicament, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+        #endregion GET
 
         #region CREATE
 

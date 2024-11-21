@@ -1,6 +1,9 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DevExpress.XtraRichEdit.Model;
+using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
 using McDermott.Web.Components.Layout;
+using McDermott.Web.Extentions;
+using System.Linq.Expressions;
 using System.Security.Policy;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -48,21 +51,10 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             await GetUserInfo();
-            await LoadData();
-            await LoadDataParentMenu();
+            await LoadData(); 
             PanelVisible = false;
         }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            //if (firstRender)
-            //{
-            //    await GetUserInfo();
-            //    await LoadData();
-            //}
-            //await base.OnAfterRenderAsync(firstRender);
-        }
-
+          
         #endregion Lifecycle Methods
 
         #region User and Access Management
@@ -128,62 +120,7 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Data Loading and Searching
-
-        #region Parent Menu Combobox
-
-        private async Task OnSearchParentMenu()
-        {
-            await LoadDataParentMenu(0, 10);
-        }
-
-        private async Task OnSearchParentMenuIndexIncrement()
-        {
-            if (ParentMenuComboBoxIndex < (totalCountParentMenu - 1))
-            {
-                ParentMenuComboBoxIndex++;
-                await LoadDataParentMenu(ParentMenuComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchParentMenundexDecrement()
-        {
-            if (ParentMenuComboBoxIndex > 0)
-            {
-                ParentMenuComboBoxIndex--;
-                await LoadDataParentMenu(ParentMenuComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputParentMenuChanged(string e)
-        {
-            ParentMenuComboBoxIndex = 0;
-            await LoadDataParentMenu(0, 10);
-        }
-
-        private async Task LoadDataParentMenu(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMenuQuery
-            {
-                Predicate = x => x.ParentId == null,
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                Select = x => new Menu
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Sequence = x.Sequence
-                },
-                SearchTerm = refParentMenuComboBox?.Text ?? ""
-            });
-            ParentMenuDto = [.. result.Item1.OrderBy(x => x.Sequence)];
-            totalCountParentMenu = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion Parent Menu Combobox
-
+          
         #region CRUD Operations
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -250,6 +187,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            await LoadParentMenu();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -434,5 +372,66 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Import and Export
+
+        #region ComboBox Menu
+
+        private MenuDto SelectedMenu { get; set; } = new();
+        async Task SelectedItemChanged(MenuDto e)
+        {
+            if (e is null)
+            {
+                SelectedMenu = new();
+                await LoadParentMenu();
+            }
+            else
+                SelectedMenu = e;
+        }
+
+        private CancellationTokenSource? _cts;
+        private async Task OnInputMenu(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadParentMenu(e.Value?.ToString() ?? "", x => x.ParentId == null, [(x => x.Sequence, false)]);
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private List<MenuDto> ParentMenus { get; set; } = [];
+        private async Task LoadParentMenu(string? e = "", Expression<Func<Menu, bool>>? predicate = null, List<(Expression<Func<Menu, object>> OrderBy, bool IsDescending)>? orderBy = null)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                predicate ??= x => x.ParentId == null;
+                orderBy ??= [(x => x.Sequence, false)];
+
+                ParentMenus = await Mediator.QueryGetComboBox<Menu, MenuDto>(e, predicate, orderBy);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
     }
 }

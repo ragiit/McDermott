@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class DrugRouteCommand
     {

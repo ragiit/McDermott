@@ -445,12 +445,12 @@ public class SeedData
             long groupGroupId = 0;
             long groupMenuId = 0;
 
-            if (!await context.Menus.AnyAsync(x => x.Name == "Configuration"))
+            if (!await context.Menus.AnyAsync(x => x.Name == "System Configuration"))
             {
                 var config = await context.Menus.AddAsync(new Menu
                 {
-                    Name = "Configuration",
-                    Sequence = 10,
+                    Name = "System Configuration",
+                    Sequence = 14,
                     Icon = "fa-solid fa-gear",
                     IsDefaultData = true
                 });

@@ -1,10 +1,5 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.AwarenessEvent.ParticipanEduCommand;
 
 namespace McDermott.Application.Features.Queries.AwarenessEvent
@@ -34,8 +29,8 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 if (!_cache.TryGetValue(cacheKey, out List<ParticipanEdu>? result))
                 {
                     result = await _unitOfWork.Repository<ParticipanEdu>().Entities
-                        .Include(x=>x.Patient)
-                        .Include(x=>x.EducationProgram)
+                        .Include(x => x.Patient)
+                        .Include(x => x.EducationProgram)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 
@@ -133,7 +128,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         Id = x.Id,
                         PatientId = x.PatientId,
                         EducationProgramId = x.EducationProgramId,
-                        CreatedDate= x.CreatedDate,
+                        CreatedDate = x.CreatedDate,
                         Patient = new User
                         {
                             Name = x.Patient == null ? string.Empty : x.Patient.Name,
@@ -148,7 +143,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         {
                             EventName = x.EducationProgram == null ? string.Empty : x.EducationProgram.EventName
                         }
-                        
                     });
 
                 if (!request.IsGetAll)
@@ -240,7 +234,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                         {
                             EventName = x.EducationProgram == null ? string.Empty : x.EducationProgram.EventName
                         }
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ParticipanEduDto>();
@@ -251,8 +244,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -266,7 +257,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetParticipanEduQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetParticipanEduQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ParticipanEduDto>();
             }
@@ -305,7 +296,6 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 var result = await _unitOfWork.Repository<ParticipanEdu>().UpdateAsync(request.ParticipanEduDto.Adapt<ParticipanEdu>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
                 _cache.Remove("GetParticipanEduQuery_"); // Ganti dengan key yang sesuai
 
@@ -366,6 +356,5 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
         }
 
         #endregion DELETE Education Program
-
     }
 }

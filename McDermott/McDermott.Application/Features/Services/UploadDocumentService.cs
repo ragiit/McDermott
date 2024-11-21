@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Services
 {
-    public  class UploadDocumentService : IUploadDocumentService
+    public class UploadDocumentService : IUploadDocumentService
     {
         private readonly IWebHostEnvironment _environment;
 

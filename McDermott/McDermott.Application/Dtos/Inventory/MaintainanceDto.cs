@@ -13,7 +13,7 @@ namespace McDermott.Application.Dtos.Inventory
         public string? ResponsibleName { get; set; }
         public DateTime RequestDate { get; set; } = DateTime.Now;
         public DateTime ScheduleDate { get; set; } = DateTime.Now;
-        public long? ResponsibleById { get; set; }       
+        public long? ResponsibleById { get; set; }
         public string? EquipmentName { get; set; }
         public bool isCorrective { get; set; } = false;
         public bool isPreventive { get; set; } = false;
@@ -31,6 +31,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual UserDto? ResponsibleBy { get; set; }
+
         [SetToNull]
         public virtual LocationDto? Location { get; set; }
     }

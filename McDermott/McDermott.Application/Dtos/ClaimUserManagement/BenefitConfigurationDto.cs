@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.ClaimUserManagement
+﻿namespace McDermott.Application.Dtos.ClaimUserManagement
 {
-    public class BenefitConfigurationDto:IMapFrom<BenefitConfiguration>
+    public class BenefitConfigurationDto : IMapFrom<BenefitConfiguration>
     {
         public long Id { get; set; }
+
         [Required(ErrorMessage = "Benefit Name is required")]
-        
         public string? BenefitName { get; set; }
 
         [Required(ErrorMessage = "Benefit Value is required.")]
         public string? TypeOfBenefit { get; set; } // Enum for 'Qty' or 'Amount'
-
 
         public int? BenefitValue { get; set; }
 

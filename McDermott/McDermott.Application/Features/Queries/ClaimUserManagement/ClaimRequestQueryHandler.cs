@@ -1,10 +1,5 @@
 ﻿using McDermott.Application.Dtos.ClaimUserManagement;
 using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimRequestCommand;
 
 namespace McDermott.Application.Features.Queries.ClaimUserManagement
@@ -241,7 +236,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         {
                             BenefitName = x.Benefit == null ? string.Empty : x.Benefit.BenefitName,
                         }
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ClaimRequestDto>();
@@ -252,8 +246,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -267,7 +259,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetClaimRequestQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetClaimRequestQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ClaimRequestDto>();
             }
@@ -306,7 +298,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                 var result = await _unitOfWork.Repository<ClaimRequest>().UpdateAsync(request.ClaimRequestDto.Adapt<ClaimRequest>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
                 _cache.Remove("GetClaimRequestQuery_"); // Ganti dengan key yang sesuai
 
@@ -367,7 +358,5 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
         }
 
         #endregion DELETE Education Program
-
     }
-
 }

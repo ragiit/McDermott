@@ -52,8 +52,7 @@
                                         <DxGridDataColumn FieldName="UomCategory.Name" Caption="Category" />
                                         <DxGridDataColumn FieldName="BiggerRatio" Caption="Bigger Ratio" />
                                         <DxGridDataColumn FieldName="Type" />
-                                        <DxGridDataColumn FieldName="Active" />
-                                        <DxGridDataColumn FieldName="RoundingPrecision" Caption="Rounding Precision" />
+                                        <DxGridDataColumn FieldName="Active" /> 
                                     </Columns>
                                     <TotalSummary>
                                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
@@ -122,17 +121,7 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Active" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.Active" />
                                                 <ValidationMessage For="@(()=> a.Active)"   />
-                                            </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Rounding Precision" ColSpanMd="12">
-                                                <DxSpinEdit @bind-Value="@a.RoundingPrecision"
-                                                            MinValue="1"
-                                                            NullText="Rounding Precision..."
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            BindValueMode="BindValueMode.OnInput" />
-                                                <ValidationMessage For="@(()=> a.RoundingPrecision)"   />
-                                            </DxFormLayoutItem>
-
+                                            </DxFormLayoutItem> 
                                         </DxFormLayout>
                                     </EditFormTemplate>
                                 </MyGridPaginate>

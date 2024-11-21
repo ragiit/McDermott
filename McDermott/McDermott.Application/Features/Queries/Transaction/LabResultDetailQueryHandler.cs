@@ -1,6 +1,4 @@
-﻿
-
-using static McDermott.Application.Features.Commands.Transaction.LabResultDetailCommand;
+﻿using static McDermott.Application.Features.Commands.Transaction.LabResultDetailCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {

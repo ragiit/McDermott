@@ -4,7 +4,10 @@
     {
         public long Id { get; set; }
         public long GroupId { get; set; }
+
+        [Required]
         public long? MenuId { get; set; }
+
         public bool IsCreate { get; set; } = true;
         public bool IsRead { get; set; } = true;
         public bool IsUpdate { get; set; } = true;

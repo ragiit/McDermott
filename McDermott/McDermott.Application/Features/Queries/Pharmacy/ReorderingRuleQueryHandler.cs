@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-
-namespace McDermott.Application.Features.Queries.Pharmacies
+﻿namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class ReorderingRuleQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetReorderingRuleQuery, List<ReorderingRuleDto>>,

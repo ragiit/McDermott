@@ -1,10 +1,4 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
@@ -63,7 +57,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
             }
         }
 
-
         public async Task<(List<MedicamentDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetMedicamentQuery request, CancellationToken cancellationToken)
         {
             try
@@ -120,8 +113,8 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         Dosage = x.Dosage,
 
                         //Uom = new Uom
-                        //{ 
-                        //    Name = x.Uom is null ? string.Empty : x.Uom.Name,   
+                        //{
+                        //    Name = x.Uom is null ? string.Empty : x.Uom.Name,
                         //},
                         //Form = new DrugForm
                         //{
@@ -141,7 +134,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         //},
                     });
 
-
                 // Paginate and sort
                 var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
                     query,
@@ -158,7 +150,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-
 
         public async Task<bool> Handle(ValidateMedicamentQuery request, CancellationToken cancellationToken)
         {

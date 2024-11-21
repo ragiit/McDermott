@@ -1,11 +1,4 @@
-﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Transaction
+﻿namespace McDermott.Application.Dtos.Transaction
 {
     public class VaccinationPlanDto : IMapFrom<VaccinationPlan>
     {

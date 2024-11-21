@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using static McDermott.Application.Features.Commands.Config.GroupMenuCommand;
 
 namespace McDermott.Application.Features.Queries.Config

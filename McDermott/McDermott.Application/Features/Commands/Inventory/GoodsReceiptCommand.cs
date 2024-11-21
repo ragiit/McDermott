@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class GoodsReceiptCommand
     {
         #region GET
+
         #region GET Goods Receipt Detail
 
         public class GetAllGoodsReceiptDetailQuery(Expression<Func<GoodsReceiptDetail, bool>>? predicate = null, bool removeCache = false) : IRequest<List<GoodsReceiptDetailDto>>
@@ -16,6 +11,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<GoodsReceiptDetail, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleGoodsReceiptDetailQuery : IRequest<GoodsReceiptDetailDto>
         {
             public List<Expression<Func<GoodsReceiptDetail, object>>> Includes { get; set; }
@@ -55,6 +51,7 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public Expression<Func<GoodsReceiptDetail, bool>> Predicate { get; } = predicate!;
         }
+
         #endregion GET Goods Receipt Detail
 
         #region GET Goods Receipt
@@ -80,7 +77,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<GoodsReceipt, bool>> Predicate { get; set; }
             public Expression<Func<GoodsReceipt, GoodsReceipt>> Select { get; set; }
 
-            public List<(Expression<Func<GoodsReceipt, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = []; 
+            public List<(Expression<Func<GoodsReceipt, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
             public bool IsDescending { get; set; } = false; // default to ascending
             public int PageIndex { get; set; } = 0;
@@ -88,7 +85,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public bool IsGetAll { get; set; } = false;
             public string SearchTerm { get; set; }
         }
-    
+
         public class BulkValidateGoodsReceiptQuery(List<GoodsReceiptDto> GoodsReceiptToValidate) : IRequest<List<GoodsReceiptDto>>
         {
             public List<GoodsReceiptDto> GoodsReceiptToValidate { get; } = GoodsReceiptToValidate;
@@ -98,6 +95,7 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public Expression<Func<GoodsReceipt, bool>> Predicate { get; } = predicate!;
         }
+
         #endregion GET Goods Receipt
 
         #region GET Goods Receipt Log
@@ -107,6 +105,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<GoodsReceiptLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleGoodsReceiptLogQuery : IRequest<GoodsReceiptLogDto>
         {
             public List<Expression<Func<GoodsReceiptLog, object>>> Includes { get; set; }
@@ -146,11 +145,13 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public Expression<Func<GoodsReceiptLog, bool>> Predicate { get; } = predicate!;
         }
-        #endregion
 
-        #endregion
+        #endregion GET Goods Receipt Log
+
+        #endregion GET
 
         #region CREATE
+
         #region CREATE Goods Receipt Detail
 
         public class CreateGoodsReceiptDetailRequest(GoodsReceiptDetailDto GoodsReceiptDetailDto) : IRequest<GoodsReceiptDetailDto>
@@ -177,9 +178,10 @@ namespace McDermott.Application.Features.Commands.Inventory
             public List<GoodsReceiptDto> GoodsReceiptDtos { get; set; } = GoodsReceiptDtos;
         }
 
-        #endregion CREATE Receiving Stock
+        #endregion CREATE Goods Receipt
 
         #region CREATE GoodsReceipt Log
+
         public class CreateGoodsReceiptLogRequest(GoodsReceiptLogDto GoodsReceiptLogDtos) : IRequest<GoodsReceiptLogDto>
         {
             public GoodsReceiptLogDto GoodsReceiptLogDto { get; set; } = GoodsReceiptLogDtos;
@@ -189,10 +191,13 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public List<GoodsReceiptLogDto> GoodsReceiptLogDtos { get; set; } = GoodsReceiptLogDtos;
         }
-        #endregion
-        #endregion
+
+        #endregion CREATE GoodsReceipt Log
+
+        #endregion CREATE
 
         #region UPDATE
+
         #region UPDATE Goods Receipt Detail
 
         public class UpdateGoodsReceiptDetailRequest(GoodsReceiptDetailDto GoodsReceiptDetailDto) : IRequest<GoodsReceiptDetailDto>
@@ -205,7 +210,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public List<GoodsReceiptDetailDto> GoodsReceiptDetailDtos { get; set; } = GoodsReceiptDetailDtos;
         }
 
-        #endregion Update Goods Receipt Detail
+        #endregion UPDATE Goods Receipt Detail
 
         #region UPDATE Goods Receipt
 
@@ -219,9 +224,10 @@ namespace McDermott.Application.Features.Commands.Inventory
             public List<GoodsReceiptDto> GoodsReceiptDtos { get; set; } = GoodsReceiptDtos;
         }
 
-        #endregion Update Goods Receipt 
+        #endregion UPDATE Goods Receipt
 
         #region UPDATE Goods Receipt Log
+
         public class UpdateGoodsReceiptLogRequest(GoodsReceiptLogDto GoodsReceiptLogDto) : IRequest<GoodsReceiptLogDto>
         {
             public GoodsReceiptLogDto GoodsReceiptLogDto { get; set; } = GoodsReceiptLogDto;
@@ -231,10 +237,13 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public List<GoodsReceiptLogDto> GoodsReceiptLogDtos { get; set; } = GoodsReceiptLogDtos;
         }
-        #endregion
-        #endregion
+
+        #endregion UPDATE Goods Receipt Log
+
+        #endregion UPDATE
 
         #region DELETE
+
         #region DELETE Goods Receipt Detail
 
         public class DeleteGoodsReceiptDetailRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
@@ -256,12 +265,15 @@ namespace McDermott.Application.Features.Commands.Inventory
         #endregion DELETE Goods Receipt
 
         #region DELETE Goods Receipt Log
+
         public class DeleteGoodsReceiptLogRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
-        #endregion
+
+        #endregion DELETE Goods Receipt Log
+
+        #endregion DELETE
     }
 }

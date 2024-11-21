@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Dtos.Bpjs
+﻿namespace McDermott.Application.Dtos.Bpjs
 {
     public class BpjsWebServiceTemporaryDto : IMapFrom<BpjsWebServiceTemporary>
     {

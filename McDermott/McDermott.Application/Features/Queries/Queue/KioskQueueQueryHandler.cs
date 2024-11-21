@@ -23,7 +23,7 @@ namespace McDermott.Application.Features.Queries.Queue
                         .Include(x => x.Kiosk.Physician)
                         .Include(x => x.Service)
                         .Include(x => x.ServiceK)
-                        .Include(x=>x.ClassType)
+                        .Include(x => x.ClassType)
                         .AsNoTracking()
                         .Select(KioskQueue => KioskQueue.Adapt<KioskQueueDto>())
                         .AsNoTracking()

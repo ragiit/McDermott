@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Medical.BuildingCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

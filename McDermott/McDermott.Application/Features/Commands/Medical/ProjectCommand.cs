@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class ProjectCommand
     {

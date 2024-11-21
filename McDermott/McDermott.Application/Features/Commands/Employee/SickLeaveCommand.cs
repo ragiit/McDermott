@@ -1,15 +1,8 @@
-﻿using McDermott.Application.Dtos.Employee;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Employee
+﻿namespace McDermott.Application.Features.Commands.Employee
 {
     public class SickLeaveCommand
     {
-        #region GET 
+        #region GET
 
         public class GetSickLeaveQuery(Expression<Func<SickLeave, bool>>? predicate = null, bool removeCache = false) : IRequest<List<SickLeaveDto>>
         {
@@ -17,7 +10,7 @@ namespace McDermott.Application.Features.Commands.Employee
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion GET 
+        #endregion GET
 
         #region CREATE
 

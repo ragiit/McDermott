@@ -1,10 +1,5 @@
 ﻿using McDermott.Application.Dtos.ClaimUserManagement;
 using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 
 namespace McDermott.Application.Features.Queries.ClaimUserManagement
@@ -134,7 +129,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         IsEmployee = x.IsEmployee,
                         BenefitValue = x.BenefitValue,
                         BenefitDuration = x.BenefitDuration,
-
                     });
 
                 if (!request.IsGetAll)
@@ -159,6 +153,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                 throw;
             }
         }
+
         public async Task<BenefitConfigurationDto> Handle(GetSingleBenefitConfigurationQuery request, CancellationToken cancellationToken)
         {
             try
@@ -213,7 +208,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         IsEmployee = x.IsEmployee,
                         BenefitValue = x.BenefitValue,
                         BenefitDuration = x.BenefitDuration,
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<BenefitConfigurationDto>();

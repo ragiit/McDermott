@@ -1,5 +1,4 @@
-﻿
-using McDermott.Domain.Common;
+﻿using McDermott.Domain.Common;
 
 namespace McDermott.Application.Dtos.Inventory
 {
@@ -21,6 +20,7 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public virtual LocationDto? Destination { get; set; }
+
         [SetToNull]
         public virtual LocationDto? Source { get; set; }
     }

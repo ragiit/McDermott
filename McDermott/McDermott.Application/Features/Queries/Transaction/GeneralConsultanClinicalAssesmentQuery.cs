@@ -104,6 +104,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
+
         public async Task<List<GeneralConsultantClinicalAssesmentDto>> Handle(UpdateListGeneralConsultantClinicalAssesmentRequest request, CancellationToken cancellationToken)
         {
             try
@@ -151,10 +152,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-
-
-
-
 
         #endregion Delete
     }

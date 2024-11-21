@@ -2,7 +2,7 @@
 {
     public class InventoryAdjusmentDetailCommand
     {
-        #region GET 
+        #region GET
 
         public class GetSingleInventoryAdjusmentDetailQuery : IRequest<InventoryAdjusmentDetailDto>
         {
@@ -34,7 +34,12 @@
             public string SearchTerm { get; set; }
         }
 
-        #endregion
+        public class ValidateInventoryAdjusmentDetail(Expression<Func<InventoryAdjusmentDetail, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<InventoryAdjusmentDetail, bool>> Predicate { get; } = predicate!;
+        }
+
+        #endregion GET
 
         #region CREATE
 

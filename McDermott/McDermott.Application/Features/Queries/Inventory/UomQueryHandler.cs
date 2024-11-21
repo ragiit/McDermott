@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
@@ -8,6 +7,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<GetSingleUomQuery, UomDto>,
         IRequestHandler<GetAllUomQuery, List<UomDto>>,
         IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
+        IRequestHandler<BulkValidateUomNameTypeQuery, List<UomDto>>,
         IRequestHandler<ValidateUomQuery, bool>,
         IRequestHandler<CreateUomRequest, UomDto>,
         IRequestHandler<CreateListUomRequest, List<UomDto>>,
@@ -49,7 +49,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
-
 
         public async Task<(List<UomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUomQuery request, CancellationToken cancellationToken)
         {
@@ -108,7 +107,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         UomCategory = new UomCategory
                         {
                             Name = x.UomCategory == null ? "" : x.UomCategory.Name,
-                        }, 
+                        },
                         Active = x.Active,
                         BiggerRatio = x.BiggerRatio,
                         RoundingPrecision = x.RoundingPrecision,
@@ -195,12 +194,11 @@ namespace McDermott.Application.Features.Queries.Inventory
                         UomCategory = new UomCategory
                         {
                             Name = x.UomCategory == null ? "" : x.UomCategory.Name,
-                        }, 
+                        },
                         Active = x.Active,
                         BiggerRatio = x.BiggerRatio,
                         RoundingPrecision = x.RoundingPrecision,
                         Type = x.Type,
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<UomDto>();
@@ -227,6 +225,25 @@ namespace McDermott.Application.Features.Queries.Inventory
                 .Where(v => A.Contains(v.Name)
                             && B.Contains(v.Type)
                             && C.Contains(v.UomCategoryId)
+                            )
+                .ToListAsync(cancellationToken);
+
+            return existingLabTests.Adapt<List<UomDto>>();
+        }
+
+        public async Task<List<UomDto>> Handle(BulkValidateUomNameTypeQuery request, CancellationToken cancellationToken)
+        {
+            var Uoms = request.UomToValidate;
+
+            // Ekstrak semua kombinasi yang akan dicari di database
+            var A = Uoms.Select(x => x.Name).Distinct().ToList();
+            var B = Uoms.Select(x => x.Type).Distinct().ToList();
+
+            var existingLabTests = await _unitOfWork.Repository<Uom>()
+                .Entities
+                .AsNoTracking()
+                .Where(v => A.Contains(v.Name)
+                            && B.Contains(v.Type)
                             )
                 .ToListAsync(cancellationToken);
 

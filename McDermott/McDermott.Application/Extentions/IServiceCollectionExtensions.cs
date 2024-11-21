@@ -1,8 +1,4 @@
-﻿using McDermott.Application.Features.Queries;
-using McDermott.Application.Features.Services;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace McDermott.Application.Extentions

@@ -85,7 +85,9 @@
             public bool IsGetAll { get; set; } = false;
             public string SearchTerm { get; set; }
         }
-        #endregion
+
+        #endregion Get Log
+
         #endregion GET
 
         #region CREATE
@@ -106,16 +108,19 @@
         }
 
         #region Create Log
+
         public class CreateGeneralConsultanMedicalSupportLogRequest(GeneralConsultanMedicalSupportLogDto GeneralConsultanMedicalSupportLogDto) : IRequest<GeneralConsultanMedicalSupportLogDto>
         {
             public GeneralConsultanMedicalSupportLogDto GeneralConsultanMedicalSupportLogDto { get; set; } = GeneralConsultanMedicalSupportLogDto;
         }
+
         public class CreateListGeneralConsultanMedicalSupportLogRequest(List<GeneralConsultanMedicalSupportLogDto> GeneralConsultanMedicalSupportLogDtos) : IRequest<List<GeneralConsultanMedicalSupportLogDto>>
         {
             public List<GeneralConsultanMedicalSupportLogDto> GeneralConsultanMedicalSupportLogDtos { get; set; } = GeneralConsultanMedicalSupportLogDtos;
         }
 
-        #endregion
+        #endregion Create Log
+
         #endregion CREATE
 
         #region Update

@@ -731,7 +731,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
                             }
 
-                            var temps = new List<InventoryAdjusmentDetailDto>();
+                            var temps = new List<InventoryAdjusmentDetailDto>();        
                             foreach (var o in Products)
                             {
                                 var sp = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == o.Id && s.LocationId == InventoryAdjusment.LocationId && s.Validate == true));

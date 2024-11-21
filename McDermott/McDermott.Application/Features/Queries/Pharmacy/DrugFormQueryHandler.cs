@@ -1,10 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class TransactionStockCommand
     {
@@ -15,6 +9,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<TransactionStock, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleTransactionStockQueryNew : IRequest<TransactionStockDto>
         {
             public List<Expression<Func<TransactionStock, object>>> Includes { get; set; }
@@ -44,10 +39,12 @@ namespace McDermott.Application.Features.Commands.Inventory
             public bool IsGetAll { get; set; } = false;
             public string SearchTerm { get; set; }
         }
+
         #endregion GET
 
         #region CREATE
-        public class CreateTransactionStockRequest(TransactionStockDto transactionStockDto):IRequest<TransactionStockDto>
+
+        public class CreateTransactionStockRequest(TransactionStockDto transactionStockDto) : IRequest<TransactionStockDto>
         {
             public TransactionStockDto TransactionStockDto { get; set; } = transactionStockDto;
         }
@@ -56,7 +53,8 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public List<TransactionStockDto> TransactionStockDtos { get; set; } = transactionStockDto;
         }
-        #endregion
+
+        #endregion CREATE
 
         #region Update
 
@@ -73,11 +71,13 @@ namespace McDermott.Application.Features.Commands.Inventory
         #endregion Update
 
         #region DELETE
+
         public class DeleteTransactionStockRequest(long? id = null, List<long>? ids = null) : IRequest<bool>
         {
             public long Id { get; set; } = id ?? 0;
             public List<long> Ids { get; set; } = ids ?? [];
         }
-        #endregion
+
+        #endregion DELETE
     }
 }

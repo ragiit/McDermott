@@ -1,10 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using McDermott.Application.Features.Services;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.Reflection.Metadata;
-using System.Threading;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
 
 namespace McDermott.Application.Features.Queries.Config

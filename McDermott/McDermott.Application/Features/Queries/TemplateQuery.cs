@@ -1,6 +1,4 @@
-﻿
-
-using static McDermott.Application.Features.Commands.TemplateCommand;
+﻿using static McDermott.Application.Features.Commands.TemplateCommand;
 
 namespace McDermott.Application.Features.Queries
 {

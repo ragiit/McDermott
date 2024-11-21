@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
@@ -35,6 +32,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
     {
         #region GET Transfer Stock
+
         public async Task<List<TransferStockDto>> Handle(BulkValidateTransferStockQuery request, CancellationToken cancellationToken)
         {
             var TransferStockDtos = request.TransferStockToValidate;
@@ -223,7 +221,8 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
-        #endregion GET Goods Receipt
+
+        #endregion GET Transfer Stock
 
         #region GET Transfer StockDetail
 
@@ -460,8 +459,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-
-
         #endregion GET Transfer StockDetail
 
         #region GET Transfer StockLog
@@ -498,6 +495,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
+
         public async Task<List<TransferStockLogDto>> Handle(BulkValidateTransferStockLogQuery request, CancellationToken cancellationToken)
         {
             var TransferStockLogDtos = request.TransferStockLogToValidate;
@@ -591,8 +589,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name
                         },
-
-
                     });
 
                 if (!request.IsGetAll)
@@ -684,8 +680,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name
                         },
-
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<TransferStockLogDto>();
@@ -697,10 +691,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-
-
-        #endregion GET Transfer Stock Log
-
+        #endregion GET Transfer StockLog
 
         #region CREATE
 

@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Dtos.ClaimUserManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands.ClaimUserManagement
 {
@@ -16,6 +11,7 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
             public Expression<Func<ClaimHistory, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleClaimHistoryQuery : IRequest<ClaimHistoryDto>
         {
             public List<Expression<Func<ClaimHistory, object>>> Includes { get; set; }
@@ -55,12 +51,13 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         {
             public Expression<Func<ClaimHistory, bool>> Predicate { get; } = predicate!;
         }
+
         public class GetClaimHistoryCountQuery(Expression<Func<ClaimHistory, bool>>? predicate = null) : IRequest<int>
         {
             public Expression<Func<ClaimHistory, bool>> Predicate { get; } = predicate!;
         }
 
-        #endregion GET Claim History Detail
+        #endregion GET Claim History
 
         #region CREATE Claim History
 
@@ -88,7 +85,7 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
             public List<ClaimHistoryDto> ClaimHistoryDtos { get; set; } = ClaimHistoryDtos;
         }
 
-        #endregion Update Claim History
+        #endregion UPDATE Claim History
 
         #region DELETE Claim History
 
@@ -99,6 +96,5 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         }
 
         #endregion DELETE Claim History
-
     }
 }

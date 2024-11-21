@@ -7,9 +7,9 @@
 
         public long CityId { get; set; } // Kabupaten
         public long ProvinceId { get; set; }
-         
+
         public virtual City? City { get; set; }
-         
+
         public virtual Province? Province { get; set; }
     }
 }

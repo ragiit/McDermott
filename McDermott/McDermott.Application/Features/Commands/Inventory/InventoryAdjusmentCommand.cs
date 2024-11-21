@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Inventory;
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class InventoryAdjusmentCommand
     {

@@ -1,6 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Medical.SampleTypeCommand;
-using static McDermott.Application.Features.Commands.Medical.ServiceCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

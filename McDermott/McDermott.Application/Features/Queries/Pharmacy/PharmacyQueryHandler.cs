@@ -1,10 +1,5 @@
-﻿using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Domain.Entities;
-using System.Linq;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
-using McDermott.Application.Features.Services;
-
 
 namespace McDermott.Application.Features.Queries.Pharmacies
 {
@@ -29,6 +24,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         IRequestHandler<DeletePharmacyLogRequest, bool>
     {
         #region Pharmacy
+
         #region GET Education Program
 
         public async Task<List<PharmacyDto>> Handle(GetAllPharmacyQuery request, CancellationToken cancellationToken)
@@ -274,8 +270,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Name = x.MedicamentGroup == null ? string.Empty : x.MedicamentGroup.Name,
                         }
-
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<PharmacyDto>();
@@ -286,8 +280,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -400,9 +392,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Pharmacy
 
         #region Pharmacy Log
+
         #region GET Education Program
 
         public async Task<List<PharmacyLogDto>> Handle(GetAllPharmacyLogQuery request, CancellationToken cancellationToken)
@@ -618,7 +612,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                                 Name = x.Pharmacy.Practitioner == null ? string.Empty : x.Pharmacy.Practitioner.Name,
                             },
                         }
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<PharmacyLogDto>();
@@ -630,11 +623,10 @@ namespace McDermott.Application.Features.Queries.Pharmacies
             }
         }
 
-
-
         #endregion GET Education Program
 
         #region CREATE
+
         public async Task<PharmacyLogDto> Handle(CreatePharmacyLogRequest request, CancellationToken cancellationToken)
         {
             try
@@ -670,9 +662,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-        #endregion
+
+        #endregion CREATE
 
         #region UPDATE
+
         public async Task<PharmacyLogDto> Handle(UpdatePharmacyLogRequest request, CancellationToken cancellationToken)
         {
             try
@@ -708,9 +702,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-        #endregion
+
+        #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeletePharmacyLogRequest request, CancellationToken cancellationToken)
         {
             try
@@ -736,7 +732,9 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-        #endregion
-        #endregion
+
+        #endregion DELETE
+
+        #endregion Pharmacy Log
     }
 }

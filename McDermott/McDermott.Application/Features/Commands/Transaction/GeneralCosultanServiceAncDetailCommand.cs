@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Transaction
+﻿namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GeneralConsultanServiceAncDetailCommand
     {
@@ -24,7 +18,7 @@ namespace McDermott.Application.Features.Commands.Transaction
             public bool IsGetAll { get; set; } = false;
             public string SearchTerm { get; set; }
         }
-                                                            
+
         public class GetGeneralConsultanServiceAncDetailQuery : IRequest<(List<GeneralConsultanServiceAncDetailDto>, int PageIndex, int PageSize, int PageCount)>
         {
             public List<Expression<Func<GeneralConsultanServiceAncDetail, object>>> Includes { get; set; }

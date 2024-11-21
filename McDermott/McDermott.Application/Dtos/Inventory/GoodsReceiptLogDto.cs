@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Common;
-namespace McDermott.Application.Dtos.Inventory
+﻿namespace McDermott.Application.Dtos.Inventory
 {
     public class GoodsReceiptLogDto : IMapFrom<GoodsReceiptLog>
     {

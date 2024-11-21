@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class MaintenanceProduct : BaseAuditableEntity
     {
@@ -12,13 +6,13 @@ namespace McDermott.Domain.Entities
         public long? ProductId { get; set; }
         public string? SerialNumber { get; set; }
         public string? Note { get; set; }
-        public DateTime? Expired {  get; set; }
+        public DateTime? Expired { get; set; }
         public EnumStatusMaintenance? Status { get; set; }
 
         [SetToNull]
         public Maintenance? Maintenance { get; set; }
+
         [SetToNull]
         public Product? Product { get; set; }
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
 {

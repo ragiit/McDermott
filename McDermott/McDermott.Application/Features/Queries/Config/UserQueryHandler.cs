@@ -1,9 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
 using Microsoft.Extensions.Caching.Distributed;
-using static McDermott.Application.Features.Commands.Config.UserCommand;
-
-using static McDermott.Application.Features.Commands.Config.UserCommand;
-using static McDermott.Application.Features.Commands.Config.UserCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {

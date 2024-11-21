@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.ActiveComponentCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies

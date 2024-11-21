@@ -1,8 +1,4 @@
-﻿using McDermott.Application.Dtos.Medical;
-using McDermott.Application.Features.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+﻿using McDermott.Application.Features.Services;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

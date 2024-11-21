@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.AllQueries
+﻿namespace McDermott.Application.Features.Commands.AllQueries
 {
     public class CountModelCommand
     {
@@ -26,6 +20,5 @@ namespace McDermott.Application.Features.Commands.AllQueries
         }
 
         #endregion GET
-
     }
 }

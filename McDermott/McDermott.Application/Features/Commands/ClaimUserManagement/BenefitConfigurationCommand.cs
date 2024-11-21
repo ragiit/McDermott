@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Dtos.ClaimUserManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands.ClaimUserManagement
 {
@@ -16,6 +11,7 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
             public Expression<Func<BenefitConfiguration, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleBenefitConfigurationQuery : IRequest<BenefitConfigurationDto>
         {
             public List<Expression<Func<BenefitConfiguration, object>>> Includes { get; set; }
@@ -55,6 +51,7 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         {
             public Expression<Func<BenefitConfiguration, bool>> Predicate { get; } = predicate!;
         }
+
         #endregion GET Education Program Detail
 
         #region CREATE Education Program
@@ -83,7 +80,7 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
             public List<BenefitConfigurationDto> BenefitConfigurationDtos { get; set; } = BenefitConfigurationDtos;
         }
 
-        #endregion Update Education Program
+        #endregion UPDATE Education Program
 
         #region DELETE Education Program
 
@@ -94,6 +91,5 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         }
 
         #endregion DELETE Education Program
-
     }
 }
