@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Extentions
+﻿namespace McDermott.Extentions
 {
     public static class ConvertNumberHelper
     {
@@ -36,31 +30,38 @@ namespace McDermott.Extentions
                         case 1:
                             hasil += "eleven";
                             break;
+
                         case 2:
                             hasil += "twelve";
                             break;
+
                         case 3:
                             hasil += "thirteen";
                             break;
+
                         case 4:
                             hasil += "fourteen";
                             break;
+
                         case 5:
                             hasil += "fifteen";
                             break;
+
                         case 6:
                             hasil += "sixteen";
                             break;
+
                         case 7:
                             hasil += "seventeen";
                             break;
+
                         case 8:
                             hasil += "eighteen";
                             break;
+
                         case 9:
                             hasil += "nineteen";
                             break;
-
 
                         // Tambahkan kasus untuk angka 13 hingga 19
                         default:

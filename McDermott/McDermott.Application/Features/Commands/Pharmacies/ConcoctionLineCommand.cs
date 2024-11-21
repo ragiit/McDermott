@@ -1,15 +1,9 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class ConcoctionLineCommand
     {
         #region ConcoctionLine
+
         #region GET ConcoctionLine
 
         public class GetAllConcoctionLineQuery(Expression<Func<ConcoctionLine, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ConcoctionLineDto>>
@@ -17,6 +11,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<ConcoctionLine, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleConcoctionLineQuery : IRequest<ConcoctionLineDto>
         {
             public List<Expression<Func<ConcoctionLine, object>>> Includes { get; set; }
@@ -56,7 +51,8 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<ConcoctionLine, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
+
+        #endregion GET ConcoctionLine
 
         #region CREATE
 
@@ -95,9 +91,11 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion ConcoctionLine
 
         #region Cut Stock ConcoctionLine
+
         #region GET StockOutLines
 
         public class GetAllStockOutLinesQuery(Expression<Func<StockOutLines, bool>>? predicate = null, bool removeCache = false) : IRequest<List<StockOutLinesDto>>
@@ -105,6 +103,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<StockOutLines, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleStockOutLinesQuery : IRequest<StockOutLinesDto>
         {
             public List<Expression<Func<StockOutLines, object>>> Includes { get; set; }
@@ -144,7 +143,8 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<StockOutLines, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
+
+        #endregion GET StockOutLines
 
         #region CREATE
 
@@ -183,6 +183,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Cut Stock ConcoctionLine
     }
 }

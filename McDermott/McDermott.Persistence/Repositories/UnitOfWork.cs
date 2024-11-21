@@ -10,9 +10,8 @@ namespace McDermott.Persistence.Repositories
     {
         private readonly ApplicationDbContext _dbContext;
         private Hashtable _repositories;
-        private bool disposed; 
+        private bool disposed;
         private bool _disposed;
-
 
         public UnitOfWork(ApplicationDbContext dbContext)
         {
@@ -48,7 +47,6 @@ namespace McDermott.Persistence.Repositories
         {
             try
             {
-
                 return await _dbContext.SaveChangesAsync(cancellationToken);
             }
             catch (Exception ex)
@@ -69,7 +67,7 @@ namespace McDermott.Persistence.Repositories
         {
             throw new NotImplementedException();
         }
-         
+
         public void Dispose()
         {
             Dispose(true);

@@ -16,7 +16,7 @@
         public class BulkValidateDiagnosisQuery(List<DiagnosisDto> DiagnosissToValidate) : IRequest<List<DiagnosisDto>>
         {
             public List<DiagnosisDto> DiagnosissToValidate { get; } = DiagnosissToValidate;
-        } 
+        }
 
         public class ValidateDiagnosisQuery(Expression<Func<Diagnosis, bool>>? predicate = null) : IRequest<bool>
         {
@@ -24,7 +24,7 @@
         }
 
         #endregion GET
-         
+
         #region CREATE
 
         public class CreateDiagnosisRequest(DiagnosisDto DiagnosisDto) : IRequest<DiagnosisDto>

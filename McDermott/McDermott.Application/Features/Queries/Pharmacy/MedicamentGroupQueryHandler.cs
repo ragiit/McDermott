@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
@@ -21,7 +20,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         IRequestHandler<DeleteMedicamentGroupDetailRequest, bool>
     {
         #region GET
-          
+
         public async Task<List<MedicamentGroupDto>> Handle(BulkValidateMedicamentGroupQuery request, CancellationToken cancellationToken)
         {
             var MedicamentGroupDtos = request.MedicamentGroupsToValidate;
@@ -100,12 +99,12 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         UoMId = x.UoMId,
                         UoM = new Uom
                         {
-                            Name = x.UoM == null ? string.Empty : x.UoM.Name, 
-                        }, 
+                            Name = x.UoM == null ? string.Empty : x.UoM.Name,
+                        },
                         FormDrugId = x.FormDrugId,
                         FormDrug = new DrugForm
                         {
-                            Name = x.FormDrug == null ? string.Empty : x.FormDrug.Name, 
+                            Name = x.FormDrug == null ? string.Empty : x.FormDrug.Name,
                         }
                     });
 
@@ -124,7 +123,8 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 // Consider logging the exception
                 throw;
             }
-        } 
+        }
+
         public async Task<bool> Handle(ValidateMedicamentGroupQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<MedicamentGroup>()
@@ -133,7 +133,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 .Where(request.Predicate)  // Apply the Predicate for filtering
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
-
 
         public async Task<List<MedicamentGroupDetailDto>> Handle(GetMedicamentGroupDetailQuery request, CancellationToken cancellationToken)
         {

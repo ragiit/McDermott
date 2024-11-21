@@ -1,11 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class ConcoctionCommand
     {
@@ -16,6 +9,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<Concoction, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleConcoctionQuery : IRequest<ConcoctionDto>
         {
             public List<Expression<Func<Concoction, object>>> Includes { get; set; }
@@ -55,7 +49,8 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<Concoction, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
+
+        #endregion GET Concoction
 
         #region CREATE
 

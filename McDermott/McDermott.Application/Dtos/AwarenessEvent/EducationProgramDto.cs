@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace McDermott.Application.Dtos.AwarenessEvent
 {
@@ -13,8 +8,10 @@ namespace McDermott.Application.Dtos.AwarenessEvent
 
         [Required(ErrorMessage = "Event Name is required.")]
         public string? EventName { get; set; }
+
         [Required(ErrorMessage = "Event Category is required.")]
         public long? EventCategoryId { get; set; }
+
         public string? HTMLContent { get; set; }
 
         public string? Description { get; set; }

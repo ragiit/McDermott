@@ -1,11 +1,4 @@
-﻿using Org.BouncyCastle.Asn1.Ocsp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Services
+﻿namespace McDermott.Application.Features.Services
 {
     public static class PaginateAsyncClass
     {

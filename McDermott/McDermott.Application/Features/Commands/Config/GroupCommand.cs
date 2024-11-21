@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Interfaces.Repositories;
-
-namespace McDermott.Application.Features.Commands.Config
+﻿namespace McDermott.Application.Features.Commands.Config
 {
     public class GroupCommand
     {

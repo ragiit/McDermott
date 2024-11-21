@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Inventory.UomCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
@@ -50,7 +49,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
-
 
         public async Task<(List<UomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUomQuery request, CancellationToken cancellationToken)
         {
@@ -109,7 +107,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         UomCategory = new UomCategory
                         {
                             Name = x.UomCategory == null ? "" : x.UomCategory.Name,
-                        }, 
+                        },
                         Active = x.Active,
                         BiggerRatio = x.BiggerRatio,
                         RoundingPrecision = x.RoundingPrecision,
@@ -196,12 +194,11 @@ namespace McDermott.Application.Features.Queries.Inventory
                         UomCategory = new UomCategory
                         {
                             Name = x.UomCategory == null ? "" : x.UomCategory.Name,
-                        }, 
+                        },
                         Active = x.Active,
                         BiggerRatio = x.BiggerRatio,
                         RoundingPrecision = x.RoundingPrecision,
                         Type = x.Type,
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<UomDto>();
@@ -240,7 +237,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
             // Ekstrak semua kombinasi yang akan dicari di database
             var A = Uoms.Select(x => x.Name).Distinct().ToList();
-            var B = Uoms.Select(x => x.Type).Distinct().ToList(); 
+            var B = Uoms.Select(x => x.Type).Distinct().ToList();
 
             var existingLabTests = await _unitOfWork.Repository<Uom>()
                 .Entities

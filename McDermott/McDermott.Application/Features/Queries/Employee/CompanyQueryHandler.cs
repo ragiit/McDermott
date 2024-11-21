@@ -33,6 +33,7 @@ namespace McDermott.Application.Features.Queries.Employee
 
             return existingCompanys.Adapt<List<CompanyDto>>();
         }
+
         public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
         {
             try
@@ -216,6 +217,7 @@ namespace McDermott.Application.Features.Queries.Employee
                 throw;
             }
         }
+
         public async Task<bool> Handle(ValidateCompanyQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<Company>()

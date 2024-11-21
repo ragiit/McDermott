@@ -1,10 +1,9 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class PrescriptionCommand
     {
         #region Prescription
+
         #region GET Prescription
 
         public class GetAllPrescriptionQuery(Expression<Func<Prescription, bool>>? predicate = null, bool removeCache = false) : IRequest<List<PrescriptionDto>>
@@ -12,6 +11,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<Prescription, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSinglePrescriptionQuery : IRequest<PrescriptionDto>
         {
             public List<Expression<Func<Prescription, object>>> Includes { get; set; }
@@ -51,7 +51,8 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<Prescription, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
+
+        #endregion GET Prescription
 
         #region CREATE
 
@@ -90,9 +91,11 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Prescription
 
         #region Cut Stock Prescription
+
         #region GET StockOutPrescription
 
         public class GetAllStockOutPrescriptionQuery(Expression<Func<StockOutPrescription, bool>>? predicate = null, bool removeCache = false) : IRequest<List<StockOutPrescriptionDto>>
@@ -100,6 +103,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public Expression<Func<StockOutPrescription, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleStockOutPrescriptionQuery : IRequest<StockOutPrescriptionDto>
         {
             public List<Expression<Func<StockOutPrescription, object>>> Includes { get; set; }
@@ -139,7 +143,8 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         {
             public Expression<Func<StockOutPrescription, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Education Program Detail
+
+        #endregion GET StockOutPrescription
 
         #region CREATE
 
@@ -178,6 +183,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Cut Stock Prescription
     }
 }

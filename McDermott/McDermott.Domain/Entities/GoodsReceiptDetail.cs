@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class GoodsReceiptDetail : BaseAuditableEntity
     {

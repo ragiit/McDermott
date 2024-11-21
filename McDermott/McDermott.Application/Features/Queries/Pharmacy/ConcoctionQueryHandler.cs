@@ -1,13 +1,5 @@
-﻿using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
 {
@@ -23,6 +15,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         IRequestHandler<DeleteConcoctionRequest, bool>
     {
         #region Concoction
+
         #region GET Concoction
 
         public async Task<List<ConcoctionDto>> Handle(GetAllConcoctionQuery request, CancellationToken cancellationToken)
@@ -155,7 +148,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
                         },
-
                     });
 
                 if (!request.IsGetAll)
@@ -253,7 +245,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
                         },
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ConcoctionDto>();
@@ -265,9 +256,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
             }
         }
 
-
-
-        #endregion GET Education Program
+        #endregion GET Concoction
 
         #region CREATE
 
@@ -378,7 +367,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
 
+        #endregion Concoction
     }
 }

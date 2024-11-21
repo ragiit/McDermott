@@ -5,14 +5,15 @@ namespace McDermott.Application.Features.Queries.Medical
     public class DiagnosisQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDiagnosisQuery, (List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<CreateDiagnosisRequest, DiagnosisDto>,
-        IRequestHandler<BulkValidateDiagnosisQuery, List<DiagnosisDto>>, 
+        IRequestHandler<BulkValidateDiagnosisQuery, List<DiagnosisDto>>,
         IRequestHandler<CreateListDiagnosisRequest, List<DiagnosisDto>>,
         IRequestHandler<UpdateDiagnosisRequest, DiagnosisDto>,
         IRequestHandler<UpdateListDiagnosisRequest, List<DiagnosisDto>>,
         IRequestHandler<ValidateDiagnosisQuery, bool>,
         IRequestHandler<DeleteDiagnosisRequest, bool>
     {
-        #region GET 
+        #region GET
+
         public async Task<List<DiagnosisDto>> Handle(BulkValidateDiagnosisQuery request, CancellationToken cancellationToken)
         {
             var DiagnosisDtos = request.DiagnosissToValidate;
@@ -89,7 +90,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<Diagnosis>().AddAsync(request.DiagnosisDto.Adapt<CreateUpdateDiagnosisDto>().Adapt<Diagnosis>()); 
+                var result = await _unitOfWork.Repository<Diagnosis>().AddAsync(request.DiagnosisDto.Adapt<CreateUpdateDiagnosisDto>().Adapt<Diagnosis>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -129,7 +130,7 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var result = await _unitOfWork.Repository<Diagnosis>().UpdateAsync(request.DiagnosisDto.Adapt<CreateUpdateDiagnosisDto>().Adapt<Diagnosis>()); 
+                var result = await _unitOfWork.Repository<Diagnosis>().UpdateAsync(request.DiagnosisDto.Adapt<CreateUpdateDiagnosisDto>().Adapt<Diagnosis>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Application.Dtos.Queue;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies

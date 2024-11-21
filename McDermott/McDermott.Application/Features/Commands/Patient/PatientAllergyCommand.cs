@@ -1,10 +1,8 @@
-﻿
-
-namespace McDermott.Application.Features.Commands.Patient
+﻿namespace McDermott.Application.Features.Commands.Patient
 {
     public class PatientAllergyCommand
     {
-        #region GET 
+        #region GET
 
         public class GetPatientAllergyQuery(Expression<Func<PatientAllergy, bool>>? predicate = null, bool removeCache = false) : IRequest<List<PatientAllergyDto>>
         {
@@ -12,7 +10,7 @@ namespace McDermott.Application.Features.Commands.Patient
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion  
+        #endregion GET
 
         #region CREATE
 

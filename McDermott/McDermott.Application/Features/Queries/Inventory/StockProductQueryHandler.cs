@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
@@ -29,11 +24,11 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!_cache.TryGetValue(cacheKey, out List<StockProduct>? result))
                 {
                     result = await _unitOfWork.Repository<StockProduct>().Entities
-                        .Include(x=>x.Product)
-                        .Include(x=>x.Product.Uom)
-                        .Include(x=>x.Source)
-                        .Include(x=>x.Destinance)
-                        .Include(x=>x.Uom)
+                        .Include(x => x.Product)
+                        .Include(x => x.Product.Uom)
+                        .Include(x => x.Source)
+                        .Include(x => x.Destinance)
+                        .Include(x => x.Uom)
                        .AsNoTracking()
                        .ToListAsync(cancellationToken);
 

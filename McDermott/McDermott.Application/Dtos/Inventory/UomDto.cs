@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace McDermott.Application.Dtos.Inventory
 {

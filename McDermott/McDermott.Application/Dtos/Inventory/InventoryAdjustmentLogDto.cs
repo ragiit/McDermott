@@ -1,9 +1,4 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Inventory
 {
@@ -19,8 +14,8 @@ namespace McDermott.Application.Dtos.Inventory
 
         [SetToNull]
         public InventoryAdjusmentDto? InventoryAdjusment { get; set; }
+
         [SetToNull]
         public User? UserBy { get; set; }
-
     }
 }

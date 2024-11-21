@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
-    public class ParticipanAwareness:BaseAuditableEntity
+    public class ParticipanAwareness : BaseAuditableEntity
     {
         public long? PatientId { get; set; }
         public long? AwarenessId { get; set; }

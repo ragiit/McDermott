@@ -1,13 +1,8 @@
 ﻿using McDermott.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Dtos.Transaction
 {
-    public class GeneralConsultationServiceLogDto :IMapFrom<GeneralConsultationServiceLog>
+    public class GeneralConsultationServiceLogDto : IMapFrom<GeneralConsultationServiceLog>
     {
         public long Id { get; set; }
         public long? GeneralConsultationServiceId { get; set; }
@@ -19,6 +14,7 @@ namespace McDermott.Application.Dtos.Transaction
 
         [SetToNull]
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
+
         [SetToNull]
         public UserDto? UserBy { get; set; }
     }

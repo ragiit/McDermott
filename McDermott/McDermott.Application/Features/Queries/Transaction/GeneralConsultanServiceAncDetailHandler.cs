@@ -1,18 +1,12 @@
 ﻿using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncDetailCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {
     public class GeneralConsultanServiceAncDetailHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
      IRequestHandler<GetGeneralConsultanServiceAncDetailQuery, (List<GeneralConsultanServiceAncDetailDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleGeneralConsultanServiceAncDetailQuery, GeneralConsultanServiceAncDetailDto>, 
-        //IRequestHandler<ValidateGeneralConsultanServiceAncDetail, bool>,
+     IRequestHandler<GetSingleGeneralConsultanServiceAncDetailQuery, GeneralConsultanServiceAncDetailDto>,
+     //IRequestHandler<ValidateGeneralConsultanServiceAncDetail, bool>,
      IRequestHandler<CreateGeneralConsultanServiceAncDetailRequest, GeneralConsultanServiceAncDetailDto>,
      //IRequestHandler<BulkValidateGeneralConsultanServiceAncDetail, List<GeneralConsultanServiceAncDetailDto>>,
      IRequestHandler<CreateListGeneralConsultanServiceAncDetailRequest, List<GeneralConsultanServiceAncDetailDto>>,
@@ -21,6 +15,7 @@ namespace McDermott.Application.Features.Queries.Transaction
      IRequestHandler<DeleteGeneralConsultanServiceAncDetailRequest, bool>
     {
         #region GET
+
         public async Task<(List<GeneralConsultanServiceAncDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServiceAncDetailQuery request, CancellationToken cancellationToken)
         {
             try
@@ -70,7 +65,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new GeneralConsultanServiceAncDetail
                     {
                         Id = x.Id,
-                        Date  = x.Date,
+                        Date = x.Date,
                         GeneralConsultanServiceAncId = x.GeneralConsultanServiceAncId,
                         Trimester = x.Trimester,
                         Complaint = x.Complaint,
@@ -80,9 +75,9 @@ namespace McDermott.Application.Features.Queries.Transaction
                         UK = x.UK,
                         TFU = x.TFU,
                         FetusPosition = x.FetusPosition,
-                        DJJ  = x.DJJ,
-                        TT = x.TT,  
-                        IsReadOnly = x.IsReadOnly, 
+                        DJJ = x.DJJ,
+                        TT = x.TT,
+                        IsReadOnly = x.IsReadOnly,
                     });
 
                 if (!request.IsGetAll)
@@ -191,6 +186,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
         //    return existingGeneralConsultanServiceAncDetails.Adapt<List<GeneralConsultanServiceAncDetailDto>>();
         //}
+
         #endregion GET
 
         #region CREATE
@@ -206,7 +202,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 //    // Fetch the latest sequence from the Reference field
                 //    var lastSeq = await _unitOfWork.Repository<GeneralConsultanServiceAncDetail>()
                 //        .Entities
-                //        .OrderByDescending(x => x.Reference) 
+                //        .OrderByDescending(x => x.Reference)
                 //        .Select(x => x.Reference)
                 //        .FirstOrDefaultAsync();
 
@@ -304,10 +300,10 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-
         #endregion UPDATE
 
         #region DELETE
+
         public async Task<bool> Handle(DeleteGeneralConsultanServiceAncDetailRequest request, CancellationToken cancellationToken)
         {
             try
@@ -333,6 +329,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-        #endregion
+
+        #endregion DELETE
     }
-} 
+}

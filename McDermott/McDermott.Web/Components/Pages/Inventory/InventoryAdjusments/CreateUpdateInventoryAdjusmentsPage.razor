@@ -72,7 +72,7 @@
 
                                                             <DxButton IconCssClass="fa-solid fa-xmark"
                                                                       Text="Cancel"
-                                                                      Click="OnCancelStatus"
+                                                                      Click="CancelItem_Click"
                                                                       RenderStyle="ButtonRenderStyle.Danger">
                                                             </DxButton>
                                                         </div>
@@ -121,58 +121,34 @@
                                                     <ValidationMessage For="@(() => InventoryAdjusment.Name)"   />
                                                 </DxFormLayoutItem>
 
-                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Locations" ColSpanMd="12">
-                                                    <MyDxComboBox Data="@Locations"
-                                                                  NullText="Select Locations"
-                                                                  @ref="refLocationsComboBox"
-                                                                  ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft) && InventoryAdjusmentDetails.Count != 0)"
-                                                                  @bind-Value="@InventoryAdjusment.LocationId"
-                                                                  TextFieldName="NameAndParent"
+                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Location" ColSpanMd="12">
+                                                    <MyDxComboBox Data="Locations"
+                                                                  NullText="Select Location"
+                                                                  TextFieldName="Name"
                                                                   ValueFieldName="Id"
-                                                                  TextChanged="((string e) => OnInputLocationsChanged(e))">
-                                                        <Buttons>
-                                                            <DxEditorButton Click="OnSearchLocationsIndexDecrement"
-                                                                            IconCssClass="fa-solid fa-caret-left"
-                                                                            Tooltip="Previous Index" />
-                                                            <DxEditorButton Click="OnSearchLocations"
-                                                                            IconCssClass="fa-solid fa-magnifying-glass"
-                                                                            Tooltip="Search" />
-                                                            <DxEditorButton Click="OnSearchLocationsIndexIncrement"
-                                                                            IconCssClass="fa-solid fa-caret-right"
-                                                                            Tooltip="Next Index" />
-                                                        </Buttons>
+                                                                  @oninput="OnInputLocation"
+                                                                  ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
+                                                                  SelectedItemChanged="((LocationDto e) => SelectedItemChanged(e))"
+                                                                  @bind-Value="InventoryAdjusment.LocationId">
                                                         <Columns>
-                                                            <DxListEditorColumn FieldName="@nameof(LocationDto.NameAndParent)" Caption="Name" />
+                                                            <DxListEditorColumn FieldName="Name" Caption="Name" />
+                                                            <DxListEditorColumn FieldName="ParentLocation.Name" Caption="Parent" />
                                                         </Columns>
                                                     </MyDxComboBox>
                                                     <ValidationMessage For="@(()=>InventoryAdjusment.LocationId)" />
                                                 </DxFormLayoutItem>
 
                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
-                                                    <MyDxComboBox Data="@Companies"
+                                                    <MyDxComboBox Data="Companies"
                                                                   NullText="Select Company"
-                                                                  @ref="refCompanyComboBox"
-                                                                  ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft) && InventoryAdjusmentDetails.Count == 0)"
-                                                                  @bind-Value="@InventoryAdjusment.CompanyId"
                                                                   TextFieldName="Name"
+                                                                  ReadOnly="@(!IsStatus(EnumStatusInventoryAdjustment.Draft))"
                                                                   ValueFieldName="Id"
-                                                                  TextChanged="((string e) => OnInputCompanyChanged(e))">
-                                                        <Buttons>
-                                                            <DxEditorButton Click="OnSearchCompanyIndexDecrement"
-                                                                            IconCssClass="fa-solid fa-caret-left"
-                                                                            Visible="@(!(!IsStatus(EnumStatusInventoryAdjustment.Draft) && InventoryAdjusmentDetails.Count == 0))"
-                                                                            Tooltip="Previous Index" />
-                                                            <DxEditorButton Click="OnSearchCompany"
-                                                                            IconCssClass="fa-solid fa-magnifying-glass"
-                                                                            Visible="@(!(!IsStatus(EnumStatusInventoryAdjustment.Draft) && InventoryAdjusmentDetails.Count == 0))"
-                                                                            Tooltip="Search" />
-                                                            <DxEditorButton Click="OnSearchCompanyIndexIncrement"
-                                                                            IconCssClass="fa-solid fa-caret-right"
-                                                                            Visible="@(!(!IsStatus(EnumStatusInventoryAdjustment.Draft) && InventoryAdjusmentDetails.Count == 0))"
-                                                                            Tooltip="Next Index" />
-                                                        </Buttons>
+                                                                  @oninput="OnInputCompany"
+                                                                  SelectedItemChanged="((CompanyDto e) => SelectedItemChanged(e))"
+                                                                  @bind-Value="InventoryAdjusment.CompanyId">
                                                         <Columns>
-                                                            <DxListEditorColumn FieldName="@nameof(CompanyDto.Name)" Caption="Name" />
+                                                            <DxListEditorColumn FieldName="@nameof(Company.Name)" Caption="Name" />
                                                         </Columns>
                                                     </MyDxComboBox>
                                                     <ValidationMessage For="@(()=>InventoryAdjusment.CompanyId)" />
@@ -220,7 +196,7 @@
                                                                                      NewItem_Click="@NewItem_Click"
                                                                                      EditItem_Click="@EditItem_Click"
                                                                                      DeleteItem_Click="@DeleteItem_Click"
-                                                                                     Refresh_Click="@(async () => await LoadData())"
+                                                                                     Refresh_Click="@(async () => await LoadDataInventoryAdjusmentDetail())"
                                                                                      EnableCreate="@IsStatus(EnumStatusInventoryAdjustment.InProgress)"
                                                                                      EnableUpdate="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress)"
                                                                                      EnableDelete="SelectedDetailDataItems.Count > 0 && InventoryAdjusmentDetails.Count > 0 && IsStatus(EnumStatusInventoryAdjustment.InProgress)"
@@ -243,11 +219,10 @@
                                                                 </Columns>
                                                                 <EditFormTemplate Context="EditFormContext">
                                                                     @{
-                                                                        if (EditFormContext.DataItem is null)
-                                                                        {
-                                                                            FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
-                                                                        }
-                                                                        var IsBatch = Products.FirstOrDefault(x => x.Id == FormInventoryAdjusmentDetail.ProductId)?.TraceAbility ?? false;
+                                                                        FormInventoryAdjusmentDetail = (InventoryAdjusmentDetailDto)EditFormContext.EditModel;
+
+                                                                        var IsBatch =  Products.FirstOrDefault(x => x.Id == FormInventoryAdjusmentDetail.ProductId)?.TraceAbility ?? false;
+                                                                         
                                                                     }
                                                                     <div class="row w-100">
                                                                         <DxFormLayout CssClass="w-100">
@@ -259,7 +234,7 @@
                                                                                                 NullText="Select Product"
                                                                                                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                 TextFieldName="Name"
-                                                                                                ValueFieldName="Id" 
+                                                                                                ValueFieldName="Id"
                                                                                                 @oninput="OnInputProduct"
                                                                                                 SelectedItemChanged="@(async (ProductDto freq) => await OnSelectProduct(freq))"
                                                                                                 @bind-Value="FormInventoryAdjusmentDetail.ProductId">
@@ -270,10 +245,11 @@
                                                                                     <ValidationMessage For="@(()=>FormInventoryAdjusmentDetail.ProductId)" />
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem Caption="Batch" Enabled="FormInventoryAdjusmentDetail.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                <DxFormLayoutItem Caption="Batch" Enabled="FormInventoryAdjusmentDetail.Id == 0" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                                                                                     <MyDxComboBox Data="@Batch"
                                                                                                   NullText="Select Batch..."
                                                                                                   AllowUserInput="true"
+                                                                                                  ReadOnly="!IsBatch"
                                                                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                                                                   @bind-Value="@FormInventoryAdjusmentDetail.Batch"
                                                                                                   @bind-Text="@FormInventoryAdjusmentDetail.Batch"
@@ -306,15 +282,17 @@
 
                                                                             <div class="col-md-4">
                                                                                 <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                    <DxDateEdit ShowValidationIcon="true" 
+                                                                                    <DxDateEdit ShowValidationIcon="true"
                                                                                                 DisplayFormat="@Helper.DefaultFormatDate"
                                                                                                 @bind-Date="@FormInventoryAdjusmentDetail.ExpiredDate"
                                                                                                 NullText="Expired Date">
                                                                                     </DxDateEdit>
+                                                                                    <ValidationMessage For="@(()=> FormInventoryAdjusmentDetail.ExpiredDate)"   />
                                                                                 </DxFormLayoutItem>
 
-                                                                                <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="UoM" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                                                                                    <DxComboBox ShowValidationIcon="true" Data="@Uoms"
+                                                                               @*  <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="UoM" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                    <DxComboBox ShowValidationIcon="true"
+                                                                                                Data="@Uoms"
                                                                                                 NullText="UoM"
                                                                                                 ReadOnly
                                                                                                 TextFieldName="Name"
@@ -324,14 +302,32 @@
                                                                                                 @bind-Value="FormInventoryAdjusmentDetail.UomId">
                                                                                     </DxComboBox>
                                                                                     <ValidationMessage For="@(() => FormInventoryAdjusmentDetail.UomId)" />
+                                                                                </DxFormLayoutItem> *@
+
+                                                                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="UoM" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                                                                                    <DxComboBox Data="Uoms"
+                                                                                                AllowUserInput="true"
+                                                                                                NullText="Select Uom" 
+                                                                                                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                                TextFieldName="Name"
+                                                                                                ValueFieldName="Id"
+                                                                                                @oninput="OnInputUom"
+                                                                                                @bind-Value="FormInventoryAdjusmentDetail.UomId">
+                                                                                        <Columns>
+                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
+                                                                                            <DxListEditorColumn FieldName="@nameof(Uom.Type)" Caption="Type" />
+                                                                                            <DxListEditorColumn FieldName="UomCategory.Name" Caption="Category" />
+                                                                                        </Columns>
+                                                                                    </DxComboBox>
+                                                                                    <ValidationMessage For="@(()=>FormInventoryAdjusmentDetail.UomId)" />
                                                                                 </DxFormLayoutItem>
                                                                             </div>
                                                                         </DxFormLayout>
 
                                                                         @*  <div class="col-md-12 d-flex justify-content-end">
-                                                                            <DxButton Enabled="@(!ActiveButton)" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
-                                                                            <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(() => GridDetail.CancelEditAsync())"></DxButton>
-                                                                        </div> *@
+                                                                    <DxButton Enabled="@(!ActiveButton)" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-sd-card" Text="Save" SubmitFormOnClick="true"></DxButton>
+                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Cancel" Click="@(() => GridDetail.CancelEditAsync())"></DxButton>
+                                                                    </div> *@
 
                                                                     </div>
                                                                 </EditFormTemplate>

@@ -2,7 +2,7 @@
 {
     public sealed class EmailEmailTemplateCommand
     {
-        #region GET 
+        #region GET
 
         public class GetEmailTemplateQuery(Expression<Func<EmailTemplate, bool>>? predicate = null, bool removeCache = false) : IRequest<List<EmailTemplateDto>>
         {
@@ -10,7 +10,7 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion GET (Bisa berdasarkan kondisi WHERE juga)
+        #endregion GET
 
         #region CREATE
 

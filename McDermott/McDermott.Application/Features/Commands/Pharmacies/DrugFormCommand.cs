@@ -1,11 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class DrugFormCommand
     {

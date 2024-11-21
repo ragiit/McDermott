@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class TransferStockProduct : BaseAuditableEntity
     {
         public string? Batch { get; set; }
         public DateTime? ExpiredDate { get; set; }
-        public long? TransferStockId { get; set; }        
+        public long? TransferStockId { get; set; }
         public long? ProductId { get; set; }
         public long? QtyStock { get; set; }
 
@@ -19,6 +13,5 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public Product? Product { get; set; }
-        
     }
 }

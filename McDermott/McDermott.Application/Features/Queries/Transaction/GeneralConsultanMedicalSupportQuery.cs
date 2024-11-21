@@ -504,7 +504,8 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-        #endregion
+        #endregion Get Log
+
         #endregion GET
 
         #region CREATE
@@ -555,6 +556,7 @@ namespace McDermott.Application.Features.Queries.Transaction
         }
 
         #region Create Log
+
         public async Task<GeneralConsultanMedicalSupportLogDto> Handle(CreateGeneralConsultanMedicalSupportLogRequest request, CancellationToken cancellationToken)
         {
             try
@@ -587,7 +589,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-        #endregion
+
+        #endregion Create Log
 
         #endregion CREATE
 

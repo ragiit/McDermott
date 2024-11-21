@@ -89,7 +89,8 @@
 
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Url" ColSpanMd="12">
                                                 <MyDxComboBox Data="@Helper.URLS"
-                                                              NullText="Select URL..."
+                                                              NullText="Select URL"
+                                                              FilteringMode="DataGridFilteringMode.Contains"
                                                               @bind-Value="@a.Url">
                                                 </MyDxComboBox>
                                                 <ValidationMessage For="@(()=> a.Url)"   />

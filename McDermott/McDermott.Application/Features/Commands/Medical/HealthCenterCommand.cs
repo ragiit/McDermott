@@ -23,8 +23,6 @@
 
         #endregion GET
 
-
-
         #region CREATE
 
         public class CreateHealthCenterRequest(HealthCenterDto HealthCenterDto) : IRequest<HealthCenterDto>

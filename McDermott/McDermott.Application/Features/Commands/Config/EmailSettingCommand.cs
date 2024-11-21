@@ -2,7 +2,7 @@
 {
     public partial class EmailSettingCommand
     {
-        #region GET 
+        #region GET
 
         public class GetEmailSettingQuery(Expression<Func<EmailSetting, bool>>? predicate = null, bool removeCache = false) : IRequest<List<EmailSettingDto>>
         {
@@ -10,7 +10,7 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion  
+        #endregion GET
 
         #region CREATE
 
@@ -48,6 +48,6 @@
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion DELETE 
+        #endregion DELETE
     }
 }

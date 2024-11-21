@@ -14,7 +14,7 @@ namespace McDermott.Web.Extentions
     }
 
     public static class Helper
-    { 
+    {
         public static readonly short CBX_DELAY = 700;
 
         public static void ShowErrorImport(this IToastService ToastService, int row, int col, string val)
@@ -278,6 +278,7 @@ namespace McDermott.Web.Extentions
             "medical/lab-uoms",
             "medical/projects",
             "medical/buildings",
+            "medical/reports",
 
             // Configurations
             "configuration/users",

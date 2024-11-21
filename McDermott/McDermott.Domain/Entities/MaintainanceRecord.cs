@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class MaintenanceRecord : BaseAuditableEntity
     {
@@ -16,8 +10,8 @@ namespace McDermott.Domain.Entities
 
         [SetToNull]
         public virtual Maintenance? Maintenance { get; set; }
+
         [SetToNull]
         public virtual Product? Product { get; set; }
-
     }
 }

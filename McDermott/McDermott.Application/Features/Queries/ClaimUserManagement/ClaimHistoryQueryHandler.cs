@@ -1,11 +1,5 @@
 ﻿using McDermott.Application.Dtos.ClaimUserManagement;
 using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
 
 namespace McDermott.Application.Features.Queries.ClaimUserManagement
@@ -23,6 +17,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
         IRequestHandler<DeleteClaimHistoryRequest, bool>
     {
         #region GET Education Program
+
         public async Task<int> Handle(GetClaimHistoryCountQuery request, CancellationToken cancellationToken)
         {
             try
@@ -39,6 +34,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                 throw;
             }
         }
+
         public async Task<List<ClaimHistoryDto>> Handle(GetAllClaimHistoryQuery request, CancellationToken cancellationToken)
         {
             try
@@ -150,7 +146,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         ClaimedValue = x.ClaimedValue,
                         PatientId = x.PatientId,
                         BenefitId = x.BenefitId,
-                        PhycisianId = x.PhycisianId,                        
+                        PhycisianId = x.PhycisianId,
                         Patient = new User
                         {
                             Name = x.Patient == null ? string.Empty : x.Patient.Name,
@@ -163,7 +159,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         {
                             BenefitName = x.Benefit == null ? string.Empty : x.Benefit.BenefitName
                         }
-                        
                     });
 
                 if (!request.IsGetAll)
@@ -255,7 +250,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                         {
                             BenefitName = x.Benefit == null ? string.Empty : x.Benefit.BenefitName
                         }
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ClaimHistoryDto>();
@@ -266,8 +260,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -281,7 +273,7 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetClaimHistoryQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetClaimHistoryQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<ClaimHistoryDto>();
             }
@@ -320,7 +312,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
                 var result = await _unitOfWork.Repository<ClaimHistory>().UpdateAsync(request.ClaimHistoryDto.Adapt<ClaimHistory>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
                 _cache.Remove("GetClaimHistoryQuery_"); // Ganti dengan key yang sesuai
 
@@ -381,6 +372,5 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
         }
 
         #endregion DELETE Education Program
-
     }
 }

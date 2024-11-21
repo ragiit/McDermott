@@ -1,8 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using static McDermott.Application.Features.Commands.Config.CountryCommand;
-using static McDermott.Application.Features.Commands.Config.VillageCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {

@@ -1,9 +1,8 @@
-﻿
-namespace McDermott.Application.Features.Commands.Bpjs
+﻿namespace McDermott.Application.Features.Commands.Bpjs
 {
     public class SystemParameterCommand
     {
-        #region GET 
+        #region GET
 
         public class GetSystemParameterQuery(Expression<Func<SystemParameter, bool>>? predicate = null, bool removeCache = false) : IRequest<List<SystemParameterDto>>
         {
@@ -11,7 +10,7 @@ namespace McDermott.Application.Features.Commands.Bpjs
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion  
+        #endregion GET
 
         #region CREATE
 

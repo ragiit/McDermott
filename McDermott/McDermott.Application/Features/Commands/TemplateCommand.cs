@@ -2,7 +2,7 @@
 {
     public class TemplateCommand
     {
-        #region GET 
+        #region GET
 
         public class GetTemplateQuery(Expression<Func<Province, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProvinceDto>>
         {
@@ -10,7 +10,7 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion  
+        #endregion GET
 
         #region CREATE
 

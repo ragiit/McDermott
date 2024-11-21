@@ -1,10 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
@@ -359,5 +353,4 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion DELETE
     }
-
 }

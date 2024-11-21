@@ -1,21 +1,17 @@
 ﻿using McDermott.Application.Dtos.ClaimUserManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace McDermott.Application.Features.Commands.ClaimUserManagement
 {
     public class ClaimRequestCommand
     {
-        #region GET Claim Request 
+        #region GET Claim Request
 
         public class GetAllClaimRequestQuery(Expression<Func<ClaimRequest, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ClaimRequestDto>>
         {
             public Expression<Func<ClaimRequest, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleClaimRequestQuery : IRequest<ClaimRequestDto>
         {
             public List<Expression<Func<ClaimRequest, object>>> Includes { get; set; }
@@ -55,7 +51,8 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         {
             public Expression<Func<ClaimRequest, bool>> Predicate { get; } = predicate!;
         }
-        #endregion GET Claim Request Detail
+
+        #endregion GET Claim Request
 
         #region CREATE Claim Request
 
@@ -83,7 +80,7 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
             public List<ClaimRequestDto> ClaimRequestDtos { get; set; } = ClaimRequestDtos;
         }
 
-        #endregion Update Claim Request
+        #endregion UPDATE Claim Request
 
         #region DELETE Claim Request
 
@@ -94,6 +91,5 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
         }
 
         #endregion DELETE Claim Request
-
     }
 }

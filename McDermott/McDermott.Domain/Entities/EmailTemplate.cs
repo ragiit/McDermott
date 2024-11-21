@@ -7,6 +7,7 @@
 
         [StringLength(200)]
         public string? From { get; set; }
+
         public long? EmailFromId { get; set; }
         public long? ById { get; set; }
 
@@ -30,7 +31,8 @@
 
         [SetToNull]
         public virtual List<User>? ToPartner { get; set; }
+
         [SetToNull]
-        public virtual EmailSetting? EmailFrom {  get; set; }
+        public virtual EmailSetting? EmailFrom { get; set; }
     }
 }

@@ -1,7 +1,4 @@
-﻿using McDermott.Application.Interfaces.Repositories;
-using static McDermott.Application.Features.Commands.Medical.NursingDiagnosesCommand;
-
-namespace McDermott.Application.Features.Commands.Medical
+﻿namespace McDermott.Application.Features.Commands.Medical
 {
     public class NursingDiagnosesCommand
     {
@@ -27,8 +24,6 @@ namespace McDermott.Application.Features.Commands.Medical
         }
 
         #endregion GET
-
-
 
         #region CREATE
 

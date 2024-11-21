@@ -14,6 +14,7 @@
 
         [SetToNull]
         public LabTest? LabTest { get; set; }
+
         [SetToNull]
         public LabUom? LabUom { get; set; }
     }

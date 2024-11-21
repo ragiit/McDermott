@@ -1,11 +1,6 @@
 ﻿using McDermott.Application.Features.Services;
-using McDermott.Application.Interfaces.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
+
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class MaintenanceRecordQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
@@ -229,7 +224,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
-
 
         #endregion GET
 

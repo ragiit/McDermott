@@ -1,8 +1,6 @@
-﻿
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
-    public class PharmacyLog :BaseAuditableEntity
+    public class PharmacyLog : BaseAuditableEntity
     {
         public long? PharmacyId { get; set; }
         public long? UserById { get; set; }

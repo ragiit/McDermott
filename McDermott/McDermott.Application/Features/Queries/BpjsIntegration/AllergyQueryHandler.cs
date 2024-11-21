@@ -1,5 +1,4 @@
-﻿
-namespace McDermott.Application.Features.Queries.BpjsIntegration
+﻿namespace McDermott.Application.Features.Queries.BpjsIntegration
 {
     public class AllergyQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetAllergyQuery, List<AllergyDto>>,

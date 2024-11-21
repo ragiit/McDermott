@@ -1,5 +1,4 @@
 ﻿using McDermott.Domain.Common;
-using McDermott.Domain.Entities;
 
 namespace McDermott.Application.Dtos.Pharmacies
 {
@@ -28,12 +27,16 @@ namespace McDermott.Application.Dtos.Pharmacies
 
         [SetToNull]
         public LocationDto? Location { get; set; }
+
         [SetToNull]
         public MedicamentGroupDto? MedicamentGroup { get; set; }
+
         [SetToNull]
         public ServiceDto? Service { get; set; }
+
         [SetToNull]
         public UserDto? Patient { get; set; }
+
         [SetToNull]
         public UserDto? Practitioner { get; set; }
     }

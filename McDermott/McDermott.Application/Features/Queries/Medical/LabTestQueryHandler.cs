@@ -1,7 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
-
-using static McDermott.Application.Features.Commands.Medical.LabTestCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {

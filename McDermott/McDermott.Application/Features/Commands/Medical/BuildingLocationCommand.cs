@@ -23,8 +23,6 @@
 
         #endregion GET
 
-
-
         #region CREATE
 
         public class CreateBuildingLocationRequest(BuildingLocationDto BuildingLocationDto) : IRequest<BuildingLocationDto>

@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using MailKit.Search;
-
-namespace McDermott.Application.Features.Commands.Transaction
+﻿namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GeneralConsultanCPPTCommand
     {

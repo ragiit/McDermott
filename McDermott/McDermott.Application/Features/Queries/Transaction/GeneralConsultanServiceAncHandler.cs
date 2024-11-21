@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
@@ -19,6 +14,7 @@ namespace McDermott.Application.Features.Queries.Transaction
       IRequestHandler<DeleteGeneralConsultanServiceAncRequest, bool>
     {
         #region GET
+
         public async Task<List<GeneralConsultanServiceAncDto>> Handle(BulkValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
         {
             var CountryDtos = request.GeneralConsultanServiceAncsToValidate;
@@ -37,6 +33,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
             return [];
         }
+
         public async Task<bool> Handle(ValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
@@ -240,7 +237,6 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                     aa.Reference = $"ANC/{year}/{month}/{day}/{aa.PatientId}/{sequence}";
                 }
-
 
                 var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(aa);
 

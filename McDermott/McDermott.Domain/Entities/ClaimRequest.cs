@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
-    public class ClaimRequest:BaseAuditableEntity
+    public class ClaimRequest : BaseAuditableEntity
     {
-       
         public long? PatientId { get; set; }
 
         public long? PhycisianId { get; set; }
@@ -23,12 +15,14 @@ namespace McDermott.Domain.Entities
         public EnumClaimRequestStatus? Status { get; set; } // Enum untuk 'Draft' dan 'Done'
 
         public bool? IsNotificationSent { get; set; } // Status notifikasi otomatis
+
         [SetToNull]
         public BenefitConfiguration? Benefit { get; set; } // Navigation property untuk data benefit
+
         [SetToNull]
         public User? Patient { get; set; } // Navigation property untuk data pasien
+
         [SetToNull]
         public User? Phycisian { get; set; } // Navigation property untuk data dokter
-
     }
 }

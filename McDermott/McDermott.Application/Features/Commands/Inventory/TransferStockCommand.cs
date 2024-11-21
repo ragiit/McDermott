@@ -1,15 +1,9 @@
-﻿using McDermott.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class TransferStockCommand
     {
         #region GET
+
         #region GET Transfer Stock Detail
 
         public class GetAllTransferStockProductQuery(Expression<Func<TransferStockProduct, bool>>? predicate = null, bool removeCache = false) : IRequest<List<TransferStockProductDto>>
@@ -17,6 +11,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<TransferStockProduct, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleTransferStockProductQuery : IRequest<TransferStockProductDto>
         {
             public List<Expression<Func<TransferStockProduct, object>>> Includes { get; set; }
@@ -56,6 +51,7 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public Expression<Func<TransferStockProduct, bool>> Predicate { get; } = predicate!;
         }
+
         #endregion GET Transfer Stock Detail
 
         #region GET Transfer Stock
@@ -90,7 +86,6 @@ namespace McDermott.Application.Features.Commands.Inventory
             public string SearchTerm { get; set; }
         }
 
-
         public class BulkValidateTransferStockQuery(List<TransferStockDto> TransferStockToValidate) : IRequest<List<TransferStockDto>>
         {
             public List<TransferStockDto> TransferStockToValidate { get; } = TransferStockToValidate;
@@ -100,6 +95,7 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public Expression<Func<TransferStock, bool>> Predicate { get; } = predicate!;
         }
+
         #endregion GET Transfer Stock
 
         #region GET Transfer Stock Log
@@ -109,6 +105,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public Expression<Func<TransferStockLog, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetSingleTransferStockLogQuery : IRequest<TransferStockLogDto>
         {
             public List<Expression<Func<TransferStockLog, object>>> Includes { get; set; }
@@ -148,8 +145,11 @@ namespace McDermott.Application.Features.Commands.Inventory
         {
             public Expression<Func<TransferStockLog, bool>> Predicate { get; } = predicate!;
         }
-        #endregion
-        #endregion
+
+        #endregion GET Transfer Stock Log
+
+        #endregion GET
+
         #region CREATE
 
         public class CreateTransferStockRequest(TransferStockDto TransferStockDto) : IRequest<TransferStockDto>
@@ -204,7 +204,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public List<TransferStockDto> TransferStockDtos { get; set; } = TransferStockDtos;
         }
 
-        #endregion Update        
+        #endregion Update
 
         #region Update Product
 
@@ -242,7 +242,7 @@ namespace McDermott.Application.Features.Commands.Inventory
             public List<long> Ids { get; set; } = ids ?? [];
         }
 
-        #endregion DELETE        
+        #endregion DELETE
 
         #region DELETE Product
 

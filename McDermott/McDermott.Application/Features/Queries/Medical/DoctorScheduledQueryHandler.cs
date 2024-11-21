@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Medical.DoctorScheduledCommand;
 
 namespace McDermott.Application.Features.Queries.Medical

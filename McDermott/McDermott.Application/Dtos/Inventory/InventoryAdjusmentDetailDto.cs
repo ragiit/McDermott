@@ -17,7 +17,6 @@
         [Required]
         public long? UomId { get; set; }
 
-        [Required]
         public DateTime? ExpiredDate { get; set; } = null;
 
         [NotMapped]

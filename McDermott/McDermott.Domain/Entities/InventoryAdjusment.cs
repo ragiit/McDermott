@@ -11,6 +11,7 @@
 
         [SetToNull]
         public virtual Locations? Location { get; set; }
+
         [SetToNull]
         public virtual Company? Company { get; set; }
 

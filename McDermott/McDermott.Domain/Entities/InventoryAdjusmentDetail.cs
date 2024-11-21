@@ -6,7 +6,7 @@
         public long? TransactionStockId { get; set; }
         public long InventoryAdjusmentId { get; set; }
         public long? ProductId { get; set; }
-        public DateTime ExpiredDate { get; set; }
+        public DateTime? ExpiredDate { get; set; } = null;
         public long TeoriticalQty { get; set; } = 0;
         public string? Batch { get; set; }
         public long RealQty { get; set; } = 0;

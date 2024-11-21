@@ -47,6 +47,7 @@ namespace McDermott.Domain.Entities
         public bool IsSinusTachycardia { get; set; } = false;
 
         #region Confined Space
+
         public long? EmployeeId { get; set; }
         public bool IsFirstTimeEnteringConfinedSpace { get; set; } = false;
         public long EnteringConfinedSpaceCount { get; set; } = 0;
@@ -96,17 +97,22 @@ namespace McDermott.Domain.Entities
         public string? SignatureEximinedDoctorBase64 { get; set; }
         public string? Recommended { get; set; }
         public long? ExaminedPhysicianId { get; set; }
-        #endregion
+
+        #endregion Confined Space
 
         public long HR { get; set; }
+
         //public bool IsVentriculatExtraSystole { get; set; } = false;
         //public bool IsSupraventricularExtraSystole { get; set; } = false;
         public bool IsOtherECG { get; set; } = false;
+
         public string? OtherDesc { get; set; }
 
         public EnumStatusGeneralConsultantServiceProcedureRoom? Status { get; set; } = EnumStatusGeneralConsultantServiceProcedureRoom.Draft;
+
         [NotMapped]
         public string StatusName => Status.GetDisplayName();
+
         public long? LabTestId { get; set; }
 
         [SetToNull]

@@ -1,15 +1,15 @@
-﻿
-
-namespace McDermott.Application.Features.Commands.Inventory
+﻿namespace McDermott.Application.Features.Commands.Inventory
 {
     public class ProductCommand
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
+
         public class GetAllProductQuery(Expression<Func<Product, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ProductDto>>
         {
             public Expression<Func<Product, bool>> Predicate { get; } = predicate!;
             public bool RemoveCache { get; } = removeCache!;
         }
+
         public class GetProductQuery(Expression<Func<Product, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<ProductDto>, int pageIndex, int pageSize, int pageCount)>
         {
             public Expression<Func<Product, bool>> Predicate { get; } = predicate!;

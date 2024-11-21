@@ -96,7 +96,7 @@
                 </DxComboBox>
  *@
 
-                @if (IsLoading)
+              @*   @if (IsLoading)
 
                 {
                     <LoadingIndicatorLayout>
@@ -107,7 +107,7 @@
                 {
                     <h1>ID: @selectedVillageId</h1>
 
-                }
+                } *@
 
                 <EditForm Model="@LoginForm" Context="EditFormContext" OnValidSubmit="@HandleValidSubmit"
                           OnInvalidSubmit="@HandleInvalidSubmit" FormName="FormUser">

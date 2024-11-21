@@ -1,12 +1,6 @@
 ﻿using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
-using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand;
 
 namespace McDermott.Application.Features.Queries.AwarenessEvent
 {
@@ -118,7 +112,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") );
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%"));
                 }
 
                 // Apply dynamic select if provided
@@ -153,6 +147,7 @@ namespace McDermott.Application.Features.Queries.AwarenessEvent
                 throw;
             }
         }
+
         public async Task<AwarenessEduCategoryDto> Handle(GetSingleAwarenessEduCategoryQuery request, CancellationToken cancellationToken)
         {
             try

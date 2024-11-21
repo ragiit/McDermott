@@ -13,7 +13,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<UpdateListGoodsReceiptRequest, List<GoodsReceiptDto>>,
         IRequestHandler<DeleteGoodsReceiptRequest, bool>,
         IRequestHandler<GetAllGoodsReceiptDetailQuery, List<GoodsReceiptDetailDto>>,//GoodsReceiptDetail
-        IRequestHandler<GetGoodsReceiptDetailQuery, (List<GoodsReceiptDetailDto>, int pageIndex, int pageSize, int pageCount)>, 
+        IRequestHandler<GetGoodsReceiptDetailQuery, (List<GoodsReceiptDetailDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetSingleGoodsReceiptDetailQuery, GoodsReceiptDetailDto>, IRequestHandler<ValidateGoodsReceiptDetailQuery, bool>,
         IRequestHandler<BulkValidateGoodsReceiptDetailQuery, List<GoodsReceiptDetailDto>>,
         IRequestHandler<CreateGoodsReceiptDetailRequest, GoodsReceiptDetailDto>,
@@ -22,17 +22,17 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<UpdateListGoodsReceiptDetailRequest, List<GoodsReceiptDetailDto>>,
         IRequestHandler<DeleteGoodsReceiptDetailRequest, bool>,
         IRequestHandler<GetAllGoodsReceiptLogQuery, List<GoodsReceiptLogDto>>,//GoodsReceiptLog
-        IRequestHandler<GetGoodsReceiptLogQuery, (List<GoodsReceiptLogDto>, int pageIndex, int pageSize, int pageCount)>,  
+        IRequestHandler<GetGoodsReceiptLogQuery, (List<GoodsReceiptLogDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetSingleGoodsReceiptLogQuery, GoodsReceiptLogDto>, IRequestHandler<ValidateGoodsReceiptLogQuery, bool>,
-        IRequestHandler<BulkValidateGoodsReceiptLogQuery, List<GoodsReceiptLogDto>>, 
+        IRequestHandler<BulkValidateGoodsReceiptLogQuery, List<GoodsReceiptLogDto>>,
         IRequestHandler<CreateGoodsReceiptLogRequest, GoodsReceiptLogDto>,
         IRequestHandler<CreateListGoodsReceiptLogRequest, List<GoodsReceiptLogDto>>,
         IRequestHandler<UpdateGoodsReceiptLogRequest, GoodsReceiptLogDto>,
         IRequestHandler<UpdateListGoodsReceiptLogRequest, List<GoodsReceiptLogDto>>,
         IRequestHandler<DeleteGoodsReceiptLogRequest, bool>
     {
+        #region GET Goods Receipt
 
-        #region GET Goods Receipt 
         public async Task<List<GoodsReceiptDto>> Handle(BulkValidateGoodsReceiptQuery request, CancellationToken cancellationToken)
         {
             var GoodsReceiptDtos = request.GoodsReceiptToValidate;
@@ -199,7 +199,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         NumberPurchase = x.NumberPurchase,
                         SchenduleDate = x.SchenduleDate,
                         SourceId = x.SourceId,
-                        Status=x.Status,
+                        Status = x.Status,
                         Source = new Locations
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name,
@@ -219,6 +219,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
+
         #endregion GET Goods Receipt
 
         #region GET Goods Receipt Detail
@@ -236,7 +237,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 {
                     result = await _unitOfWork.Repository<GoodsReceiptDetail>().Entities
                         .Include(x => x.GoodsReceipt)
-                        .Include(x=>x.Product)
+                        .Include(x => x.Product)
                         .AsNoTracking()
                         .ToListAsync(cancellationToken);
 
@@ -446,8 +447,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-
-
         #endregion GET Goods Receipt Detail
 
         #region GET Goods Receipt Log
@@ -484,6 +483,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
+
         public async Task<List<GoodsReceiptLogDto>> Handle(BulkValidateGoodsReceiptLogQuery request, CancellationToken cancellationToken)
         {
             var GoodsReceiptLogDtos = request.GoodsReceiptLogToValidate;
@@ -577,8 +577,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name
                         },
-
-
                     });
 
                 if (!request.IsGetAll)
@@ -670,8 +668,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                         {
                             Name = x.Source == null ? string.Empty : x.Source.Name
                         },
-
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptLogDto>();
@@ -682,8 +678,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
-
-
 
         #endregion GET Goods Receipt Log
 
@@ -697,7 +691,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                _cache.Remove("GetGoodsReceiptDetailQuery_"); // Ganti dengan key yang sesuai 
+                _cache.Remove("GetGoodsReceiptDetailQuery_"); // Ganti dengan key yang sesuai
 
                 return result.Adapt<GoodsReceiptDetailDto>();
             }
@@ -727,7 +721,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion CREATE Goods Receipt Detail
 
-        #region CREATE Goods Receipt 
+        #region CREATE Goods Receipt
 
         public async Task<GoodsReceiptDto> Handle(CreateGoodsReceiptRequest request, CancellationToken cancellationToken)
         {
@@ -765,7 +759,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion CREATE Goods Receipt 
+        #endregion CREATE Goods Receipt
 
         #region CREATE Goods Receipt Log
 
@@ -805,7 +799,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion CREATE Goods Receipt 
+        #endregion CREATE Goods Receipt Log
 
         #region UPDATE Goods Receipt Detail
 
@@ -816,7 +810,6 @@ namespace McDermott.Application.Features.Queries.Inventory
                 var result = await _unitOfWork.Repository<GoodsReceiptDetail>().UpdateAsync(request.GoodsReceiptDetailDto.Adapt<GoodsReceiptDetail>());
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
-
 
                 _cache.Remove("GetGoodsReceiptDetailQuery_"); // Ganti dengan key yang sesuai
 
@@ -848,7 +841,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion UPDATE Goods Receipt Detail
 
-        #region UPDATE Goods Receipt 
+        #region UPDATE Goods Receipt
 
         public async Task<GoodsReceiptDto> Handle(UpdateGoodsReceiptRequest request, CancellationToken cancellationToken)
         {
@@ -886,7 +879,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion UPDATE Goods Receipt 
+        #endregion UPDATE Goods Receipt
 
         #region UPDATE Goods Receipt Log
 
@@ -926,7 +919,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion UPDATE Goods Receipt 
+        #endregion UPDATE Goods Receipt Log
 
         #region DELETE Goods Receipt Detail
 
@@ -958,7 +951,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
         #endregion DELETE Goods Receipt Detail
 
-        #region DELETE Goods Receipt 
+        #region DELETE Goods Receipt
 
         public async Task<bool> Handle(DeleteGoodsReceiptRequest request, CancellationToken cancellationToken)
         {
@@ -986,7 +979,7 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion DELETE Goods Receipt 
+        #endregion DELETE Goods Receipt
 
         #region DELETE Goods Receipt Log
 
@@ -1016,6 +1009,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-        #endregion DELETE Goods Receipt 
+        #endregion DELETE Goods Receipt Log
     }
 }

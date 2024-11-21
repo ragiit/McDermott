@@ -1,16 +1,16 @@
-Company
+Uom
 
-public class CompanyCommand
+public class UomCommand
  {
      #region GET
 
-    public class GetSingleCompanyQuery : IRequest<CompanyDto>
+    public class GetSingleUomQuery : IRequest<UomDto>
     {
-        public List<Expression<Func<Company, object>>> Includes { get; set; }
-        public Expression<Func<Company, bool>> Predicate { get; set; }
-        public Expression<Func<Company, Company>> Select { get; set; }
+        public List<Expression<Func<Uom, object>>> Includes { get; set; }
+        public Expression<Func<Uom, bool>> Predicate { get; set; }
+        public Expression<Func<Uom, Uom>> Select { get; set; }
 
-        public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -19,13 +19,13 @@ public class CompanyCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetCompanyQuery : IRequest<(List<CompanyDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetUomQuery : IRequest<(List<UomDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Company, object>>> Includes { get; set; }
-        public Expression<Func<Company, bool>> Predicate { get; set; }
-        public Expression<Func<Company, Company>> Select { get; set; }
+        public List<Expression<Func<Uom, object>>> Includes { get; set; }
+        public Expression<Func<Uom, bool>> Predicate { get; set; }
+        public Expression<Func<Uom, Uom>> Select { get; set; }
 
-        public List<(Expression<Func<Company, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -34,49 +34,49 @@ public class CompanyCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateCompany(Expression<Func<Company, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateUom(Expression<Func<Uom, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Company, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
+     public class CreateUomRequest(UomDto UomDto) : IRequest<UomDto>
      {
-         public CompanyDto CompanyDto { get; set; } = CompanyDto;
+         public UomDto UomDto { get; set; } = UomDto;
      }
 
-     public class BulkValidateCompany(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
+     public class BulkValidateUom(List<UomDto> UomsToValidate) : IRequest<List<UomDto>>
      {
-         public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
+         public List<UomDto> UomsToValidate { get; } = UomsToValidate;
      }
 
-     public class CreateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
+     public class CreateListUomRequest(List<UomDto> UomDtos) : IRequest<List<UomDto>>
      {
-         public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
+         public List<UomDto> UomDtos { get; set; } = UomDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateCompanyRequest(CompanyDto CompanyDto) : IRequest<CompanyDto>
+     public class UpdateUomRequest(UomDto UomDto) : IRequest<UomDto>
      {
-         public CompanyDto CompanyDto { get; set; } = CompanyDto;
+         public UomDto UomDto { get; set; } = UomDto;
      }
 
-     public class UpdateListCompanyRequest(List<CompanyDto> CompanyDtos) : IRequest<List<CompanyDto>>
+     public class UpdateListUomRequest(List<UomDto> UomDtos) : IRequest<List<UomDto>>
      {
-         public List<CompanyDto> CompanyDtos { get; set; } = CompanyDtos;
+         public List<UomDto> UomDtos { get; set; } = UomDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteCompanyRequest : IRequest<bool>
+     public class DeleteUomRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -85,54 +85,54 @@ public class CompanyCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
+IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
   
-IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
-public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleCompanyQuery, CompanyDto>, 
-     IRequestHandler<ValidateCompany, bool>,
-     IRequestHandler<CreateCompanyRequest, CompanyDto>,
-     IRequestHandler<BulkValidateCompany, List<CompanyDto>>,
-     IRequestHandler<CreateListCompanyRequest, List<CompanyDto>>,
-     IRequestHandler<UpdateCompanyRequest, CompanyDto>,
-     IRequestHandler<UpdateListCompanyRequest, List<CompanyDto>>,
-     IRequestHandler<DeleteCompanyRequest, bool>
+IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleUomQuery, UomDto>,
+public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleUomQuery, UomDto>, 
+     IRequestHandler<ValidateUom, bool>,
+     IRequestHandler<CreateUomRequest, UomDto>,
+     IRequestHandler<BulkValidateUom, List<UomDto>>,
+     IRequestHandler<CreateListUomRequest, List<UomDto>>,
+     IRequestHandler<UpdateUomRequest, UomDto>,
+     IRequestHandler<UpdateListUomRequest, List<UomDto>>,
+     IRequestHandler<DeleteUomRequest, bool>
 {
     #region GET
-    public async Task<List<CompanyDto>> Handle(BulkValidateCompany request, CancellationToken cancellationToken)
+    public async Task<List<UomDto>> Handle(BulkValidateUom request, CancellationToken cancellationToken)
     {
-        var CompanyDtos = request.CompanysToValidate;
+        var UomDtos = request.UomsToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var CompanyNames = CompanyDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = CompanyDtos.Select(x => x.Code).Distinct().ToList();
+        //var UomNames = UomDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = UomDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingCompanys = await _unitOfWork.Repository<Company>()
+        //var existingUoms = await _unitOfWork.Repository<Uom>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => CompanyNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => UomNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingCompanys.Adapt<List<CompanyDto>>();
+        //return existingUoms.Adapt<List<UomDto>>();
 
         return [];
     }
-    public async Task<bool> Handle(ValidateCompany request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateUom request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Company>()
+        return await _unitOfWork.Repository<Uom>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<CompanyDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
+    public async Task<(List<UomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUomQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Company>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<Uom>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -148,8 +148,8 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Company>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Company>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Uom>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Uom>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -166,7 +166,7 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -174,7 +174,7 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Company
+                query = query.Select(x => new Uom
                 {
                     Id = x.Id, 
                 });
@@ -188,11 +188,11 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<CompanyDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<UomDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<CompanyDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<UomDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -202,11 +202,11 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<CompanyDto> Handle(GetSingleCompanyQuery request, CancellationToken cancellationToken)
+    public async Task<UomDto> Handle(GetSingleUomQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Company>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<Uom>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -222,8 +222,8 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Company>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Company>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<Uom>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<Uom>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -240,7 +240,7 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -248,12 +248,12 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Company
+                query = query.Select(x => new Uom
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CompanyDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<UomDto>();
         }
         catch (Exception ex)
         {
@@ -266,17 +266,17 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<CompanyDto> Handle(CreateCompanyRequest request, CancellationToken cancellationToken)
+     public async Task<UomDto> Handle(CreateUomRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());
+             var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<CompanyDto>();
+             return result.Adapt<UomDto>();
          }
          catch (Exception)
          {
@@ -284,16 +284,16 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<CompanyDto>> Handle(CreateListCompanyRequest request, CancellationToken cancellationToken)
+     public async Task<List<UomDto>> Handle(CreateListUomRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<Company>>());
+             var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDtos.Adapt<List<Uom>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<CompanyDto>>();
+             return result.Adapt<List<UomDto>>();
          }
          catch (Exception)
          {
@@ -305,17 +305,17 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<CompanyDto> Handle(UpdateCompanyRequest request, CancellationToken cancellationToken)
+     public async Task<UomDto> Handle(UpdateUomRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<CompanyDto>().Adapt<Company>());
+             var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDto.Adapt<UomDto>().Adapt<Uom>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<CompanyDto>();
+             return result.Adapt<UomDto>();
          }
          catch (Exception)
          {
@@ -323,16 +323,16 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<CompanyDto>> Handle(UpdateListCompanyRequest request, CancellationToken cancellationToken)
+     public async Task<List<UomDto>> Handle(UpdateListUomRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<Company>>());
+             var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDtos.Adapt<List<Uom>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<CompanyDto>>();
+             return result.Adapt<List<UomDto>>();
          }
          catch (Exception)
          {
@@ -344,23 +344,23 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteCompanyRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteUomRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Company>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<Uom>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Company>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<Uom>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetCompanyQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -374,20 +374,20 @@ public class CompanyHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateCompanyQuery(List<CompanyDto> CompanysToValidate) : IRequest<List<CompanyDto>>
+public class BulkValidateUomQuery(List<UomDto> UomsToValidate) : IRequest<List<UomDto>>
 {
-    public List<CompanyDto> CompanysToValidate { get; } = CompanysToValidate;
+    public List<UomDto> UomsToValidate { get; } = UomsToValidate;
 }a
 
 
-IRequestHandler<BulkValidateCompanyQuery, List<CompanyDto>>,
+IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
   
-IRequestHandler<GetCompanyQuery, (List<CompanyDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
+IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleUomQuery, UomDto>,
 
 
 
- var a = await Mediator.Send(new GetCompanysQuery
+ var a = await Mediator.Send(new GetUomsQuery
  {
      OrderByList =
      [
@@ -399,10 +399,10 @@ IRequestHandler<GetSingleCompanyQuery, CompanyDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleCompanyQuery
+var patienss = (await Mediator.Send(new GetSingleUomQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Company
+    Select = x => new Uom
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -415,13 +415,13 @@ var patienss = (await Mediator.Send(new GetSingleCompanyQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetCompanyQuery
+    var result = await Mediator.Send(new GetUomQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Companys = result.Item1;
+    Uoms = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -434,22 +434,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetCompanyQuery
+ var result = await Mediator.Send(new GetUomQuery
  {
-     Predicate = x => x.CompanyId == CompanyId,
-     SearchTerm = refCompanyComboBox?.Text ?? "",
+     Predicate = x => x.UomId == UomId,
+     SearchTerm = refUomComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Companys = result.Item1;
- totalCountCompany = result.PageCount;
+ Uoms = result.Item1;
+ totalCountUom = result.PageCount;
 
- Companys = (await Mediator.Send(new GetCompanyQuery
+ Uoms = (await Mediator.Send(new GetUomQuery
  {
-     Predicate = x => x.Id == CompanyForm.IdCardCompanyId,
+     Predicate = x => x.Id == UomForm.IdCardUomId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleCompanysQuery
+var data = (await Mediator.Send(new GetSingleUomsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -457,17 +457,17 @@ var data = (await Mediator.Send(new GetSingleCompanysQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Company
+    Select = x => new Uom
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Company
+        Patient = new Uom
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Company
+        Pratitioner = new Uom
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -480,55 +480,55 @@ var data = (await Mediator.Send(new GetSingleCompanysQuery
 })) ?? new();
 
 
-#region ComboboxCompany
+#region ComboboxUom
 
- private DxComboBox<CompanyDto, long?> refCompanyComboBox { get; set; }
- private int CompanyComboBoxIndex { get; set; } = 0;
- private int totalCountCompany = 0;
+ private DxComboBox<UomDto, long?> refUomComboBox { get; set; }
+ private int UomComboBoxIndex { get; set; } = 0;
+ private int totalCountUom = 0;
 
- private async Task OnSearchCompany()
+ private async Task OnSearchUom()
  {
-     await LoadDataCompany();
+     await LoadDataUom();
  }
 
- private async Task OnSearchCompanyIndexIncrement()
+ private async Task OnSearchUomIndexIncrement()
  {
-     if (CompanyComboBoxIndex < (totalCountCompany - 1))
+     if (UomComboBoxIndex < (totalCountUom - 1))
      {
-         CompanyComboBoxIndex++;
-         await LoadDataCompany(CompanyComboBoxIndex, 10);
+         UomComboBoxIndex++;
+         await LoadDataUom(UomComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchCompanyIndexDecrement()
+ private async Task OnSearchUomIndexDecrement()
  {
-     if (CompanyComboBoxIndex > 0)
+     if (UomComboBoxIndex > 0)
      {
-         CompanyComboBoxIndex--;
-         await LoadDataCompany(CompanyComboBoxIndex, 10);
+         UomComboBoxIndex--;
+         await LoadDataUom(UomComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputCompanyChanged(string e)
+ private async Task OnInputUomChanged(string e)
  {
-     CompanyComboBoxIndex = 0;
-     await LoadDataCompany();
+     UomComboBoxIndex = 0;
+     await LoadDataUom();
  }
 
  
-  private async Task LoadDataCompany(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataUom(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetCompanyQuery
+          var result = await Mediator.Send(new GetUomQuery
           {
-              SearchTerm = refCompanyComboBox?.Text ?? "",
+              SearchTerm = refUomComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Companys = result.Item1;
-          totalCountCompany = result.PageCount;
+          Uoms = result.Item1;
+          totalCountUom = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -538,47 +538,47 @@ var data = (await Mediator.Send(new GetSingleCompanysQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxCompany
+ #endregion ComboboxUom
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
-    <MyDxComboBox Data="@Companys"
-                  NullText="Select Company"
-                  @ref="refCompanyComboBox"
-                  @bind-Value="@a.CompanyId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
+    <MyDxComboBox Data="@Uoms"
+                  NullText="Select Uom"
+                  @ref="refUomComboBox"
+                  @bind-Value="@a.UomId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputCompanyChanged(e))">
+                  TextChanged="((string e) => OnInputUomChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchCompanyIndexDecrement"
+            <DxEditorButton Click="OnSearchUomIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchCompany"
+            <DxEditorButton Click="OnSearchUom"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchCompanyIndexIncrement"
+            <DxEditorButton Click="OnSearchUomIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(CompanyDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
-            <DxListEditorColumn FieldName="@nameof(CompanyDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(UomDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="Uom.Name" Caption="Uom" />
+            <DxListEditorColumn FieldName="@nameof(UomDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.CompanyId)" />
+    <ValidationMessage For="@(()=>a.UomId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());
-var result = await _unitOfWork.Repository<Company>().AddAsync(request.CompanyDtos.Adapt<List<CreateUpdateCompanyDto>>().Adapt<List<Company>>()); 
+var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());
+var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDtos.Adapt<List<CreateUpdateUomDto>>().Adapt<List<Uom>>()); 
 
-var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDto.Adapt<CreateUpdateCompanyDto>().Adapt<Company>());  
-var result = await _unitOfWork.Repository<Company>().UpdateAsync(request.CompanyDtos.Adapt<List<CreateUpdateCompanyDto>>().Adapt<List<Company>>());
+var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());  
+var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDtos.Adapt<List<CreateUpdateUomDto>>().Adapt<List<Uom>>());
 
-list3 = (await Mediator.Send(new GetCompanyQuery
+list3 = (await Mediator.Send(new GetUomQuery
 {
-    Predicate = x => CompanyNames.Contains(x.Name.ToLower()),
+    Predicate = x => UomNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Company
+    Select = x => new Uom
     {
         Id = x.Id,
         Name = x.Name
@@ -588,42 +588,42 @@ list3 = (await Mediator.Send(new GetCompanyQuery
 
 #region Searching
 
-    private int pageSizeCompanyAttendance { get; set; } = 10;
-    private int totalCountCompanyAttendance = 0;
-    private int activePageIndexCompanyAttendance { get; set; } = 0;
-    private string searchTermCompanyAttendance { get; set; } = string.Empty;
+    private int pageSizeUomAttendance { get; set; } = 10;
+    private int totalCountUomAttendance = 0;
+    private int activePageIndexUomAttendance { get; set; } = 0;
+    private string searchTermUomAttendance { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedCompanyAttendance(string searchText)
+    private async Task OnSearchBoxChangedUomAttendance(string searchText)
     {
-        searchTermCompanyAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeCompanyAttendance);
+        searchTermUomAttendance = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeUomAttendance);
     }
 
-    private async Task OnpageSizeCompanyAttendanceIndexChanged(int newpageSizeCompanyAttendance)
+    private async Task OnpageSizeUomAttendanceIndexChanged(int newpageSizeUomAttendance)
     {
-        pageSizeCompanyAttendance = newpageSizeCompanyAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeCompanyAttendance);
+        pageSizeUomAttendance = newpageSizeUomAttendance;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeUomAttendance);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeCompanyAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeUomAttendance);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeCompanyAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeUomAttendance = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetCompanyAttendanceQuery
+        var result = await Mediator.Send(new GetUomAttendanceQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeCompanyAttendance,
-            SearchTerm = searchTermCompanyAttendance,
+            PageSize = pageSizeUomAttendance,
+            SearchTerm = searchTermUomAttendance,
         });
-        CompanyAttendances = result.Item1;
-        totalCountCompanyAttendance = result.PageCount;
-        activePageIndexCompanyAttendance = pageIndex;
+        UomAttendances = result.Item1;
+        totalCountUomAttendance = result.PageCount;
+        activePageIndexUomAttendance = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
@@ -696,7 +696,7 @@ list3 = (await Mediator.Send(new GetCompanyQuery
 
 
    <MyGridPaginate @ref="GridDetail"
-                 Data="Companys"
+                 Data="Uoms"
                  @bind-SelectedDataItems="@SelectedDetailDataItems"
                  EditModelSaving="OnSaveInventoryAdjumentDetail"
                  DataItemDeleting="OnDeleteInventoryAdjumentDetail"
@@ -707,8 +707,8 @@ list3 = (await Mediator.Send(new GetCompanyQuery
 
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="CompanyDto"
-                          Items="@Companys"
+         <MyDxToolbarBase TItem="UomDto"
+                          Items="@Uoms"
                           Grid="GridDetail"
                           SelectedDataItems="@SelectedDetailDataItems"
                           NewItem_Click="@NewItem_Click"
@@ -724,53 +724,53 @@ list3 = (await Mediator.Send(new GetCompanyQuery
 
      <Columns>
          <DxGridSelectionColumn Width="15px" />
-         <DxGridDataColumn FieldName="Company.Name" Caption="Company"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="Uom.Name" Caption="Uom"></DxGridDataColumn>
          <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
          <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
          <DxGridDataColumn FieldName="Difference" Caption="Difference" />
          <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
          <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
-         <DxGridDataColumn FieldName="Company.Company.Name" Caption="Company" />
+         <DxGridDataColumn FieldName="Uom.Uom.Name" Caption="Uom" />
      </Columns>
      <EditFormTemplate Context="EditFormContext">
          @{
              if (EditFormContext.DataItem is null)
              {
-                 FormCompany = (CompanyDto)EditFormContext.EditModel;
+                 FormUom = (UomDto)EditFormContext.EditModel;
              }
-             var IsBatch = Companys.FirstOrDefault(x => x.Id == FormCompany.CompanyId)?.TraceAbility ?? false;
+             var IsBatch = Uoms.FirstOrDefault(x => x.Id == FormUom.UomId)?.TraceAbility ?? false;
 
-             ActiveButton = FormCompany.CompanyId is null ||
-             string.IsNullOrWhiteSpace(FormCompany.Batch) && IsBatch ||
-             FormCompany.ExpiredDate is null ||
-             FormCompany.CompanyId is null;
+             ActiveButton = FormUom.UomId is null ||
+             string.IsNullOrWhiteSpace(FormUom.Batch) && IsBatch ||
+             FormUom.ExpiredDate is null ||
+             FormUom.UomId is null;
          }
          <div class="row w-100">
              <DxFormLayout CssClass="w-100">
                  <div class="col-md-4">
-                     <DxFormLayoutItem Caption="Company" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox Data="@Companys"
-                                     @bind-Value="@FormCompany.CompanyId"
+                     <DxFormLayoutItem Caption="Uom" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@Uoms"
+                                     @bind-Value="@FormUom.UomId"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     NullText="Select Company..."
+                                     NullText="Select Uom..."
                                      TextFieldName="Name"
-                                     ReadOnly="@(FormCompany.Id != 0)"
+                                     ReadOnly="@(FormUom.Id != 0)"
                                      ValueFieldName="Id"
-                                     SelectedItemChanged="@(async (CompanyDto freq) => await OnSelectCompany(freq))"
+                                     SelectedItemChanged="@(async (UomDto freq) => await OnSelectUom(freq))"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      ShowValidationIcon="true" />
-                         <ValidationMessage For="@(()=> FormCompany.CompanyId)"   />
+                         <ValidationMessage For="@(()=> FormUom.UomId)"   />
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem Caption="Batch" Enabled="FormCompany.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormUom.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <MyDxComboBox Data="@Batch"
-                                       ReadOnly="@(FormCompany.Id != 0)"
+                                       ReadOnly="@(FormUom.Id != 0)"
                                        NullText="Select Batch..."
                                        AllowUserInput="true"
-                                       @bind-Value="@FormCompany.Batch"
-                                       @bind-Text="@FormCompany.Batch"
+                                       @bind-Value="@FormUom.Batch"
+                                       @bind-Text="@FormUom.Batch"
                                        SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
-                         <ValidationMessage For="@(() => FormCompany.Batch)" />
+                         <ValidationMessage For="@(() => FormUom.Batch)" />
 
                      </DxFormLayoutItem>
                  </div>
@@ -780,43 +780,43 @@ list3 = (await Mediator.Send(new GetCompanyQuery
                          <DxSpinEdit ShowValidationIcon="true"
                                      ReadOnly
                                      MinValue="0"
-                                     @bind-Value="@FormCompany.TeoriticalQty"
+                                     @bind-Value="@FormUom.TeoriticalQty"
                                      NullText="Teoritical Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormCompany.TeoriticalQty)"   />
+                         <ValidationMessage For="@(()=> FormUom.TeoriticalQty)"   />
                      </DxFormLayoutItem>
 
                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxSpinEdit ShowValidationIcon="true"
                                      MinValue="0"
-                                     @bind-Value="@FormCompany.RealQty"
+                                     @bind-Value="@FormUom.RealQty"
                                      NullText="Real Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormCompany.RealQty)"   />
+                         <ValidationMessage For="@(()=> FormUom.RealQty)"   />
                      </DxFormLayoutItem>
                  </div>
 
                  <div class="col-md-4">
                      <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxDateEdit ShowValidationIcon="true"
-                                     ReadOnly="@(FormCompany.Id != 0)"
+                                     ReadOnly="@(FormUom.Id != 0)"
                                      DisplayFormat="@Helper.DefaultFormatDate"
-                                     @bind-Date="@FormCompany.ExpiredDate"
+                                     @bind-Date="@FormUom.ExpiredDate"
                                      NullText="Expired Date">
                          </DxDateEdit>
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Company" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox ShowValidationIcon="true" Data="@Companys"
-                                     NullText="Company"
-                                     ReadOnly="@(FormCompany.Id != 0)"
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Uom" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@Uoms"
+                                     NullText="Uom"
+                                     ReadOnly="@(FormUom.Id != 0)"
                                      TextFieldName="Name"
                                      ValueFieldName="Id"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     @bind-Value="FormCompany.CompanyId">
+                                     @bind-Value="FormUom.UomId">
                          </DxComboBox>
-                         <ValidationMessage For="@(() => FormCompany.CompanyId)" />
+                         <ValidationMessage For="@(() => FormUom.UomId)" />
                      </DxFormLayoutItem>
                  </div>
              </DxFormLayout>
@@ -835,58 +835,58 @@ list3 = (await Mediator.Send(new GetCompanyQuery
 
  NEW COMBOBOX VIRAL 2024
 
-Company
+Uom
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Company" ColSpanMd="12">
-    <DxComboBox Data="Companys"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
+    <DxComboBox Data="Uoms"
                 AllowUserInput="true"
-                NullText="Select Company"
+                NullText="Select Uom"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputCompany"
-                @bind-Value="a.CompanyId">
+                @oninput="OnInputUom"
+                @bind-Value="a.UomId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Company.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Company.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Uom.Code)" Caption="Code" />
         </Columns>
     </DxComboBox>
-    <ValidationMessage For="@(()=>a.CompanyId)" />
+    <ValidationMessage For="@(()=>a.UomId)" />
 </DxFormLayoutItem>
 
-#region ComboBox Company
+#region ComboBox Uom
  
-private CancellationTokenSource? _ctsCompany;
-private async Task OnInputCompany(ChangeEventArgs e)
+private CancellationTokenSource? _ctsUom;
+private async Task OnInputUom(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
             
-        _ctsCompany?.Cancel();
-        _ctsCompany?.Dispose();
-        _ctsCompany = new CancellationTokenSource();
+        _ctsUom?.Cancel();
+        _ctsUom?.Dispose();
+        _ctsUom = new CancellationTokenSource();
             
-        await Task.Delay(700, _ctsCompany.Token);
+        await Task.Delay(700, _ctsUom.Token);
             
-        await LoadCompany(e.Value?.ToString() ?? "");
+        await LoadUom(e.Value?.ToString() ?? "");
     } 
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsCompany?.Dispose();
-        _ctsCompany = null;
+        _ctsUom?.Dispose();
+        _ctsUom = null;
     } 
 }
 
- private async Task LoadCompany(string? e = "", Expression<Func<Company, bool>>? predicate = null)
+ private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
  {
      try
      {
          PanelVisible = true;
-         Companys = await Mediator.QueryGetComboBox<Company, CompanyDto>(e, predicate);
+         Uoms = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
          PanelVisible = false;
      }
      catch (Exception ex)
@@ -900,76 +900,76 @@ private async Task OnInputCompany(ChangeEventArgs e)
 
 
 // Ini buat di EditItemClick
-await LoadCompany(id:  a.CompanyId);
+await LoadUom(id:  a.UomId);
 
-Company
+Uom
 
 
 
 VIRAL 2025
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-    <MyDxComboBox Data="Countries"
-                NullText="Select Province"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
+    <MyDxComboBox Data="Uoms"
+                NullText="Select Uom"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputProvince"
-                SelectedItemChanged="((ProvinceDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.ProvinceId">
+                @oninput="OnInputUom"
+                SelectedItemChanged="((UomDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.UomId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Province.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Province.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Uom.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.ProvinceId)" />
+    <ValidationMessage For="@(()=>a.UomId)" />
 </DxFormLayoutItem>
 
 
-#region ComboBox Province
+#region ComboBox Uom
 
-private ProvinceDto SelectedProvince { get; set; } = new();
-async Task SelectedItemChanged(ProvinceDto e)
+private UomDto SelectedUom { get; set; } = new();
+async Task SelectedItemChanged(UomDto e)
 {
     if (e is null)
     {
-        SelectedProvince = new();
-        await LoadCounty(); 
+        SelectedUom = new();
+        await LoadUom(); 
     }
     else
-        SelectedProvince = e;
+        SelectedUom = e;
 }
 
-private CancellationTokenSource? _cts;
-private async Task OnInputProvince(ChangeEventArgs e)
+private CancellationTokenSource? _ctsUom;
+private async Task OnInputUom(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
 
         _cts?.Cancel();
-        _cts?.Dispose();
-        _cts = new CancellationTokenSource();
+        _ctsUom?.Dispose();
+        _ctsUom = new CancellationTokenSource();
 
-        await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+        await Task.Delay(Helper.CBX_DELAY, _ctsUom.Token);
 
-        await LoadCounty(e.Value?.ToString() ?? "");
+        await LoadUom(e.Value?.ToString() ?? "");
     }
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _cts?.Dispose();
-        _cts = null;
+        _ctsUom?.Dispose();
+        _ctsUom = null;
     }
 }
 
-private async Task LoadCounty(string? e = "", Expression<Func<Province, bool>>? predicate = null)
+private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
 {
     try
     {
         PanelVisible = true;
-        Countries = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
+        Countries = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
         PanelVisible = false;
     }
     catch (Exception ex)

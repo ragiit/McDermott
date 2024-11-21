@@ -1,11 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Inventory.ProductCommand;
-using static McDermott.Application.Features.Commands.Medical.ProjectCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
@@ -22,6 +16,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<DeleteProductRequest, bool>
     {
         #region GET
+
         public async Task<(List<ProductDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductQueryNew request, CancellationToken cancellationToken)
         {
             try
@@ -59,7 +54,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")  
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
                             );
                 }
 
@@ -99,7 +94,6 @@ namespace McDermott.Application.Features.Queries.Inventory
             }
         }
 
-
         public async Task<ProductDto> Handle(GetSingleProductQueryNew request, CancellationToken cancellationToken)
         {
             try
@@ -137,7 +131,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")  
+                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%")
                         );
                 }
 

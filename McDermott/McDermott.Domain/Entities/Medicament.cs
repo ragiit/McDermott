@@ -1,6 +1,4 @@
-﻿
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class Medicament : BaseAuditableEntity
     {
@@ -17,7 +15,6 @@ namespace McDermott.Domain.Entities
         public bool? Cronies { get; set; }
         public string? MontlyMax { get; set; }
         public string? Dosage { get; set; }
-
 
         public Uom? Uom { get; set; }
         public DrugForm? Form { get; set; }

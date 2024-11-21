@@ -1,14 +1,5 @@
-﻿using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using McDermott.Application.Extentions;
+﻿using McDermott.Application.Extentions;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.VisualBasic;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.Linq;
 
 namespace McDermott.Application.Features.Queries.Transaction
 {

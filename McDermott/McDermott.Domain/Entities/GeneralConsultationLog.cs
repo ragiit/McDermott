@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Domain.Entities
+﻿namespace McDermott.Domain.Entities
 {
     public class GeneralConsultationLog : BaseAuditableEntity
     {
@@ -15,7 +9,6 @@ namespace McDermott.Domain.Entities
 
         public GeneralConsultanService? GeneralConsultanService { get; set; }
         public GeneralConsultanMedicalSupport? ProcedureRoom { get; set; }
-        public User? UserBy {  get; set; }
-        
+        public User? UserBy { get; set; }
     }
 }

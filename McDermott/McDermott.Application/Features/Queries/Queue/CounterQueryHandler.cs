@@ -1,7 +1,5 @@
 ﻿using McDermott.Application.Dtos.Queue;
 using McDermott.Application.Features.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 
 namespace McDermott.Application.Features.Queries.Queue

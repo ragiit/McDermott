@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {

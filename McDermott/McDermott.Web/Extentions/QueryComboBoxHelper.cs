@@ -9,7 +9,7 @@ namespace McDermott.Web.Extentions
 {
     public static class QueryComboBoxHelper
     {
-        const short PAGE_SIZE = 20;
+        private const short PAGE_SIZE = 20;
 
         /// <summary>
         /// Queries data using the provided mediator and search term.
@@ -214,12 +214,12 @@ namespace McDermott.Web.Extentions
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
                 })).Item1;
-
             }
 
-            #endregion
+            #endregion Configurations
 
             #region Inventories
+
             if (typeof(TDto) == typeof(ProductDto))
             {
                 var result = (await mediator.Send(new GetProductQueryNew
@@ -238,6 +238,29 @@ namespace McDermott.Web.Extentions
 
                 return result.Cast<TDto>().ToList();
             }
+
+            if (typeof(TDto) == typeof(UomDto))
+            {
+                var result = (await mediator.Send(new GetUomQuery
+                {
+                    Predicate = predicate as Expression<Func<Uom, bool>> ?? (x => true),
+                    Select = x => new Uom
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Type = x.Type,
+                        UomCategory = new UomCategory
+                        {
+                            Name = x.UomCategory == null ? "" : x.UomCategory.Name
+                        }
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
             if (typeof(TDto) == typeof(LocationDto))
             {
                 var result = (await mediator.Send(new GetLocationQuery
@@ -246,8 +269,12 @@ namespace McDermott.Web.Extentions
                     Select = x => new Locations
                     {
                         Id = x.Id,
-                        Name = x.Name, 
+                        Name = x.Name,
                         ParentLocationId = x.ParentLocationId,
+                        ParentLocation = new Locations
+                        {
+                            Name = x.ParentLocation == null ? "" : x.ParentLocation.Name,
+                        }
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -255,7 +282,8 @@ namespace McDermott.Web.Extentions
 
                 return result.Cast<TDto>().ToList();
             }
-            #endregion
+
+            #endregion Inventories
 
             throw new NotSupportedException($"Query for type {typeof(T)} is not supported.");
         }

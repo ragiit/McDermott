@@ -1,7 +1,5 @@
-﻿using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Application.Dtos.Pharmacies;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
-using McDermott.Application.Features.Services;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
 {
@@ -25,6 +23,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         IRequestHandler<DeleteStockOutPrescriptionRequest, bool>
     {
         #region Prescription
+
         #region GET Education Program
 
         public async Task<List<PrescriptionDto>> Handle(GetAllPrescriptionQuery request, CancellationToken cancellationToken)
@@ -166,7 +165,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Name = ac.Name
                         }).ToList()
-
                     });
 
                 if (!request.IsGetAll)
@@ -273,7 +271,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Name = ac.Name
                         }).ToList(),
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<PrescriptionDto>();
@@ -284,8 +281,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -398,9 +393,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Prescription
 
         #region Stock Out Prescription
+
         #region GET Education Program
 
         public async Task<List<StockOutPrescriptionDto>> Handle(GetAllStockOutPrescriptionQuery request, CancellationToken cancellationToken)
@@ -510,7 +507,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Select(x => new StockOutPrescription
                     {
                         Id = x.Id,
-                       
+
                         PrescriptionId = x.PrescriptionId,
                         TransactionStockId = x.TransactionStockId,
                         CutStock = x.CutStock,
@@ -519,7 +516,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Batch = x.TransactionStock == null ? string.Empty : x.TransactionStock.Batch,
                         },
-
                     });
 
                 if (!request.IsGetAll)
@@ -597,12 +593,11 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         PrescriptionId = x.PrescriptionId,
                         TransactionStockId = x.TransactionStockId,
                         CutStock = x.CutStock,
-                        
+
                         TransactionStock = new TransactionStock
                         {
                             Batch = x.TransactionStock == null ? string.Empty : x.TransactionStock.Batch,
                         },
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<StockOutPrescriptionDto>();
@@ -613,8 +608,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 throw;
             }
         }
-
-
 
         #endregion GET Education Program
 
@@ -727,6 +720,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
         }
 
         #endregion DELETE
-        #endregion
+
+        #endregion Stock Out Prescription
     }
 }

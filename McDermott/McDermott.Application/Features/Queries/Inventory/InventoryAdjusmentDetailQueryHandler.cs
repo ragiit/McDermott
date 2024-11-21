@@ -3,15 +3,25 @@
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class InventoryAdjusmentDetailQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-    IRequestHandler<GetInventoryAdjusmentDetailQuery, (List<InventoryAdjusmentDetailDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleInventoryAdjusmentDetailQuery, InventoryAdjusmentDetailDto>, 
+        IRequestHandler<GetInventoryAdjusmentDetailQuery, (List<InventoryAdjusmentDetailDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleInventoryAdjusmentDetailQuery, InventoryAdjusmentDetailDto>,
         IRequestHandler<CreateInventoryAdjusmentDetailRequest, InventoryAdjusmentDetailDto>,
+        IRequestHandler<ValidateInventoryAdjusmentDetail, bool>,
         IRequestHandler<CreateListInventoryAdjusmentDetailRequest, List<InventoryAdjusmentDetailDto>>,
         IRequestHandler<UpdateInventoryAdjusmentDetailRequest, InventoryAdjusmentDetailDto>,
         IRequestHandler<UpdateListInventoryAdjusmentDetailRequest, List<InventoryAdjusmentDetailDto>>,
         IRequestHandler<DeleteInventoryAdjusmentDetailRequest, bool>
     {
         #region GET
+
+        public async Task<bool> Handle(ValidateInventoryAdjusmentDetail request, CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Repository<InventoryAdjusmentDetail>()
+                .Entities
+                .AsNoTracking()
+                .Where(request.Predicate)  // Apply the Predicate for filtering
+                .AnyAsync(cancellationToken);  // Check if any record matches the condition
+        }
 
         public async Task<(List<InventoryAdjusmentDetailDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetInventoryAdjusmentDetailQuery request, CancellationToken cancellationToken)
         {
@@ -69,6 +79,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         Product = new Product
                         {
                             Name = x.Product == null ? "" : x.Product.Name,
+                            UomId = x.Product == null ? null : x.Product.UomId,
                             Uom = new Uom
                             {
                                 Name = x.Product.Uom == null ? "" : x.Product.Uom.Name
@@ -78,7 +89,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         RealQty = x.RealQty,
                         StockProduct = x.StockProduct,
                         TransactionStockId = x.TransactionStockId,
-                        TeoriticalQty = x.TeoriticalQty,    
+                        TeoriticalQty = x.TeoriticalQty,
                     });
 
                 if (!request.IsGetAll)
@@ -160,6 +171,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         Product = new Product
                         {
                             Name = x.Product == null ? "" : x.Product.Name,
+                            UomId = x.Product == null ? null : x.Product.UomId,
                             Uom = new Uom
                             {
                                 Name = x.Product.Uom == null ? "" : x.Product.Uom.Name
@@ -169,7 +181,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                         RealQty = x.RealQty,
                         StockProduct = x.StockProduct,
                         TransactionStockId = x.TransactionStockId,
-                        TeoriticalQty = x.TeoriticalQty, 
+                        TeoriticalQty = x.TeoriticalQty,
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<InventoryAdjusmentDetailDto>();
@@ -180,6 +192,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                 throw;
             }
         }
+
         #endregion GET
 
         #region CREATE

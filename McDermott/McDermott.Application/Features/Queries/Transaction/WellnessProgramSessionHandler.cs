@@ -1,9 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramSessionCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
@@ -19,6 +14,7 @@ namespace McDermott.Application.Features.Queries.Transaction
      IRequestHandler<DeleteWellnessProgramSessionRequest, bool>
     {
         #region GET
+
         public async Task<List<WellnessProgramSessionDto>> Handle(BulkValidateWellnessProgramSession request, CancellationToken cancellationToken)
         {
             var CountryDtos = request.WellnessProgramSessionsToValidate;
@@ -37,6 +33,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
             return [];
         }
+
         public async Task<bool> Handle(ValidateWellnessProgramSession request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<WellnessProgramSession>()
@@ -180,7 +177,6 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
         }
 
-       
         #endregion GET
 
         #region CREATE

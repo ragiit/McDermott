@@ -1,15 +1,8 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Pharmacies
+﻿namespace McDermott.Application.Features.Commands.Pharmacies
 {
     public class ReorderingRuleCommand
     {
-        #region GET 
+        #region GET
 
         public class GetReorderingRuleQuery(Expression<Func<ReorderingRule, bool>>? predicate = null, bool removeCache = false) : IRequest<List<ReorderingRuleDto>>
         {
@@ -17,7 +10,7 @@ namespace McDermott.Application.Features.Commands.Pharmacies
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        #endregion GET  
+        #endregion GET
 
         #region CREATE
 
