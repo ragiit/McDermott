@@ -11,7 +11,6 @@ namespace McDermott.Application.Dtos.Pharmacies
         public long? MedicamentGroupId { get; set; }
         public long? DrugFormId { get; set; }
         public long? DrugRouteId { get; set; }
-        public string? MedicamentName { get; set; }
         public string? MedicamenName { get; set; }
 
         public string? DrugFormName { get; set; }

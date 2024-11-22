@@ -1,11 +1,12 @@
 ﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
 {
     public class PrescriptionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
        IRequestHandler<GetAllPrescriptionQuery, List<PrescriptionDto>>,//Prescription
-        IRequestHandler<GetConcoctionLinesQuery, (List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetPrescriptionQuery, (List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetSinglePrescriptionQuery, PrescriptionDto>, IRequestHandler<ValidatePrescriptionQuery, bool>,
         IRequestHandler<BulkValidatePrescriptionQuery, List<PrescriptionDto>>,
         IRequestHandler<CreatePrescriptionRequest, PrescriptionDto>,
@@ -84,7 +85,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 .AnyAsync(cancellationToken);  // Check if any record matches the condition
         }
 
-        public async Task<(List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetConcoctionLinesQuery request, CancellationToken cancellationToken)
+        public async Task<(List<PrescriptionDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetPrescriptionQuery request, CancellationToken cancellationToken)
         {
             try
             {

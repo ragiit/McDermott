@@ -85,6 +85,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private PatientAllergyDto PatientAllergy { get; set; } = new();
         private UserDto postPatient { get; set; } = new();
         private PharmacyLogDto PharmaciesLog { get; set; } = new();
+        
 
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
@@ -97,8 +98,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private List<PrescriptionDto> getPrescriptions { get; set; } = [];
         private List<ConcoctionDto> getConcoctions { get; set; } = [];
         private List<ConcoctionLineDto> getConcoctionLines { get; set; } = [];
-        private List<StockOutPrescriptionDto> StockOutPrescriptions { get; set; } = [];
-        private List<StockOutLinesDto> StockOutLines { get; set; } = [];
+        private List<StockOutPrescriptionDto> StockOutPrescriptions { get; set; } = [];        
         private List<AllergyDto> allergies { get; set; } = [];
         private List<PatientAllergyDto> PatientAllergies { get; set; } = [];
         private List<PharmacyLogDto> Logs { get; set; } = [];
@@ -114,11 +114,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private List<MedicamentGroupDto> MedicamentGroups { get; set; } = [];
         private List<MedicamentGroupDto> MedicamentGroupsConcoction { get; set; } = [];
         private List<DrugFormDto> DrugForms { get; set; } = [];
-        private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
         private List<DrugRouteDto> DrugRoutes { get; set; } = [];
+        private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
         private List<TransactionStockDto> TransactionStocks { get; set; } = [];
         private List<TransactionStockDto> StockOutProducts { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponentt { get; set; } = [];
+        private TransactionStockDto postTransactionStock { get; set; } = new();
         private TransactionStockDto FormTransactionStock { get; set; } = new();
         private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private IEnumerable<ActiveComponentDto>? selectedActiveComponentPrescriptions { get; set; } = [];
@@ -872,7 +873,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             {
                 PanelVisiblePrescription = true;
 
-                var result = await Mediator.Send(new GetConcoctionLinesQuery
+                var result = await Mediator.Send(new GetPrescriptionQuery
                 {
                     Predicate = x => x.PharmacyId == postPharmacy.Id,
                 });
@@ -1010,7 +1011,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             GridConcoction.ShowRowDeleteConfirmation(FocusedRowVisibleIndexConcoction);
         }
 
-        private async Task OnDeletePrescription()
+        private async Task OnDeletePrescription(GridDataItemDeletingEventArgs e)
         {
             PanelVisiblePrescription = true;
             var data = SelectedDataItemsPrescription[0].Adapt<PrescriptionDto>();
@@ -1029,7 +1030,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
             PanelVisiblePrescription = false;
         }
-        private async Task OnDeleteConcoction()
+        private async Task OnDeleteConcoction(GridDataItemDeletingEventArgs e)
         {
             PanelVisibleConcoction = true;
             var data = SelectedDataItemsConcoction[0].Adapt<ConcoctionDto>();
@@ -1345,7 +1346,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             try
             {
                 StockOutPrescriptions = (await Mediator.Send(new GetStockOutPrescriptionQuery())).Item1;
-                StockOutLines = (await Mediator.Send(new GetStockOutLinesQuery())).Item1;
+                var StockOutLines = (await Mediator.Send(new GetStockOutLinesQuery())).Item1;
                 var pharmacyData = getPharmacies.FirstOrDefault(x => x.Id == postPharmacy.Id);
                 if (pharmacyData == null)
                 {

@@ -1,1 +1,65 @@
-﻿@page "pharmacy/prescriptions/cl/{PageMode}"
+﻿@page "/pharmacy/prescriptions/cl/{PageMode}"
+
+@using McDermott.Web.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>McHealthCare - Pharmacy</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+        <BaseHeaderPage Title="Pharmacy" OnClickBack="@(async () => NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}/?Id={PostConcoction.PharmacyId}"))" ShowBackButton="true" />
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <EditForm Model="@PostConcoction" Context="EditFormContext" OnInvalidSubmit="@HandleInvalidSubmit" OnValidSubmit="@HandleValidSubmit">
+                            <DataAnnotationsValidator />
+                            <AntiforgeryToken />
+                            <div class="card">
+                                <div class="card-body">
+                                    <DxFormLayout CssClass="w100">
+                                        <DxFormLayoutItem Caption="Prescribing Doctor" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxComboBox ShowValidationIcon="true"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@GetPractitioner"
+                                                        NullText="Select Prescribing Doctor..."
+                                                        @bind-Value="@PostConcoction.PrescribingDoctorId"
+                                                        TextFieldName="Name"
+                                                        ReadOnly
+                                                        ValueFieldName="Id">
+                                            </DxComboBox>
+                                            <ValidationMessage For="@(()=> PostConcoction.PrescribingDoctorId)" />
+                                        </DxFormLayoutItem>
+                                        <DxFormLayoutItem Caption="Medicament Group" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxComboBox ShowValidationIcon="true"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@GetMedicamentGroup"
+                                                        NullText="Select Medicament Group..."
+                                                        @bind-Value="@PostConcoction.MedicamentGroupId"
+                                                        SelectedItemChanged="@((MedicamentGroupDto value) =>  SelectedMedicamentGroupConcoction(value))"
+                                                        TextFieldName="Name"
+                                                        ReadOnly="@(PostPharmacy.Status != EnumStatusPharmacy.Draft)"
+                                                        ValueFieldName="Id">
+                                            </DxComboBox>
+                                            <ValidationMessage For="@(()=> PostConcoction.MedicamentGroupId)" />
+                                        </DxFormLayoutItem>
+
+                                        <DxFormLayoutItem Caption="Medicine Name" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@PostConcoction.MedicamenName"
+                                                       ShowValidationIcon="true"
+                                                       ReadOnly="@(PostPharmacy.Status != EnumStatusPharmacy.Draft)"
+                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                       NullText="Name" />
+                                            <ValidationMessage For="@(() => PostConcoction.MedicamenName)"   />
+                                        </DxFormLayoutItem>
+                                    </DxFormLayout>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
