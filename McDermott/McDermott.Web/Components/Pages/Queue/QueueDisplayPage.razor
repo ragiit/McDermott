@@ -30,24 +30,6 @@
                                         DataItemDeleting="OnDelete"
                                         FocusedRowChanged="Grid_FocusedRowChanged">
 
-                                    @* <ToolbarTemplate>
-                                <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && QueueDisplay.Count > 0" />
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && QueueDisplay.Count > 0" />
-                                <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                <DxToolbarItem Text="Column Chooser" Click="ColumnChooserButton_Click" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
-                                <DxToolbarItem Text="Export" BeginGroup="true" IconCssClass="fa-solid fa-file-export">
-                                <Items>
-                                <DxToolbarItem Text="To CSV" Click="ExportCsvItem_Click" />
-                                <DxToolbarItem Text="To XLSX" Click="ExportXlsxItem_Click" />
-                                <DxToolbarItem Text="To XLS" Click="ExportXlsItem_Click" />
-                                </Items>
-                                </DxToolbarItem>
-                                <DxToolbarItem Visible="@UserAccessCRUID.IsImport" Click="@ImportFile" Text="Import" IconCssClass="fa-solid fa-file-import" />
-                                </DxToolbar>
-                                </ToolbarTemplate> *@
-
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="QueueDisplayDto"
                                                          Items="@QueueDisplay"
@@ -84,13 +66,7 @@
                                                     <DxTextBox @bind-Text="@a.Name" NullText="Name Display.."></DxTextBox>
                                                 </div>
                                             </DxFormLayoutItem>
-                                          @*   <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Counter">
-                                                <DxTagBox Data="@Counters" FilteringMode="@DataGridFilteringMode.Contains"
-                                                          @bind-Values="@selectedCounter"
-                                                          NullText="Select Counter.."
-                                                          ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                          TextFieldName="Name" />
-                                            </DxFormLayoutItem> *@
+                                          
 
                                             <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Counters">
                                                 <Template>
