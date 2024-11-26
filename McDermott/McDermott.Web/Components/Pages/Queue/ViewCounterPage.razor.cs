@@ -7,6 +7,34 @@ namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class ViewCounterPage
     {
+        #region UserLoginAndAccessRole
+
+        [Inject]
+        public UserInfoService UserInfoService { get; set; }
+
+        private GroupMenuDto UserAccessCRUID = new();
+        private User UserLogin { get; set; } = new();
+        private bool IsAccess = false;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+
+        }
+
+        private async Task GetUserInfo()
+        {
+            try
+            {
+                var user = await UserInfoService.GetUserInfo(ToastService);
+                IsAccess = user.Item1;
+                UserAccessCRUID = user.Item2;
+                UserLogin = user.Item3;
+            }
+            catch { }
+        }
+
+        #endregion UserLoginAndAccessRole
+
         #region Relation Data
 
         private List<CounterDto> counters = new();
@@ -62,27 +90,28 @@ namespace McDermott.Web.Components.Pages.Queue
                 //    .Build();
 
                 //await hubConnection.StartAsync();
+                await GetUserInfo();
 
                 await InvokeAsync(StateHasChanged);
             }
             catch { }
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            try
-            {
-                await base.OnAfterRenderAsync(firstRender);
+        //protected override async Task OnAfterRenderAsync(bool firstRender)
+        //{
+        //    try
+        //    {
+        //        await base.OnAfterRenderAsync(firstRender);
 
-                if (firstRender)
-                {
-                    await oLocal.GetCookieUserLogin();
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
+        //        if (firstRender)
+        //        {
+        //            await oLocal.GetCookieUserLogin();
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //}
 
         private async Task LoadData()
         {
@@ -90,7 +119,7 @@ namespace McDermott.Web.Components.Pages.Queue
             {
                 var us = await JsRuntime.GetCookieUserLogin();
 
-                userBy = us.Name;
+                userBy = UserLogin.Name;
 
                 ShowPresent = false;
                 PanelVisible = true;
@@ -98,10 +127,10 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     Predicate = x => x.Id == CounterId
                 });
-                //Services = await Mediator.Send(new GetServiceQuery());
+                var resultService = await Mediator.Send(new GetServiceQuery());
                 var physician = await Mediator.Send(new GetUserQuery());
                 DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());
-                ServiceK = Services.Where(x => x.IsKiosk == true).ToList();
+                ServiceK = resultService.Item1.Where(x => x.IsKiosk == true).ToList();
                 var GetClass = await Mediator.Send(new GetClassTypeQuery());
 
                 //var cekServicesK = service
@@ -135,14 +164,41 @@ namespace McDermott.Web.Components.Pages.Queue
                     }
                 }
                 NameCounter = $"Queue Counter {general.Name}";
-                sId = general.ServiceId;
                 PhysicianId = general.PhysicianId;
+                sId = general.ServiceId;
+                var Phys = await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x=>x.Id == general.PhysicianId,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    }
+                }) ;
 
                 var skId = general.ServiceKId;
-                NameServicesK = Services.FirstOrDefault(x => x.Id == skId)?.Name;
+                var servk = await Mediator.Send(new GetSingleServiceQuery
+                {
+                    Predicate = x => x.Id == skId,
+                    Select = x => new Service
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    }
+                });
+                NameServicesK = servk.Name ?? "-";
 
-                NameServices = sId != null ? Services.FirstOrDefault(x => x.Id == sId)?.Name : "-";
-                Phy = PhysicianId != null ? physician.FirstOrDefault(x => x.Id == PhysicianId && x.IsPhysicion)?.Name : "-";
+                var serv = await Mediator.Send(new GetSingleServiceQuery
+                {
+                    Predicate = x => x.Id == sId,
+                    Select = x => new Service
+                    {
+                        Id = x.Id,
+                        Name = x.Name
+                    }
+                });
+                NameServices = serv.Name ?? "-";
+                Phy = Phys.Name ?? "-";
                 PanelVisible = false;
             }
             catch (Exception ex)

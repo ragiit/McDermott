@@ -505,7 +505,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     {
                         await Mediator.Send(new UpdateCounterRequest(counterForm));
                     }
-                    NavigationManager.NavigateTo($"/queue/counter-view/{counterForm.Id}");
+                    NavigationManager.NavigateTo($"queue/counter-view/{counterForm.Id}");
                     showFormProcess = false;
                     await LoadData();
                 }
@@ -625,7 +625,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 {
                     await Mediator.Send(new UpdateCounterRequest(counterForm));
                 }
-                NavigationManager.NavigateTo($"/queue/counter-view/{counterForm.Id}");
+                NavigationManager.NavigateTo($"queue/counter-view/{counterForm.Id}");
                 showFormProcess = false;
                 await LoadData();
             }

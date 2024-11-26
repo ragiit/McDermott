@@ -318,7 +318,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private async Task OnRenderTo(QueueDisplayDto context)
         {
             var DisplayId = context.Id;
-            NavigationManager.NavigateTo($"/queue/viewdisplay/{DisplayId}", true);
+            NavigationManager.NavigateTo($"queue/viewdisplay/{DisplayId}", true);
         }
 
         #endregion Method OnRenderTo

@@ -974,13 +974,14 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.BMIState = dto.BMIState;
             entity.RiskOfFalling = dto.RiskOfFalling;
             entity.RiskOfFallingDetail = dto.RiskOfFallingDetail;
+            entity.IsClaim = dto.IsClaim;
 
             SetPropertiesModified(entity, nameof(entity.InformationFrom), nameof(entity.AwarenessId), nameof(entity.LocationId), nameof(entity.Weight),
                 nameof(entity.Height), nameof(entity.RR), nameof(entity.SpO2), nameof(entity.WaistCircumference),
                  nameof(entity.LILA),
                 nameof(entity.BMIIndex), nameof(entity.BMIIndexString), nameof(entity.ScrinningTriageScale), nameof(entity.ClinicVisitTypes),
                 nameof(entity.E), nameof(entity.V), nameof(entity.M), nameof(entity.Temp), nameof(entity.HR),
-                nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState),
+                nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState),nameof(entity.IsClaim),
                 nameof(entity.RiskOfFalling), nameof(entity.RiskOfFallingDetail));
         }
 
