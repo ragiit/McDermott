@@ -66,7 +66,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private string NameClasses { get; set; }
         private string NameServices { get; set; } = string.Empty;
         private string NameServicesK { get; set; } = string.Empty;
-        private string Phy { get; set; } = string.Empty;
+        private string? Phy { get; set; } = string.Empty;
         private string? userBy;
         private long? sId { get; set; }
         private long? PhysicianId { get; set; }
@@ -84,13 +84,13 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
+                await GetUserInfo();
                 await LoadData();
                 //hubConnection = new HubConnectionBuilder()
                 //    .WithUrl("http://localhost:5000/realTimeHub")
                 //    .Build();
 
                 //await hubConnection.StartAsync();
-                await GetUserInfo();
 
                 await InvokeAsync(StateHasChanged);
             }
@@ -164,17 +164,17 @@ namespace McDermott.Web.Components.Pages.Queue
                     }
                 }
                 NameCounter = $"Queue Counter {general.Name}";
-                PhysicianId = general.PhysicianId;
+
                 sId = general.ServiceId;
                 var Phys = await Mediator.Send(new GetSingleUserQuery
                 {
-                    Predicate = x=>x.Id == general.PhysicianId,
+                    Predicate = x => x.Id == general.PhysicianId,
                     Select = x => new User
                     {
                         Id = x.Id,
                         Name = x.Name
                     }
-                }) ;
+                });
 
                 var skId = general.ServiceKId;
                 var servk = await Mediator.Send(new GetSingleServiceQuery
@@ -198,7 +198,11 @@ namespace McDermott.Web.Components.Pages.Queue
                     }
                 });
                 NameServices = serv.Name ?? "-";
-                Phy = Phys.Name ?? "-";
+                if (general.PhysicianId is not null)
+                {
+                    PhysicianId = general.PhysicianId;
+                    Phy = Phys.Name ?? "-";
+                }
                 PanelVisible = false;
             }
             catch (Exception ex)

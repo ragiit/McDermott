@@ -1,591 +1,593 @@
-﻿@page "/queue/counter-view/{CounterId:long}"
+﻿@page "/queue/queue-counters/view/{CounterId:long}"
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Counter View</PageTitle>
-
-<div class="wrapper">
-    <section class="content">
-        <div class="container-fluid">
-            <div class=" row">
-                <div class="col">
-                    <div class="card">
-                        @if (!ShowPresent)
-                        {
-                            <div class="card-header bg-primary">
-                                <div class="row">
-                                    <div class="col-md-4 d-flex justify-content-start align-items-center">
-                                        <DxButton Text="Back" Click="CloseDetail" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
+@if (IsAccess && UserAccessCRUID is not null && (UserAccessCRUID.IsCreate || UserAccessCRUID.IsUpdate))
+{
+    <div class="wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class=" row">
+                    <div class="col">
+                        <div class="card">
+                            @if (!ShowPresent)
+                            {
+                                <div class="card-header bg-primary">
+                                    <div class="row">
+                                        <div class="col-md-4 d-flex justify-content-start align-items-center">
+                                            <DxButton Text="Back" Click="CloseDetail" CssClass="fs-6 fw-bolder" IconCssClass="fa-solid fa-arrow-left" />
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <h4>@NameCounter.ToUpper()</h4>
+                                        </div>
+                                        <div class="col-md-4 text-center"></div>
                                     </div>
-                                    <div class="col-md-4 text-center">
-                                        <h4>@NameCounter.ToUpper()</h4>
-                                    </div>
-                                    <div class="col-md-4 text-center"></div>
                                 </div>
-                            </div>
 
-                            <div class="card-body">
-                                @if (sId == null && PhysicianId == null)
-                                {
-                                    <div class="row">
-                                        <div class="col-5">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>User</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p class="mt-0">@userBy </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-5">
-                                                    <label>Service Counter</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServicesK</p>
+                                <div class="card-body">
+                                    @if (sId == null && PhysicianId == null)
+                                    {
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>User</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mt-0">@userBy </p>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                            <hr class="px-0" />
                                         </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Service </label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServices</p>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <label>Service Counter</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServicesK</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Physicion</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@Phy</p>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Service </label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServices</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <hr class="px-0" />
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Physicion</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@Phy</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="px-0" />
 
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col">
-                                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                            IsContentBlocked="true"
-                                                            ApplyBackgroundShading="true"
-                                                            IndicatorAreaVisible="false"
-                                                            Text="Fetching Data...">
-                                                <DxGrid @ref="Grid"
-                                                        Data="@KiosksQueue"
-                                                        PageSize="10"
-                                                        ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                                                        AllowSelectRowByClick="true"
-                                                        PagerPosition="GridPagerPosition.Bottom"
-                                                        PageSizeSelectorVisible="true"
-                                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                        PageSizeSelectorAllRowsItemVisible="true"
-                                                        PagerSwitchToInputBoxButtonCount="10"
-                                                        ShowSearchBox="true"
-                                                        ShowGroupPanel="true"
-                                                        AutoExpandAllGroupRows="true"
-                                                        ShowFilterRow="true"
-                                                        PagerVisibleNumericButtonCount="10"
-                                                        CustomizeElement="Grid_CustomizeElement"
-                                                        KeyboardNavigationEnabled="true">
-                                                    <ToolbarTemplate>
-                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                        </DxToolbar>
-                                                    </ToolbarTemplate>
-                                                    <Columns>
-                                                        <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="9px" SortIndex="0" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" MinWidth="100" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" MinWidth="100" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" MinWidth="100" />
-                                                        <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" MinWidth="100">
-                                                            <CellDisplayTemplate>
-                                                                @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="QueueStage" Caption="Status" MinWidth="90">
-                                                            <CellDisplayTemplate>
-                                                                @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" MinWidth="300" Caption="Action" SortIndex="0">
-                                                            <CellDisplayTemplate>
-                                                                @{
-                                                                    var a = (KioskQueueDto)context.DataItem;
-                                                                }
-                                                                @if (a.QueueStage == null)
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "call")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "present")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                    </Columns>
-                                                </DxGrid>
-                                            </DxLoadingPanel>
                                         </div>
-                                    </div>
-                                }
-                                else if (sId != null && PhysicianId != null)
-                                {
-                                    <div class="row">
-                                        <div class="col-5">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>User</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p class="mt-0">@userBy </p>
-                                                </div>
+                                        <div class="row mt-3">
+                                            <div class="col">
+                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+                                                    <DxGrid @ref="Grid"
+                                                            Data="@KiosksQueue"
+                                                            PageSize="10"
+                                                            ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                                            AllowSelectRowByClick="true"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            PageSizeSelectorVisible="true"
+                                                            FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                                            EditorRenderMode="GridEditorRenderMode.Detached"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            ShowSearchBox="true"
+                                                            ShowGroupPanel="true"
+                                                            AutoExpandAllGroupRows="true"
+                                                            ShowFilterRow="true"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            CustomizeElement="Grid_CustomizeElement"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="9px" SortIndex="0" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" MinWidth="100" />
+                                                            <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" MinWidth="100">
+                                                                <CellDisplayTemplate>
+                                                                    @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="QueueStage" Caption="Status" MinWidth="90">
+                                                                <CellDisplayTemplate>
+                                                                    @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" MinWidth="300" Caption="Action" SortIndex="0">
+                                                                <CellDisplayTemplate>
+                                                                    @{
+                                                                        var a = (KioskQueueDto)context.DataItem;
+                                                                    }
+                                                                    @if (a.QueueStage == null)
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "call")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "present")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                        </Columns>
+                                                    </DxGrid>
+                                                </DxLoadingPanel>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-5">
-                                                    <label>Service Counter</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServicesK</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Service </label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServices</p>
+                                    }
+                                    else if (sId != null && PhysicianId != null)
+                                    {
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>User</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mt-0">@userBy </p>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                            <hr class="px-0" />
                                         </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Physicion</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@Phy</p>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <label>Service Counter</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServicesK</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col">
-                                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                            IsContentBlocked="true"
-                                                            ApplyBackgroundShading="true"
-                                                            IndicatorAreaVisible="false"
-                                                            Text="Fetching Data...">
-                                                <DxGrid @ref="Grid"
-                                                        Data="@KiosksQueue"
-                                                        PageSize="10"
-                                                        ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                                                        AllowSelectRowByClick="true"
-                                                        PagerPosition="GridPagerPosition.Bottom"
-                                                        PageSizeSelectorVisible="true"
-                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                        PageSizeSelectorAllRowsItemVisible="true"
-                                                        PagerSwitchToInputBoxButtonCount="10"
-                                                        PagerVisibleNumericButtonCount="10"
-                                                        CustomizeElement="Grid_CustomizeElement"
-                                                        KeyboardNavigationEnabled="true">
-                                                    <ToolbarTemplate>
-                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                        </DxToolbar>
-                                                    </ToolbarTemplate>
-                                                    <Columns>
-                                                        <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
-                                                        <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
-                                                            <CellDisplayTemplate>
-                                                                @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
-                                                            <CellDisplayTemplate>
-                                                                @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
-                                                            <CellDisplayTemplate>
-                                                                @{
-                                                                    var a = (KioskQueueDto)context.DataItem;
-                                                                }
-                                                                @if (a.QueueStage == null)
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "call")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "present")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                    </Columns>
-                                                </DxGrid>
-                                            </DxLoadingPanel>
-                                        </div>
-                                    </div>
-                                }
-                                else if (sId != null && PhysicianId == null)
-                                {
-                                    <div class="row">
-                                        <div class="col-5">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>User</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p class="mt-0">@userBy </p>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Service </label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServices</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-5">
-                                                    <label>Service Counter</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServicesK</p>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Physicion</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@Phy</p>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <hr class="px-0" />
                                         </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Service </label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServices</p>
-                                                </div>
+                                        <div class="row mt-3">
+                                            <div class="col">
+                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+                                                    <DxGrid @ref="Grid"
+                                                            Data="@KiosksQueue"
+                                                            PageSize="10"
+                                                            ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                                            AllowSelectRowByClick="true"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            PageSizeSelectorVisible="true"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            CustomizeElement="Grid_CustomizeElement"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" />
+                                                            <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
+                                                                <CellDisplayTemplate>
+                                                                    @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
+                                                                <CellDisplayTemplate>
+                                                                    @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                <CellDisplayTemplate>
+                                                                    @{
+                                                                        var a = (KioskQueueDto)context.DataItem;
+                                                                    }
+                                                                    @if (a.QueueStage == null)
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "call")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "present")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                        </Columns>
+                                                    </DxGrid>
+                                                </DxLoadingPanel>
                                             </div>
                                         </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Physicion</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@Phy</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col">
-                                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                            IsContentBlocked="true"
-                                                            ApplyBackgroundShading="true"
-                                                            IndicatorAreaVisible="false"
-                                                            Text="Fetching Data...">
-                                                <DxGrid @ref="Grid"
-                                                        Data="@KiosksQueue"
-                                                        PageSize="10"
-                                                        ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                                                        AllowSelectRowByClick="true"
-                                                        PagerPosition="GridPagerPosition.Bottom"
-                                                        PageSizeSelectorVisible="true"
-                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                        PageSizeSelectorAllRowsItemVisible="true"
-                                                        PagerSwitchToInputBoxButtonCount="10"
-                                                        PagerVisibleNumericButtonCount="10"
-                                                        CustomizeElement="Grid_CustomizeElement"
-                                                        KeyboardNavigationEnabled="true">
-                                                    <ToolbarTemplate>
-                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                        </DxToolbar>
-                                                    </ToolbarTemplate>
-                                                    <Columns>
-                                                        <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
-                                                        <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
-                                                            <CellDisplayTemplate>
-                                                                @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
-                                                            <CellDisplayTemplate>
-                                                                @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
-                                                            <CellDisplayTemplate>
-                                                                @{
-                                                                    var a = (KioskQueueDto)context.DataItem;
-                                                                }
-                                                                @if (a.QueueStage == null)
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "call")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "present")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                    </Columns>
-                                                </DxGrid>
-                                            </DxLoadingPanel>
-                                        </div>
-                                    </div>
-                                }
-                                else if (sId == null && PhysicianId != null)
-                                {
-                                    <div class="row">
-                                        <div class="col-5">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>User</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p class="mt-0">@userBy </p>
+                                    }
+                                    else if (sId != null && PhysicianId == null)
+                                    {
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>User</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mt-0">@userBy </p>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                            <hr class="px-0" />
                                         </div>
-                                        <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-5">
-                                                    <label>Service Counter</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServicesK</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Service </label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@NameServices</p>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <label>Service Counter</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServicesK</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <label>Physicion</label>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p>@Phy</p>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Service </label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServices</p>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Physicion</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@Phy</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="px-0" />
                                         </div>
-                                        <hr class="px-0" />
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col">
-                                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                            IsContentBlocked="true"
-                                                            ApplyBackgroundShading="true"
-                                                            IndicatorAreaVisible="false"
-                                                            Text="Fetching Data...">
-                                                <DxGrid @ref="Grid"
-                                                        Data="@KiosksQueue"
-                                                        PageSize="10"
-                                                        ColumnResizeMode="GridColumnResizeMode.NextColumn"
-                                                        AllowSelectRowByClick="true"
-                                                        PagerPosition="GridPagerPosition.Bottom"
-                                                        PageSizeSelectorVisible="true"
-                                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                                        PageSizeSelectorAllRowsItemVisible="true"
-                                                        PagerSwitchToInputBoxButtonCount="10"
-                                                        PagerVisibleNumericButtonCount="10"
-                                                        CustomizeElement="Grid_CustomizeElement"
-                                                        KeyboardNavigationEnabled="true">
-                                                    <ToolbarTemplate>
-                                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                                            <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                                        </DxToolbar>
-                                                    </ToolbarTemplate>
-                                                    <Columns>
-                                                        <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
-                                                        <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
-                                                        <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
-                                                            <CellDisplayTemplate>
-                                                                @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
-                                                            <CellDisplayTemplate>
-                                                                @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                        <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
-                                                            <CellDisplayTemplate>
-                                                                @{
-                                                                    var a = (KioskQueueDto)context.DataItem;
-                                                                }
-                                                                @if (a.QueueStage == null)
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "call")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                                else if (a.QueueStage == "present")
-                                                                {
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
-                                                                    <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
-                                                                }
-                                                            </CellDisplayTemplate>
-                                                        </DxGridDataColumn>
-                                                    </Columns>
-                                                </DxGrid>
-                                            </DxLoadingPanel>
+                                        <div class="row mt-3">
+                                            <div class="col">
+                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+                                                    <DxGrid @ref="Grid"
+                                                            Data="@KiosksQueue"
+                                                            PageSize="10"
+                                                            ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                                            AllowSelectRowByClick="true"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            PageSizeSelectorVisible="true"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            CustomizeElement="Grid_CustomizeElement"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Physician.Name" Caption="Phycisian" Width="170px" />
+                                                            <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
+                                                                <CellDisplayTemplate>
+                                                                    @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
+                                                                <CellDisplayTemplate>
+                                                                    @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                <CellDisplayTemplate>
+                                                                    @{
+                                                                        var a = (KioskQueueDto)context.DataItem;
+                                                                    }
+                                                                    @if (a.QueueStage == null)
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "call")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "present")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                        </Columns>
+                                                    </DxGrid>
+                                                </DxLoadingPanel>
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <DxPopup HeaderText="PATIENT DETAIL" @bind-visible="@ShowPresent" HeaderCssClass="fw-bold bg-primary" Width="45%" EnableAdaptivity="false" CloseOnEscape="false"
-                                     CloseOnOutsideClick="false">
-                                <EditForm Model="@FormCounters" Context="EditFormContext">
-                                    <div class="row justify-content-between">
-                                        <div class="col-4">
-                                            <p><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></p>
+                                    }
+                                    else if (sId == null && PhysicianId != null)
+                                    {
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>User</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p class="mt-0">@userBy </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 text-end"><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></div>
+                                            <hr class="px-0" />
                                         </div>
-                                        <div class="col-8 align-self-end">
-                                            <DxTabs>
-                                                <DxTab Text="Call" Enabled="@(FormCounters.QueueStage == "call")"></DxTab>
-                                                <DxTab Text="Present" Enabled="@(FormCounters.QueueStage == "present")"></DxTab>
-                                                <DxTab Text="Absent" Enabled="@(FormCounters.QueueStage == "absent")"></DxTab>
-                                                <DxTab Text="Finish" Enabled="@(FormCounters.QueueStage == "finish")"></DxTab>
-                                            </DxTabs>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <label>Service Counter</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServicesK</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Service </label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@NameServices</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <label>Physicion</label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <p>@Phy</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="px-0" />
                                         </div>
-                                    </div>
-                                    @*  <div class="row mt-3 justify-content-end">
+                                        <div class="row mt-3">
+                                            <div class="col">
+                                                <DxLoadingPanel @bind-Visible="PanelVisible"
+                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                IsContentBlocked="true"
+                                                                ApplyBackgroundShading="true"
+                                                                IndicatorAreaVisible="false"
+                                                                Text="Fetching Data...">
+                                                    <DxGrid @ref="Grid"
+                                                            Data="@KiosksQueue"
+                                                            PageSize="10"
+                                                            ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                                            AllowSelectRowByClick="true"
+                                                            PagerPosition="GridPagerPosition.Bottom"
+                                                            PageSizeSelectorVisible="true"
+                                                            PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
+                                                            PageSizeSelectorAllRowsItemVisible="true"
+                                                            PagerSwitchToInputBoxButtonCount="10"
+                                                            PagerVisibleNumericButtonCount="10"
+                                                            CustomizeElement="Grid_CustomizeElement"
+                                                            KeyboardNavigationEnabled="true">
+                                                        <ToolbarTemplate>
+                                                            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                                                                <DxToolbarItem Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
+                                                            </DxToolbar>
+                                                        </ToolbarTemplate>
+                                                        <Columns>
+                                                            <DxGridDataColumn FieldName="QueueNumber" Caption="No" DisplayFormat="{0:000}" Width="3px" SortIndex="0" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Patient Name" Width="190px" />
+                                                            <DxGridDataColumn FieldName="Kiosk.Service.Name" Caption="Service" Width="150px" />
+                                                            <DxGridDataColumn FieldName="NameClass" Caption="Patient Type" Width="120px">
+                                                                <CellDisplayTemplate>
+                                                                    @GetClassTypeIconHtml((context.DataItem as KioskQueueDto).NameClass)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="QueueStage" Caption="Status" Width="90px">
+                                                                <CellDisplayTemplate>
+                                                                    @GetIssueStageIconHtml((context.DataItem as KioskQueueDto).QueueStage)
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                            <DxGridDataColumn FieldName="Kiosk.Patient.Name" Caption="Action" SortIndex="0">
+                                                                <CellDisplayTemplate>
+                                                                    @{
+                                                                        var a = (KioskQueueDto)context.DataItem;
+                                                                    }
+                                                                    @if (a.QueueStage == null)
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Call" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "call")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                    else if (a.QueueStage == "present")
+                                                                    {
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="ReCall" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-brands fa-whatsapp" @onclick="() => Click_Call(a)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Present" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-clipboard-check" @onclick="() => Click_Present(a.Id)"></DxButton>
+                                                                        <DxButton RenderStyle="ButtonRenderStyle.Danger" Text="Absent" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-circle-minus" @onclick="() => Click_Absent(a.Id)"></DxButton>
+                                                                    }
+                                                                </CellDisplayTemplate>
+                                                            </DxGridDataColumn>
+                                                        </Columns>
+                                                    </DxGrid>
+                                                </DxLoadingPanel>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <DxPopup HeaderText="PATIENT DETAIL" @bind-visible="@ShowPresent" HeaderCssClass="fw-bold bg-primary" Width="45%" EnableAdaptivity="false" CloseOnEscape="false"
+                                         CloseOnOutsideClick="false">
+                                    <EditForm Model="@FormCounters" Context="EditFormContext">
+                                        <div class="row justify-content-between">
+                                            <div class="col-4">
+                                                <p><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i></p>
+                                            </div>
+                                            <div class="col-8 align-self-end">
+                                                <DxTabs>
+                                                    <DxTab Text="Call" Enabled="@(FormCounters.QueueStage == "call")"></DxTab>
+                                                    <DxTab Text="Present" Enabled="@(FormCounters.QueueStage == "present")"></DxTab>
+                                                    <DxTab Text="Absent" Enabled="@(FormCounters.QueueStage == "absent")"></DxTab>
+                                                    <DxTab Text="Finish" Enabled="@(FormCounters.QueueStage == "finish")"></DxTab>
+                                                </DxTabs>
+                                            </div>
+                                        </div>
+                                        @*  <div class="row mt-3 justify-content-end">
                                 <div class="col-4">
                                 <p><i>@DateOnly.FromDateTime(DateTime.Now).ToString("dd MMMM yyyy")</i><hr /></p>
                                 </div>
                                 </div> *@
-                                    <div class="row mt-3">
-                                        <div class="col-10">
-                                            <div class="row">
-                                                <label class="col-sm-4 col-form-label">Patient Name</label>
-                                                <div class="col-sm-8">
-                                                    @* <p>@DataPatient.Kiosk.Patient.Name</p> *@
-                                                    <p class="form-control-plaintext">@FormCounters.Kiosk.Patient?.Name</p>
-                                                </div>
-                                                <label class="col-sm-4 col-form-label">No. Queue</label>
-                                                <div class="col-sm-8">
-                                                    <p class="form-control-plaintext"> @string.Format("{0:D3}", FormCounters.QueueNumber)</p>
-                                                </div>
-                                                <label class="col-sm-4 col-form-label">Service</label>
-                                                <div class="col-sm-8">
-                                                    <p class="form-control-plaintext">@FormCounters.Service?.Name</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row justify-content-end">
-                                        <div class="col-7">
-                                            <div class="row">
-                                                <label class="col-sm-4 col-form-label">Counter</label>
-                                                <div class="col-sm-8">
-                                                    <p class="form-control-plaintext">@FormCounters.ServiceK?.Name</p>
-                                                </div>
-                                                <label class="col-sm-4 col-form-label">Physician</label>
-                                                <div class="col-sm-8">
-                                                    <p class="form-control-plaintext">@((FormCounters.Kiosk.Physician?.Name) ?? "-") </p>
+                                        <div class="row mt-3">
+                                            <div class="col-10">
+                                                <div class="row">
+                                                    <label class="col-sm-4 col-form-label">Patient Name</label>
+                                                    <div class="col-sm-8">
+                                                        @* <p>@DataPatient.Kiosk.Patient.Name</p> *@
+                                                        <p class="form-control-plaintext">@FormCounters.Kiosk.Patient?.Name</p>
+                                                    </div>
+                                                    <label class="col-sm-4 col-form-label">No. Queue</label>
+                                                    <div class="col-sm-8">
+                                                        <p class="form-control-plaintext"> @string.Format("{0:D3}", FormCounters.QueueNumber)</p>
+                                                    </div>
+                                                    <label class="col-sm-4 col-form-label">Service</label>
+                                                    <div class="col-sm-8">
+                                                        <p class="form-control-plaintext">@FormCounters.Service?.Name</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <hr />
-                                    <div class="row mt-2">
-                                        <div class="col-3 align-self-center">
+                                        <div class="row justify-content-end">
+                                            <div class="col-7">
+                                                <div class="row">
+                                                    <label class="col-sm-4 col-form-label">Counter</label>
+                                                    <div class="col-sm-8">
+                                                        <p class="form-control-plaintext">@FormCounters.ServiceK?.Name</p>
+                                                    </div>
+                                                    <label class="col-sm-4 col-form-label">Physician</label>
+                                                    <div class="col-sm-8">
+                                                        <p class="form-control-plaintext">@((FormCounters.Kiosk.Physician?.Name) ?? "-") </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                        <div class="row mt-2">
                                             <div class="col-3 align-self-center">
-                                                <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Finish" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-check" SubmitFormOnClick="true" Click="Click_Finish"></DxButton>
+                                                <div class="col-3 align-self-center">
+                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Finish" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-check" SubmitFormOnClick="true" Click="Click_Finish"></DxButton>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+
+                                                <DxFormLayout CssClass="mt">
+                                                    <DxFormLayoutItem ColSpanMd="12">
+                                                        <DxComboBox Data="@ServiceK" @bind-Value="FormCounters.ServiceKId" NullText="Select Counter.." TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
+                                                    </DxFormLayoutItem>
+                                                </DxFormLayout>
+                                            </div>
+                                            <div class="col-3 align-self-center">
+                                                <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Next" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-long" SubmitFormOnClick="true" Click="Click_Next"></DxButton>
                                             </div>
                                         </div>
-                                        <div class="col-6">
-
-                                            <DxFormLayout CssClass="mt">
-                                                <DxFormLayoutItem ColSpanMd="12">
-                                                    <DxComboBox Data="@ServiceK" @bind-Value="FormCounters.ServiceKId" NullText="Select Counter.." TextFieldName="Name" ValueFieldName="Id"></DxComboBox>
-                                                </DxFormLayoutItem>
-                                            </DxFormLayout>
-                                        </div>
-                                        <div class="col-3 align-self-center">
-                                            <DxButton RenderStyle="ButtonRenderStyle.Primary" Text="Next" RenderStyleMode="@ButtonRenderStyleMode.Outline" IconCssClass="fa-solid fa-right-long" SubmitFormOnClick="true" Click="Click_Next"></DxButton>
-                                        </div>
-                                    </div>
-                                </EditForm>
-                            </DxPopup>
-                        }
+                                    </EditForm>
+                                </DxPopup>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-</div>
+        </section>
+    </div>
+}
