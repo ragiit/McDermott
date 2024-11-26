@@ -521,26 +521,30 @@ namespace McDermott.Application.Features.Queries.Config
                     if (idUser != null)
                     {
                         // Fetch patient-family relations for the user
-                        var asiop = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(idUser));
+                        var DataPatient = (await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(idUser))).FirstOrDefault();
 
                         // Create a list to accumulate family members' data
                         List<UserDto> familyMembersData = [];
 
-                        //foreach (var relation in asiop)
-                        //{
-                        //    // Fetch family members based on the relation's FamilyMemberId
-                        //    var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(relation.FamilyMemberId));
-                        //    var FamilyId = await _unitOfWork.Repository<Family>().GetAllAsync(x => x.Id.Equals(relation.FamilyId));
-                        //    var nameFamily = FamilyId.Select(x => x.Name).FirstOrDefault();
 
-                        //    // Convert the family members to UserDto and add to the family members' data list
-                        //    var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
-                        //    foreach (var familyMemberDto in familyMemberDtos)
-                        //    {
-                        //        familyMemberDto.FamilyRelation = nameFamily;  // Assuming the relation entity has a RelationshipType property
-                        //    }
-                        //    familyMembersData.AddRange(familyMemberDtos);
-                        //}
+                        // Fetch family members based on the relation's FamilyMemberId
+                        var Familys = await _unitOfWork.Repository<PatientFamilyRelation>().GetAllAsync(x => x.FamilyMemberId.Equals(DataPatient.Id));
+                        foreach (var relation in Familys)
+                        {
+                            var familyMembers = await _unitOfWork.Repository<User>().GetAllAsync(x => x.Id.Equals(relation.PatientId));
+
+                            // Convert the family members to UserDto and add to the family members' data list
+                            var familyMemberDtos = familyMembers.Adapt<List<UserDto>>();
+                            foreach (var familyMemberDto in familyMemberDtos)
+                            {
+                                var SelectFamily = (await _unitOfWork.Repository<PatientFamilyRelation>().GetAllAsync(x => x.FamilyMemberId.Equals(familyMemberDto.Id))).FirstOrDefault();
+                                var DataFamily = await _unitOfWork.Repository<Family>().GetAllAsync(x => x.Id.Equals(SelectFamily.FamilyId));
+                                var nameFamily = DataFamily.Select(x => x.Name).FirstOrDefault();
+
+                                familyMemberDto.FamilyRelation = nameFamily;  // Assuming the relation entity has a RelationshipType property
+                            }
+                            familyMembersData.AddRange(familyMemberDtos);
+                        }
 
                         // Add the accumulated family members' data to the main data list
                         data.AddRange(familyMembersData);

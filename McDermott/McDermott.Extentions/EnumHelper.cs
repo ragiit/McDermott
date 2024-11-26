@@ -54,6 +54,18 @@ namespace McDermott.Application.Extentions
             Success = 2,
         }
 
+        public enum EnumStatusCounter
+        {
+            [Display(Name = "Open")]
+            Open = 0,
+
+            [Display(Name = "On Process")]
+            OnProcess = 1,
+
+            [Display(Name = "Stop")]
+            Stop = 2,
+        }
+
         public enum EnumPageMode
         {
             [Display(Name = "create")]

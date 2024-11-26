@@ -455,7 +455,7 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private void CloseDetail()
         {
-            NavigationManager.NavigateTo("queue/queue-counter");
+            NavigationManager.NavigateTo("queue/queue-counters");
         }
 
         #endregion Function Button

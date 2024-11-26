@@ -170,6 +170,7 @@ namespace McDermott.Web.Components.Pages.Queue
             //var by =
 
             await LoadData();
+            await LoadDataPhysicion();
         }
 
         private async Task LoadData()

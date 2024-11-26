@@ -71,45 +71,36 @@ namespace McDermott.Web.Components.Pages.Queue
         protected override async Task OnInitializedAsync()
         {
             DisplayId = $"{NavigationManager.Uri.Replace(NavigationManager.BaseUri + "queue/viewdisplay/", "")}".ToInt32();
-            //hubConnection = new HubConnectionBuilder()
-            //        .WithUrl("http://localhost:5000/realTimeHub")
-            //        .Build();
-            //hubConnection.On<long, long>("CallPatient", (Id, numberQueue) =>
-            //{
-            //    IdQueue = Id;
-            //    Cids = numberQueue;
-            //    //foreach (var ic in getCount)
-            //    //{
-            //    //    if (ic.Id == Id)
-            //    //    {
-            //    //        Cids = numberQueue;
-            //    //        break;
-            //    //    }
-            //    //}
-            //    InvokeAsync(StateHasChanged);
-            //});
-            //await hubConnection.StartAsync();
+
             var queues = await Mediator.Send(new GetSingleQueueDisplayQuery
             {
                 Predicate = x => x.Id == DisplayId
             });
+
             foreach (var i in queues.CounterIds)
             {
-                var DataCounter = await Mediator.Send(new GetSingleCounterQuery
+                var dataCounter = await Mediator.Send(new GetSingleCounterQuery
                 {
                     Predicate = x => x.Id == i
                 });
-                var card = new CounterDto
+
+                // Cek status counter
+                if (dataCounter.Status == "on process") // Ganti "On Process" dengan nilai yang sesuai
                 {
-                    Id = i,
-                    Name = DataCounter.Name,
-                    ServiceKId = DataCounter.ServiceKId,
-                    ServiceId = DataCounter.ServiceId
-                };
-                getCount.Add(card);
-                var sa = getCount;
-                cId = DataCounter.ServiceKId;
+                    var card = new CounterDto
+                    {
+                        Id = i,
+                        Name = dataCounter.Name,
+                        ServiceKId = dataCounter.ServiceKId,
+                        ServiceId = dataCounter.ServiceId
+                    };
+
+                    getCount.Add(card);
+                }
             }
+
+            // Setelah foreach selesai, getCount hanya berisi counter dengan status "On Process".
+
 
             await LoadData();
 
