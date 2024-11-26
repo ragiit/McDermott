@@ -191,7 +191,10 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task UserSelected(UserDto user)
         {
-            BPJS = InsurancePolices.Where(x => x.UserId == user.Id).FirstOrDefault();
+            BPJS = await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.UserId == user.Id
+            });
             if (BPJS is not null)
             {
                 FormKios.BPJS = BPJS.PolicyNumber;
@@ -208,6 +211,7 @@ namespace McDermott.Web.Components.Pages.Queue
             }
             else
             {
+                FormKios.BPJS = null;
                 statBPJS = "no BPJS number";
             }
         }
