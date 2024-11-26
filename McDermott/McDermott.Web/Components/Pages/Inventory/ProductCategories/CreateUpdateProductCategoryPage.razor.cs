@@ -5,16 +5,21 @@ namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
     public partial class CreateUpdateProductCategoryPage
     {
         #region relation data
+
         private List<ProductCategoryDto> GetProductCategory = [];
         private ProductCategoryDto PostProductCategory = new();
         private ProductCategoryDto tempProductCategory = new();
-        #endregion
+
+        #endregion relation data
 
         #region Variabel Static
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
+
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
+
         private IGrid Grid;
         private bool FormValidationState { get; set; } = false;
         private bool PanelVisible { get; set; } = false;
@@ -31,7 +36,8 @@ namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
             "Manual",
             "Automated"
         };
-        #endregion
+
+        #endregion Variabel Static
 
         #region UserLoginAndAccessRole
 
@@ -118,14 +124,20 @@ namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
         {
             PanelVisible = true;
         }
+
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetProductCategoryQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+                var result = await Mediator.Send(new GetProductCategoryQuery
+                {
+                    SearchTerm = searchTerm ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
                 GetProductCategory = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -133,7 +145,8 @@ namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
                 ex.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion LoadData
 
         #region Handle Submit
 
@@ -162,6 +175,7 @@ namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
             NavigationManager.NavigateTo($"inventory/product-categories");
             return;
         }
+
         private void KeyPressHandler(KeyboardEventArgs args)
         {
             if (args.Key == "Enter")

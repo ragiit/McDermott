@@ -1,4 +1,5 @@
 ﻿using DevExpress.Data.Access;
+using DevExpress.Office.Services.Implementation;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
@@ -171,7 +172,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 await LoadJobPosition();
                 await LoadDepartment();
             }
-
+            await LoadService();
             PanelVisible = false;
             return;
         }
@@ -182,11 +183,11 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             #region KTP Address
 
-            await LoadCountry(predicate: x => x.Id == UserForm.IdCardCountryId);
-            await LoadProvince(predicate: x => x.Id == UserForm.IdCardProvinceId);
-            await LoadCity(predicate: x => x.Id == UserForm.IdCardCityId);
-            await LoadDistrict(predicate: x => x.Id == UserForm.IdCardDistrictId);
-            await LoadVillage(predicate: x => x.Id == UserForm.IdCardVillageId);
+            await LoadCountry(predicate: UserForm.IdCardCountryId is null ? null : x => x.Id == UserForm.IdCardCountryId);
+            await LoadProvince(predicate: UserForm.IdCardProvinceId is null ? null : x => x.Id == UserForm.IdCardProvinceId);
+            await LoadCity(predicate: UserForm.IdCardCityId is null ? null : x => x.Id == UserForm.IdCardCityId);
+            await LoadDistrict(predicate: UserForm.IdCardDistrictId is null ? null : x => x.Id == UserForm.IdCardDistrictId);
+            await LoadVillage(predicate: UserForm.IdCardVillageId is null ? null : x => x.Id == UserForm.IdCardVillageId);
 
             #endregion KTP Address
 
@@ -216,10 +217,11 @@ namespace McDermott.Web.Components.Pages.Config.Users
             {
                 Predicate = x => x.Id == UserForm.GroupId
             })).Item1;
-            await LoadUser(predicate: x => x.Id == UserForm.SupervisorId);
-            await LoadJobPosition(predicate: x => x.Id == UserForm.SupervisorId);
-            await LoadDepartment(predicate: x => x.Id == UserForm.SupervisorId);
-            await LoadOccupational(predicate: x => x.Id == UserForm.OccupationalId);
+
+            await LoadUser(predicate: UserForm.SupervisorId is null ? null : x => x.Id == UserForm.SupervisorId);
+            await LoadJobPosition(predicate: UserForm.SupervisorId is null ? null : x => x.Id == UserForm.JobPositionId);
+            await LoadDepartment(predicate: UserForm.SupervisorId is null ? null : x => x.Id == UserForm.DepartmentId);
+            await LoadOccupational(predicate: UserForm.OccupationalId is null ? null : x => x.Id == UserForm.OccupationalId);
 
             Specialities = (await Mediator.QueryGetHelper<Speciality, SpecialityDto>(predicate: x => x.Id == UserForm.SpecialityId)).Item1;
 
@@ -1574,13 +1576,11 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox Country
 
-        private CountryDto SelectedCountry { get; set; } = new();
-
         private async Task SelectedItemChanged(CountryDto e)
         {
             if (e is null)
             {
-                SelectedCountry = new();
+                UserForm.IdCardCountryId = null;
                 Provinces = [];
                 Cities = [];
                 Districts = [];
@@ -1589,7 +1589,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             }
             else
             {
-                SelectedCountry = e;
+                UserForm.IdCardCountryId = e.Id;
                 await LoadProvince();
             }
         }
@@ -1632,13 +1632,11 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox Province
 
-        private ProvinceDto SelectedProvince { get; set; } = new();
-
         private async Task SelectedItemChanged(ProvinceDto e)
         {
             if (e is null)
             {
-                SelectedProvince = new();
+                UserForm.IdCardProvinceId = new();
                 Cities = [];
                 Districts = [];
                 Villages = [];
@@ -1646,7 +1644,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
             }
             else
             {
-                SelectedProvince = e;
+                UserForm.IdCardProvinceId = e.Id;
                 await LoadCity();
             }
         }
@@ -1663,7 +1661,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                 await Task.Delay(Helper.CBX_DELAY, _cts.Token);
 
-                await LoadProvince(e.Value?.ToString() ?? "", x => x.CountryId == SelectedCountry.Id);
+                await LoadProvince(e.Value?.ToString() ?? "", x => x.CountryId == UserForm.IdCardCountryId);
             }
             finally
             {
@@ -1676,7 +1674,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             try
             {
-                predicate ??= x => x.CountryId == SelectedCountry.Id;
+                predicate ??= x => x.CountryId == UserForm.IdCardCountryId;
 
                 Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
             }
@@ -1691,20 +1689,18 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox City
 
-        private CityDto SelectedCity { get; set; } = new();
-
         private async Task SelectedItemChanged(CityDto e)
         {
             if (e is null)
             {
-                SelectedCity = new();
+                UserForm.IdCardCityId = new();
                 Districts = [];
                 Villages = [];
                 await LoadCity();
             }
             else
             {
-                SelectedCity = e;
+                UserForm.IdCardCityId = e.Id;
                 await LoadDistrict();
             }
         }
@@ -1721,7 +1717,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                 await Task.Delay(Helper.CBX_DELAY, _ctsCity.Token);
 
-                await LoadCity(e.Value?.ToString() ?? "", x => x.ProvinceId == SelectedProvince.Id);
+                await LoadCity(e.Value?.ToString() ?? "", x => x.ProvinceId == UserForm.IdCardProvinceId);
             }
             finally
             {
@@ -1734,7 +1730,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             try
             {
-                predicate ??= x => x.ProvinceId == SelectedProvince.Id;
+                predicate ??= x => x.ProvinceId == UserForm.IdCardProvinceId;
 
                 Cities = await Mediator.QueryGetComboBox<City, CityDto>(e, predicate);
             }
@@ -1749,19 +1745,17 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox District
 
-        private DistrictDto SelectedDistrict { get; set; } = new();
-
         private async Task SelectedItemChanged(DistrictDto e)
         {
             if (e is null)
             {
-                SelectedDistrict = new();
+                UserForm.IdCardDistrictId = new();
                 Villages = [];
                 await LoadDistrict();
             }
             else
             {
-                SelectedDistrict = e;
+                UserForm.IdCardDistrictId = e.Id;
                 await LoadVillage();
             }
         }
@@ -1778,7 +1772,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                 await Task.Delay(Helper.CBX_DELAY, _ctsDistrict.Token);
 
-                await LoadDistrict(e.Value?.ToString() ?? "", x => x.CityId == SelectedCity.Id);
+                await LoadDistrict(e.Value?.ToString() ?? "", x => x.CityId == UserForm.IdCardCityId);
             }
             finally
             {
@@ -1791,7 +1785,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             try
             {
-                predicate ??= x => x.CityId == SelectedCity.Id;
+                predicate ??= x => x.CityId == UserForm.IdCardCityId;
                 Districts = await Mediator.QueryGetComboBox<District, DistrictDto>(e, predicate);
             }
             catch (Exception ex)
@@ -1830,7 +1824,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                 await Task.Delay(Helper.CBX_DELAY, _ctsVillage.Token);
 
-                await LoadVillage(e.Value?.ToString() ?? "", x => x.DistrictId == SelectedDistrict.Id);
+                await LoadVillage(e.Value?.ToString() ?? "", x => x.DistrictId == UserForm.IdCardDistrictId);
             }
             finally
             {
@@ -1843,7 +1837,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             try
             {
-                predicate ??= x => x.DistrictId == SelectedDistrict.Id;
+                predicate ??= x => x.DistrictId == UserForm.IdCardDistrictId;
 
                 Villages = await Mediator.QueryGetComboBox<Village, VillageDto>(e, predicate);
             }
@@ -1860,17 +1854,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox User
 
-        private UserDto SelectedUser { get; set; } = new();
-
         private async Task SelectedItemChanged(UserDto e)
         {
             if (e is null)
             {
-                SelectedUser = new();
                 await LoadUser();
             }
-            else
-                SelectedUser = e;
         }
 
         private CancellationTokenSource? _ctsUser;
@@ -1912,17 +1901,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox JobPosition
 
-        private JobPositionDto SelectedJobPosition { get; set; } = new();
-
         private async Task SelectedItemChanged(JobPositionDto e)
         {
             if (e is null)
             {
-                SelectedJobPosition = new();
                 await LoadJobPosition();
             }
-            else
-                SelectedJobPosition = e;
         }
 
         private CancellationTokenSource? _ctsJobPosition;
@@ -1963,17 +1947,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox Department
 
-        private DepartmentDto SelectedDepartment { get; set; } = new();
-
         private async Task SelectedItemChanged(DepartmentDto e)
         {
             if (e is null)
             {
-                SelectedDepartment = new();
                 await LoadDepartment();
             }
-            else
-                SelectedDepartment = e;
         }
 
         private CancellationTokenSource? _ctsDepartment;
@@ -2014,17 +1993,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #region ComboBox Occupational
 
-        private OccupationalDto SelectedOccupational { get; set; } = new();
-
         private async Task SelectedItemChanged(OccupationalDto e)
         {
             if (e is null)
             {
-                SelectedOccupational = new();
                 await LoadOccupational();
             }
-            else
-                SelectedOccupational = e;
         }
 
         private CancellationTokenSource? _ctsOccupational;
@@ -2064,5 +2038,51 @@ namespace McDermott.Web.Components.Pages.Config.Users
         #endregion ComboBox Occupational
 
         #endregion ComboBox
+
+        #region ComboBox Service
+
+        private async Task SelectedItemChanged(ServiceDto e)
+        {
+            if (e is null)
+            {
+                await LoadService();
+            }
+        }
+
+        private CancellationTokenSource? _ctsService;
+
+        private async Task OnInputService(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsService?.Cancel();
+                _ctsService?.Dispose();
+                _ctsService = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsService.Token);
+
+                await LoadService(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsService?.Dispose();
+                _ctsService = null;
+            }
+        }
+
+        private async Task LoadService(string? e = "", Expression<Func<Service, bool>>? predicate = null)
+        {
+            try
+            {
+                Services = await Mediator.QueryGetComboBox<Service, ServiceDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Service
     }
 }

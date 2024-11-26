@@ -297,6 +297,7 @@ namespace McDermott.Web.Components.Pages.Config
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 3, prov ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {
@@ -310,6 +311,7 @@ namespace McDermott.Web.Components.Pages.Config
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 4, city ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {
@@ -323,6 +325,7 @@ namespace McDermott.Web.Components.Pages.Config
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 5, district ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {

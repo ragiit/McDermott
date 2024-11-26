@@ -283,7 +283,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 LoadDataDrugRoute(),
                 LoadDataDrugDosage(),
 
-
                 LoadData(),
                 // LoadDataBPJSCl(),
                 // LoadDataLocation(),
@@ -295,14 +294,12 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             PanelVisible = false;
         }
 
-
         private async Task LoadDataAsync()
         {
             getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
 
             var resultScrap = await Mediator.Send(new GetMaintenanceProductQuery());
             GetMaintenanceProduct = resultScrap.Item1;
-
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -555,7 +552,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             PanelVisible = false;
         }
 
-        #endregion ComboBox Uom
+        #endregion ComboBox UomPurchase
 
         #region Combo Box DrugForm
 
@@ -596,7 +593,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugFormQuery { SearchTerm = refDrugFormComboBox?.Text, PageSize = pageSize, PageIndex= pageIndex});
+            var result = await Mediator.Send(new GetDrugFormQuery { SearchTerm = refDrugFormComboBox?.Text, PageSize = pageSize, PageIndex = pageIndex });
             GetDrugForms = result.Item1;
             totalCount = result.PageCount;
             PanelVisible = false;
@@ -735,9 +732,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProductCategoryQuery(searchTerm: refProductCategoryComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetProductCategoryQuery
+            {
+                SearchTerm = refProductCategoryComboBox?.Text ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             GetProductCategories = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -788,7 +790,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             PanelVisible = false;
         }
 
-        #endregion ComboBox Uom
+        #endregion ComboBox Drug Dosage
 
         //#region ComboBox BPJS Classification
         //private DxComboBox<BpjsClassificationDto, long?> refBPJSClComboBox { get; set; }
@@ -968,7 +970,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             }
         }
 
-
         #endregion Smart Button
 
         #region Button
@@ -1013,7 +1014,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 await OnSave();
             else
                 FormValidationState = true;
-
         }
 
         private async Task HandleInvalidSubmit()
@@ -1118,7 +1118,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             {
                 PostMedicaments.ActiveComponentId?.AddRange(selectedActiveComponents.Select(x => x.Id));
             }
-
         }
 
         private bool ValidateMedicamentDetails()

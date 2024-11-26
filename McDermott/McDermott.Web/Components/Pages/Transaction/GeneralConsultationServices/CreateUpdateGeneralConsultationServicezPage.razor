@@ -280,9 +280,9 @@
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                                             </DxFormLayoutItem>
-                                                            <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Return Status" ColSpanMd="12">
+                                                                <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Discharge Plan" ColSpanMd="12">
                                                                 <MyDxComboBox Data="@Helper._homeStatusTemps"
-                                                                              NullText="Return Status..."
+                                                                              NullText="Select Discharge Plan"
                                                                               ReadOnly="ReadOnlyForm()"
                                                                               @bind-Value="@GeneralConsultanService.HomeStatus"
                                                                               TextFieldName="Name"

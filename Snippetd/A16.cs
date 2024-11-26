@@ -1,16 +1,16 @@
-GeneralConsultanServiceAnc
+ProductCategory
 
-public class GeneralConsultanServiceAncCommand
+public class ProductCategoryCommand
  {
      #region GET
 
-    public class GetSingleGeneralConsultanServiceAncQuery : IRequest<GeneralConsultanServiceAncDto>
+    public class GetSingleProductCategoryQuery : IRequest<ProductCategoryDto>
     {
-        public List<Expression<Func<GeneralConsultanServiceAnc, object>>> Includes { get; set; }
-        public Expression<Func<GeneralConsultanServiceAnc, bool>> Predicate { get; set; }
-        public Expression<Func<GeneralConsultanServiceAnc, GeneralConsultanServiceAnc>> Select { get; set; }
+        public List<Expression<Func<ProductCategory, object>>> Includes { get; set; }
+        public Expression<Func<ProductCategory, bool>> Predicate { get; set; }
+        public Expression<Func<ProductCategory, ProductCategory>> Select { get; set; }
 
-        public List<(Expression<Func<GeneralConsultanServiceAnc, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<ProductCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -19,13 +19,13 @@ public class GeneralConsultanServiceAncCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetGeneralConsultanServiceAncQuery : IRequest<(List<GeneralConsultanServiceAncDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetProductCategoryQuery : IRequest<(List<ProductCategoryDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<GeneralConsultanServiceAnc, object>>> Includes { get; set; }
-        public Expression<Func<GeneralConsultanServiceAnc, bool>> Predicate { get; set; }
-        public Expression<Func<GeneralConsultanServiceAnc, GeneralConsultanServiceAnc>> Select { get; set; }
+        public List<Expression<Func<ProductCategory, object>>> Includes { get; set; }
+        public Expression<Func<ProductCategory, bool>> Predicate { get; set; }
+        public Expression<Func<ProductCategory, ProductCategory>> Select { get; set; }
 
-        public List<(Expression<Func<GeneralConsultanServiceAnc, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<ProductCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -34,49 +34,49 @@ public class GeneralConsultanServiceAncCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateGeneralConsultanServiceAnc(Expression<Func<GeneralConsultanServiceAnc, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateProductCategory(Expression<Func<ProductCategory, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<GeneralConsultanServiceAnc, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto) : IRequest<GeneralConsultanServiceAncDto>
+     public class CreateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>
      {
-         public GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto { get; set; } = GeneralConsultanServiceAncDto;
+         public ProductCategoryDto ProductCategoryDto { get; set; } = ProductCategoryDto;
      }
 
-     public class BulkValidateGeneralConsultanServiceAnc(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate) : IRequest<List<GeneralConsultanServiceAncDto>>
+     public class BulkValidateProductCategory(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
      {
-         public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate { get; } = GeneralConsultanServiceAncsToValidate;
+         public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
      }
 
-     public class CreateListGeneralConsultanServiceAncRequest(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos) : IRequest<List<GeneralConsultanServiceAncDto>>
+     public class CreateListProductCategoryRequest(List<ProductCategoryDto> ProductCategoryDtos) : IRequest<List<ProductCategoryDto>>
      {
-         public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos { get; set; } = GeneralConsultanServiceAncDtos;
+         public List<ProductCategoryDto> ProductCategoryDtos { get; set; } = ProductCategoryDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto) : IRequest<GeneralConsultanServiceAncDto>
+     public class UpdateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>
      {
-         public GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto { get; set; } = GeneralConsultanServiceAncDto;
+         public ProductCategoryDto ProductCategoryDto { get; set; } = ProductCategoryDto;
      }
 
-     public class UpdateListGeneralConsultanServiceAncRequest(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos) : IRequest<List<GeneralConsultanServiceAncDto>>
+     public class UpdateListProductCategoryRequest(List<ProductCategoryDto> ProductCategoryDtos) : IRequest<List<ProductCategoryDto>>
      {
-         public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos { get; set; } = GeneralConsultanServiceAncDtos;
+         public List<ProductCategoryDto> ProductCategoryDtos { get; set; } = ProductCategoryDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteGeneralConsultanServiceAncRequest : IRequest<bool>
+     public class DeleteProductCategoryRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -85,54 +85,54 @@ public class GeneralConsultanServiceAncCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateGeneralConsultanServiceAncQuery, List<GeneralConsultanServiceAncDto>>,
+IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
   
-IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>,
-public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>, 
-     IRequestHandler<ValidateGeneralConsultanServiceAnc, bool>,
-     IRequestHandler<CreateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
-     IRequestHandler<BulkValidateGeneralConsultanServiceAnc, List<GeneralConsultanServiceAncDto>>,
-     IRequestHandler<CreateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
-     IRequestHandler<UpdateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
-     IRequestHandler<UpdateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
-     IRequestHandler<DeleteGeneralConsultanServiceAncRequest, bool>
+IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
+public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>, 
+     IRequestHandler<ValidateProductCategory, bool>,
+     IRequestHandler<CreateProductCategoryRequest, ProductCategoryDto>,
+     IRequestHandler<BulkValidateProductCategory, List<ProductCategoryDto>>,
+     IRequestHandler<CreateListProductCategoryRequest, List<ProductCategoryDto>>,
+     IRequestHandler<UpdateProductCategoryRequest, ProductCategoryDto>,
+     IRequestHandler<UpdateListProductCategoryRequest, List<ProductCategoryDto>>,
+     IRequestHandler<DeleteProductCategoryRequest, bool>
 {
     #region GET
-    public async Task<List<GeneralConsultanServiceAncDto>> Handle(BulkValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
+    public async Task<List<ProductCategoryDto>> Handle(BulkValidateProductCategory request, CancellationToken cancellationToken)
     {
-        var GeneralConsultanServiceAncDtos = request.GeneralConsultanServiceAncsToValidate;
+        var ProductCategoryDtos = request.ProductCategorysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var GeneralConsultanServiceAncNames = GeneralConsultanServiceAncDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = GeneralConsultanServiceAncDtos.Select(x => x.Code).Distinct().ToList();
+        //var ProductCategoryNames = ProductCategoryDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = ProductCategoryDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingGeneralConsultanServiceAncs = await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
+        //var existingProductCategorys = await _unitOfWork.Repository<ProductCategory>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => GeneralConsultanServiceAncNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => ProductCategoryNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingGeneralConsultanServiceAncs.Adapt<List<GeneralConsultanServiceAncDto>>();
+        //return existingProductCategorys.Adapt<List<ProductCategoryDto>>();
 
         return [];
     }
-    public async Task<bool> Handle(ValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateProductCategory request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
+        return await _unitOfWork.Repository<ProductCategory>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServiceAncQuery request, CancellationToken cancellationToken)
+    public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductCategoryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<GeneralConsultanServiceAnc>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -148,8 +148,8 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<ProductCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<ProductCategory>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -166,7 +166,7 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.GeneralConsultanServiceAnc.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.ProductCategory.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -174,7 +174,7 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new GeneralConsultanServiceAnc
+                query = query.Select(x => new ProductCategory
                 {
                     Id = x.Id, 
                 });
@@ -188,11 +188,11 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<GeneralConsultanServiceAncDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralConsultanServiceAncDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProductCategoryDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -202,11 +202,11 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
         }
     }
  
-    public async Task<GeneralConsultanServiceAncDto> Handle(GetSingleGeneralConsultanServiceAncQuery request, CancellationToken cancellationToken)
+    public async Task<ProductCategoryDto> Handle(GetSingleProductCategoryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<GeneralConsultanServiceAnc>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -222,8 +222,8 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<ProductCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<ProductCategory>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -240,7 +240,7 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.GeneralConsultanServiceAnc.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.ProductCategory.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -248,12 +248,12 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new GeneralConsultanServiceAnc
+                query = query.Select(x => new ProductCategory
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceAncDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProductCategoryDto>();
         }
         catch (Exception ex)
         {
@@ -266,17 +266,17 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
 
      #region CREATE
 
-     public async Task<GeneralConsultanServiceAncDto> Handle(CreateGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<ProductCategoryDto> Handle(CreateProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDto.Adapt<CreateUpdateGeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());
+             var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GeneralConsultanServiceAncDto>();
+             return result.Adapt<ProductCategoryDto>();
          }
          catch (Exception)
          {
@@ -284,16 +284,16 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
          }
      }
 
-     public async Task<List<GeneralConsultanServiceAncDto>> Handle(CreateListGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<List<ProductCategoryDto>> Handle(CreateListProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<GeneralConsultanServiceAnc>>());
+             var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDtos.Adapt<List<ProductCategory>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GeneralConsultanServiceAncDto>>();
+             return result.Adapt<List<ProductCategoryDto>>();
          }
          catch (Exception)
          {
@@ -305,17 +305,17 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
 
      #region UPDATE
 
-     public async Task<GeneralConsultanServiceAncDto> Handle(UpdateGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<ProductCategoryDto> Handle(UpdateProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDto.Adapt<GeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());
+             var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDto.Adapt<ProductCategoryDto>().Adapt<ProductCategory>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<GeneralConsultanServiceAncDto>();
+             return result.Adapt<ProductCategoryDto>();
          }
          catch (Exception)
          {
@@ -323,16 +323,16 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
          }
      }
 
-     public async Task<List<GeneralConsultanServiceAncDto>> Handle(UpdateListGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<List<ProductCategoryDto>> Handle(UpdateListProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<GeneralConsultanServiceAnc>>());
+             var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDtos.Adapt<List<ProductCategory>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<GeneralConsultanServiceAncDto>>();
+             return result.Adapt<List<ProductCategoryDto>>();
          }
          catch (Exception)
          {
@@ -344,23 +344,23 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<GeneralConsultanServiceAnc>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<ProductCategory>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<GeneralConsultanServiceAnc>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<ProductCategory>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -374,20 +374,20 @@ public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryC
 }
 
  
-public class BulkValidateGeneralConsultanServiceAncQuery(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate) : IRequest<List<GeneralConsultanServiceAncDto>>
+public class BulkValidateProductCategoryQuery(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
 {
-    public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate { get; } = GeneralConsultanServiceAncsToValidate;
+    public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
 }a
 
 
-IRequestHandler<BulkValidateGeneralConsultanServiceAncQuery, List<GeneralConsultanServiceAncDto>>,
+IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
   
-IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>,
+IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
 
 
 
- var a = await Mediator.Send(new GetGeneralConsultanServiceAncsQuery
+ var a = await Mediator.Send(new GetProductCategorysQuery
  {
      OrderByList =
      [
@@ -399,10 +399,10 @@ IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServic
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
+var patienss = (await Mediator.Send(new GetSingleProductCategoryQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new GeneralConsultanServiceAnc
+    Select = x => new ProductCategory
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -415,41 +415,41 @@ var patienss = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+    var result = await Mediator.Send(new GetProductCategoryQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    GeneralConsultanServiceAncs = result.Item1;
+    ProductCategorys = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastService);
+    ex.HandleException(ToastProductCategory);
 }
 finally
 { 
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+ var result = await Mediator.Send(new GetProductCategoryQuery
  {
-     Predicate = x => x.GeneralConsultanServiceAncId == GeneralConsultanServiceAncId,
-     SearchTerm = refGeneralConsultanServiceAncComboBox?.Text ?? "",
+     Predicate = x => x.ProductCategoryId == ProductCategoryId,
+     SearchTerm = refProductCategoryComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- GeneralConsultanServiceAncs = result.Item1;
- totalCountGeneralConsultanServiceAnc = result.PageCount;
+ ProductCategorys = result.Item1;
+ totalCountProductCategory = result.PageCount;
 
- GeneralConsultanServiceAncs = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+ ProductCategorys = (await Mediator.Send(new GetProductCategoryQuery
  {
-     Predicate = x => x.Id == GeneralConsultanServiceAncForm.IdCardGeneralConsultanServiceAncId,
+     Predicate = x => x.Id == ProductCategoryForm.IdCardProductCategoryId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncsQuery
+var data = (await Mediator.Send(new GetSingleProductCategorysQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -457,17 +457,17 @@ var data = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new GeneralConsultanServiceAnc
+    Select = x => new ProductCategory
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new GeneralConsultanServiceAnc
+        Patient = new ProductCategory
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new GeneralConsultanServiceAnc
+        Pratitioner = new ProductCategory
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -480,105 +480,105 @@ var data = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncsQuery
 })) ?? new();
 
 
-#region ComboboxGeneralConsultanServiceAnc
+#region ComboboxProductCategory
 
- private DxComboBox<GeneralConsultanServiceAncDto, long?> refGeneralConsultanServiceAncComboBox { get; set; }
- private int GeneralConsultanServiceAncComboBoxIndex { get; set; } = 0;
- private int totalCountGeneralConsultanServiceAnc = 0;
+ private DxComboBox<ProductCategoryDto, long?> refProductCategoryComboBox { get; set; }
+ private int ProductCategoryComboBoxIndex { get; set; } = 0;
+ private int totalCountProductCategory = 0;
 
- private async Task OnSearchGeneralConsultanServiceAnc()
+ private async Task OnSearchProductCategory()
  {
-     await LoadDataGeneralConsultanServiceAnc();
+     await LoadDataProductCategory();
  }
 
- private async Task OnSearchGeneralConsultanServiceAncIndexIncrement()
+ private async Task OnSearchProductCategoryIndexIncrement()
  {
-     if (GeneralConsultanServiceAncComboBoxIndex < (totalCountGeneralConsultanServiceAnc - 1))
+     if (ProductCategoryComboBoxIndex < (totalCountProductCategory - 1))
      {
-         GeneralConsultanServiceAncComboBoxIndex++;
-         await LoadDataGeneralConsultanServiceAnc(GeneralConsultanServiceAncComboBoxIndex, 10);
+         ProductCategoryComboBoxIndex++;
+         await LoadDataProductCategory(ProductCategoryComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchGeneralConsultanServiceAncIndexDecrement()
+ private async Task OnSearchProductCategoryIndexDecrement()
  {
-     if (GeneralConsultanServiceAncComboBoxIndex > 0)
+     if (ProductCategoryComboBoxIndex > 0)
      {
-         GeneralConsultanServiceAncComboBoxIndex--;
-         await LoadDataGeneralConsultanServiceAnc(GeneralConsultanServiceAncComboBoxIndex, 10);
+         ProductCategoryComboBoxIndex--;
+         await LoadDataProductCategory(ProductCategoryComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputGeneralConsultanServiceAncChanged(string e)
+ private async Task OnInputProductCategoryChanged(string e)
  {
-     GeneralConsultanServiceAncComboBoxIndex = 0;
-     await LoadDataGeneralConsultanServiceAnc();
+     ProductCategoryComboBoxIndex = 0;
+     await LoadDataProductCategory();
  }
 
  
-  private async Task LoadDataGeneralConsultanServiceAnc(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataProductCategory(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+          var result = await Mediator.Send(new GetProductCategoryQuery
           {
-              SearchTerm = refGeneralConsultanServiceAncComboBox?.Text ?? "",
+              SearchTerm = refProductCategoryComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          GeneralConsultanServiceAncs = result.Item1;
-          totalCountGeneralConsultanServiceAnc = result.PageCount;
+          ProductCategorys = result.Item1;
+          totalCountProductCategory = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastService);
+          ex.HandleException(ToastProductCategory);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxGeneralConsultanServiceAnc
+ #endregion ComboboxProductCategory
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12">
-    <MyDxComboBox Data="@GeneralConsultanServiceAncs"
-                  NullText="Select GeneralConsultanServiceAnc"
-                  @ref="refGeneralConsultanServiceAncComboBox"
-                  @bind-Value="@a.GeneralConsultanServiceAncId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
+    <MyDxComboBox Data="@ProductCategorys"
+                  NullText="Select ProductCategory"
+                  @ref="refProductCategoryComboBox"
+                  @bind-Value="@a.ProductCategoryId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputGeneralConsultanServiceAncChanged(e))">
+                  TextChanged="((string e) => OnInputProductCategoryChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchGeneralConsultanServiceAncIndexDecrement"
+            <DxEditorButton Click="OnSearchProductCategoryIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchGeneralConsultanServiceAnc"
+            <DxEditorButton Click="OnSearchProductCategory"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchGeneralConsultanServiceAncIndexIncrement"
+            <DxEditorButton Click="OnSearchProductCategoryIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAncDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="GeneralConsultanServiceAnc.Name" Caption="GeneralConsultanServiceAnc" />
-            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAncDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategoryDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="ProductCategory.Name" Caption="ProductCategory" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategoryDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.GeneralConsultanServiceAncId)" />
+    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDto.Adapt<CreateUpdateGeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());
-var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<CreateUpdateGeneralConsultanServiceAncDto>>().Adapt<List<GeneralConsultanServiceAnc>>()); 
+var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());
+var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDtos.Adapt<List<CreateUpdateProductCategoryDto>>().Adapt<List<ProductCategory>>()); 
 
-var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDto.Adapt<CreateUpdateGeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());  
-var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<CreateUpdateGeneralConsultanServiceAncDto>>().Adapt<List<GeneralConsultanServiceAnc>>());
+var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());  
+var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDtos.Adapt<List<CreateUpdateProductCategoryDto>>().Adapt<List<ProductCategory>>());
 
-list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+list3 = (await Mediator.Send(new GetProductCategoryQuery
 {
-    Predicate = x => GeneralConsultanServiceAncNames.Contains(x.Name.ToLower()),
+    Predicate = x => ProductCategoryNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new GeneralConsultanServiceAnc
+    Select = x => new ProductCategory
     {
         Id = x.Id,
         Name = x.Name
@@ -588,47 +588,47 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
 
 #region Searching
 
-    private int pageSizeGeneralConsultanServiceAnc { get; set; } = 10;
-    private int totalCountGeneralConsultanServiceAnc = 0;
-    private int activePageIndexGeneralConsultanServiceAnc { get; set; } = 0;
-    private string searchTermGeneralConsultanServiceAnc { get; set; } = string.Empty;
+    private int pageSizeProductCategory { get; set; } = 10;
+    private int totalCountProductCategory = 0;
+    private int activePageIndexProductCategory { get; set; } = 0;
+    private string searchTermProductCategory { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedGeneralConsultanServiceAnc(string searchText)
+    private async Task OnSearchBoxChangedProductCategory(string searchText)
     {
-        searchTermGeneralConsultanServiceAnc = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeGeneralConsultanServiceAnc);
+        searchTermProductCategory = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeProductCategory);
     }
 
-    private async Task OnpageSizeGeneralConsultanServiceAncIndexChanged(int newpageSizeGeneralConsultanServiceAnc)
+    private async Task OnpageSizeProductCategoryIndexChanged(int newpageSizeProductCategory)
     {
-        pageSizeGeneralConsultanServiceAnc = newpageSizeGeneralConsultanServiceAnc;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeGeneralConsultanServiceAnc);
+        pageSizeProductCategory = newpageSizeProductCategory;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeProductCategory);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeGeneralConsultanServiceAnc);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeProductCategory);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeGeneralConsultanServiceAnc = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeProductCategory = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+        var result = await Mediator.Send(new GetProductCategoryQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeGeneralConsultanServiceAnc,
-            SearchTerm = searchTermGeneralConsultanServiceAnc,
+            PageSize = pageSizeProductCategory,
+            SearchTerm = searchTermProductCategory,
         });
-        GeneralConsultanServiceAncs = result.Item1;
-        totalCountGeneralConsultanServiceAnc = result.PageCount;
-        activePageIndexGeneralConsultanServiceAnc = pageIndex;
+        ProductCategorys = result.Item1;
+        totalCountProductCategory = result.PageCount;
+        activePageIndexProductCategory = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastService);
+        ex.HandleException(ToastProductCategory);
     }
     finally { PanelVisible = false; }
 }
@@ -667,7 +667,7 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
       {
           PanelVisible = true;
           SelectedDataItems = [];
-          var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+          var a = await Mediator.Send(new GetGeneralConsultanProductCategorysQuery
           {
               OrderByList =
               [
@@ -681,13 +681,13 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
               SearchTerm = searchTerm,
           });
 
-          GeneralConsultanServices = a.Item1;
+          GeneralConsultanProductCategorys = a.Item1;
           totalCount = a.PageCount;
           activePageIndex = pageIndex;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastService);
+          ex.HandleException(ToastProductCategory);
       }
       finally { PanelVisible = false; }
   }
@@ -696,7 +696,7 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
 
 
    <MyGridPaginate @ref="GridDetail"
-                 Data="GeneralConsultanServiceAncs"
+                 Data="ProductCategorys"
                  @bind-SelectedDataItems="@SelectedDetailDataItems"
                  EditModelSaving="OnSaveInventoryAdjumentDetail"
                  DataItemDeleting="OnDeleteInventoryAdjumentDetail"
@@ -707,70 +707,70 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
 
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="GeneralConsultanServiceAncDto"
-                          Items="@GeneralConsultanServiceAncs"
+         <MyDxToolbarBase TItem="ProductCategoryDto"
+                          Items="@ProductCategorys"
                           Grid="GridDetail"
                           SelectedDataItems="@SelectedDetailDataItems"
                           NewItem_Click="@NewItem_Click"
                           EditItem_Click="@EditItem_Click"
                           DeleteItem_Click="@DeleteItem_Click"
                           Refresh_Click="@(async () => await LoadData())"
-                          IsImport="GeneralConsultanServiceAncAccessCRUID.IsImport"
-                          VisibleNew="GeneralConsultanServiceAncAccessCRUID.IsCreate"
-                          VisibleEdit="GeneralConsultanServiceAncAccessCRUID.IsUpdate"
-                          VisibleDelete="GeneralConsultanServiceAncAccessCRUID.IsDelete" />
+                          IsImport="ProductCategoryAccessCRUID.IsImport"
+                          VisibleNew="ProductCategoryAccessCRUID.IsCreate"
+                          VisibleEdit="ProductCategoryAccessCRUID.IsUpdate"
+                          VisibleDelete="ProductCategoryAccessCRUID.IsDelete" />
      </ToolbarTemplate>
 
 
      <Columns>
          <DxGridSelectionColumn Width="15px" />
-         <DxGridDataColumn FieldName="GeneralConsultanServiceAnc.Name" Caption="GeneralConsultanServiceAnc"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="ProductCategory.Name" Caption="ProductCategory"></DxGridDataColumn>
          <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
          <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
          <DxGridDataColumn FieldName="Difference" Caption="Difference" />
          <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
          <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
-         <DxGridDataColumn FieldName="GeneralConsultanServiceAnc.GeneralConsultanServiceAnc.Name" Caption="GeneralConsultanServiceAnc" />
+         <DxGridDataColumn FieldName="ProductCategory.ProductCategory.Name" Caption="ProductCategory" />
      </Columns>
      <EditFormTemplate Context="EditFormContext">
          @{
              if (EditFormContext.DataItem is null)
              {
-                 FormGeneralConsultanServiceAnc = (GeneralConsultanServiceAncDto)EditFormContext.EditModel;
+                 FormProductCategory = (ProductCategoryDto)EditFormContext.EditModel;
              }
-             var IsBatch = GeneralConsultanServiceAncs.FirstOrDefault(x => x.Id == FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId)?.TraceAbility ?? false;
+             var IsBatch = ProductCategorys.FirstOrDefault(x => x.Id == FormProductCategory.ProductCategoryId)?.TraceAbility ?? false;
 
-             ActiveButton = FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId is null ||
-             string.IsNullOrWhiteSpace(FormGeneralConsultanServiceAnc.Batch) && IsBatch ||
-             FormGeneralConsultanServiceAnc.ExpiredDate is null ||
-             FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId is null;
+             ActiveButton = FormProductCategory.ProductCategoryId is null ||
+             string.IsNullOrWhiteSpace(FormProductCategory.Batch) && IsBatch ||
+             FormProductCategory.ExpiredDate is null ||
+             FormProductCategory.ProductCategoryId is null;
          }
          <div class="row w-100">
              <DxFormLayout CssClass="w-100">
                  <div class="col-md-4">
-                     <DxFormLayoutItem Caption="GeneralConsultanServiceAnc" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox Data="@GeneralConsultanServiceAncs"
-                                     @bind-Value="@FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId"
+                     <DxFormLayoutItem Caption="ProductCategory" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@ProductCategorys"
+                                     @bind-Value="@FormProductCategory.ProductCategoryId"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     NullText="Select GeneralConsultanServiceAnc..."
+                                     NullText="Select ProductCategory..."
                                      TextFieldName="Name"
-                                     ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
+                                     ReadOnly="@(FormProductCategory.Id != 0)"
                                      ValueFieldName="Id"
-                                     SelectedItemChanged="@(async (GeneralConsultanServiceAncDto freq) => await OnSelectGeneralConsultanServiceAnc(freq))"
+                                     SelectedItemChanged="@(async (ProductCategoryDto freq) => await OnSelectProductCategory(freq))"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      ShowValidationIcon="true" />
-                         <ValidationMessage For="@(()=> FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId)"   />
+                         <ValidationMessage For="@(()=> FormProductCategory.ProductCategoryId)"   />
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem Caption="Batch" Enabled="FormGeneralConsultanServiceAnc.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormProductCategory.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <MyDxComboBox Data="@Batch"
-                                       ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
+                                       ReadOnly="@(FormProductCategory.Id != 0)"
                                        NullText="Select Batch..."
-                                       AllowGeneralConsultanServiceAncInput="true"
-                                       @bind-Value="@FormGeneralConsultanServiceAnc.Batch"
-                                       @bind-Text="@FormGeneralConsultanServiceAnc.Batch"
+                                       AllowProductCategoryInput="true"
+                                       @bind-Value="@FormProductCategory.Batch"
+                                       @bind-Text="@FormProductCategory.Batch"
                                        SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
-                         <ValidationMessage For="@(() => FormGeneralConsultanServiceAnc.Batch)" />
+                         <ValidationMessage For="@(() => FormProductCategory.Batch)" />
 
                      </DxFormLayoutItem>
                  </div>
@@ -780,43 +780,43 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
                          <DxSpinEdit ShowValidationIcon="true"
                                      ReadOnly
                                      MinValue="0"
-                                     @bind-Value="@FormGeneralConsultanServiceAnc.TeoriticalQty"
+                                     @bind-Value="@FormProductCategory.TeoriticalQty"
                                      NullText="Teoritical Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormGeneralConsultanServiceAnc.TeoriticalQty)"   />
+                         <ValidationMessage For="@(()=> FormProductCategory.TeoriticalQty)"   />
                      </DxFormLayoutItem>
 
                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxSpinEdit ShowValidationIcon="true"
                                      MinValue="0"
-                                     @bind-Value="@FormGeneralConsultanServiceAnc.RealQty"
+                                     @bind-Value="@FormProductCategory.RealQty"
                                      NullText="Real Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormGeneralConsultanServiceAnc.RealQty)"   />
+                         <ValidationMessage For="@(()=> FormProductCategory.RealQty)"   />
                      </DxFormLayoutItem>
                  </div>
 
                  <div class="col-md-4">
                      <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxDateEdit ShowValidationIcon="true"
-                                     ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
+                                     ReadOnly="@(FormProductCategory.Id != 0)"
                                      DisplayFormat="@Helper.DefaultFormatDate"
-                                     @bind-Date="@FormGeneralConsultanServiceAnc.ExpiredDate"
+                                     @bind-Date="@FormProductCategory.ExpiredDate"
                                      NullText="Expired Date">
                          </DxDateEdit>
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox ShowValidationIcon="true" Data="@GeneralConsultanServiceAncs"
-                                     NullText="GeneralConsultanServiceAnc"
-                                     ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="ProductCategory" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@ProductCategorys"
+                                     NullText="ProductCategory"
+                                     ReadOnly="@(FormProductCategory.Id != 0)"
                                      TextFieldName="Name"
                                      ValueFieldName="Id"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     @bind-Value="FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId">
+                                     @bind-Value="FormProductCategory.ProductCategoryId">
                          </DxComboBox>
-                         <ValidationMessage For="@(() => FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId)" />
+                         <ValidationMessage For="@(() => FormProductCategory.ProductCategoryId)" />
                      </DxFormLayoutItem>
                  </div>
              </DxFormLayout>
@@ -835,63 +835,63 @@ list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
 
  NEW COMBOBOX VIRAL 2024
 
-GeneralConsultanServiceAnc
+ProductCategory
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12">
-    <DxComboBox Data="GeneralConsultanServiceAncs"
-                AllowGeneralConsultanServiceAncInput="true"
-                NullText="Select GeneralConsultanServiceAnc"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
+    <DxComboBox Data="ProductCategorys"
+                AllowProductCategoryInput="true"
+                NullText="Select ProductCategory"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputGeneralConsultanServiceAnc"
-                @bind-Value="a.GeneralConsultanServiceAncId">
+                @oninput="OnInputProductCategory"
+                @bind-Value="a.ProductCategoryId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Code)" Caption="Code" />
         </Columns>
     </DxComboBox>
-    <ValidationMessage For="@(()=>a.GeneralConsultanServiceAncId)" />
+    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
 </DxFormLayoutItem>
 
-#region ComboBox GeneralConsultanServiceAnc
+#region ComboBox ProductCategory
  
-private CancellationTokenSource? _ctsGeneralConsultanServiceAnc;
-private async Task OnInputGeneralConsultanServiceAnc(ChangeEventArgs e)
+private CancellationTokenSource? _ctsProductCategory;
+private async Task OnInputProductCategory(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
             
-        _ctsGeneralConsultanServiceAnc?.Cancel();
-        _ctsGeneralConsultanServiceAnc?.Dispose();
-        _ctsGeneralConsultanServiceAnc = new CancellationTokenSource();
+        _ctsProductCategory?.Cancel();
+        _ctsProductCategory?.Dispose();
+        _ctsProductCategory = new CancellationTokenSource();
             
-        await Task.Delay(700, _ctsGeneralConsultanServiceAnc.Token);
+        await Task.Delay(700, _ctsProductCategory.Token);
             
-        await LoadGeneralConsultanServiceAnc(e.Value?.ToString() ?? "");
+        await LoadProductCategory(e.Value?.ToString() ?? "");
     } 
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsGeneralConsultanServiceAnc?.Dispose();
-        _ctsGeneralConsultanServiceAnc = null;
+        _ctsProductCategory?.Dispose();
+        _ctsProductCategory = null;
     } 
 }
 
- private async Task LoadGeneralConsultanServiceAnc(string? e = "", Expression<Func<GeneralConsultanServiceAnc, bool>>? predicate = null)
+ private async Task LoadProductCategory(string? e = "", Expression<Func<ProductCategory, bool>>? predicate = null)
  {
      try
      {
          PanelVisible = true;
-         GeneralConsultanServiceAncs = await Mediator.QueryGetComboBox<GeneralConsultanServiceAnc, GeneralConsultanServiceAncDto>(e, predicate);
+         ProductCategorys = await Mediator.QueryGetComboBox<ProductCategory, ProductCategoryDto>(e, predicate);
          PanelVisible = false;
      }
      catch (Exception ex)
      {
-         ex.HandleException(ToastService);
+         ex.HandleException(ToastProductCategory);
      }
      finally { PanelVisible = false; }
  }
@@ -900,74 +900,75 @@ private async Task OnInputGeneralConsultanServiceAnc(ChangeEventArgs e)
 
 
 // Ini buat di EditItemClick
-await LoadGeneralConsultanServiceAnc(id:  a.GeneralConsultanServiceAncId);
+await LoadProductCategory(id:  a.ProductCategoryId);
 
-GeneralConsultanServiceAnc
+ProductCategory
 
 
 
 VIRAL 2025
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12">
-    <MyDxComboBox Data="GeneralConsultanServiceAncs"
-                NullText="Select GeneralConsultanServiceAnc"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
+    <MyDxComboBox Data="ProductCategorys"
+                NullText="Select ProductCategory"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputGeneralConsultanServiceAnc"
-                SelectedItemChanged="((GeneralConsultanServiceAncDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.GeneralConsultanServiceAncId">
+                @oninput="OnInputProductCategory"
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                SelectedItemChanged="((ProductCategoryDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.ProductCategoryId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.GeneralConsultanServiceAncId)" />
+    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
 </DxFormLayoutItem>
 
 
-#region ComboBox GeneralConsultanServiceAnc
+#region ComboBox ProductCategory
 
-    private GeneralConsultanServiceAncDto SelectedGeneralConsultanServiceAnc { get; set; } = new();
-    async Task SelectedItemChanged(GeneralConsultanServiceAncDto e)
+    private ProductCategoryDto SelectedProductCategory { get; set; } = new();
+    async Task SelectedItemChanged(ProductCategoryDto e)
     {
         if (e is null)
         {
-            SelectedGeneralConsultanServiceAnc = new();
-            await LoadGeneralConsultanServiceAnc(); 
+            SelectedProductCategory = new();
+            await LoadProductCategory(); 
         }
         else
-            SelectedGeneralConsultanServiceAnc = e;
+            SelectedProductCategory = e;
     }
 
-    private CancellationTokenSource? _ctsGeneralConsultanServiceAnc;
-    private async Task OnInputGeneralConsultanServiceAnc(ChangeEventArgs e)
+    private CancellationTokenSource? _ctsProductCategory;
+    private async Task OnInputProductCategory(ChangeEventArgs e)
     {
         try
         { 
-            _ctsGeneralConsultanServiceAnc?.Cancel();
-            _ctsGeneralConsultanServiceAnc?.Dispose();
-            _ctsGeneralConsultanServiceAnc = new CancellationTokenSource();
+            _ctsProductCategory?.Cancel();
+            _ctsProductCategory?.Dispose();
+            _ctsProductCategory = new CancellationTokenSource();
 
-            await Task.Delay(Helper.CBX_DELAY, _ctsGeneralConsultanServiceAnc.Token);
+            await Task.Delay(Helper.CBX_DELAY, _ctsProductCategory.Token);
 
-            await LoadGeneralConsultanServiceAnc(e.Value?.ToString() ?? "");
+            await LoadProductCategory(e.Value?.ToString() ?? "");
         }
         finally
         { 
-            _ctsGeneralConsultanServiceAnc?.Dispose();
-            _ctsGeneralConsultanServiceAnc = null;
+            _ctsProductCategory?.Dispose();
+            _ctsProductCategory = null;
         }
     }
 
-    private async Task LoadGeneralConsultanServiceAnc(string? e = "", Expression<Func<GeneralConsultanServiceAnc, bool>>? predicate = null)
+    private async Task LoadProductCategory(string? e = "", Expression<Func<ProductCategory, bool>>? predicate = null)
     {
         try
         { 
-            GeneralConsultanServiceAncs = await Mediator.QueryGetComboBox<GeneralConsultanServiceAnc, GeneralConsultanServiceAncDto>(e, predicate); 
+            ProductCategorys = await Mediator.QueryGetComboBox<ProductCategory, ProductCategoryDto>(e, predicate); 
         }
         catch (Exception ex)
         {
-            ex.HandleException(ToastService);
+            ex.HandleException(ToastProductCategory);
         }
         finally { PanelVisible = false; }
     }

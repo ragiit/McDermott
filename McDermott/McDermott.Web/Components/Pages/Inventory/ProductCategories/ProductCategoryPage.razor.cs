@@ -115,9 +115,14 @@ namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.QueryGetHelper<ProductCategory, ProductCategoryDto>(pageIndex, pageSize, searchTerm);
+            var result = await Mediator.Send(new GetProductCategoryQuery
+            {
+                SearchTerm = searchTerm ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             GetProductCategory = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }

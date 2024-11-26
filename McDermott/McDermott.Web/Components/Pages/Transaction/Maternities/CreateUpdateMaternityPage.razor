@@ -188,7 +188,7 @@
                                                         }
                                                         <DxFormLayout>
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@Patients"
+                                                                @*  <MyDxComboBox Data="@Patients"
                                                                               NullText="Select Patient"
                                                                               @ref="refPatientComboBox"
                                                                               @bind-Value="@GeneralConsultanService.PatientId"
@@ -221,7 +221,29 @@
                                                                     </Columns>
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
+                                                            </DxFormLayoutItem> *@
+
+                                                                <MyDxComboBox Data="Patients"
+                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                              NullText="Select Patient"
+                                                                              TextFieldName="Name"
+                                                                              ValueFieldName="Id"
+                                                                              @oninput="OnInputUser"
+                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                              SelectedItemChanged="((UserDto e) => SelectedItemChanged(e))"
+                                                                              @bind-Value="GeneralConsultanService.PatientId">
+                                                                    <Columns>
+                                                                        <DxListEditorColumn FieldName="NoRm" Caption="Medical Record" />
+                                                                        <DxListEditorColumn FieldName="Name" />
+                                                                        <DxListEditorColumn FieldName="Email" />
+                                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+                                                                        <DxListEditorColumn FieldName="Gender" />
+                                                                    </Columns>
+                                                                </MyDxComboBox>
+                                                                <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
                                                             </DxFormLayoutItem>
+
+
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
                                                                 <DxTextBox @bind-Text="(GeneralConsultanService.Patient.NoRm)" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
 
@@ -245,18 +267,17 @@
                                                                             <DxGridLayoutRow />
                                                                         </Rows>
                                                                         <Columns>
-                                                                            <DxGridLayoutColumn Width="90%" />
-                                                                            <DxGridLayoutColumn Width="30%" />
+                                                                            <DxGridLayoutColumn Width="100%" />
                                                                         </Columns>
                                                                         <Items>
                                                                             <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
                                                                                 <Template>
-                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Patient.Age" NullText="Age" ReadOnly InputCssClass="fw-normal" />
-                                                                                </Template>
-                                                                            </DxGridLayoutItem>
-                                                                            <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
-                                                                                <Template>
-                                                                                    <h6 class="pl-1 pt-2 normal-caption">Year</h6>
+                                                                                    <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanService.Patient.Age" NullText="Age" ReadOnly InputCssClass="fw-normal">
+                                                                                        <Buttons>
+                                                                                            <DxEditorButton Tooltip="Year"
+                                                                                                            Text="Year" />
+                                                                                        </Buttons>
+                                                                                    </DxSpinEdit>
                                                                                 </Template>
                                                                             </DxGridLayoutItem>
                                                                         </Items>
@@ -308,53 +329,35 @@
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.ClassType)" />
                                                             </DxFormLayoutItem>
+
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@Services"
+                                                                <MyDxComboBox Data="Services"
                                                                               NullText="Select Service"
-                                                                              @ref="refServiceComboBox"
-                                                                              @bind-Value="@GeneralConsultanService.ServiceId"
-                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                               TextFieldName="Name"
+                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                               ValueFieldName="Id"
-                                                                              TextChanged="((string e) => OnInputServiceChanged(e))">
-                                                                    <Buttons>
-                                                                        <DxEditorButton Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)" Click="OnSearchServiceIndexDecrement"
-                                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                                        Tooltip="Previous Index" />
-                                                                        <DxEditorButton Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)" Click="OnSearchService"
-                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                        Tooltip="Search" />
-                                                                        <DxEditorButton Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)" Click="OnSearchServiceIndexIncrement"
-                                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                                        Tooltip="Next Index" />
-                                                                    </Buttons>
+                                                                              @oninput="OnInputService"
+                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                              SelectedItemChanged="((ServiceDto e) => SelectedItemChanged(e))"
+                                                                              @bind-Value="GeneralConsultanService.ServiceId">
                                                                     <Columns>
-                                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
-                                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
+                                                                        <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
+                                                                        <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
                                                                     </Columns>
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(()=>GeneralConsultanService.ServiceId)" />
                                                             </DxFormLayoutItem>
+
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
-                                                                <MyDxComboBox Data="@Physicions"
-                                                                              NullText="Select Physicion"
-                                                                              @ref="refPhysicionComboBox"
-                                                                              @bind-Value="@GeneralConsultanService.PratitionerId"
-                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                <MyDxComboBox Data="Physicions"
+                                                                              NullText="Select Physicions"
                                                                               TextFieldName="Name"
                                                                               ValueFieldName="Id"
-                                                                              TextChanged="((string e) => OnInputPhysicionChanged(e))">
-                                                                    <Buttons>
-                                                                        <DxEditorButton Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)" Click="OnSearchPhysicionIndexDecrement"
-                                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                                        Tooltip="Previous Index" />
-                                                                        <DxEditorButton Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)" Click="OnSearchPhysicion"
-                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                        Tooltip="Search" />
-                                                                        <DxEditorButton Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)" Click="OnSearchPhysicionIndexIncrement"
-                                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                                        Tooltip="Next Index" />
-                                                                    </Buttons>
+                                                                              @oninput="OnInputPhysicions"
+                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                              SelectedItemChanged="((UserDto e) => SelectedItemPhysicianChanged(e))"
+                                                                              @bind-Value="GeneralConsultanService.PratitionerId">
                                                                     <Columns>
                                                                         <DxListEditorColumn FieldName="Name" />
                                                                         <DxListEditorColumn FieldName="Email" />
@@ -362,7 +365,6 @@
                                                                         <DxListEditorColumn FieldName="Gender" />
                                                                         <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
                                                                         <DxListEditorColumn FieldName="IsPhysicion" Caption="Physicion" />
-                                                                        <DxListEditorColumn FieldName="IsNurse" Caption="Nurse" />
                                                                     </Columns>
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(()=>GeneralConsultanService.PratitionerId)" />
@@ -390,7 +392,7 @@
                                                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                                                             {
                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                                                    <MyDxComboBox Data="@InsurancePolicies"
+                                                                    @*  <MyDxComboBox Data="@InsurancePolicies"
                                                                                   ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                                                                   NullText="Select InsurancePolicy"
                                                                                   @ref="refInsurancePolicyComboBox"
@@ -416,7 +418,25 @@
                                                                             <DxListEditorColumn FieldName="Insurance.Name"
                                                                                                 Caption="Insurance Company" />
                                                                         </Columns>
+                                                                    </MyDxComboBox> *@
+
+                                                                    <MyDxComboBox Data="InsurancePolicies"
+                                                                                  NullText="Select InsurancePolicy"
+                                                                                  @oninput="OnInputInsurancePolicy"
+                                                                                  EditFormat="{0} - {1}"
+                                                                                  ValueFieldName="Id"
+                                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                                                  SelectedItemChanged="((InsurancePolicyDto e) => SelectedItemChanged(e))"
+                                                                                  @bind-Value="GeneralConsultanService.InsurancePolicyId">
+                                                                        <Columns>
+                                                                            <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
+                                                                                                Caption="No Card" />
+
+                                                                            <DxListEditorColumn FieldName="Insurance.Name"
+                                                                                                Caption="Insurance Company" />
+                                                                        </Columns>
                                                                     </MyDxComboBox>
+                                                                    <ValidationMessage For="@(()=>GeneralConsultanService.InsurancePolicyId)" />
                                                                 </DxFormLayoutItem>
 
 
@@ -1160,8 +1180,19 @@
                                                         <div class="w-100 mt-2">
                                                             <div class="card">
                                                                 <div class="card-header">
-                                                                    <span class="fw-bolder">ANC</span>
+                                                                    <div class="row justify-content-between">
+                                                                        <div class="col">
+                                                                            <span class="fw-bolder">ANC</span>
+                                                                        </div>
+                                                                        @if (GeneralConsultanServiceAnc.Id != 0 && GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed)
+                                                                       {
+                                                                            <div class="col-sm text-end align-self-center">
+                                                                                <span class="badge text-bg-danger" style="font-size: 0.9rem">Closed</span>
+                                                                            </div>
+                                                                       }
+                                                                    </div>
                                                                 </div>
+
 
                                                                 <EditForm Model="@GeneralConsultanServiceAnc"
                                                                           @onkeypress="@KeyPressHandler"
@@ -1180,7 +1211,6 @@
                                                                                           @ref="refReferenceComboBox"
                                                                                           @bind-Value="@GeneralConsultanServiceAnc.Reference"
                                                                                           TextFieldName="Reference"
-                                                                                          ReadOnly="ReadOnlyForm()"
                                                                                           ValueFieldName="Reference"
                                                                                           TextChanged="((string e) => OnInputReferenceChanged(e))"
                                                                                           SelectedItemChanged="((GeneralConsultanServiceAncDto e) => OnSelectedReferenceChanged(e))">
@@ -1205,28 +1235,28 @@
                                                                         <DxFormLayoutItem Context="abc" Caption="Pregnancy Status" CaptionCssClass="normal-caption" ColSpanMd="6">
                                                                             <DxFormLayoutItem Caption="G" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAnc.PregnancyStatusG"
-                                                                                            ReadOnly="ReadOnlyForm()"
+                                                                                            ReadOnly="ReadOnlyForm() || GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed"
                                                                                             NullText="G" />
                                                                             </DxFormLayoutItem>
                                                                             <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.PregnancyStatusG)" />
 
                                                                             <DxFormLayoutItem Caption="P" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAnc.PregnancyStatusP"
-                                                                                            ReadOnly="ReadOnlyForm()"
+                                                                                            ReadOnly="ReadOnlyForm() || GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed"
                                                                                             NullText="P" />
                                                                                 <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.PregnancyStatusP)" />
                                                                             </DxFormLayoutItem>
 
                                                                             <DxFormLayoutItem Caption="A" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAnc.PregnancyStatusA"
-                                                                                            ReadOnly="ReadOnlyForm()"
+                                                                                            ReadOnly="ReadOnlyForm() || GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed"
                                                                                             NullText="A" />
                                                                                 <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.PregnancyStatusA)" />
                                                                             </DxFormLayoutItem>
 
                                                                             <DxFormLayoutItem Caption="H" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                 <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAnc.PregnancyStatusH"
-                                                                                            ReadOnly="ReadOnlyForm()"
+                                                                                            ReadOnly="ReadOnlyForm() || GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed"
                                                                                             NullText="H" />
                                                                                 <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.PregnancyStatusH)" />
                                                                             </DxFormLayoutItem>
@@ -1238,13 +1268,13 @@
                                                                             <DxFormLayout>
                                                                                 <DxFormLayoutItem Caption="SC History" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <MyTextBox @bind-Text="@GeneralConsultanServiceAnc.HistorySC"
-                                                                                               ReadOnly="ReadOnlyForm()"
+                                                                                               ReadOnly="ReadOnlyForm() || GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed"
                                                                                                NullText="SC History" />
                                                                                     <ValidationMessage For="@(()=>GeneralConsultanServiceAnc.HistorySC)" />
                                                                                 </DxFormLayoutItem>
 
                                                                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="HPHT" ColSpanMd="12">
-                                                                                    <DxDateEdit ReadOnly="ReadOnlyForm()"
+                                                                                    <DxDateEdit ReadOnly="ReadOnlyForm() || GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Closed"
                                                                                                 Date="@GeneralConsultanServiceAnc.HPHT"
                                                                                                 DisplayFormat="@Helper.DefaultFormatDate"
                                                                                                 DateExpression="@(() => GeneralConsultanServiceAnc.HPHT)"
@@ -1295,7 +1325,7 @@
                                                                                             <DxButton Enabled="!IsLoading" RenderStyle="ButtonRenderStyle.Primary" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-floppy-disk" Text="Save" SubmitFormOnClick="true"></DxButton>
                                                                                             <DxButton RenderStyle="ButtonRenderStyle.Danger" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-xmark" Text="Clear"></DxButton>
                                                                                             <DxButton RenderStyle="ButtonRenderStyle.Success"
-                                                                                                      Visible="@(GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Open)"
+                                                                                                      Visible="@(GeneralConsultanServiceAnc.Status == EnumStatusGeneralConsultanServiceAnc.Open && GeneralConsultanServiceAnc.Id != 0)"
                                                                                                       RenderStyleMode="@ButtonRenderStyleMode.Contained"
                                                                                                       IconCssClass="fa-solid fa-times-circle"
                                                                                                       Text="Close ANC"
@@ -1442,73 +1472,6 @@
                                                                         </DxLoadingPanel>
                                                                     </DxFormLayout>
                                                                 </DxFormLayout>
-
-                                                                @* <div class="card-body">
-                                                        <div class="w-100">
-                                                        <div class="card">
-                                                        <div class="card-header">
-                                                        <span class="fw-bolder">ANC Reference</span>
-                                                        </div>
-
-                                                        <div class="card-body">
-                                                        <DxFormLayout CssClass="w-100">
-                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reference" ColSpanMd="12">
-                                                        <MyDxComboBox Data="@Patients"
-                                                        NullText="Select Reference"
-                                                        @ref="refPatientComboBox"
-                                                        @bind-Value="@GeneralConsultanService.PatientId"
-                                                        TextFieldName="Name"
-                                                        ValueFieldName="Id"
-                                                        ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                        SelectedItemChanged="@((UserDto e) => SelectedItemPatientChanged(e))"
-                                                        TextChanged="((string e) => OnInputPatientChanged(e))">
-                                                        <Buttons>
-                                                        <DxEditorButton Click="OnSearchPatientIndexDecrement"
-                                                        IconCssClass="fa-solid fa-caret-left"
-                                                        Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
-                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchPatient"
-                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                        Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
-                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchPatientIndexIncrement"
-                                                        Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
-                                                        IconCssClass="fa-solid fa-caret-right"
-                                                        Tooltip="Next Index" />
-                                                        </Buttons>
-                                                        <Columns>
-                                                        <DxListEditorColumn FieldName="NoRm" Caption="Medical Record" />
-                                                        <DxListEditorColumn FieldName="Name" />
-                                                        <DxListEditorColumn FieldName="Email" />
-                                                        <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
-                                                        <DxListEditorColumn FieldName="Gender" />
-                                                        <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
-                                                        </Columns>
-                                                        </MyDxComboBox>
-                                                        <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
-                                                        </DxFormLayoutItem>
-                                                        </DxFormLayout>
-                                                        </div>
-                                                        </div>
-                                                        </div>
-                                                        </div>
-
-                                                        <div class="card-body">
-                                                        <div class="w-100">
-                                                        <div class="card">
-                                                        <div class="card-header">
-                                                        <span class="fw-bolder">ANC Reference Details</span>
-                                                        </div>
-
-                                                        <div class="card-body">
-                                                        <DxFormLayout CssClass="w-100">
-
-                                                        </DxFormLayout>
-                                                        </div>
-                                                        </div>
-                                                        </div>
-                                                        </div> *@
-
                                                             </div>
                                                         </div>
                                                     </DxTabPage>

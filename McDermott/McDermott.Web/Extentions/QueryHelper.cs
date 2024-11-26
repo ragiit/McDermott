@@ -36,24 +36,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            
-            else if (typeof(TDto) == typeof(ProductCategoryDto))
-            {
-                var result = await mediator.Send(new GetProductCategoryQuery(
-                    predicate as Expression<Func<ProductCategory, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new ProductCategory
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                    } : select as Expression<Func<ProductCategory, ProductCategory>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(ActiveComponentDto))
             {
                 var result = await mediator.Send(new GetActiveComponentQuery(
@@ -247,74 +229,6 @@ namespace McDermott.Web.Extentions
                             Name = x.District.Name
                         },
                     } : select as Expression<Func<Village, Village>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(DrugFormDto))
-            {
-                var result = await mediator.Send(new GetDrugFormQuery(
-                    predicate as Expression<Func<DrugForm, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new DrugForm
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code
-                    } : select as Expression<Func<DrugForm, DrugForm>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(DrugRouteDto))
-            {
-                var result = await mediator.Send(new GetDrugRouteQuery(
-                    predicate as Expression<Func<DrugRoute, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new DrugRoute
-                    {
-                        Id = x.Id,
-                        Route = x.Route,
-                        Code = x.Code
-                    } : select as Expression<Func<DrugRoute, DrugRoute>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(DrugRouteDto))
-            {
-                var result = await mediator.Send(new GetDrugRouteQuery(
-                    predicate as Expression<Func<DrugRoute, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new DrugRoute
-                    {
-                        Id = x.Id,
-                        Route = x.Route,
-                        Code = x.Code
-                    } : select as Expression<Func<DrugRoute, DrugRoute>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(DrugRouteDto))
-            {
-                var result = await mediator.Send(new GetDrugRouteQuery(
-                    predicate as Expression<Func<DrugRoute, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new DrugRoute
-                    {
-                        Id = x.Id,
-                        Route = x.Route,
-                        Code = x.Code
-                    } : select as Expression<Func<DrugRoute, DrugRoute>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

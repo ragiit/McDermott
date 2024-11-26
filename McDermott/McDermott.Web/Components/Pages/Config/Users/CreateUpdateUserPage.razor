@@ -114,6 +114,9 @@
                                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Martial Status" ColSpanMd="12">
                                                                     <MyDxComboBox Data="@Helper.MartialStatuss" @bind-Value="@UserForm.MartialStatus" NullText="Select Martial Status"></MyDxComboBox>
                                                                 </DxFormLayoutItem>
+                                                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Blood Type" ColSpanMd="12">
+                                                                    <MyDxComboBox Data="@Helper.BloodTypes" @bind-Value="@UserForm.BloodType" NullText="Select Blood Type"></MyDxComboBox>
+                                                                </DxFormLayoutItem>
                                                             </DxFormLayout>
                                                         </div>
                                                         <div class="col-md-6">
@@ -727,6 +730,28 @@
                                                                             </div>
                                                                         </Template>
                                                                     </DxFormLayoutItem>
+
+                                                                    @* <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Services"> *@
+                                                                    @*     <Template> *@
+                                                                    @*         <div class="row w-100">  *@
+                                                                    @*             <div class="col-md-12"> *@
+                                                                    @*                 <DxTagBox Data="@Services"  *@
+                                                                    @*                           @bind-Values="@SelectedServices" *@
+                                                                    @*                           TextFieldName="Name" *@
+                                                                    @*                           @oninput="OnInputService"   *@
+                                                                    @*                           CssClass="w-100" *@
+                                                                    @*                           NullText="Select Service" *@
+                                                                    @*                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"> *@
+                                                                    @*                     <Columns> *@
+                                                                    @*                         <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" /> *@
+                                                                    @*                         <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" /> *@
+                                                                    @*                         <DxListEditorColumn FieldName="@nameof(Service.Quota)" Caption="Quota" /> *@
+                                                                    @*                     </Columns> *@
+                                                                    @*                 </DxTagBox> *@
+                                                                    @*             </div> *@
+                                                                    @*         </div> *@
+                                                                    @*     </Template> *@
+                                                                    @* </DxFormLayoutItem> *@
 
                                                                 </DxFormLayout>
                                                             </div>
