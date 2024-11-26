@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using McDermott.Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
@@ -179,9 +180,14 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var countries = await Mediator.Send(new GetCronisCategoryQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-            Chronises = countries.Item1;
-            totalCount = countries.pageCount;
+            var result = await Mediator.Send(new GetCronisCategoryQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = searchTerm ?? ""
+            });
+            Chronises = result.Item1;
+            totalCount = result.PageCount;
             activePageIndex = pageIndex;
             PanelVisible = false;
         }

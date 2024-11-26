@@ -4,13 +4,34 @@
     {
         #region GET
 
-        public class GetDiagnosisQuery(Expression<Func<Diagnosis, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleDiagnosisQuery : IRequest<DiagnosisDto>
         {
-            public Expression<Func<Diagnosis, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Diagnosis, object>>> Includes { get; set; }
+            public Expression<Func<Diagnosis, bool>> Predicate { get; set; }
+            public Expression<Func<Diagnosis, Diagnosis>> Select { get; set; }
+
+            public List<(Expression<Func<Diagnosis, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetDiagnosisQuery : IRequest<(List<DiagnosisDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Diagnosis, object>>> Includes { get; set; }
+            public Expression<Func<Diagnosis, bool>> Predicate { get; set; }
+            public Expression<Func<Diagnosis, Diagnosis>> Select { get; set; }
+
+            public List<(Expression<Func<Diagnosis, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateDiagnosisQuery(List<DiagnosisDto> DiagnosissToValidate) : IRequest<List<DiagnosisDto>>

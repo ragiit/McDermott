@@ -6,15 +6,14 @@
         public long GeneralConsultanServiceId { get; set; }
         public long PatientId { get; set; }
         public string Reference { get; set; } = string.Empty;
-
-        [Required]
-        public string? PregnancyStatusG { get; set; }
-
-        [Required]
-        public string? PregnancyStatusP { get; set; }
-
-        [Required]
-        public string? PregnancyStatusA { get; set; }
+        public int? PregnancyStatusG { get; set; }
+        public int? PregnancyStatusP { get; set; }
+        public int? PregnancyStatusA { get; set; }
+        public int? PregnancyStatusH { get; set; }
+        public int? UK { get; set; }
+        public string? HistorySC { get; set; }
+        public string? Notes { get; set; }
+        public EnumStatusGeneralConsultanServiceAnc Status { get; set; } = EnumStatusGeneralConsultanServiceAnc.Open;
 
         [Required]
         public DateTime? HPHT { get; set; }
@@ -32,9 +31,14 @@
         public long GeneralConsultanServiceId { get; set; }
         public long PatientId { get; set; }
         public string Reference { get; set; } = string.Empty;
-        public string? PregnancyStatusG { get; set; }
-        public string? PregnancyStatusP { get; set; }
-        public string? PregnancyStatusA { get; set; }
+        public int? PregnancyStatusG { get; set; }
+        public int? PregnancyStatusP { get; set; }
+        public int? PregnancyStatusA { get; set; }
+        public int? PregnancyStatusH { get; set; }
+        public string? HistorySC { get; set; }
+        public string? Notes { get; set; }
+        public EnumStatusGeneralConsultanServiceAnc Status { get; set; } = EnumStatusGeneralConsultanServiceAnc.Open;
+        public int? UK { get; set; }
         public string? HPHT { get; set; }
         public string? HPL { get; set; }
     }

@@ -146,7 +146,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                 var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
                 NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
-                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery(predicate: x => x.Id == a.DiagnosisId))).Item1;
+                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery { Predicate = x => x.Id == a.DiagnosisId })).Item1;
 
                 PanelVisible = false;
             }
@@ -534,12 +534,30 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         {
             if (d is null)
             {
-                GeneralConsultanService.HPL = DateTime.Now;
+                GeneralConsultanServiceAnc.UK = null;
+                GeneralConsultanService.HPL = null;
                 return;
             }
+
             GeneralConsultanServiceAnc.HPHT = d;
-            GeneralConsultanServiceAnc.HPL = d.GetValueOrDefault().AddDays(280); 
+            GeneralConsultanServiceAnc.HPL = d.GetValueOrDefault().AddDays(280);
+
+            // Contoh HPHT (Hari Pertama Haid Terakhir)
+            DateTime hpht = d.GetValueOrDefault();
+
+            // Tambahkan 14 hari ke HPHT
+            DateTime hphtPlus14 = hpht.AddDays(14);
+
+            // Tanggal hari ini
+            DateTime today = DateTime.Today;
+
+            // Hitung selisih hari
+            int selisihHari = (today - hphtPlus14).Days;
+
+            // Hitung usia kehamilan dalam minggu
+            GeneralConsultanServiceAnc.UK = selisihHari / 7;
         }
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -553,12 +571,9 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private bool ReadOnlyForm()
         {
-            var a = ((
-                GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) ||
-                GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife))
-                );
+            var a = ((GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife)));
 
-            return !a;
+            return !a || GeneralConsultanServiceAnc.Status != EnumStatusGeneralConsultanServiceAnc.Closed;
         }
 
         private async Task<GeneralConsultanServiceDto> GetGeneralConsultanServiceById()
@@ -1104,9 +1119,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetDiagnosisQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosesComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetDiagnosisQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refDiagnosesComboBox?.Text ?? ""
+                });
                 Diagnoses = result.Item1;
-                totalCountDiagnoses = result.pageCount;
+                totalCountDiagnoses = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -1447,6 +1467,47 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             {
                 IsLoading = false;
             }
+        }
+
+        private bool IsClosePopupVisible { get; set; }
+        private string CloseNote { get; set; } = string.Empty;
+
+        private void ShowClosePopup()
+        {
+            IsClosePopupVisible = true;
+        }
+
+        private void CancelClosePopup()
+        {
+            IsClosePopupVisible = false;
+        }
+
+        private async Task ConfirmCloseANC()
+        {
+            // Simulate saving to the database
+            await SaveCloseANCAsync(CloseNote);
+
+            // Close the popup
+            IsClosePopupVisible = false;
+        }
+
+        private async Task SaveCloseANCAsync(string note)
+        {
+            GeneralConsultanServiceAnc.Notes = note;
+            GeneralConsultanServiceAnc.Status = EnumStatusGeneralConsultanServiceAnc.Closed;
+
+            var searchAnc = (await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
+            {
+                IsGetAll = true,
+                Predicate = x => x.GeneralConsultanServiceAncId == GeneralConsultanServiceAnc.Id && x.IsReadOnly == false,
+                Select = x => x
+            })).Item1;
+
+            searchAnc.ForEach(x => x.IsReadOnly = true);
+
+            await Mediator.Send(new UpdateListGeneralConsultanServiceAncDetailRequest(searchAnc));
+
+            await HandleValidSubmitAnc();
         }
 
         private GeneralConsultanServiceAncDto GeneralConsultanServiceAnc { get; set; } = new();

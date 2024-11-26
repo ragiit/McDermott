@@ -111,7 +111,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             await LoadDataCPPT();
         }
 
-
         #region Searching
 
         private int pageSizeGridCPPT { get; set; } = 10;
@@ -169,7 +168,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
                 NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
-                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery(predicate: x => x.Id == a.DiagnosisId))).Item1;
+                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
+                {
+                    Predicate = x => x.Id == a.DiagnosisId
+                })).Item1;
 
                 PanelVisible = false;
             }
@@ -265,14 +267,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private async Task OnClickTabClaim()
         {
-
             await LoadDataBenefit();
             await LoadDataPatients();
             await LoadDataPhycisian();
             await LoadDataClaim();
-
         }
+
         private bool isActiveButton { get; set; }
+
         private void GridClaim_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleClaimIndex = args.VisibleIndex;
@@ -288,6 +290,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 ex.HandleException(ToastService);
             }
         }
+
         #region Searching
 
         private int pageSizeGridClaim { get; set; } = 10;
@@ -315,6 +318,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         #endregion Searching
 
         #region LoadData
+
         private async Task LoadDataClaim(int pageIndex = 0, int pageSizeGridClaim = 10)
         {
             try
@@ -329,7 +333,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 GetClaimRequests = ab.Item1;
                 totalCountGridClaim = ab.PageCount;
                 activePageIndexTotalCountGridClaim = pageIndex;
-
             }
             catch (Exception ex)
             {
@@ -337,12 +340,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
             finally { PanelVisibleClaim = false; }
         }
-        #endregion
+
+        #endregion LoadData
+
         #region Click
+
         private async Task NewItemClaim_Click()
         {
             await GridClaim.StartEditNewRowAsync();
-
         }
 
         private async Task EditItemClaim_Click()
@@ -359,6 +364,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             await LoadDataClaim();
         }
+
         private async Task OnDeleteClaim(GridDataItemDeletingEventArgs e)
         {
             try
@@ -407,6 +413,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 Ex.HandleException(ToastService);
             }
         }
+
         private async Task OnDone(ClaimRequestDto Data)
         {
             // Lakukan validasi klaim terlebih dahulu
@@ -434,13 +441,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 postClaimhistory.ClaimedValue = 1;
 
                 await Mediator.Send(new CreateClaimHistoryRequest(postClaimhistory));
-
-
             }
 
             await LoadDataClaim();
         }
+
         private DateTime nextEligibleDate { get; set; }
+
         private async Task cekValidasi(BenefitConfigurationDto data)
         {
             if (data is not null)
@@ -460,12 +467,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             {
                 PostClaimRequests.BenefitId = null;
             }
-
         }
+
         private async Task CekPatient(UserDto data)
         {
             VisibleButton = true;
         }
+
         public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
             var benefitConfig = await Mediator.Send(new GetSingleBenefitConfigurationQuery
@@ -491,7 +499,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             var lastClaimCount = await Mediator.Send(new GetClaimHistoryQuery
             {
                 Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,
-
             });
             int counts = 0;
             if (benefitConfig.TypeOfBenefit == "Amount")
@@ -502,7 +509,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             {
                 counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
             }
-
 
             // Cek apakah klaim melebihi durasi yang diizinkan
             if (lastClaims != null)
@@ -518,7 +524,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     VisibleButton = false;
                     return;
                 }
-
             }
 
             // Jika validasi berhasil
@@ -539,8 +544,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 _ => lastClaimDate
             };
         }
-
-
 
         public MarkupString GetIssueStatusIconHtml(EnumClaimRequestStatus? status)
         {
@@ -579,6 +582,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         #region ComboBox
+
         #region ComboBox Patient
 
         private DxComboBox<UserDto, long?> refPatientsComboBox { get; set; }
@@ -677,7 +681,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             var result = await Mediator.Send(new GetBenefitConfigurationQuery
             {
-                Predicate = x=>x.Status == EnumBenefitStatus.Active,
+                Predicate = x => x.Status == EnumBenefitStatus.Active,
                 SearchTerm = refBenefitComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
@@ -686,7 +690,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             totalCountGridClaim = result.PageCount;
         }
 
-        #endregion
+        #endregion ComboBox Benefit
 
         #region ComboBox Phycisian
 
@@ -745,11 +749,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             totalCountGridClaim = result.PageCount;
         }
 
-        #endregion
+        #endregion ComboBox Phycisian
 
-        #endregion
-        #endregion
-        #endregion
+        #endregion ComboBox
+
+        #endregion Click
+
+        #endregion Claim User
+
         private void KeyPressHandler(KeyboardEventArgs args)
         {
             if (args.Key == "Enter")
@@ -885,10 +892,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private List<PrognosaRequest> PrognosaRequests { get; set; } = [];
+
         private async Task LoadPrognosaData()
         {
             PrognosaRequests = await GetPrognosaData();
         }
+
         private async Task<List<PrognosaRequest>> GetPrognosaData()
         {
             try
@@ -905,7 +914,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         KdPrognosa = item.kdPrognosa,
                         NmPrognosa = item.nmPrognosa,
                     }).ToList();
-                     
+
                     return a;
                 }
                 else
@@ -923,6 +932,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
             return [];
         }
+
         private async Task LoadData()
         {
             if (PageMode == EnumPageMode.Update.GetDisplayName())
@@ -1357,9 +1367,14 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetDiagnosisQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosesComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetDiagnosisQuery
+                {
+                    SearchTerm = refDiagnosesComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
                 Diagnoses = result.Item1;
-                totalCountDiagnoses = result.pageCount;
+                totalCountDiagnoses = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -2141,7 +2156,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         case EnumStatusGeneralConsultantService.Waiting:
                             GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Waiting;
                             PrognosaRequests = await GetPrognosaData();
-                            StagingText = EnumStatusGeneralConsultantService.Physician; 
+                            StagingText = EnumStatusGeneralConsultantService.Physician;
                             break;
 
                         case EnumStatusGeneralConsultantService.Physician:

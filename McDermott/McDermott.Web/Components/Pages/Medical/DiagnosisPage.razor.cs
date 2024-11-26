@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
+using System.Linq.Expressions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -58,7 +59,7 @@ namespace McDermott.Web.Components.Pages.Medical
         [
             new() { Column = "Code"},
             new() { Column = "Name (en)", Notes = "Mandatory" },
-            new() { Column = "Name (id)" }, 
+            new() { Column = "Name (id)" },
             new() { Column = "Chronic Category"},
         ];
 
@@ -122,12 +123,17 @@ namespace McDermott.Web.Components.Pages.Medical
                     //        Name = x.Name
                     //    }))).Item1;
 
-                    list2 = (await Mediator.Send(new GetCronisCategoryQuery(x => b.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new CronisCategory
+                    list2 = (await Mediator.Send(new GetCronisCategoryQuery
+                    {
+                        Predicate = x => b.Contains(x.Name.ToLower()),
+                        Select = x => new CronisCategory
                         {
                             Id = x.Id,
                             Name = x.Name
-                        }))).Item1;
+                        },
+                        IsGetAll = true
+                    }
+                    )).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
@@ -193,7 +199,7 @@ namespace McDermott.Web.Components.Pages.Medical
                             !existingVillages.Any(ev =>
                                 ev.Name == village.Name &&
                                 ev.NameInd == village.NameInd &&
-                                ev.Code == village.Code && 
+                                ev.Code == village.Code &&
                                 ev.CronisCategoryId == village.CronisCategoryId
                             )
                         ).ToList();
@@ -218,55 +224,58 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             await GetUserInfo();
             await LoadData();
-            await LoadDataDiseaseCategory();
-            await LoadDataCronisCategory();
         }
 
-        #region ComboboxCronisCategory
+        #region ComboBox CronisCategory
 
-        private DxComboBox<CronisCategoryDto, long?> refCronisCategoryComboBox { get; set; }
-        private int CronisCategoryComboBoxIndex { get; set; } = 0;
-        private int totalCountCronisCategory = 0;
+        private CronisCategoryDto SelectedCronisCategory { get; set; } = new();
 
-        private async Task OnSearchCronisCategory()
+        private async Task SelectedItemChanged(CronisCategoryDto e)
         {
-            await LoadDataCronisCategory();
-        }
-
-        private async Task OnSearchCronisCategoryIndexIncrement()
-        {
-            if (CronisCategoryComboBoxIndex < (totalCountCronisCategory - 1))
+            if (e is null)
             {
-                CronisCategoryComboBoxIndex++;
-                await LoadDataCronisCategory(CronisCategoryComboBoxIndex, 10);
+                SelectedCronisCategory = new();
+                await LoadCronisCategory();
+            }
+            else
+                SelectedCronisCategory = e;
+        }
+
+        private CancellationTokenSource? _ctsCronisCategory;
+
+        private async Task OnInputCronisCategory(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsCronisCategory?.Cancel();
+                _ctsCronisCategory?.Dispose();
+                _ctsCronisCategory = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsCronisCategory.Token);
+
+                await LoadCronisCategory(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsCronisCategory?.Dispose();
+                _ctsCronisCategory = null;
             }
         }
 
-        private async Task OnSearchCronisCategoryndexDecrement()
+        private async Task LoadCronisCategory(string? e = "", Expression<Func<CronisCategory, bool>>? predicate = null)
         {
-            if (CronisCategoryComboBoxIndex > 0)
+            try
             {
-                CronisCategoryComboBoxIndex--;
-                await LoadDataCronisCategory(CronisCategoryComboBoxIndex, 10);
+                Cronises = await Mediator.QueryGetComboBox<CronisCategory, CronisCategoryDto>(e, predicate);
             }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
-        private async Task OnInputCronisCategoryChanged(string e)
-        {
-            CronisCategoryComboBoxIndex = 0;
-            await LoadDataCronisCategory();
-        }
-
-        private async Task LoadDataCronisCategory(int pageIndex = 0, int pageSize = 10, long? CronisCategoryId = null)
-        {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetCronisCategoryQuery(CronisCategoryId == null ? null : x => x.Id == CronisCategoryId, pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCronisCategoryComboBox?.Text ?? ""));
-            Cronises = result.Item1;
-            totalCountCronisCategory = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCronisCategory
+        #endregion ComboBox CronisCategory
 
         #region ComboboxDiseaseCategory
 
@@ -346,9 +355,14 @@ namespace McDermott.Web.Components.Pages.Medical
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetDiagnosisQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var a = await Mediator.Send(new GetDiagnosisQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm ?? "",
+                });
                 Diagnoses = a.Item1;
-                totalCount = a.pageCount;
+                totalCount = a.PageCount;
                 activePageIndex = pageIndex;
                 PanelVisible = false;
             }
@@ -366,6 +380,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task NewItem_Click()
         {
+            await LoadCronisCategory();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -383,7 +398,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task LoadComboboxEdit(DiagnosisDto a)
         {
-            Cronises = (await Mediator.Send(new GetCronisCategoryQuery(x => x.Id == a.CronisCategoryId))).Item1;
+            await LoadCronisCategory(predicate: x => x.Id == a.CronisCategoryId);
             Diseases = (await Mediator.Send(new GetDiseaseCategoryQuery(x => x.Id == a.DiseaseCategoryId))).Item1;
         }
 

@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;
 
 namespace McDermott.Web.Extentions
 {
@@ -36,7 +37,26 @@ namespace McDermott.Web.Extentions
                     Select = x => new User
                     {
                         Id = x.Id,
-                        Name = x.Name
+                        Name = x.Name,
+                        Email = x.Email
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
+            if (typeof(TDto) == typeof(OccupationalDto))
+            {
+                var result = (await mediator.Send(new GetOccupationalQuery
+                {
+                    Predicate = predicate as Expression<Func<Occupational, bool>> ?? (x => true),
+                    Select = x => new Occupational
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -239,6 +259,24 @@ namespace McDermott.Web.Extentions
                 return result.Cast<TDto>().ToList();
             }
 
+            if (typeof(TDto) == typeof(CronisCategoryDto))
+            {
+                var result = (await mediator.Send(new GetCronisCategoryQuery
+                {
+                    Predicate = predicate as Expression<Func<CronisCategory, bool>> ?? (x => true),
+                    Select = x => new CronisCategory
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
             if (typeof(TDto) == typeof(UomDto))
             {
                 var result = (await mediator.Send(new GetUomQuery
@@ -284,6 +322,81 @@ namespace McDermott.Web.Extentions
             }
 
             #endregion Inventories
+
+            #region Employees
+
+            if (typeof(TDto) == typeof(JobPositionDto))
+            {
+                var result = (await mediator.Send(new GetJobPositionQuery
+                {
+                    Predicate = predicate as Expression<Func<JobPosition, bool>> ?? (x => true),
+                    Select = x => new JobPosition
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        DepartmentId = x.DepartmentId,
+                        Department = new Department
+                        {
+                            Name = x.Department.Name
+                        }
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            if (typeof(TDto) == typeof(DepartmentDto))
+            {
+                var result = (await mediator.Send(new GetDepartmentQuery
+                {
+                    Predicate = predicate as Expression<Func<Department, bool>> ?? (x => true),
+                    Select = x => new Department
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ParentDepartmentId = x.ParentDepartmentId,
+                        CompanyId = x.CompanyId,
+                        ManagerId = x.ManagerId,
+                        ParentDepartment = new Domain.Entities.Department
+                        {
+                            Name = x.ParentDepartment.Name
+                        },
+                        Company = new Domain.Entities.Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        Manager = new Domain.Entities.User
+                        {
+                            Name = x.Manager.Name
+                        },
+                        DepartmentCategory = x.DepartmentCategory
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            #endregion Employees
+
+            #region Transactions
+
+            if (typeof(TDto) == typeof(GeneralConsultanServiceAncDto))
+            {
+                var result = (await mediator.Send(new GetGeneralConsultanServiceAncQuery
+                {
+                    Predicate = predicate as Expression<Func<GeneralConsultanServiceAnc, bool>> ?? (x => true),
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            #endregion Transactions
 
             throw new NotSupportedException($"Query for type {typeof(T)} is not supported.");
         }

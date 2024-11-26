@@ -3,7 +3,8 @@
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class CronisCategoryQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetCronisCategoryQuery, (List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetCronisCategoryQuery, (List<CronisCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleCronisCategoryQuery, CronisCategoryDto>,
         IRequestHandler<CreateCronisCategoryRequest, CronisCategoryDto>,
         IRequestHandler<BulkValidateCronisCategoryQuery, List<CronisCategoryDto>>,
         IRequestHandler<CreateListCronisCategoryRequest, List<CronisCategoryDto>>,
@@ -35,6 +36,25 @@ namespace McDermott.Application.Features.Queries.Medical
             {
                 var query = _unitOfWork.Repository<CronisCategory>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<CronisCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<CronisCategory>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -44,34 +64,106 @@ namespace McDermott.Application.Features.Queries.Medical
                     }
                 }
 
-                if (request.Predicate is not null)
-                    query = query.Where(request.Predicate);
-
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Description, $"%{request.SearchTerm}%")
-                        );
+                       EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.Description, $"%{request.SearchTerm}%")
+                       );
                 }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new CronisCategory
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<CronisCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<CronisCategoryDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<CronisCategoryDto> Handle(GetSingleCronisCategoryQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<CronisCategory>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<CronisCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<CronisCategory>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
                 }
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
-                return (pagedItems.Adapt<List<CronisCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                       EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.Description, $"%{request.SearchTerm}%")
+                       );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new CronisCategory
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CronisCategoryDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

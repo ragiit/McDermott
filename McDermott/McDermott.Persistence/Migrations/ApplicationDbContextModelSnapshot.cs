@@ -2796,24 +2796,39 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("HPL")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("HistorySC")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LILA")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("PatientId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("PregnancyStatusA")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PregnancyStatusA")
+                        .HasColumnType("int");
 
-                    b.Property<string>("PregnancyStatusG")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PregnancyStatusG")
+                        .HasColumnType("int");
 
-                    b.Property<string>("PregnancyStatusP")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PregnancyStatusH")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PregnancyStatusP")
+                        .HasColumnType("int");
 
                     b.Property<string>("Reference")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UK")
+                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2851,8 +2866,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DJJ")
-                        .HasColumnType("int");
+                    b.Property<string>("DJJ")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");

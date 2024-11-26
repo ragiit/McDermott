@@ -1,16 +1,16 @@
-Uom
+GeneralConsultanServiceAnc
 
-public class UomCommand
+public class GeneralConsultanServiceAncCommand
  {
      #region GET
 
-    public class GetSingleUomQuery : IRequest<UomDto>
+    public class GetSingleGeneralConsultanServiceAncQuery : IRequest<GeneralConsultanServiceAncDto>
     {
-        public List<Expression<Func<Uom, object>>> Includes { get; set; }
-        public Expression<Func<Uom, bool>> Predicate { get; set; }
-        public Expression<Func<Uom, Uom>> Select { get; set; }
+        public List<Expression<Func<GeneralConsultanServiceAnc, object>>> Includes { get; set; }
+        public Expression<Func<GeneralConsultanServiceAnc, bool>> Predicate { get; set; }
+        public Expression<Func<GeneralConsultanServiceAnc, GeneralConsultanServiceAnc>> Select { get; set; }
 
-        public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<GeneralConsultanServiceAnc, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -19,13 +19,13 @@ public class UomCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetUomQuery : IRequest<(List<UomDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetGeneralConsultanServiceAncQuery : IRequest<(List<GeneralConsultanServiceAncDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Uom, object>>> Includes { get; set; }
-        public Expression<Func<Uom, bool>> Predicate { get; set; }
-        public Expression<Func<Uom, Uom>> Select { get; set; }
+        public List<Expression<Func<GeneralConsultanServiceAnc, object>>> Includes { get; set; }
+        public Expression<Func<GeneralConsultanServiceAnc, bool>> Predicate { get; set; }
+        public Expression<Func<GeneralConsultanServiceAnc, GeneralConsultanServiceAnc>> Select { get; set; }
 
-        public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<GeneralConsultanServiceAnc, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -34,49 +34,49 @@ public class UomCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateUom(Expression<Func<Uom, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateGeneralConsultanServiceAnc(Expression<Func<GeneralConsultanServiceAnc, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<GeneralConsultanServiceAnc, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateUomRequest(UomDto UomDto) : IRequest<UomDto>
+     public class CreateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto) : IRequest<GeneralConsultanServiceAncDto>
      {
-         public UomDto UomDto { get; set; } = UomDto;
+         public GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto { get; set; } = GeneralConsultanServiceAncDto;
      }
 
-     public class BulkValidateUom(List<UomDto> UomsToValidate) : IRequest<List<UomDto>>
+     public class BulkValidateGeneralConsultanServiceAnc(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate) : IRequest<List<GeneralConsultanServiceAncDto>>
      {
-         public List<UomDto> UomsToValidate { get; } = UomsToValidate;
+         public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate { get; } = GeneralConsultanServiceAncsToValidate;
      }
 
-     public class CreateListUomRequest(List<UomDto> UomDtos) : IRequest<List<UomDto>>
+     public class CreateListGeneralConsultanServiceAncRequest(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos) : IRequest<List<GeneralConsultanServiceAncDto>>
      {
-         public List<UomDto> UomDtos { get; set; } = UomDtos;
+         public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos { get; set; } = GeneralConsultanServiceAncDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateUomRequest(UomDto UomDto) : IRequest<UomDto>
+     public class UpdateGeneralConsultanServiceAncRequest(GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto) : IRequest<GeneralConsultanServiceAncDto>
      {
-         public UomDto UomDto { get; set; } = UomDto;
+         public GeneralConsultanServiceAncDto GeneralConsultanServiceAncDto { get; set; } = GeneralConsultanServiceAncDto;
      }
 
-     public class UpdateListUomRequest(List<UomDto> UomDtos) : IRequest<List<UomDto>>
+     public class UpdateListGeneralConsultanServiceAncRequest(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos) : IRequest<List<GeneralConsultanServiceAncDto>>
      {
-         public List<UomDto> UomDtos { get; set; } = UomDtos;
+         public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncDtos { get; set; } = GeneralConsultanServiceAncDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteUomRequest : IRequest<bool>
+     public class DeleteGeneralConsultanServiceAncRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -85,54 +85,54 @@ public class UomCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
+IRequestHandler<BulkValidateGeneralConsultanServiceAncQuery, List<GeneralConsultanServiceAncDto>>,
   
-IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleUomQuery, UomDto>,
-public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleUomQuery, UomDto>, 
-     IRequestHandler<ValidateUom, bool>,
-     IRequestHandler<CreateUomRequest, UomDto>,
-     IRequestHandler<BulkValidateUom, List<UomDto>>,
-     IRequestHandler<CreateListUomRequest, List<UomDto>>,
-     IRequestHandler<UpdateUomRequest, UomDto>,
-     IRequestHandler<UpdateListUomRequest, List<UomDto>>,
-     IRequestHandler<DeleteUomRequest, bool>
+IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>,
+public class GeneralConsultanServiceAncHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>, 
+     IRequestHandler<ValidateGeneralConsultanServiceAnc, bool>,
+     IRequestHandler<CreateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
+     IRequestHandler<BulkValidateGeneralConsultanServiceAnc, List<GeneralConsultanServiceAncDto>>,
+     IRequestHandler<CreateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
+     IRequestHandler<UpdateGeneralConsultanServiceAncRequest, GeneralConsultanServiceAncDto>,
+     IRequestHandler<UpdateListGeneralConsultanServiceAncRequest, List<GeneralConsultanServiceAncDto>>,
+     IRequestHandler<DeleteGeneralConsultanServiceAncRequest, bool>
 {
     #region GET
-    public async Task<List<UomDto>> Handle(BulkValidateUom request, CancellationToken cancellationToken)
+    public async Task<List<GeneralConsultanServiceAncDto>> Handle(BulkValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
     {
-        var UomDtos = request.UomsToValidate;
+        var GeneralConsultanServiceAncDtos = request.GeneralConsultanServiceAncsToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var UomNames = UomDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = UomDtos.Select(x => x.Code).Distinct().ToList();
+        //var GeneralConsultanServiceAncNames = GeneralConsultanServiceAncDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = GeneralConsultanServiceAncDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingUoms = await _unitOfWork.Repository<Uom>()
+        //var existingGeneralConsultanServiceAncs = await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => UomNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => GeneralConsultanServiceAncNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingUoms.Adapt<List<UomDto>>();
+        //return existingGeneralConsultanServiceAncs.Adapt<List<GeneralConsultanServiceAncDto>>();
 
         return [];
     }
-    public async Task<bool> Handle(ValidateUom request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateGeneralConsultanServiceAnc request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Uom>()
+        return await _unitOfWork.Repository<GeneralConsultanServiceAnc>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<UomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUomQuery request, CancellationToken cancellationToken)
+    public async Task<(List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanServiceAncQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Uom>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<GeneralConsultanServiceAnc>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -148,8 +148,8 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Uom>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Uom>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -166,7 +166,7 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.GeneralConsultanServiceAnc.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -174,7 +174,7 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Uom
+                query = query.Select(x => new GeneralConsultanServiceAnc
                 {
                     Id = x.Id, 
                 });
@@ -188,11 +188,11 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<UomDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<GeneralConsultanServiceAncDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<UomDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<GeneralConsultanServiceAncDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -202,11 +202,11 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<UomDto> Handle(GetSingleUomQuery request, CancellationToken cancellationToken)
+    public async Task<GeneralConsultanServiceAncDto> Handle(GetSingleGeneralConsultanServiceAncQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Uom>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<GeneralConsultanServiceAnc>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -222,8 +222,8 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Uom>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Uom>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<GeneralConsultanServiceAnc>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -240,7 +240,7 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.GeneralConsultanServiceAnc.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -248,12 +248,12 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Uom
+                query = query.Select(x => new GeneralConsultanServiceAnc
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<UomDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceAncDto>();
         }
         catch (Exception ex)
         {
@@ -266,17 +266,17 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<UomDto> Handle(CreateUomRequest request, CancellationToken cancellationToken)
+     public async Task<GeneralConsultanServiceAncDto> Handle(CreateGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());
+             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDto.Adapt<CreateUpdateGeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<UomDto>();
+             return result.Adapt<GeneralConsultanServiceAncDto>();
          }
          catch (Exception)
          {
@@ -284,16 +284,16 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<UomDto>> Handle(CreateListUomRequest request, CancellationToken cancellationToken)
+     public async Task<List<GeneralConsultanServiceAncDto>> Handle(CreateListGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDtos.Adapt<List<Uom>>());
+             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<GeneralConsultanServiceAnc>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<UomDto>>();
+             return result.Adapt<List<GeneralConsultanServiceAncDto>>();
          }
          catch (Exception)
          {
@@ -305,17 +305,17 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<UomDto> Handle(UpdateUomRequest request, CancellationToken cancellationToken)
+     public async Task<GeneralConsultanServiceAncDto> Handle(UpdateGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDto.Adapt<UomDto>().Adapt<Uom>());
+             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDto.Adapt<GeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<UomDto>();
+             return result.Adapt<GeneralConsultanServiceAncDto>();
          }
          catch (Exception)
          {
@@ -323,16 +323,16 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<UomDto>> Handle(UpdateListUomRequest request, CancellationToken cancellationToken)
+     public async Task<List<GeneralConsultanServiceAncDto>> Handle(UpdateListGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDtos.Adapt<List<Uom>>());
+             var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<GeneralConsultanServiceAnc>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<UomDto>>();
+             return result.Adapt<List<GeneralConsultanServiceAncDto>>();
          }
          catch (Exception)
          {
@@ -344,23 +344,23 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteUomRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteGeneralConsultanServiceAncRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Uom>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<GeneralConsultanServiceAnc>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Uom>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<GeneralConsultanServiceAnc>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetGeneralConsultanServiceAncQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -374,20 +374,20 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateUomQuery(List<UomDto> UomsToValidate) : IRequest<List<UomDto>>
+public class BulkValidateGeneralConsultanServiceAncQuery(List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate) : IRequest<List<GeneralConsultanServiceAncDto>>
 {
-    public List<UomDto> UomsToValidate { get; } = UomsToValidate;
+    public List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncsToValidate { get; } = GeneralConsultanServiceAncsToValidate;
 }a
 
 
-IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
+IRequestHandler<BulkValidateGeneralConsultanServiceAncQuery, List<GeneralConsultanServiceAncDto>>,
   
-IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleUomQuery, UomDto>,
+IRequestHandler<GetGeneralConsultanServiceAncQuery, (List<GeneralConsultanServiceAncDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleGeneralConsultanServiceAncQuery, GeneralConsultanServiceAncDto>,
 
 
 
- var a = await Mediator.Send(new GetUomsQuery
+ var a = await Mediator.Send(new GetGeneralConsultanServiceAncsQuery
  {
      OrderByList =
      [
@@ -399,10 +399,10 @@ IRequestHandler<GetSingleUomQuery, UomDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleUomQuery
+var patienss = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Uom
+    Select = x => new GeneralConsultanServiceAnc
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -415,13 +415,13 @@ var patienss = (await Mediator.Send(new GetSingleUomQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetUomQuery
+    var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Uoms = result.Item1;
+    GeneralConsultanServiceAncs = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
@@ -434,22 +434,22 @@ finally
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetUomQuery
+ var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
  {
-     Predicate = x => x.UomId == UomId,
-     SearchTerm = refUomComboBox?.Text ?? "",
+     Predicate = x => x.GeneralConsultanServiceAncId == GeneralConsultanServiceAncId,
+     SearchTerm = refGeneralConsultanServiceAncComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Uoms = result.Item1;
- totalCountUom = result.PageCount;
+ GeneralConsultanServiceAncs = result.Item1;
+ totalCountGeneralConsultanServiceAnc = result.PageCount;
 
- Uoms = (await Mediator.Send(new GetUomQuery
+ GeneralConsultanServiceAncs = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
  {
-     Predicate = x => x.Id == UomForm.IdCardUomId,
+     Predicate = x => x.Id == GeneralConsultanServiceAncForm.IdCardGeneralConsultanServiceAncId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleUomsQuery
+var data = (await Mediator.Send(new GetSingleGeneralConsultanServiceAncsQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -457,17 +457,17 @@ var data = (await Mediator.Send(new GetSingleUomsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Uom
+    Select = x => new GeneralConsultanServiceAnc
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Uom
+        Patient = new GeneralConsultanServiceAnc
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Uom
+        Pratitioner = new GeneralConsultanServiceAnc
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -480,55 +480,55 @@ var data = (await Mediator.Send(new GetSingleUomsQuery
 })) ?? new();
 
 
-#region ComboboxUom
+#region ComboboxGeneralConsultanServiceAnc
 
- private DxComboBox<UomDto, long?> refUomComboBox { get; set; }
- private int UomComboBoxIndex { get; set; } = 0;
- private int totalCountUom = 0;
+ private DxComboBox<GeneralConsultanServiceAncDto, long?> refGeneralConsultanServiceAncComboBox { get; set; }
+ private int GeneralConsultanServiceAncComboBoxIndex { get; set; } = 0;
+ private int totalCountGeneralConsultanServiceAnc = 0;
 
- private async Task OnSearchUom()
+ private async Task OnSearchGeneralConsultanServiceAnc()
  {
-     await LoadDataUom();
+     await LoadDataGeneralConsultanServiceAnc();
  }
 
- private async Task OnSearchUomIndexIncrement()
+ private async Task OnSearchGeneralConsultanServiceAncIndexIncrement()
  {
-     if (UomComboBoxIndex < (totalCountUom - 1))
+     if (GeneralConsultanServiceAncComboBoxIndex < (totalCountGeneralConsultanServiceAnc - 1))
      {
-         UomComboBoxIndex++;
-         await LoadDataUom(UomComboBoxIndex, 10);
+         GeneralConsultanServiceAncComboBoxIndex++;
+         await LoadDataGeneralConsultanServiceAnc(GeneralConsultanServiceAncComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchUomIndexDecrement()
+ private async Task OnSearchGeneralConsultanServiceAncIndexDecrement()
  {
-     if (UomComboBoxIndex > 0)
+     if (GeneralConsultanServiceAncComboBoxIndex > 0)
      {
-         UomComboBoxIndex--;
-         await LoadDataUom(UomComboBoxIndex, 10);
+         GeneralConsultanServiceAncComboBoxIndex--;
+         await LoadDataGeneralConsultanServiceAnc(GeneralConsultanServiceAncComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputUomChanged(string e)
+ private async Task OnInputGeneralConsultanServiceAncChanged(string e)
  {
-     UomComboBoxIndex = 0;
-     await LoadDataUom();
+     GeneralConsultanServiceAncComboBoxIndex = 0;
+     await LoadDataGeneralConsultanServiceAnc();
  }
 
  
-  private async Task LoadDataUom(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataGeneralConsultanServiceAnc(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetUomQuery
+          var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
           {
-              SearchTerm = refUomComboBox?.Text ?? "",
+              SearchTerm = refGeneralConsultanServiceAncComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Uoms = result.Item1;
-          totalCountUom = result.PageCount;
+          GeneralConsultanServiceAncs = result.Item1;
+          totalCountGeneralConsultanServiceAnc = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
@@ -538,47 +538,47 @@ var data = (await Mediator.Send(new GetSingleUomsQuery
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxUom
+ #endregion ComboboxGeneralConsultanServiceAnc
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
-    <MyDxComboBox Data="@Uoms"
-                  NullText="Select Uom"
-                  @ref="refUomComboBox"
-                  @bind-Value="@a.UomId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12">
+    <MyDxComboBox Data="@GeneralConsultanServiceAncs"
+                  NullText="Select GeneralConsultanServiceAnc"
+                  @ref="refGeneralConsultanServiceAncComboBox"
+                  @bind-Value="@a.GeneralConsultanServiceAncId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputUomChanged(e))">
+                  TextChanged="((string e) => OnInputGeneralConsultanServiceAncChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchUomIndexDecrement"
+            <DxEditorButton Click="OnSearchGeneralConsultanServiceAncIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchUom"
+            <DxEditorButton Click="OnSearchGeneralConsultanServiceAnc"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchUomIndexIncrement"
+            <DxEditorButton Click="OnSearchGeneralConsultanServiceAncIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(UomDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Uom.Name" Caption="Uom" />
-            <DxListEditorColumn FieldName="@nameof(UomDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAncDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="GeneralConsultanServiceAnc.Name" Caption="GeneralConsultanServiceAnc" />
+            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAncDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.UomId)" />
+    <ValidationMessage For="@(()=>a.GeneralConsultanServiceAncId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());
-var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDtos.Adapt<List<CreateUpdateUomDto>>().Adapt<List<Uom>>()); 
+var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDto.Adapt<CreateUpdateGeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());
+var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().AddAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<CreateUpdateGeneralConsultanServiceAncDto>>().Adapt<List<GeneralConsultanServiceAnc>>()); 
 
-var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());  
-var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDtos.Adapt<List<CreateUpdateUomDto>>().Adapt<List<Uom>>());
+var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDto.Adapt<CreateUpdateGeneralConsultanServiceAncDto>().Adapt<GeneralConsultanServiceAnc>());  
+var result = await _unitOfWork.Repository<GeneralConsultanServiceAnc>().UpdateAsync(request.GeneralConsultanServiceAncDtos.Adapt<List<CreateUpdateGeneralConsultanServiceAncDto>>().Adapt<List<GeneralConsultanServiceAnc>>());
 
-list3 = (await Mediator.Send(new GetUomQuery
+list3 = (await Mediator.Send(new GetGeneralConsultanServiceAncQuery
 {
-    Predicate = x => UomNames.Contains(x.Name.ToLower()),
+    Predicate = x => GeneralConsultanServiceAncNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Uom
+    Select = x => new GeneralConsultanServiceAnc
     {
         Id = x.Id,
         Name = x.Name
@@ -588,42 +588,42 @@ list3 = (await Mediator.Send(new GetUomQuery
 
 #region Searching
 
-    private int pageSizeUomAttendance { get; set; } = 10;
-    private int totalCountUomAttendance = 0;
-    private int activePageIndexUomAttendance { get; set; } = 0;
-    private string searchTermUomAttendance { get; set; } = string.Empty;
+    private int pageSizeGeneralConsultanServiceAnc { get; set; } = 10;
+    private int totalCountGeneralConsultanServiceAnc = 0;
+    private int activePageIndexGeneralConsultanServiceAnc { get; set; } = 0;
+    private string searchTermGeneralConsultanServiceAnc { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedUomAttendance(string searchText)
+    private async Task OnSearchBoxChangedGeneralConsultanServiceAnc(string searchText)
     {
-        searchTermUomAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeUomAttendance);
+        searchTermGeneralConsultanServiceAnc = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeGeneralConsultanServiceAnc);
     }
 
-    private async Task OnpageSizeUomAttendanceIndexChanged(int newpageSizeUomAttendance)
+    private async Task OnpageSizeGeneralConsultanServiceAncIndexChanged(int newpageSizeGeneralConsultanServiceAnc)
     {
-        pageSizeUomAttendance = newpageSizeUomAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeUomAttendance);
+        pageSizeGeneralConsultanServiceAnc = newpageSizeGeneralConsultanServiceAnc;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeGeneralConsultanServiceAnc);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeUomAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeGeneralConsultanServiceAnc);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeUomAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeGeneralConsultanServiceAnc = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetUomAttendanceQuery
+        var result = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeUomAttendance,
-            SearchTerm = searchTermUomAttendance,
+            PageSize = pageSizeGeneralConsultanServiceAnc,
+            SearchTerm = searchTermGeneralConsultanServiceAnc,
         });
-        UomAttendances = result.Item1;
-        totalCountUomAttendance = result.PageCount;
-        activePageIndexUomAttendance = pageIndex;
+        GeneralConsultanServiceAncs = result.Item1;
+        totalCountGeneralConsultanServiceAnc = result.PageCount;
+        activePageIndexGeneralConsultanServiceAnc = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
@@ -696,7 +696,7 @@ list3 = (await Mediator.Send(new GetUomQuery
 
 
    <MyGridPaginate @ref="GridDetail"
-                 Data="Uoms"
+                 Data="GeneralConsultanServiceAncs"
                  @bind-SelectedDataItems="@SelectedDetailDataItems"
                  EditModelSaving="OnSaveInventoryAdjumentDetail"
                  DataItemDeleting="OnDeleteInventoryAdjumentDetail"
@@ -707,70 +707,70 @@ list3 = (await Mediator.Send(new GetUomQuery
 
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="UomDto"
-                          Items="@Uoms"
+         <MyDxToolbarBase TItem="GeneralConsultanServiceAncDto"
+                          Items="@GeneralConsultanServiceAncs"
                           Grid="GridDetail"
                           SelectedDataItems="@SelectedDetailDataItems"
                           NewItem_Click="@NewItem_Click"
                           EditItem_Click="@EditItem_Click"
                           DeleteItem_Click="@DeleteItem_Click"
                           Refresh_Click="@(async () => await LoadData())"
-                          IsImport="UserAccessCRUID.IsImport"
-                          VisibleNew="UserAccessCRUID.IsCreate"
-                          VisibleEdit="UserAccessCRUID.IsUpdate"
-                          VisibleDelete="UserAccessCRUID.IsDelete" />
+                          IsImport="GeneralConsultanServiceAncAccessCRUID.IsImport"
+                          VisibleNew="GeneralConsultanServiceAncAccessCRUID.IsCreate"
+                          VisibleEdit="GeneralConsultanServiceAncAccessCRUID.IsUpdate"
+                          VisibleDelete="GeneralConsultanServiceAncAccessCRUID.IsDelete" />
      </ToolbarTemplate>
 
 
      <Columns>
          <DxGridSelectionColumn Width="15px" />
-         <DxGridDataColumn FieldName="Uom.Name" Caption="Uom"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="GeneralConsultanServiceAnc.Name" Caption="GeneralConsultanServiceAnc"></DxGridDataColumn>
          <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
          <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
          <DxGridDataColumn FieldName="Difference" Caption="Difference" />
          <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
          <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
-         <DxGridDataColumn FieldName="Uom.Uom.Name" Caption="Uom" />
+         <DxGridDataColumn FieldName="GeneralConsultanServiceAnc.GeneralConsultanServiceAnc.Name" Caption="GeneralConsultanServiceAnc" />
      </Columns>
      <EditFormTemplate Context="EditFormContext">
          @{
              if (EditFormContext.DataItem is null)
              {
-                 FormUom = (UomDto)EditFormContext.EditModel;
+                 FormGeneralConsultanServiceAnc = (GeneralConsultanServiceAncDto)EditFormContext.EditModel;
              }
-             var IsBatch = Uoms.FirstOrDefault(x => x.Id == FormUom.UomId)?.TraceAbility ?? false;
+             var IsBatch = GeneralConsultanServiceAncs.FirstOrDefault(x => x.Id == FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId)?.TraceAbility ?? false;
 
-             ActiveButton = FormUom.UomId is null ||
-             string.IsNullOrWhiteSpace(FormUom.Batch) && IsBatch ||
-             FormUom.ExpiredDate is null ||
-             FormUom.UomId is null;
+             ActiveButton = FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId is null ||
+             string.IsNullOrWhiteSpace(FormGeneralConsultanServiceAnc.Batch) && IsBatch ||
+             FormGeneralConsultanServiceAnc.ExpiredDate is null ||
+             FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId is null;
          }
          <div class="row w-100">
              <DxFormLayout CssClass="w-100">
                  <div class="col-md-4">
-                     <DxFormLayoutItem Caption="Uom" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox Data="@Uoms"
-                                     @bind-Value="@FormUom.UomId"
+                     <DxFormLayoutItem Caption="GeneralConsultanServiceAnc" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@GeneralConsultanServiceAncs"
+                                     @bind-Value="@FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     NullText="Select Uom..."
+                                     NullText="Select GeneralConsultanServiceAnc..."
                                      TextFieldName="Name"
-                                     ReadOnly="@(FormUom.Id != 0)"
+                                     ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
                                      ValueFieldName="Id"
-                                     SelectedItemChanged="@(async (UomDto freq) => await OnSelectUom(freq))"
+                                     SelectedItemChanged="@(async (GeneralConsultanServiceAncDto freq) => await OnSelectGeneralConsultanServiceAnc(freq))"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      ShowValidationIcon="true" />
-                         <ValidationMessage For="@(()=> FormUom.UomId)"   />
+                         <ValidationMessage For="@(()=> FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId)"   />
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem Caption="Batch" Enabled="FormUom.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormGeneralConsultanServiceAnc.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <MyDxComboBox Data="@Batch"
-                                       ReadOnly="@(FormUom.Id != 0)"
+                                       ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
                                        NullText="Select Batch..."
-                                       AllowUserInput="true"
-                                       @bind-Value="@FormUom.Batch"
-                                       @bind-Text="@FormUom.Batch"
+                                       AllowGeneralConsultanServiceAncInput="true"
+                                       @bind-Value="@FormGeneralConsultanServiceAnc.Batch"
+                                       @bind-Text="@FormGeneralConsultanServiceAnc.Batch"
                                        SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
-                         <ValidationMessage For="@(() => FormUom.Batch)" />
+                         <ValidationMessage For="@(() => FormGeneralConsultanServiceAnc.Batch)" />
 
                      </DxFormLayoutItem>
                  </div>
@@ -780,43 +780,43 @@ list3 = (await Mediator.Send(new GetUomQuery
                          <DxSpinEdit ShowValidationIcon="true"
                                      ReadOnly
                                      MinValue="0"
-                                     @bind-Value="@FormUom.TeoriticalQty"
+                                     @bind-Value="@FormGeneralConsultanServiceAnc.TeoriticalQty"
                                      NullText="Teoritical Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormUom.TeoriticalQty)"   />
+                         <ValidationMessage For="@(()=> FormGeneralConsultanServiceAnc.TeoriticalQty)"   />
                      </DxFormLayoutItem>
 
                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxSpinEdit ShowValidationIcon="true"
                                      MinValue="0"
-                                     @bind-Value="@FormUom.RealQty"
+                                     @bind-Value="@FormGeneralConsultanServiceAnc.RealQty"
                                      NullText="Real Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormUom.RealQty)"   />
+                         <ValidationMessage For="@(()=> FormGeneralConsultanServiceAnc.RealQty)"   />
                      </DxFormLayoutItem>
                  </div>
 
                  <div class="col-md-4">
                      <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxDateEdit ShowValidationIcon="true"
-                                     ReadOnly="@(FormUom.Id != 0)"
+                                     ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
                                      DisplayFormat="@Helper.DefaultFormatDate"
-                                     @bind-Date="@FormUom.ExpiredDate"
+                                     @bind-Date="@FormGeneralConsultanServiceAnc.ExpiredDate"
                                      NullText="Expired Date">
                          </DxDateEdit>
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Uom" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox ShowValidationIcon="true" Data="@Uoms"
-                                     NullText="Uom"
-                                     ReadOnly="@(FormUom.Id != 0)"
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@GeneralConsultanServiceAncs"
+                                     NullText="GeneralConsultanServiceAnc"
+                                     ReadOnly="@(FormGeneralConsultanServiceAnc.Id != 0)"
                                      TextFieldName="Name"
                                      ValueFieldName="Id"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     @bind-Value="FormUom.UomId">
+                                     @bind-Value="FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId">
                          </DxComboBox>
-                         <ValidationMessage For="@(() => FormUom.UomId)" />
+                         <ValidationMessage For="@(() => FormGeneralConsultanServiceAnc.GeneralConsultanServiceAncId)" />
                      </DxFormLayoutItem>
                  </div>
              </DxFormLayout>
@@ -835,58 +835,58 @@ list3 = (await Mediator.Send(new GetUomQuery
 
  NEW COMBOBOX VIRAL 2024
 
-Uom
+GeneralConsultanServiceAnc
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
-    <DxComboBox Data="Uoms"
-                AllowUserInput="true"
-                NullText="Select Uom"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12">
+    <DxComboBox Data="GeneralConsultanServiceAncs"
+                AllowGeneralConsultanServiceAncInput="true"
+                NullText="Select GeneralConsultanServiceAnc"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputUom"
-                @bind-Value="a.UomId">
+                @oninput="OnInputGeneralConsultanServiceAnc"
+                @bind-Value="a.GeneralConsultanServiceAncId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Uom.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Code)" Caption="Code" />
         </Columns>
     </DxComboBox>
-    <ValidationMessage For="@(()=>a.UomId)" />
+    <ValidationMessage For="@(()=>a.GeneralConsultanServiceAncId)" />
 </DxFormLayoutItem>
 
-#region ComboBox Uom
+#region ComboBox GeneralConsultanServiceAnc
  
-private CancellationTokenSource? _ctsUom;
-private async Task OnInputUom(ChangeEventArgs e)
+private CancellationTokenSource? _ctsGeneralConsultanServiceAnc;
+private async Task OnInputGeneralConsultanServiceAnc(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
             
-        _ctsUom?.Cancel();
-        _ctsUom?.Dispose();
-        _ctsUom = new CancellationTokenSource();
+        _ctsGeneralConsultanServiceAnc?.Cancel();
+        _ctsGeneralConsultanServiceAnc?.Dispose();
+        _ctsGeneralConsultanServiceAnc = new CancellationTokenSource();
             
-        await Task.Delay(700, _ctsUom.Token);
+        await Task.Delay(700, _ctsGeneralConsultanServiceAnc.Token);
             
-        await LoadUom(e.Value?.ToString() ?? "");
+        await LoadGeneralConsultanServiceAnc(e.Value?.ToString() ?? "");
     } 
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsUom?.Dispose();
-        _ctsUom = null;
+        _ctsGeneralConsultanServiceAnc?.Dispose();
+        _ctsGeneralConsultanServiceAnc = null;
     } 
 }
 
- private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
+ private async Task LoadGeneralConsultanServiceAnc(string? e = "", Expression<Func<GeneralConsultanServiceAnc, bool>>? predicate = null)
  {
      try
      {
          PanelVisible = true;
-         Uoms = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
+         GeneralConsultanServiceAncs = await Mediator.QueryGetComboBox<GeneralConsultanServiceAnc, GeneralConsultanServiceAncDto>(e, predicate);
          PanelVisible = false;
      }
      catch (Exception ex)
@@ -900,83 +900,76 @@ private async Task OnInputUom(ChangeEventArgs e)
 
 
 // Ini buat di EditItemClick
-await LoadUom(id:  a.UomId);
+await LoadGeneralConsultanServiceAnc(id:  a.GeneralConsultanServiceAncId);
 
-Uom
+GeneralConsultanServiceAnc
 
 
 
 VIRAL 2025
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
-    <MyDxComboBox Data="Uoms"
-                NullText="Select Uom"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="GeneralConsultanServiceAnc" ColSpanMd="12">
+    <MyDxComboBox Data="GeneralConsultanServiceAncs"
+                NullText="Select GeneralConsultanServiceAnc"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputUom"
-                SelectedItemChanged="((UomDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.UomId">
+                @oninput="OnInputGeneralConsultanServiceAnc"
+                SelectedItemChanged="((GeneralConsultanServiceAncDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.GeneralConsultanServiceAncId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Uom.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(GeneralConsultanServiceAnc.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.UomId)" />
+    <ValidationMessage For="@(()=>a.GeneralConsultanServiceAncId)" />
 </DxFormLayoutItem>
 
 
-#region ComboBox Uom
+#region ComboBox GeneralConsultanServiceAnc
 
-private UomDto SelectedUom { get; set; } = new();
-async Task SelectedItemChanged(UomDto e)
-{
-    if (e is null)
+    private GeneralConsultanServiceAncDto SelectedGeneralConsultanServiceAnc { get; set; } = new();
+    async Task SelectedItemChanged(GeneralConsultanServiceAncDto e)
     {
-        SelectedUom = new();
-        await LoadUom(); 
+        if (e is null)
+        {
+            SelectedGeneralConsultanServiceAnc = new();
+            await LoadGeneralConsultanServiceAnc(); 
+        }
+        else
+            SelectedGeneralConsultanServiceAnc = e;
     }
-    else
-        SelectedUom = e;
-}
 
-private CancellationTokenSource? _ctsUom;
-private async Task OnInputUom(ChangeEventArgs e)
-{
-    try
+    private CancellationTokenSource? _ctsGeneralConsultanServiceAnc;
+    private async Task OnInputGeneralConsultanServiceAnc(ChangeEventArgs e)
     {
-        PanelVisible = true;
+        try
+        { 
+            _ctsGeneralConsultanServiceAnc?.Cancel();
+            _ctsGeneralConsultanServiceAnc?.Dispose();
+            _ctsGeneralConsultanServiceAnc = new CancellationTokenSource();
 
-        _cts?.Cancel();
-        _ctsUom?.Dispose();
-        _ctsUom = new CancellationTokenSource();
+            await Task.Delay(Helper.CBX_DELAY, _ctsGeneralConsultanServiceAnc.Token);
 
-        await Task.Delay(Helper.CBX_DELAY, _ctsUom.Token);
-
-        await LoadUom(e.Value?.ToString() ?? "");
+            await LoadGeneralConsultanServiceAnc(e.Value?.ToString() ?? "");
+        }
+        finally
+        { 
+            _ctsGeneralConsultanServiceAnc?.Dispose();
+            _ctsGeneralConsultanServiceAnc = null;
+        }
     }
-    finally
+
+    private async Task LoadGeneralConsultanServiceAnc(string? e = "", Expression<Func<GeneralConsultanServiceAnc, bool>>? predicate = null)
     {
-        PanelVisible = false;
-
-        // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsUom?.Dispose();
-        _ctsUom = null;
+        try
+        { 
+            GeneralConsultanServiceAncs = await Mediator.QueryGetComboBox<GeneralConsultanServiceAnc, GeneralConsultanServiceAncDto>(e, predicate); 
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
     }
-}
-
-private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
-{
-    try
-    {
-        PanelVisible = true;
-        Countries = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
-        PanelVisible = false;
-    }
-    catch (Exception ex)
-    {
-        ex.HandleException(ToastService);
-    }
-    finally { PanelVisible = false; }
-}
 
 #endregion

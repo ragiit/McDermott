@@ -4,16 +4,34 @@
     {
         #region GET (Bisa berdasarkan kondisi WHERE juga)
 
-        public class GetJobPositionQuery(Expression<Func<JobPosition, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<JobPosition, object>>>? includes = null, Expression<Func<JobPosition, JobPosition>>? select = null) : IRequest<(List<JobPositionDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleJobPositionQuery : IRequest<JobPositionDto>
         {
-            public Expression<Func<JobPosition, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<JobPosition, object>>> Includes { get; set; }
+            public Expression<Func<JobPosition, bool>> Predicate { get; set; }
+            public Expression<Func<JobPosition, JobPosition>> Select { get; set; }
 
-            public List<Expression<Func<JobPosition, object>>> Includes { get; } = includes!;
-            public Expression<Func<JobPosition, JobPosition>>? Select { get; } = select!;
+            public List<(Expression<Func<JobPosition, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetJobPositionQuery : IRequest<(List<JobPositionDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<JobPosition, object>>> Includes { get; set; }
+            public Expression<Func<JobPosition, bool>> Predicate { get; set; }
+            public Expression<Func<JobPosition, JobPosition>> Select { get; set; }
+
+            public List<(Expression<Func<JobPosition, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateJobPositionQuery(List<JobPositionDto> JobPositionsToValidate) : IRequest<List<JobPositionDto>>

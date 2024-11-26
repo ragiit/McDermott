@@ -116,11 +116,11 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             PanelVisible = false;
         }
 
-
         #region ComboBox Menu
 
         private MenuDto SelectedMenu { get; set; } = new();
-        async Task SelectedItemChanged(MenuDto e)
+
+        private async Task SelectedItemChanged(MenuDto e)
         {
             if (e is null)
             {
@@ -132,12 +132,11 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         }
 
         private CancellationTokenSource? _cts;
+
         private async Task OnInputMenu(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _cts?.Cancel();
                 _cts?.Dispose();
                 _cts = new CancellationTokenSource();
@@ -148,9 +147,6 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _cts?.Dispose();
                 _cts = null;
             }
@@ -160,12 +156,9 @@ namespace McDermott.Web.Components.Pages.Config.Groups
         {
             try
             {
-                PanelVisible = true;
-
-                predicate ??= x => x.ParentId == null || x.Name.Equals("All");
+                predicate ??= x => x.ParentId != null || x.Name.Equals("All");
 
                 Menus = await Mediator.QueryGetComboBox<Menu, MenuDto>(e, predicate);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -174,8 +167,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             finally { PanelVisible = false; }
         }
 
-        #endregion
-
+        #endregion ComboBox Menu
 
         private async Task Refresh_Click()
         {
@@ -480,140 +472,15 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             if (Group.Id == 0)
             {
                 var result = await Mediator.Send(new CreateGroupRequest(Group));
-
-                //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
-
-                //if (GroupMenus.Any(x => x.Menu?.Name is "All"))
-                //{
-                //    Menus.ForEach(z =>
-                //    {
-                //        if (z.Id != 0 && z.Name is not "All")
-                //        {
-                //            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
-                //            request.Add(new GroupMenuDto
-                //            {
-                //                Id = 0,
-                //                MenuId = z.Id,
-                //                GroupId = group[0].Id,
-                //                IsCreate = all.IsCreate,
-                //                IsRead = all.IsRead,
-                //                IsUpdate = all.IsUpdate,
-                //                IsDelete = all.IsDelete,
-                //                IsImport = all.IsImport,
-                //            });
-                //        }
-                //    });
-
-                //    await Mediator.Send(new CreateListGroupMenuRequest(request));
-
-                //    ShowForm = false;
-
-                //    await LoadData();
-
-                //    return;
-                //}
-
-                GroupMenus.ForEach(x =>
-                {
-                    x.Id = 0;
-                    x.GroupId = result.Id;
-                });
-
-                //for (int i = 0; i < GroupMenus.Count; i++)
-                //{
-                //    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
-                //    var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
-                //    if (cekP is not null)
-                //    {
-                //        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
-                //        if (cekLagi is null)
-                //        {
-                //            GroupMenus.Add(new GroupMenuDto
-                //            {
-                //                Id = 0,
-                //                GroupId = group[0].Id,
-                //                MenuId = cekP.Id,
-                //                Menu = cekP
-                //            });
-                //        }
-                //    }
-                //}
-
                 await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
+                Id = result.Id;
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
             }
             else
             {
                 var result = await Mediator.Send(new UpdateGroupRequest(Group));
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
-
-                return;
-                //var group = await Mediator.Send(new GetGroupQuery(x => x.Name == Group.Name));
-
-                await Mediator.Send(new DeleteGroupMenuRequest(ids: DeletedGroupMenus.Select(x => x.Id).ToList()));
-
-                var request = new List<GroupMenuDto>();
-
-                if (GroupMenus.Any(x => x.Menu?.Name is "All"))
-                {
-                    Menus.ForEach(z =>
-                    {
-                        if (z.Id != 0 && z.Name is not "All")
-                        {
-                            var all = GroupMenus.FirstOrDefault(x => x.Menu?.Name is "All");
-                            request.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                MenuId = z.Id,
-                                GroupId = Group.Id,
-                                IsCreate = all.IsCreate,
-                                IsRead = all.IsRead,
-                                IsUpdate = all.IsUpdate,
-                                IsDelete = all.IsDelete,
-                                IsImport = all.IsImport,
-                            });
-                        }
-                    });
-
-                    await Mediator.Send(new CreateListGroupMenuRequest(request));
-
-                    ShowForm = false;
-                    NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
-
-                    await LoadData();
-
-                    return;
-                }
-
-                GroupMenus.ForEach(x =>
-                {
-                    x.Id = 0;
-                    x.GroupId = result.Id;
-                });
-
-                for (int i = 0; i < GroupMenus.Count; i++)
-                {
-                    var check = Menus.FirstOrDefault(x => x.Id == GroupMenus[i].MenuId);
-                    var cekP = Menus.FirstOrDefault(x => check!.Parent != null && x.Name == check!.Parent.Name);
-                    if (cekP is not null)
-                    {
-                        var cekLagi = GroupMenus.FirstOrDefault(x => x.MenuId == cekP.Id);
-                        if (cekLagi is null)
-                        {
-                            GroupMenus.Add(new GroupMenuDto
-                            {
-                                Id = 0,
-                                GroupId = result.Id,
-                                MenuId = cekP.Id,
-                                Menu = cekP
-                            });
-                        }
-                    }
-                }
-
-                await Mediator.Send(new CreateListGroupMenuRequest(GroupMenus));
-
-                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}", true);
+                Id = result.Id;
+                NavigationManager.NavigateTo($"configuration/groups/{EnumPageMode.Update.GetDisplayName()}?Id={result.Id}", true);
             }
 
             ShowForm = false;

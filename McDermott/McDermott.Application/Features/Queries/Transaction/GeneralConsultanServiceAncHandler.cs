@@ -100,7 +100,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                         HPHT = x.HPHT,
                         HPL = x.HPL,
                         LILA = x.LILA,
-                        PatientId = x.PatientId
+                        HistorySC = x.HistorySC,
+                        UK = x.UK,
+                        PatientId = x.PatientId,
+                        Status = x.Status,
+                        Notes = x.Notes
                     });
 
                 if (!request.IsGetAll)
@@ -183,7 +187,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                         HPHT = x.HPHT,
                         HPL = x.HPL,
                         LILA = x.LILA,
-                        PatientId = x.PatientId
+                        HistorySC = x.HistorySC,
+                        UK = x.UK,
+                        PatientId = x.PatientId,
+                        Status = x.Status,
+                        Notes = x.Notes
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceAncDto>();

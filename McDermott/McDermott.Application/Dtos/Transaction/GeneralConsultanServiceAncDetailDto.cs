@@ -14,7 +14,7 @@
         public int UK { get; set; } // Temperature
         public int TFU { get; set; } // Temperature
         public string? FetusPosition { get; set; }  // Letak Janin
-        public int DJJ { get; set; } // Temperature
+        public string? DJJ { get; set; } // Temperature
         public int TT { get; set; } // Temperature
         public string? InspectionInitials { get; set; }   // Paraf Pemeriksaan
         public bool IsReadOnly { get; set; } = false;
@@ -36,7 +36,7 @@
         public int UK { get; set; } // Temperature
         public int TFU { get; set; } // Temperature
         public string? FetusPosition { get; set; }  // Letak Janin
-        public int DJJ { get; set; } // Temperature
+        public string? DJJ { get; set; } // Temperature
         public int TT { get; set; } // Temperature
         public string? InspectionInitials { get; set; }   // Paraf Pemeriksaan
         public bool IsReadOnly { get; set; } = false;

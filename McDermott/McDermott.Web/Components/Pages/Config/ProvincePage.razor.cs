@@ -105,11 +105,11 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-
         #region ComboBox Country
 
         private CountryDto SelectedCountry { get; set; } = new();
-        async Task SelectedItemChanged(CountryDto e)
+
+        private async Task SelectedItemChanged(CountryDto e)
         {
             if (e is null)
             {
@@ -121,12 +121,11 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         private CancellationTokenSource? _cts;
+
         private async Task OnInputCountry(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _cts?.Cancel();
                 _cts?.Dispose();
                 _cts = new CancellationTokenSource();
@@ -137,9 +136,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _cts?.Dispose();
                 _cts = null;
             }
@@ -149,9 +145,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                PanelVisible = true;
                 Countries = await Mediator.QueryGetComboBox<Country, CountryDto>(e, predicate);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -160,7 +154,7 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Country
 
         public IGrid Grid { get; set; }
 
