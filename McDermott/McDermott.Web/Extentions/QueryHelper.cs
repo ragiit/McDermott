@@ -36,50 +36,7 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(UomCategoryDto))
-            {
-                var result = await mediator.Send(new GetDrugRouteQuery(
-                    predicate as Expression<Func<DrugRoute, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new DrugRoute
-                    {
-                        Id = x.Id,
-                        Route = x.Route,
-                        Code = x.Code,
-                    } : select as Expression<Func<DrugRoute, DrugRoute>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(DrugDosageDto))
-            {
-                var result = await mediator.Send(new GetDrugDosageQuery(
-                    predicate as Expression<Func<DrugDosage, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.DrugRoute
-                    ] : includes as List<Expression<Func<DrugDosage, object>>>,
-                    select: select is null ? x => new DrugDosage
-                    {
-                        Id = x.Id,
-                        Frequency = x.Frequency,
-                        TotalQtyPerDay = x.TotalQtyPerDay,
-                        Days = x.Days,
-                        DrugRouteId = x.DrugRouteId,
-                        DrugRoute = new DrugRoute
-                        {
-                            Route = x.DrugRoute.Route
-                        }
-                    } : select as Expression<Func<DrugDosage, DrugDosage>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
+            
             else if (typeof(TDto) == typeof(ProductCategoryDto))
             {
                 var result = await mediator.Send(new GetProductCategoryQuery(
@@ -307,6 +264,40 @@ namespace McDermott.Web.Extentions
                         Name = x.Name,
                         Code = x.Code
                     } : select as Expression<Func<DrugForm, DrugForm>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(DrugRouteDto))
+            {
+                var result = await mediator.Send(new GetDrugRouteQuery(
+                    predicate as Expression<Func<DrugRoute, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new DrugRoute
+                    {
+                        Id = x.Id,
+                        Route = x.Route,
+                        Code = x.Code
+                    } : select as Expression<Func<DrugRoute, DrugRoute>>
+                ));
+
+                return ((List<TDto>)(object)result.Item1, result.pageCount);
+            }
+            else if (typeof(TDto) == typeof(DrugRouteDto))
+            {
+                var result = await mediator.Send(new GetDrugRouteQuery(
+                    predicate as Expression<Func<DrugRoute, bool>>,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    searchTerm: searchTerm ?? "",
+                    select: select is null ? x => new DrugRoute
+                    {
+                        Id = x.Id,
+                        Route = x.Route,
+                        Code = x.Code
+                    } : select as Expression<Func<DrugRoute, DrugRoute>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

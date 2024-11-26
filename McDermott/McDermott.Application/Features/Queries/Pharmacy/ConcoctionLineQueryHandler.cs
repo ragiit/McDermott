@@ -1,4 +1,6 @@
 ﻿using McDermott.Application.Features.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
@@ -94,7 +96,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Where(request.Predicate);
 
                 // Apply ordering
-                if (request.OrderByList.Count != 0)
+                if (request.OrderByList?.Count > 0)
                 {
                     var firstOrderBy = request.OrderByList.First();
                     query = firstOrderBy.IsDescending
@@ -108,8 +110,12 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                             : ((IOrderedQueryable<ConcoctionLine>)query).ThenBy(additionalOrderBy.OrderBy);
                     }
                 }
+                else
+                {
+                    query = query.OrderBy(x => x.Id); // Default ordering
+                }
 
-                // Apply dynamic includes
+                // Apply includes
                 if (request.Includes is not null)
                 {
                     foreach (var includeExpression in request.Includes)
@@ -121,9 +127,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                            EF.Functions.Like(v.Product.Name, $"%{request.SearchTerm}%") ||
-                            EF.Functions.Like(v.TotalQty.ToString(), $"%{request.SearchTerm}%")
-                            );
+                        EF.Functions.Like(v.Product.Name, $"%{request.SearchTerm}%"));
                 }
 
                 // Apply dynamic select if provided
@@ -156,14 +160,16 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         }).ToList(),
                     });
 
+
+                // Ensure single query mode or apply pagination
                 if (!request.IsGetAll)
-                { // Paginate and sort
+                {
                     var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                        query,
-                        request.PageSize,
-                        request.PageIndex,
-                        cancellationToken
-                    );
+                query,
+                request.PageSize,
+                request.PageIndex,
+                cancellationToken
+            );
 
                     return (pagedItems.Adapt<List<ConcoctionLineDto>>(), request.PageIndex, request.PageSize, totalPages);
                 }
@@ -171,6 +177,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 {
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<ConcoctionLineDto>>(), 0, 1, 1);
                 }
+
             }
             catch (Exception ex)
             {

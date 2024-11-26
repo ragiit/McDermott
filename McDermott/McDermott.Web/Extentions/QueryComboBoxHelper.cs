@@ -398,6 +398,69 @@ namespace McDermott.Web.Extentions
 
             #endregion Transactions
 
+            #region Pharmacy
+            if (typeof(TDto) == typeof(DrugFormDto))
+            {
+                var result = (await mediator.Send(new GetDrugFormQuery
+                {
+                    Predicate = predicate as Expression<Func<DrugForm, bool>> ?? (x => true),
+                    Select = x => new DrugForm
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code=x.Code,
+
+                        
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            if (typeof(TDto) == typeof(DrugDosageDto))
+            {
+                var result = (await mediator.Send(new GetDrugDosageQuery
+                {
+                    Predicate = predicate as Expression<Func<DrugDosage, bool>> ?? (x => true),
+                    Select = x => new DrugDosage
+                    {
+                        Id = x.Id,
+                        Frequency = x.Frequency,
+                        DrugRouteId = x.DrugRouteId,
+                        DrugRoute = new DrugRoute
+                        {
+                            Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route
+                        }
+
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            if (typeof(TDto) == typeof(DrugRouteDto))
+            {
+                var result = (await mediator.Send(new GetDrugRouteQuery
+                {
+                    Predicate = predicate as Expression<Func<DrugRoute, bool>> ?? (x => true),
+                    Select = x => new DrugRoute
+                    {
+                        Id = x.Id,
+                        Route = x.Route,
+                        Code = x.Code,
+
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+            #endregion
             throw new NotSupportedException($"Query for type {typeof(T)} is not supported.");
         }
     }

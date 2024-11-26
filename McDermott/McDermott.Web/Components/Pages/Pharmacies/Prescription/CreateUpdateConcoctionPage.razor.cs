@@ -1,8 +1,12 @@
-﻿using McDermott.Application.Dtos.AwarenessEvent;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Application.Dtos.AwarenessEvent;
 using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand;
+using McDermott.Web.Extentions;
+using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
@@ -13,21 +17,26 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
     {
         #region Relation Data
         private List<ConcoctionDto> GetConcoctions { get; set; } = [];
-        private List<ConcoctionLineDto> GetConcoctionLines { get; set; } = [];
+        private List<ConcoctionLineDto> GetConcoctionLine { get; set; } = [];
         private List<StockOutLinesDto> GetStockOutLines { get; set; } = [];
         private List<PharmacyDto> GetPharmacy { get; set; } = [];
-        private List<UserDto> GetPractitioner { get; set; } = [];
+        private List<UserDto> GetPractitioners { get; set; } = [];
         private List<ActiveComponentDto> ActiveComponents { get; set; } = [];
-        private List<TransactionStockDto> TransactionStocks { get; set; } = [];
+        private List<TransactionStockDto> GetTransactionStocks { get; set; } = [];
         private List<StockOutLinesDto> StockOutLines { get; set; } = [];
         private List<ProductDto> GetProducts { get; set; } = [];
         private List<MedicamentGroupDto> GetMedicamentGroup { get; set; } = [];
         private List<MedicamentDto> GetMedicament { get; set; } = [];
+        private List<DrugRouteDto> GetDrugRoutes { get; set; } = [];
+        private List<DrugFormDto> GetDrugForms { get; set; } = [];
+        private List<DrugDosageDto> GetDrugDosages { get; set; } = [];
+        private List<UomDto> GetUom { get; set; } = [];
 
         private ConcoctionDto PostConcoction { get; set; } = new();
-        private ConcoctionLineDto PostConcoctionLines { get; set; } = new();
+        private ConcoctionLineDto PostConcoctionLine { get; set; } = new();
         private StockOutLinesDto PostStockOutLines { get; set; } = new();
         private PharmacyDto PostPharmacy { get; set; } = new();
+        private TransactionStockDto PostTransactionStock { get; set; } = new();
         #endregion
 
         #region Static Variabel
@@ -43,6 +52,8 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private bool PanelVisible { get; set; } = false;
         private bool PanelVisibleCl { get; set; } = false;
         public bool FormValidationState { get; set; } = false;
+        private bool isActiveButton { get; set; } = false;
+        private IEnumerable<ActiveComponentDto>? selectedActiveComponents { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsCl { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
@@ -104,22 +115,21 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
         #endregion Searching
 
-
         #region Load Data
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
             await GetUserInfo();
-            //await LoadProduct();
+            await LoadProduct();
             //await LoadDataTransaction();
             //await LoadDataActiveComponent();
-            //await LoadDataDrugDosage();
-            //await LoadDataDrugRoute();
+            await LoadDosage();
+            await LoadRoute();
             //await LoadDataSigna();
-            //await LoadDataDrugForm();
+            await LoadForm();
             await LoadData();
             //await LoadDataPatient();
-            //await LoadDataPractitioner();
+            await LoadDataPractitioner();
 
             PanelVisible = false;
         }
@@ -140,7 +150,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                     PostPharmacy = cekPharmacy ?? new();
 
                     PostConcoction.PharmacyId = PostPharmacy.Id;
-                    PostConcoction.PrescribingDoctorId = PostPharmacy.PractitionerId;
+                    PostConcoction.PractitionerId = PostPharmacy.PractitionerId;
 
                 }
                 else
@@ -176,7 +186,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 {
                     Predicate = x => x.ConcoctionId == PostConcoction.Id,
                 });
-                GetConcoctionLines = result.Item1;
+                GetConcoctionLine = result.Item1;
                 totalCountConcoctionLine = result.PageCount;
                 activePageIndexConcoctionLine = result.PageIndex;
                 PanelVisibleCl = false;
@@ -193,7 +203,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
             });
 
-            GetPractitioner = getPractitioner.Item1;
+            GetPractitioners = getPractitioner.Item1;
 
         }
 
@@ -221,7 +231,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                     if (checkProduct == null)
                         return;
 
-                    var stockProduct = TransactionStocks
+                    var stockProduct = GetTransactionStocks
                                     .Where(x => x.ProductId == checkProduct.Id && x.LocationId is not null && x.LocationId == PostPharmacy.LocationId && x.Validate == true)
                                     .Sum(x => x.Quantity);
 
@@ -271,23 +281,325 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                     concoctionLinesList.Add(newConcoctionLine);
                 }
 
-                GetConcoctionLines = concoctionLinesList;
+                GetConcoctionLine = concoctionLinesList;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
         }
+
+        private async Task ChangeProduct(ProductDto product)
+        {
+            try
+            {
+                if (product is null)
+                    return;
+
+                var ChekMedicament = await Mediator.Send(new GetSingleMedicamentQuery
+                {
+                    Predicate = x => x.ProductId == product.Id
+                });
+                var checkUom = await Mediator.Send(new GetSingleUomQuery { Predicate = x => x.Id == ChekMedicament.UomId });
+
+                PostConcoctionLine.Dosage = ChekMedicament?.Dosage ?? 0;
+                PostConcoctionLine.MedicamentDosage = ChekMedicament?.Dosage ?? 0;
+                PostConcoctionLine.UomId = ChekMedicament?.UomId ?? null;
+
+                if (PostConcoctionLine.Dosage <= PostConcoctionLine.MedicamentDosage)
+                {
+                    PostConcoctionLine.TotalQty = 1;
+                }
+                else
+                {
+                    var temp = (PostConcoctionLine.Dosage / PostConcoctionLine.MedicamentDosage) + (PostConcoctionLine.Dosage % PostConcoctionLine.MedicamentDosage != 0 ? 1 : 0);
+                    PostConcoctionLine.TotalQty = temp * PostConcoction.ConcoctionQty;
+                }
+                selectedActiveComponents = ActiveComponents.Where(a => ChekMedicament != null && ChekMedicament.ActiveComponentId != null && ChekMedicament.ActiveComponentId.Contains(a.Id)).ToList();
+                var aa = PostPharmacy.LocationId;
+                var checkStock = GetTransactionStocks.Where(x => x.ProductId == product.Id && x.LocationId == PostPharmacy.LocationId && x.Validate == true).Sum(x => x.Quantity);
+                PostConcoctionLine.AvaliableQty = checkStock;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+
+        private void ChangeTotalQtyInHeader(long value)
+        {
+            PostConcoction.ConcoctionQty = value;
+            if (PostConcoctionLine.Dosage <= PostConcoctionLine.MedicamentDosage)
+            {
+                PostConcoctionLine.TotalQty = 1;
+            }
+            else
+            {
+                double temp = ((double)PostConcoctionLine.Dosage / (double)PostConcoctionLine.MedicamentDosage) * (double)value;
+                PostConcoctionLine.TotalQty = (long)Math.Ceiling(temp);
+            }
+        }
+
+        private void ChangeTotalQtyMedicament(long value)
+        {
+            //Convert Variabel
+            if (value == 0)
+                return;
+
+            PostConcoctionLine.Dosage = value;
+            if (value <= PostConcoctionLine.MedicamentDosage)
+            {
+                PostConcoctionLine.TotalQty = 1;
+            }
+            else
+            {
+                if (PostConcoctionLine.MedicamentDosage != 0)
+                {
+                    double temp = ((double)value / (double)PostConcoctionLine.MedicamentDosage) * (double)PostConcoction.ConcoctionQty;
+                    PostConcoctionLine.TotalQty = (long)Math.Ceiling(temp);
+                }
+                else
+                {
+                    ToastService.ShowInfo("Medicament Dosage Not Null!");
+                }
+            }
+        }
         #endregion
 
         #region Grid
-        private void GridConcoctionLine_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        private void GridCl_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndexCl = args.VisibleIndex;
         }
         #endregion
 
-        #region New Edit Delete Click
+        #region ComboBox
+        private CancellationTokenSource? _cts;
+
+        #region ComboBox Product
+
+        private ProductDto SelectedProducts { get; set; } = new();
+        async Task SelectedItemChanged(ProductDto e)
+        {
+            if (e is null)
+            {
+                SelectedProducts = new();
+                await LoadProduct(); // untuk refresh lagi ketika user klik clear 
+            }
+            else
+                SelectedProducts = e;
+        }
+
+        private async Task OnInputProduct(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadProduct(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadProduct(string? e = "", Expression<Func<Product, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                GetProducts = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
+
+        #region ComboBox Drug Route
+
+        private DrugRouteDto SelectedRoute { get; set; } = new();
+        async Task SelectedItemChanged(DrugRouteDto e)
+        {
+            if (e is null)
+            {
+                SelectedRoute = new();
+                await LoadRoute(); // untuk refresh lagi ketika user klik clear 
+            }
+            else
+                SelectedRoute = e;
+        }
+
+        private async Task OnInputRoute(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadRoute(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadRoute(string? e = "", Expression<Func<DrugRoute, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                GetDrugRoutes = await Mediator.QueryGetComboBox<DrugRoute, DrugRouteDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
+
+        #region ComboBox Drug Form
+
+        private DrugFormDto SelectedForm { get; set; } = new();
+        async Task SelectedItemChanged(DrugFormDto e)
+        {
+            if (e is null)
+            {
+                SelectedForm = new();
+                await LoadForm(); // untuk refresh lagi ketika user klik clear 
+            }
+            else
+                SelectedForm = e;
+        }
+
+        private async Task OnInputForm(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadForm(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadForm(string? e = "", Expression<Func<DrugForm, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                GetDrugForms = await Mediator.QueryGetComboBox<DrugForm, DrugFormDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
+
+        #region ComboBox Drug Dosage
+
+        private DrugDosageDto SelectedDosage { get; set; } = new();
+        async Task SelectedItemChanged(DrugDosageDto e)
+        {
+            if (e is null)
+            {
+                SelectedDosage = new();
+                await LoadDosage(); // untuk refresh lagi ketika user klik clear 
+            }
+            else
+                SelectedDosage = e;
+        }
+
+        private async Task OnInputDosage(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadDosage(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadDosage(string? e = "", Expression<Func<DrugDosage, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                GetDrugDosages = await Mediator.QueryGetComboBox<DrugDosage, DrugDosageDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region New Edit Delete Refresh Click
 
         private async Task NewItemCl_Click()
         {
@@ -302,6 +614,15 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private async Task DeleteItemCl_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndexCl);
+        }
+
+        private async Task Refresh_Click()
+        {
+            await LoadDataConcoctionLine();
+        }
+        private async Task OnDiscard()
+        {
+            NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}/?Id={PostConcoction.PharmacyId}");
         }
         #endregion
 
@@ -350,6 +671,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 if (PostConcoction.Id == 0)
                 {
                     PostConcoction.PharmacyId = PostPharmacy.Id;
+                    PostConcoction.PractitionerId = PostPharmacy.PractitionerId;
                     await Mediator.Send(new CreateConcoctionRequest(PostConcoction));
                     ToastService.ShowSuccess("Add Data Concoction Success");
                 }
@@ -358,6 +680,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                     await Mediator.Send(new UpdateConcoctionRequest(PostConcoction));
                     ToastService.ShowSuccess("Add Data Concoction Success");
                 }
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -368,15 +691,15 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         {
             try
             {
-                if (PostConcoctionLines.Id == 0)
+                if (PostConcoctionLine.Id == 0)
                 {
-                    PostConcoctionLines.ConcoctionId = PostConcoction.Id;
-                    await Mediator.Send(new CreateConcoctionLineRequest(PostConcoctionLines));
+                    PostConcoctionLine.ConcoctionId = PostConcoction.Id;
+                    await Mediator.Send(new CreateConcoctionLineRequest(PostConcoctionLine));
                     ToastService.ShowSuccess("Add ConcoctionLine Success");
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateConcoctionLineRequest(PostConcoctionLines));
+                    await Mediator.Send(new UpdateConcoctionLineRequest(PostConcoctionLine));
                     ToastService.ShowSuccess("Update ConcoctionLine Success");
                 }
 
@@ -388,6 +711,286 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
         }
         #endregion
+
+        #region Cut Stock
+
+        private bool isDetailLines { get; set; } = false;
+
+        //private long? StockIds { get; set; }
+        private bool traceAvailability { get; set; } = false;
+
+        private long Lines_Id { get; set; } = 0;
+
+        private async Task cancelCutStockLines()
+        {
+            isDetailLines = false;
+            SelectedDataItemsCl = [];
+            StateHasChanged();
+        }
+
+        private async Task ShowCutStockLines(long LinesId)
+        {
+            
+            PanelVisible = true;
+            Lines_Id = LinesId;
+            //Get the ConcoctionLines by ID
+            var concoctionLines = await Mediator.Send(new GetSingleConcoctionLineQuery
+            {
+                Predicate = x => x.Id == LinesId
+            });
+            if (concoctionLines == null)
+            {
+                // Handle case where the ConcoctionLine is not found
+                return;
+            }
+
+            //Get the Product associated with the ConcoctionLine
+            var product = GetProducts.FirstOrDefault(x => x.Id == concoctionLines.ProductId);
+            if (product == null)
+            {
+                // Handle case where the product is not found
+                return;
+            }
+            // Update state variables
+            traceAvailability = product.TraceAbility;
+
+            isDetailLines = true;
+
+            // Filter stock products based on specific conditions
+
+            var StockOutProducts = GetTransactionStocks
+                    .Where(s => s.ProductId == product.Id && s.LocationId == PostPharmacy.LocationId && s.Quantity > 0)
+                    .OrderBy(x => x.ExpiredDate)
+                    .GroupBy(s => s.Batch)
+                    .Select(g => new TransactionStockDto
+                    {
+                        ProductId = product.Id,
+                        Batch = g.Key,
+                        ExpiredDate = g.First().ExpiredDate,
+                        Quantity = g.Sum(x => x.Quantity),
+                        LocationId = PostPharmacy.LocationId
+                    }).ToList();
+
+            // Fetch stock out prescription data
+
+            if (product.TraceAbility)
+            {
+                var dataStock = await Mediator.Send(new GetStockOutLinesQuery {Predicate = x => x.LinesId == LinesId });
+                if (dataStock.Item1 == null || dataStock.Item1.Count == 0)
+                {
+                    long currentStockInput = 0;
+                    PostStockOutLines.CutStock = 0;
+                    var listStockOutLines = new List<StockOutLinesDto>();
+
+                    foreach (var item in StockOutProducts)
+                    {
+                        if (currentStockInput >= concoctionLines.TotalQty) break;
+
+                        var newStockOutLines = new StockOutLinesDto
+                        {
+                            Id = Helper.RandomNumber,
+                            LinesId = concoctionLines.Id,
+                            TransactionStockId = item.Id,
+                            Batch = item.Batch,
+                            ExpiredDate = item.ExpiredDate,
+                            CurrentStock = item.Quantity
+                        };
+
+                        if (currentStockInput == 0)
+                        {
+                            newStockOutLines.CutStock = item.Quantity > concoctionLines.TotalQty ? concoctionLines.TotalQty : item.Quantity;
+                        }
+                        else
+                        {
+                            long remainingNeeded = concoctionLines.TotalQty - currentStockInput;
+                            newStockOutLines.CutStock = item.Quantity >= remainingNeeded ? remainingNeeded : item.Quantity;
+                        }
+
+                        currentStockInput += newStockOutLines.CutStock;
+                        listStockOutLines.Add(newStockOutLines);
+                    }
+
+                    StockOutLines = listStockOutLines;
+                }
+                else
+                {
+                    // Updating batch and expired values from StockOutProducts
+                    foreach (var stock in dataStock.Item1)
+                    {
+                        var qtys = StockOutProducts.Sum(x => x.Quantity);
+                        var stockProduct = GetTransactionStocks.FirstOrDefault(x => x.Id == stock.TransactionStockId);
+                        if (stockProduct != null)
+                        {
+                            stock.TransactionStockId = stockProduct.Id;
+                            stock.Batch = stockProduct.Batch;
+                            stock.ExpiredDate = stockProduct.ExpiredDate;
+                            stock.CurrentStock = qtys;
+                        }
+                    }
+                    StockOutLines = dataStock.Item1;
+                }
+            }
+            else
+            {
+                var dataStock = await Mediator.Send(new GetStockOutLinesQuery { Predicate = x => x.LinesId == LinesId });
+
+                if (dataStock.Item1 == null || dataStock.Item1.Count == 0)
+                {
+                    long currentStockInput = 0;
+                    PostStockOutLines.CutStock = 0;
+                    var listStockOutLines = new List<StockOutLinesDto>();
+
+                    foreach (var item in StockOutProducts)
+                    {
+                        if (currentStockInput >= concoctionLines.TotalQty) break;
+
+                        var newStockOutLines = new StockOutLinesDto
+                        {
+                            Id = Helper.RandomNumber,
+                            LinesId = concoctionLines.Id,
+                            TransactionStockId = item.Id,
+                            Batch = item.Batch,
+                            ExpiredDate = item.ExpiredDate,
+                            CurrentStock = item.Quantity
+                        };
+
+                        if (currentStockInput == 0)
+                        {
+                            newStockOutLines.CutStock = item.Quantity > concoctionLines.TotalQty ? concoctionLines.TotalQty : item.Quantity;
+                        }
+                        else
+                        {
+                            long remainingNeeded = concoctionLines.TotalQty - currentStockInput;
+                            newStockOutLines.CutStock = item.Quantity >= remainingNeeded ? remainingNeeded : item.Quantity;
+                        }
+
+                        currentStockInput += newStockOutLines.CutStock;
+                        listStockOutLines.Add(newStockOutLines);
+                    }
+
+                    StockOutLines = listStockOutLines;
+                }
+                else
+                {
+                    // Updating batch and expired values from StockOutProducts
+                    foreach (var stock in dataStock.Item1)
+                    {
+                        var qtys = StockOutProducts.Sum(x => x.Quantity);
+                        var stockProduct = StockOutProducts.FirstOrDefault(x => x.Id == stock.TransactionStockId);
+                        if (stockProduct != null)
+                        {
+                            stock.CurrentStock = qtys;
+                        }
+                    }
+                    StockOutLines = dataStock.Item1;
+                }
+            }
+            PanelVisible = false;
+        }
+
+        private async Task SaveStockOutLines()
+        {
+            try
+            {
+                foreach (var item in StockOutLines)
+                {
+                    var cekReference = GetTransactionStocks.Where(x => x.SourceTable == nameof(ConcoctionLine))
+                        .OrderByDescending(x => x.SourcTableId).Select(z => z.Reference).FirstOrDefault();
+                    int NextReferenceNumber = 1;
+                    if (cekReference != null)
+                    {
+                        int.TryParse(cekReference?.Substring("PHCL#".Length), out NextReferenceNumber);
+                        NextReferenceNumber++;
+                    }
+                    string referenceNumber = $"PHCL#{NextReferenceNumber:D3}";
+
+                    var check_CutStock = await Mediator.Send(new GetSingleConcoctionLineQuery
+                    {
+                        Predicate = x => x.Id == item.LinesId
+                    });
+                    var concoction_data = await Mediator.Send(new GetSingleConcoctionQuery
+                    {
+                        Predicate = x => x.Id == check_CutStock.ConcoctionId
+                    });
+
+                    PostTransactionStock.ProductId = check_CutStock?.Product?.Id;
+                    PostTransactionStock.SourceTable = nameof(ConcoctionLine);
+                    PostTransactionStock.SourcTableId = check_CutStock?.Id;
+                    PostTransactionStock.LocationId = concoction_data?.Pharmacy?.LocationId;
+                    PostTransactionStock.ExpiredDate = item?.ExpiredDate;
+                    PostTransactionStock.Batch = item?.Batch;
+                    PostTransactionStock.Quantity = -(item?.CutStock) ?? 0;
+                    PostTransactionStock.Reference = referenceNumber;
+                    PostTransactionStock.UomId = check_CutStock?.Product?.UomId;
+                    PostTransactionStock.Validate = false;
+                    var datas = await Mediator.Send(new CreateTransactionStockRequest(PostTransactionStock));
+
+                    item.TransactionStockId = datas.Id;
+
+                    var item_lines = new StockOutLinesDto
+                    {
+                        CutStock = item.CutStock,
+                        TransactionStockId = item.TransactionStockId,
+                        LinesId = item.LinesId
+                    };
+
+                    var existingStock = await Mediator.Send(new GetStockOutLinesQuery {Predicate= x => x.TransactionStockId == item.TransactionStockId && x.LinesId == item.LinesId });
+
+                    if (!existingStock.Item1.Any())
+                    {
+                        await Mediator.Send(new CreateStockOutLinesRequest(item_lines));
+                    }
+                    else
+                    {
+                        var existingItem = existingStock.Item1.First();
+                        existingItem.CutStock = item.CutStock;
+                        await Mediator.Send(new UpdateStockOutLinesRequest(existingItem));
+                    }
+                }
+                isDetailLines = false;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+        }
+
+        private DateTime? SelectedBatchExpired { get; set; }
+
+
+        private async Task ChangeOutStockLines(string value)
+        {
+            SelectedBatchExpired = null;
+
+            if (value is not null)
+            {
+                var line = await Mediator.Send(new GetSingleConcoctionLineQuery{Predicate = x => x.Id == Lines_Id});
+                PostStockOutLines.Batch = value;
+
+                var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
+                    s.ProductId == line.ProductId &&
+                    s.LocationId == PostPharmacy.LocationId &&
+                    s.Validate == true
+                ));
+                // Find the first matching product
+                var matchedProduct = stockProducts.FirstOrDefault(x =>
+                    x.LocationId == PostPharmacy.LocationId &&
+                    x.ProductId == line.ProductId &&
+                    x.Batch == PostStockOutLines.Batch
+                );
+
+                PostStockOutLines.ExpiredDate = matchedProduct?.ExpiredDate ?? new();
+
+                var aa = await Mediator.Send(new GetTransactionStockQuery(x => x.Validate == true && x.ProductId == line.ProductId
+                && x.LocationId == PostPharmacy.LocationId && x.Batch == PostStockOutLines.Batch));
+
+                PostStockOutLines.CurrentStock = aa.Sum(x => x.Quantity);
+            }
+        }
+
+        #endregion Cut Stock
+
 
     }
 }

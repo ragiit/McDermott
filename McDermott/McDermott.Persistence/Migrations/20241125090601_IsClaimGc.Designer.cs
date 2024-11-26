@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241125090601_IsClaimGc")]
+    partial class IsClaimGc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2799,39 +2802,24 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("HPL")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HistorySC")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("LILA")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("PatientId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("PregnancyStatusA")
-                        .HasColumnType("int");
+                    b.Property<string>("PregnancyStatusA")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PregnancyStatusG")
-                        .HasColumnType("int");
+                    b.Property<string>("PregnancyStatusG")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PregnancyStatusH")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PregnancyStatusP")
-                        .HasColumnType("int");
+                    b.Property<string>("PregnancyStatusP")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Reference")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UK")
-                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -2869,8 +2857,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DJJ")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DJJ")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");

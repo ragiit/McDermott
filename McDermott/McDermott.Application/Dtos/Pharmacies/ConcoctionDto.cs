@@ -7,7 +7,7 @@ namespace McDermott.Application.Dtos.Pharmacies
         public long Id { get; set; }
         public long PharmacyId { get; set; }
         public long? DrugDosageId { get; set; }
-        public long? PrescribingDoctorId { get; set; }
+        public long? PractitionerId { get; set; }
         public long? MedicamentGroupId { get; set; }
         public long? DrugFormId { get; set; }
         public long? DrugRouteId { get; set; }
@@ -30,7 +30,7 @@ namespace McDermott.Application.Dtos.Pharmacies
         public PharmacyDto? Pharmacy { get; set; }
 
         [SetToNull]
-        public UserDto? PrescribingDoctor { get; set; }
+        public UserDto? Practitioner { get; set; }
 
         [SetToNull]
         public MedicamentGroupDto? MedicamentGroup { get; set; }

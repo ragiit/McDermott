@@ -86,7 +86,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Where(request.Predicate);
 
                 // Apply ordering
-                if (request.OrderByList.Count != 0)
+                if (request.OrderByList?.Count > 0)
                 {
                     var firstOrderBy = request.OrderByList.First();
                     query = firstOrderBy.IsDescending
@@ -100,8 +100,12 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                             : ((IOrderedQueryable<Concoction>)query).ThenBy(additionalOrderBy.OrderBy);
                     }
                 }
+                else
+                {
+                    query = query.OrderBy(x => x.Id); // Default ordering
+                }
 
-                // Apply dynamic includes
+                // Apply includes
                 if (request.Includes is not null)
                 {
                     foreach (var includeExpression in request.Includes)
@@ -110,15 +114,12 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     }
                 }
 
-                //if (!string.IsNullOrEmpty(request.SearchTerm))
-                //{
-                //    query = query.Where(v =>
-                //            EF.Functions.Like(v.EventName, $"%{request.SearchTerm}%") ||
-                //            EF.Functions.Like(v.EventCategory.Name, $"%{request.SearchTerm}%")
-                //            );
-                //}
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                        EF.Functions.Like(v.MedicamenName, $"%{request.SearchTerm}%"));
+                }
 
-                // Apply dynamic select if provided
                 if (request.Select is not null)
                     query = query.Select(request.Select);
                 else
@@ -132,6 +133,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         DrugRouteId = x.DrugRouteId,
                         MedicamentGroupId = x.MedicamentGroupId,
                         ConcoctionQty = x.ConcoctionQty,
+                        MedicamenName = x.MedicamenName,
                         Practitioner = new User
                         {
                             Name = x.Practitioner == null ? string.Empty : x.Practitioner.Name,
@@ -150,14 +152,15 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         },
                     });
 
+                // Ensure single query mode or apply pagination
                 if (!request.IsGetAll)
-                { // Paginate and sort
+                {
                     var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                        query,
-                        request.PageSize,
-                        request.PageIndex,
-                        cancellationToken
-                    );
+             query,
+             request.PageSize,
+             request.PageIndex,
+             cancellationToken
+         );
 
                     return (pagedItems.Adapt<List<ConcoctionDto>>(), request.PageIndex, request.PageSize, totalPages);
                 }
@@ -165,6 +168,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 {
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<ConcoctionDto>>(), 0, 1, 1);
                 }
+
             }
             catch (Exception ex)
             {
@@ -207,13 +211,12 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     }
                 }
 
-                //if (!string.IsNullOrEmpty(request.SearchTerm))
-                //{
-                //    query = query.Where(v =>
-                //            EF.Functions.Like(v.EventName, $"%{request.SearchTerm}%") ||
-                //            EF.Functions.Like(v.EventCategory.Name, $"%{request.SearchTerm}%")
-                //            );
-                //}
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.MedicamenName, $"%{request.SearchTerm}%")
+                            );
+                }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
@@ -229,6 +232,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         DrugRouteId = x.DrugRouteId,
                         MedicamentGroupId = x.MedicamentGroupId,
                         ConcoctionQty = x.ConcoctionQty,
+                        MedicamenName = x.MedicamenName,
                         Practitioner = new User
                         {
                             Name = x.Practitioner == null ? string.Empty : x.Practitioner.Name,

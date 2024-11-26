@@ -514,6 +514,9 @@
                                                                     </Template>
                                                                 </DxFormLayoutItem>
                                                             }
+                                                            <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption=" Claim" ColSpanMd="12">
+                                                                <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))" @bind-Checked="@GeneralConsultanService.IsClaim" />
+                                                            </DxFormLayoutItem>
 
                                                             @* <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Conference Link" ColSpanMd="12">
                                                         <a href="@(GeneralConsultanService.LinkMeet)"></a>
@@ -1095,7 +1098,7 @@
                                                                                                 <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
                                                                                             </DxFormLayoutItem>
 
-                                                                                            
+
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnoses" ColSpanMd="12">
                                                                                                 <MyDxComboBox Data="@Diagnoses"
                                                                                                               NullText="Select Diagnoses"
@@ -1128,7 +1131,7 @@
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
                                                                                                 @*  <MyTextBox @bind-Text="@a.Planning"
                                                                                                                NullText="Name" /> *@ 
-                                                                                                                                </DxFormLayoutItem>
+                                                                                                    </DxFormLayoutItem>
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medication Therapy" ColSpanMd="12">
                                                                                                 <MyTextBox @bind-Text="@a.MedicationTherapy"
                                                                                                            NullText="Medication Therapy" />
@@ -1233,6 +1236,10 @@
                                                                 </div>
                                                             </div>
                                                         </DxTabPage>
+                                                    }
+
+                                                    @if (GeneralConsultanService.IsClaim)
+                                                    {
                                                         <DxTabPage Text="Claim Request" Click="OnClickTabClaim">
                                                             <div class="w-100 mt-2">
                                                                 <div class="card w-100">
@@ -1270,17 +1277,17 @@
                                                                                                              IsImport="false"
                                                                                                              IsExport="false"
                                                                                                              EnableDelete="isActiveButton"
-                                                                                                             VisibleNew="UserAccessCRUID.IsCreate"
-                                                                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                                                                             VisibleNew="IsStatus(EnumStatusGeneralConsultantService.NurseStation) "
+                                                                                                             VisibleEdit="IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician)"
+                                                                                                             VisibleDelete="IsStatus(EnumStatusGeneralConsultantService.NurseStation) " />
 
                                                                                         </ToolbarTemplate>
                                                                                         <Columns>
                                                                                             <DxGridSelectionColumn Width="30px" />
-                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name"  />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Patient.Name" Caption="Patient Name" />
                                                                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Phycisian.Name" Caption="Phycisian Name" />
                                                                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Benefit.BenefitName" Caption="Benefit Name" />
-                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" DisplayFormat="@Helper.DefaultFormatDate"/>
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ClaimDate" Caption="Claim Date" DisplayFormat="@Helper.DefaultFormatDate" />
                                                                                             <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Remark" Caption="Remark" />
                                                                                             <DxGridDataColumn FieldName="Status" MinWidth="100" Width="auto" Caption="Status">
                                                                                                 <CellDisplayTemplate>
@@ -1289,20 +1296,22 @@
                                                                                             </DxGridDataColumn>
                                                                                             <DxGridDataColumn FieldName="Id" MinWidth="200" AllowSort="false" Width="auto" TextAlignment="GridTextAlignment.Center">
                                                                                                 <CellDisplayTemplate>
-                                                                                                    @{
-                                                                                                        var dataItem = (context.DataItem as ClaimRequestDto);
-                                                                                                    }
-
-                                                                                                    @if (dataItem.Status == EnumClaimRequestStatus.Draft)
+                                                                                                    @if (IsStatus(EnumStatusGeneralConsultantService.Physician))
                                                                                                     {
-                                                                                                        <DxButton RenderStyle="ButtonRenderStyle.Success"
-                                                                                                                  title="Done"
-                                                                                                                  Text="Done"
-                                                                                                                  IconCssClass="fa-solid fa-check"
-                                                                                                                  Click="@(() => OnDone(dataItem))"
-                                                                                                                  CssClass="btn-icon-undo me-1" />
-                                                                                                    }
 
+                                                                                                        var dataItem = (context.DataItem as ClaimRequestDto);
+
+
+                                                                                                        @if (dataItem.Status == EnumClaimRequestStatus.Draft)
+                                                                                                        {
+                                                                                                            <DxButton RenderStyle="ButtonRenderStyle.Success"
+                                                                                                                      title="Done"
+                                                                                                                      Text="Done"
+                                                                                                                      IconCssClass="fa-solid fa-check"
+                                                                                                                      Click="@(() => OnDone(dataItem))"
+                                                                                                                      CssClass="btn-icon-undo me-1" />
+                                                                                                        }
+                                                                                                    }
                                                                                                 </CellDisplayTemplate>
                                                                                                 <HeaderCaptionTemplate>Action</HeaderCaptionTemplate>
                                                                                             </DxGridDataColumn>
@@ -1460,6 +1469,7 @@
                                                             </div>
                                                         </DxTabPage>
                                                     }
+
                                                 </DxTabs>
                                             </div>
                                         </div>

@@ -139,9 +139,14 @@ namespace McDermott.Web.Components.Pages.Pharmacies
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.QueryGetHelper<DrugDosage, DrugDosageDto>(pageIndex, pageSize, searchTerm);
+                var result = await Mediator.Send(new GetDrugDosageQuery
+                {
+                    SearchTerm=searchTerm,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                });
                 GetDrugDosages = result.Item1;
-                totalCount = result.pageCount;
+                totalCount = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception)
@@ -239,12 +244,17 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                             dr.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDrugRouteQuery(x => dr.Contains(x.Route.ToLower()), 0, 0,
-                        select: x => new DrugRoute
+                    var ax = await Mediator.Send(new GetDrugRouteQuery
+                    {
+                        Predicate = x => dr.Contains(x.Route.ToLower()),
+                        Select = x => new DrugRoute
                         {
                             Id = x.Id,
                             Route = x.Route
-                        }))).Item1;
+                        }
+                    });
+
+                    list1 = ax.Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {

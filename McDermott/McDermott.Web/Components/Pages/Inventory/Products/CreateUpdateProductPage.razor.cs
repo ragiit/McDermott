@@ -282,7 +282,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 LoadDataDrugForm(),
                 LoadDataDrugRoute(),
                 LoadDataDrugDosage(),
-                
+
 
                 LoadData(),
                 // LoadDataBPJSCl(),
@@ -596,9 +596,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugFormQuery(searchTerm: refDrugFormComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetDrugFormQuery { SearchTerm = refDrugFormComboBox?.Text, PageSize = pageSize, PageIndex= pageIndex});
             GetDrugForms = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -643,9 +643,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugRouteQuery(searchTerm: refDrugRouteComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetDrugRouteQuery { SearchTerm = refDrugRouteComboBox?.Text, PageSize = pageSize, PageIndex = pageIndex });
             GetDrugRoutes = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
@@ -782,9 +782,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetDrugDosageQuery(searchTerm: refDrugDosageComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetDrugDosageQuery { SearchTerm = refDrugDosageComboBox?.Text, PageSize = pageSize, PageIndex = pageIndex });
             GetDrugDosage = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 
