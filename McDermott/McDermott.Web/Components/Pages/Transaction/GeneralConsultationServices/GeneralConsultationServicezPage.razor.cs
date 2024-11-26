@@ -123,6 +123,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     OrderByList =
                     [
+                        (x=>x.IsClaim, true),
                         (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
@@ -204,6 +205,33 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
             return new MarkupString("");
         }
+
+        public MarkupString GetIssueClaimIconHtml(GeneralConsultanServiceDto priority)
+        {
+            if (priority is not null)
+            {
+                if (!priority.IsClaim )
+                    return new MarkupString("");
+
+                string priorytyClass = "info";
+                string title = string.Empty;
+
+                if (priority.IsClaim)
+                    title = $" Claim";
+                else
+                {
+                    if (priority.IsClaim)
+                        title = $"Claim";
+                   
+                }
+
+                string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+
+                return new MarkupString(html);
+            }
+            return new MarkupString("");
+        }
+
 
         private bool IsDashboard { get; set; } = false;
 

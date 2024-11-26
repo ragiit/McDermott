@@ -4,32 +4,44 @@
     {
         #region GET
 
-        public class GetAllDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DrugRouteDto>>
+        public class GetSingleDrugRouteQuery : IRequest<DrugRouteDto>
         {
-            public Expression<Func<DrugRoute, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
+            public List<Expression<Func<DrugRoute, object>>> Includes { get; set; }
+            public Expression<Func<DrugRoute, bool>> Predicate { get; set; }
+            public Expression<Func<DrugRoute, DrugRoute>> Select { get; set; }
+
+            public List<(Expression<Func<DrugRoute, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        public class GetDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<DrugRoute, object>>>? includes = null, Expression<Func<DrugRoute, DrugRoute>>? select = null) : IRequest<(List<DrugRouteDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetDrugRouteQuery : IRequest<(List<DrugRouteDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public Expression<Func<DrugRoute, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<DrugRoute, object>>> Includes { get; set; }
+            public Expression<Func<DrugRoute, bool>> Predicate { get; set; }
+            public Expression<Func<DrugRoute, DrugRoute>> Select { get; set; }
 
-            public List<Expression<Func<DrugRoute, object>>> Includes { get; } = includes!;
-            public Expression<Func<DrugRoute, DrugRoute>>? Select { get; } = select!;
-        }
+            public List<(Expression<Func<DrugRoute, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
-        public class BulkValidateDrugRouteQuery(List<DrugRouteDto> DrugRoutesToValidate) : IRequest<List<DrugRouteDto>>
-        {
-            public List<DrugRouteDto> DrugRoutesToValidate { get; } = DrugRoutesToValidate;
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class ValidateDrugRouteQuery(Expression<Func<DrugRoute, bool>>? predicate = null) : IRequest<bool>
         {
             public Expression<Func<DrugRoute, bool>> Predicate { get; } = predicate!;
+        }
+
+        public class BulkValidateDrugRouteQuery(List<DrugRouteDto> DrugRoutesToValidate) : IRequest<List<DrugRouteDto>>
+        {
+            public List<DrugRouteDto> DrugRoutesToValidate { get; } = DrugRoutesToValidate;
         }
 
         #endregion GET

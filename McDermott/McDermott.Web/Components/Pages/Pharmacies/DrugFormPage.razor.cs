@@ -110,9 +110,9 @@ namespace McDermott.Web.Components.Pages.Pharmacies
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetDrugFormQuery(searchTerm: searchTerm, pageIndex: pageIndex, pageSize: pageSize));
+                var a = await Mediator.Send(new GetDrugFormQuery { SearchTerm = searchTerm, PageIndex = pageIndex, PageSize = pageSize });
                 DataFormDrugs = a.Item1;
-                totalCount = a.pageCount;
+                totalCount = a.PageCount;
                 activePageIndex = pageIndex;
             }
             catch (Exception ex)

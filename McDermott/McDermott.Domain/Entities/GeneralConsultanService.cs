@@ -141,6 +141,10 @@ namespace McDermott.Domain.Entities
 
         #endregion ANC
 
+        #region Claim
+        public bool? IsClaim { get; set; } 
+        #endregion
+
         public long? ProjectId { get; set; }
         public bool IsAccident { get; set; }
 

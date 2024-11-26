@@ -4,15 +4,34 @@
     {
         #region GET
 
-        public class GetAllDrugFormQuery(Expression<Func<DrugForm, bool>>? predicate = null, bool removeCache = false) : IRequest<List<DrugFormDto>>
+        public class GetSingleDrugFormQuery : IRequest<DrugFormDto>
         {
-            public Expression<Func<DrugForm, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
+            public List<Expression<Func<DrugForm, object>>> Includes { get; set; }
+            public Expression<Func<DrugForm, bool>> Predicate { get; set; }
+            public Expression<Func<DrugForm, DrugForm>> Select { get; set; }
+
+            public List<(Expression<Func<DrugForm, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
-        public class BulkValidateDrugFormQuery(List<DrugFormDto> DrugFormsToValidate) : IRequest<List<DrugFormDto>>
+        public class GetDrugFormQuery : IRequest<(List<DrugFormDto>, int PageIndex, int PageSize, int PageCount)>
         {
-            public List<DrugFormDto> DrugFormsToValidate { get; } = DrugFormsToValidate;
+            public List<Expression<Func<DrugForm, object>>> Includes { get; set; }
+            public Expression<Func<DrugForm, bool>> Predicate { get; set; }
+            public Expression<Func<DrugForm, DrugForm>> Select { get; set; }
+
+            public List<(Expression<Func<DrugForm, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class ValidateDrugFormQuery(Expression<Func<DrugForm, bool>>? predicate = null) : IRequest<bool>
@@ -20,16 +39,9 @@
             public Expression<Func<DrugForm, bool>> Predicate { get; } = predicate!;
         }
 
-        public class GetDrugFormQuery(Expression<Func<DrugForm, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false, List<Expression<Func<DrugForm, object>>>? includes = null, Expression<Func<DrugForm, DrugForm>>? select = null) : IRequest<(List<DrugFormDto>, int pageIndex, int pageSize, int pageCount)>
+        public class BulkValidateDrugFormQuery(List<DrugFormDto> DrugFormsToValidate) : IRequest<List<DrugFormDto>>
         {
-            public Expression<Func<DrugForm, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
-
-            public List<Expression<Func<DrugForm, object>>> Includes { get; } = includes!;
-            public Expression<Func<DrugForm, DrugForm>>? Select { get; } = select!;
+            public List<DrugFormDto> DrugFormsToValidate { get; } = DrugFormsToValidate;
         }
 
         #endregion GET

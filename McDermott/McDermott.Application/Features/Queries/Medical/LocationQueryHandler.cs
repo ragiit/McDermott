@@ -5,9 +5,9 @@ namespace McDermott.Application.Features.Queries.Medical
     public class LocationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetLocationQuery, (List<LocationDto>, int pageIndex, int pageSize, int pageCount)>,
         IRequestHandler<GetSingleLocationQuery, LocationDto>,
-        IRequestHandler<CreateLocationRequest, LocationDto>,
         IRequestHandler<ValidateLocationQuery, bool>,
         IRequestHandler<BulkValidateLocationsQuery, List<LocationDto>>,
+        IRequestHandler<CreateLocationRequest, LocationDto>,
         IRequestHandler<CreateListLocationRequest, List<LocationDto>>,
         IRequestHandler<UpdateLocationRequest, LocationDto>,
         IRequestHandler<UpdateListLocationRequest, List<LocationDto>>,

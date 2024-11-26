@@ -120,7 +120,7 @@ namespace McDermott.Application.Dtos.Transaction
                 }
             }
         }
-
+        public bool IsClaim { get; set; } = false;
         public bool IsSickLeave { get; set; } = false;
         public bool IsMaternityLeave { get; set; } = false;
         public DateTime? StartDateSickLeave { get; set; }

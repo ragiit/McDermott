@@ -100,6 +100,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
                         RegistrationDate = x.RegistrationDate,
                         ClassType = x.ClassType,
+                        IsClaim = x.IsClaim,
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceDto>();
@@ -221,7 +222,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                         KioskQueue = new KioskQueue
                         {
                             QueueNumber = x.KioskQueue == null ? null : x.KioskQueue.QueueNumber
-                        }
+                        },
+                        IsClaim =x.IsClaim,
                     });
 
                 if (!request.IsGetAll)

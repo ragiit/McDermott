@@ -111,6 +111,11 @@
                                                     @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
+                                            <DxGridDataColumn MinWidth="200" FieldName="IsClaim" Caption="Claim">
+                                                <CellDisplayTemplate>
+                                                    @GetIssueClaimIconHtml((context.DataItem as GeneralConsultanServiceDto))
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
                                         </Columns>
 
                                         <TotalSummary>
