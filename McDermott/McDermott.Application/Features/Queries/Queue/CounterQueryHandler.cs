@@ -97,19 +97,19 @@ namespace McDermott.Application.Features.Queries.Queue
                         ServiceId = x.ServiceId,
                         Service = new Service
                         {
-                            Name = x.Service == null ? "" : x.Service.Name,
+                            Name = x.Service == null ? string.Empty : x.Service.Name,
                         },
                         PhysicianId = x.PhysicianId,
                         Physician = new User
                         {
-                            Name = x.Physician == null ? "" : x.Physician.Name
+                            Name = x.Physician == null ? string.Empty : x.Physician.Name
                         },
                         IsActive = x.IsActive,
                         Status = x.Status,
                         ServiceKId = x.ServiceKId,
                         ServiceK = new Service
                         {
-                            Name = x.ServiceK == null ? "" : x.ServiceK.Name
+                            Name = x.ServiceK == null ? string.Empty : x.ServiceK.Name
                         }
                     });
 
@@ -188,19 +188,19 @@ namespace McDermott.Application.Features.Queries.Queue
                         ServiceId = x.ServiceId,
                         Service = new Service
                         {
-                            Name = x.Service == null ? "" : x.Service.Name,
+                            Name = x.Service == null ? string.Empty : x.Service.Name,
                         },
                         PhysicianId = x.PhysicianId,
                         Physician = new User
                         {
-                            Name = x.Physician == null ? "" : x.Physician.Name
+                            Name = x.Physician == null ? string.Empty : x.Physician.Name
                         },
                         IsActive = x.IsActive,
                         Status = x.Status,
                         ServiceKId = x.ServiceKId,
                         ServiceK = new Service
                         {
-                            Name = x.ServiceK == null ? "" : x.ServiceK.Name
+                            Name = x.ServiceK == null ? string.Empty : x.ServiceK.Name
                         }
                     });
 

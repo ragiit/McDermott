@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using McDermott.Domain.Common;
 
 namespace McDermott.Application.Dtos.Queue
 {
@@ -15,8 +16,10 @@ namespace McDermott.Application.Dtos.Queue
         public long? PhysicianId { get; set; }
 
         public string? Status { get; set; } = string.Empty;
-
+        [SetToNull]
         public virtual ServiceDto? Service { get; set; }
+        [SetToNull]
+        public virtual UserDto? Physician { get; set; }
     }
 
     public class AddCounterPopUp : AbstractValidator<CounterDto>

@@ -870,6 +870,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     IsMaternityLeave = x.IsMaternityLeave,
                     StartMaternityLeave = x.StartMaternityLeave,
                     EndMaternityLeave = x.EndMaternityLeave,
+                    IsClaim = x.IsClaim,
 
                     PPKRujukanCode = x.PPKRujukanCode,
                     PPKRujukanName = x.PPKRujukanName,
