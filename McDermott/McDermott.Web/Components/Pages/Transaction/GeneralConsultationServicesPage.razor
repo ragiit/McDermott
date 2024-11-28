@@ -1949,12 +1949,12 @@ else
 
                                                         <!-- Date -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date" ColSpanMd="12">
-                                                            <DxDateEdit @bind-Date="@GeneralConsultanService.Date" NullText="Select Date" />
+                                                            <DxDateEdit @bind-Date="@GeneralConsultanService.DateRJMCINT" NullText="Select Date" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Kepada/To -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Kepada/To" ColSpanMd="12">
-                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Kepada" NullText="Enter To" />
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.ReferTo" NullText="Enter To" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Hospital -->
@@ -1965,16 +1965,16 @@ else
                                                         </DxFormLayoutItem>
 
                                                         <!-- Examination Purpose -->
-                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Purpose" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Specialist" ColSpanMd="12">
                                                             <DxComboBox Data="@ExaminationPurposes"
-                                                                        @bind-Value="@GeneralConsultanService.ExaminationPurpose"
-                                                                        NullText="Select Examination Purpose" />
+                                                                        @bind-Value="@GeneralConsultanService.Specialist"
+                                                                        NullText="Select Specialist" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Category -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
                                                             <DxComboBox Data="@Categories"
-                                                                        @bind-Value="@GeneralConsultanService.Category"
+                                                                        @bind-Value="@GeneralConsultanService.CategoryRJMCINT"
                                                                         NullText="Select Category" />
                                                         </DxFormLayoutItem> 
                                                     </DxFormLayout>
@@ -1991,22 +1991,22 @@ else
 
                                                         <!-- Name -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
-                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Name" NullText="Enter Name" />
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.PatientId" NullText="Enter Name" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Job -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Job" ColSpanMd="12">
-                                                            <DxTextBox @bind-Value="@GeneralConsultanService.Job" NullText="Enter Job" />
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.JobPositionId" NullText="Enter Job" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Temporary Diagnosis -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temporary Diagnosis" ColSpanMd="12">
-                                                            <DxTextBox @bind-Value="@GeneralConsultanService.TemporaryDiagnosis" NullText="Enter Diagnosis" />
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.TempDiagnosis" NullText="Enter Diagnosis" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Therapy Provided -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Therapy Provided" ColSpanMd="12">
-                                                            <DxTextBox @bind-Value="@GeneralConsultanService.TherapyProvided" NullText="Enter Therapy" />
+                                                            <DxTextBox @bind-Value="@GeneralConsultanService.TherapyProvide" NullText="Enter Therapy" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Inpatient Class -->

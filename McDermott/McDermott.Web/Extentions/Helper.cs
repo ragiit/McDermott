@@ -74,6 +74,7 @@ namespace McDermott.Web.Extentions
 
         public static string DisplayFormat { get; } = "HH:mm";
         public static List<string> Hospitals { get; set; } = new List<string> { "RSBK", "RSE", "RSHB", "RSBP", "RSAB", "RSGH", "RSMA", "RSHBH", "RSSD" };
+        public static List<string> ClaimTypes { get; set; } = new List<string> { "Dentist", "Glasses", "Safety Glasses" };
         public static List<string> ExaminationPurposes { get; set; } = new List<string> { "Dentist", "Internist", "Pulmonologist", "Cardiologist", "Eye", "ENT", "Paediatric", "Surgeon", "Obstetrician", "Neurologist", "Urologist", "Neurosurgeon", "Orthopaedic", "Physiotherapist", "Dermatologist", "Psychiatrist", "Laboratorium" };
         public static List<string> Categories { get; set; } = new List<string> { "KANKER", "ACCIDENT Inside", "EMPLOYEE", "KELAINAN BAWAAN", "ACCIDENT Outside", "DEPENDENT" };
         public static List<string> ExamFor { get; set; } = new List<string> { "Pemeriksaan / penanganan lebih lanjut", "Pembedahan", "Perawatan", "Bersalin" };

@@ -211,6 +211,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                             IsMaternity = x.IsMaternity
                         },
                         Payment = x.Payment,
+                        
                         AppointmentDate = x.AppointmentDate,
                         IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
                         RegistrationDate = x.RegistrationDate,
