@@ -79,6 +79,22 @@ namespace McDermott.Domain.Entities
         public string? AccidentExaminationDocs { get; set; }
         public string? AccidentExaminationBase64 { get; set; }
 
+        #region Mcdermott Internal
+        public string? TypeClaim { get; set; }
+        public string? Number { get; set; }
+        public DateTime? DateRJMCINT { get; set; }
+        public string? ReferTo { get; set; }
+        public string? Hospital {  get; set; }
+        public string? Specialist {  get; set; }
+        public string? CategoryRJMCINT { get; set; }
+        public string? ExamFor {  get; set; }
+        public long? JobPositionId { get; set; }
+        public string? TempDiagnosis {  get; set; }
+        public string? TherapyProvide {  get; set; }
+        public string? InpatientClass { get; set; }
+
+        #endregion
+
         #region Clinical Assesment
 
         public string? ScrinningTriageScale { get; set; }
@@ -158,6 +174,8 @@ namespace McDermott.Domain.Entities
 
         //[SetToNull]
         public virtual KioskQueue? KioskQueue { get; set; }
+
+        public virtual JobPosition? JobPosition { get; set; }
 
         //[SetToNull]
         public virtual User? Patient { get; set; }

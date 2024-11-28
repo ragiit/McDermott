@@ -4,6 +4,7 @@ using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace McDermott.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241128074603_RujukanMCINT")]
+    partial class RujukanMCINT
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -877,9 +880,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("GeneralConsultanServiceId")
-                        .HasColumnType("bigint");
-
                     b.Property<bool?>("IsNotificationSent")
                         .HasColumnType("bit");
 
@@ -904,8 +904,6 @@ namespace McDermott.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BenefitId");
-
-                    b.HasIndex("GeneralConsultanServiceId");
 
                     b.HasIndex("PatientId");
 
@@ -6976,11 +6974,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("BenefitId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.GeneralConsultanService", "GeneralConsultanService")
-                        .WithMany()
-                        .HasForeignKey("GeneralConsultanServiceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
@@ -6992,8 +6985,6 @@ namespace McDermott.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Benefit");
-
-                    b.Navigation("GeneralConsultanService");
 
                     b.Navigation("Patient");
 

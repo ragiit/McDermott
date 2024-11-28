@@ -328,7 +328,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 var ab = await Mediator.Send(new GetClaimRequestQuery
                 {
                     SearchTerm = searchTermGridClaim ?? "",
-                    Predicate = x => x.PatientId == GeneralConsultanService.PatientId
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id
                 });
                 GetClaimRequests = ab.Item1;
                 totalCountGridClaim = ab.PageCount;
@@ -398,6 +398,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 if (PostClaimRequests.Id == 0)
                 {
                     PostClaimRequests.Status = EnumClaimRequestStatus.Draft;
+                    PostClaimRequests.GeneralConsultanServiceId = GeneralConsultanService.Id;
                     item = await Mediator.Send(new CreateClaimRequestRequest(PostClaimRequests));
                     ToastService.ShowSuccess($"Add Data Claim Request Success");
                 }
@@ -1908,7 +1909,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 FamilyMedicalHistoryOther = userForm.FamilyMedicalHistoryOther,
                                 MedicationHistory = userForm.MedicationHistory,
                                 PastMedicalHistory = userForm.PastMedicalHistory,
-                                CurrentMobile = userForm.CurrentMobile
+                                CurrentMobile = userForm.CurrentMobile,
+                                
                             }
                         };
 

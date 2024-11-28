@@ -5,6 +5,7 @@
         public long? PatientId { get; set; }
 
         public long? PhycisianId { get; set; }
+        public long? GeneralConsultanServiceId { get; set; }
 
         public DateTime ClaimDate { get; set; }
 
@@ -24,5 +25,8 @@
 
         [SetToNull]
         public User? Phycisian { get; set; } // Navigation property untuk data dokter
+
+        [SetToNull]
+        public GeneralConsultanService? GeneralConsultanService { get; set; }
     }
 }

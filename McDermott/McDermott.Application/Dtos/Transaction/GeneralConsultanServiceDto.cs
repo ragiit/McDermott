@@ -261,18 +261,6 @@ namespace McDermott.Application.Dtos.Transaction
 
         #endregion ANC
 
-        public string Number { get; set; }
-        public DateTime Date { get; set; }
-        public string Kepada { get; set; }
-        public string Hospital { get; set; }
-        public string ExaminationPurpose { get; set; }
-        public string Category { get; set; }
-        public string ExamFor { get; set; }
-        public string Name { get; set; }
-        public string Job { get; set; }
-        public string TemporaryDiagnosis { get; set; }
-        public string TherapyProvided { get; set; }
-        public string InpatientClass { get; set; }
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
 
@@ -289,6 +277,23 @@ namespace McDermott.Application.Dtos.Transaction
         public virtual ServiceDto? Service { get; set; }
         public virtual InsurancePolicyDto? InsurancePolicy { get; set; }
         public virtual ProjectDto? Project { get; set; }
+
+        #region Mcdermott Internal
+        public string? TypeClaim { get; set; }
+        public string? Number { get; set; }
+        public DateTime DateRJMCINT { get; set; } = DateTime.Now;
+        public string? ReferTo { get; set; }
+        public string? Hospital { get; set; }
+        public string? Specialist { get; set; }
+        public string? CategoryRJMCINT { get; set; }
+        public string? ExamFor { get; set; }
+        public long? JobPositionId { get; set; }
+        public string? TempDiagnosis { get; set; }
+        public string? TherapyProvide { get; set; }
+        public string? InpatientClass { get; set; }
+
+        #endregion
+
 
         // Add this property
         [NotMapped]
@@ -461,6 +466,22 @@ namespace McDermott.Application.Dtos.Transaction
             }
         }
 
+        #region Mcdermott Internal
+        public string? TypeClaim { get; set; }
+        public string? Number { get; set; }
+        public DateTime? DateRJMCINT { get; set; }
+        public string? ReferTo { get; set; }
+        public string? Hospital { get; set; }
+        public string? Specialist { get; set; }
+        public string? CategoryRJMCINT { get; set; }
+        public string? ExamFor { get; set; }
+        public long? JobPositionId { get; set; }
+        public string? TempDiagnosis { get; set; }
+        public string? TherapyProvide { get; set; }
+        public string? InpatientClass { get; set; }
+
+        #endregion
+
         public bool IsSickLeave { get; set; } = false;
         public bool IsMaternityLeave { get; set; } = false;
         public DateTime? StartDateSickLeave { get; set; }
@@ -495,6 +516,8 @@ namespace McDermott.Application.Dtos.Transaction
         public string? LinkMeet { get; set; } //telemedic
 
         public bool IsTelemedicine { get; set; } = false;
+
+        public bool? IsClaim { get; set; }
 
         #region Clinical Assesment
 

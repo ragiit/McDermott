@@ -171,6 +171,16 @@ namespace McDermott.Application.Extentions
             Finish = 3
         }
 
+        public enum EnumTypeClaim
+        {
+            [Display(Name = "Dentist")]
+            Dentist = 1,
+            [Display(Name = "Glasses")]
+            Glasses = 2,
+            [Display(Name = "Safety Glasses")]
+            SafetyGlasses = 3
+        }
+
         public enum EnumStatusGeneralConsultantService
         {
             [Display(Name = "Canceled")]

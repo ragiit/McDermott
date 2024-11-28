@@ -1,4 +1,5 @@
 ﻿@using FluentValidation.Results
+@using static McDermott.Application.Features.Commands.Config.OccupationalCommand
 @inject IPCareService PCareService
 
 <div class="popup-content">
@@ -502,6 +503,14 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <DxFormLayout CssClass="w-100">
+                                                @if (GeneralConsultanService.IsClaim)
+                                                {
+                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Claim Type" ColSpanMd="12">
+                                                        <DxComboBox Data="@ClaimTypes"
+                                                                    @bind-Value="@GeneralConsultanService.TypeClaim"
+                                                                    NullText="Select Claim Type" />
+                                                    </DxFormLayoutItem>
+                                                }
                                                 <!-- Number -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Number" ColSpanMd="12">
                                                     <DxTextBox @bind-Value="@GeneralConsultanService.Number" NullText="McD/RLH/Clinic/0001" />
@@ -509,12 +518,12 @@
 
                                                 <!-- Date -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date" ColSpanMd="12">
-                                                    <DxDateEdit @bind-Date="@GeneralConsultanService.Date" NullText="Select Date" />
+                                                    <DxDateEdit @bind-Date="@GeneralConsultanService.DateRJMCINT" DisplayFormat="@Helper.DefaultFormatDate" NullText="Select Date" />
                                                 </DxFormLayoutItem>
 
                                                 <!-- Kepada/To -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Kepada/To" ColSpanMd="12">
-                                                    <DxTextBox @bind-Value="@GeneralConsultanService.Kepada" NullText="Enter To" />
+                                                    <DxTextBox @bind-Value="@GeneralConsultanService.ReferTo" NullText="Enter To" />
                                                 </DxFormLayoutItem>
 
                                                 <!-- Hospital -->
@@ -527,14 +536,14 @@
                                                 <!-- Examination Purpose -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Purpose" ColSpanMd="12">
                                                     <DxComboBox Data="@ExaminationPurposes"
-                                                                @bind-Value="@GeneralConsultanService.ExaminationPurpose"
-                                                                NullText="Select Examination Purpose" />
+                                                                @bind-Value="@GeneralConsultanService.Specialist"
+                                                                NullText="Select Specialist" />
                                                 </DxFormLayoutItem>
 
                                                 <!-- Category -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
                                                     <DxComboBox Data="@Categories"
-                                                                @bind-Value="@GeneralConsultanService.Category"
+                                                                @bind-Value="@GeneralConsultanService.CategoryRJMCINT"
                                                                 NullText="Select Category" />
                                                 </DxFormLayoutItem>
                                             </DxFormLayout>
@@ -551,22 +560,36 @@
 
                                                 <!-- Name -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
-                                                    <DxTextBox @bind-Value="@GeneralConsultanService.Name" NullText="Enter Name" />
+                                                    <MyDxComboBox Data="@Patients"
+                                                                  NullText="Select Patient"
+                                                                  @ref="refPatientComboBox"
+                                                                  @bind-Value="@GeneralConsultanService.PatientId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id"
+                                                                  ReadOnly="true">
+                                                    </MyDxComboBox>
                                                 </DxFormLayoutItem>
 
                                                 <!-- Job -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Job" ColSpanMd="12">
-                                                    <DxTextBox @bind-Value="@GeneralConsultanService.Job" NullText="Enter Job" />
+                                                    <MyDxComboBox Data="@Occupationals"
+                                                                  NullText="Select Patient"
+                                                                  @ref="refOccupationalComboBox"
+                                                                  @bind-Value="GeneralConsultanService.Patient.OccupationalId"
+                                                                  TextFieldName="Name"
+                                                                  ValueFieldName="Id"
+                                                                  ReadOnly="true">
+                                                    </MyDxComboBox>
                                                 </DxFormLayoutItem>
 
                                                 <!-- Temporary Diagnosis -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temporary Diagnosis" ColSpanMd="12">
-                                                    <DxTextBox @bind-Value="@GeneralConsultanService.TemporaryDiagnosis" NullText="Enter Diagnosis" />
+                                                    <DxTextBox @bind-Value="@GeneralConsultanService.TempDiagnosis" NullText="Enter Diagnosis" />
                                                 </DxFormLayoutItem>
 
                                                 <!-- Therapy Provided -->
                                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Therapy Provided" ColSpanMd="12">
-                                                    <DxTextBox @bind-Value="@GeneralConsultanService.TherapyProvided" NullText="Enter Therapy" />
+                                                    <DxTextBox @bind-Value="@GeneralConsultanService.TherapyProvide" NullText="Enter Therapy" />
                                                 </DxFormLayoutItem>
 
                                                 <!-- Inpatient Class -->
@@ -1126,6 +1149,7 @@
                         DateOfBirth = x.DateOfBirth,
                         NoId = x.NoId,
                         CurrentMobile = x.CurrentMobile,
+                        OccupationalId =x.OccupationalId,
 
                         IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
                         IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
@@ -1140,7 +1164,10 @@
 
                         IsMedicationHistory = x.IsMedicationHistory,
                         MedicationHistory = x.MedicationHistory,
-                        PastMedicalHistory = x.PastMedicalHistory
+                        PastMedicalHistory = x.PastMedicalHistory,
+                        Occupational = new Occupational{
+                            Name = x.Occupational == null ? string.Empty : x.Occupational.Name
+                        }
                     }
                 });
             Patients = result.Item1;
@@ -1189,6 +1216,7 @@
 
     #endregion ComboboxPatient
 
+    private List<OccupationalDto> Occupationals { get; set; } = [];
     private List<UserDto> Patients { get; set; } = [];
     private List<ServiceDto> Services { get; set; } = [];
     #region ComboboxService
@@ -1251,7 +1279,6 @@
     }
 
     #endregion ComboboxService
-
 
     #region ComboboxPhysicion
 
@@ -1337,9 +1364,15 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-                                                                        [
-                                                                            x => x.Insurance
-                                                                        ],
+<<<<<<< HEAD
+                                                    [
+                                                        x => x.Insurance
+                                                    ],
+=======
+                                                                    [
+                                                                        x => x.Insurance
+                                                                    ],
+>>>>>>> ddd15cf0f0fde0d8aa7b6f4d60ed2ee7be849e07
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -1524,8 +1557,66 @@
         catch { }
 
         IsReferTo = false;
+
+
     }
 
+<<<<<<< HEAD
+    #region ComboboxOccupational
+
+    private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
+    private int OccupationalComboBoxIndex { get; set; } = 0;
+    private int totalCountOccupational = 0;
+
+    private async Task OnSearchOccupational()
+    {
+        await LoadDataOccupational();
+    }
+
+    private async Task OnSearchOccupationalIndexIncrement()
+    {
+        if (OccupationalComboBoxIndex < (totalCountOccupational - 1))
+        {
+            OccupationalComboBoxIndex++;
+            await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchOccupationalIndexDecrement()
+    {
+        if (OccupationalComboBoxIndex > 0)
+        {
+            OccupationalComboBoxIndex--;
+            await LoadDataOccupational(OccupationalComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputOccupationalChanged(string e)
+    {
+        OccupationalComboBoxIndex = 0;
+        await LoadDataOccupational();
+    }
+
+    private async Task LoadDataOccupational(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            var result = await Mediator.Send(new GetOccupationalQuery());
+            Occupationals = result.Item1;
+            PanelVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+
+    #endregion
+
+=======
 
     private List<DiagnosisBPJSIntegrationTemp> _diagnosisBPJSIntegrationTemp { get; set; } = new();
     private DiagnosisBPJSIntegrationTemp DiagnosaValue { get; set; }
@@ -1589,4 +1680,5 @@
         PanelVisible = false;
     }
 
+>>>>>>> ddd15cf0f0fde0d8aa7b6f4d60ed2ee7be849e07
 }
