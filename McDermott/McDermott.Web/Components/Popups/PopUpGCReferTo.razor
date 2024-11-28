@@ -364,8 +364,8 @@
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
                                                             <MyDxComboBox Data="@_diagnosisBPJSIntegrationTemp"
                                                                           NullText="Select Diagnosis"
-                                                                          @bind-Text="@DiagnosaValue"
-                                                                          @bind-Value="@DiagnosaValue"
+                                                                          @bind-Text="@DiagnosaText"
+                                                                          Value="DiagnosaValue"
                                                                           TextFieldName="NmDiag"
                                                                           ValueFieldName="KdDiag"
                                                                           SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => OnSelectDiagnosa(e))">
@@ -389,10 +389,10 @@
                                                         </DxFormLayoutItem>
                                                     }
 
-                                                    @if (_diagnosisBPJSIntegrationTemp.Count > 0 && Convert.ToBoolean(_diagnosisBPJSIntegrationTemp.FirstOrDefault(x => x.KdDiag == DiagnosaValue)?.NonSpesialis))
+                                                    @* @if (_diagnosisBPJSIntegrationTemp.Count > 0 && Convert.ToBoolean(_diagnosisBPJSIntegrationTemp.FirstOrDefault(x => x.KdDiag == DiagnosaValue)?.NonSpesialis))
                                                     {
 
-                                                    }
+                                                    } *@
 
                                                     @*  @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
                                                     {
@@ -1337,9 +1337,9 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-                                                                    [
-                                                                        x => x.Insurance
-                                                                    ],
+                                                                        [
+                                                                            x => x.Insurance
+                                                                        ],
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -1528,7 +1528,8 @@
 
 
     private List<DiagnosisBPJSIntegrationTemp> _diagnosisBPJSIntegrationTemp { get; set; } = new();
-    private string DiagnosaValue { get; set; }
+    private DiagnosisBPJSIntegrationTemp DiagnosaValue { get; set; }
+    private string DiagnosaText { get; set; }
 
     private async Task OnSearchDiagnosaIndexDecrement()
     {
@@ -1549,14 +1550,13 @@
 
     private void OnSelectDiagnosa(DiagnosisBPJSIntegrationTemp e)
     {
-        if (e is not null)
-            DiagnosaValue = e.NmDiag;
+        DiagnosaValue = e;
     }
     private async Task OnSearchDiagnosa(int index = 0)
     {
         PanelVisible = true;
 
-        var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"diagnosa/{DiagnosaValue}/{index}/20", HttpMethod.Get);
+        var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"diagnosa/{DiagnosaText}/{index}/20", HttpMethod.Get);
 
         if (response.Item2 != 200)
         {

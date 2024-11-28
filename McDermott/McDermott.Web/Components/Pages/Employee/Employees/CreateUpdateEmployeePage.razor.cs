@@ -220,7 +220,10 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
             {
                 Predicate = x => x.Id == UserForm.DepartmentId,
             })).Item1;
-            Occupationals = (await Mediator.QueryGetHelper<Occupational, OccupationalDto>(predicate: x => x.Id == UserForm.OccupationalId)).Item1;
+
+            //Occupationals = (await Mediator.QueryGetHelper<Occupational, OccupationalDto>(predicate: x => x.Id == UserForm.OccupationalId)).Item1;
+            //Occupationals = await Mediator.QueryGetComboBox<Occupational, OccupationalDto>(e, predicate);
+
             SelectedServices = (await Mediator.Send(new GetServiceQuery
             {
                 Predicate = x => UserForm.DoctorServiceIds != null && UserForm.DoctorServiceIds.Contains(x.Id),

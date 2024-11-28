@@ -9,6 +9,7 @@
         public string? Complaint { get; set; }
         public int KU { get; set; } // GeneralCondition
         public int TD { get; set; } // BloodPressure
+        public int TD2 { get; set; } // BloodPressure
         public int Suhu { get; set; } // Temperature
         public int BB { get; set; } // Temperature
         public int UK { get; set; } // Temperature
@@ -31,6 +32,7 @@
         public string? Complaint { get; set; }
         public int KU { get; set; } // GeneralCondition
         public int TD { get; set; } // BloodPressure
+        public int TD2 { get; set; } // BloodPressure
         public int Suhu { get; set; } // Temperature
         public int BB { get; set; } // Temperature
         public int UK { get; set; } // Temperature

@@ -1388,7 +1388,7 @@
 
                                                                                 <EditFormTemplate Context="EditFormContext">
                                                                                     @{
-                                                                                        var a = (GeneralConsultanServiceAncDetailDto)EditFormContext.EditModel;
+                                                                                        var a = (GeneralConsultanServiceAncDetailDto)EditFormContext.EditModel; 
                                                                                     }
                                                                                     <DxFormLayout CssClass="w-100">
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Trimester" ColSpanMd="12">
@@ -1407,8 +1407,12 @@
                                                                                             <DxSpinEdit MinValue="0" @bind-Value="@a.KU" NullText="General Condition (KU)" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
-                                                                                        <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Blood Pressure (TD)" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TD" NullText="Blood Pressure (TD)" InputCssClass="fw-normal" />
+                                                                                        <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Blood Pressure (TD)" ColSpanMd="6">
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TD" NullText="0" InputCssClass="fw-normal" />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                           <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="/" ColSpanMd="6">
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TD2" NullText="0" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Temperature (Suhu)" ColSpanMd="12">
@@ -1417,10 +1421,6 @@
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Body Weight (BB)" ColSpanMd="12">
                                                                                             <DxSpinEdit MinValue="0" @bind-Value="@a.BB" NullText="Body Weight" InputCssClass="fw-normal" />
-                                                                                        </DxFormLayoutItem>
-
-                                                                                        <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Gestational Age (UK)" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.UK" NullText="Gestational Age" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Uterine Fundal Height (TFU)" ColSpanMd="12">

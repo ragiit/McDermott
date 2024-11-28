@@ -270,6 +270,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             {
                 GeneralConsultanServiceAnc = new();
                 GeneralConsultanServiceAncDetails = [];
+                await OnSearchReference();
                 return;
             }
 
@@ -332,9 +333,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
         private List<string> References { get; set; } = [];
         private List<GeneralConsultanServiceAncDto> GeneralCosultanServiceAncs { get; set; } = [];
 
+        private GeneralConsultanServiceAncDetailDto GeneralConsultanServiceAncDetail { get; set; } = new();
+
         private async Task NewItemAnc_Click()
         {
             await GridAnc.StartEditNewRowAsync();
+            GeneralConsultanServiceAncDetail.BB = GeneralConsultanService.Weight.ToInt32();
+            GeneralConsultanServiceAncDetail.TD = GeneralConsultanService.Systolic.ToInt32();
+            GeneralConsultanServiceAncDetail.TD2 = GeneralConsultanService.Diastole.ToInt32();
         }
 
         private async Task RefreshAnc_Click()

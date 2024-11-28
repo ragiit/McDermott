@@ -1404,30 +1404,30 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync(firstRender);
+            //await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
-            {
-                try
-                {
-                    await GetUserInfo();
-                    StateHasChanged();
-                }
-                catch { }
+            //if (firstRender)
+            //{
+            //    try
+            //    {
+            //        await GetUserInfo();
+            //        StateHasChanged();
+            //    }
+            //    catch { }
 
-                await LoadData();
-                StateHasChanged();
+            //    await LoadData();
+            //    StateHasChanged();
 
-                await LoadComboBox();
-                StateHasChanged();
+            //    await LoadComboBox();
+            //    StateHasChanged();
 
-                try
-                {
-                    Grid?.SelectRow(0, true);
-                }
-                catch { }
-                //await JsRuntime.InvokeVoidAsync("initializeSignaturePad");
-            }
+            //    try
+            //    {
+            //        Grid?.SelectRow(0, true);
+            //    }
+            //    catch { }
+            //    //await JsRuntime.InvokeVoidAsync("initializeSignaturePad");
+            //}
         }
 
         private List<IBrowserFile> BrowserFiles = [];
