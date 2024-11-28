@@ -1,5 +1,9 @@
+using DevExpress.Blazor.Internal;
+using DevExpress.XtraRichEdit.Model;
 using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Domain.Entities;
+using McDermott.Web.Extentions;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 
 namespace McDermott.Web.Components.Pages.Config
@@ -100,7 +104,7 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadDataCountry();
+            await LoadCountry();
             PanelVisible = false;
         }
 
@@ -167,6 +171,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
+            await LoadCountry();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -177,21 +182,9 @@ namespace McDermott.Web.Components.Pages.Config
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CompanyDto ?? new());
-
-                Countries = (await Mediator.Send(new GetCountryQuery
-                {
-                    Predicate = x => x.Id == a.CountryId,
-                })).Item1;
-
-                Provinces = (await Mediator.Send(new GetProvinceQuery
-                {
-                    Predicate = x => x.Id == a.ProvinceId,
-                })).Item1;
-
-                Cities = (await Mediator.Send(new GetCityQuery
-                {
-                    Predicate = x => x.Id == a.CityId,
-                })).Item1;
+                await LoadCountry(predicate: x => x.Id == a.CountryId);
+                await LoadProvince(predicate: x => x.Id == a.ProvinceId && a.CountryId == x.CountryId);
+                await LoadCity(predicate: x => x.Id == a.CityId && x.ProvinceId == a.ProvinceId);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -208,114 +201,52 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion Default Grid Components
 
-        #region ComboboxProvince
+        #region ComboBox
 
-        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
-        private int ProvinceComboBoxIndex { get; set; } = 0;
-        private int totalCountProvince = 0;
+        #region ComboBox Country
 
-        private async Task OnSearchProvince()
+        private CountryDto SelectedCountry { get; set; } = new();
+
+        private async Task SelectedItemChanged(CountryDto e)
         {
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task OnSearchProvinceIndexIncrement()
-        {
-            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
+            if (e is null)
             {
-                ProvinceComboBoxIndex++;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
+                SelectedCountry = new();
+                await LoadCountry();
+            }
+            else
+            {
+                SelectedCountry = e;
+                await LoadProvince();
             }
         }
 
-        private async Task OnSearchProvinceIndexDecrement()
-        {
-            if (ProvinceComboBoxIndex > 0)
-            {
-                ProvinceComboBoxIndex--;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
+        private CancellationTokenSource? _ctsCountry;
 
-        private async Task OnInputProvinceChanged(string e)
-        {
-            ProvinceComboBoxIndex = 0;
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var countryId = refCountryComboBox?.Value.GetValueOrDefault();
-            var result = await Mediator.Send(new GetProvinceQuery
-            {
-                Predicate = x => x.CountryId == countryId,
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refProvinceComboBox?.Text ?? ""
-            });
-            Provinces = result.Item1;
-            totalCountProvince = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxProvince
-
-        #region ComboboxCity
-
-        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
-        private int CityComboBoxIndex { get; set; } = 0;
-        private int totalCountCity = 0;
-
-        private async Task OnSearchCity()
-        {
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task OnSearchCityIndexIncrement()
-        {
-            if (CityComboBoxIndex < (totalCountCity - 1))
-            {
-                CityComboBoxIndex++;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchCityIndexDecrement()
-        {
-            if (CityComboBoxIndex > 0)
-            {
-                CityComboBoxIndex--;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputCityChanged(string e)
-        {
-            CityComboBoxIndex = 0;
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
+        private async Task OnInputCountry(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                SelectedDataItems = [];
-                var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
+                _ctsCountry?.Cancel();
+                _ctsCountry?.Dispose();
+                _ctsCountry = new CancellationTokenSource();
 
-                var result = await Mediator.Send(new GetCityQuery
-                {
-                    Predicate = x => x.ProvinceId == provinceId,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = refCityComboBox?.Text ?? ""
-                });
-                Cities = result.Item1;
-                totalCountCity = result.PageCount;
+                await Task.Delay(Helper.CBX_DELAY, _ctsCountry.Token);
 
-                PanelVisible = false;
+                await LoadCountry(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsCountry?.Dispose();
+                _ctsCountry = null;
+            }
+        }
+
+        private async Task LoadCountry(string? e = "", Expression<Func<Country, bool>>? predicate = null)
+        {
+            try
+            {
+                Countries = await Mediator.QueryGetComboBox<Country, CountryDto>(e, predicate);
             }
             catch (Exception ex)
             {
@@ -324,58 +255,54 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxCity
+        #endregion ComboBox Country
 
-        #region ComboboxCountry
+        #region ComboBox Province
 
-        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
-        private int CountryComboBoxIndex { get; set; } = 0;
-        private int totalCountCountry = 0;
+        private ProvinceDto SelectedProvince { get; set; } = new();
 
-        private async Task OnSearchCountry()
+        private async Task SelectedItemChanged(ProvinceDto e)
         {
-            await LoadDataCountry(0, 10);
-        }
-
-        private async Task OnSearchCountryIndexIncrement()
-        {
-            if (CountryComboBoxIndex < (totalCountCountry - 1))
+            if (e is null)
             {
-                CountryComboBoxIndex++;
-                await LoadDataCountry(CountryComboBoxIndex, 10);
+                SelectedProvince = new();
+                await LoadProvince();
+            }
+            else
+            {
+                SelectedProvince = e;
+                await LoadCity();
             }
         }
 
-        private async Task OnSearchCountryIndexDecrement()
-        {
-            if (CountryComboBoxIndex > 0)
-            {
-                CountryComboBoxIndex--;
-                await LoadDataCountry(CountryComboBoxIndex, 10);
-            }
-        }
+        private CancellationTokenSource? _cts;
 
-        private async Task OnInputCountryChanged(string e)
-        {
-            CountryComboBoxIndex = 0;
-            await LoadDataCountry(0, 10);
-        }
-
-        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
+        private async Task OnInputProvince(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                SelectedDataItems = [];
-                var result = await Mediator.Send(new GetCountryQuery
-                {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = refCountryComboBox?.Text ?? ""
-                });
-                Countries = result.Item1;
-                totalCount = result.PageCount;
-                PanelVisible = false;
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadProvince(e.Value?.ToString() ?? "", x => x.CountryId == SelectedCountry.Id);
+            }
+            finally
+            {
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadProvince(string? e = "", Expression<Func<Province, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.CountryId == SelectedCountry.Id;
+
+                Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
             }
             catch (Exception ex)
             {
@@ -384,6 +311,61 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxCountry
+        #endregion ComboBox Province
+
+        #region ComboBox City
+
+        private CityDto SelectedCity { get; set; } = new();
+
+        private async Task SelectedItemChanged(CityDto e)
+        {
+            if (e is null)
+            {
+                SelectedCity = new();
+                await LoadCity();
+            }
+            else
+                SelectedCity = e;
+        }
+
+        private CancellationTokenSource? _ctsCity;
+
+        private async Task OnInputCity(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsCity?.Cancel();
+                _ctsCity?.Dispose();
+                _ctsCity = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsCity.Token);
+
+                await LoadCity(e.Value?.ToString() ?? "", x => x.ProvinceId == SelectedProvince.Id);
+            }
+            finally
+            {
+                _ctsCity?.Dispose();
+                _ctsCity = null;
+            }
+        }
+
+        private async Task LoadCity(string? e = "", Expression<Func<City, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.ProvinceId == SelectedProvince.Id;
+
+                Cities = await Mediator.QueryGetComboBox<City, CityDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox City
+
+        #endregion ComboBox
     }
 }

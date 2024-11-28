@@ -13,6 +13,9 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
+                        <InputFile id="fileInputMedicalEquipment" style="display:none" OnChange="@ImportExcelFileMedicalEquipment" accept=".xlsx" multiple="false"></InputFile>
+
+
                         <div class="card">
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IsContentBlocked="true"
@@ -53,7 +56,13 @@
                                             <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="() => EditItem_Click()" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
                                             <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
                                             <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-
+                                            <DxToolbarItem Text="Import" IconCssClass="fa-solid fa-file-import">
+                                                <Items>
+                                                    <DxToolbarItem Text="Medical Equipment Template" Click="ExportMedicalEquipmentTemplate" />
+                                                    <DxToolbarItem Text="Import Medical Equipment" Click="ImportFileMedicalEquipmentTemplate" />
+                                                    @* <DxToolbarItem Text="Import" Click="ImportFile" /> *@
+                                                </Items>
+                                            </DxToolbarItem>
                                         </DxToolbar>
                                     </ToolbarTemplate>
                                     <Columns>

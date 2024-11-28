@@ -297,6 +297,7 @@ namespace McDermott.Web.Components.Pages.Config
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 3, prov ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {
@@ -310,6 +311,7 @@ namespace McDermott.Web.Components.Pages.Config
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 4, city ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {
@@ -323,6 +325,7 @@ namespace McDermott.Web.Components.Pages.Config
                             if (cachedParent is null)
                             {
                                 ToastService.ShowErrorImport(row, 5, district ?? string.Empty);
+                                isValid = false;
                             }
                             else
                             {
@@ -418,8 +421,10 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #region ComboBox Province
+
         private ProvinceDto SelectedProvince { get; set; } = new();
-        async Task SelectedItemChanged(ProvinceDto e)
+
+        private async Task SelectedItemChanged(ProvinceDto e)
         {
             if (e is null)
                 SelectedProvince = new();
@@ -432,12 +437,11 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         private CancellationTokenSource? _ctsProvince;
+
         private async Task OnInputProvince(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _ctsProvince?.Cancel();
                 _ctsProvince?.Dispose();
                 _ctsProvince = new CancellationTokenSource();
@@ -448,9 +452,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _ctsProvince?.Dispose();
                 _ctsProvince = null;
             }
@@ -460,9 +461,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                PanelVisible = true;
                 Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -471,28 +470,29 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Province
 
         #region ComboBox City
+
         private CityDto SelectedCity { get; set; } = new();
-        async Task SelectedItemCityChanged(CityDto e)
+
+        private async Task SelectedItemCityChanged(CityDto e)
         {
             if (e is null)
                 SelectedCity = new();
             else
             {
                 SelectedCity = e;
-
                 await LoadDistrict();
             }
         }
+
         private CancellationTokenSource? _ctsCity;
+
         private async Task OnInputCity(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _ctsCity?.Cancel();
                 _ctsCity?.Dispose();
                 _ctsCity = new CancellationTokenSource();
@@ -503,9 +503,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _ctsCity?.Dispose();
                 _ctsCity = null;
             }
@@ -515,28 +512,26 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                PanelVisible = true;
+                predicate ??= x => x.ProvinceId == SelectedProvince.Id;
+
                 Cities = await Mediator.QueryGetComboBox<City, CityDto>(e, predicate);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-            finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox City
 
         #region ComboBox District
 
         private CancellationTokenSource? _ctsDistrict;
+
         private async Task OnInputDistrict(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _ctsDistrict?.Cancel();
                 _ctsDistrict?.Dispose();
                 _ctsDistrict = new CancellationTokenSource();
@@ -547,9 +542,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _ctsDistrict?.Dispose();
                 _ctsDistrict = null;
             }
@@ -559,9 +551,9 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                PanelVisible = true;
+                predicate ??= x => x.CityId == SelectedCity.Id && x.ProvinceId == SelectedProvince.Id;
+
                 Districts = await Mediator.QueryGetComboBox<District, DistrictDto>(e, predicate);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -570,9 +562,6 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion
-
-       
-       
+        #endregion ComboBox District
     }
 }

@@ -51,10 +51,10 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             await GetUserInfo();
-            await LoadData(); 
+            await LoadData();
             PanelVisible = false;
         }
-          
+
         #endregion Lifecycle Methods
 
         #region User and Access Management
@@ -120,7 +120,7 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #endregion Data Loading and Searching
-          
+
         #region CRUD Operations
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -376,7 +376,8 @@ namespace McDermott.Web.Components.Pages.Config
         #region ComboBox Menu
 
         private MenuDto SelectedMenu { get; set; } = new();
-        async Task SelectedItemChanged(MenuDto e)
+
+        private async Task SelectedItemChanged(MenuDto e)
         {
             if (e is null)
             {
@@ -388,12 +389,11 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         private CancellationTokenSource? _cts;
+
         private async Task OnInputMenu(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _cts?.Cancel();
                 _cts?.Dispose();
                 _cts = new CancellationTokenSource();
@@ -404,26 +404,21 @@ namespace McDermott.Web.Components.Pages.Config
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _cts?.Dispose();
                 _cts = null;
             }
         }
 
         private List<MenuDto> ParentMenus { get; set; } = [];
+
         private async Task LoadParentMenu(string? e = "", Expression<Func<Menu, bool>>? predicate = null, List<(Expression<Func<Menu, object>> OrderBy, bool IsDescending)>? orderBy = null)
         {
             try
             {
-                PanelVisible = true;
-
                 predicate ??= x => x.ParentId == null;
                 orderBy ??= [(x => x.Sequence, false)];
 
                 ParentMenus = await Mediator.QueryGetComboBox<Menu, MenuDto>(e, predicate, orderBy);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -432,6 +427,6 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Menu
     }
 }

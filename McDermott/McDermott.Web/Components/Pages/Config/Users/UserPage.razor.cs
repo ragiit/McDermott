@@ -1226,9 +1226,14 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetOccupationalQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refOccupationalComboBox?.Text ?? ""));
+            var result = await Mediator.Send(new GetOccupationalQuery
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = refOccupationalComboBox?.Text ?? ""
+            });
             Occupationals = result.Item1;
-            totalCountOccupational = result.pageCount;
+            totalCountOccupational = result.PageCount;
             PanelVisible = false;
         }
 

@@ -4,7 +4,8 @@ using static McDermott.Application.Features.Commands.Employee.DepartmentCommand;
 namespace McDermott.Application.Features.Queries.Employee
 {
     public class DepartmentQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-         IRequestHandler<GetDepartmentQuery, (List<DepartmentDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetDepartmentQuery, (List<DepartmentDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleDepartmentQuery, DepartmentDto>,
         IRequestHandler<ValidateDepartmentQuery, bool>,
         IRequestHandler<BulkValidateDepartmentQuery, List<DepartmentDto>>,
          IRequestHandler<CreateDepartmentRequest, DepartmentDto>,
@@ -41,6 +42,25 @@ namespace McDermott.Application.Features.Queries.Employee
             {
                 var query = _unitOfWork.Repository<Department>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Department>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Department>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -50,37 +70,136 @@ namespace McDermott.Application.Features.Queries.Employee
                     }
                 }
 
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.ParentDepartment.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Department
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ParentDepartmentId = x.ParentDepartmentId,
+                        CompanyId = x.CompanyId,
+                        ManagerId = x.ManagerId,
+                        ParentDepartment = new Domain.Entities.Department
+                        {
+                            Name = x.ParentDepartment.Name
+                        },
+                        Company = new Domain.Entities.Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        Manager = new Domain.Entities.User
+                        {
+                            Name = x.Manager.Name
+                        },
+                        DepartmentCategory = x.DepartmentCategory
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<DepartmentDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<DepartmentDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<DepartmentDto> Handle(GetSingleDepartmentQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Department>().Entities.AsNoTracking();
+
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Department>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Department>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ParentDepartment.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Company.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Manager.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.DepartmentCategory, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.ParentDepartment.Name, $"%{request.SearchTerm}%")
                         );
                 }
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
-                }
+                else
+                    query = query.Select(x => new Department
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ParentDepartmentId = x.ParentDepartmentId,
+                        CompanyId = x.CompanyId,
+                        ManagerId = x.ManagerId,
+                        ParentDepartment = new Domain.Entities.Department
+                        {
+                            Name = x.ParentDepartment.Name
+                        },
+                        Company = new Domain.Entities.Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        Manager = new Domain.Entities.User
+                        {
+                            Name = x.Manager.Name
+                        },
+                        DepartmentCategory = x.DepartmentCategory
+                    });
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
-
-                return (pagedItems.Adapt<List<DepartmentDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<DepartmentDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

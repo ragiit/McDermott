@@ -74,7 +74,7 @@
         {
             public List<Expression<Func<User, object>>> Includes { get; set; }
             public Expression<Func<User, bool>> Predicate { get; set; }
-            public Expression<Func<User, User>> Select { get; set; }
+            public Expression<Func<User, User>>? Select { get; set; }
 
             public List<(Expression<Func<User, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 

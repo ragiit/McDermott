@@ -33,6 +33,15 @@ namespace McDermott.Application.Extentions
             return null;
         }
 
+        public enum EnumStatusGeneralConsultanServiceAnc
+        {
+            [Display(Name = "Open")]
+            Open = 0,
+
+            [Display(Name = "Closed")]
+            Closed = 1,
+        }
+
         public enum EnumBpjsWebServiceTemporary
         {
             [Display(Name = "Failed")]

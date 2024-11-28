@@ -36,24 +36,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            
-            else if (typeof(TDto) == typeof(ProductCategoryDto))
-            {
-                var result = await mediator.Send(new GetProductCategoryQuery(
-                    predicate as Expression<Func<ProductCategory, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new ProductCategory
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Code = x.Code,
-                    } : select as Expression<Func<ProductCategory, ProductCategory>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(ActiveComponentDto))
             {
                 var result = await mediator.Send(new GetActiveComponentQuery(
@@ -163,7 +145,7 @@ namespace McDermott.Web.Extentions
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
-            } 
+            }
             else if (typeof(TDto) == typeof(PatientFamilyRelationDto))
             {
                 var result = await mediator.Send(new GetPatientFamilyRelationQuery(
@@ -251,23 +233,6 @@ namespace McDermott.Web.Extentions
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);
             }
-            else if (typeof(TDto) == typeof(OccupationalDto))
-            {
-                var result = await mediator.Send(new GetOccupationalQuery(
-                    predicate as Expression<Func<Occupational, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    select: select is null ? x => new Occupational
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Description = x.Description
-                    } : select as Expression<Func<Occupational, Occupational>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
             else if (typeof(TDto) == typeof(SignaDto))
             {
                 var result = await mediator.Send(new GetSignaQuery(
@@ -297,69 +262,6 @@ namespace McDermott.Web.Extentions
                         Name = x.Name,
                         Code = x.Code,
                     } : select as Expression<Func<Speciality, Speciality>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            }
-            else if (typeof(TDto) == typeof(JobPositionDto))
-            {
-                var result = await mediator.Send(new GetJobPositionQuery(
-                    predicate as Expression<Func<JobPosition, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes: includes is null ?
-                    [
-                        x => x.Department,
-                    ] : includes as List<Expression<Func<JobPosition, object>>>,
-                    select: select is null ? x => new JobPosition
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        DepartmentId = x.DepartmentId,
-                        Department = new Department
-                        {
-                            Name = x.Department.Name
-                        }
-                    } : select as Expression<Func<JobPosition, JobPosition>>
-                ));
-
-                return ((List<TDto>)(object)result.Item1, result.pageCount);
-            } 
-            else if (typeof(TDto) == typeof(DepartmentDto))
-            {
-                var result = await mediator.Send(new GetDepartmentQuery(
-                    predicate as Expression<Func<Department, bool>>,
-                    pageIndex: pageIndex,
-                    pageSize: pageSize,
-                    searchTerm: searchTerm ?? "",
-                    includes:
-                    [
-                        x => x.Manager,
-                        x => x.ParentDepartment,
-                        x => x.Company,
-                    ],
-                    select: select is null ? x => new Department
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        ParentDepartmentId = x.ParentDepartmentId,
-                        CompanyId = x.CompanyId,
-                        ManagerId = x.ManagerId,
-                        ParentDepartment = new Domain.Entities.Department
-                        {
-                            Name = x.ParentDepartment.Name
-                        },
-                        Company = new Domain.Entities.Company
-                        {
-                            Name = x.Company.Name
-                        },
-                        Manager = new Domain.Entities.User
-                        {
-                            Name = x.Manager.Name
-                        },
-                        DepartmentCategory = x.DepartmentCategory
-                    } : select as Expression<Func<Department, Department>>
                 ));
 
                 return ((List<TDto>)(object)result.Item1, result.pageCount);

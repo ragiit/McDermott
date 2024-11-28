@@ -52,7 +52,7 @@
                                         <DxGridSelectionColumn Width="15px" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
                                         <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" />
+                                        @* <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" /> *@
                                         <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
                                         <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
                                     </Columns>
@@ -70,10 +70,10 @@
                                                 <MyTextBox @bind-Text="@a.Code" NullText="Code" />
                                                 <ValidationMessage For="@(()=>a.Code)" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota" ColSpanMd="12">
+                                          @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Quota" NullText="Quota" />
                                                 <ValidationMessage For="@(()=>a.Quota)" />
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem> *@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsPatient" />
                                                 <ValidationMessage For="@(()=>a.IsPatient)" />
@@ -119,14 +119,10 @@
                                                 <DxCheckBox @bind-Checked="@a.IsVaccination" />
                                                 <ValidationMessage For="@(()=>a.IsVaccination)" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
+                                           @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
                                                 <ValidationMessage For="@(()=>a.IsTelemedicine)" />
-                                            </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
-                                                <ValidationMessage For="@(()=>a.IsTelemedicine)" />
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem>  *@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Maternity" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsMaternity" />
                                                 <ValidationMessage For="@(()=>a.IsMaternity)" />

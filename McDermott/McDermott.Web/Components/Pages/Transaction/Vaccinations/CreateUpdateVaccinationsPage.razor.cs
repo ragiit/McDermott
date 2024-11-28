@@ -9,7 +9,9 @@ using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
+
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+
 using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
@@ -55,7 +57,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             await LoadDataVaccinationGiven();
         }
 
-
         private async Task LoadDataVaccinationGiven(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -78,7 +79,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxProduct
+        #endregion ComboboxVaccinationGiven
 
         #region ComboboxSalesPerson
 
@@ -116,6 +117,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         }
 
         private List<UserDto> SalesPersons { get; set; } = [];
+
         private async Task LoadDataSalesPerson(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -189,6 +191,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         }
 
         private List<UserDto> Educators { get; set; } = [];
+
         private async Task LoadDataEducator(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -224,7 +227,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxEducator  
+        #endregion ComboboxEducator
 
         #region ComboboxVaccinationGivenPhysicion
 
@@ -262,6 +265,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         }
 
         private List<UserDto> VaccinationGivenPhysicions { get; set; } = [];
+
         private async Task LoadDataVaccinationGivenPhysicion(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -297,9 +301,9 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxVaccinationGivenPhysicion  
+        #endregion ComboboxVaccinationGivenPhysicion
 
-        #endregion
+        #endregion Vaccination Given
 
         private async Task OnClickCancelGiveVaccine(VaccinationPlanDto e)
         {
@@ -392,6 +396,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         }
 
         private bool IsVaccinationGiven = false;
+
         private async Task OnSelectProduct(ProductDto e)
         {
             try
@@ -1009,7 +1014,10 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
                 var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
                 NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
-                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery(predicate: x => x.Id == a.DiagnosisId))).Item1;
+                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
+                {
+                    Predicate = x => x.Id == a.DiagnosisId
+                })).Item1;
 
                 PanelVisible = false;
             }
@@ -1288,7 +1296,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                     case EnumStatusGeneralConsultantService.Canceled:
                         StagingText = EnumStatusGeneralConsultantService.Canceled;
                         break;
-
 
                     default:
                         break;
@@ -1618,9 +1625,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetDiagnosisQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosesComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetDiagnosisQuery
+                {
+                    SearchTerm = refDiagnosesComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
                 Diagnoses = result.Item1;
-                totalCountDiagnoses = result.pageCount;
+                totalCountDiagnoses = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -2492,8 +2504,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                     if (PageMode == EnumPageMode.Create.GetDisplayName())
                         NavigationManager.NavigateTo($"{FormUrl}/{EnumPageMode.Update.GetDisplayName()}?Id={GeneralConsultanService.Id}");
 
-
-
                     if (IsStatus(EnumStatusGeneralConsultantService.Finished))
                     {
                         #region Cut Product Stock
@@ -2805,10 +2815,12 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         }
 
         private bool IsPopUpPainScale = false;
+
         private void OnClickPainScalePopUp()
         {
             IsPopUpPainScale = true;
         }
+
         private void OnClosePopup()
         {
             IsPopUpPainScale = false;

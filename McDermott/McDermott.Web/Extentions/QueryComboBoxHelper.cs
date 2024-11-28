@@ -5,6 +5,7 @@ using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCo
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
+using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;
 
 namespace McDermott.Web.Extentions
 {
@@ -22,7 +23,12 @@ namespace McDermott.Web.Extentions
         /// <param name="searchTerm">The optional search term for filtering.</param>
         /// <returns>A list of DTOs matching the search criteria.</returns>
         /// <exception cref="NotSupportedException">Thrown if the type is not supported.</exception>
-        public static async Task<List<TDto>> QueryGetComboBox<T, TDto>(this IMediator mediator, string? searchTerm = "", Expression<Func<T, bool>>? predicate = null, List<(Expression<Func<T, object>> OrderBy, bool IsDescending)>? orderBy = null)
+        public static async Task<List<TDto>> QueryGetComboBox<T, TDto>(
+            this IMediator mediator, string? searchTerm = "",
+            Expression<Func<T, bool>>? predicate = null,
+            List<(Expression<Func<T, object>> OrderBy, bool IsDescending)>? orderBy = null,
+            Expression<Func<T, T>>? select = null
+            )
         {
             orderBy ??= [];
             searchTerm ??= string.Empty;
@@ -34,10 +40,29 @@ namespace McDermott.Web.Extentions
                 var result = (await mediator.Send(new GetUserQueryNew
                 {
                     Predicate = predicate as Expression<Func<User, bool>> ?? (x => true),
-                    Select = x => new User
+                    Select = select is null ? x => new User
                     {
                         Id = x.Id,
-                        Name = x.Name
+                        Name = x.Name,
+                        Email = x.Email,
+                    } : select as Expression<Func<User, User>>,
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
+            if (typeof(TDto) == typeof(OccupationalDto))
+            {
+                var result = (await mediator.Send(new GetOccupationalQuery
+                {
+                    Predicate = predicate as Expression<Func<Occupational, bool>> ?? (x => true),
+                    Select = x => new Occupational
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -215,6 +240,8 @@ namespace McDermott.Web.Extentions
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
                 })).Item1;
+
+                return result.Cast<TDto>().ToList();
             }
 
             #endregion Configurations
@@ -232,6 +259,24 @@ namespace McDermott.Web.Extentions
                         Name = x.Name,
                         UomId = x.UomId,
                         TraceAbility = x.TraceAbility,
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            if (typeof(TDto) == typeof(CronisCategoryDto))
+            {
+                var result = (await mediator.Send(new GetCronisCategoryQuery
+                {
+                    Predicate = predicate as Expression<Func<CronisCategory, bool>> ?? (x => true),
+                    Select = x => new CronisCategory
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -286,7 +331,129 @@ namespace McDermott.Web.Extentions
 
             #endregion Inventories
 
+            #region Employees
+
+            if (typeof(TDto) == typeof(JobPositionDto))
+            {
+                var result = (await mediator.Send(new GetJobPositionQuery
+                {
+                    Predicate = predicate as Expression<Func<JobPosition, bool>> ?? (x => true),
+                    Select = x => new JobPosition
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        DepartmentId = x.DepartmentId,
+                        Department = new Department
+                        {
+                            Name = x.Department.Name
+                        }
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            if (typeof(TDto) == typeof(DepartmentDto))
+            {
+                var result = (await mediator.Send(new GetDepartmentQuery
+                {
+                    Predicate = predicate as Expression<Func<Department, bool>> ?? (x => true),
+                    Select = x => new Department
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ParentDepartmentId = x.ParentDepartmentId,
+                        CompanyId = x.CompanyId,
+                        ManagerId = x.ManagerId,
+                        ParentDepartment = new Domain.Entities.Department
+                        {
+                            Name = x.ParentDepartment.Name
+                        },
+                        Company = new Domain.Entities.Company
+                        {
+                            Name = x.Company.Name
+                        },
+                        Manager = new Domain.Entities.User
+                        {
+                            Name = x.Manager.Name
+                        },
+                        DepartmentCategory = x.DepartmentCategory
+                    },
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            #endregion Employees
+
+            #region Medicals
+
+            if (typeof(TDto) == typeof(ServiceDto))
+            {
+                var result = (await mediator.Send(new GetServiceQuery
+                {
+                    Predicate = predicate as Expression<Func<Service, bool>> ?? (x => true),
+                    Select = select is null ? x => new Service
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                        IsMaternity = x.IsMaternity,
+                    } : select as Expression<Func<Service, Service>>,
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
+            if (typeof(TDto) == typeof(InsurancePolicyDto))
+            {
+                var result = (await mediator.Send(new GetInsurancePolicyQuery
+                {
+                    Predicate = predicate as Expression<Func<InsurancePolicy, bool>> ?? (x => true),
+                    Select = select is null ? x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        PolicyNumber = x.PolicyNumber,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
+                    } : select as Expression<Func<InsurancePolicy, InsurancePolicy>>,
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
+            #endregion Medicals
+
+            #region Transactions
+
+            if (typeof(TDto) == typeof(GeneralConsultanServiceAncDto))
+            {
+                var result = (await mediator.Send(new GetGeneralConsultanServiceAncQuery
+                {
+                    Predicate = predicate as Expression<Func<GeneralConsultanServiceAnc, bool>> ?? (x => true),
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return result.Cast<TDto>().ToList();
+            }
+
+            #endregion Transactions
+
             #region Pharmacy
+
             if (typeof(TDto) == typeof(DrugFormDto))
             {
                 var result = (await mediator.Send(new GetDrugFormQuery
@@ -296,9 +463,7 @@ namespace McDermott.Web.Extentions
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        Code=x.Code,
-
-                        
+                        Code = x.Code,
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -321,7 +486,6 @@ namespace McDermott.Web.Extentions
                         {
                             Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route
                         }
-
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -340,7 +504,6 @@ namespace McDermott.Web.Extentions
                         Id = x.Id,
                         Route = x.Route,
                         Code = x.Code,
-
                     },
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -348,7 +511,9 @@ namespace McDermott.Web.Extentions
 
                 return result.Cast<TDto>().ToList();
             }
-            #endregion
+
+            #endregion Pharmacy
+
             throw new NotSupportedException($"Query for type {typeof(T)} is not supported.");
         }
     }

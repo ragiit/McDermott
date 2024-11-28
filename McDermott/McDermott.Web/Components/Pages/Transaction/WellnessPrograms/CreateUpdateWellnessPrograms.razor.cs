@@ -447,10 +447,15 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetDiagnosisQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosisComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetDiagnosisQuery
+                {
+                    SearchTerm = refDiagnosisComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
 
                 Diagnoses = result.Item1;
-                totalCountDiagnosis = result.pageCount;
+                totalCountDiagnosis = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -487,7 +492,6 @@ namespace McDermott.Web.Components.Pages.Transaction.WellnessPrograms
             //    await QuillHtml.LoadHTMLContent(WellnessProgram.Content);
             //    StateHasChanged();
             //}
-
 
             //await GetUserInfo();
             //StateHasChanged();

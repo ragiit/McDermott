@@ -8,7 +8,7 @@
         {
             public List<Expression<Func<InsurancePolicy, object>>> Includes { get; set; }
             public Expression<Func<InsurancePolicy, bool>> Predicate { get; set; }
-            public Expression<Func<InsurancePolicy, InsurancePolicy>> Select { get; set; }
+            public Expression<Func<InsurancePolicy, InsurancePolicy>>? Select { get; set; }
 
             public List<(Expression<Func<InsurancePolicy, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 

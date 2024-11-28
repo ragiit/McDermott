@@ -1,5 +1,5 @@
 ﻿using DevExpress.Data.Access;
-using DocumentFormat.OpenXml.Bibliography;
+using DevExpress.Office.Services.Implementation;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using GreenDonut;
@@ -164,7 +164,15 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             if (Id.HasValue)
                 await LoadComboBoxEdit();
-
+            else
+            {
+                await LoadCountry();
+                await LoadOccupational();
+                await LoadUser();
+                await LoadJobPosition();
+                await LoadDepartment();
+            }
+            await LoadService();
             PanelVisible = false;
             return;
         }
@@ -175,23 +183,11 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             #region KTP Address
 
-            Countries = (await Mediator.Send(new GetCountryQuery
-            {
-                Predicate = x => x.Id == UserForm.IdCardCountryId,
-            })).Item1;
-            Provinces = (await Mediator.Send(new GetProvinceQuery
-            {
-                Predicate = x => x.Id == UserForm.IdCardProvinceId,
-            })).Item1;
-            Cities = (await Mediator.Send(new GetCityQuery
-            {
-                Predicate = x => x.Id == UserForm.IdCardCityId,
-            })).Item1;
-            Districts = (await Mediator.Send(new GetDistrictQuery
-            {
-                Predicate = x => x.Id == UserForm.IdCardDistrictId,
-            })).Item1;
-            Villages = (await Mediator.QueryGetHelper<Village, VillageDto>(predicate: x => x.Id == UserForm.IdCardVillageId)).Item1;
+            await LoadCountry(predicate: UserForm.IdCardCountryId is null ? null : x => x.Id == UserForm.IdCardCountryId);
+            await LoadProvince(predicate: UserForm.IdCardProvinceId is null ? null : x => x.Id == UserForm.IdCardProvinceId);
+            await LoadCity(predicate: UserForm.IdCardCityId is null ? null : x => x.Id == UserForm.IdCardCityId);
+            await LoadDistrict(predicate: UserForm.IdCardDistrictId is null ? null : x => x.Id == UserForm.IdCardDistrictId);
+            await LoadVillage(predicate: UserForm.IdCardVillageId is null ? null : x => x.Id == UserForm.IdCardVillageId);
 
             #endregion KTP Address
 
@@ -221,56 +217,12 @@ namespace McDermott.Web.Components.Pages.Config.Users
             {
                 Predicate = x => x.Id == UserForm.GroupId
             })).Item1;
-            Supervisors = (await Mediator.Send(new GetUserQuery2(x => x.Id == UserForm.SupervisorId,
-            select: x => new User
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Email = x.Email
-            }))).Item1;
 
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery(x => x.Id == UserForm.JobPositionId,
-            includes:
-            [
-                x => x.Department
-            ],
-            select: x => new JobPosition
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Department = new Domain.Entities.Department
-                {
-                    Name = x.Department.Name
-                },
-            }))).Item1;
+            await LoadUser(predicate: UserForm.SupervisorId is null ? null : x => x.Id == UserForm.SupervisorId);
+            await LoadJobPosition(predicate: UserForm.SupervisorId is null ? null : x => x.Id == UserForm.JobPositionId);
+            await LoadDepartment(predicate: UserForm.SupervisorId is null ? null : x => x.Id == UserForm.DepartmentId);
+            await LoadOccupational(predicate: UserForm.OccupationalId is null ? null : x => x.Id == UserForm.OccupationalId);
 
-            Departments = (await Mediator.Send(new GetDepartmentQuery(x => x.Id == UserForm.DepartmentId,
-            includes:
-            [
-                x => x.Manager,
-                x => x.ParentDepartment,
-                x => x.Company,
-            ],
-            select: x => new Department
-            {
-                Id = x.Id,
-                Name = x.Name,
-                ParentDepartment = new Domain.Entities.Department
-                {
-                    Name = x.ParentDepartment.Name
-                },
-                Company = new Domain.Entities.Company
-                {
-                    Name = x.Company.Name
-                },
-                Manager = new Domain.Entities.User
-                {
-                    Name = x.Manager.Name
-                },
-                DepartmentCategory = x.DepartmentCategory
-            }))).Item1;
-
-            Occupationals = (await Mediator.QueryGetHelper<Occupational, OccupationalDto>(predicate: x => x.Id == UserForm.OccupationalId)).Item1;
             Specialities = (await Mediator.QueryGetHelper<Speciality, SpecialityDto>(predicate: x => x.Id == UserForm.SpecialityId)).Item1;
 
             Services = (await Mediator.Send(new GetServiceQuery
@@ -1115,33 +1067,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
             //}
         }
 
-        private async Task LoadComboBox(int pageIndex = 0, int pageSize = 10)
-        {
-            #region KTP Address
-
-            await LoadDataCountry();
-            await LoadDataProvince();
-            await LoadDataCity();
-            await LoadDataDistrict();
-            await LoadDataVillage();
-
-            #endregion KTP Address
-
-            await LoadDataCountryResidence();
-            await LoadDataProvinceResidence();
-            await LoadDataCityResidence();
-            await LoadDataDistrictResidence();
-            await LoadDataVillageResidence();
-
-            await LoadDataGroup();
-            await LoadDataOccupational();
-            await LoadDataSpeciality();
-            await LoadDataService();
-            await LoadDataSupervisor();
-            await LoadDataJobPosition();
-            await LoadDataDepartment();
-        }
-
         #region ComboboxGroup
 
         private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
@@ -1193,63 +1118,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxGroup
-
-        #region ComboboxOccupational
-
-        private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
-        private int OccupationalComboBoxIndex { get; set; } = 0;
-        private int totalCountOccupational = 0;
-
-        private async Task OnSearchOccupational()
-        {
-            await LoadDataOccupational(0, 10);
-        }
-
-        private async Task OnSearchOccupationalIndexIncrement()
-        {
-            if (OccupationalComboBoxIndex < (totalCountOccupational - 1))
-            {
-                OccupationalComboBoxIndex++;
-                await LoadDataOccupational(OccupationalComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchOccupationalndexDecrement()
-        {
-            if (OccupationalComboBoxIndex > 0)
-            {
-                OccupationalComboBoxIndex--;
-                await LoadDataOccupational(OccupationalComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputOccupationalChanged(string e)
-        {
-            OccupationalComboBoxIndex = 0;
-            await LoadDataOccupational(0, 10);
-        }
-
-        private async Task LoadDataOccupational(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetOccupationalQuery(
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                searchTerm: refOccupationalComboBox?.Text ?? "",
-                select: x => new Occupational
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Description = x.Description
-                }
-
-            )); Occupationals = result.Item1;
-            totalCountOccupational = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxOccupational
 
         #region ComboboxSpeciality
 
@@ -1373,254 +1241,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
         #endregion ComboboxService
 
-        #region ComboboxSupervisor
-
-        private DxComboBox<UserDto, long?> refSupervisorComboBox { get; set; }
-        private int SupervisorComboBoxIndex { get; set; } = 0;
-        private int totalCountSupervisor = 0;
-
-        private async Task OnSearchSupervisor()
-        {
-            await LoadDataSupervisor();
-        }
-
-        private async Task OnSearchSupervisorIndexIncrement()
-        {
-            if (SupervisorComboBoxIndex < (totalCountSupervisor - 1))
-            {
-                SupervisorComboBoxIndex++;
-                await LoadDataSupervisor(SupervisorComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchSupervisorndexDecrement()
-        {
-            if (SupervisorComboBoxIndex > 0)
-            {
-                SupervisorComboBoxIndex--;
-                await LoadDataSupervisor(SupervisorComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputSupervisorChanged(string e)
-        {
-            SupervisorComboBoxIndex = 0;
-            await LoadDataSupervisor();
-        }
-
-        private List<UserDto> Supervisors = [];
-
-        private async Task LoadDataSupervisor(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetUserQuery2(
-                 predicate: x => x.IsEmployee == true,
-                 pageIndex: pageIndex,
-                 pageSize: pageSize,
-                 searchTerm: refSupervisorComboBox?.Text ?? "",
-                 select: x => new User
-                 {
-                     Id = x.Id,
-                     Name = x.Name,
-                     Email = x.Email
-                 }
-
-            ));
-            Supervisors = result.Item1;
-            totalCountSupervisor = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxSupervisor
-
-        #region ComboboxJobPosition
-
-        private DxComboBox<JobPositionDto, long?> refJobPositionComboBox { get; set; }
-        private int JobPositionComboBoxIndex { get; set; } = 0;
-        private int totalCountJobPosition = 0;
-
-        private async Task OnSearchJobPosition()
-        {
-            await LoadDataJobPosition();
-        }
-
-        private async Task OnSearchJobPositionIndexIncrement()
-        {
-            if (JobPositionComboBoxIndex < (totalCountJobPosition - 1))
-            {
-                JobPositionComboBoxIndex++;
-                await LoadDataJobPosition(JobPositionComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchJobPositionndexDecrement()
-        {
-            if (JobPositionComboBoxIndex > 0)
-            {
-                JobPositionComboBoxIndex--;
-                await LoadDataJobPosition(JobPositionComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputJobPositionChanged(string e)
-        {
-            JobPositionComboBoxIndex = 0;
-            await LoadDataJobPosition();
-        }
-
-        private async Task LoadDataJobPosition(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetJobPositionQuery(
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                searchTerm: refJobPositionComboBox?.Text ?? "",
-                includes:
-                [
-                    x => x.Department
-                ],
-                select: x => new JobPosition
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Department = new Domain.Entities.Department
-                    {
-                        Name = x.Department.Name
-                    },
-                }
-
-            ));
-            JobPositions = result.Item1;
-            totalCountJobPosition = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxJobPosition
-
-        #region ComboboxDepartment
-
-        private DxComboBox<DepartmentDto, long?> refDepartmentComboBox { get; set; }
-        private int DepartmentComboBoxIndex { get; set; } = 0;
-        private int totalCountDepartment = 0;
-
-        private async Task OnSearchDepartment()
-        {
-            await LoadDataDepartment();
-        }
-
-        private async Task OnSearchDepartmentIndexIncrement()
-        {
-            if (DepartmentComboBoxIndex < (totalCountDepartment - 1))
-            {
-                DepartmentComboBoxIndex++;
-                await LoadDataDepartment(DepartmentComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchDepartmentndexDecrement()
-        {
-            if (DepartmentComboBoxIndex > 0)
-            {
-                DepartmentComboBoxIndex--;
-                await LoadDataDepartment(DepartmentComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputDepartmentChanged(string e)
-        {
-            DepartmentComboBoxIndex = 0;
-            await LoadDataDepartment();
-        }
-
-        private async Task LoadDataDepartment(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetDepartmentQuery(
-                pageIndex: pageIndex,
-                pageSize: pageSize,
-                searchTerm: refDepartmentComboBox?.Text ?? "",
-                includes:
-                [
-                    x => x.Manager,
-                    x => x.ParentDepartment,
-                    x => x.Company,
-                ],
-                select: x => new Department
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    ParentDepartment = new Domain.Entities.Department
-                    {
-                        Name = x.ParentDepartment.Name
-                    },
-                    Company = new Domain.Entities.Company
-                    {
-                        Name = x.Company.Name
-                    },
-                    Manager = new Domain.Entities.User
-                    {
-                        Name = x.Manager.Name
-                    },
-                    DepartmentCategory = x.DepartmentCategory
-                }
-            ));
-            Departments = result.Item1;
-            totalCountDepartment = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxDepartment
-
         #region Ktp Address
-
-        #region ComboboxVillage
-
-        private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
-        private int VillageComboBoxIndex { get; set; } = 0;
-        private int totalCountVillage = 0;
-
-        private async Task OnSearchVillage()
-        {
-            await LoadDataVillage(0, 10);
-        }
-
-        private async Task OnSearchVillageIndexIncrement()
-        {
-            if (VillageComboBoxIndex < (totalCountVillage - 1))
-            {
-                VillageComboBoxIndex++;
-                await LoadDataVillage(VillageComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchVillageIndexDecrement()
-        {
-            if (VillageComboBoxIndex > 0)
-            {
-                VillageComboBoxIndex--;
-                await LoadDataVillage(VillageComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputVillageChanged(string e)
-        {
-            VillageComboBoxIndex = 0;
-            await LoadDataVillage(0, 10);
-        }
-
-        private async Task LoadDataVillage(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var districtId = refDistrictComboBox?.Value.GetValueOrDefault();
-            var id = refVillageComboBox?.Value ?? null;
-            var result = await Mediator.QueryGetHelper<Village, VillageDto>(pageIndex, pageSize, refVillageComboBox?.Text ?? "", x => x.DistrictId == districtId);
-            Villages = result.Item1;
-            totalCountVillage = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxVillage
 
         #region ComboboxCountry
 
@@ -1681,177 +1302,6 @@ namespace McDermott.Web.Components.Pages.Config.Users
         }
 
         #endregion ComboboxCountry
-
-        #region ComboboxCity
-
-        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
-        private int CityComboBoxIndex { get; set; } = 0;
-        private int totalCountCity = 0;
-
-        private async Task OnSearchCity()
-        {
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task OnSearchCityIndexIncrement()
-        {
-            if (CityComboBoxIndex < (totalCountCity - 1))
-            {
-                CityComboBoxIndex++;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchCityIndexDecrement()
-        {
-            if (CityComboBoxIndex > 0)
-            {
-                CityComboBoxIndex--;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputCityChanged(string e)
-        {
-            CityComboBoxIndex = 0;
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var provinceId = refProvinceComboBox?.Value.GetValueOrDefault();
-            UserForm.IdCardDistrictId = null;
-            UserForm.IdCardVillageId = null;
-            var id = refCityComboBox?.Value ?? null;
-            var result = await Mediator.Send(new GetCityQuery
-            {
-                Predicate = x => x.ProvinceId == provinceId,
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refCityComboBox?.Text ?? ""
-            });
-            Cities = result.Item1;
-            totalCountCity = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCity
-
-        #region ComboboxProvince
-
-        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
-        private int ProvinceComboBoxIndex { get; set; } = 0;
-        private int totalCountProvince = 0;
-
-        private async Task OnSearchProvince()
-        {
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task OnSearchProvinceIndexIncrement()
-        {
-            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
-            {
-                ProvinceComboBoxIndex++;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchProvinceIndexDecrement()
-        {
-            if (ProvinceComboBoxIndex > 0)
-            {
-                ProvinceComboBoxIndex--;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputProvinceChanged(string e)
-        {
-            ProvinceComboBoxIndex = 0;
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var countryId = refCountryComboBox?.Value.GetValueOrDefault();
-            UserForm.IdCardCityId = null;
-            UserForm.IdCardDistrictId = null;
-            UserForm.IdCardVillageId = null;
-
-            var result = await Mediator.Send(new GetProvinceQuery
-            {
-                Predicate = x => x.CountryId == countryId,
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refProvinceComboBox?.Text ?? ""
-            });
-            Provinces = result.Item1;
-            totalCountProvince = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxProvince
-
-        #region ComboboxDistrict
-
-        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
-        private int DistrictComboBoxIndex { get; set; } = 0;
-        private int totalCountDistrict = 0;
-
-        private async Task OnSearchDistrict()
-        {
-            await LoadDataDistrict(0, 10);
-        }
-
-        private async Task OnSearchDistrictIndexIncrement()
-        {
-            if (DistrictComboBoxIndex < (totalCountDistrict - 1))
-            {
-                DistrictComboBoxIndex++;
-                await LoadDataDistrict(DistrictComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchDistrictndexDecrement()
-        {
-            if (DistrictComboBoxIndex > 0)
-            {
-                DistrictComboBoxIndex--;
-                await LoadDataDistrict(DistrictComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputDistrictChanged(string e)
-        {
-            DistrictComboBoxIndex = 0;
-            await LoadDataDistrict(0, 10);
-        }
-
-        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var cityId = refCityComboBox?.Value.GetValueOrDefault();
-            UserForm.IdCardVillageId = null;
-            var id = refDistrictComboBox?.Value ?? null;
-            var result = await Mediator.Send(new GetDistrictQuery
-            {
-                Predicate = x => x.CityId == cityId,
-                SearchTerm = refDistrictComboBox?.Text ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-            });
-            Districts = result.Item1;
-            totalCountDistrict = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxDistrict
 
         #endregion Ktp Address
 
@@ -2119,5 +1569,520 @@ namespace McDermott.Web.Components.Pages.Config.Users
         #endregion ComboboxDistrictResidence
 
         #endregion Residence Address
+
+        #region ComboBox
+
+        #region KTP Address
+
+        #region ComboBox Country
+
+        private async Task SelectedItemChanged(CountryDto e)
+        {
+            if (e is null)
+            {
+                UserForm.IdCardCountryId = null;
+                Provinces = [];
+                Cities = [];
+                Districts = [];
+                Villages = [];
+                await LoadCountry();
+            }
+            else
+            {
+                UserForm.IdCardCountryId = e.Id;
+                await LoadProvince();
+            }
+        }
+
+        private CancellationTokenSource? _ctsCountry;
+
+        private async Task OnInputCountry(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsCountry?.Cancel();
+                _ctsCountry?.Dispose();
+                _ctsCountry = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsCountry.Token);
+
+                await LoadCountry(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsCountry?.Dispose();
+                _ctsCountry = null;
+            }
+        }
+
+        private async Task LoadCountry(string? e = "", Expression<Func<Country, bool>>? predicate = null)
+        {
+            try
+            {
+                Countries = await Mediator.QueryGetComboBox<Country, CountryDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Country
+
+        #region ComboBox Province
+
+        private async Task SelectedItemChanged(ProvinceDto e)
+        {
+            if (e is null)
+            {
+                UserForm.IdCardProvinceId = new();
+                Cities = [];
+                Districts = [];
+                Villages = [];
+                await LoadProvince();
+            }
+            else
+            {
+                UserForm.IdCardProvinceId = e.Id;
+                await LoadCity();
+            }
+        }
+
+        private CancellationTokenSource? _cts;
+
+        private async Task OnInputProvince(ChangeEventArgs e)
+        {
+            try
+            {
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadProvince(e.Value?.ToString() ?? "", x => x.CountryId == UserForm.IdCardCountryId);
+            }
+            finally
+            {
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadProvince(string? e = "", Expression<Func<Province, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.CountryId == UserForm.IdCardCountryId;
+
+                Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Province
+
+        #region ComboBox City
+
+        private async Task SelectedItemChanged(CityDto e)
+        {
+            if (e is null)
+            {
+                UserForm.IdCardCityId = new();
+                Districts = [];
+                Villages = [];
+                await LoadCity();
+            }
+            else
+            {
+                UserForm.IdCardCityId = e.Id;
+                await LoadDistrict();
+            }
+        }
+
+        private CancellationTokenSource? _ctsCity;
+
+        private async Task OnInputCity(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsCity?.Cancel();
+                _ctsCity?.Dispose();
+                _ctsCity = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsCity.Token);
+
+                await LoadCity(e.Value?.ToString() ?? "", x => x.ProvinceId == UserForm.IdCardProvinceId);
+            }
+            finally
+            {
+                _ctsCity?.Dispose();
+                _ctsCity = null;
+            }
+        }
+
+        private async Task LoadCity(string? e = "", Expression<Func<City, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.ProvinceId == UserForm.IdCardProvinceId;
+
+                Cities = await Mediator.QueryGetComboBox<City, CityDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox City
+
+        #region ComboBox District
+
+        private async Task SelectedItemChanged(DistrictDto e)
+        {
+            if (e is null)
+            {
+                UserForm.IdCardDistrictId = new();
+                Villages = [];
+                await LoadDistrict();
+            }
+            else
+            {
+                UserForm.IdCardDistrictId = e.Id;
+                await LoadVillage();
+            }
+        }
+
+        private CancellationTokenSource? _ctsDistrict;
+
+        private async Task OnInputDistrict(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsDistrict?.Cancel();
+                _ctsDistrict?.Dispose();
+                _ctsDistrict = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsDistrict.Token);
+
+                await LoadDistrict(e.Value?.ToString() ?? "", x => x.CityId == UserForm.IdCardCityId);
+            }
+            finally
+            {
+                _ctsDistrict?.Dispose();
+                _ctsDistrict = null;
+            }
+        }
+
+        private async Task LoadDistrict(string? e = "", Expression<Func<District, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.CityId == UserForm.IdCardCityId;
+                Districts = await Mediator.QueryGetComboBox<District, DistrictDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox District
+
+        #region ComboBox Village
+
+        private VillageDto SelectedVillage { get; set; } = new();
+
+        private async Task SelectedItemChanged(VillageDto e)
+        {
+            if (e is null)
+            {
+                SelectedVillage = new();
+                await LoadVillage();
+            }
+            else
+                SelectedVillage = e;
+        }
+
+        private CancellationTokenSource? _ctsVillage;
+
+        private async Task OnInputVillage(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsVillage?.Cancel();
+                _ctsVillage?.Dispose();
+                _ctsVillage = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsVillage.Token);
+
+                await LoadVillage(e.Value?.ToString() ?? "", x => x.DistrictId == UserForm.IdCardDistrictId);
+            }
+            finally
+            {
+                _ctsVillage?.Dispose();
+                _ctsVillage = null;
+            }
+        }
+
+        private async Task LoadVillage(string? e = "", Expression<Func<Village, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.DistrictId == UserForm.IdCardDistrictId;
+
+                Villages = await Mediator.QueryGetComboBox<Village, VillageDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Village
+
+        #endregion KTP Address
+
+        #region ComboBox User
+
+        private async Task SelectedItemChanged(UserDto e)
+        {
+            if (e is null)
+            {
+                await LoadUser();
+            }
+        }
+
+        private CancellationTokenSource? _ctsUser;
+
+        private async Task OnInputUser(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsUser?.Cancel();
+                _ctsUser?.Dispose();
+                _ctsUser = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsUser.Token);
+
+                await LoadUser(e.Value?.ToString() ?? "", x => x.IsEmployee == true);
+            }
+            finally
+            {
+                _ctsUser?.Dispose();
+                _ctsUser = null;
+            }
+        }
+
+        private async Task LoadUser(string? e = "", Expression<Func<User, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.IsEmployee == true;
+                Users = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox User
+
+        #region ComboBox JobPosition
+
+        private async Task SelectedItemChanged(JobPositionDto e)
+        {
+            if (e is null)
+            {
+                await LoadJobPosition();
+            }
+        }
+
+        private CancellationTokenSource? _ctsJobPosition;
+
+        private async Task OnInputJobPosition(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsJobPosition?.Cancel();
+                _ctsJobPosition?.Dispose();
+                _ctsJobPosition = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsJobPosition.Token);
+
+                await LoadJobPosition(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsJobPosition?.Dispose();
+                _ctsJobPosition = null;
+            }
+        }
+
+        private async Task LoadJobPosition(string? e = "", Expression<Func<JobPosition, bool>>? predicate = null)
+        {
+            try
+            {
+                JobPositions = await Mediator.QueryGetComboBox<JobPosition, JobPositionDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox JobPosition
+
+        #region ComboBox Department
+
+        private async Task SelectedItemChanged(DepartmentDto e)
+        {
+            if (e is null)
+            {
+                await LoadDepartment();
+            }
+        }
+
+        private CancellationTokenSource? _ctsDepartment;
+
+        private async Task OnInputDepartment(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsDepartment?.Cancel();
+                _ctsDepartment?.Dispose();
+                _ctsDepartment = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsDepartment.Token);
+
+                await LoadDepartment(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsDepartment?.Dispose();
+                _ctsDepartment = null;
+            }
+        }
+
+        private async Task LoadDepartment(string? e = "", Expression<Func<Department, bool>>? predicate = null)
+        {
+            try
+            {
+                Departments = await Mediator.QueryGetComboBox<Department, DepartmentDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Department
+
+        #region ComboBox Occupational
+
+        private async Task SelectedItemChanged(OccupationalDto e)
+        {
+            if (e is null)
+            {
+                await LoadOccupational();
+            }
+        }
+
+        private CancellationTokenSource? _ctsOccupational;
+
+        private async Task OnInputOccupational(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsOccupational?.Cancel();
+                _ctsOccupational?.Dispose();
+                _ctsOccupational = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsOccupational.Token);
+
+                await LoadOccupational(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsOccupational?.Dispose();
+                _ctsOccupational = null;
+            }
+        }
+
+        private async Task LoadOccupational(string? e = "", Expression<Func<Occupational, bool>>? predicate = null)
+        {
+            try
+            {
+                Occupationals = await Mediator.QueryGetComboBox<Occupational, OccupationalDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Occupational
+
+        #endregion ComboBox
+
+        #region ComboBox Service
+
+        private async Task SelectedItemChanged(ServiceDto e)
+        {
+            if (e is null)
+            {
+                await LoadService();
+            }
+        }
+
+        private CancellationTokenSource? _ctsService;
+
+        private async Task OnInputService(ChangeEventArgs e)
+        {
+            try
+            {
+                _ctsService?.Cancel();
+                _ctsService?.Dispose();
+                _ctsService = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsService.Token);
+
+                await LoadService(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsService?.Dispose();
+                _ctsService = null;
+            }
+        }
+
+        private async Task LoadService(string? e = "", Expression<Func<Service, bool>>? predicate = null)
+        {
+            try
+            {
+                Services = await Mediator.QueryGetComboBox<Service, ServiceDto>(e, predicate);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Service
     }
 }

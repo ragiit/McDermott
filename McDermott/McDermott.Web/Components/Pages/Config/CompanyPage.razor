@@ -14,31 +14,31 @@
                     <div class="col">
                         <div class="card">
                             <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
+                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                            IsContentBlocked="true"
+                            ApplyBackgroundShading="true"
+                            IndicatorAreaVisible="false"
+                            Text="Fetching Data...">
                                 <MyGridPaginate @ref="Grid"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                EditModelSaving="OnSave"
-                                                DataItemDeleting="OnDelete"
-                                                KeyFieldName="Id"
-                                                Data="Companys">
+                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                @bind-SelectedDataItems="@SelectedDataItems"
+                                EditModelSaving="OnSave"
+                                DataItemDeleting="OnDelete"
+                                KeyFieldName="Id"
+                                Data="Companys">
                                     <ToolbarTemplate>
                                         <MyDxToolbarBase TItem="CompanyDto"
-                                                         Items="@Companys"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="(async () => await LoadData())"
-                                                         Grid="Grid"
-                                                         IsImport="false"
-                                                         VisibleNew="UserAccessCRUID.IsCreate"
-                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                        Items="@Companys"
+                                        SelectedDataItems="@SelectedDataItems"
+                                        NewItem_Click="@NewItem_Click"
+                                        EditItem_Click="@EditItem_Click"
+                                        DeleteItem_Click="@DeleteItem_Click"
+                                        Refresh_Click="(async () => await LoadData())"
+                                        Grid="Grid"
+                                        IsImport="false"
+                                        VisibleNew="UserAccessCRUID.IsCreate"
+                                        VisibleEdit="UserAccessCRUID.IsUpdate"
+                                        VisibleDelete="UserAccessCRUID.IsDelete" />
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
@@ -51,12 +51,24 @@
                                     </Columns>
                                     <TotalSummary>
                                         <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                           FieldName="Name"
-                                                           Visible="true" />
+                                        FieldName="Name"
+                                        Visible="true" />
                                     </TotalSummary>
                                     <EditFormTemplate Context="EditFormContext">
                                         @{
                                             var a = (CompanyDto)EditFormContext.EditModel;
+
+                                            if (a.CountryId is null)
+                                            {
+                                                Provinces = [];
+                                                a.ProvinceId = null;
+                                            }
+
+                                            if (a.ProvinceId is null)
+                                            {
+                                                Cities = [];  
+                                                a.CityId = null; 
+                                            } 
                                         }
                                         <DxFormLayout CssClass="mt">
                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" caption="Name" ColSpanMd="12">
@@ -101,90 +113,53 @@
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="2" Column="0" CssClass="mt">
                                                                 <Template>
-                                                                    <MyDxComboBox Data="@Countries"
-                                                                                  Context="Ctxz"
-                                                                                  NullText="Select Country..."
-                                                                                  @ref="refCountryComboBox"
-                                                                                  @bind-Value="@a.CountryId"
+                                                                    <MyDxComboBox Data="Countries"
+                                                                                  NullText="Select Country"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
-                                                                                  TextChanged="((string e) => OnInputCountryChanged(e))">
-                                                                        <Buttons>
-                                                                            <DxEditorButton Click="OnSearchCountryIndexDecrement"
-                                                                                            IconCssClass="fa-solid fa-caret-left"
-                                                                                            Tooltip="Previous Index" />
-                                                                            <DxEditorButton Click="OnSearchCountry"
-                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                            Tooltip="Search" />
-                                                                            <DxEditorButton Click="OnSearchCountryIndexIncrement"
-                                                                                            IconCssClass="fa-solid fa-caret-right"
-                                                                                            Tooltip="Next Index" />
-                                                                        </Buttons>
+                                                                                  @oninput="OnInputCountry"
+                                                                                  SelectedItemChanged="((CountryDto e) => SelectedItemChanged(e))"
+                                                                                  @bind-Value="a.CountryId">
                                                                         <Columns>
                                                                             <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
                                                                             <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
                                                                         </Columns>
                                                                     </MyDxComboBox>
-                                                                    <ValidationMessage For="@(() => a.CountryId)" />
+                                                                    <ValidationMessage For="@(()=>a.CountryId)" />
                                                                 </Template>
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="2" Column="1" CssClass="mt ml">
-                                                                <Template>
-
-                                                                    <MyDxComboBox Data="@Provinces" Context="Ctxz1"
-                                                                                  NullText="Select Province..."
-                                                                                  @ref="refProvinceComboBox"
-                                                                                  @bind-Value="@a.ProvinceId"
+                                                                <Template> 
+                                                                    <MyDxComboBox Data="Provinces"
+                                                                                  NullText="Select Province"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
-                                                                                  TextChanged="((string e) => OnInputProvinceChanged(e))">
-                                                                        <Buttons>
-                                                                            <DxEditorButton Click="OnSearchProvinceIndexDecrement"
-                                                                                            IconCssClass="fa-solid fa-caret-left"
-                                                                                            Tooltip="Previous Index" />
-                                                                            <DxEditorButton Click="OnSearchProvince"
-                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                            Tooltip="Search" />
-                                                                            <DxEditorButton Click="OnSearchProvinceIndexIncrement"
-                                                                                            IconCssClass="fa-solid fa-caret-right"
-                                                                                            Tooltip="Next Index" />
-                                                                        </Buttons>
+                                                                                  @oninput="OnInputProvince"
+                                                                                  SelectedItemChanged="((ProvinceDto e) => SelectedItemChanged(e))"
+                                                                                  @bind-Value="a.ProvinceId">
                                                                         <Columns>
                                                                             <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
-                                                                            <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
-                                                                            <DxListEditorColumn FieldName="@nameof(ProvinceDto.Code)" Caption="Code" />
+                                                                            <DxListEditorColumn FieldName="Country.Name" Caption="Country" /> 
                                                                         </Columns>
                                                                     </MyDxComboBox>
-                                                                    <ValidationMessage For="@(() => a.ProvinceId)" />
-
+                                                                    <ValidationMessage For="@(()=>a.ProvinceId)" /> 
                                                                 </Template>
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="3" Column="0" CssClass="mt">
                                                                 <Template>
-                                                                    <MyDxComboBox Data="@Cities" Context="Ctxz2"
-                                                                                  NullText="Select City..."
-                                                                                  @ref="refCityComboBox"
-                                                                                  @bind-Value="@a.CityId"
+                                                                    <MyDxComboBox Data="Cities"
+                                                                                  NullText="Select City"
                                                                                   TextFieldName="Name"
                                                                                   ValueFieldName="Id"
-                                                                                  TextChanged="((string e) => OnInputCityChanged(e))">
-                                                                        <Buttons>
-                                                                            <DxEditorButton Click="OnSearchCityIndexDecrement"
-                                                                                            IconCssClass="fa-solid fa-caret-left"
-                                                                                            Tooltip="Previous Index" />
-                                                                            <DxEditorButton Click="OnSearchCity"
-                                                                                            IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                            Tooltip="Search" />
-                                                                            <DxEditorButton Click="OnSearchCityIndexIncrement"
-                                                                                            IconCssClass="fa-solid fa-caret-right"
-                                                                                            Tooltip="Next Index" />
-                                                                        </Buttons>
+                                                                                  @oninput="OnInputCity"
+                                                                                  SelectedItemChanged="((CityDto e) => SelectedItemChanged(e))"
+                                                                                  @bind-Value="a.CityId">
                                                                         <Columns>
                                                                             <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
                                                                             <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
                                                                         </Columns>
                                                                     </MyDxComboBox>
-                                                                    <ValidationMessage For="@(() => a.CityId)" />
+                                                                    <ValidationMessage For="@(()=>a.CityId)" />
                                                                 </Template>
                                                             </DxGridLayoutItem>
                                                             <DxGridLayoutItem Row="3" Column="1" CssClass="ml">

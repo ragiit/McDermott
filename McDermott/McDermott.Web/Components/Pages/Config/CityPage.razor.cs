@@ -8,7 +8,6 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class CityPage
     {
-
         private DxUpload MyUpload { get; set; }
 
         private List<CityDto> Cities = [];
@@ -354,8 +353,10 @@ namespace McDermott.Web.Components.Pages.Config
         #endregion Default Grid Components
 
         #region ComboBox Province
+
         private ProvinceDto SelectedProvince { get; set; } = new();
-        async Task SelectedItemChanged(ProvinceDto e)
+
+        private async Task SelectedItemChanged(ProvinceDto e)
         {
             if (e is null)
             {
@@ -365,13 +366,13 @@ namespace McDermott.Web.Components.Pages.Config
             else
                 SelectedProvince = e;
         }
+
         private CancellationTokenSource? _cts;
+
         private async Task OnInputProvince(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-
                 _cts?.Cancel();
                 _cts?.Dispose();
                 _cts = new CancellationTokenSource();
@@ -382,9 +383,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
             finally
             {
-                PanelVisible = false;
-
-                // Untuk menghindari kebocoran memori (memory leaks).
                 _cts?.Dispose();
                 _cts = null;
             }
@@ -394,9 +392,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                PanelVisible = true;
                 Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -405,6 +401,6 @@ namespace McDermott.Web.Components.Pages.Config
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Province
     }
 }

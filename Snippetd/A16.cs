@@ -1,16 +1,16 @@
-Uom
+ProductCategory
 
-public class UomCommand
+public class ProductCategoryCommand
  {
      #region GET
 
-    public class GetSingleUomQuery : IRequest<UomDto>
+    public class GetSingleProductCategoryQuery : IRequest<ProductCategoryDto>
     {
-        public List<Expression<Func<Uom, object>>> Includes { get; set; }
-        public Expression<Func<Uom, bool>> Predicate { get; set; }
-        public Expression<Func<Uom, Uom>> Select { get; set; }
+        public List<Expression<Func<ProductCategory, object>>> Includes { get; set; }
+        public Expression<Func<ProductCategory, bool>> Predicate { get; set; }
+        public Expression<Func<ProductCategory, ProductCategory>> Select { get; set; }
 
-        public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<ProductCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -19,13 +19,13 @@ public class UomCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetUomQuery : IRequest<(List<UomDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetProductCategoryQuery : IRequest<(List<ProductCategoryDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<Uom, object>>> Includes { get; set; }
-        public Expression<Func<Uom, bool>> Predicate { get; set; }
-        public Expression<Func<Uom, Uom>> Select { get; set; }
+        public List<Expression<Func<ProductCategory, object>>> Includes { get; set; }
+        public Expression<Func<ProductCategory, bool>> Predicate { get; set; }
+        public Expression<Func<ProductCategory, ProductCategory>> Select { get; set; }
 
-        public List<(Expression<Func<Uom, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<ProductCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -34,49 +34,49 @@ public class UomCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateUom(Expression<Func<Uom, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateProductCategory(Expression<Func<ProductCategory, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<Uom, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateUomRequest(UomDto UomDto) : IRequest<UomDto>
+     public class CreateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>
      {
-         public UomDto UomDto { get; set; } = UomDto;
+         public ProductCategoryDto ProductCategoryDto { get; set; } = ProductCategoryDto;
      }
 
-     public class BulkValidateUom(List<UomDto> UomsToValidate) : IRequest<List<UomDto>>
+     public class BulkValidateProductCategory(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
      {
-         public List<UomDto> UomsToValidate { get; } = UomsToValidate;
+         public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
      }
 
-     public class CreateListUomRequest(List<UomDto> UomDtos) : IRequest<List<UomDto>>
+     public class CreateListProductCategoryRequest(List<ProductCategoryDto> ProductCategoryDtos) : IRequest<List<ProductCategoryDto>>
      {
-         public List<UomDto> UomDtos { get; set; } = UomDtos;
+         public List<ProductCategoryDto> ProductCategoryDtos { get; set; } = ProductCategoryDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateUomRequest(UomDto UomDto) : IRequest<UomDto>
+     public class UpdateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>
      {
-         public UomDto UomDto { get; set; } = UomDto;
+         public ProductCategoryDto ProductCategoryDto { get; set; } = ProductCategoryDto;
      }
 
-     public class UpdateListUomRequest(List<UomDto> UomDtos) : IRequest<List<UomDto>>
+     public class UpdateListProductCategoryRequest(List<ProductCategoryDto> ProductCategoryDtos) : IRequest<List<ProductCategoryDto>>
      {
-         public List<UomDto> UomDtos { get; set; } = UomDtos;
+         public List<ProductCategoryDto> ProductCategoryDtos { get; set; } = ProductCategoryDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteUomRequest : IRequest<bool>
+     public class DeleteProductCategoryRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -85,54 +85,54 @@ public class UomCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
+IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
   
-IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleUomQuery, UomDto>,
-public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleUomQuery, UomDto>, 
-     IRequestHandler<ValidateUom, bool>,
-     IRequestHandler<CreateUomRequest, UomDto>,
-     IRequestHandler<BulkValidateUom, List<UomDto>>,
-     IRequestHandler<CreateListUomRequest, List<UomDto>>,
-     IRequestHandler<UpdateUomRequest, UomDto>,
-     IRequestHandler<UpdateListUomRequest, List<UomDto>>,
-     IRequestHandler<DeleteUomRequest, bool>
+IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
+public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>, 
+     IRequestHandler<ValidateProductCategory, bool>,
+     IRequestHandler<CreateProductCategoryRequest, ProductCategoryDto>,
+     IRequestHandler<BulkValidateProductCategory, List<ProductCategoryDto>>,
+     IRequestHandler<CreateListProductCategoryRequest, List<ProductCategoryDto>>,
+     IRequestHandler<UpdateProductCategoryRequest, ProductCategoryDto>,
+     IRequestHandler<UpdateListProductCategoryRequest, List<ProductCategoryDto>>,
+     IRequestHandler<DeleteProductCategoryRequest, bool>
 {
     #region GET
-    public async Task<List<UomDto>> Handle(BulkValidateUom request, CancellationToken cancellationToken)
+    public async Task<List<ProductCategoryDto>> Handle(BulkValidateProductCategory request, CancellationToken cancellationToken)
     {
-        var UomDtos = request.UomsToValidate;
+        var ProductCategoryDtos = request.ProductCategorysToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var UomNames = UomDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = UomDtos.Select(x => x.Code).Distinct().ToList();
+        //var ProductCategoryNames = ProductCategoryDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = ProductCategoryDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingUoms = await _unitOfWork.Repository<Uom>()
+        //var existingProductCategorys = await _unitOfWork.Repository<ProductCategory>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => UomNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => ProductCategoryNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingUoms.Adapt<List<UomDto>>();
+        //return existingProductCategorys.Adapt<List<ProductCategoryDto>>();
 
         return [];
     }
-    public async Task<bool> Handle(ValidateUom request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateProductCategory request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Uom>()
+        return await _unitOfWork.Repository<ProductCategory>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<UomDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetUomQuery request, CancellationToken cancellationToken)
+    public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductCategoryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Uom>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -148,8 +148,8 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Uom>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Uom>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<ProductCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<ProductCategory>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -166,7 +166,7 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.ProductCategory.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -174,7 +174,7 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Uom
+                query = query.Select(x => new ProductCategory
                 {
                     Id = x.Id, 
                 });
@@ -188,11 +188,11 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<UomDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<UomDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProductCategoryDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -202,11 +202,11 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         }
     }
  
-    public async Task<UomDto> Handle(GetSingleUomQuery request, CancellationToken cancellationToken)
+    public async Task<ProductCategoryDto> Handle(GetSingleProductCategoryQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<Uom>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -222,8 +222,8 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<Uom>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<Uom>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<ProductCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<ProductCategory>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -240,7 +240,7 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.Uom.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.ProductCategory.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -248,12 +248,12 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new Uom
+                query = query.Select(x => new ProductCategory
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<UomDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProductCategoryDto>();
         }
         catch (Exception ex)
         {
@@ -266,17 +266,17 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region CREATE
 
-     public async Task<UomDto> Handle(CreateUomRequest request, CancellationToken cancellationToken)
+     public async Task<ProductCategoryDto> Handle(CreateProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());
+             var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<UomDto>();
+             return result.Adapt<ProductCategoryDto>();
          }
          catch (Exception)
          {
@@ -284,16 +284,16 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<UomDto>> Handle(CreateListUomRequest request, CancellationToken cancellationToken)
+     public async Task<List<ProductCategoryDto>> Handle(CreateListProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDtos.Adapt<List<Uom>>());
+             var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDtos.Adapt<List<ProductCategory>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<UomDto>>();
+             return result.Adapt<List<ProductCategoryDto>>();
          }
          catch (Exception)
          {
@@ -305,17 +305,17 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region UPDATE
 
-     public async Task<UomDto> Handle(UpdateUomRequest request, CancellationToken cancellationToken)
+     public async Task<ProductCategoryDto> Handle(UpdateProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDto.Adapt<UomDto>().Adapt<Uom>());
+             var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDto.Adapt<ProductCategoryDto>().Adapt<ProductCategory>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<UomDto>();
+             return result.Adapt<ProductCategoryDto>();
          }
          catch (Exception)
          {
@@ -323,16 +323,16 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
          }
      }
 
-     public async Task<List<UomDto>> Handle(UpdateListUomRequest request, CancellationToken cancellationToken)
+     public async Task<List<ProductCategoryDto>> Handle(UpdateListProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDtos.Adapt<List<Uom>>());
+             var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDtos.Adapt<List<ProductCategory>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<UomDto>>();
+             return result.Adapt<List<ProductCategoryDto>>();
          }
          catch (Exception)
          {
@@ -344,23 +344,23 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteUomRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteProductCategoryRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<Uom>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<ProductCategory>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<Uom>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<ProductCategory>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetUomQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -374,20 +374,20 @@ public class UomHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
 }
 
  
-public class BulkValidateUomQuery(List<UomDto> UomsToValidate) : IRequest<List<UomDto>>
+public class BulkValidateProductCategoryQuery(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
 {
-    public List<UomDto> UomsToValidate { get; } = UomsToValidate;
+    public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
 }a
 
 
-IRequestHandler<BulkValidateUomQuery, List<UomDto>>,
+IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
   
-IRequestHandler<GetUomQuery, (List<UomDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleUomQuery, UomDto>,
+IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
 
 
 
- var a = await Mediator.Send(new GetUomsQuery
+ var a = await Mediator.Send(new GetProductCategorysQuery
  {
      OrderByList =
      [
@@ -399,10 +399,10 @@ IRequestHandler<GetSingleUomQuery, UomDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleUomQuery
+var patienss = (await Mediator.Send(new GetSingleProductCategoryQuery
 {
     Predicate = x => x.Id == data.PatientId,
-    Select = x => new Uom
+    Select = x => new ProductCategory
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -415,41 +415,41 @@ var patienss = (await Mediator.Send(new GetSingleUomQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetUomQuery
+    var result = await Mediator.Send(new GetProductCategoryQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    Uoms = result.Item1;
+    ProductCategorys = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastService);
+    ex.HandleException(ToastProductCategory);
 }
 finally
 { 
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetUomQuery
+ var result = await Mediator.Send(new GetProductCategoryQuery
  {
-     Predicate = x => x.UomId == UomId,
-     SearchTerm = refUomComboBox?.Text ?? "",
+     Predicate = x => x.ProductCategoryId == ProductCategoryId,
+     SearchTerm = refProductCategoryComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- Uoms = result.Item1;
- totalCountUom = result.PageCount;
+ ProductCategorys = result.Item1;
+ totalCountProductCategory = result.PageCount;
 
- Uoms = (await Mediator.Send(new GetUomQuery
+ ProductCategorys = (await Mediator.Send(new GetProductCategoryQuery
  {
-     Predicate = x => x.Id == UomForm.IdCardUomId,
+     Predicate = x => x.Id == ProductCategoryForm.IdCardProductCategoryId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleUomsQuery
+var data = (await Mediator.Send(new GetSingleProductCategorysQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -457,17 +457,17 @@ var data = (await Mediator.Send(new GetSingleUomsQuery
         x => x.Pratitioner,
         x => x.Patient
     ],
-    Select = x => new Uom
+    Select = x => new ProductCategory
     {
         Id = x.Id,
         PatientId = x.PatientId,
-        Patient = new Uom
+        Patient = new ProductCategory
         {
             DateOfBirth = x.Patient.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new Uom
+        Pratitioner = new ProductCategory
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -480,105 +480,105 @@ var data = (await Mediator.Send(new GetSingleUomsQuery
 })) ?? new();
 
 
-#region ComboboxUom
+#region ComboboxProductCategory
 
- private DxComboBox<UomDto, long?> refUomComboBox { get; set; }
- private int UomComboBoxIndex { get; set; } = 0;
- private int totalCountUom = 0;
+ private DxComboBox<ProductCategoryDto, long?> refProductCategoryComboBox { get; set; }
+ private int ProductCategoryComboBoxIndex { get; set; } = 0;
+ private int totalCountProductCategory = 0;
 
- private async Task OnSearchUom()
+ private async Task OnSearchProductCategory()
  {
-     await LoadDataUom();
+     await LoadDataProductCategory();
  }
 
- private async Task OnSearchUomIndexIncrement()
+ private async Task OnSearchProductCategoryIndexIncrement()
  {
-     if (UomComboBoxIndex < (totalCountUom - 1))
+     if (ProductCategoryComboBoxIndex < (totalCountProductCategory - 1))
      {
-         UomComboBoxIndex++;
-         await LoadDataUom(UomComboBoxIndex, 10);
+         ProductCategoryComboBoxIndex++;
+         await LoadDataProductCategory(ProductCategoryComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchUomIndexDecrement()
+ private async Task OnSearchProductCategoryIndexDecrement()
  {
-     if (UomComboBoxIndex > 0)
+     if (ProductCategoryComboBoxIndex > 0)
      {
-         UomComboBoxIndex--;
-         await LoadDataUom(UomComboBoxIndex, 10);
+         ProductCategoryComboBoxIndex--;
+         await LoadDataProductCategory(ProductCategoryComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputUomChanged(string e)
+ private async Task OnInputProductCategoryChanged(string e)
  {
-     UomComboBoxIndex = 0;
-     await LoadDataUom();
+     ProductCategoryComboBoxIndex = 0;
+     await LoadDataProductCategory();
  }
 
  
-  private async Task LoadDataUom(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataProductCategory(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetUomQuery
+          var result = await Mediator.Send(new GetProductCategoryQuery
           {
-              SearchTerm = refUomComboBox?.Text ?? "",
+              SearchTerm = refProductCategoryComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          Uoms = result.Item1;
-          totalCountUom = result.PageCount;
+          ProductCategorys = result.Item1;
+          totalCountProductCategory = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastService);
+          ex.HandleException(ToastProductCategory);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxUom
+ #endregion ComboboxProductCategory
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
-    <MyDxComboBox Data="@Uoms"
-                  NullText="Select Uom"
-                  @ref="refUomComboBox"
-                  @bind-Value="@a.UomId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
+    <MyDxComboBox Data="@ProductCategorys"
+                  NullText="Select ProductCategory"
+                  @ref="refProductCategoryComboBox"
+                  @bind-Value="@a.ProductCategoryId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputUomChanged(e))">
+                  TextChanged="((string e) => OnInputProductCategoryChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchUomIndexDecrement"
+            <DxEditorButton Click="OnSearchProductCategoryIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchUom"
+            <DxEditorButton Click="OnSearchProductCategory"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchUomIndexIncrement"
+            <DxEditorButton Click="OnSearchProductCategoryIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(UomDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="Uom.Name" Caption="Uom" />
-            <DxListEditorColumn FieldName="@nameof(UomDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategoryDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="ProductCategory.Name" Caption="ProductCategory" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategoryDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.UomId)" />
+    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());
-var result = await _unitOfWork.Repository<Uom>().AddAsync(request.UomDtos.Adapt<List<CreateUpdateUomDto>>().Adapt<List<Uom>>()); 
+var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());
+var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDtos.Adapt<List<CreateUpdateProductCategoryDto>>().Adapt<List<ProductCategory>>()); 
 
-var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDto.Adapt<CreateUpdateUomDto>().Adapt<Uom>());  
-var result = await _unitOfWork.Repository<Uom>().UpdateAsync(request.UomDtos.Adapt<List<CreateUpdateUomDto>>().Adapt<List<Uom>>());
+var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());  
+var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDtos.Adapt<List<CreateUpdateProductCategoryDto>>().Adapt<List<ProductCategory>>());
 
-list3 = (await Mediator.Send(new GetUomQuery
+list3 = (await Mediator.Send(new GetProductCategoryQuery
 {
-    Predicate = x => UomNames.Contains(x.Name.ToLower()),
+    Predicate = x => ProductCategoryNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new Uom
+    Select = x => new ProductCategory
     {
         Id = x.Id,
         Name = x.Name
@@ -588,47 +588,47 @@ list3 = (await Mediator.Send(new GetUomQuery
 
 #region Searching
 
-    private int pageSizeUomAttendance { get; set; } = 10;
-    private int totalCountUomAttendance = 0;
-    private int activePageIndexUomAttendance { get; set; } = 0;
-    private string searchTermUomAttendance { get; set; } = string.Empty;
+    private int pageSizeProductCategory { get; set; } = 10;
+    private int totalCountProductCategory = 0;
+    private int activePageIndexProductCategory { get; set; } = 0;
+    private string searchTermProductCategory { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedUomAttendance(string searchText)
+    private async Task OnSearchBoxChangedProductCategory(string searchText)
     {
-        searchTermUomAttendance = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeUomAttendance);
+        searchTermProductCategory = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeProductCategory);
     }
 
-    private async Task OnpageSizeUomAttendanceIndexChanged(int newpageSizeUomAttendance)
+    private async Task OnpageSizeProductCategoryIndexChanged(int newpageSizeProductCategory)
     {
-        pageSizeUomAttendance = newpageSizeUomAttendance;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeUomAttendance);
+        pageSizeProductCategory = newpageSizeProductCategory;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeProductCategory);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeUomAttendance);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeProductCategory);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeUomAttendance = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeProductCategory = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetUomAttendanceQuery
+        var result = await Mediator.Send(new GetProductCategoryQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeUomAttendance,
-            SearchTerm = searchTermUomAttendance,
+            PageSize = pageSizeProductCategory,
+            SearchTerm = searchTermProductCategory,
         });
-        UomAttendances = result.Item1;
-        totalCountUomAttendance = result.PageCount;
-        activePageIndexUomAttendance = pageIndex;
+        ProductCategorys = result.Item1;
+        totalCountProductCategory = result.PageCount;
+        activePageIndexProductCategory = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastService);
+        ex.HandleException(ToastProductCategory);
     }
     finally { PanelVisible = false; }
 }
@@ -667,7 +667,7 @@ list3 = (await Mediator.Send(new GetUomQuery
       {
           PanelVisible = true;
           SelectedDataItems = [];
-          var a = await Mediator.Send(new GetGeneralConsultanServicesQuery
+          var a = await Mediator.Send(new GetGeneralConsultanProductCategorysQuery
           {
               OrderByList =
               [
@@ -681,13 +681,13 @@ list3 = (await Mediator.Send(new GetUomQuery
               SearchTerm = searchTerm,
           });
 
-          GeneralConsultanServices = a.Item1;
+          GeneralConsultanProductCategorys = a.Item1;
           totalCount = a.PageCount;
           activePageIndex = pageIndex;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastService);
+          ex.HandleException(ToastProductCategory);
       }
       finally { PanelVisible = false; }
   }
@@ -696,7 +696,7 @@ list3 = (await Mediator.Send(new GetUomQuery
 
 
    <MyGridPaginate @ref="GridDetail"
-                 Data="Uoms"
+                 Data="ProductCategorys"
                  @bind-SelectedDataItems="@SelectedDetailDataItems"
                  EditModelSaving="OnSaveInventoryAdjumentDetail"
                  DataItemDeleting="OnDeleteInventoryAdjumentDetail"
@@ -707,70 +707,70 @@ list3 = (await Mediator.Send(new GetUomQuery
 
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="UomDto"
-                          Items="@Uoms"
+         <MyDxToolbarBase TItem="ProductCategoryDto"
+                          Items="@ProductCategorys"
                           Grid="GridDetail"
                           SelectedDataItems="@SelectedDetailDataItems"
                           NewItem_Click="@NewItem_Click"
                           EditItem_Click="@EditItem_Click"
                           DeleteItem_Click="@DeleteItem_Click"
                           Refresh_Click="@(async () => await LoadData())"
-                          IsImport="UserAccessCRUID.IsImport"
-                          VisibleNew="UserAccessCRUID.IsCreate"
-                          VisibleEdit="UserAccessCRUID.IsUpdate"
-                          VisibleDelete="UserAccessCRUID.IsDelete" />
+                          IsImport="ProductCategoryAccessCRUID.IsImport"
+                          VisibleNew="ProductCategoryAccessCRUID.IsCreate"
+                          VisibleEdit="ProductCategoryAccessCRUID.IsUpdate"
+                          VisibleDelete="ProductCategoryAccessCRUID.IsDelete" />
      </ToolbarTemplate>
 
 
      <Columns>
          <DxGridSelectionColumn Width="15px" />
-         <DxGridDataColumn FieldName="Uom.Name" Caption="Uom"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="ProductCategory.Name" Caption="ProductCategory"></DxGridDataColumn>
          <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
          <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
          <DxGridDataColumn FieldName="Difference" Caption="Difference" />
          <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
          <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
-         <DxGridDataColumn FieldName="Uom.Uom.Name" Caption="Uom" />
+         <DxGridDataColumn FieldName="ProductCategory.ProductCategory.Name" Caption="ProductCategory" />
      </Columns>
      <EditFormTemplate Context="EditFormContext">
          @{
              if (EditFormContext.DataItem is null)
              {
-                 FormUom = (UomDto)EditFormContext.EditModel;
+                 FormProductCategory = (ProductCategoryDto)EditFormContext.EditModel;
              }
-             var IsBatch = Uoms.FirstOrDefault(x => x.Id == FormUom.UomId)?.TraceAbility ?? false;
+             var IsBatch = ProductCategorys.FirstOrDefault(x => x.Id == FormProductCategory.ProductCategoryId)?.TraceAbility ?? false;
 
-             ActiveButton = FormUom.UomId is null ||
-             string.IsNullOrWhiteSpace(FormUom.Batch) && IsBatch ||
-             FormUom.ExpiredDate is null ||
-             FormUom.UomId is null;
+             ActiveButton = FormProductCategory.ProductCategoryId is null ||
+             string.IsNullOrWhiteSpace(FormProductCategory.Batch) && IsBatch ||
+             FormProductCategory.ExpiredDate is null ||
+             FormProductCategory.ProductCategoryId is null;
          }
          <div class="row w-100">
              <DxFormLayout CssClass="w-100">
                  <div class="col-md-4">
-                     <DxFormLayoutItem Caption="Uom" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox Data="@Uoms"
-                                     @bind-Value="@FormUom.UomId"
+                     <DxFormLayoutItem Caption="ProductCategory" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@ProductCategorys"
+                                     @bind-Value="@FormProductCategory.ProductCategoryId"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     NullText="Select Uom..."
+                                     NullText="Select ProductCategory..."
                                      TextFieldName="Name"
-                                     ReadOnly="@(FormUom.Id != 0)"
+                                     ReadOnly="@(FormProductCategory.Id != 0)"
                                      ValueFieldName="Id"
-                                     SelectedItemChanged="@(async (UomDto freq) => await OnSelectUom(freq))"
+                                     SelectedItemChanged="@(async (ProductCategoryDto freq) => await OnSelectProductCategory(freq))"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      ShowValidationIcon="true" />
-                         <ValidationMessage For="@(()=> FormUom.UomId)"   />
+                         <ValidationMessage For="@(()=> FormProductCategory.ProductCategoryId)"   />
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem Caption="Batch" Enabled="FormUom.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormProductCategory.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <MyDxComboBox Data="@Batch"
-                                       ReadOnly="@(FormUom.Id != 0)"
+                                       ReadOnly="@(FormProductCategory.Id != 0)"
                                        NullText="Select Batch..."
-                                       AllowUserInput="true"
-                                       @bind-Value="@FormUom.Batch"
-                                       @bind-Text="@FormUom.Batch"
+                                       AllowProductCategoryInput="true"
+                                       @bind-Value="@FormProductCategory.Batch"
+                                       @bind-Text="@FormProductCategory.Batch"
                                        SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
-                         <ValidationMessage For="@(() => FormUom.Batch)" />
+                         <ValidationMessage For="@(() => FormProductCategory.Batch)" />
 
                      </DxFormLayoutItem>
                  </div>
@@ -780,43 +780,43 @@ list3 = (await Mediator.Send(new GetUomQuery
                          <DxSpinEdit ShowValidationIcon="true"
                                      ReadOnly
                                      MinValue="0"
-                                     @bind-Value="@FormUom.TeoriticalQty"
+                                     @bind-Value="@FormProductCategory.TeoriticalQty"
                                      NullText="Teoritical Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormUom.TeoriticalQty)"   />
+                         <ValidationMessage For="@(()=> FormProductCategory.TeoriticalQty)"   />
                      </DxFormLayoutItem>
 
                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxSpinEdit ShowValidationIcon="true"
                                      MinValue="0"
-                                     @bind-Value="@FormUom.RealQty"
+                                     @bind-Value="@FormProductCategory.RealQty"
                                      NullText="Real Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormUom.RealQty)"   />
+                         <ValidationMessage For="@(()=> FormProductCategory.RealQty)"   />
                      </DxFormLayoutItem>
                  </div>
 
                  <div class="col-md-4">
                      <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxDateEdit ShowValidationIcon="true"
-                                     ReadOnly="@(FormUom.Id != 0)"
+                                     ReadOnly="@(FormProductCategory.Id != 0)"
                                      DisplayFormat="@Helper.DefaultFormatDate"
-                                     @bind-Date="@FormUom.ExpiredDate"
+                                     @bind-Date="@FormProductCategory.ExpiredDate"
                                      NullText="Expired Date">
                          </DxDateEdit>
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Uom" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox ShowValidationIcon="true" Data="@Uoms"
-                                     NullText="Uom"
-                                     ReadOnly="@(FormUom.Id != 0)"
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="ProductCategory" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@ProductCategorys"
+                                     NullText="ProductCategory"
+                                     ReadOnly="@(FormProductCategory.Id != 0)"
                                      TextFieldName="Name"
                                      ValueFieldName="Id"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     @bind-Value="FormUom.UomId">
+                                     @bind-Value="FormProductCategory.ProductCategoryId">
                          </DxComboBox>
-                         <ValidationMessage For="@(() => FormUom.UomId)" />
+                         <ValidationMessage For="@(() => FormProductCategory.ProductCategoryId)" />
                      </DxFormLayoutItem>
                  </div>
              </DxFormLayout>
@@ -835,63 +835,63 @@ list3 = (await Mediator.Send(new GetUomQuery
 
  NEW COMBOBOX VIRAL 2024
 
-Uom
+ProductCategory
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
-    <DxComboBox Data="Uoms"
-                AllowUserInput="true"
-                NullText="Select Uom"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
+    <DxComboBox Data="ProductCategorys"
+                AllowProductCategoryInput="true"
+                NullText="Select ProductCategory"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputUom"
-                @bind-Value="a.UomId">
+                @oninput="OnInputProductCategory"
+                @bind-Value="a.ProductCategoryId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Uom.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Code)" Caption="Code" />
         </Columns>
     </DxComboBox>
-    <ValidationMessage For="@(()=>a.UomId)" />
+    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
 </DxFormLayoutItem>
 
-#region ComboBox Uom
+#region ComboBox ProductCategory
  
-private CancellationTokenSource? _ctsUom;
-private async Task OnInputUom(ChangeEventArgs e)
+private CancellationTokenSource? _ctsProductCategory;
+private async Task OnInputProductCategory(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
             
-        _ctsUom?.Cancel();
-        _ctsUom?.Dispose();
-        _ctsUom = new CancellationTokenSource();
+        _ctsProductCategory?.Cancel();
+        _ctsProductCategory?.Dispose();
+        _ctsProductCategory = new CancellationTokenSource();
             
-        await Task.Delay(700, _ctsUom.Token);
+        await Task.Delay(700, _ctsProductCategory.Token);
             
-        await LoadUom(e.Value?.ToString() ?? "");
+        await LoadProductCategory(e.Value?.ToString() ?? "");
     } 
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsUom?.Dispose();
-        _ctsUom = null;
+        _ctsProductCategory?.Dispose();
+        _ctsProductCategory = null;
     } 
 }
 
- private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
+ private async Task LoadProductCategory(string? e = "", Expression<Func<ProductCategory, bool>>? predicate = null)
  {
      try
      {
          PanelVisible = true;
-         Uoms = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
+         ProductCategorys = await Mediator.QueryGetComboBox<ProductCategory, ProductCategoryDto>(e, predicate);
          PanelVisible = false;
      }
      catch (Exception ex)
      {
-         ex.HandleException(ToastService);
+         ex.HandleException(ToastProductCategory);
      }
      finally { PanelVisible = false; }
  }
@@ -900,83 +900,77 @@ private async Task OnInputUom(ChangeEventArgs e)
 
 
 // Ini buat di EditItemClick
-await LoadUom(id:  a.UomId);
+await LoadProductCategory(id:  a.ProductCategoryId);
 
-Uom
+ProductCategory
 
 
 
 VIRAL 2025
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Uom" ColSpanMd="12">
-    <MyDxComboBox Data="Uoms"
-                NullText="Select Uom"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
+    <MyDxComboBox Data="ProductCategorys"
+                NullText="Select ProductCategory"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputUom"
-                SelectedItemChanged="((UomDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.UomId">
+                @oninput="OnInputProductCategory"
+                ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                SelectedItemChanged="((ProductCategoryDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.ProductCategoryId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Uom.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Uom.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(ProductCategory.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.UomId)" />
+    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
 </DxFormLayoutItem>
 
 
-#region ComboBox Uom
+#region ComboBox ProductCategory
 
-private UomDto SelectedUom { get; set; } = new();
-async Task SelectedItemChanged(UomDto e)
-{
-    if (e is null)
+    private ProductCategoryDto SelectedProductCategory { get; set; } = new();
+    async Task SelectedItemChanged(ProductCategoryDto e)
     {
-        SelectedUom = new();
-        await LoadUom(); 
+        if (e is null)
+        {
+            SelectedProductCategory = new();
+            await LoadProductCategory(); 
+        }
+        else
+            SelectedProductCategory = e;
     }
-    else
-        SelectedUom = e;
-}
 
-private CancellationTokenSource? _ctsUom;
-private async Task OnInputUom(ChangeEventArgs e)
-{
-    try
+    private CancellationTokenSource? _ctsProductCategory;
+    private async Task OnInputProductCategory(ChangeEventArgs e)
     {
-        PanelVisible = true;
+        try
+        { 
+            _ctsProductCategory?.Cancel();
+            _ctsProductCategory?.Dispose();
+            _ctsProductCategory = new CancellationTokenSource();
 
-        _cts?.Cancel();
-        _ctsUom?.Dispose();
-        _ctsUom = new CancellationTokenSource();
+            await Task.Delay(Helper.CBX_DELAY, _ctsProductCategory.Token);
 
-        await Task.Delay(Helper.CBX_DELAY, _ctsUom.Token);
-
-        await LoadUom(e.Value?.ToString() ?? "");
+            await LoadProductCategory(e.Value?.ToString() ?? "");
+        }
+        finally
+        { 
+            _ctsProductCategory?.Dispose();
+            _ctsProductCategory = null;
+        }
     }
-    finally
+
+    private async Task LoadProductCategory(string? e = "", Expression<Func<ProductCategory, bool>>? predicate = null)
     {
-        PanelVisible = false;
-
-        // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsUom?.Dispose();
-        _ctsUom = null;
+        try
+        { 
+            ProductCategorys = await Mediator.QueryGetComboBox<ProductCategory, ProductCategoryDto>(e, predicate); 
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastProductCategory);
+        }
+        finally { PanelVisible = false; }
     }
-}
-
-private async Task LoadUom(string? e = "", Expression<Func<Uom, bool>>? predicate = null)
-{
-    try
-    {
-        PanelVisible = true;
-        Countries = await Mediator.QueryGetComboBox<Uom, UomDto>(e, predicate);
-        PanelVisible = false;
-    }
-    catch (Exception ex)
-    {
-        ex.HandleException(ToastService);
-    }
-    finally { PanelVisible = false; }
-}
 
 #endregion

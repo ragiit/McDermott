@@ -4,9 +4,10 @@ using static McDermott.Application.Features.Commands.Employee.JobPositionCommand
 namespace McDermott.Application.Features.Queries.Employee
 {
     public class JobPositionQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-       IRequestHandler<GetJobPositionQuery, (List<JobPositionDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<ValidateJobPositionQuery, bool>,
-IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
+        IRequestHandler<GetJobPositionQuery, (List<JobPositionDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleJobPositionQuery, JobPositionDto>,
+        IRequestHandler<ValidateJobPositionQuery, bool>,
+        IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
         IRequestHandler<CreateJobPositionRequest, JobPositionDto>,
         IRequestHandler<CreateListJobPositionRequest, List<JobPositionDto>>,
         IRequestHandler<UpdateJobPositionRequest, JobPositionDto>,
@@ -39,6 +40,25 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
             {
                 var query = _unitOfWork.Repository<JobPosition>().Entities.AsNoTracking();
 
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<JobPosition>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<JobPosition>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
                 // Apply dynamic includes
                 if (request.Includes is not null)
                 {
@@ -48,8 +68,85 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
                     }
                 }
 
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Department.Name, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new JobPosition
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        DepartmentId = x.DepartmentId,
+                        Department = new Department
+                        {
+                            Name = x.Department.Name
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<JobPositionDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<JobPositionDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<JobPositionDto> Handle(GetSingleJobPositionQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<JobPosition>().Entities.AsNoTracking();
+
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<JobPosition>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<JobPosition>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
@@ -61,21 +158,24 @@ IRequestHandler<BulkValidateJobPositionQuery, List<JobPositionDto>>,
 
                 // Apply dynamic select if provided
                 if (request.Select is not null)
-                {
                     query = query.Select(request.Select);
-                }
+                else
+                    query = query.Select(x => new JobPosition
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        DepartmentId = x.DepartmentId,
+                        Department = new Department
+                        {
+                            Name = x.Department.Name
+                        }
+                    });
 
-                var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
-                                  query,
-                                  request.PageSize,
-                                  request.PageIndex,
-                                  q => q.OrderBy(x => x.Name), // Custom order by bisa diterapkan di sini
-                                  cancellationToken);
-
-                return (pagedItems.Adapt<List<JobPositionDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<JobPositionDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

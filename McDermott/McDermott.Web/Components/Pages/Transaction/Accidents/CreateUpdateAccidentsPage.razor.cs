@@ -141,7 +141,10 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
 
                 var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
                 NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
-                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery(predicate: x => x.Id == a.DiagnosisId))).Item1;
+                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
+                {
+                    Predicate = x => x.Id == a.DiagnosisId
+                })).Item1;
 
                 PanelVisible = false;
             }
@@ -479,7 +482,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                 Services = (await Mediator.Send(new GetServiceQuery
                 {
                     Predicate = x => x.Id == GeneralConsultanService.ServiceId
-                })).Item1; 
+                })).Item1;
 
                 UserForm = resultGC.Patient ?? new();
 
@@ -774,9 +777,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetDiagnosisQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refDiagnosesComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetDiagnosisQuery
+                {
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = refDiagnosesComboBox?.Text ?? ""
+                });
                 Diagnoses = result.Item1;
-                totalCountDiagnoses = result.pageCount;
+                totalCountDiagnoses = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -1795,14 +1803,17 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
         public byte[]? DocumentContent;
 
         private bool IsPopUpPainScale = false;
+
         private void OnClickPainScalePopUp()
         {
             IsPopUpPainScale = true;
         }
+
         private void OnClosePopup()
         {
             IsPopUpPainScale = false;
         }
+
         #endregion OnClick
 
         #region Assesment of Injury

@@ -1,9 +1,11 @@
-﻿using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
+﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 
 namespace McDermott.Application.Features.Queries.Medical
 {
     public class DiagnosisQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetDiagnosisQuery, (List<DiagnosisDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSingleDiagnosisQuery, DiagnosisDto>,
         IRequestHandler<CreateDiagnosisRequest, DiagnosisDto>,
         IRequestHandler<BulkValidateDiagnosisQuery, List<DiagnosisDto>>,
         IRequestHandler<CreateListDiagnosisRequest, List<DiagnosisDto>>,
@@ -40,11 +42,119 @@ namespace McDermott.Application.Features.Queries.Medical
         {
             try
             {
-                var query = _unitOfWork.Repository<Diagnosis>().Entities
-                    .Include(x => x.DiseaseCategory)
-                    .Include(x => x.CronisCategory)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Diagnosis>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Diagnosis>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Diagnosis>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                       EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.NameInd, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.NameInd, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.CronisCategory.Name, $"%{request.SearchTerm}%") ||
+                       EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Diagnosis
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NameInd = x.NameInd,
+                        Code = x.Code,
+                        CronisCategoryId = x.CronisCategoryId,
+                        CronisCategory = new CronisCategory
+                        {
+                            Name = x.CronisCategory == null ? "" : x.CronisCategory.Name,
+                        }
+                    });
+
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
+
+                    return (pagedItems.Adapt<List<DiagnosisDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<DiagnosisDto>>(), 0, 1, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public async Task<DiagnosisDto> Handle(GetSingleDiagnosisQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Diagnosis>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Diagnosis>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Diagnosis>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
@@ -53,22 +163,28 @@ namespace McDermott.Application.Features.Queries.Medical
                         EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
-                var pagedResult = query
-                            .OrderBy(x => x.Name);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Diagnosis
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NameInd = x.NameInd,
+                        Code = x.Code,
+                        CronisCategoryId = x.CronisCategoryId,
+                        CronisCategory = new CronisCategory
+                        {
+                            Name = x.CronisCategory == null ? "" : x.CronisCategory.Name,
+                        }
+                    });
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<DiagnosisDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<DiagnosisDto>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                // Consider logging the exception
                 throw;
             }
         }

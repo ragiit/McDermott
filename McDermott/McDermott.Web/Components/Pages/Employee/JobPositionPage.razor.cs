@@ -212,12 +212,11 @@ namespace McDermott.Web.Components.Pages.Employee
                             aa.Add(a.ToLower());
                     }
 
-                    list1 = (await Mediator.Send(new GetDepartmentQuery(x => aa.Contains(x.Name.ToLower()), 0, 0,
-                        select: x => new Department
-                        {
-                            Id = x.Id,
-                            Name = x.Name
-                        }))).Item1;
+                    list1 = (await Mediator.Send(new GetDepartmentQuery
+                    {
+                        Predicate = x => aa.Contains(x.Name.ToLower()),
+                        IsGetAll = true
+                    })).Item1;
 
                     for (int row = 2; row <= ws.Dimension.End.Row; row++)
                     {
