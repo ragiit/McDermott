@@ -52,10 +52,10 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    //query = query.Where(v =>
-                    //        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    //        EF.Functions.Like(v.GeneralConsultanServiceAncDetail.Name, $"%{request.SearchTerm}%")
-                    //        );
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Trimester, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Complaint, $"%{request.SearchTerm}%")
+                            );
                 }
 
                 // Apply dynamic select if provided

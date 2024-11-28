@@ -1,0 +1,138 @@
+﻿@using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncDetailCommand
+
+<DxLoadingPanel @bind-Visible="PanelVisible"
+IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+IsContentBlocked="true"
+ApplyBackgroundShading="true"
+IndicatorAreaVisible="false"
+Text="Fetching Data...">
+    <MyGridPaginate @ref="GridAnc"
+    Data="GeneralConsultanServiceAncDetails"
+    @bind-SelectedDataItems="@SelectedDataItemsAnc"
+    FocusedRowChanged="GridTabAnc_FocusedRowChanged"
+    SearchTextChanged="OnSearchBoxChangedGridAnc"
+    KeyFieldName="Id">
+
+        <Columns>
+            <DxGridDataColumn FieldName="Date" Caption="Date" DisplayFormat="@Helper.DefaultFormatDateTime" />
+            <DxGridDataColumn FieldName="Trimester" Caption="Trimester" GroupIndex="0" />
+            <DxGridDataColumn FieldName="Complaint" Caption="Complaint" />
+            <DxGridDataColumn FieldName="KU" Caption="KU" />
+            <DxGridDataColumn FieldName="TD" Caption="TD" />
+            <DxGridDataColumn FieldName="BB" Caption="BB" />
+            <DxGridDataColumn FieldName="UK" Caption="UK" />
+            <DxGridDataColumn FieldName="TFU" Caption="TFU" />
+            <DxGridDataColumn FieldName="FetusPosition" Caption="Fetus Position" />
+            <DxGridDataColumn FieldName="DJJ" Caption="DJJ" />
+            <DxGridDataColumn FieldName="TT" Caption="TT" />
+        </Columns>
+
+    </MyGridPaginate>
+
+
+    <div class="row">
+        <DxFormLayout>
+            <div class="col-md-9">
+                <DxFormLayoutItem>
+                    <DxPager PageCount="totalCountGridAnc"
+                    ActivePageIndexChanged="OnPageIndexChangedGridAnc"
+                    ActivePageIndex="activePageIndexTotalCountGridAnc"
+                    VisibleNumericButtonCount="10"
+                    SizeMode="SizeMode.Medium"
+                    NavigationMode="PagerNavigationMode.Auto">
+                    </DxPager>
+                </DxFormLayoutItem>
+            </div>
+            <div class="col-md-3 d-flex justify-content-end">
+                <DxFormLayoutItem Caption="Page Size:">
+                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                    NullText="Select Page Size"
+                    ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                    SelectedItemChanged="((int e ) => OnpageSizeGridAncIndexChangedGridAnc(e))"
+                    @bind-Value="pageSizeGridAnc">
+                    </MyDxComboBox>
+                </DxFormLayoutItem>
+            </div>
+        </DxFormLayout>
+    </div>
+</DxLoadingPanel>
+
+@code {
+
+    private bool PanelVisible = false;
+    private IGrid GridAnc { get; set; }
+    private IReadOnlyList<object> SelectedDataItemsAnc { get; set; } = [];
+    private int FocusedGridTabAncRowVisibleIndex { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAnc();
+    }
+
+    private async Task NewItemAnc_Click()
+    {
+        await GridAnc.StartEditNewRowAsync();
+    }
+
+    private async Task RefreshAnc_Click()
+    {
+        await LoadDataAnc();
+    }
+
+    #region Searching
+
+    private int pageSizeGridAnc { get; set; } = 10;
+    private int totalCountGridAnc = 0;
+    private int activePageIndexTotalCountGridAnc { get; set; } = 0;
+    private string searchTermGridAnc { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChangedGridAnc(string searchText)
+    {
+        searchTermGridAnc = searchText;
+        await LoadDataAnc(0, pageSizeGridAnc);
+    }
+
+    private async Task OnpageSizeGridAncIndexChangedGridAnc(int newpageSizeGridAnc)
+    {
+        pageSizeGridAnc = newpageSizeGridAnc;
+        await LoadDataAnc(0, newpageSizeGridAnc);
+    }
+
+    private async Task OnPageIndexChangedGridAnc(int newPageIndex)
+    {
+        await LoadDataAnc(newPageIndex, pageSizeGridAnc);
+    }
+
+    #endregion Searching
+
+
+    private List<GeneralConsultanServiceAncDetailDto> GeneralConsultanServiceAncDetails { get; set; } = [];
+    [Parameter] public GeneralConsultanServiceAncDto GeneralConsultanServiceAnc { get; set; } = new();
+
+    private async Task LoadDataAnc(int pageIndex = 0, int pageSizeGridAnc = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            SelectedDataItemsAnc = [];
+            var ab = await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
+                {
+                    SearchTerm = searchTermGridAnc ?? "",
+                    Predicate = x => x.GeneralConsultanServiceAncId == GeneralConsultanServiceAnc.Id,
+                });
+            GeneralConsultanServiceAncDetails = ab.Item1;
+            totalCountGridAnc = ab.PageCount;
+            activePageIndexTotalCountGridAnc = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    private void GridTabAnc_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedGridTabAncRowVisibleIndex = args.VisibleIndex;
+    }
+}

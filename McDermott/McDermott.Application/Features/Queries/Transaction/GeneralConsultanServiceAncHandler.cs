@@ -79,10 +79,11 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
-                    //query = query.Where(v =>
-                    //        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    //        EF.Functions.Like(v.GeneralConsultanServiceAnc.Name, $"%{request.SearchTerm}%")
-                    //        );
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Patient.Name, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Patient.NoRm, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Reference, $"%{request.SearchTerm}%")
+                            );
                 }
 
                 // Apply dynamic select if provided
@@ -103,8 +104,14 @@ namespace McDermott.Application.Features.Queries.Transaction
                         HistorySC = x.HistorySC,
                         UK = x.UK,
                         PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            Name = x.Patient == null ? "" : x.Patient.Name,
+                            NoRm = x.Patient == null ? "" : x.Patient.NoRm,
+                        },
                         Status = x.Status,
-                        Notes = x.Notes
+                        Notes = x.Notes,
+                        CreatedDate = x.CreatedDate
                     });
 
                 if (!request.IsGetAll)

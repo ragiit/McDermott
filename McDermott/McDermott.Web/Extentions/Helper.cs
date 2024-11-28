@@ -199,6 +199,7 @@ namespace McDermott.Web.Extentions
             "clinic-service/telemedicines",
             "clinic-service/vaccinations",
             "clinic-service/maternities",
+            "clinic-service/maternity-anc",
             "clinic-service/wellness",
             "clinic-service/reporting-and-analytics",
 

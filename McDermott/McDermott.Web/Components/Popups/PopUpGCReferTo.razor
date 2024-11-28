@@ -350,9 +350,52 @@
                                                             <DxCheckBox @bind-Checked="@GeneralConsultanService.IsSarana" />
                                                         </DxFormLayoutItem>
 
+                                                        @if (Convert.ToBoolean(GeneralConsultanService.IsSarana))
+                                                        {
+                                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="12">
+                                                                <MyDxComboBox Data="@SpesialisSaranas"
+                                                                              NullText="Select Sarana..."
+                                                                              @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisSaranaCode"
+                                                                              TextFieldName="NmSarana"
+                                                                              ValueFieldName="KdSarana">
+                                                                </MyDxComboBox>
+                                                            </DxFormLayoutItem>
+                                                        }
+
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@_diagnosisBPJSIntegrationTemp"
+                                                                          NullText="Select Diagnosis"
+                                                                          @bind-Text="@DiagnosaValue"
+                                                                          @bind-Value="@DiagnosaValue"
+                                                                          TextFieldName="NmDiag"
+                                                                          ValueFieldName="KdDiag"
+                                                                          SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => OnSelectDiagnosa(e))">
+                                                                <Buttons>
+                                                                    <DxEditorButton Click="OnSearchDiagnosaIndexDecrement"
+                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                    Tooltip="Previous Index" />
+                                                                    <DxEditorButton Click="(() => OnSearchDiagnosa(0))"
+                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                    Tooltip="Search" />
+                                                                    <DxEditorButton Click="OnSearchDiagnosaIndexIncrement"
+                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                    Tooltip="Next Index" />
+                                                                </Buttons>
+                                                                <Columns>
+                                                                    <DxListEditorColumn FieldName="KdDiag" />
+                                                                    <DxListEditorColumn FieldName="NmDiag" />
+                                                                    <DxListEditorColumn FieldName="NonSpesialis" />
+                                                                </Columns>
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
                                                     }
 
-                                                    @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
+                                                    @if (_diagnosisBPJSIntegrationTemp.Count > 0 && Convert.ToBoolean(_diagnosisBPJSIntegrationTemp.FirstOrDefault(x => x.KdDiag == DiagnosaValue)?.NonSpesialis))
+                                                    {
+
+                                                    }
+
+                                                    @*  @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
                                                     {
                                                         @if (Convert.ToBoolean(GeneralConsultanService.IsSarana))
                                                         {
@@ -365,11 +408,11 @@
                                                                 </MyDxComboBox>
                                                             </DxFormLayoutItem>
                                                         }
-                                                    }
+                                                    } *@
                                                 </DxFormLayout>
                                             </div>
 
-                                            <div class="col-md-6">
+                                            @*  <div class="col-md-6">
                                                 <DxFormLayout CssClass="w-100">
                                                     @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
                                                     {
@@ -394,9 +437,8 @@
                                                             </DxFormLayoutItem>
                                                         }
                                                     }
-                                                </DxFormLayout>
-
-                                            </div>
+                                                </DxFormLayout> 
+                                            </div> *@
 
                                             <div class="col-md-12">
                                                 <div class="w-100 row justify-content-end mt-2 mb-2">
@@ -1322,9 +1364,15 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
+<<<<<<< HEAD
                                                     [
                                                         x => x.Insurance
                                                     ],
+=======
+                                                                    [
+                                                                        x => x.Insurance
+                                                                    ],
+>>>>>>> ddd15cf0f0fde0d8aa7b6f4d60ed2ee7be849e07
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -1513,6 +1561,7 @@
 
     }
 
+<<<<<<< HEAD
     #region ComboboxOccupational
 
     private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
@@ -1567,4 +1616,69 @@
 
     #endregion
 
+=======
+
+    private List<DiagnosisBPJSIntegrationTemp> _diagnosisBPJSIntegrationTemp { get; set; } = new();
+    private string DiagnosaValue { get; set; }
+
+    private async Task OnSearchDiagnosaIndexDecrement()
+    {
+        if (DiagnosaComboBoxIndex > 0)
+        {
+            DiagnosaComboBoxIndex--;
+            await OnSearchDiagnosa(DiagnosaComboBoxIndex);
+        }
+    }
+    private int DiagnosaComboBoxIndex { get; set; } = 0;
+
+    private async Task OnSearchDiagnosaIndexIncrement()
+    {
+        DiagnosaComboBoxIndex++;
+        await OnSearchDiagnosa(DiagnosaComboBoxIndex);
+    }
+    private DxComboBox<string, string> refDiagnosa { get; set; }
+
+    private void OnSelectDiagnosa(DiagnosisBPJSIntegrationTemp e)
+    {
+        if (e is not null)
+            DiagnosaValue = e.NmDiag;
+    }
+    private async Task OnSearchDiagnosa(int index = 0)
+    {
+        PanelVisible = true;
+
+        var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"diagnosa/{DiagnosaValue}/{index}/20", HttpMethod.Get);
+
+        if (response.Item2 != 200)
+        {
+            PanelVisible = false;
+
+            if (response.Item2 == 404)
+            {
+                ToastService.ClearErrorToasts();
+                ToastService.ShowError(Convert.ToString(response.Item1));
+            }
+
+            _diagnosisBPJSIntegrationTemp.Clear();
+
+            return;
+        }
+
+        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Item1);
+
+        var dynamicList = (IEnumerable<dynamic>)data.list;
+
+        var DiagnosisList = dynamicList.Select(item => new DiagnosisBPJSIntegrationTemp
+            {
+                KdDiag = item.kdDiag,
+                NmDiag = item.nmDiag,
+                NonSpesialis = item.nonSpesialis,
+            }).ToList();
+
+        _diagnosisBPJSIntegrationTemp = DiagnosisList;
+
+        PanelVisible = false;
+    }
+
+>>>>>>> ddd15cf0f0fde0d8aa7b6f4d60ed2ee7be849e07
 }

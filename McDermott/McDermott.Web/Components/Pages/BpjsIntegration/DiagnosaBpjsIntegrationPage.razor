@@ -16,22 +16,20 @@
                             <div class="card-body">
                                 <DxFormLayout CssClass="w-100">
                                     <DxFormLayoutItem Caption="Diagnosis" CaptionCssClass="normal-caption required-caption" ColSpanMd="6">
-                                        <DxComboBox Data="@Diagnoses"
-                                                    @bind-Value="@SelectedDiagnosis"
-                                                    NullText="Select Diagnosis..."
-                                                    SelectedItemChanged="@((DiagnosisDto req)=> SelectChangeDiagnoses(req))"
-                                                    FilteringMode="DataGridFilteringMode.Contains"
-                                                    EditFormat="{0} {1}">
-                                            <Columns>
-                                                <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)"
-                                                                    Caption="Code" />
-                                                <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)"
-                                                                    Caption="Name" />
-                                                <DxListEditorColumn FieldName="@nameof(DiagnosisDto.DiseaseCategory.Name)"
-                                                                    Caption="Disease Category" />
-                                            </Columns>
-                                        </DxComboBox>
+                                        <DxEditorButton IconCssClass="fa-solid fa-magnifying-glass" />
 
+                                        <DxMaskedInput NullText="Type Code or Diagnosa"
+                                                       @bind-Value="Diagnosa"
+                                                       @ref="refDiagnosa"
+                                                       
+                                                       ShowValidationIcon="true"
+                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                            <Buttons>
+                                                <DxEditorButton Click="OnSearchDiagnosis"
+                                                                Tooltip="Search Diagnosa"
+                                                                IconCssClass="fa-solid fa-magnifying-glass" />
+                                            </Buttons>
+                                        </DxMaskedInput>
                                     </DxFormLayoutItem>
 
                                     <DxFormLayoutItem Context="ItemContexxt" ColSpanMd="12">

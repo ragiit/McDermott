@@ -1909,7 +1909,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 FamilyMedicalHistoryOther = userForm.FamilyMedicalHistoryOther,
                                 MedicationHistory = userForm.MedicationHistory,
                                 PastMedicalHistory = userForm.PastMedicalHistory,
-                                CurrentMobile = userForm.CurrentMobile
+                                CurrentMobile = userForm.CurrentMobile,
+                                
                             }
                         };
 

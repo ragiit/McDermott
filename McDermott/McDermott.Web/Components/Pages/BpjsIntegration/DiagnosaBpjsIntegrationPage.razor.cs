@@ -6,18 +6,6 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
     {
         private List<DiagnosisDto> Diagnoses = [];
 
-        public class DiagnosisBPJSIntegrationTemp
-        {
-            [JsonPropertyName("kdDiag")]
-            public string KdDiag { get; set; } = string.Empty;
-
-            [JsonPropertyName("nmDiag")]
-            public string NmDiag { get; set; } = string.Empty;
-
-            [JsonPropertyName("nonSpesialis")]
-            public bool NonSpesialis { get; set; }
-        }
-
         public class KdTkp
         {
             public int Code { get; set; }
@@ -63,6 +51,16 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
             IsLoading = false;
         }
 
+        public string Diagnosa { get; set; } = string.Empty;
+
+        private async Task OnSearchDiagnosis()
+        {
+            var a = refDiagnosa;
+            var ba = Diagnosa;
+
+            await LoadData();
+        }
+
         private async Task ExportXlsxItem_Click()
         {
             await Grid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
@@ -98,11 +96,13 @@ namespace McDermott.Web.Components.Pages.BpjsIntegration
             await LoadData();
         }
 
+        private DxMaskedInput<string> refDiagnosa { get; set; }
+
         private async Task LoadData()
         {
             PanelVisible = true;
 
-            var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"diagnosa/{SelectedDiagnosis.Name}/{parameter1}/{parameter2}", HttpMethod.Get);
+            var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"diagnosa/{Diagnosa}/{parameter1}/{parameter2}", HttpMethod.Get);
 
             if (response.Item2 != 200)
             {
