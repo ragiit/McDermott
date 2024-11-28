@@ -1388,55 +1388,55 @@
 
                                                                                 <EditFormTemplate Context="EditFormContext">
                                                                                     @{
-                                                                                        var a = (GeneralConsultanServiceAncDetailDto)EditFormContext.EditModel; 
+                                                                                        GeneralConsultanServiceAncDetail = (GeneralConsultanServiceAncDetailDto)EditFormContext.EditModel;
                                                                                     }
                                                                                     <DxFormLayout CssClass="w-100">
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Trimester" ColSpanMd="12">
                                                                                             <MyDxComboBox Data="@Trimester"
                                                                                                           NullText="Select Trimester"
-                                                                                                          @bind-Value="@a.Trimester">
+                                                                                                          @bind-Value="@GeneralConsultanServiceAncDetail.Trimester">
                                                                                             </MyDxComboBox>
                                                                                             <ValidationMessage For="@(()=>SelectedReference)" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Complaint" ColSpanMd="12">
-                                                                                            <MyTextBox @bind-Text="@a.Complaint" NullText="Complaint" />
+                                                                                            <MyTextBox @bind-Text="@GeneralConsultanServiceAncDetail.Complaint" NullText="Complaint" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="General Condition (KU)" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.KU" NullText="General Condition (KU)" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.KU" NullText="General Condition (KU)" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Blood Pressure (TD)" ColSpanMd="6">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TD" NullText="0" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.TD" NullText="0" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                            <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="/" ColSpanMd="6">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TD2" NullText="0" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.TD2" NullText="0" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Temperature (Suhu)" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.Suhu" NullText="Temperature" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.Suhu" NullText="Temperature" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Body Weight (BB)" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.BB" NullText="Body Weight" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.BB" NullText="Body Weight" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Uterine Fundal Height (TFU)" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TFU" NullText="Uterine Fundal Height" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.TFU" NullText="Uterine Fundal Height" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Fetus Position" ColSpanMd="12">
-                                                                                            <MyTextBox @bind-Text="@a.FetusPosition" NullText="Fetus Position" />
+                                                                                            <MyTextBox @bind-Text="@GeneralConsultanServiceAncDetail.FetusPosition" NullText="Fetus Position" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Fetal Heart Rate (DJJ)" ColSpanMd="12">
-                                                                                            <MyTextBox @bind-Text="@a.DJJ" NullText="Fetal Heart Rate" InputCssClass="fw-normal" />
+                                                                                            <MyTextBox @bind-Text="@GeneralConsultanServiceAncDetail.DJJ" NullText="Fetal Heart Rate" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
 
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Immunization TT" ColSpanMd="12">
-                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@a.TT" NullText="Immunization TT" InputCssClass="fw-normal" />
+                                                                                            <DxSpinEdit MinValue="0" @bind-Value="@GeneralConsultanServiceAncDetail.TT" NullText="Immunization TT" InputCssClass="fw-normal" />
                                                                                         </DxFormLayoutItem>
                                                                                     </DxFormLayout>
                                                                                 </EditFormTemplate>

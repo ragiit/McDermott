@@ -1149,7 +1149,7 @@
                         DateOfBirth = x.DateOfBirth,
                         NoId = x.NoId,
                         CurrentMobile = x.CurrentMobile,
-                        OccupationalId =x.OccupationalId,
+                        OccupationalId = x.OccupationalId,
 
                         IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
                         IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
@@ -1165,7 +1165,8 @@
                         IsMedicationHistory = x.IsMedicationHistory,
                         MedicationHistory = x.MedicationHistory,
                         PastMedicalHistory = x.PastMedicalHistory,
-                        Occupational = new Occupational{
+                        Occupational = new Occupational
+                        {
                             Name = x.Occupational == null ? string.Empty : x.Occupational.Name
                         }
                     }
@@ -1364,15 +1365,9 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-<<<<<<< HEAD
-                                                    [
-                                                        x => x.Insurance
-                                                    ],
-=======
-                                                                    [
-                                                                        x => x.Insurance
-                                                                    ],
->>>>>>> ddd15cf0f0fde0d8aa7b6f4d60ed2ee7be849e07
+                                                                        [
+                                                                            x => x.Insurance
+                                                                        ],
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -1561,7 +1556,6 @@
 
     }
 
-<<<<<<< HEAD
     #region ComboboxOccupational
 
     private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
@@ -1615,8 +1609,6 @@
 
 
     #endregion
-
-=======
 
     private List<DiagnosisBPJSIntegrationTemp> _diagnosisBPJSIntegrationTemp { get; set; } = new();
     private DiagnosisBPJSIntegrationTemp DiagnosaValue { get; set; }
@@ -1679,6 +1671,4 @@
 
         PanelVisible = false;
     }
-
->>>>>>> ddd15cf0f0fde0d8aa7b6f4d60ed2ee7be849e07
 }

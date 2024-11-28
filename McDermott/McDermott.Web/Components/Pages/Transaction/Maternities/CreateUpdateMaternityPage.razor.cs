@@ -341,6 +341,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             GeneralConsultanServiceAncDetail.BB = GeneralConsultanService.Weight.ToInt32();
             GeneralConsultanServiceAncDetail.TD = GeneralConsultanService.Systolic.ToInt32();
             GeneralConsultanServiceAncDetail.TD2 = GeneralConsultanService.Diastole.ToInt32();
+            GeneralConsultanServiceAncDetail.Suhu = GeneralConsultanService.Temp.ToInt32();
         }
 
         private async Task RefreshAnc_Click()
