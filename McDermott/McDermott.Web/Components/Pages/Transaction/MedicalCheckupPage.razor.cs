@@ -1,5 +1,4 @@
-﻿
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using Microsoft.Extensions.Caching.Memory;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
@@ -1116,11 +1115,9 @@ namespace McDermott.Web.Components.Pages.Transaction
             Patients = (await Mediator.Send(new GetUserQueryNew
             {
                 Predicate = x => x.IsPatient == true || x.IsEmployeeRelation == true,
-
             })).Item1;
             Services = (await Mediator.Send(new GetServiceQuery
             {
-
             })).Item1;
         }
 
@@ -1399,9 +1396,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             ToastService.ShowInfoSubmittingForm();
         }
 
-        protected override Task OnInitializedAsync()
+        protected override async Task OnInitializedAsync()
         {
-            return base.OnInitializedAsync();
+            await GetUserInfo();
+            await LoadData();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -1548,7 +1546,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
             StateHasChanged();
         }
-
 
         private async Task SelectFile()
         {

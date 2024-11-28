@@ -1,4 +1,5 @@
-﻿using McDermott.Application.Dtos.Queue;
+﻿using DevExpress.CodeParser;
+using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 
@@ -1051,7 +1052,28 @@ namespace McDermott.Web.Components.Pages.Queue
                         FormGeneral.TypeRegistration = "Telemedicine";
                     }
 
-                    FormGeneral.IsGC = true;
+                    var s = await Mediator.Send(new GetSingleServiceQuery
+                    {
+                        Predicate = x => x.Id == FormKios.ServiceId,
+                        Select = x => new Service
+                        {
+                            IsMaternity = x.IsMaternity,
+                            IsVaccination = x.IsVaccination,
+                            IsMcu = x.IsMcu
+                        }
+                    });
+
+                    FormGeneral.IsMaternity = s.IsMaternity;
+                    FormGeneral.IsVaccination = s.IsVaccination;
+                    if (s.IsMcu)
+                    {
+                        FormGeneral.IsMcu = true;
+                        FormGeneral.TypeRegistration = "MCU";
+                    }
+
+                    if (!s.IsMaternity && !s.IsVaccination && !s.IsMcu)
+                        FormGeneral.IsGC = true;
+
                     await Mediator.Send(new CreateGeneralConsultanServiceRequest(FormGeneral));
                 }
                 else

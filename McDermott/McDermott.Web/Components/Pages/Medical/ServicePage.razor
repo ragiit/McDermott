@@ -50,11 +50,13 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" Width="200px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Code" Width="100px" />
-                                        @* <DxGridDataColumn MinWidth="200" FieldName="Quota" Width="90px" /> *@
-                                        <DxGridDataColumn MinWidth="200" FieldName="Flag" Width="130px" Caption="Flag" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="KioskName" Caption=" Service Counter" />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0"  />
+                                        <DxGridDataColumn FieldName="Code"   />
+                                        <DxGridDataColumn FieldName="IsVaccination" />
+                                        <DxGridDataColumn FieldName="IsTelemedicine" />
+                                        <DxGridDataColumn FieldName="IsMaternity" />
+                                        <DxGridDataColumn FieldName="Flag"  Caption="Flag" />
+                                        <DxGridDataColumn FieldName="KioskName" Caption=" Service Counter" />
                                     </Columns>
 
                                     <EditFormTemplate Context="EditFormContext">
@@ -111,7 +113,7 @@
                                                 <DxCheckBox @bind-Checked="@a.IsKiosk" />
                                                 <ValidationMessage For="@(()=>a.IsKiosk)" />
                                             </DxFormLayoutItem>
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Mcu" ColSpanMd="12">
+                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Medical Check Up" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsMcu" />
                                                 <ValidationMessage For="@(()=>a.IsMcu)" />
                                             </DxFormLayoutItem>
@@ -126,7 +128,7 @@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Maternity" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsMaternity" />
                                                 <ValidationMessage For="@(()=>a.IsMaternity)" />
-                                            </DxFormLayoutItem>
+                                            </DxFormLayoutItem> 
                                         </DxFormLayout>
                                     </EditFormTemplate>
 

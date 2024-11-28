@@ -11,6 +11,7 @@
         public int? PregnancyStatusA { get; set; }
         public int? PregnancyStatusH { get; set; }
         public int? UK { get; set; }
+        public string? UKString => UK is not null ? $"{UK.GetValueOrDefault()} Week" : "-";
         public string? HistorySC { get; set; }
         public string? Notes { get; set; }
         public EnumStatusGeneralConsultanServiceAnc Status { get; set; } = EnumStatusGeneralConsultanServiceAnc.Open;
@@ -20,6 +21,8 @@
 
         [Required]
         public DateTime? HPL { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
 
         public GeneralConsultanServiceDto? GeneralConsultanService { get; set; }
         public User? Patient { get; set; }

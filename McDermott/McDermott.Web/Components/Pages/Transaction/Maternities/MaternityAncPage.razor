@@ -1,0 +1,252 @@
+﻿@page "/clinic-service/maternity-anc"
+@using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand
+@rendermode InteractiveServer
+
+<PageTitle>@Helper.APP_NAME - Maternity ANC</PageTitle>
+
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+{
+
+    <div class="wrapper">
+
+        <BaseHeaderPage Title="Maternity ANC" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <DxLoadingPanel @bind-Visible="PanelVisible"
+                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                            IsContentBlocked="true"
+                                            ApplyBackgroundShading="true"
+                                            IndicatorAreaVisible="false"
+                                            Text="Fetching Data...">
+                                <MyGridPaginate @ref="Grid"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                Data="GeneralConsultanServiceAncs"
+                                                KeyFieldName="Id"
+                                                FocusedRowChanged="Grid_FocusedRowChanged">
+
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="GeneralConsultanServiceAncDto"
+                                                         Grid="Grid"
+                                                         Items="@GeneralConsultanServiceAncs"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         VisibleNew="false"
+                                                         VisibleEdit="false"
+                                                         VisibleDelete="false" />
+                                    </ToolbarTemplate>
+
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Id" Caption="Id" Visible="false" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Reference" Caption="Reference" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Patient.NoRm" Caption="No. RM" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="PregnancyStatusG" Caption="G" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="PregnancyStatusP" Caption="P" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="PregnancyStatusA" Caption="A" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="PregnancyStatusH" Caption="H" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="HistorySC" Caption="SC History" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="HPHT" DisplayFormat="@Helper.DefaultFormatDate" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="HPL" DisplayFormat="@Helper.DefaultFormatDate" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="UKString" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Notes" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Status" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="CreatedDate" Caption="Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                    </Columns>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Id"
+                                                           Visible="true" />
+                                    </TotalSummary>
+
+                                    <DetailRowTemplate>
+                                        <_DetailGridMaternityAnc GeneralConsultanServiceAnc="(GeneralConsultanServiceAncDto)context.DataItem" />
+                                    </DetailRowTemplate>
+                                </MyGridPaginate>
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
+                            </DxLoadingPanel>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
+}
+
+@code
+{
+    private bool PanelVisible { get; set; } = true;
+
+    #region UserLoginAndAccessRole
+
+    [Inject]
+    public UserInfoService UserInfoService { get; set; }
+
+    private GroupMenuDto UserAccessCRUID = new();
+    private User UserLogin { get; set; } = new();
+    private bool IsAccess = false;
+
+    private async Task GetUserInfo()
+    {
+        try
+        {
+            var user = await UserInfoService.GetUserInfo(ToastService);
+            IsAccess = user.Item1;
+            UserAccessCRUID = user.Item2;
+            UserLogin = user.Item3;
+        }
+        catch { }
+    }
+    #endregion UserLoginAndAccessRole
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            PanelVisible = true;
+            await GetUserInfo();
+            await LoadData();
+            PanelVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    private List<GeneralConsultanServiceAncDto> GeneralConsultanServiceAncs { get; set; } = [];
+
+
+    private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+    {
+        FocusedRowVisibleIndex = args.VisibleIndex;
+    }
+    public IGrid Grid { get; set; }
+    private int FocusedRowVisibleIndex { get; set; }
+    private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+
+    #region Searching
+
+    private int pageSize { get; set; } = 10;
+    private int totalCount = 0;
+    private int activePageIndex { get; set; } = 0;
+    private string searchTerm { get; set; } = string.Empty;
+
+    private async Task OnSearchBoxChanged(string searchText)
+    {
+        searchTerm = searchText;
+        await LoadData(0, pageSize);
+    }
+
+    private async Task OnPageSizeIndexChanged(int newPageSize)
+    {
+        pageSize = newPageSize;
+        await LoadData(0, newPageSize);
+    }
+
+    private async Task OnPageIndexChanged(int newPageIndex)
+    {
+        await LoadData(newPageIndex, pageSize);
+    }
+
+    private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+            SelectedDataItems = [];
+            var a = await Mediator.Send(new GetGeneralConsultanServiceAncQuery
+                {
+                    OrderByList =
+                                [
+                                    (x => x.CreatedDate, true),               // OrderByDescending RegistrationDate
+                    (x => x.Status, true),
+                ],
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm,
+                });
+            GeneralConsultanServiceAncs = a.Item1;
+            totalCount = a.PageCount;
+            activePageIndex = pageIndex;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
+    }
+
+    #endregion Searching
+
+    private async Task Refresh_Click()
+    {
+        await LoadData();
+    }
+
+    public MarkupString GetIssuePriorityIconHtml(GeneralConsultanServiceDto priority)
+    {
+        if (priority is not null)
+        {
+            if (!priority.IsAlertInformationSpecialCase && priority.ClassType is null)
+                return new MarkupString("");
+
+            string priorytyClass = "danger";
+            string title = string.Empty;
+
+            if (priority.IsAlertInformationSpecialCase && priority.ClassType is not null)
+                title = $" Priority, {priority.ClassType}";
+            else
+            {
+                if (priority.ClassType is not null)
+                    title = $"{priority.ClassType}";
+                if (priority.IsAlertInformationSpecialCase)
+                    title = $" Priority ";
+            }
+
+            string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
+
+            return new MarkupString(html);
+        }
+        return new MarkupString("");
+    }
+}
