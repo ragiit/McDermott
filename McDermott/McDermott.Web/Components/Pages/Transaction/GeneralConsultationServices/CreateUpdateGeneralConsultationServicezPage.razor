@@ -514,7 +514,7 @@
                                                                     </Template>
                                                                 </DxFormLayoutItem>
                                                             }
-                                                            <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption=" Claim" ColSpanMd="12">
+                                                            <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation)  || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician)|| GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="normal-caption" Caption=" Claim" ColSpanMd="12">
                                                                 <DxCheckBox ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))" @bind-Checked="@GeneralConsultanService.IsClaim" />
                                                             </DxFormLayoutItem>
 
