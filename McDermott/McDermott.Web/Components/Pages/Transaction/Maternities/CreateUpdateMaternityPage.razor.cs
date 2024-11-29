@@ -337,6 +337,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private async Task NewItemAnc_Click()
         {
+            GeneralConsultanServiceAncDetail = new();
             GeneralConsultanServiceAncDetail.BB = GeneralConsultanService.Weight.ToInt32();
             GeneralConsultanServiceAncDetail.TD = GeneralConsultanService.Systolic.ToInt32();
             GeneralConsultanServiceAncDetail.TD2 = GeneralConsultanService.DiastolicBP.ToInt32();
@@ -409,7 +410,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             {
                 PanelVisible = true;
                 await GridAnc.StartEditRowAsync(FocusedGridTabAncRowVisibleIndex);
-
+                GeneralConsultanServiceAncDetail = new();
                 GeneralConsultanServiceAncDetail = (GridAnc.GetDataItem(FocusedGridTabAncRowVisibleIndex) as GeneralConsultanServiceAncDetailDto ?? new());
                 //NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
                 //Diagnoses = (await Mediator.Send(new GetDiagnosisQuery(predicate: x => x.Id == a.DiagnosisId))).Item1;
@@ -482,6 +483,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 {
                     await Mediator.Send(new UpdateGeneralConsultanServiceAncDetailRequest(editModel));
                 }
+                GeneralConsultanServiceAncDetail = new();
                 await LoadDataAnc(activePageIndexTotalCountGridAnc, pageSizeGridAnc);
 
                 if (string.IsNullOrWhiteSpace(GeneralConsultanService.ReferenceAnc))
