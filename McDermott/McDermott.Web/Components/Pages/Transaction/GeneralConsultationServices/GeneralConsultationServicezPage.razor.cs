@@ -55,7 +55,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        private List<StatusMcuData> StatusMcus = []; 
+        private List<StatusMcuData> StatusMcus = [];
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
@@ -71,7 +71,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     await Mediator.Send(new DeleteGeneralConsultanServiceRequest(ids: a.Select(x => x.Id).ToList()));
                 }
                 await LoadData();
-
             }
             catch { }
         }
@@ -79,7 +78,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
-
         }
 
         private async Task Refresh_Click()
@@ -123,12 +121,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     OrderByList =
                     [
-                        (x=>x.IsClaim, true),
                         (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
-                        (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
+                        (x => x.ClassType != null, true),               // ThenByDescending ClassType is not null
+                        (x=>x.IsClaim, true),
                     ],
-                    Predicate = x => x.IsGC == true,
+                    Predicate = x => x.Service != null && x.Service.IsVaccination == false && x.Service.IsMcu == false && x.Service.IsMaternity == false && x.Service.IsTelemedicine == false,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,
@@ -210,7 +208,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             if (priority is not null)
             {
-                if (!priority.IsClaim )
+                if (!priority.IsClaim)
                     return new MarkupString("");
 
                 string priorytyClass = "info";
@@ -222,7 +220,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     if (priority.IsClaim)
                         title = $"Claim";
-                   
                 }
 
                 string html = string.Format("<span class='badge bg-{0} py-1 px-2' title='{1} Priority'>{1}</span>", priorytyClass, title);
@@ -231,7 +228,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
             return new MarkupString("");
         }
-
 
         private bool IsDashboard { get; set; } = false;
 

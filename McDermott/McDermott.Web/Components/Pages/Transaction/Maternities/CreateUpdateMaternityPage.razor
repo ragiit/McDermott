@@ -1361,9 +1361,8 @@
                                                                                     <DxGridDataColumn FieldName="Trimester" Caption="Trimester" GroupIndex="0" />
                                                                                     <DxGridDataColumn FieldName="Complaint" Caption="Complaint" />
                                                                                     <DxGridDataColumn FieldName="KU" Caption="KU" />
-                                                                                    <DxGridDataColumn FieldName="TD" Caption="TD" />
-                                                                                    <DxGridDataColumn FieldName="BB" Caption="BB" />
-                                                                                    <DxGridDataColumn FieldName="UK" Caption="UK" />
+                                                                                    <DxGridDataColumn FieldName="TD" Caption="TD" /> 
+                                                                                    <DxGridDataColumn FieldName="BB" Caption="BB" /> 
                                                                                     <DxGridDataColumn FieldName="TFU" Caption="TFU" />
                                                                                     <DxGridDataColumn FieldName="FetusPosition" Caption="Fetus Position" />
                                                                                     <DxGridDataColumn FieldName="DJJ" Caption="DJJ" />
@@ -1388,7 +1387,7 @@
 
                                                                                 <EditFormTemplate Context="EditFormContext">
                                                                                     @{
-                                                                                        GeneralConsultanServiceAncDetail = (GeneralConsultanServiceAncDetailDto)EditFormContext.EditModel;
+                                                                                        // var a = (GeneralConsultanServiceAncDetailDto)EditFormContext.EditModel; 
                                                                                     }
                                                                                     <DxFormLayout CssClass="w-100">
                                                                                         <DxFormLayoutItem CaptionCssClass=" normal-caption" Caption="Trimester" ColSpanMd="12">

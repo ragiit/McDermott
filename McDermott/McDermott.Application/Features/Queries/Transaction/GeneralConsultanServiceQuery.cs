@@ -208,10 +208,13 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Service = new Service
                         {
                             Name = x.Service == null ? string.Empty : x.Service.Name,
-                            IsMaternity = x.IsMaternity
+                            IsMaternity = x.Service == null ? false : x.Service.IsMaternity,
+                            IsTelemedicine = x.Service == null ? false : x.Service.IsTelemedicine,
+                            IsMcu = x.Service == null ? false : x.Service.IsMcu,
+                            IsVaccination = x.Service == null ? false : x.Service.IsVaccination
                         },
                         Payment = x.Payment,
-                        
+
                         AppointmentDate = x.AppointmentDate,
                         IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
                         RegistrationDate = x.RegistrationDate,
@@ -224,7 +227,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         {
                             QueueNumber = x.KioskQueue == null ? null : x.KioskQueue.QueueNumber
                         },
-                        IsClaim =x.IsClaim,
+                        IsClaim = x.IsClaim,
                     });
 
                 if (!request.IsGetAll)
@@ -982,7 +985,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                  nameof(entity.LILA),
                 nameof(entity.BMIIndex), nameof(entity.BMIIndexString), nameof(entity.ScrinningTriageScale), nameof(entity.ClinicVisitTypes),
                 nameof(entity.E), nameof(entity.V), nameof(entity.M), nameof(entity.Temp), nameof(entity.HR),
-                nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState),nameof(entity.IsClaim),
+                nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState), nameof(entity.IsClaim),
                 nameof(entity.RiskOfFalling), nameof(entity.RiskOfFallingDetail));
         }
 

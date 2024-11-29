@@ -118,7 +118,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
                     ],
-                    Predicate = x => x.IsVaccination == true,
+                    Predicate = x => x.Service.IsVaccination == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,

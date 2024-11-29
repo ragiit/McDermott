@@ -120,7 +120,7 @@
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
                     ],
-                    Predicate = x => x.Service != null && x.IsMaternity == true && x.Service.IsMaternity == true,
+                    Predicate = x => x.Service != null && x.Service.IsMaternity == true,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     SearchTerm = searchTerm,

@@ -482,13 +482,14 @@
                 }
                 else if (!string.IsNullOrWhiteSpace(SelectedRujukanType) && SelectedRujukanType.Equals(RujukanTypes.ToList()[2]))
                 {
+
                     <DxLoadingPanel @bind-Visible="IsLoadingRJMCINT"
                                     IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                     IsContentBlocked="true"
                                     ApplyBackgroundShading="true"
                                     IndicatorAreaVisible="false"
                                     Text="Fetching Data...">
-                        <EditForm Model="@RJMCINTGeneralConsultanService" @onkeypress="@KeyPressHandler" Context="EditFormContext4" OnValidSubmit="@HandleValidSubmitRJMCINT" OnInvalidSubmit="@HandleInvalidSubmit">
+                        <EditForm Model="@GeneralConsultanService" @onkeypress="@KeyPressHandler" Context="EditFormContext4" OnValidSubmit="@HandleValidSubmitRJMCINT" OnInvalidSubmit="@HandleInvalidSubmit">
                             <DataAnnotationsValidator />
                             <ValidationSummary />
                             <AntiforgeryToken />
@@ -507,43 +508,45 @@
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Claim Type" ColSpanMd="12">
                                                                 <DxComboBox Data="@ClaimTypes"
-                                                                            @bind-Value="@RJMCINTGeneralConsultanService.TypeClaim"
+                                                                            @bind-Value="@GeneralConsultanService.TypeClaim"
                                                                             NullText="Select Claim Type" />
                                                             </DxFormLayoutItem>
                                                         }
                                                         <!-- Number -->
-                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Number" ColSpanMd="12">
-                                                            <DxTextBox @bind-Text="@RJMCINTGeneralConsultanService.Number" NullText="McD/RLH/Clinic/0001" />
-                                                        </DxFormLayoutItem> 
+                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Number" ColSpanMd="12">
+                                                            <DxTextBox @bind-Text="@GeneralConsultanService.Number" NullText="McD/RLH/Clinic/0001" />
+                                                        </DxFormLayoutItem>
 
                                                         <!-- Date -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Date" ColSpanMd="12">
-                                                            <DxDateEdit @bind-Date="@RJMCINTGeneralConsultanService.DateRJMCINT" DisplayFormat="@Helper.DefaultFormatDate" NullText="Select Date" />
+                                                            <DxDateEdit @bind-Date="@GeneralConsultanService.DateRJMCINT" DisplayFormat="@Helper.DefaultFormatDate" NullText="Select Date" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Kepada/To -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Kepada/To" ColSpanMd="12">
-                                                            <DxTextBox @bind-Text="@RJMCINTGeneralConsultanService.ReferTo" NullText="Enter To" />
+                                                            <DxTextBox @bind-Text="@GeneralConsultanService.ReferTo" NullText="Enter To" />
                                                         </DxFormLayoutItem>
+
 
                                                         <!-- Hospital -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Hospital" ColSpanMd="12">
                                                             <DxComboBox Data="@Hospitals"
-                                                                        @bind-Value="@RJMCINTGeneralConsultanService.Hospital"
+                                                                        @bind-Value="@GeneralConsultanService.Hospital"
                                                                         NullText="Select Hospital" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Examination Purpose -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Examination Purpose" ColSpanMd="12">
                                                             <DxComboBox Data="@ExaminationPurposes"
-                                                                        @bind-Value="@RJMCINTGeneralConsultanService.Specialist"
+                                                                        @bind-Value="@GeneralConsultanService.Specialist"
                                                                         NullText="Select Specialist" />
                                                         </DxFormLayoutItem>
+
 
                                                         <!-- Category -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
                                                             <DxComboBox Data="@Categories"
-                                                                        @bind-Value="@RJMCINTGeneralConsultanService.CategoryRJMCINT"
+                                                                        @bind-Value="@GeneralConsultanService.CategoryRJMCINT"
                                                                         NullText="Select Category" />
                                                         </DxFormLayoutItem>
                                                     </DxFormLayout>
@@ -554,7 +557,7 @@
                                                         <!-- Exam For -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Exam For" ColSpanMd="12">
                                                             <DxComboBox Data="@ExamFor"
-                                                                        @bind-Value="@RJMCINTGeneralConsultanService.ExamFor"
+                                                                        @bind-Value="@GeneralConsultanService.ExamFor"
                                                                         NullText="Select Exam For" />
                                                         </DxFormLayoutItem>
 
@@ -563,7 +566,7 @@
                                                             <MyDxComboBox Data="@Patients"
                                                                           NullText="Select Patient"
                                                                           @ref="refPatientComboBox"
-                                                                          @bind-Value="@RJMCINTGeneralConsultanService.PatientId"
+                                                                          @bind-Value="@GeneralConsultanService.PatientId"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"
                                                                           ReadOnly="true">
@@ -575,7 +578,7 @@
                                                             <MyDxComboBox Data="@Occupationals"
                                                                           NullText="Select Patient"
                                                                           @ref="refOccupationalComboBox"
-                                                                          @bind-Value="RJMCINTGeneralConsultanService.Patient.OccupationalId"
+                                                                          @bind-Value="GeneralConsultanService.Patient.OccupationalId"
                                                                           TextFieldName="Name"
                                                                           ValueFieldName="Id"
                                                                           ReadOnly="true">
@@ -584,18 +587,18 @@
 
                                                         <!-- Temporary Diagnosis -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Temporary Diagnosis" ColSpanMd="12">
-                                                            <DxTextBox @bind-Text="@RJMCINTGeneralConsultanService.TempDiagnosis" NullText="Enter Diagnosis" />
+                                                            <DxTextBox @bind-Text="@GeneralConsultanService.TempDiagnosis" NullText="Enter Diagnosis" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Therapy Provided -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Therapy Provided" ColSpanMd="12">
-                                                            <DxTextBox @bind-Text="@RJMCINTGeneralConsultanService.TherapyProvide" NullText="Enter Therapy" />
+                                                            <DxTextBox @bind-Text="@GeneralConsultanService.TherapyProvide" NullText="Enter Therapy" />
                                                         </DxFormLayoutItem>
 
                                                         <!-- Inpatient Class -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Inpatient Class" ColSpanMd="12">
                                                             <DxComboBox Data="@InpatientClasses"
-                                                                        @bind-Value="@RJMCINTGeneralConsultanService.InpatientClass"
+                                                                        @bind-Value="@GeneralConsultanService.InpatientClass"
                                                                         NullText="Select Inpatient Class" />
                                                         </DxFormLayoutItem>
                                                     </DxFormLayout>
@@ -612,6 +615,7 @@
                                                 </div>
 
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -630,7 +634,7 @@
     private bool IsLoading { get; set; } = false;
     private bool IsLoadingRJMCINT { get; set; } = false;
     private GeneralConsultanServiceDto ReferToGeneralConsultanService { get; set; } = new();
-    private GeneralConsultanServiceDto RJMCINTGeneralConsultanService { get; set; } = new();
+    // private GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
     private bool IsLoadingReferTo { get; set; } = false;
     private string SelectedRujukanType { get; set; } = "Rujuk Internal";
     private string SelectedRujukanExternal { get; set; }
@@ -717,6 +721,7 @@
                 return;
             }
 
+            GeneralConsultanService.Id = 0;
             await HandleGeneralConsultationSaveAsync(GeneralConsultanService, UserForm);
 
             // Refactored Save Logic
@@ -785,19 +790,7 @@
             {
 
                 GeneralConsultanServiceDto = GeneralConsultanService,
-                // GeneralConsultanServiceDto = new GeneralConsultanServiceDto{
-                //     TypeClaim = RJMCINTGeneralConsultanService.TypeClaim,
-                //     Number = RJMCINTGeneralConsultanService.Number,
-                //     Hospital = RJMCINTGeneralConsultanService.Hospital,
-                //     ExamFor = RJMCINTGeneralConsultanService.ExamFor,
-                //     DateRJMCINT = RJMCINTGeneralConsultanService.DateRJMCINT,
-                //     ReferTo = RJMCINTGeneralConsultanService.ReferTo,
-                //     Specialist = RJMCINTGeneralConsultanService.Specialist,
-                //     CategoryRJMCINT = RJMCINTGeneralConsultanService.CategoryRJMCINT,
-                //     TempDiagnosis = RJMCINTGeneralConsultanService.TempDiagnosis,
-                //     TherapyProvide = RJMCINTGeneralConsultanService.TherapyProvide,
-                //     InpatientClass = RJMCINTGeneralConsultanService.InpatientClass,
-                // }
+                
             };
         res = await Mediator.Send(updateRJMCINT);
         IsLoading = false;
@@ -1423,9 +1416,9 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-                                                                                                        [
-                                                                                                            x => x.Insurance
-                                                                                                        ],
+                                                                                                            [
+                                                                                                                x => x.Insurance
+                                                                                                            ],
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
