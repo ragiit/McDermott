@@ -2597,9 +2597,6 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsVaccination")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("JobPositionId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("KdPrognosa")
                         .HasColumnType("nvarchar(max)");
 
@@ -2635,6 +2632,9 @@ namespace McDermott.Persistence.Migrations
 
                     b.Property<string>("Number")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("OccupationalId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("PPKRujukanCode")
                         .HasColumnType("nvarchar(max)");
@@ -2801,11 +2801,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.HasIndex("InsurancePolicyId");
 
-                    b.HasIndex("JobPositionId");
-
                     b.HasIndex("KioskQueueId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("OccupationalId");
 
                     b.HasIndex("PatientId");
 
@@ -7431,11 +7431,6 @@ namespace McDermott.Persistence.Migrations
                         .HasForeignKey("InsurancePolicyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("McDermott.Domain.Entities.JobPosition", "JobPosition")
-                        .WithMany()
-                        .HasForeignKey("JobPositionId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("McDermott.Domain.Entities.KioskQueue", "KioskQueue")
                         .WithMany()
                         .HasForeignKey("KioskQueueId")
@@ -7444,6 +7439,11 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.Locations", "Location")
                         .WithMany()
                         .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("McDermott.Domain.Entities.Occupational", "Occupational")
+                        .WithMany()
+                        .HasForeignKey("OccupationalId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.User", "Patient")
@@ -7470,11 +7470,11 @@ namespace McDermott.Persistence.Migrations
 
                     b.Navigation("InsurancePolicy");
 
-                    b.Navigation("JobPosition");
-
                     b.Navigation("KioskQueue");
 
                     b.Navigation("Location");
+
+                    b.Navigation("Occupational");
 
                     b.Navigation("Patient");
 

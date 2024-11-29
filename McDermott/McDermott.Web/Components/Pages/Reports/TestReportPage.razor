@@ -1,6 +1,7 @@
 ﻿@page "/viewer"
 @layout EmptyLayoutBase
 @using DevExpress.Blazor.Reporting
+@using DevExpress.XtraReports
 @using DevExpress.XtraReports.UI
  
 <link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css" rel="stylesheet" />
@@ -11,11 +12,19 @@
 </DxReportViewer>
 
 @code {
-    DxReportViewer? reportViewer;
+     DxReportViewer reportViewer { get; set; }
+    IReport Report { get; set; }
 
-         XtraReport Report { get{
-        return XtraReport.FromFile(System.IO.Path.Combine(Directory.GetCurrentDirectory(),
-         @"wwwroot\Reports\TestReport.repx"));
-        }
+    protected override async Task OnInitializedAsync()
+    {
+        // PanelVisible = true;
+        Report = new ReportRujukanBPJS();
     }
+    // DxReportViewer? reportViewer;
+
+    //      XtraReport Report { get{
+    //     return XtraReport.FromFile(System.IO.Path.Combine(Directory.GetCurrentDirectory(),
+    //      @"wwwroot\Reports\TestReport.repx"));
+    //     }
+    // }
 }

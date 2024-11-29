@@ -378,6 +378,35 @@
                                                                 </Columns>
                                                             </MyDxComboBox>
                                                         </DxFormLayoutItem>
+
+
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="DiagnosisBPJSIntegrationTemp" ColSpanMd="12">
+                                                            <MyDxComboBox Data="@_diagnosisBPJSIntegrationTemp"
+                                                                          NullText="Select DiagnosisBPJSIntegrationTemp"
+                                                                          @ref="refDiagnosisBPJSIntegrationTempComboBox"
+                                                                          @bind-Value="SelectedDiagnoses"
+                                                                          TextFieldName="NmDiag"
+                                                                          ValueFieldName="KdDiag"
+                                                                          TextChanged="((string e) => OnInputDiagnosisBPJSIntegrationTempChanged(e))"
+                                                                          SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => SelectedItemDiagnosisBPJSIntegrationTempChanged(e))">
+                                                                <Buttons>
+                                                                    <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTempIndexDecrement"
+                                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                                    Tooltip="Previous Index" />
+                                                                    <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTemp"
+                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                                    Tooltip="Search" />
+                                                                    <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTempIndexIncrement"
+                                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                                    Tooltip="Next Index" />
+                                                                </Buttons>
+                                                                <Columns>
+                                                                    <DxListEditorColumn FieldName="KdDiag" />
+                                                                    <DxListEditorColumn FieldName="NmDiag" />
+                                                                    <DxListEditorColumn FieldName="NonSpesialis" />
+                                                                </Columns>
+                                                            </MyDxComboBox>
+                                                        </DxFormLayoutItem>
                                                     }
 
                                                     @* @if (_diagnosisBPJSIntegrationTemp.Count > 0 && Convert.ToBoolean(_diagnosisBPJSIntegrationTemp.FirstOrDefault(x => x.KdDiag == DiagnosaValue)?.NonSpesialis))
@@ -790,7 +819,7 @@
             {
 
                 GeneralConsultanServiceDto = GeneralConsultanService,
-                
+
             };
         res = await Mediator.Send(updateRJMCINT);
         IsLoading = false;
@@ -1416,9 +1445,9 @@
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                     Includes =
-                                                                                                            [
-                                                                                                                x => x.Insurance
-                                                                                                            ],
+                                                                                                                                [
+                                                                                                                                    x => x.Insurance
+                                                                                                                                ],
                     Select = x => new InsurancePolicy
                     {
                         Id = x.Id,
@@ -1722,6 +1751,98 @@
         _diagnosisBPJSIntegrationTemp = DiagnosisList;
 
         PanelVisible = false;
+    }
+    #endregion
+
+    #region ComboboxDiagnosisBPJSIntegrationTemp
+
+    private DxComboBox<DiagnosisBPJSIntegrationTemp, string> refDiagnosisBPJSIntegrationTempComboBox { get; set; }
+    private int DiagnosisBPJSIntegrationTempComboBoxIndex { get; set; } = 0;
+    private string SelectedDiagnoses { get; set; }
+    private int totalCountDiagnosisBPJSIntegrationTemp = 0;
+
+    private async Task OnSearchDiagnosisBPJSIntegrationTemp()
+    {
+        await LoadDataDiagnosisBPJSIntegrationTemp();
+    }
+
+    private async Task OnSearchDiagnosisBPJSIntegrationTempIndexIncrement()
+    {
+        if (DiagnosisBPJSIntegrationTempComboBoxIndex < (totalCountDiagnosisBPJSIntegrationTemp - 1))
+        {
+            DiagnosisBPJSIntegrationTempComboBoxIndex++;
+            await LoadDataDiagnosisBPJSIntegrationTemp(DiagnosisBPJSIntegrationTempComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnSearchDiagnosisBPJSIntegrationTempIndexDecrement()
+    {
+        if (DiagnosisBPJSIntegrationTempComboBoxIndex > 0)
+        {
+            DiagnosisBPJSIntegrationTempComboBoxIndex--;
+            await LoadDataDiagnosisBPJSIntegrationTemp(DiagnosisBPJSIntegrationTempComboBoxIndex, 10);
+        }
+    }
+
+    private async Task OnInputDiagnosisBPJSIntegrationTempChanged(string e)
+    {
+        DiagnosisBPJSIntegrationTempComboBoxIndex = 0;
+        await LoadDataDiagnosisBPJSIntegrationTemp();
+    }
+    private async Task SelectedItemDiagnosisBPJSIntegrationTempChanged(DiagnosisBPJSIntegrationTemp e)
+    {
+
+        if (e is null)
+        {
+            SelectedDiagnoses = "";
+            return;
+        }
+
+        SelectedDiagnoses = e.KdDiag;
+    }
+    private async Task LoadDataDiagnosisBPJSIntegrationTemp(int pageIndex = 0, int pageSize = 10)
+    {
+        try
+        {
+            PanelVisible = true;
+
+            var response = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"diagnosa/{refDiagnosisBPJSIntegrationTempComboBox?.Text ?? ""}/{pageIndex}/20", HttpMethod.Get);
+
+            if (response.Item2 != 200)
+            {
+                PanelVisible = false;
+
+                if (response.Item2 == 404)
+                {
+                    ToastService.ClearErrorToasts();
+                    ToastService.ShowError(Convert.ToString(response.Item1));
+                }
+
+                _diagnosisBPJSIntegrationTemp.Clear();
+
+                return;
+            }
+
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Item1);
+
+            var dynamicList = (IEnumerable<dynamic>)data.list;
+
+            var DiagnosisList = dynamicList.Select(item => new DiagnosisBPJSIntegrationTemp
+                {
+                    KdDiag = item.kdDiag,
+                    NmDiag = item.nmDiag,
+                    NonSpesialis = item.nonSpesialis,
+                }).ToList();
+
+            _diagnosisBPJSIntegrationTemp = DiagnosisList;
+
+            PanelVisible = false;
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+        finally { PanelVisible = false; }
     }
     #endregion
 }

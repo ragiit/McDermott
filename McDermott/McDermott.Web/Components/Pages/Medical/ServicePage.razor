@@ -3,8 +3,8 @@
 
 <PageTitle>McHealthCare - Service</PageTitle>
 
-@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead) 
-{ 
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
+{
     <div class="wrapper">
 
         <BaseHeaderPage Title="Service" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
@@ -50,12 +50,12 @@
 
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" SortIndex="0"  />
-                                        <DxGridDataColumn FieldName="Code"   />
+                                        <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                        <DxGridDataColumn FieldName="Code" />
                                         <DxGridDataColumn FieldName="IsVaccination" />
                                         <DxGridDataColumn FieldName="IsTelemedicine" />
                                         <DxGridDataColumn FieldName="IsMaternity" />
-                                        <DxGridDataColumn FieldName="Flag"  Caption="Flag" />
+                                        <DxGridDataColumn FieldName="Flag" Caption="Flag" />
                                         <DxGridDataColumn FieldName="KioskName" Caption=" Service Counter" />
                                     </Columns>
 
@@ -72,14 +72,14 @@
                                                 <MyTextBox @bind-Text="@a.Code" NullText="Code" />
                                                 <ValidationMessage For="@(()=>a.Code)" />
                                             </DxFormLayoutItem>
-                                          @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota" ColSpanMd="12">
+                                            @*   <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Quota" ColSpanMd="12">
                                                 <DxTextBox @bind-Text="@a.Quota" NullText="Quota" />
                                                 <ValidationMessage For="@(()=>a.Quota)" />
                                             </DxFormLayoutItem> *@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsPatient" />
                                                 <ValidationMessage For="@(()=>a.IsPatient)" />
-                                            </DxFormLayoutItem> 
+                                            </DxFormLayoutItem>
 
                                             <DxFormLayoutItem Visible="@Convert.ToBoolean(a.IsPatient)" CaptionCssClass="normal-caption" Caption="Service Counter" ColSpanMd="12">
                                                 <MyDxComboBox Data="@ServicesK"
@@ -101,7 +101,7 @@
                                                                         Tooltip="Next Index" />
                                                     </Buttons>
                                                     <Columns>
-                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" /> 
+                                                        <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="@nameof(ServiceDto.Code)" Caption="Code" />
                                                         <DxListEditorColumn FieldName="@nameof(ServiceDto.Quota)" Caption="Quota" />
                                                     </Columns>
@@ -121,14 +121,14 @@
                                                 <DxCheckBox @bind-Checked="@a.IsVaccination" />
                                                 <ValidationMessage For="@(()=>a.IsVaccination)" />
                                             </DxFormLayoutItem>
-                                           @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
+                                            @*  <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Telemedicine" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsTelemedicine" />
                                                 <ValidationMessage For="@(()=>a.IsTelemedicine)" />
                                             </DxFormLayoutItem>  *@
                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Maternity" ColSpanMd="12">
                                                 <DxCheckBox @bind-Checked="@a.IsMaternity" />
                                                 <ValidationMessage For="@(()=>a.IsMaternity)" />
-                                            </DxFormLayoutItem> 
+                                            </DxFormLayoutItem>
                                         </DxFormLayout>
                                     </EditFormTemplate>
 

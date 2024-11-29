@@ -401,7 +401,7 @@ IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
 
 var patienss = (await Mediator.Send(new GetSingleProductCategoryQuery
 {
-    Predicate = x => x.Id == data.PatientId,
+    Predicate = x => x.Id == data.DiagnosisBPJSIntegrationTempId,
     Select = x => new ProductCategory
     {
         Id = x.Id,
@@ -455,15 +455,15 @@ var data = (await Mediator.Send(new GetSingleProductCategorysQuery
     Includes =
     [
         x => x.Pratitioner,
-        x => x.Patient
+        x => x.DiagnosisBPJSIntegrationTemp
     ],
     Select = x => new ProductCategory
     {
         Id = x.Id,
-        PatientId = x.PatientId,
-        Patient = new ProductCategory
+        DiagnosisBPJSIntegrationTempId = x.DiagnosisBPJSIntegrationTempId,
+        DiagnosisBPJSIntegrationTemp = new ProductCategory
         {
-            DateOfBirth = x.Patient.DateOfBirth
+            DateOfBirth = x.DiagnosisBPJSIntegrationTemp.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
@@ -974,3 +974,161 @@ VIRAL 2025
     }
 
 #endregion
+
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="DiagnosisBPJSIntegrationTemp" ColSpanMd="12">
+     <MyDxComboBox Data="@DiagnosisBPJSIntegrationTemps"
+                   NullText="Select DiagnosisBPJSIntegrationTemp"
+                   @ref="refDiagnosisBPJSIntegrationTempComboBox"
+                   @bind-Value="@GeneralConsultanService.DiagnosisBPJSIntegrationTempId"
+                   TextFieldName="Name"
+                   ValueFieldName="Id"
+                   ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                   SelectedItemChanged="@((UserDto e) => SelectedItemDiagnosisBPJSIntegrationTempChanged(e))"
+                   TextChanged="((string e) => OnInputDiagnosisBPJSIntegrationTempChanged(e))">
+         <Buttons>
+             <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTempIndexDecrement"
+                             IconCssClass="fa-solid fa-caret-left"
+                             Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
+                             Tooltip="Previous Index" />
+             <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTemp"
+                             IconCssClass="fa-solid fa-magnifying-glass"
+                             Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
+                             Tooltip="Search" />
+             <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTempIndexIncrement"
+                             Visible="!ReadOnlyForm() && IsStatus(EnumStatusGeneralConsultantService.Planned)"
+                             IconCssClass="fa-solid fa-caret-right"
+                             Tooltip="Next Index" />
+         </Buttons>
+         <Columns>
+             <DxListEditorColumn FieldName="NoRm" Caption="Medical Record" />
+             <DxListEditorColumn FieldName="Name" />
+             <DxListEditorColumn FieldName="Email" />
+             <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
+             <DxListEditorColumn FieldName="Gender" />
+             <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
+         </Columns>
+     </MyDxComboBox>
+     <ValidationMessage For="@(()=>GeneralConsultanService.DiagnosisBPJSIntegrationTempId)" />
+ </DxFormLayoutItem>
+
+ #region ComboboxDiagnosisBPJSIntegrationTemp
+
+private DxComboBox<UserDto, long?> refDiagnosisBPJSIntegrationTempComboBox { get; set; }
+private int DiagnosisBPJSIntegrationTempComboBoxIndex { get; set; } = 0;
+private int totalCountDiagnosisBPJSIntegrationTemp = 0;
+
+private async Task OnSearchDiagnosisBPJSIntegrationTemp()
+{
+    await LoadDataDiagnosisBPJSIntegrationTemp();
+}
+
+private async Task OnSearchDiagnosisBPJSIntegrationTempIndexIncrement()
+{
+    if (DiagnosisBPJSIntegrationTempComboBoxIndex < (totalCountDiagnosisBPJSIntegrationTemp - 1))
+    {
+        DiagnosisBPJSIntegrationTempComboBoxIndex++;
+        await LoadDataDiagnosisBPJSIntegrationTemp(DiagnosisBPJSIntegrationTempComboBoxIndex, 10);
+    }
+}
+
+private async Task OnSearchDiagnosisBPJSIntegrationTempIndexDecrement()
+{
+    if (DiagnosisBPJSIntegrationTempComboBoxIndex > 0)
+    {
+        DiagnosisBPJSIntegrationTempComboBoxIndex--;
+        await LoadDataDiagnosisBPJSIntegrationTemp(DiagnosisBPJSIntegrationTempComboBoxIndex, 10);
+    }
+}
+
+private async Task OnInputDiagnosisBPJSIntegrationTempChanged(string e)
+{
+    DiagnosisBPJSIntegrationTempComboBoxIndex = 0;
+    await LoadDataDiagnosisBPJSIntegrationTemp();
+}
+
+private async Task LoadDataDiagnosisBPJSIntegrationTemp(int pageIndex = 0, int pageSize = 10)
+{
+    try
+    {
+        PanelVisible = true;
+        var result = await Mediator.Send(new GetUserQueryNew
+        {
+            Predicate = x => x.IsDiagnosisBPJSIntegrationTemp == true,
+            SearchTerm = refDiagnosisBPJSIntegrationTempComboBox?.Text ?? "",
+            PageIndex = pageIndex,
+            PageSize = pageSize,
+            Select = x => new User
+            {
+                Id = x.Id,
+                Name = x.Name,
+                NoRm = x.NoRm,
+                Email = x.Email,
+                MobilePhone = x.MobilePhone,
+                Gender = x.Gender,
+                DateOfBirth = x.DateOfBirth,
+                NoId = x.NoId,
+                CurrentMobile = x.CurrentMobile,
+
+                IsWeatherDiagnosisBPJSIntegrationTempAllergyIds = x.IsWeatherDiagnosisBPJSIntegrationTempAllergyIds,
+                IsFoodDiagnosisBPJSIntegrationTempAllergyIds = x.IsFoodDiagnosisBPJSIntegrationTempAllergyIds,
+                IsPharmacologyDiagnosisBPJSIntegrationTempAllergyIds = x.IsPharmacologyDiagnosisBPJSIntegrationTempAllergyIds,
+                WeatherDiagnosisBPJSIntegrationTempAllergyIds = x.WeatherDiagnosisBPJSIntegrationTempAllergyIds,
+                FoodDiagnosisBPJSIntegrationTempAllergyIds = x.FoodDiagnosisBPJSIntegrationTempAllergyIds,
+                PharmacologyDiagnosisBPJSIntegrationTempAllergyIds = x.PharmacologyDiagnosisBPJSIntegrationTempAllergyIds,
+
+                IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                FamilyMedicalHistory = x.FamilyMedicalHistory,
+                FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+
+                IsMedicationHistory = x.IsMedicationHistory,
+                MedicationHistory = x.MedicationHistory,
+                PastMedicalHistory = x.PastMedicalHistory
+            }
+        });
+        DiagnosisBPJSIntegrationTemps = result.Item1;
+        totalCountDiagnosisBPJSIntegrationTemp = result.PageCount;
+        PanelVisible = false;
+    }
+    catch (Exception ex)
+    {
+        ex.HandleException(ToastService);
+    }
+    finally { PanelVisible = false; }
+}
+
+private async Task SelectedItemDiagnosisBPJSIntegrationTempChanged(UserDto e)
+{
+    GeneralConsultanService.InsurancePolicyId = null;
+    InsurancePolicies.Clear();
+    GeneralConsultanService.DiagnosisBPJSIntegrationTemp = new();
+
+    if (e is null)
+        return;
+
+    GeneralConsultanService.DiagnosisBPJSIntegrationTemp = DiagnosisBPJSIntegrationTemps.FirstOrDefault(x => x.Id == e.Id) ?? new();
+    GeneralConsultanService.DiagnosisBPJSIntegrationTempId = e.Id;
+    UserForm = DiagnosisBPJSIntegrationTemps.FirstOrDefault(x => x.Id == e.Id) ?? new();
+
+    if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
+    {
+        InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
+        {
+            Predicate = x => x.UserId == GeneralConsultanService.DiagnosisBPJSIntegrationTempId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true,
+            Select = x => new InsurancePolicy
+            {
+                Id = x.Id,
+                Insurance = new Insurance
+                {
+                    Name = x.Insurance == null ? "" : x.Insurance.Name,
+                },
+                NoKartu = x.NoKartu,
+                KdProviderPstKdProvider = x.KdProviderPstKdProvider,
+                PolicyNumber = x.PolicyNumber,
+                PstPrb = x.PstPrb,
+                PstProl = x.PstProl
+            }
+        })).Item1;
+    }
+}
+
+#endregion ComboboxDiagnosisBPJSIntegrationTemp
