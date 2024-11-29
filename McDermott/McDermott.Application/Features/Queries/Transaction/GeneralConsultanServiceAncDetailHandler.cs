@@ -71,6 +71,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Complaint = x.Complaint,
                         KU = x.KU,
                         TD = x.TD,
+                        TD2 = x.TD2,
+                        Suhu = x.Suhu,
                         BB = x.BB,
                         UK = x.UK,
                         TFU = x.TFU,
@@ -152,6 +154,21 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new GeneralConsultanServiceAncDetail
                     {
                         Id = x.Id,
+                        Date = x.Date,
+                        GeneralConsultanServiceAncId = x.GeneralConsultanServiceAncId,
+                        Trimester = x.Trimester,
+                        Complaint = x.Complaint,
+                        KU = x.KU,
+                        TD = x.TD,
+                        TD2 = x.TD2,
+                        Suhu = x.Suhu,
+                        BB = x.BB,
+                        UK = x.UK,
+                        TFU = x.TFU,
+                        FetusPosition = x.FetusPosition,
+                        DJJ = x.DJJ,
+                        TT = x.TT,
+                        IsReadOnly = x.IsReadOnly,
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GeneralConsultanServiceAncDetailDto>();

@@ -337,11 +337,12 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private async Task NewItemAnc_Click()
         {
-            await GridAnc.StartEditNewRowAsync();
             GeneralConsultanServiceAncDetail.BB = GeneralConsultanService.Weight.ToInt32();
             GeneralConsultanServiceAncDetail.TD = GeneralConsultanService.Systolic.ToInt32();
-            GeneralConsultanServiceAncDetail.TD2 = GeneralConsultanService.Diastole.ToInt32();
+            GeneralConsultanServiceAncDetail.TD2 = GeneralConsultanService.DiastolicBP.ToInt32();
             GeneralConsultanServiceAncDetail.Suhu = GeneralConsultanService.Temp.ToInt32();
+
+            await GridAnc.StartEditNewRowAsync();
         }
 
         private async Task RefreshAnc_Click()
@@ -409,7 +410,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 PanelVisible = true;
                 await GridAnc.StartEditRowAsync(FocusedGridTabAncRowVisibleIndex);
 
-                //var a = (GridAnc.GetDataItem(FocusedGridTabAncRowVisibleIndex) as GeneralConsultanAncDto ?? new());
+                GeneralConsultanServiceAncDetail = (GridAnc.GetDataItem(FocusedGridTabAncRowVisibleIndex) as GeneralConsultanServiceAncDetailDto ?? new());
                 //NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
                 //Diagnoses = (await Mediator.Send(new GetDiagnosisQuery(predicate: x => x.Id == a.DiagnosisId))).Item1;
 
@@ -449,7 +450,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             {
                 PanelVisible = true;
 
-                var editModel = (GeneralConsultanServiceAncDetailDto)e.EditModel;
+                //var editModel = (GeneralConsultanServiceAncDetailDto)e.EditModel;
+                var editModel = GeneralConsultanServiceAncDetail;
 
                 //var cekRef = References.FirstOrDefault(x => x == refReferenceComboBox.Text);
                 //if (cekRef is not null)
@@ -2022,9 +2024,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             IsReferTo = true;
         }
 
-        private void HandleClosePopupReferTo()
+        private async Task HandleClosePopupReferTo()
         {
             IsReferTo = false; // Tutup popup
+
+            await LoadData();
         }
 
         private void OnAppoimentPopUpClick()
@@ -2044,7 +2048,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"/pharmacy/presciptions/{GeneralConsultanService.Id}");
+            //NavigationManager.NavigateTo($"pharmacy/presciptions/{GeneralConsultanService.Id}");
+            NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}?GcId={GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()

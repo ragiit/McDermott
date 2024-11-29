@@ -1910,7 +1910,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                                 MedicationHistory = userForm.MedicationHistory,
                                 PastMedicalHistory = userForm.PastMedicalHistory,
                                 CurrentMobile = userForm.CurrentMobile,
-                                
                             }
                         };
 
@@ -2610,7 +2609,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private void OnClickReferralPrescriptionConcoction()
         {
-            NavigationManager.NavigateTo($"/pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}?GcId={GeneralConsultanService.Id}");
+            NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}?GcId={GeneralConsultanService.Id}");
         }
 
         private void OnPrintDocumentMedical()
@@ -2764,6 +2763,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 ex.HandleException(ToastService);
             }
             finally { PanelVisible = false; }
+        }
+
+        private async Task OnPrintRujukanBPJS()
+        {
+            var reportUrl = "/api/reports/rujukan-bpjs/id"; // Sesuaikan URL API Anda
+            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
         }
 
         private async Task OnPrint()
