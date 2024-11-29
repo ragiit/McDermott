@@ -317,7 +317,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         #endregion Searching
 
-        #region LoadData
+        #region LoadData Claim
 
         private async Task LoadDataClaim(int pageIndex = 0, int pageSizeGridClaim = 10)
         {
@@ -404,6 +404,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 }
                 else
                 {
+                    PostClaimRequests.GeneralConsultanServiceId = GeneralConsultanService.Id;
                     item = await Mediator.Send(new UpdateClaimRequestRequest(PostClaimRequests));
                     ToastService.ShowSuccess($"Update Data Claim Request Success");
                 }
@@ -431,6 +432,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             if (Data.Id != 0)
             {
                 Data.Status = EnumClaimRequestStatus.Done;
+                Data.GeneralConsultanServiceId = GeneralConsultanService.Id;
                 item = await Mediator.Send(new UpdateClaimRequestRequest(Data));
 
                 ToastService.ShowSuccess("Update Status Success");

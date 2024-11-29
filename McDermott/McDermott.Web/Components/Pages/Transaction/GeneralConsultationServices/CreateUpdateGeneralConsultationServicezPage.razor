@@ -1326,6 +1326,7 @@
                                                                                                 PostClaimRequests = (ClaimRequestDto)EditFormContext.EditModel;
                                                                                                 PostClaimRequests.PatientId = GeneralConsultanService.PatientId;
                                                                                                 PostClaimRequests.PhycisianId = GeneralConsultanService.PratitionerId;
+                                                                                                PostClaimRequests.GeneralConsultanServiceId = GeneralConsultanService.Id;
                                                                                             }
                                                                                             <DxFormLayout CssClass="w-100">
                                                                                                 <DxFormLayoutItem Caption="Patient" CaptionCssClass="normal-caption" ColSpanMd="6">

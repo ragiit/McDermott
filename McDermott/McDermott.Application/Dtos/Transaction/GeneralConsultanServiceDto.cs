@@ -287,7 +287,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? Specialist { get; set; }
         public string? CategoryRJMCINT { get; set; }
         public string? ExamFor { get; set; }
-        public long? JobPositionId { get; set; }
+        public long? OccupationalId { get; set; }
         public string? TempDiagnosis { get; set; }
         public string? TherapyProvide { get; set; }
         public string? InpatientClass { get; set; }
@@ -469,13 +469,13 @@ namespace McDermott.Application.Dtos.Transaction
         #region Mcdermott Internal
         public string? TypeClaim { get; set; }
         public string? Number { get; set; }
-        public DateTime? DateRJMCINT { get; set; }
+        public DateTime DateRJMCINT { get; set; } = DateTime.Now;
         public string? ReferTo { get; set; }
         public string? Hospital { get; set; }
         public string? Specialist { get; set; }
         public string? CategoryRJMCINT { get; set; }
         public string? ExamFor { get; set; }
-        public long? JobPositionId { get; set; }
+        public long? OccupationalId { get; set; }
         public string? TempDiagnosis { get; set; }
         public string? TherapyProvide { get; set; }
         public string? InpatientClass { get; set; }

@@ -88,7 +88,7 @@ namespace McDermott.Domain.Entities
         public string? Specialist {  get; set; }
         public string? CategoryRJMCINT { get; set; }
         public string? ExamFor {  get; set; }
-        public long? JobPositionId { get; set; }
+        public long? OccupationalId { get; set; }
         public string? TempDiagnosis {  get; set; }
         public string? TherapyProvide {  get; set; }
         public string? InpatientClass { get; set; }
@@ -175,7 +175,7 @@ namespace McDermott.Domain.Entities
         //[SetToNull]
         public virtual KioskQueue? KioskQueue { get; set; }
 
-        public virtual JobPosition? JobPosition { get; set; }
+        public virtual Occupational? Occupational { get; set; }
 
         //[SetToNull]
         public virtual User? Patient { get; set; }

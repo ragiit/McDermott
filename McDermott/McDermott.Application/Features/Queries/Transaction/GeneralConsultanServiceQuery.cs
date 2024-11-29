@@ -1283,6 +1283,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.Payment = request.GeneralConsultanServiceDto.Payment;
                     entity.RegistrationDate = request.GeneralConsultanServiceDto.RegistrationDate;
                     entity.PatientNextVisitSchedule = request.GeneralConsultanServiceDto.PatientNextVisitSchedule;
+                    entity.IsClaim = request.GeneralConsultanServiceDto.IsClaim;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.SerialNo));
@@ -1295,6 +1296,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PatientNextVisitSchedule));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Payment));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.RegistrationDate));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.IsClaim));
                 }
                 else if (request.Status == EnumStatusGeneralConsultantService.Waiting)
                 {
@@ -1326,6 +1328,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.BMIState = request.GeneralConsultanServiceDto.BMIState;
                     entity.RiskOfFalling = request.GeneralConsultanServiceDto.RiskOfFalling;
                     entity.RiskOfFallingDetail = request.GeneralConsultanServiceDto.RiskOfFallingDetail;
+                    entity.IsClaim = request.GeneralConsultanServiceDto.IsClaim;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PratitionerId));
@@ -1350,6 +1353,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.BMIState));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.RiskOfFalling));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.RiskOfFallingDetail));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.IsClaim));
                 }
                 else if (request.Status == EnumStatusGeneralConsultantService.NurseStation || request.Status == EnumStatusGeneralConsultantService.Midwife)
                 {
@@ -1358,8 +1362,10 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().Attach(entity);
 
                     entity.Status = request.GeneralConsultanServiceDto.Status;
+                    entity.IsClaim = request.GeneralConsultanServiceDto.IsClaim;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.IsClaim));
                 }
                 else if (request.Status == EnumStatusGeneralConsultantService.Physician)
                 {
@@ -1368,8 +1374,32 @@ namespace McDermott.Application.Features.Queries.Transaction
                     _unitOfWork.Repository<GeneralConsultanService>().Attach(entity);
 
                     entity.Status = request.GeneralConsultanServiceDto.Status;
+                    entity.TypeClaim = request.GeneralConsultanServiceDto.TypeClaim;
+                    entity.Number = request.GeneralConsultanServiceDto.Number;
+                    entity.DateRJMCINT = request.GeneralConsultanServiceDto.DateRJMCINT;
+                    entity.ReferTo = request.GeneralConsultanServiceDto.ReferTo;
+                    entity.Hospital = request.GeneralConsultanServiceDto.Hospital;
+                    entity.Specialist = request.GeneralConsultanServiceDto.Specialist;
+                    entity.CategoryRJMCINT = request.GeneralConsultanServiceDto.CategoryRJMCINT;
+                    entity.ExamFor = request.GeneralConsultanServiceDto.ExamFor;
+                    entity.OccupationalId = request.GeneralConsultanServiceDto.OccupationalId;
+                    entity.TempDiagnosis = request.GeneralConsultanServiceDto.TempDiagnosis;
+                    entity.TherapyProvide = request.GeneralConsultanServiceDto.TherapyProvide;
+                    entity.InpatientClass = request.GeneralConsultanServiceDto.InpatientClass;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.TypeClaim));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Number));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.DateRJMCINT));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.ReferTo));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Hospital));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Specialist));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.CategoryRJMCINT));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.ExamFor));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.OccupationalId));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.TempDiagnosis));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.TherapyProvide));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.InpatientClass));
                 }
                 else if (request.Status == EnumStatusGeneralConsultantService.Finished)
                 {
