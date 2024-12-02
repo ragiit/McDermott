@@ -1,43 +1,43 @@
 
-#region ComboBox City
+#region ComboBox Diagnosis
 
-    private CityDto SelectedCity { get; set; } = new();
-    async Task SelectedItemChanged(CityDto e)
+    private DiagnosisDto SelectedDiagnosis { get; set; } = new();
+    async Task SelectedItemChanged(DiagnosisDto e)
     {
         if (e is null)
         {
-            SelectedCity = new();
-            await LoadCity(); 
+            SelectedDiagnosis = new();
+            await LoadDiagnosis(); 
         }
         else
-            SelectedCity = e;
+            SelectedDiagnosis = e;
     }
 
-    private CancellationTokenSource? _ctsCity;
-    private async Task OnInputCity(ChangeEventArgs e)
+    private CancellationTokenSource? _ctsDiagnosis;
+    private async Task OnInputDiagnosis(ChangeEventArgs e)
     {
         try
         { 
-            _ctsCity?.Cancel();
-            _ctsCity?.Dispose();
-            _ctsCity = new CancellationTokenSource();
+            _ctsDiagnosis?.Cancel();
+            _ctsDiagnosis?.Dispose();
+            _ctsDiagnosis = new CancellationTokenSource();
 
-            await Task.Delay(Helper.CBX_DELAY, _ctsCity.Token);
+            await Task.Delay(Helper.CBX_DELAY, _ctsDiagnosis.Token);
 
-            await LoadCity(e.Value?.ToString() ?? "");
+            await LoadDiagnosis(e.Value?.ToString() ?? "");
         }
         finally
         { 
-            _ctsCity?.Dispose();
-            _ctsCity = null;
+            _ctsDiagnosis?.Dispose();
+            _ctsDiagnosis = null;
         }
     }
 
-    private async Task LoadCity(string? e = "", Expression<Func<City, bool>>? predicate = null)
+    private async Task LoadDiagnosis(string? e = "", Expression<Func<Diagnosis, bool>>? predicate = null)
     {
         try
         { 
-            Citys = await Mediator.QueryGetComboBox<City, CityDto>(e, predicate); 
+            Diagnosiss = await Mediator.QueryGetComboBox<Diagnosis, DiagnosisDto>(e, predicate); 
         }
         catch (Exception ex)
         {
@@ -49,21 +49,21 @@
 #endregion
 
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
-    <MyDxComboBox Data="Citys"
-                NullText="Select City"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
+    <MyDxComboBox Data="Diagnosiss"
+                NullText="Select Diagnosis"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputCity"
-                SelectedItemChanged="((CityDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.CityId">
+                @oninput="OnInputDiagnosis"
+                SelectedItemChanged="((DiagnosisDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.DiagnosisId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(City.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(City.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(Diagnosis.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Diagnosis.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.CityId)" />
+    <ValidationMessage For="@(()=>a.DiagnosisId)" />
 </DxFormLayoutItem>
 
 
-City
+Diagnosis

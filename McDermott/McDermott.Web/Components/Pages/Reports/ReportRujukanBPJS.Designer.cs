@@ -38,9 +38,6 @@
             this.xrTableCell1 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrLabelDokter = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabelSalamDate = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrTable3 = new DevExpress.XtraReports.UI.XRTable();
-            this.xrTableRow3 = new DevExpress.XtraReports.UI.XRTableRow();
-            this.xrTableCell3 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrLabelBerlakuDate = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabelJadwal = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabelRencana = new DevExpress.XtraReports.UI.XRLabel();
@@ -100,7 +97,6 @@
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrPictureBox2 = new DevExpress.XtraReports.UI.XRPictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.xrTable3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
@@ -118,7 +114,7 @@
             // 
             this.Detail.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrTable1});
-            this.Detail.HeightF = 576.0636F;
+            this.Detail.HeightF = 534.6592F;
             this.Detail.Name = "Detail";
             // 
             // xrTable1
@@ -130,7 +126,7 @@
             this.xrTable1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
             this.xrTable1.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.xrTableRow1});
-            this.xrTable1.SizeF = new System.Drawing.SizeF(752.9999F, 576.0636F);
+            this.xrTable1.SizeF = new System.Drawing.SizeF(775.9999F, 534.6592F);
             // 
             // xrTableRow1
             // 
@@ -149,7 +145,6 @@
             this.xrTableCell1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
             this.xrLabelDokter,
             this.xrLabelSalamDate,
-            this.xrTable3,
             this.xrLabelBerlakuDate,
             this.xrLabelJadwal,
             this.xrLabelRencana,
@@ -207,7 +202,7 @@
             this.xrLabelDokter.StylePriority.UseBorders = false;
             this.xrLabelDokter.StylePriority.UseTextAlignment = false;
             this.xrLabelDokter.Text = "DR ADVENTIUS";
-            this.xrLabelDokter.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
+            this.xrLabelDokter.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
             // 
             // xrLabelSalamDate
             // 
@@ -222,28 +217,6 @@
             this.xrLabelSalamDate.StylePriority.UseTextAlignment = false;
             this.xrLabelSalamDate.Text = "Salam sejawat,\r\n12 November 2024";
             this.xrLabelSalamDate.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            // 
-            // xrTable3
-            // 
-            this.xrTable3.LocationFloat = new DevExpress.Utils.PointFloat(611.254F, 440.4541F);
-            this.xrTable3.Name = "xrTable3";
-            this.xrTable3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
-            this.xrTable3.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
-            this.xrTableRow3});
-            this.xrTable3.SizeF = new System.Drawing.SizeF(99.99994F, 63.88892F);
-            // 
-            // xrTableRow3
-            // 
-            this.xrTableRow3.Cells.AddRange(new DevExpress.XtraReports.UI.XRTableCell[] {
-            this.xrTableCell3});
-            this.xrTableRow3.Name = "xrTableRow3";
-            this.xrTableRow3.Weight = 1D;
-            // 
-            // xrTableCell3
-            // 
-            this.xrTableCell3.Multiline = true;
-            this.xrTableCell3.Name = "xrTableCell3";
-            this.xrTableCell3.Weight = 1D;
             // 
             // xrLabelBerlakuDate
             // 
@@ -329,7 +302,7 @@
             // xrLabel43
             // 
             this.xrLabel43.Borders = DevExpress.XtraPrinting.BorderSide.None;
-            this.xrLabel43.LocationFloat = new DevExpress.Utils.PointFloat(10.00004F, 405.0117F);
+            this.xrLabel43.LocationFloat = new DevExpress.Utils.PointFloat(9.999984F, 405.0117F);
             this.xrLabel43.Multiline = true;
             this.xrLabel43.Name = "xrLabel43";
             this.xrLabel43.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -757,7 +730,7 @@
             this.xrTable2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
             this.xrTable2.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.xrTableRow2});
-            this.xrTable2.SizeF = new System.Drawing.SizeF(732.9999F, 107.532F);
+            this.xrTable2.SizeF = new System.Drawing.SizeF(755.9999F, 107.532F);
             // 
             // xrTableRow2
             // 
@@ -789,7 +762,7 @@
             this.xrBarCode1.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrBarCode1.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrBarCode1.AutoModule = true;
-            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(381.844F, 10.00001F);
+            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(404.844F, 10.00001F);
             this.xrBarCode1.Name = "xrBarCode1";
             this.xrBarCode1.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 10, 0, 0, 96F);
             this.xrBarCode1.SizeF = new System.Drawing.SizeF(341.1559F, 76.65382F);
@@ -928,7 +901,7 @@
             // 
             this.xrLabel5.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel5.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
-            this.xrLabel5.LocationFloat = new DevExpress.Utils.PointFloat(601.3332F, 32.99999F);
+            this.xrLabel5.LocationFloat = new DevExpress.Utils.PointFloat(624.3332F, 32.99999F);
             this.xrLabel5.Multiline = true;
             this.xrLabel5.Name = "xrLabel5";
             this.xrLabel5.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -941,7 +914,7 @@
             // 
             this.xrLabel4.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel4.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
-            this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(601.3332F, 10.00001F);
+            this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(624.3332F, 10.00001F);
             this.xrLabel4.Multiline = true;
             this.xrLabel4.Name = "xrLabel4";
             this.xrLabel4.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -955,7 +928,7 @@
             this.xrLabel3.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel3.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrLabel3.Font = new DevExpress.Drawing.DXFont("Arial", 9F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(470.0832F, 32.99999F);
+            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(493.0832F, 32.99999F);
             this.xrLabel3.Multiline = true;
             this.xrLabel3.Name = "xrLabel3";
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -970,7 +943,7 @@
             this.xrLabel2.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel2.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrLabel2.Font = new DevExpress.Drawing.DXFont("Arial", 9F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel2.LocationFloat = new DevExpress.Utils.PointFloat(470.0832F, 10.00001F);
+            this.xrLabel2.LocationFloat = new DevExpress.Utils.PointFloat(493.0832F, 10.00001F);
             this.xrLabel2.Multiline = true;
             this.xrLabel2.Name = "xrLabel2";
             this.xrLabel2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -990,7 +963,7 @@
             this.xrLabel1.Multiline = true;
             this.xrLabel1.Name = "xrLabel1";
             this.xrLabel1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel1.SizeF = new System.Drawing.SizeF(167.3077F, 20.59615F);
+            this.xrLabel1.SizeF = new System.Drawing.SizeF(190.3077F, 20.59615F);
             this.xrLabel1.StylePriority.UseFont = false;
             this.xrLabel1.StylePriority.UseTextAlignment = false;
             this.xrLabel1.Text = "Surat Rujukan FKTP\r\n";
@@ -1017,12 +990,10 @@
             this.Font = new DevExpress.Drawing.DXFont(resources.GetString("$this.Font"), 8.25F);
             this.HorizontalContentSplitting = DevExpress.XtraPrinting.HorizontalContentSplitting.Smart;
             this.Margins = new DevExpress.Drawing.DXMargins(34F, 40F, 24.14773F, 11.15963F);
-            this.PageHeight = 1169;
-            this.PageWidth = 827;
-            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.A4;
+            this.PageHeight = 685;
+            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Custom;
             this.Version = "23.2";
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.xrTable3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
 
@@ -1089,9 +1060,6 @@
         public DevExpress.XtraReports.UI.XRLabel xrLabel36;
         public DevExpress.XtraReports.UI.XRLabel xrLabelDokter;
         public DevExpress.XtraReports.UI.XRLabel xrLabelSalamDate;
-        private DevExpress.XtraReports.UI.XRTable xrTable3;
-        private DevExpress.XtraReports.UI.XRTableRow xrTableRow3;
-        private DevExpress.XtraReports.UI.XRTableCell xrTableCell3;
         public DevExpress.XtraReports.UI.XRLabel xrLabelBerlakuDate;
         public DevExpress.XtraReports.UI.XRLabel xrLabelJadwal;
         public DevExpress.XtraReports.UI.XRLabel xrLabelRencana;

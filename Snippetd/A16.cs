@@ -1,16 +1,16 @@
-ProductCategory
+NursingDiagnoses
 
-public class ProductCategoryCommand
+public class NursingDiagnosesCommand
  {
      #region GET
 
-    public class GetSingleProductCategoryQuery : IRequest<ProductCategoryDto>
+    public class GetSingleNursingDiagnosesQuery : IRequest<NursingDiagnosesDto>
     {
-        public List<Expression<Func<ProductCategory, object>>> Includes { get; set; }
-        public Expression<Func<ProductCategory, bool>> Predicate { get; set; }
-        public Expression<Func<ProductCategory, ProductCategory>> Select { get; set; }
+        public List<Expression<Func<NursingDiagnoses, object>>> Includes { get; set; }
+        public Expression<Func<NursingDiagnoses, bool>> Predicate { get; set; }
+        public Expression<Func<NursingDiagnoses, NursingDiagnoses>> Select { get; set; }
 
-        public List<(Expression<Func<ProductCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<NursingDiagnoses, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -19,13 +19,13 @@ public class ProductCategoryCommand
         public string SearchTerm { get; set; }
     }
 
-    public class GetProductCategoryQuery : IRequest<(List<ProductCategoryDto>, int PageIndex, int PageSize, int PageCount)>
+    public class GetNursingDiagnosesQuery : IRequest<(List<NursingDiagnosesDto>, int PageIndex, int PageSize, int PageCount)>
     {
-        public List<Expression<Func<ProductCategory, object>>> Includes { get; set; }
-        public Expression<Func<ProductCategory, bool>> Predicate { get; set; }
-        public Expression<Func<ProductCategory, ProductCategory>> Select { get; set; }
+        public List<Expression<Func<NursingDiagnoses, object>>> Includes { get; set; }
+        public Expression<Func<NursingDiagnoses, bool>> Predicate { get; set; }
+        public Expression<Func<NursingDiagnoses, NursingDiagnoses>> Select { get; set; }
 
-        public List<(Expression<Func<ProductCategory, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public List<(Expression<Func<NursingDiagnoses, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 
         public bool IsDescending { get; set; } = false; // default to ascending
         public int PageIndex { get; set; } = 0;
@@ -34,49 +34,49 @@ public class ProductCategoryCommand
         public string SearchTerm { get; set; }
     }
 
-     public class ValidateProductCategory(Expression<Func<ProductCategory, bool>>? predicate = null) : IRequest<bool>
+     public class ValidateNursingDiagnoses(Expression<Func<NursingDiagnoses, bool>>? predicate = null) : IRequest<bool>
      {
-         public Expression<Func<ProductCategory, bool>> Predicate { get; } = predicate!;
+         public Expression<Func<NursingDiagnoses, bool>> Predicate { get; } = predicate!;
      }
 
      #endregion GET
 
      #region CREATE
 
-     public class CreateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>
+     public class CreateNursingDiagnosesRequest(NursingDiagnosesDto NursingDiagnosesDto) : IRequest<NursingDiagnosesDto>
      {
-         public ProductCategoryDto ProductCategoryDto { get; set; } = ProductCategoryDto;
+         public NursingDiagnosesDto NursingDiagnosesDto { get; set; } = NursingDiagnosesDto;
      }
 
-     public class BulkValidateProductCategory(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
+     public class BulkValidateNursingDiagnoses(List<NursingDiagnosesDto> NursingDiagnosessToValidate) : IRequest<List<NursingDiagnosesDto>>
      {
-         public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
+         public List<NursingDiagnosesDto> NursingDiagnosessToValidate { get; } = NursingDiagnosessToValidate;
      }
 
-     public class CreateListProductCategoryRequest(List<ProductCategoryDto> ProductCategoryDtos) : IRequest<List<ProductCategoryDto>>
+     public class CreateListNursingDiagnosesRequest(List<NursingDiagnosesDto> NursingDiagnosesDtos) : IRequest<List<NursingDiagnosesDto>>
      {
-         public List<ProductCategoryDto> ProductCategoryDtos { get; set; } = ProductCategoryDtos;
+         public List<NursingDiagnosesDto> NursingDiagnosesDtos { get; set; } = NursingDiagnosesDtos;
      }
 
      #endregion CREATE
 
      #region Update
 
-     public class UpdateProductCategoryRequest(ProductCategoryDto ProductCategoryDto) : IRequest<ProductCategoryDto>
+     public class UpdateNursingDiagnosesRequest(NursingDiagnosesDto NursingDiagnosesDto) : IRequest<NursingDiagnosesDto>
      {
-         public ProductCategoryDto ProductCategoryDto { get; set; } = ProductCategoryDto;
+         public NursingDiagnosesDto NursingDiagnosesDto { get; set; } = NursingDiagnosesDto;
      }
 
-     public class UpdateListProductCategoryRequest(List<ProductCategoryDto> ProductCategoryDtos) : IRequest<List<ProductCategoryDto>>
+     public class UpdateListNursingDiagnosesRequest(List<NursingDiagnosesDto> NursingDiagnosesDtos) : IRequest<List<NursingDiagnosesDto>>
      {
-         public List<ProductCategoryDto> ProductCategoryDtos { get; set; } = ProductCategoryDtos;
+         public List<NursingDiagnosesDto> NursingDiagnosesDtos { get; set; } = NursingDiagnosesDtos;
      }
 
      #endregion Update
 
      #region DELETE
 
-     public class DeleteProductCategoryRequest : IRequest<bool>
+     public class DeleteNursingDiagnosesRequest : IRequest<bool>
      {
          public long Id { get; set; }  
          public List<long> Ids { get; set; }  
@@ -85,54 +85,54 @@ public class ProductCategoryCommand
      #endregion DELETE
  }
 
-IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
+IRequestHandler<BulkValidateNursingDiagnosesQuery, List<NursingDiagnosesDto>>,
   
-IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
-public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-     IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
-     IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>, 
-     IRequestHandler<ValidateProductCategory, bool>,
-     IRequestHandler<CreateProductCategoryRequest, ProductCategoryDto>,
-     IRequestHandler<BulkValidateProductCategory, List<ProductCategoryDto>>,
-     IRequestHandler<CreateListProductCategoryRequest, List<ProductCategoryDto>>,
-     IRequestHandler<UpdateProductCategoryRequest, ProductCategoryDto>,
-     IRequestHandler<UpdateListProductCategoryRequest, List<ProductCategoryDto>>,
-     IRequestHandler<DeleteProductCategoryRequest, bool>
+IRequestHandler<GetNursingDiagnosesQuery, (List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleNursingDiagnosesQuery, NursingDiagnosesDto>,
+public class NursingDiagnosesHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
+     IRequestHandler<GetNursingDiagnosesQuery, (List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>,
+     IRequestHandler<GetSingleNursingDiagnosesQuery, NursingDiagnosesDto>, 
+     IRequestHandler<ValidateNursingDiagnoses, bool>,
+     IRequestHandler<CreateNursingDiagnosesRequest, NursingDiagnosesDto>,
+     IRequestHandler<BulkValidateNursingDiagnoses, List<NursingDiagnosesDto>>,
+     IRequestHandler<CreateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>,
+     IRequestHandler<UpdateNursingDiagnosesRequest, NursingDiagnosesDto>,
+     IRequestHandler<UpdateListNursingDiagnosesRequest, List<NursingDiagnosesDto>>,
+     IRequestHandler<DeleteNursingDiagnosesRequest, bool>
 {
     #region GET
-    public async Task<List<ProductCategoryDto>> Handle(BulkValidateProductCategory request, CancellationToken cancellationToken)
+    public async Task<List<NursingDiagnosesDto>> Handle(BulkValidateNursingDiagnoses request, CancellationToken cancellationToken)
     {
-        var ProductCategoryDtos = request.ProductCategorysToValidate;
+        var NursingDiagnosesDtos = request.NursingDiagnosessToValidate;
 
         // Ekstrak semua kombinasi yang akan dicari di database
-        //var ProductCategoryNames = ProductCategoryDtos.Select(x => x.Name).Distinct().ToList();
-        //var Codes = ProductCategoryDtos.Select(x => x.Code).Distinct().ToList();
+        //var NursingDiagnosesNames = NursingDiagnosesDtos.Select(x => x.Name).Distinct().ToList();
+        //var Codes = NursingDiagnosesDtos.Select(x => x.Code).Distinct().ToList();
 
-        //var existingProductCategorys = await _unitOfWork.Repository<ProductCategory>()
+        //var existingNursingDiagnosess = await _unitOfWork.Repository<NursingDiagnoses>()
         //    .Entities
         //    .AsNoTracking()
-        //    .Where(v => ProductCategoryNames.Contains(v.Name) && Codes.Contains(v.Code))
+        //    .Where(v => NursingDiagnosesNames.Contains(v.Name) && Codes.Contains(v.Code))
         //    .ToListAsync(cancellationToken);
 
-        //return existingProductCategorys.Adapt<List<ProductCategoryDto>>();
+        //return existingNursingDiagnosess.Adapt<List<NursingDiagnosesDto>>();
 
         return [];
     }
-    public async Task<bool> Handle(ValidateProductCategory request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(ValidateNursingDiagnoses request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<ProductCategory>()
+        return await _unitOfWork.Repository<NursingDiagnoses>()
             .Entities
             .AsNoTracking()
             .Where(request.Predicate)  // Apply the Predicate for filtering
             .AnyAsync(cancellationToken);  // Check if any record matches the condition
     }
 
-    public async Task<(List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetProductCategoryQuery request, CancellationToken cancellationToken)
+    public async Task<(List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetNursingDiagnosesQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking(); 
+            var query = _unitOfWork.Repository<NursingDiagnoses>().Entities.AsNoTracking(); 
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -148,8 +148,8 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<ProductCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<ProductCategory>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<NursingDiagnoses>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<NursingDiagnoses>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -166,7 +166,7 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
             {
                 query = query.Where(v =>
                         EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.ProductCategory.Name, $"%{request.SearchTerm}%")
+                        EF.Functions.Like(v.NursingDiagnoses.Name, $"%{request.SearchTerm}%")
                         );
             }
 
@@ -174,7 +174,7 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new ProductCategory
+                query = query.Select(x => new NursingDiagnoses
                 {
                     Id = x.Id, 
                 });
@@ -188,11 +188,11 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
                     cancellationToken
                 );
 
-                return (pagedItems.Adapt<List<ProductCategoryDto>>(), request.PageIndex, request.PageSize, totalPages);
+                return (pagedItems.Adapt<List<NursingDiagnosesDto>>(), request.PageIndex, request.PageSize, totalPages);
             }
             else
             {
-                return ((await query.ToListAsync(cancellationToken)).Adapt<List<ProductCategoryDto>>(), 0, 1, 1);
+                return ((await query.ToListAsync(cancellationToken)).Adapt<List<NursingDiagnosesDto>>(), 0, 1, 1);
             }
         }
         catch (Exception ex)
@@ -202,11 +202,11 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
         }
     }
  
-    public async Task<ProductCategoryDto> Handle(GetSingleProductCategoryQuery request, CancellationToken cancellationToken)
+    public async Task<NursingDiagnosesDto> Handle(GetSingleNursingDiagnosesQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var query = _unitOfWork.Repository<ProductCategory>().Entities.AsNoTracking();
+            var query = _unitOfWork.Repository<NursingDiagnoses>().Entities.AsNoTracking();
 
             if (request.Predicate is not null)
                 query = query.Where(request.Predicate);
@@ -222,8 +222,8 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
                 foreach (var additionalOrderBy in request.OrderByList.Skip(1))
                 {
                     query = additionalOrderBy.IsDescending
-                        ? ((IOrderedQueryable<ProductCategory>)query).ThenByDescending(additionalOrderBy.OrderBy)
-                        : ((IOrderedQueryable<ProductCategory>)query).ThenBy(additionalOrderBy.OrderBy);
+                        ? ((IOrderedQueryable<NursingDiagnoses>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                        : ((IOrderedQueryable<NursingDiagnoses>)query).ThenBy(additionalOrderBy.OrderBy);
                 }
             }
 
@@ -240,7 +240,7 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
             {
                 query = query.Where(v =>
                     EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
-                    EF.Functions.Like(v.ProductCategory.Name, $"%{request.SearchTerm}%")
+                    EF.Functions.Like(v.NursingDiagnoses.Name, $"%{request.SearchTerm}%")
                     );
             }
 
@@ -248,12 +248,12 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
             if (request.Select is not null)
                 query = query.Select(request.Select);
             else
-                query = query.Select(x => new ProductCategory
+                query = query.Select(x => new NursingDiagnoses
                 {
                     Id = x.Id, 
                 });
 
-            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<ProductCategoryDto>();
+            return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<NursingDiagnosesDto>();
         }
         catch (Exception ex)
         {
@@ -266,17 +266,17 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
 
      #region CREATE
 
-     public async Task<ProductCategoryDto> Handle(CreateProductCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<NursingDiagnosesDto> Handle(CreateNursingDiagnosesRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());
+             var result = await _unitOfWork.Repository<NursingDiagnoses>().AddAsync(request.NursingDiagnosesDto.Adapt<CreateUpdateNursingDiagnosesDto>().Adapt<NursingDiagnoses>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<ProductCategoryDto>();
+             return result.Adapt<NursingDiagnosesDto>();
          }
          catch (Exception)
          {
@@ -284,16 +284,16 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
          }
      }
 
-     public async Task<List<ProductCategoryDto>> Handle(CreateListProductCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<List<NursingDiagnosesDto>> Handle(CreateListNursingDiagnosesRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDtos.Adapt<List<ProductCategory>>());
+             var result = await _unitOfWork.Repository<NursingDiagnoses>().AddAsync(request.NursingDiagnosesDtos.Adapt<List<NursingDiagnoses>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<ProductCategoryDto>>();
+             return result.Adapt<List<NursingDiagnosesDto>>();
          }
          catch (Exception)
          {
@@ -305,17 +305,17 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
 
      #region UPDATE
 
-     public async Task<ProductCategoryDto> Handle(UpdateProductCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<NursingDiagnosesDto> Handle(UpdateNursingDiagnosesRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDto.Adapt<ProductCategoryDto>().Adapt<ProductCategory>());
+             var result = await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDto.Adapt<NursingDiagnosesDto>().Adapt<NursingDiagnoses>());
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<ProductCategoryDto>();
+             return result.Adapt<NursingDiagnosesDto>();
          }
          catch (Exception)
          {
@@ -323,16 +323,16 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
          }
      }
 
-     public async Task<List<ProductCategoryDto>> Handle(UpdateListProductCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<List<NursingDiagnosesDto>> Handle(UpdateListNursingDiagnosesRequest request, CancellationToken cancellationToken)
      {
          try
          {
-             var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDtos.Adapt<List<ProductCategory>>());
+             var result = await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDtos.Adapt<List<NursingDiagnoses>>());
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
 
-             return result.Adapt<List<ProductCategoryDto>>();
+             return result.Adapt<List<NursingDiagnosesDto>>();
          }
          catch (Exception)
          {
@@ -344,23 +344,23 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
 
      #region DELETE
 
-     public async Task<bool> Handle(DeleteProductCategoryRequest request, CancellationToken cancellationToken)
+     public async Task<bool> Handle(DeleteNursingDiagnosesRequest request, CancellationToken cancellationToken)
      {
          try
          {
              if (request.Id > 0)
              {
-                 await _unitOfWork.Repository<ProductCategory>().DeleteAsync(request.Id);
+                 await _unitOfWork.Repository<NursingDiagnoses>().DeleteAsync(request.Id);
              }
 
              if (request.Ids.Count > 0)
              {
-                 await _unitOfWork.Repository<ProductCategory>().DeleteAsync(x => request.Ids.Contains(x.Id));
+                 await _unitOfWork.Repository<NursingDiagnoses>().DeleteAsync(x => request.Ids.Contains(x.Id));
              }
 
              await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-             _cache.Remove("GetProductCategoryQuery_"); // Ganti dengan key yang sesuai
+             _cache.Remove("GetNursingDiagnosesQuery_"); // Ganti dengan key yang sesuai
 
              return true;
          }
@@ -374,20 +374,20 @@ public class ProductCategoryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache
 }
 
  
-public class BulkValidateProductCategoryQuery(List<ProductCategoryDto> ProductCategorysToValidate) : IRequest<List<ProductCategoryDto>>
+public class BulkValidateNursingDiagnosesQuery(List<NursingDiagnosesDto> NursingDiagnosessToValidate) : IRequest<List<NursingDiagnosesDto>>
 {
-    public List<ProductCategoryDto> ProductCategorysToValidate { get; } = ProductCategorysToValidate;
+    public List<NursingDiagnosesDto> NursingDiagnosessToValidate { get; } = NursingDiagnosessToValidate;
 }a
 
 
-IRequestHandler<BulkValidateProductCategoryQuery, List<ProductCategoryDto>>,
+IRequestHandler<BulkValidateNursingDiagnosesQuery, List<NursingDiagnosesDto>>,
   
-IRequestHandler<GetProductCategoryQuery, (List<ProductCategoryDto>, int pageIndex, int pageSize, int pageCount)>,
-IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
+IRequestHandler<GetNursingDiagnosesQuery, (List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>,
+IRequestHandler<GetSingleNursingDiagnosesQuery, NursingDiagnosesDto>,
 
 
 
- var a = await Mediator.Send(new GetProductCategorysQuery
+ var a = await Mediator.Send(new GetNursingDiagnosessQuery
  {
      OrderByList =
      [
@@ -399,10 +399,10 @@ IRequestHandler<GetSingleProductCategoryQuery, ProductCategoryDto>,
      PageSize = pageSize,
  });
 
-var patienss = (await Mediator.Send(new GetSingleProductCategoryQuery
+var patienss = (await Mediator.Send(new GetSingleNursingDiagnosesQuery
 {
     Predicate = x => x.Id == data.DiagnosisBPJSIntegrationTempId,
-    Select = x => new ProductCategory
+    Select = x => new NursingDiagnoses
     {
         Id = x.Id,
         IsEmployee = x.IsEmployee,
@@ -415,41 +415,41 @@ var patienss = (await Mediator.Send(new GetSingleProductCategoryQuery
 try
 {
     PanelVisible = true;
-    var result = await Mediator.Send(new GetProductCategoryQuery
+    var result = await Mediator.Send(new GetNursingDiagnosesQuery
     {
         SearchTerm = searchTerm,
         PageIndex = pageIndex,
         PageSize = pageSize,
     });
-    ProductCategorys = result.Item1;
+    NursingDiagnosess = result.Item1;
     totalCount = result.PageCount;
     activePageIndex = pageIndex;
 }
 catch (Exception ex)
 {
-    ex.HandleException(ToastProductCategory);
+    ex.HandleException(ToastNursingDiagnoses);
 }
 finally
 { 
     PanelVisible = false;
 }
 
- var result = await Mediator.Send(new GetProductCategoryQuery
+ var result = await Mediator.Send(new GetNursingDiagnosesQuery
  {
-     Predicate = x => x.ProductCategoryId == ProductCategoryId,
-     SearchTerm = refProductCategoryComboBox?.Text ?? "",
+     Predicate = x => x.NursingDiagnosesId == NursingDiagnosesId,
+     SearchTerm = refNursingDiagnosesComboBox?.Text ?? "",
      PageIndex = pageIndex,
      PageSize = pageSize,
  });
- ProductCategorys = result.Item1;
- totalCountProductCategory = result.PageCount;
+ NursingDiagnosess = result.Item1;
+ totalCountNursingDiagnoses = result.PageCount;
 
- ProductCategorys = (await Mediator.Send(new GetProductCategoryQuery
+ NursingDiagnosess = (await Mediator.Send(new GetNursingDiagnosesQuery
  {
-     Predicate = x => x.Id == ProductCategoryForm.IdCardProductCategoryId,
+     Predicate = x => x.Id == NursingDiagnosesForm.IdCardNursingDiagnosesId,
  })).Item1;
 
-var data = (await Mediator.Send(new GetSingleProductCategorysQuery
+var data = (await Mediator.Send(new GetSingleNursingDiagnosessQuery
 {
     Predicate = x => x.Id == id,
     Includes =
@@ -457,17 +457,17 @@ var data = (await Mediator.Send(new GetSingleProductCategorysQuery
         x => x.Pratitioner,
         x => x.DiagnosisBPJSIntegrationTemp
     ],
-    Select = x => new ProductCategory
+    Select = x => new NursingDiagnoses
     {
         Id = x.Id,
         DiagnosisBPJSIntegrationTempId = x.DiagnosisBPJSIntegrationTempId,
-        DiagnosisBPJSIntegrationTemp = new ProductCategory
+        DiagnosisBPJSIntegrationTemp = new NursingDiagnoses
         {
             DateOfBirth = x.DiagnosisBPJSIntegrationTemp.DateOfBirth
         },
         RegistrationDate = x.RegistrationDate,
         PratitionerId = x.PratitionerId,
-        Pratitioner = new ProductCategory
+        Pratitioner = new NursingDiagnoses
         {
             Name = x.Pratitioner.Name,
             SipNo = x.Pratitioner.SipNo
@@ -480,105 +480,105 @@ var data = (await Mediator.Send(new GetSingleProductCategorysQuery
 })) ?? new();
 
 
-#region ComboboxProductCategory
+#region ComboboxNursingDiagnoses
 
- private DxComboBox<ProductCategoryDto, long?> refProductCategoryComboBox { get; set; }
- private int ProductCategoryComboBoxIndex { get; set; } = 0;
- private int totalCountProductCategory = 0;
+ private DxComboBox<NursingDiagnosesDto, long?> refNursingDiagnosesComboBox { get; set; }
+ private int NursingDiagnosesComboBoxIndex { get; set; } = 0;
+ private int totalCountNursingDiagnoses = 0;
 
- private async Task OnSearchProductCategory()
+ private async Task OnSearchNursingDiagnoses()
  {
-     await LoadDataProductCategory();
+     await LoadDataNursingDiagnoses();
  }
 
- private async Task OnSearchProductCategoryIndexIncrement()
+ private async Task OnSearchNursingDiagnosesIndexIncrement()
  {
-     if (ProductCategoryComboBoxIndex < (totalCountProductCategory - 1))
+     if (NursingDiagnosesComboBoxIndex < (totalCountNursingDiagnoses - 1))
      {
-         ProductCategoryComboBoxIndex++;
-         await LoadDataProductCategory(ProductCategoryComboBoxIndex, 10);
+         NursingDiagnosesComboBoxIndex++;
+         await LoadDataNursingDiagnoses(NursingDiagnosesComboBoxIndex, 10);
      }
  }
 
- private async Task OnSearchProductCategoryIndexDecrement()
+ private async Task OnSearchNursingDiagnosesIndexDecrement()
  {
-     if (ProductCategoryComboBoxIndex > 0)
+     if (NursingDiagnosesComboBoxIndex > 0)
      {
-         ProductCategoryComboBoxIndex--;
-         await LoadDataProductCategory(ProductCategoryComboBoxIndex, 10);
+         NursingDiagnosesComboBoxIndex--;
+         await LoadDataNursingDiagnoses(NursingDiagnosesComboBoxIndex, 10);
      }
  }
 
- private async Task OnInputProductCategoryChanged(string e)
+ private async Task OnInputNursingDiagnosesChanged(string e)
  {
-     ProductCategoryComboBoxIndex = 0;
-     await LoadDataProductCategory();
+     NursingDiagnosesComboBoxIndex = 0;
+     await LoadDataNursingDiagnoses();
  }
 
  
-  private async Task LoadDataProductCategory(int pageIndex = 0, int pageSize = 10)
+  private async Task LoadDataNursingDiagnoses(int pageIndex = 0, int pageSize = 10)
   {
       try
       {
           PanelVisible = true;
-          var result = await Mediator.Send(new GetProductCategoryQuery
+          var result = await Mediator.Send(new GetNursingDiagnosesQuery
           {
-              SearchTerm = refProductCategoryComboBox?.Text ?? "",
+              SearchTerm = refNursingDiagnosesComboBox?.Text ?? "",
               PageIndex = pageIndex,
               PageSize = pageSize,
           });
-          ProductCategorys = result.Item1;
-          totalCountProductCategory = result.PageCount;
+          NursingDiagnosess = result.Item1;
+          totalCountNursingDiagnoses = result.PageCount;
           PanelVisible = false;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastProductCategory);
+          ex.HandleException(ToastNursingDiagnoses);
       }
       finally { PanelVisible = false; }
   }
 
- #endregion ComboboxProductCategory
+ #endregion ComboboxNursingDiagnoses
 
- <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
-    <MyDxComboBox Data="@ProductCategorys"
-                  NullText="Select ProductCategory"
-                  @ref="refProductCategoryComboBox"
-                  @bind-Value="@a.ProductCategoryId"
+ <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="NursingDiagnoses" ColSpanMd="12">
+    <MyDxComboBox Data="@NursingDiagnosess"
+                  NullText="Select NursingDiagnoses"
+                  @ref="refNursingDiagnosesComboBox"
+                  @bind-Value="@a.NursingDiagnosesId"
                   TextFieldName="Name"
                   ValueFieldName="Id"
-                  TextChanged="((string e) => OnInputProductCategoryChanged(e))">
+                  TextChanged="((string e) => OnInputNursingDiagnosesChanged(e))">
         <Buttons>
-            <DxEditorButton Click="OnSearchProductCategoryIndexDecrement"
+            <DxEditorButton Click="OnSearchNursingDiagnosesIndexDecrement"
                             IconCssClass="fa-solid fa-caret-left"
                             Tooltip="Previous Index" />
-            <DxEditorButton Click="OnSearchProductCategory"
+            <DxEditorButton Click="OnSearchNursingDiagnoses"
                             IconCssClass="fa-solid fa-magnifying-glass"
                             Tooltip="Search" />
-            <DxEditorButton Click="OnSearchProductCategoryIndexIncrement"
+            <DxEditorButton Click="OnSearchNursingDiagnosesIndexIncrement"
                             IconCssClass="fa-solid fa-caret-right"
                             Tooltip="Next Index" />
         </Buttons>
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(ProductCategoryDto.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="ProductCategory.Name" Caption="ProductCategory" />
-            <DxListEditorColumn FieldName="@nameof(ProductCategoryDto.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="NursingDiagnoses.Name" Caption="NursingDiagnoses" />
+            <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
+    <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
 </DxFormLayoutItem>
 
-var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());
-var result = await _unitOfWork.Repository<ProductCategory>().AddAsync(request.ProductCategoryDtos.Adapt<List<CreateUpdateProductCategoryDto>>().Adapt<List<ProductCategory>>()); 
+var result = await _unitOfWork.Repository<NursingDiagnoses>().AddAsync(request.NursingDiagnosesDto.Adapt<CreateUpdateNursingDiagnosesDto>().Adapt<NursingDiagnoses>());
+var result = await _unitOfWork.Repository<NursingDiagnoses>().AddAsync(request.NursingDiagnosesDtos.Adapt<List<CreateUpdateNursingDiagnosesDto>>().Adapt<List<NursingDiagnoses>>()); 
 
-var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDto.Adapt<CreateUpdateProductCategoryDto>().Adapt<ProductCategory>());  
-var result = await _unitOfWork.Repository<ProductCategory>().UpdateAsync(request.ProductCategoryDtos.Adapt<List<CreateUpdateProductCategoryDto>>().Adapt<List<ProductCategory>>());
+var result = await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDto.Adapt<CreateUpdateNursingDiagnosesDto>().Adapt<NursingDiagnoses>());  
+var result = await _unitOfWork.Repository<NursingDiagnoses>().UpdateAsync(request.NursingDiagnosesDtos.Adapt<List<CreateUpdateNursingDiagnosesDto>>().Adapt<List<NursingDiagnoses>>());
 
-list3 = (await Mediator.Send(new GetProductCategoryQuery
+list3 = (await Mediator.Send(new GetNursingDiagnosesQuery
 {
-    Predicate = x => ProductCategoryNames.Contains(x.Name.ToLower()),
+    Predicate = x => NursingDiagnosesNames.Contains(x.Name.ToLower()),
     IsGetAll = true,
-    Select = x => new ProductCategory
+    Select = x => new NursingDiagnoses
     {
         Id = x.Id,
         Name = x.Name
@@ -588,47 +588,47 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
 
 #region Searching
 
-    private int pageSizeProductCategory { get; set; } = 10;
-    private int totalCountProductCategory = 0;
-    private int activePageIndexProductCategory { get; set; } = 0;
-    private string searchTermProductCategory { get; set; } = string.Empty;
+    private int pageSizeNursingDiagnoses { get; set; } = 10;
+    private int totalCountNursingDiagnoses = 0;
+    private int activePageIndexNursingDiagnoses { get; set; } = 0;
+    private string searchTermNursingDiagnoses { get; set; } = string.Empty;
 
-    private async Task OnSearchBoxChangedProductCategory(string searchText)
+    private async Task OnSearchBoxChangedNursingDiagnoses(string searchText)
     {
-        searchTermProductCategory = searchText;
-        await LoadDataOnSearchBoxChanged(0, pageSizeProductCategory);
+        searchTermNursingDiagnoses = searchText;
+        await LoadDataOnSearchBoxChanged(0, pageSizeNursingDiagnoses);
     }
 
-    private async Task OnpageSizeProductCategoryIndexChanged(int newpageSizeProductCategory)
+    private async Task OnpageSizeNursingDiagnosesIndexChanged(int newpageSizeNursingDiagnoses)
     {
-        pageSizeProductCategory = newpageSizeProductCategory;
-        await LoadDataOnSearchBoxChanged(0, newpageSizeProductCategory);
+        pageSizeNursingDiagnoses = newpageSizeNursingDiagnoses;
+        await LoadDataOnSearchBoxChanged(0, newpageSizeNursingDiagnoses);
     }
 
     private async Task OnPageIndexChangedOnSearchBoxChanged(int newPageIndex)
     {
-        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeProductCategory);
+        await LoadDataOnSearchBoxChanged(newPageIndex, pageSizeNursingDiagnoses);
     }
- private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeProductCategory = 10)
+ private async Task LoadDataOnSearchBoxChanged(int pageIndex = 0, int pageSizeNursingDiagnoses = 10)
 {
     try
     {
         PanelVisible = true;
         SelectedDataItems = new ObservableRangeCollection<object>();
-        var result = await Mediator.Send(new GetProductCategoryQuery
+        var result = await Mediator.Send(new GetNursingDiagnosesQuery
         {
             PageIndex = pageIndex,
-            PageSize = pageSizeProductCategory,
-            SearchTerm = searchTermProductCategory,
+            PageSize = pageSizeNursingDiagnoses,
+            SearchTerm = searchTermNursingDiagnoses,
         });
-        ProductCategorys = result.Item1;
-        totalCountProductCategory = result.PageCount;
-        activePageIndexProductCategory = pageIndex;
+        NursingDiagnosess = result.Item1;
+        totalCountNursingDiagnoses = result.PageCount;
+        activePageIndexNursingDiagnoses = pageIndex;
         PanelVisible = false;
     }
     catch (Exception ex)
     {
-        ex.HandleException(ToastProductCategory);
+        ex.HandleException(ToastNursingDiagnoses);
     }
     finally { PanelVisible = false; }
 }
@@ -667,7 +667,7 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
       {
           PanelVisible = true;
           SelectedDataItems = [];
-          var a = await Mediator.Send(new GetGeneralConsultanProductCategorysQuery
+          var a = await Mediator.Send(new GetGeneralConsultanNursingDiagnosessQuery
           {
               OrderByList =
               [
@@ -681,13 +681,13 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
               SearchTerm = searchTerm,
           });
 
-          GeneralConsultanProductCategorys = a.Item1;
+          GeneralConsultanNursingDiagnosess = a.Item1;
           totalCount = a.PageCount;
           activePageIndex = pageIndex;
       }
       catch (Exception ex)
       {
-          ex.HandleException(ToastProductCategory);
+          ex.HandleException(ToastNursingDiagnoses);
       }
       finally { PanelVisible = false; }
   }
@@ -696,7 +696,7 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
 
 
    <MyGridPaginate @ref="GridDetail"
-                 Data="ProductCategorys"
+                 Data="NursingDiagnosess"
                  @bind-SelectedDataItems="@SelectedDetailDataItems"
                  EditModelSaving="OnSaveInventoryAdjumentDetail"
                  DataItemDeleting="OnDeleteInventoryAdjumentDetail"
@@ -707,70 +707,70 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
 
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="ProductCategoryDto"
-                          Items="@ProductCategorys"
+         <MyDxToolbarBase TItem="NursingDiagnosesDto"
+                          Items="@NursingDiagnosess"
                           Grid="GridDetail"
                           SelectedDataItems="@SelectedDetailDataItems"
                           NewItem_Click="@NewItem_Click"
                           EditItem_Click="@EditItem_Click"
                           DeleteItem_Click="@DeleteItem_Click"
                           Refresh_Click="@(async () => await LoadData())"
-                          IsImport="ProductCategoryAccessCRUID.IsImport"
-                          VisibleNew="ProductCategoryAccessCRUID.IsCreate"
-                          VisibleEdit="ProductCategoryAccessCRUID.IsUpdate"
-                          VisibleDelete="ProductCategoryAccessCRUID.IsDelete" />
+                          IsImport="NursingDiagnosesAccessCRUID.IsImport"
+                          VisibleNew="NursingDiagnosesAccessCRUID.IsCreate"
+                          VisibleEdit="NursingDiagnosesAccessCRUID.IsUpdate"
+                          VisibleDelete="NursingDiagnosesAccessCRUID.IsDelete" />
      </ToolbarTemplate>
 
 
      <Columns>
          <DxGridSelectionColumn Width="15px" />
-         <DxGridDataColumn FieldName="ProductCategory.Name" Caption="ProductCategory"></DxGridDataColumn>
+         <DxGridDataColumn FieldName="NursingDiagnoses.Name" Caption="NursingDiagnoses"></DxGridDataColumn>
          <DxGridDataColumn FieldName="TeoriticalQty" Caption="Teoritical Qty" />
          <DxGridDataColumn FieldName="RealQty" Caption="Real Qty" />
          <DxGridDataColumn FieldName="Difference" Caption="Difference" />
          <DxGridDataColumn FieldName="Batch" Caption="Lot Serial Number" />
          <DxGridDataColumn FieldName="ExpiredDate" Caption="Expired Date" SortIndex="0" DisplayFormat="@Helper.DefaultFormatDate" />
-         <DxGridDataColumn FieldName="ProductCategory.ProductCategory.Name" Caption="ProductCategory" />
+         <DxGridDataColumn FieldName="NursingDiagnoses.NursingDiagnoses.Name" Caption="NursingDiagnoses" />
      </Columns>
      <EditFormTemplate Context="EditFormContext">
          @{
              if (EditFormContext.DataItem is null)
              {
-                 FormProductCategory = (ProductCategoryDto)EditFormContext.EditModel;
+                 FormNursingDiagnoses = (NursingDiagnosesDto)EditFormContext.EditModel;
              }
-             var IsBatch = ProductCategorys.FirstOrDefault(x => x.Id == FormProductCategory.ProductCategoryId)?.TraceAbility ?? false;
+             var IsBatch = NursingDiagnosess.FirstOrDefault(x => x.Id == FormNursingDiagnoses.NursingDiagnosesId)?.TraceAbility ?? false;
 
-             ActiveButton = FormProductCategory.ProductCategoryId is null ||
-             string.IsNullOrWhiteSpace(FormProductCategory.Batch) && IsBatch ||
-             FormProductCategory.ExpiredDate is null ||
-             FormProductCategory.ProductCategoryId is null;
+             ActiveButton = FormNursingDiagnoses.NursingDiagnosesId is null ||
+             string.IsNullOrWhiteSpace(FormNursingDiagnoses.Batch) && IsBatch ||
+             FormNursingDiagnoses.ExpiredDate is null ||
+             FormNursingDiagnoses.NursingDiagnosesId is null;
          }
          <div class="row w-100">
              <DxFormLayout CssClass="w-100">
                  <div class="col-md-4">
-                     <DxFormLayoutItem Caption="ProductCategory" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox Data="@ProductCategorys"
-                                     @bind-Value="@FormProductCategory.ProductCategoryId"
+                     <DxFormLayoutItem Caption="NursingDiagnoses" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox Data="@NursingDiagnosess"
+                                     @bind-Value="@FormNursingDiagnoses.NursingDiagnosesId"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     NullText="Select ProductCategory..."
+                                     NullText="Select NursingDiagnoses..."
                                      TextFieldName="Name"
-                                     ReadOnly="@(FormProductCategory.Id != 0)"
+                                     ReadOnly="@(FormNursingDiagnoses.Id != 0)"
                                      ValueFieldName="Id"
-                                     SelectedItemChanged="@(async (ProductCategoryDto freq) => await OnSelectProductCategory(freq))"
+                                     SelectedItemChanged="@(async (NursingDiagnosesDto freq) => await OnSelectNursingDiagnoses(freq))"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      ShowValidationIcon="true" />
-                         <ValidationMessage For="@(()=> FormProductCategory.ProductCategoryId)"   />
+                         <ValidationMessage For="@(()=> FormNursingDiagnoses.NursingDiagnosesId)"   />
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem Caption="Batch" Enabled="FormProductCategory.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                     <DxFormLayoutItem Caption="Batch" Enabled="FormNursingDiagnoses.Id == 0" Visible="IsBatch" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <MyDxComboBox Data="@Batch"
-                                       ReadOnly="@(FormProductCategory.Id != 0)"
+                                       ReadOnly="@(FormNursingDiagnoses.Id != 0)"
                                        NullText="Select Batch..."
-                                       AllowProductCategoryInput="true"
-                                       @bind-Value="@FormProductCategory.Batch"
-                                       @bind-Text="@FormProductCategory.Batch"
+                                       AllowNursingDiagnosesInput="true"
+                                       @bind-Value="@FormNursingDiagnoses.Batch"
+                                       @bind-Text="@FormNursingDiagnoses.Batch"
                                        SelectedItemChanged="@((string a)=> SelectedBatch(a))" />
-                         <ValidationMessage For="@(() => FormProductCategory.Batch)" />
+                         <ValidationMessage For="@(() => FormNursingDiagnoses.Batch)" />
 
                      </DxFormLayoutItem>
                  </div>
@@ -780,43 +780,43 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
                          <DxSpinEdit ShowValidationIcon="true"
                                      ReadOnly
                                      MinValue="0"
-                                     @bind-Value="@FormProductCategory.TeoriticalQty"
+                                     @bind-Value="@FormNursingDiagnoses.TeoriticalQty"
                                      NullText="Teoritical Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormProductCategory.TeoriticalQty)"   />
+                         <ValidationMessage For="@(()=> FormNursingDiagnoses.TeoriticalQty)"   />
                      </DxFormLayoutItem>
 
                      <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Real Qty" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxSpinEdit ShowValidationIcon="true"
                                      MinValue="0"
-                                     @bind-Value="@FormProductCategory.RealQty"
+                                     @bind-Value="@FormNursingDiagnoses.RealQty"
                                      NullText="Real Qty"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
-                         <ValidationMessage For="@(()=> FormProductCategory.RealQty)"   />
+                         <ValidationMessage For="@(()=> FormNursingDiagnoses.RealQty)"   />
                      </DxFormLayoutItem>
                  </div>
 
                  <div class="col-md-4">
                      <DxFormLayoutItem Caption="Expired Date" CaptionCssClass="required-caption normal-caption" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
                          <DxDateEdit ShowValidationIcon="true"
-                                     ReadOnly="@(FormProductCategory.Id != 0)"
+                                     ReadOnly="@(FormNursingDiagnoses.Id != 0)"
                                      DisplayFormat="@Helper.DefaultFormatDate"
-                                     @bind-Date="@FormProductCategory.ExpiredDate"
+                                     @bind-Date="@FormNursingDiagnoses.ExpiredDate"
                                      NullText="Expired Date">
                          </DxDateEdit>
                      </DxFormLayoutItem>
 
-                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="ProductCategory" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
-                         <DxComboBox ShowValidationIcon="true" Data="@ProductCategorys"
-                                     NullText="ProductCategory"
-                                     ReadOnly="@(FormProductCategory.Id != 0)"
+                     <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="NursingDiagnoses" ColSpanMd="12" CaptionPosition="CaptionPosition.Vertical">
+                         <DxComboBox ShowValidationIcon="true" Data="@NursingDiagnosess"
+                                     NullText="NursingDiagnoses"
+                                     ReadOnly="@(FormNursingDiagnoses.Id != 0)"
                                      TextFieldName="Name"
                                      ValueFieldName="Id"
                                      ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                      FilteringMode="@DataGridFilteringMode.Contains"
-                                     @bind-Value="FormProductCategory.ProductCategoryId">
+                                     @bind-Value="FormNursingDiagnoses.NursingDiagnosesId">
                          </DxComboBox>
-                         <ValidationMessage For="@(() => FormProductCategory.ProductCategoryId)" />
+                         <ValidationMessage For="@(() => FormNursingDiagnoses.NursingDiagnosesId)" />
                      </DxFormLayoutItem>
                  </div>
              </DxFormLayout>
@@ -835,63 +835,63 @@ list3 = (await Mediator.Send(new GetProductCategoryQuery
 
  NEW COMBOBOX VIRAL 2024
 
-ProductCategory
+NursingDiagnoses
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
-    <DxComboBox Data="ProductCategorys"
-                AllowProductCategoryInput="true"
-                NullText="Select ProductCategory"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="NursingDiagnoses" ColSpanMd="12">
+    <DxComboBox Data="NursingDiagnosess"
+                AllowNursingDiagnosesInput="true"
+                NullText="Select NursingDiagnoses"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputProductCategory"
-                @bind-Value="a.ProductCategoryId">
+                @oninput="OnInputNursingDiagnoses"
+                @bind-Value="a.NursingDiagnosesId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(ProductCategory.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(ProductCategory.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(NursingDiagnoses.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(NursingDiagnoses.Code)" Caption="Code" />
         </Columns>
     </DxComboBox>
-    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
+    <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
 </DxFormLayoutItem>
 
-#region ComboBox ProductCategory
+#region ComboBox NursingDiagnoses
  
-private CancellationTokenSource? _ctsProductCategory;
-private async Task OnInputProductCategory(ChangeEventArgs e)
+private CancellationTokenSource? _ctsNursingDiagnoses;
+private async Task OnInputNursingDiagnoses(ChangeEventArgs e)
 {
     try
     {
         PanelVisible = true;
             
-        _ctsProductCategory?.Cancel();
-        _ctsProductCategory?.Dispose();
-        _ctsProductCategory = new CancellationTokenSource();
+        _ctsNursingDiagnoses?.Cancel();
+        _ctsNursingDiagnoses?.Dispose();
+        _ctsNursingDiagnoses = new CancellationTokenSource();
             
-        await Task.Delay(700, _ctsProductCategory.Token);
+        await Task.Delay(700, _ctsNursingDiagnoses.Token);
             
-        await LoadProductCategory(e.Value?.ToString() ?? "");
+        await LoadNursingDiagnoses(e.Value?.ToString() ?? "");
     } 
     finally
     {
         PanelVisible = false;
 
         // Untuk menghindari kebocoran memori (memory leaks).
-        _ctsProductCategory?.Dispose();
-        _ctsProductCategory = null;
+        _ctsNursingDiagnoses?.Dispose();
+        _ctsNursingDiagnoses = null;
     } 
 }
 
- private async Task LoadProductCategory(string? e = "", Expression<Func<ProductCategory, bool>>? predicate = null)
+ private async Task LoadNursingDiagnoses(string? e = "", Expression<Func<NursingDiagnoses, bool>>? predicate = null)
  {
      try
      {
          PanelVisible = true;
-         ProductCategorys = await Mediator.QueryGetComboBox<ProductCategory, ProductCategoryDto>(e, predicate);
+         NursingDiagnosess = await Mediator.QueryGetComboBox<NursingDiagnoses, NursingDiagnosesDto>(e, predicate);
          PanelVisible = false;
      }
      catch (Exception ex)
      {
-         ex.HandleException(ToastProductCategory);
+         ex.HandleException(ToastNursingDiagnoses);
      }
      finally { PanelVisible = false; }
  }
@@ -900,75 +900,75 @@ private async Task OnInputProductCategory(ChangeEventArgs e)
 
 
 // Ini buat di EditItemClick
-await LoadProductCategory(id:  a.ProductCategoryId);
+await LoadNursingDiagnoses(id:  a.NursingDiagnosesId);
 
-ProductCategory
+NursingDiagnoses
 
 
 
 VIRAL 2025
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="ProductCategory" ColSpanMd="12">
-    <MyDxComboBox Data="ProductCategorys"
-                NullText="Select ProductCategory"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="NursingDiagnoses" ColSpanMd="12">
+    <MyDxComboBox Data="NursingDiagnosess"
+                NullText="Select NursingDiagnoses"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputProductCategory"
+                @oninput="OnInputNursingDiagnoses"
                 ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                SelectedItemChanged="((ProductCategoryDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.ProductCategoryId">
+                SelectedItemChanged="((NursingDiagnosesDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.NursingDiagnosesId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(ProductCategory.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(ProductCategory.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(NursingDiagnoses.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(NursingDiagnoses.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.ProductCategoryId)" />
+    <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
 </DxFormLayoutItem>
 
 
-#region ComboBox ProductCategory
+#region ComboBox NursingDiagnoses
 
-    private ProductCategoryDto SelectedProductCategory { get; set; } = new();
-    async Task SelectedItemChanged(ProductCategoryDto e)
+    private NursingDiagnosesDto SelectedNursingDiagnoses { get; set; } = new();
+    async Task SelectedItemChanged(NursingDiagnosesDto e)
     {
         if (e is null)
         {
-            SelectedProductCategory = new();
-            await LoadProductCategory(); 
+            SelectedNursingDiagnoses = new();
+            await LoadNursingDiagnoses(); 
         }
         else
-            SelectedProductCategory = e;
+            SelectedNursingDiagnoses = e;
     }
 
-    private CancellationTokenSource? _ctsProductCategory;
-    private async Task OnInputProductCategory(ChangeEventArgs e)
+    private CancellationTokenSource? _ctsNursingDiagnoses;
+    private async Task OnInputNursingDiagnoses(ChangeEventArgs e)
     {
         try
         { 
-            _ctsProductCategory?.Cancel();
-            _ctsProductCategory?.Dispose();
-            _ctsProductCategory = new CancellationTokenSource();
+            _ctsNursingDiagnoses?.Cancel();
+            _ctsNursingDiagnoses?.Dispose();
+            _ctsNursingDiagnoses = new CancellationTokenSource();
 
-            await Task.Delay(Helper.CBX_DELAY, _ctsProductCategory.Token);
+            await Task.Delay(Helper.CBX_DELAY, _ctsNursingDiagnoses.Token);
 
-            await LoadProductCategory(e.Value?.ToString() ?? "");
+            await LoadNursingDiagnoses(e.Value?.ToString() ?? "");
         }
         finally
         { 
-            _ctsProductCategory?.Dispose();
-            _ctsProductCategory = null;
+            _ctsNursingDiagnoses?.Dispose();
+            _ctsNursingDiagnoses = null;
         }
     }
 
-    private async Task LoadProductCategory(string? e = "", Expression<Func<ProductCategory, bool>>? predicate = null)
+    private async Task LoadNursingDiagnoses(string? e = "", Expression<Func<NursingDiagnoses, bool>>? predicate = null)
     {
         try
         { 
-            ProductCategorys = await Mediator.QueryGetComboBox<ProductCategory, ProductCategoryDto>(e, predicate); 
+            NursingDiagnosess = await Mediator.QueryGetComboBox<NursingDiagnoses, NursingDiagnosesDto>(e, predicate); 
         }
         catch (Exception ex)
         {
-            ex.HandleException(ToastProductCategory);
+            ex.HandleException(ToastNursingDiagnoses);
         }
         finally { PanelVisible = false; }
     }

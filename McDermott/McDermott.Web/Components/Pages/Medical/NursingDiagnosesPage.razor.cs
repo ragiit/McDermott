@@ -103,11 +103,17 @@
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetNursingDiagnosesQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+            PanelVisible = true; 
+            var result = await Mediator.Send(new GetNursingDiagnosesQuery
+            {
+                SearchTerm = searchTerm ?? "",
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            });
             NursingDiagnoses = result.Item1;
-            totalCount = result.pageCount;
-            SelectedDataItems = new ObservableRangeCollection<object>();
+            totalCount = result.PageCount;
+            activePageIndex = pageIndex;
+            SelectedDataItems = [];
             PanelVisible = false;
         }
 

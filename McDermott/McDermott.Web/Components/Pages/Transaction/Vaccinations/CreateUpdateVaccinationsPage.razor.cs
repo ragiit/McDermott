@@ -9,10 +9,13 @@ using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
-
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+ 
 
 using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;
+using DevExpress.CodeParser;
+using McDermott.Web.Extentions;
+using System.Linq.Expressions;
+using DevExpress.Printing.ExportHelpers;
 
 namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 {
@@ -1013,7 +1016,10 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
                 await GridCppt.StartEditRowAsync(FocusedGridTabCPPTRowVisibleIndex);
 
                 var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
-                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
+                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery
+                {
+                    Predicate = x => x.Id == a.NursingDiagnosesId
+                })).Item1;
                 Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
                 {
                     Predicate = x => x.Id == a.DiagnosisId
@@ -1419,40 +1425,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             Awareness = await Mediator.Send(new GetAwarenessQuery());
         }
 
-        #region ComboboxNursingDiagnoses
-
-        private DxComboBox<NursingDiagnosesDto, long?> refNursingDiagnosesComboBox { get; set; }
-        private int NursingDiagnosesComboBoxIndex { get; set; } = 0;
-        private int totalCountNursingDiagnoses = 0;
-
-        private async Task OnSearchNursingDiagnoses()
-        {
-            await LoadDataNursingDiagnoses();
-        }
-
-        private async Task OnSearchNursingDiagnosesIndexIncrement()
-        {
-            if (NursingDiagnosesComboBoxIndex < (totalCountNursingDiagnoses - 1))
-            {
-                NursingDiagnosesComboBoxIndex++;
-                await LoadDataNursingDiagnoses(NursingDiagnosesComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchNursingDiagnosesIndexDecrement()
-        {
-            if (NursingDiagnosesComboBoxIndex > 0)
-            {
-                NursingDiagnosesComboBoxIndex--;
-                await LoadDataNursingDiagnoses(NursingDiagnosesComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputNursingDiagnosesChanged(string e)
-        {
-            NursingDiagnosesComboBoxIndex = 0;
-            await LoadDataNursingDiagnoses();
-        }
 
         private async Task OnClickTabCPPT()
         {
@@ -1465,15 +1437,46 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             }
         }
 
-        private async Task LoadDataNursingDiagnoses(int pageIndex = 0, int pageSize = 10)
+
+        #region ComboBox NursingDiagnoses
+
+        private NursingDiagnosesDto SelectedNursingDiagnoses { get; set; } = new();
+        async Task SelectedItemChanged(NursingDiagnosesDto e)
+        {
+            if (e is null)
+            {
+                SelectedNursingDiagnoses = new();
+                await LoadDataNursingDiagnoses();
+            }
+            else
+                SelectedNursingDiagnoses = e;
+        }
+
+        private CancellationTokenSource? _ctsNursingDiagnoses;
+        private async Task OnInputNursingDiagnoses(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetNursingDiagnosesQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refNursingDiagnosesComboBox?.Text ?? ""));
-                NursingDiagnoses = result.Item1;
-                totalCountNursingDiagnoses = result.pageCount;
-                PanelVisible = false;
+                _ctsNursingDiagnoses?.Cancel();
+                _ctsNursingDiagnoses?.Dispose();
+                _ctsNursingDiagnoses = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsNursingDiagnoses.Token);
+
+                await LoadDataNursingDiagnoses(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsNursingDiagnoses?.Dispose();
+                _ctsNursingDiagnoses = null;
+            }
+        }
+
+        private async Task LoadDataNursingDiagnoses(string? e = "", Expression<Func<NursingDiagnoses, bool>>? predicate = null)
+        {
+            try
+            {
+                NursingDiagnoses = await Mediator.QueryGetComboBox<NursingDiagnoses, NursingDiagnosesDto>(e, predicate);
             }
             catch (Exception ex)
             {
@@ -1482,7 +1485,8 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxNursingDiagnoses
+        #endregion
+
 
         #region ComboboxInsurancePolicy
 
@@ -1562,25 +1566,6 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 
         #endregion ComboboxInsurancePolicy
 
-        #region ComboboxDiagnoses
-
-        private DxComboBox<DiagnosisDto, long?> refDiagnosesComboBox { get; set; }
-        private int DiagnosesComboBoxIndex { get; set; } = 0;
-        private int totalCountDiagnoses = 0;
-
-        private async Task OnSearchDiagnoses()
-        {
-            await LoadDataDiagnoses();
-        }
-
-        private async Task OnSearchDiagnosesIndexIncrement()
-        {
-            if (DiagnosesComboBoxIndex < (totalCountDiagnoses - 1))
-            {
-                DiagnosesComboBoxIndex++;
-                await LoadDataDiagnoses(DiagnosesComboBoxIndex, 10);
-            }
-        }
 
         private void OnSelectRiskOfFalling(string e)
         {
@@ -1605,35 +1590,45 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             }
         }
 
-        private async Task OnSearchDiagnosesIndexDecrement()
+        #region ComboBox Diagnosis
+
+        private DiagnosisDto SelectedDiagnosis { get; set; } = new();
+        async Task SelectedItemChanged(DiagnosisDto e)
         {
-            if (DiagnosesComboBoxIndex > 0)
+            if (e is null)
             {
-                DiagnosesComboBoxIndex--;
-                await LoadDataDiagnoses(DiagnosesComboBoxIndex, 10);
+                SelectedDiagnosis = new();
+                await LoadDataDiagnoses();
             }
+            else
+                SelectedDiagnosis = e;
         }
 
-        private async Task OnInputDiagnosesChanged(string e)
-        {
-            DiagnosesComboBoxIndex = 0;
-            await LoadDataDiagnoses();
-        }
-
-        private async Task LoadDataDiagnoses(int pageIndex = 0, int pageSize = 10)
+        private CancellationTokenSource? _ctsDiagnosis;
+        private async Task OnInputDiagnosis(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetDiagnosisQuery
-                {
-                    SearchTerm = refDiagnosesComboBox?.Text ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize
-                });
-                Diagnoses = result.Item1;
-                totalCountDiagnoses = result.PageCount;
-                PanelVisible = false;
+                _ctsDiagnosis?.Cancel();
+                _ctsDiagnosis?.Dispose();
+                _ctsDiagnosis = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsDiagnosis.Token);
+
+                await LoadDataDiagnoses(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsDiagnosis?.Dispose();
+                _ctsDiagnosis = null;
+            }
+        }
+
+        private async Task LoadDataDiagnoses(string? e = "", Expression<Func<Diagnosis, bool>>? predicate = null)
+        {
+            try
+            {
+                Diagnoses = await Mediator.QueryGetComboBox<Diagnosis, DiagnosisDto>(e, predicate);
             }
             catch (Exception ex)
             {
@@ -1642,7 +1637,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxDiagnoses
+        #endregion 
 
         #region ComboboxPatient
 

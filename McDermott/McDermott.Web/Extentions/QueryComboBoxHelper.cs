@@ -411,6 +411,42 @@ namespace McDermott.Web.Extentions
                 return ((List<TDto>)(object)result);
             }
 
+            if (typeof(TDto) == typeof(NursingDiagnosesDto))
+            {
+                var result = (await mediator.Send(new GetNursingDiagnosesQuery
+                {
+                    Predicate = predicate as Expression<Func<NursingDiagnoses, bool>> ?? (x => true),
+                    Select = select is null ? x => new NursingDiagnoses
+                    {
+                        Id = x.Id,
+                        Problem = x.Problem,
+                        Code = x.Code,
+                    } : select as Expression<Func<NursingDiagnoses, NursingDiagnoses>>,
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
+            if (typeof(TDto) == typeof(DiagnosisDto))
+            {
+                var result = (await mediator.Send(new GetDiagnosisQuery
+                {
+                    Predicate = predicate as Expression<Func<Diagnosis, bool>> ?? (x => true),
+                    Select = select is null ? x => new Diagnosis
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    } : select as Expression<Func<Diagnosis, Diagnosis>>,
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
             if (typeof(TDto) == typeof(InsurancePolicyDto))
             {
                 var result = (await mediator.Send(new GetInsurancePolicyQuery

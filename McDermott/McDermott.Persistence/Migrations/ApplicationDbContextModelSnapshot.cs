@@ -2652,6 +2652,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<bool>("IsOutsideBatam")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("IsReferDiagnosisNonSpesialis")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsSarana")
                         .HasColumnType("bit");
 
@@ -2721,6 +2724,9 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("Payment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PracticeScheduleTimeDate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long?>("PratitionerId")
                         .HasColumnType("bigint");
 
@@ -2742,8 +2748,17 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("ReferDateVisit")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ReferDiagnosisKd")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReferDiagnosisNm")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ReferReason")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReferSelectFaskesDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ReferTo")
                         .HasColumnType("nvarchar(max)");
@@ -2776,6 +2791,12 @@ namespace McDermott.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReferenceAnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReferralExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReferralNo")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RegistrationDate")

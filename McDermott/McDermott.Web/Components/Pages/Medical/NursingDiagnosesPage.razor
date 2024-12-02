@@ -5,8 +5,8 @@
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
-    <div class="wrapper">
-        <McDermott.Web.Components.Layout.BaseContentHeaderLayout Title="Nursing Diagnoses" />
+    <div class="wrapper"> 
+        <BaseHeaderPage Title="Nursing Diagnoses" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">

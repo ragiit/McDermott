@@ -8,8 +8,8 @@
         <DxFormLayout CssClass="w-100">
             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Type" ColSpanMd="6">
                 <MyDxComboBox Data="@RujukanTypes"
-                              NullText="Select Refer Type..."
-                              @bind-Value="SelectedRujukanType">
+                NullText="Select Refer Type..."
+                @bind-Value="SelectedRujukanType">
                 </MyDxComboBox>
             </DxFormLayoutItem>
 
@@ -21,8 +21,8 @@
             {
                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer" ColSpanMd="6">
                     <MyDxComboBox Data="@RujukanExtenalVertical"
-                                  NullText="Select Refer Vertical Type..."
-                                  @bind-Value="SelectedRujukanVertical">
+                    NullText="Select Refer Vertical Type..."
+                    @bind-Value="SelectedRujukanVertical">
                     </MyDxComboBox>
                 </DxFormLayoutItem>
             }
@@ -36,11 +36,11 @@
                 @if (SelectedRujukanType is not null && SelectedRujukanType.Equals(RujukanTypes.ToList()[0]))
                 {
                     <DxLoadingPanel @bind-Visible="IsLoadingReferTo"
-                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                    IsContentBlocked="true"
-                                    ApplyBackgroundShading="true"
-                                    IndicatorAreaVisible="false"
-                                    Text="Fetching Data...">
+                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="false"
+                    Text="Fetching Data...">
                         <EditForm Model="@ReferToGeneralConsultanService" @onkeypress="@KeyPressHandler" Context="EditFormContext2" OnValidSubmit="@HandleValidSubmitReferTo" OnInvalidSubmit="@HandleInvalidSubmit">
                             <DataAnnotationsValidator /> <DataAnnotationsValidator />
                             <ValidationSummary />
@@ -81,12 +81,12 @@
                                                     <DxFormLayout>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Patients"
-                                                                          NullText="Select Patient"
-                                                                          @ref="refPatientComboBox"
-                                                                          @bind-Value="@GeneralConsultanService.PatientId"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Id"
-                                                                          ReadOnly="true">
+                                                            NullText="Select Patient"
+                                                            @ref="refPatientComboBox"
+                                                            @bind-Value="@GeneralConsultanService.PatientId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            ReadOnly="true">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(()=>GeneralConsultanService.PatientId)" />
                                                         </DxFormLayoutItem>
@@ -99,9 +99,9 @@
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Current Mobile" ColSpanMd="12">
                                                             <DxMaskedInput @bind-Value="@UserForm.CurrentMobile"
-                                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                           NullText="Current Mobile"
-                                                                           ShowValidationIcon="true">
+                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                            NullText="Current Mobile"
+                                                            ShowValidationIcon="true">
                                                             </DxMaskedInput>
                                                             <ValidationMessage For="@(() => UserForm.CurrentMobile)"   />
                                                         </DxFormLayoutItem>
@@ -133,9 +133,9 @@
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Reg Type" ColSpanMd="12">
                                                             <MyDxComboBox Data="@RegisType"
-                                                                          NullText="Select Registration..."
-                                                                          AllowUserInput="true"
-                                                                          @bind-Value="@GeneralConsultanService.TypeRegistration">
+                                                            NullText="Select Registration..."
+                                                            AllowUserInput="true"
+                                                            @bind-Value="@GeneralConsultanService.TypeRegistration">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                                         </DxFormLayoutItem>
@@ -148,29 +148,29 @@
                                                     <DxFormLayout>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Patient Type" ColSpanMd="12">
                                                             <MyDxComboBox Data="@ClassTypes"
-                                                                          NullText="Select Patient Type.."
-                                                                          @bind-Value="@GeneralConsultanService.ClassType">
+                                                            NullText="Select Patient Type.."
+                                                            @bind-Value="@GeneralConsultanService.ClassType">
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.ClassType)" />
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Services"
-                                                                          NullText="Select Service"
-                                                                          @ref="refServiceComboBox"
-                                                                          @bind-Value="@GeneralConsultanService.ServiceId"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Id"
-                                                                          TextChanged="((string e) => OnInputServiceChanged(e))">
+                                                            NullText="Select Service"
+                                                            @ref="refServiceComboBox"
+                                                            @bind-Value="@GeneralConsultanService.ServiceId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            TextChanged="((string e) => OnInputServiceChanged(e))">
                                                                 <Buttons>
                                                                     <DxEditorButton Click="OnSearchServiceIndexDecrement"
-                                                                                    IconCssClass="fa-solid fa-caret-left"
-                                                                                    Tooltip="Previous Index" />
+                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                    Tooltip="Previous Index" />
                                                                     <DxEditorButton Click="OnSearchService"
-                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                    Tooltip="Search" />
+                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                    Tooltip="Search" />
                                                                     <DxEditorButton Click="OnSearchServiceIndexIncrement"
-                                                                                    IconCssClass="fa-solid fa-caret-right"
-                                                                                    Tooltip="Next Index" />
+                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                    Tooltip="Next Index" />
                                                                 </Buttons>
                                                                 <Columns>
                                                                     <DxListEditorColumn FieldName="@nameof(ServiceDto.Name)" Caption="Name" />
@@ -181,22 +181,22 @@
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Physicions"
-                                                                          NullText="Select Physicion"
-                                                                          @ref="refPhysicionComboBox"
-                                                                          @bind-Value="@GeneralConsultanService.PratitionerId"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Id"
-                                                                          TextChanged="((string e) => OnInputPhysicionChanged(e))">
+                                                            NullText="Select Physicion"
+                                                            @ref="refPhysicionComboBox"
+                                                            @bind-Value="@GeneralConsultanService.PratitionerId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            TextChanged="((string e) => OnInputPhysicionChanged(e))">
                                                                 <Buttons>
                                                                     <DxEditorButton Click="OnSearchPhysicionIndexDecrement"
-                                                                                    IconCssClass="fa-solid fa-caret-left"
-                                                                                    Tooltip="Previous Index" />
+                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                    Tooltip="Previous Index" />
                                                                     <DxEditorButton Click="OnSearchPhysicion"
-                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                    Tooltip="Search" />
+                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                    Tooltip="Search" />
                                                                     <DxEditorButton Click="OnSearchPhysicionIndexIncrement"
-                                                                                    IconCssClass="fa-solid fa-caret-right"
-                                                                                    Tooltip="Next Index" />
+                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                    Tooltip="Next Index" />
                                                                 </Buttons>
                                                                 <Columns>
                                                                     <DxListEditorColumn FieldName="Name" />
@@ -212,9 +212,9 @@
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Method" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Payments"
-                                                                          NullText="Payment Method.."
-                                                                          SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
-                                                                          @bind-Value="GeneralConsultanService.Payment">
+                                                            NullText="Payment Method.."
+                                                            SelectedItemChanged="@((string e) => SelectedItemPaymentChanged(e))"
+                                                            @bind-Value="GeneralConsultanService.Payment">
 
                                                             </MyDxComboBox>
                                                             <ValidationMessage For="@(() => GeneralConsultanService.Payment)" />
@@ -231,30 +231,30 @@
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
                                                                 <MyDxComboBox Data="@InsurancePolicies"
-                                                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                                              NullText="Select InsurancePolicy"
-                                                                              @ref="refInsurancePolicyComboBox"
-                                                                              @bind-Value="GeneralConsultanService.InsurancePolicyId"
-                                                                              EditFormat="{0} - {1}"
-                                                                              ValueFieldName="Id"
-                                                                              TextChanged="((string e) => OnInputInsurancePolicyChanged(e))">
+                                                                ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                                NullText="Select InsurancePolicy"
+                                                                @ref="refInsurancePolicyComboBox"
+                                                                @bind-Value="GeneralConsultanService.InsurancePolicyId"
+                                                                EditFormat="{0} - {1}"
+                                                                ValueFieldName="Id"
+                                                                TextChanged="((string e) => OnInputInsurancePolicyChanged(e))">
                                                                     <Buttons>
                                                                         <DxEditorButton Click="OnSearchInsurancePolicyIndexDecrement"
-                                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                                        Tooltip="Previous Index" />
+                                                                        IconCssClass="fa-solid fa-caret-left"
+                                                                        Tooltip="Previous Index" />
                                                                         <DxEditorButton Click="OnSearchInsurancePolicy"
-                                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                        Tooltip="Search" />
+                                                                        IconCssClass="fa-solid fa-magnifying-glass"
+                                                                        Tooltip="Search" />
                                                                         <DxEditorButton Click="OnSearchInsurancePolicyIndexIncrement"
-                                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                                        Tooltip="Next Index" />
+                                                                        IconCssClass="fa-solid fa-caret-right"
+                                                                        Tooltip="Next Index" />
                                                                     </Buttons>
                                                                     <Columns>
                                                                         <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
-                                                                                            Caption="No Card" />
+                                                                        Caption="No Card" />
 
                                                                         <DxListEditorColumn FieldName="Insurance.Name"
-                                                                                            Caption="Insurance Company" />
+                                                                        Caption="Insurance Company" />
                                                                     </Columns>
                                                                 </MyDxComboBox>
                                                             </DxFormLayoutItem>
@@ -295,8 +295,8 @@
                                                     {
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Visit Date" ColSpanMd="12">
                                                             <DxDateEdit @bind-Date="@GeneralConsultanService.ReferDateVisit"
-                                                                        Mask="@DateTimeMask.ShortDate"
-                                                                        NullText="Select Visit Date" />
+                                                            Mask="@DateTimeMask.ShortDate"
+                                                            NullText="Select Visit Date" />
                                                         </DxFormLayoutItem>
                                                     }
 
@@ -304,10 +304,10 @@
                                                     {
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Category" ColSpanMd="12">
                                                             <MyDxComboBox Data="@SpesialisRefrensiKhusus"
-                                                                          NullText="Select Category..."
-                                                                          @bind-Value="@GeneralConsultanService.ReferVerticalKhususCategoryCode"
-                                                                          TextFieldName="NmKhusus"
-                                                                          ValueFieldName="KdKhusus">
+                                                            NullText="Select Category..."
+                                                            @bind-Value="@GeneralConsultanService.ReferVerticalKhususCategoryCode"
+                                                            TextFieldName="NmKhusus"
+                                                            ValueFieldName="KdKhusus">
                                                             </MyDxComboBox>
                                                         </DxFormLayoutItem>
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Reason..." ColSpanMd="12">
@@ -318,21 +318,21 @@
                                                     {
                                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Spesialis" ColSpanMd="12">
                                                             <MyDxComboBox Data="@SpesialisPs"
-                                                                          NullText="Select Spesialis..."
-                                                                          @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode"
-                                                                          SelectedItemChanged="(SpesialisPCare e) => SelectedItemSpesialis(e)"
-                                                                          TextFieldName="NmSpesialis"
-                                                                          ValueFieldName="KdSpesialis">
+                                                            NullText="Select Spesialis..."
+                                                            @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode"
+                                                            SelectedItemChanged="(SpesialisPCare e) => SelectedItemSpesialis(e)"
+                                                            TextFieldName="NmSpesialis"
+                                                            ValueFieldName="KdSpesialis">
                                                             </MyDxComboBox>
                                                         </DxFormLayoutItem>
                                                         @if (SelectedRujukanVertical is not null && SelectedRujukanVertical.Equals(RujukanExtenalVertical.ToList()[1]))
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sub Spesialis" ColSpanMd="12">
                                                                 <MyDxComboBox Data="@SubSpesialisPs"
-                                                                              NullText="Select Sub Spesialis..."
-                                                                              @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode"
-                                                                              TextFieldName="NmSubSpesialis"
-                                                                              ValueFieldName="KdSubSpesialis">
+                                                                NullText="Select Sub Spesialis..."
+                                                                @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode"
+                                                                TextFieldName="NmSubSpesialis"
+                                                                ValueFieldName="KdSubSpesialis">
                                                                 </MyDxComboBox>
                                                             </DxFormLayoutItem>
                                                         }
@@ -345,61 +345,61 @@
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Sarana" ColSpanMd="12">
                                                                 <MyDxComboBox Data="@SpesialisSaranas"
-                                                                              NullText="Select Sarana..."
-                                                                              @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisSaranaCode"
-                                                                              TextFieldName="NmSarana"
-                                                                              ValueFieldName="KdSarana">
+                                                                NullText="Select Sarana..."
+                                                                @bind-Value="@GeneralConsultanService.ReferVerticalSpesialisSaranaCode"
+                                                                TextFieldName="NmSarana"
+                                                                ValueFieldName="KdSarana">
                                                                 </MyDxComboBox>
                                                             </DxFormLayoutItem>
                                                         }
 
-                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
-                                                            <MyDxComboBox Data="@_diagnosisBPJSIntegrationTemp"
-                                                                          NullText="Select Diagnosis"
-                                                                          @bind-Text="@DiagnosaText"
-                                                                          Value="DiagnosaValue"
-                                                                          TextFieldName="NmDiag"
-                                                                          ValueFieldName="KdDiag"
-                                                                          SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => OnSelectDiagnosa(e))">
-                                                                <Buttons>
-                                                                    <DxEditorButton Click="OnSearchDiagnosaIndexDecrement"
-                                                                                    IconCssClass="fa-solid fa-caret-left"
-                                                                                    Tooltip="Previous Index" />
-                                                                    <DxEditorButton Click="(() => OnSearchDiagnosa(0))"
-                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                    Tooltip="Search" />
-                                                                    <DxEditorButton Click="OnSearchDiagnosaIndexIncrement"
-                                                                                    IconCssClass="fa-solid fa-caret-right"
-                                                                                    Tooltip="Next Index" />
-                                                                </Buttons>
-                                                                <Columns>
-                                                                    <DxListEditorColumn FieldName="KdDiag" />
-                                                                    <DxListEditorColumn FieldName="NmDiag" />
-                                                                    <DxListEditorColumn FieldName="NonSpesialis" />
-                                                                </Columns>
-                                                            </MyDxComboBox>
-                                                        </DxFormLayoutItem>
+                                                        @* <DxFormLayoutItem CaptionCssClass="required-caption normal-caption normal-caption" Caption="Diagnosis" ColSpanMd="12"> *@
+                                                        @*     <MyDxComboBox Data="@_diagnosisBPJSIntegrationTemp" *@
+                                                        @*                   NullText="Select Diagnosis" *@
+                                                        @*                   @bind-Text="@DiagnosaText" *@
+                                                        @*                   Value="DiagnosaValue" *@
+                                                        @*                   TextFieldName="NmDiag" *@
+                                                        @*                   ValueFieldName="KdDiag" *@
+                                                        @*                   SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => OnSelectDiagnosa(e))"> *@
+                                                        @*         <Buttons> *@
+                                                        @*             <DxEditorButton Click="OnSearchDiagnosaIndexDecrement" *@
+                                                        @*                             IconCssClass="fa-solid fa-caret-left" *@
+                                                        @*                             Tooltip="Previous Index" /> *@
+                                                        @*             <DxEditorButton Click="(() => OnSearchDiagnosa(0))" *@
+                                                        @*                             IconCssClass="fa-solid fa-magnifying-glass" *@
+                                                        @*                             Tooltip="Search" /> *@
+                                                        @*             <DxEditorButton Click="OnSearchDiagnosaIndexIncrement" *@
+                                                        @*                             IconCssClass="fa-solid fa-caret-right" *@
+                                                        @*                             Tooltip="Next Index" /> *@
+                                                        @*         </Buttons> *@
+                                                        @*         <Columns> *@
+                                                        @*             <DxListEditorColumn FieldName="KdDiag" /> *@
+                                                        @*             <DxListEditorColumn FieldName="NmDiag" /> *@
+                                                        @*             <DxListEditorColumn FieldName="NonSpesialis" /> *@
+                                                        @*         </Columns> *@
+                                                        @*     </MyDxComboBox> *@
+                                                        @* </DxFormLayoutItem> *@
 
 
-                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="DiagnosisBPJSIntegrationTemp" ColSpanMd="12">
+                                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
                                                             <MyDxComboBox Data="@_diagnosisBPJSIntegrationTemp"
-                                                                          NullText="Select DiagnosisBPJSIntegrationTemp"
-                                                                          @ref="refDiagnosisBPJSIntegrationTempComboBox"
-                                                                          @bind-Value="SelectedDiagnoses"
-                                                                          TextFieldName="NmDiag"
-                                                                          ValueFieldName="KdDiag"
-                                                                          TextChanged="((string e) => OnInputDiagnosisBPJSIntegrationTempChanged(e))"
-                                                                          SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => SelectedItemDiagnosisBPJSIntegrationTempChanged(e))">
+                                                            NullText="Select Diagnosis"
+                                                            @ref="refDiagnosisBPJSIntegrationTempComboBox"
+                                                            @bind-Value="SelectedDiagnoses"
+                                                            TextFieldName="NmDiag"
+                                                            ValueFieldName="KdDiag"
+                                                            TextChanged="((string e) => OnInputDiagnosisBPJSIntegrationTempChanged(e))"
+                                                            SelectedItemChanged="@((DiagnosisBPJSIntegrationTemp e) => SelectedItemDiagnosisBPJSIntegrationTempChanged(e))">
                                                                 <Buttons>
                                                                     <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTempIndexDecrement"
-                                                                                    IconCssClass="fa-solid fa-caret-left"
-                                                                                    Tooltip="Previous Index" />
+                                                                    IconCssClass="fa-solid fa-caret-left"
+                                                                    Tooltip="Previous Index" />
                                                                     <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTemp"
-                                                                                    IconCssClass="fa-solid fa-magnifying-glass"
-                                                                                    Tooltip="Search" />
+                                                                    IconCssClass="fa-solid fa-magnifying-glass"
+                                                                    Tooltip="Search" />
                                                                     <DxEditorButton Click="OnSearchDiagnosisBPJSIntegrationTempIndexIncrement"
-                                                                                    IconCssClass="fa-solid fa-caret-right"
-                                                                                    Tooltip="Next Index" />
+                                                                    IconCssClass="fa-solid fa-caret-right"
+                                                                    Tooltip="Next Index" />
                                                                 </Buttons>
                                                                 <Columns>
                                                                     <DxListEditorColumn FieldName="KdDiag" />
@@ -477,22 +477,22 @@
 
                                             <div class="col-md-12 mt-2">
                                                 <DxLoadingPanel @bind-Visible="IsLoadingSearchFaskes"
-                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                                IsContentBlocked="true"
-                                                                ApplyBackgroundShading="true"
-                                                                IndicatorAreaVisible="false"
-                                                                Text="Fetching Data...">
+                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                IsContentBlocked="true"
+                                                ApplyBackgroundShading="true"
+                                                IndicatorAreaVisible="false"
+                                                Text="Fetching Data...">
                                                     <MyGrid @ref="GridRujukanRefer"
-                                                            Data="RujukanSubSpesialis"
-                                                            KeyFieldName="Kdppk">
+                                                    Data="RujukanSubSpesialis"
+                                                    KeyFieldName="Kdppk">
                                                         <Columns>
                                                             <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Nmppk))" Caption="Faskes" />
                                                             <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kelas))" Caption="Class" />
                                                             <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.AlamatPpk))" Caption="Address" />
                                                             <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.TelpPpk))" Caption="Phone" />
                                                             <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Distance))" Caption="Distance" />
-                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="Patient" />
-                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Patient" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.JmlRujuk))" Caption="JmlRujuk" />
+                                                            <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Kapasitas))" Caption="Kapasitas" />
                                                             <DxGridDataColumn FieldName="@(nameof(RujukanFaskesKhususSpesialisPCare.Persentase))" Caption="%" />
                                                             <DxGridDataColumn Caption="Action ">
                                                                 <CellDisplayTemplate>
@@ -514,11 +514,11 @@
                 {
 
                     <DxLoadingPanel @bind-Visible="IsLoadingRJMCINT"
-                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                    IsContentBlocked="true"
-                                    ApplyBackgroundShading="true"
-                                    IndicatorAreaVisible="false"
-                                    Text="Fetching Data...">
+                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                    IsContentBlocked="true"
+                    ApplyBackgroundShading="true"
+                    IndicatorAreaVisible="false"
+                    Text="Fetching Data...">
                         <EditForm Model="@GCReferTo" @onkeypress="@KeyPressHandler" Context="EditFormContext4" OnValidSubmit="@HandleValidSubmitRJMCINT" OnInvalidSubmit="@HandleInvalidSubmit">
                             <DataAnnotationsValidator />
                             <ValidationSummary />
@@ -538,8 +538,8 @@
                                                         {
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Claim Type" ColSpanMd="12">
                                                                 <DxComboBox Data="@ClaimTypes"
-                                                                            @bind-Value="@GCReferTo.TypeClaim"
-                                                                            NullText="Select Claim Type" />
+                                                                @bind-Value="@GCReferTo.TypeClaim"
+                                                                NullText="Select Claim Type" />
                                                             </DxFormLayoutItem>
                                                         }
                                                         <!-- Number -->
@@ -561,15 +561,15 @@
                                                             <!-- Hospital -->
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Hospital" ColSpanMd="12">
                                                                 <DxComboBox Data="@Hospitals"
-                                                                            @bind-Value="@GCReferTo.Hospital"
-                                                                            NullText="Select Hospital" />
+                                                                @bind-Value="@GCReferTo.Hospital"
+                                                                NullText="Select Hospital" />
                                                             </DxFormLayoutItem>
 
                                                             <!-- Examination Purpose -->
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Specialist" ColSpanMd="12">
                                                                 <DxComboBox Data="@ExaminationPurposes"
-                                                                            @bind-Value="@GCReferTo.Specialist"
-                                                                            NullText="Select Specialist" />
+                                                                @bind-Value="@GCReferTo.Specialist"
+                                                                NullText="Select Specialist" />
                                                             </DxFormLayoutItem>
                                                         }
                                                         @if (GCReferTo.TypeClaim != "Safety Glasses")
@@ -577,8 +577,8 @@
                                                             <!-- Category -->
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Category" ColSpanMd="12">
                                                                 <DxComboBox Data="@Categories"
-                                                                            @bind-Value="@GCReferTo.CategoryRJMCINT"
-                                                                            NullText="Select Category" />
+                                                                @bind-Value="@GCReferTo.CategoryRJMCINT"
+                                                                NullText="Select Category" />
                                                             </DxFormLayoutItem>
                                                         }
                                                     </DxFormLayout>
@@ -591,31 +591,31 @@
                                                             <!-- Exam For -->
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Exam For" ColSpanMd="12">
                                                                 <DxComboBox Data="@ExamFor"
-                                                                            @bind-Value="@GCReferTo.ExamFor"
-                                                                            NullText="Select Exam For" />
+                                                                @bind-Value="@GCReferTo.ExamFor"
+                                                                NullText="Select Exam For" />
                                                             </DxFormLayoutItem>
                                                         }
                                                         <!-- Name -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Name" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Patients"
-                                                                          NullText="Select Patient"
-                                                                          @ref="refPatientComboBox"
-                                                                          @bind-Value="@GeneralConsultanService.PatientId"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Id"
-                                                                          ReadOnly="true">
+                                                            NullText="Select Patient"
+                                                            @ref="refPatientComboBox"
+                                                            @bind-Value="@GeneralConsultanService.PatientId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            ReadOnly="true">
                                                             </MyDxComboBox>
                                                         </DxFormLayoutItem>
 
                                                         <!-- Job -->
                                                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Job" ColSpanMd="12">
                                                             <MyDxComboBox Data="@Occupationals"
-                                                                          NullText="Select Patient"
-                                                                          @ref="refOccupationalComboBox"
-                                                                          @bind-Value="GeneralConsultanService.Patient.OccupationalId"
-                                                                          TextFieldName="Name"
-                                                                          ValueFieldName="Id"
-                                                                          ReadOnly="true">
+                                                            NullText="Select Patient"
+                                                            @ref="refOccupationalComboBox"
+                                                            @bind-Value="GeneralConsultanService.Patient.OccupationalId"
+                                                            TextFieldName="Name"
+                                                            ValueFieldName="Id"
+                                                            ReadOnly="true">
                                                             </MyDxComboBox>
                                                         </DxFormLayoutItem>
 
@@ -633,8 +633,8 @@
                                                             <!-- Inpatient Class -->
                                                             <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Inpatient Class" ColSpanMd="12">
                                                                 <DxComboBox Data="@InpatientClasses"
-                                                                            @bind-Value="@GCReferTo.InpatientClass"
-                                                                            NullText="Select Inpatient Class" />
+                                                                @bind-Value="@GCReferTo.InpatientClass"
+                                                                NullText="Select Inpatient Class" />
                                                             </DxFormLayoutItem>
                                                         }
                                                     </DxFormLayout>
@@ -1154,31 +1154,31 @@
         try
         {
             string cacheKey = $"spesialis/khusus";
-            if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisRefrensiKhususPCare>? r))
-            {
-                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/khusus", HttpMethod.Get);
-                if (result.Item2 == 200)
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+            // if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisRefrensiKhususPCare>? r))
+            // {
+            //     var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis/khusus", HttpMethod.Get);
+            //     if (result.Item2 == 200)
+            //     {
+            //         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                    var dynamicList = (IEnumerable<dynamic>)data.list;
+            //         var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                    r = dynamicList.Select(item => new SpesialisRefrensiKhususPCare
-                        {
-                            KdKhusus = item.kdKhusus,
-                            NmKhusus = item.nmKhusus
-                        }).ToList();
-                    MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
-                }
-                else
-                {
-                    MemoryCache.Remove(cacheKey);
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-                }
-            }
+            //         r = dynamicList.Select(item => new SpesialisRefrensiKhususPCare
+            //             {
+            //                 KdKhusus = item.kdKhusus,
+            //                 NmKhusus = item.nmKhusus
+            //             }).ToList();
+            //         MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+            //     }
+            //     else
+            //     {
+            //         MemoryCache.Remove(cacheKey);
+            //         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+            //         ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+            //     }
+            // }
 
-            SpesialisRefrensiKhusus = r ?? [];
+            // SpesialisRefrensiKhusus = r ?? [];
         }
         catch (Exception ex)
         {
@@ -1193,32 +1193,32 @@
         try
         {
             string cacheKey = $"spesialis";
-            if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisPCare>? r))
-            {
-                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis", HttpMethod.Get);
-                if (result.Item2 == 200)
-                {
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+            // if (!MemoryCache.TryGetValue(cacheKey, out List<SpesialisPCare>? r))
+            // {
+            //     var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"spesialis", HttpMethod.Get);
+            //     if (result.Item2 == 200)
+            //     {
+            //         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
 
-                    var dynamicList = (IEnumerable<dynamic>)data.list;
+            //         var dynamicList = (IEnumerable<dynamic>)data.list;
 
-                    r = dynamicList.Select(item => new SpesialisPCare
-                        {
-                            KdSpesialis = item.kdSpesialis,
-                            NmSpesialis = item.nmSpesialis
-                        }).ToList();
+            //         r = dynamicList.Select(item => new SpesialisPCare
+            //             {
+            //                 KdSpesialis = item.kdSpesialis,
+            //                 NmSpesialis = item.nmSpesialis
+            //             }).ToList();
 
-                    MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
-                }
-                else
-                {
-                    MemoryCache.Remove(cacheKey);
-                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
-                    ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
-                }
-            }
+            //         MemoryCache.Set(cacheKey, r, TimeSpan.FromMinutes(15));
+            //     }
+            //     else
+            //     {
+            //         MemoryCache.Remove(cacheKey);
+            //         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+            //         ToastService.ShowError($"{data.metaData.message}\n Code: {data.metaData.code}");
+            //     }
+            // }
 
-            SpesialisPs = r ?? [];
+            // SpesialisPs = r ?? [];
         }
         catch (Exception ex)
         {
@@ -1650,8 +1650,58 @@
         }
     }
 
-    private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = [];
-    private List<SpesialisPCare> SpesialisPs = [];
+    private List<SpesialisRefrensiKhususPCare> SpesialisRefrensiKhusus = new List<SpesialisRefrensiKhususPCare>
+    {
+        new SpesialisRefrensiKhususPCare { KdKhusus = "HDL", NmKhusus = "HEMODIALISA" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "THA", NmKhusus = "THALASEMIA" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "HEM", NmKhusus = "HEMOFILI" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "IGD", NmKhusus = "ALIH RAWAT" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "JIW", NmKhusus = "JIWA" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "KLT", NmKhusus = "KUSTA" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "PAR", NmKhusus = "TB-MDR" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "KEM", NmKhusus = "SARANA KEMOTERAPI" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "RAT", NmKhusus = "SARANA RADIOTERAPI" },
+        new SpesialisRefrensiKhususPCare { KdKhusus = "HIV", NmKhusus = "HIV-ODHA" }
+    };
+    private List<SpesialisPCare> SpesialisPs = new List<SpesialisPCare>
+    {
+        new SpesialisPCare { KdSpesialis = "ANA", NmSpesialis = "ANAK" },
+        new SpesialisPCare { KdSpesialis = "AND", NmSpesialis = "ANDROLOGI" },
+        new SpesialisPCare { KdSpesialis = "BDA", NmSpesialis = "BEDAH ANAK" },
+        new SpesialisPCare { KdSpesialis = "BDM", NmSpesialis = "GIGI BEDAH MULUT" },
+        new SpesialisPCare { KdSpesialis = "BDP", NmSpesialis = "BEDAH PLASTIK" },
+        new SpesialisPCare { KdSpesialis = "BED", NmSpesialis = "BEDAH" },
+        new SpesialisPCare { KdSpesialis = "BSY", NmSpesialis = "BEDAH SARAF" },
+        new SpesialisPCare { KdSpesialis = "BTK", NmSpesialis = "BTKV (BEDAH THORAX KARDIOVASKULER)" },
+        new SpesialisPCare { KdSpesialis = "GIG", NmSpesialis = "GIGI" },
+        new SpesialisPCare { KdSpesialis = "GIZ", NmSpesialis = "GIZI KLINIK" },
+        new SpesialisPCare { KdSpesialis = "GND", NmSpesialis = "GIGI ENDODONSI" },
+        new SpesialisPCare { KdSpesialis = "GOR", NmSpesialis = "GIGI ORTHODONTI" },
+        new SpesialisPCare { KdSpesialis = "GPR", NmSpesialis = "GIGI PERIODONTI" },
+        new SpesialisPCare { KdSpesialis = "GRD", NmSpesialis = "GIGI RADIOLOGI" },
+        new SpesialisPCare { KdSpesialis = "INT", NmSpesialis = "PENYAKIT DALAM" },
+        new SpesialisPCare { KdSpesialis = "IRM", NmSpesialis = "Installasi Rehabilitasi Medik" },
+        new SpesialisPCare { KdSpesialis = "JAN", NmSpesialis = "JANTUNG DAN PEMBULUH DARAH" },
+        new SpesialisPCare { KdSpesialis = "JIW", NmSpesialis = "JIWA" },
+        new SpesialisPCare { KdSpesialis = "KDK", NmSpesialis = "KEDOKTERAN KELAUTAN" },
+        new SpesialisPCare { KdSpesialis = "KDN", NmSpesialis = "KEDOKTERAN NUKLIR" },
+        new SpesialisPCare { KdSpesialis = "KDO", NmSpesialis = "KEDOKTERAN OKUPASI" },
+        new SpesialisPCare { KdSpesialis = "KDP", NmSpesialis = "KEDOKTERAN PENERBANGAN" },
+        new SpesialisPCare { KdSpesialis = "KLT", NmSpesialis = "KULIT KELAMIN" },
+        new SpesialisPCare { KdSpesialis = "KON", NmSpesialis = "GIGI PEDODONTIS" },
+        new SpesialisPCare { KdSpesialis = "KOR", NmSpesialis = "KEDOKTERAAN OLAHRAGA" },
+        new SpesialisPCare { KdSpesialis = "MAT", NmSpesialis = "MATA" },
+        new SpesialisPCare { KdSpesialis = "OBG", NmSpesialis = "OBGYN" },
+        new SpesialisPCare { KdSpesialis = "ORT", NmSpesialis = "ORTHOPEDI" },
+        new SpesialisPCare { KdSpesialis = "PAR", NmSpesialis = "PARU" },
+        new SpesialisPCare { KdSpesialis = "PNM", NmSpesialis = "GIGI PENYAKIT MULUT" },
+        new SpesialisPCare { KdSpesialis = "PTD", NmSpesialis = "GIGI PROSTHODONTI" },
+        new SpesialisPCare { KdSpesialis = "RDT", NmSpesialis = "RADIOTERAPI" },
+        new SpesialisPCare { KdSpesialis = "SAR", NmSpesialis = "SARAF" },
+        new SpesialisPCare { KdSpesialis = "THT", NmSpesialis = "THT-KL" },
+        new SpesialisPCare { KdSpesialis = "URO", NmSpesialis = "UROLOGI" }
+    };
+
     private List<SpesialisSaranaPCare> SpesialisSaranas = [];
     private List<SubSpesialisPCare> SubSpesialisPs = [];
     private List<RujukanFaskesKhususSpesialisPCare> RujukanSubSpesialis = [];
@@ -1678,6 +1728,10 @@
 
             if (rujuk is not null)
             {
+                GeneralConsultanService.PracticeScheduleTimeDate = rujuk.Jadwal;
+                GeneralConsultanService.ReferralExpiry = GeneralConsultanService.ReferDateVisit.GetValueOrDefault().AddMonths(3);
+                GeneralConsultanService.ReferSelectFaskesDate = DateTime.Now;
+
                 GeneralConsultanService.PPKRujukanCode = rujuk.Kdppk;
                 GeneralConsultanService.PPKRujukanName = rujuk.Nmppk ?? "-";
                 GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName = SpesialisPs.FirstOrDefault(x => x.KdSpesialis == GeneralConsultanService.ReferVerticalSpesialisParentSpesialisCode)?.NmSpesialis ?? "-";
@@ -1860,11 +1914,15 @@
 
         if (e is null)
         {
-            SelectedDiagnoses = "";
+            GeneralConsultanService.ReferDiagnosisKd = null;
+            GeneralConsultanService.ReferDiagnosisNm = null;
+            GeneralConsultanService.IsReferDiagnosisNonSpesialis = null;
             return;
         }
 
-        SelectedDiagnoses = e.KdDiag;
+        GeneralConsultanService.ReferDiagnosisKd = e.KdDiag;
+        GeneralConsultanService.ReferDiagnosisNm = e.NmDiag;
+        GeneralConsultanService.IsReferDiagnosisNonSpesialis = e.NonSpesialis;
     }
     private async Task LoadDataDiagnosisBPJSIntegrationTemp(int pageIndex = 0, int pageSize = 10)
     {
