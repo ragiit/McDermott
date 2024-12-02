@@ -278,7 +278,7 @@ namespace McDermott.Web.Controllers
             var ExtraReport = new McDReferral();
             var gs = await mediator.Send(new GetSingleGCReferToInternalQuery
             {
-                Predicate = x => x.Id == id,
+                Predicate = x => x.GeneralConsultanServiceId == id,
                 Select = x => new GCReferToInternal
                 {
                     GeneralConsultanServiceId = x.GeneralConsultanServiceId,
@@ -335,7 +335,7 @@ namespace McDermott.Web.Controllers
             // Dynamically set the checkbox for Category
             ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "Kanker";
             ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "Dependent";
-            ExtraReport.xrEmployee.Checked = gs.CategoryRJMCINT == "Employee";
+            ExtraReport.xrEmployee.Checked = gs.CategoryRJMCINT == "EMPLOYEE";
             ExtraReport.xrAccidentInside.Checked = gs.CategoryRJMCINT == "ACCIDENT Inside";
             ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "Accident Outside";
             ExtraReport.xrKelainan.Checked = gs.CategoryRJMCINT == "KELAINAN BAWAAN";
