@@ -188,7 +188,16 @@ namespace McDermott.Web.Controllers
                 Select = x => new GCReferToInternal
                 {
                     GeneralConsultanServiceId = x.GeneralConsultanServiceId,
-                    DateRJMCINT =x.DateRJMCINT
+                    DateRJMCINT = x.DateRJMCINT,
+                    Number = x.Number,
+                    ReferTo = x.ReferTo,
+                    Hospital = x.Hospital,
+                    CategoryRJMCINT=x.CategoryRJMCINT,
+                    ExamFor=x.ExamFor,
+                    TempDiagnosis=x.TempDiagnosis,
+                    TherapyProvide=x.TherapyProvide,
+                    InpatientClass =x.InpatientClass,
+                    Specialist=x.Specialist,
                 }
             }) ?? new();
             var gx = await mediator.Send(new GetSingleGeneralConsultanServicesQuery
@@ -201,7 +210,7 @@ namespace McDermott.Web.Controllers
                         Name = x.Patient.Name,
                         DateOfBirth = x.Patient.DateOfBirth,
                         Gender = x.Patient.Gender,
-                        Occupational =x.Patient.Occupational.Name,
+
                     },
 
                     VisitNumber = x.VisitNumber,
@@ -210,7 +219,57 @@ namespace McDermott.Web.Controllers
                 }
             }) ?? new();
 
-            ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString();
+            ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
+            ExtraReport.xrNumber.Text = gs.Number ?? "-";
+            ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
+            ExtraReport.xrPatientName.Text = gx.Patient.Name ?? "-";
+            ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
+            ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
+            ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
+
+            // Dynamically set the checkbox for the hospital
+            ExtraReport.xrRSE.Checked = gs.Hospital == "RSE";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSBK";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSHB";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSBP";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSAB";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSGH";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSMA";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSHBH";
+            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSSD"; 
+            
+            // Dynamically set the checkbox for Category
+            ExtraReport.xrKanker.Checked = gs.Hospital == "Kanker";
+            ExtraReport.xrDependent.Checked = gs.Hospital == "Dependent";
+            ExtraReport.xrEmployee.Checked = gs.Hospital == "Employee";
+            ExtraReport.xrAccidentInside.Checked = gs.Hospital == "ACCIDENT Inside";
+            ExtraReport.xrAccidentOutside.Checked = gs.Hospital == "Accident Outside";
+            ExtraReport.xrKelainan.Checked = gs.Hospital == "KELAINAN BAWAAN";
+
+            // Dynamically set the checkbox for Inpatient Class
+            ExtraReport.xrClassVIP.Checked = gs.Hospital == "VIP Class";
+            ExtraReport.xrClass1B.Checked = gs.Hospital == "Class 1 B";
+            ExtraReport.xrClass2.Checked = gs.Hospital == "Class 2";
+
+            // Dynamically set the checkbox for Examp For
+            ExtraReport.xrFurther.Checked = gs.Hospital == "Pemeriksaan / penanganan lebih lanjut";
+            ExtraReport.xrSurgery.Checked = gs.Hospital == "Pembedahan";
+            ExtraReport.xrHospitalization.Checked = gs.Hospital == "Perawatan";
+            ExtraReport.xrMaternity.Checked = gs.Hospital == "Bersalin";
+            ExtraReport.xrRefaction.Checked = gs.Hospital == "Pemeriksaan Refraksi Mata";
+            ExtraReport.xrPhysiotherapy.Checked = gs.Hospital == "Fisioterapy";
+
+            // Dynamically set the checkbox for Specialist
+            ExtraReport.xrDentist.Checked = gs.Hospital == "Dentist";
+            ExtraReport.xrInternist.Checked = gs.Hospital == "Internist";
+            ExtraReport.xrPulmonologist.Checked = gs.Hospital == "Pulmonologist";
+            ExtraReport.xrCardiologist.Checked = gs.Hospital == "Cardiologist";
+            ExtraReport.xrEye.Checked = gs.Hospital == "Eye";
+            ExtraReport.xrENT.Checked = gs.Hospital == "ENT";
+            ExtraReport.xrPaediatric.Checked = gs.Hospital == "Paediatric";
+            ExtraReport.xrSurgeon.Checked = gs.Hospital == "Surgeon";
+            ExtraReport.xrObstetrician.Checked = gs.Hospital == "Obstetrician";
+
             // Export ke PDF
             ExtraReport.ExportToPdf(stream);
 
