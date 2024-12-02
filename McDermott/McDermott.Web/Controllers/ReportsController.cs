@@ -333,36 +333,44 @@ namespace McDermott.Web.Controllers
             ExtraReport.xrRSBK.Checked = gs.Hospital == "RSSD"; 
             
             // Dynamically set the checkbox for Category
-            ExtraReport.xrKanker.Checked = gs.Hospital == "Kanker";
-            ExtraReport.xrDependent.Checked = gs.Hospital == "Dependent";
-            ExtraReport.xrEmployee.Checked = gs.Hospital == "Employee";
-            ExtraReport.xrAccidentInside.Checked = gs.Hospital == "ACCIDENT Inside";
-            ExtraReport.xrAccidentOutside.Checked = gs.Hospital == "Accident Outside";
-            ExtraReport.xrKelainan.Checked = gs.Hospital == "KELAINAN BAWAAN";
+            ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "Kanker";
+            ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "Dependent";
+            ExtraReport.xrEmployee.Checked = gs.CategoryRJMCINT == "Employee";
+            ExtraReport.xrAccidentInside.Checked = gs.CategoryRJMCINT == "ACCIDENT Inside";
+            ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "Accident Outside";
+            ExtraReport.xrKelainan.Checked = gs.CategoryRJMCINT == "KELAINAN BAWAAN";
 
             // Dynamically set the checkbox for Inpatient Class
-            ExtraReport.xrClassVIP.Checked = gs.Hospital == "VIP Class";
-            ExtraReport.xrClass1B.Checked = gs.Hospital == "Class 1 B";
-            ExtraReport.xrClass2.Checked = gs.Hospital == "Class 2";
+            ExtraReport.xrClassVIP.Checked = gs.InpatientClass == "VIP Class";
+            ExtraReport.xrClass1B.Checked = gs.InpatientClass == "Class 1 B";
+            ExtraReport.xrClass2.Checked = gs.InpatientClass == "Class 2";
 
             // Dynamically set the checkbox for Examp For
-            ExtraReport.xrFurther.Checked = gs.Hospital == "Pemeriksaan / penanganan lebih lanjut";
-            ExtraReport.xrSurgery.Checked = gs.Hospital == "Pembedahan";
-            ExtraReport.xrHospitalization.Checked = gs.Hospital == "Perawatan";
-            ExtraReport.xrMaternity.Checked = gs.Hospital == "Bersalin";
-            ExtraReport.xrRefaction.Checked = gs.Hospital == "Pemeriksaan Refraksi Mata";
-            ExtraReport.xrPhysiotherapy.Checked = gs.Hospital == "Fisioterapy";
+            ExtraReport.xrFurther.Checked = gs.ExamFor == "Pemeriksaan / penanganan lebih lanjut";
+            ExtraReport.xrSurgery.Checked = gs.ExamFor == "Pembedahan";
+            ExtraReport.xrHospitalization.Checked = gs.ExamFor == "Perawatan";
+            ExtraReport.xrMaternity.Checked = gs.ExamFor == "Bersalin";
+            ExtraReport.xrRefaction.Checked = gs.ExamFor == "Pemeriksaan Refraksi Mata";
+            ExtraReport.xrPhysiotherapy.Checked = gs.ExamFor == "Fisioterapy";
 
             // Dynamically set the checkbox for Specialist
-            ExtraReport.xrDentist.Checked = gs.Hospital == "Dentist";
-            ExtraReport.xrInternist.Checked = gs.Hospital == "Internist";
-            ExtraReport.xrPulmonologist.Checked = gs.Hospital == "Pulmonologist";
-            ExtraReport.xrCardiologist.Checked = gs.Hospital == "Cardiologist";
-            ExtraReport.xrEye.Checked = gs.Hospital == "Eye";
-            ExtraReport.xrENT.Checked = gs.Hospital == "ENT";
-            ExtraReport.xrPaediatric.Checked = gs.Hospital == "Paediatric";
-            ExtraReport.xrSurgeon.Checked = gs.Hospital == "Surgeon";
-            ExtraReport.xrObstetrician.Checked = gs.Hospital == "Obstetrician";
+            ExtraReport.xrDentist.Checked = gs.Specialist == "Dentist";
+            ExtraReport.xrInternist.Checked = gs.Specialist == "Internist";
+            ExtraReport.xrPulmonologist.Checked = gs.Specialist == "Pulmonologist";
+            ExtraReport.xrCardiologist.Checked = gs.Specialist == "Cardiologist";
+            ExtraReport.xrEye.Checked = gs.Specialist == "Eye";
+            ExtraReport.xrENT.Checked = gs.Specialist == "ENT";
+            ExtraReport.xrPaediatric.Checked = gs.Specialist == "Paediatric";
+            ExtraReport.xrSurgeon.Checked = gs.Specialist == "Surgeon";
+            ExtraReport.xrObstetrician.Checked = gs.Specialist == "Obstetrician";
+            ExtraReport.xrNeurologist.Checked = gs.Specialist == "Neurologist";
+            ExtraReport.xrUrologist.Checked = gs.Specialist == "Urologist";
+            ExtraReport.xrNeurosurgeon.Checked = gs.Specialist == "Neurosurgeon";
+            ExtraReport.xrOrthopaedic.Checked = gs.Specialist == "Orthopaedic";
+            ExtraReport.xrPhysiotherapist.Checked = gs.Specialist == "Physiotherapist";
+            ExtraReport.xrDermatologist.Checked = gs.Specialist == "Dermatologist";
+            ExtraReport.xrPsychiatrist.Checked = gs.Specialist == "Psychiatrist";
+            ExtraReport.xrLaboratorium.Checked = gs.Specialist == "Laboratorium";
 
             // Export ke PDF
             ExtraReport.ExportToPdf(stream);
