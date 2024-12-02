@@ -993,6 +993,16 @@ namespace McDermott.Application.Features.Queries.Transaction
         {
             if (isReferTo)
             {
+                entity.ReferDateVisit = dto.ReferDateVisit;
+                entity.PracticeScheduleTimeDate = dto.PracticeScheduleTimeDate;
+                entity.ReferralExpiry = dto.ReferralExpiry;
+                entity.ReferSelectFaskesDate = dto.ReferSelectFaskesDate;
+                entity.ReferDiagnosisKd = dto.ReferDiagnosisKd;
+                entity.ReferDiagnosisNm = dto.ReferDiagnosisNm;
+                entity.IsReferDiagnosisNonSpesialis = dto.IsReferDiagnosisNonSpesialis;
+
+                //entity. = dto.;
+
                 entity.PPKRujukanCode = dto.PPKRujukanCode;
                 entity.PPKRujukanName = dto.PPKRujukanName;
                 entity.ReferVerticalSpesialisParentSpesialisName = dto.ReferVerticalSpesialisParentSpesialisName;
@@ -1011,6 +1021,14 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.InpatientClass = dto.InpatientClass;
 
                 SetPropertiesModified(entity,
+                    nameof(entity.ReferDateVisit),
+                    nameof(entity.PracticeScheduleTimeDate),
+                    nameof(entity.ReferralExpiry),
+                    nameof(entity.ReferSelectFaskesDate),
+                    nameof(entity.ReferDiagnosisKd),
+                    nameof(entity.ReferDiagnosisNm),
+                    nameof(entity.IsReferDiagnosisNonSpesialis),
+
                     nameof(entity.PPKRujukanCode),
                     nameof(entity.PPKRujukanName),
                     nameof(entity.ReferVerticalSpesialisParentSpesialisName),
@@ -1030,6 +1048,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             else
             {
+                entity.ReferralNo = dto.ReferralNo;
                 entity.LocationId = dto.LocationId;
                 entity.PratitionerId = dto.PratitionerId;
                 entity.HomeStatus = dto.HomeStatus;
@@ -1046,6 +1065,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 UpdateNurseStationFields(entity, dto); // Including NurseStation fields
 
                 SetPropertiesModified(entity, nameof(entity.PratitionerId), nameof(entity.HomeStatus), nameof(entity.IsSickLeave),
+                    nameof(entity.ReferralNo),
                     nameof(entity.LocationId),
                     nameof(entity.Anamnesa),
                     nameof(entity.BMHP),
@@ -1194,7 +1214,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                         PatientNextVisitSchedule = request.GeneralConsultanServiceDto.PatientNextVisitSchedule,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
-                        LocationId = request.GeneralConsultanServiceDto.LocationId
+                        LocationId = request.GeneralConsultanServiceDto.LocationId,
+                        SerialNo = request.GeneralConsultanServiceDto.SerialNo
                     };
 
                     // Tambahkan entitas baru ke repository dan simpan ke database
@@ -1233,7 +1254,8 @@ namespace McDermott.Application.Features.Queries.Transaction
                         HPL = request.GeneralConsultanServiceDto.HPL,
                         AppointmentDate = request.GeneralConsultanServiceDto.AppointmentDate,
                         Reference = await GenerateReferenceNumber(),
-                        LocationId = request.GeneralConsultanServiceDto.LocationId
+                        LocationId = request.GeneralConsultanServiceDto.LocationId,
+                        SerialNo = request.GeneralConsultanServiceDto.SerialNo
                     };
 
                     // Tambahkan entitas baru ke repository dan simpan ke database

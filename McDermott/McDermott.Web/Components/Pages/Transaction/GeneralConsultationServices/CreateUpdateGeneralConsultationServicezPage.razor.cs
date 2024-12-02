@@ -97,7 +97,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private IGrid GridClaim { get; set; }
         private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsClaim { get; set; } = [];
-       
+
         private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
         private int FocusedGridTabClaimRowVisibleIndex { get; set; }
         private List<DiagnosisDto> Diagnoses = [];
@@ -889,6 +889,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     Anamnesa = x.Anamnesa,
                     TypeClaim = x.TypeClaim,
 
+                    ReferDateVisit = x.ReferDateVisit,
+                    ReferralNo = x.ReferralNo,
                 }
             });
 
@@ -1708,8 +1710,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     }
 
                     GeneralConsultanService.Status = EnumStatusGeneralConsultantService.Canceled;
-                    GeneralConsultanService = await Mediator.Send(new CancelGeneralConsultanServiceRequest(GeneralConsultanService));
+                    await Mediator.Send(new CancelGeneralConsultanServiceRequest(GeneralConsultanService));
                     StagingText = EnumStatusGeneralConsultantService.Canceled;
+
+                    Id = GeneralConsultanService.Id;
+                    GeneralConsultanService = await GetGeneralConsultanServiceById();
 
                     ToastService.ShowSuccess("The patient has been successfully canceled from the consultation.");
                 }
@@ -2106,6 +2111,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 else
                     IsContinueCPPT = true;
 
+                // Kirim WS Kunjungan PCare
                 if ((!PopUpConfirmation && IsContinueCPPT) || IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
                 {
                     if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
@@ -2228,6 +2234,21 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     }
                     else
                     {
+                        if (GeneralConsultanService.Status == EnumStatusGeneralConsultantService.Physician && string.IsNullOrWhiteSpace(GeneralConsultanService.ReferralNo) && !string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                        {
+                            var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan/rujukan/{GeneralConsultanService.VisitNumber}", HttpMethod.Get);
+                            if (result.Item2 == 200)
+                            {
+                                dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+
+                                GeneralConsultanService.ReferralNo = data.noRujukan;
+                            }
+                            else
+                            {
+                                ToastService.ShowError($"Error when Sending Refferal, {result.Item2}");
+                            }
+                        }
+
                         newGC = await Mediator.Send(new UpdateConfirmFormGeneralConsultanServiceNewRequest
                         {
                             GeneralConsultanServiceDto = GeneralConsultanService,
@@ -2445,7 +2466,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         TerapiObat = g.MedicationTherapy ?? "",
                         TerapiNonObat = g.NonMedicationTherapy ?? "",
                         Bmhp = GeneralConsultanService.BMHP ?? "",
-                        Suhu = GeneralConsultanService.Temp.ToString(),
+                        Suhu = "36",
                     };
                 }
 
@@ -2480,6 +2501,47 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             return true;
         }
 
+        private bool IsLoadingSendReferral = false;
+        private async Task OnClickSendRefferal()
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                    await SendPcareRequestKunjungan();
+
+                if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                {
+                    var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan/rujukan/{GeneralConsultanService.VisitNumber}", HttpMethod.Get);
+                    if (result.Item2 == 200)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                        GeneralConsultanService.ReferralNo = data.noRujukan;
+                    }
+                    else
+                    {
+                        ToastService.ShowError($"Error when Sending Refferal, {result.Item2}");
+                    }
+                }
+
+                if (GeneralConsultanService.VisitNumber is not null || GeneralConsultanService.ReferralNo != null)
+                {
+                    var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                    {
+                        GeneralConsultanServiceDto = GeneralConsultanService,
+                        Status = EnumStatusGeneralConsultantService.Physician,
+                        IsReferTo = false
+                    };
+
+                    await Mediator.Send(updateRequest);
+                    Id = GeneralConsultanService.Id;
+                    GeneralConsultanService = await GetGeneralConsultanServiceById();
+                }
+            }
+            catch (Exception e)
+            {
+                e.HandleException(ToastService);
+            }
+        }
         private async Task<bool> SendPcareRequestRegistration()
         {
             if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
@@ -2778,6 +2840,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
         }
 
+        private async Task OnPrintRujukanBPJSPRB()
+        {
+            var reportUrl = $"api/reports/rujukan-bpjs-prb/{GeneralConsultanService.Id.ToString()}";
+            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+        }
+
         private async Task OnPrint()
         {
             try
@@ -2878,18 +2946,18 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             await LoadDataRefertoMC();
         }
-        private async Task LoadDataRefertoMC(int pageSize=0, int pageIndex=10 )
+        private async Task LoadDataRefertoMC(int pageSize = 0, int pageIndex = 10)
         {
             IsLoadingRJMCINT = true;
             var gcs = await Mediator.Send(new GetGCReferToInternalQuery
             {
-                Predicate =x=>x.GeneralConsultanServiceId == GeneralConsultanService.Id
+                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id
 
             });
             GcRefer = gcs.Item1;
             totalCountRMC = gcs.PageCount;
             activePageIndexTotalCountRMC = gcs.PageIndex;
-            
+
             IsLoadingRJMCINT = false;
         }
 
@@ -2932,7 +3000,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private void GridRCM_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleRMCIndex = args.VisibleIndex;
-           
+
         }
 
         #endregion

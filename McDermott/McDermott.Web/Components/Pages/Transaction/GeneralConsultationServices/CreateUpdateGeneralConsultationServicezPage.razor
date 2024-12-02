@@ -89,6 +89,7 @@
                                                                     <Items>
                                                                         <DxToolbarItem IconCssClass="fa-solid fa-file-arrow-down" Text="SLIP" GroupName="italic" Click="OnPrint" />
                                                                         <DxToolbarItem IconCssClass="fa-solid fa-file-arrow-down" Text="Rujukan BPJS" GroupName="italic" Click="OnPrintRujukanBPJS" />
+                                                                        <DxToolbarItem IconCssClass="fa-solid fa-file-arrow-down" Text="Rujukan BPJS + PRB" GroupName="italic" Click="OnPrintRujukanBPJSPRB" />
                                                                         @if (GeneralConsultanService.IsSickLeave == true || GeneralConsultanService.IsMaternityLeave == true)
                                                                         {
                                                                             <DxToolbarItem IconCssClass="fa-solid fa-file-arrow-down" Text="SickLeave" Click="(()=>SendToPrint(GeneralConsultanService.Id))" />
@@ -855,8 +856,8 @@
                                                                                             </Columns>
                                                                                             <Items>
                                                                                                 <DxGridLayoutItem Row="0" Column="0" CssClass="mt">
-                                                                                                    <Template>
-                                                                                                        <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.HR" NullText="HR" />
+                                                                                                    <Template> 
+                                                                                                        <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="30" MaxValue="160" @bind-Value="@GeneralConsultanService.HR" NullText="HR" />
                                                                                                     </Template>
                                                                                                 </DxGridLayoutItem>
                                                                                                 <DxGridLayoutItem Row="0" Column="1" CssClass="mt ml">
@@ -883,7 +884,7 @@
                                                                                             <Items>
                                                                                                 <DxGridLayoutItem Row="0" Column="0">
                                                                                                     <Template>
-                                                                                                        <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="0" @bind-Value="@GeneralConsultanService.Systolic" />
+                                                                                                        <DxSpinEdit ReadOnly="ReadOnlyForm()" MinValue="40" MaxValue="203" @bind-Value="@GeneralConsultanService.Systolic" />
                                                                                                     </Template>
                                                                                                 </DxGridLayoutItem>
                                                                                                 <DxGridLayoutItem Row="0" Column="2">
@@ -1132,7 +1133,7 @@
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
                                                                                                 @*  <MyTextBox @bind-Text="@a.Planning"
                                                                                                                NullText="Name" /> *@ 
-                                                                                                            </DxFormLayoutItem>
+                                                                                                                                                            </DxFormLayoutItem>
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medication Therapy" ColSpanMd="12">
                                                                                                 <MyTextBox @bind-Text="@a.MedicationTherapy"
                                                                                                            NullText="Medication Therapy" />
@@ -1184,7 +1185,7 @@
 
                                                     </DxTabPage>
 
-                                                    @if (IsStatus(EnumStatusGeneralConsultantService.Physician) || IsStatus(EnumStatusGeneralConsultantService.Finished) || IsStatus(EnumStatusGeneralConsultantService.Canceled))
+                                                    @if (GeneralConsultanService.Payment.Equals("BPJS") && (IsStatus(EnumStatusGeneralConsultantService.Physician) || IsStatus(EnumStatusGeneralConsultantService.Finished) || IsStatus(EnumStatusGeneralConsultantService.Canceled)))
                                                     {
                                                         <DxTabPage Text="BPJS Integration">
                                                             <div class="w-100 mt-2">
@@ -1193,47 +1194,84 @@
                                                                         <span class="fw-bolder">BPJS Integration</span>
                                                                     </div>
 
-                                                                    <div class="card-body">
-                                                                        <div class="row w-100">
-                                                                            <div class="col-md-12">
-                                                                                <DxFormLayout CssClass="w-100">
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Visit Number" ColSpanMd="12">
-                                                                                        @if (GeneralConsultanService.VisitNumber is not null)
-                                                                                        {
-                                                                                            <label>@GeneralConsultanService.VisitNumber</label>
-                                                                                        }
-                                                                                        else
-                                                                                        {
-                                                                                            <label>-</label>
-                                                                                        }
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Number" ColSpanMd="12">
-                                                                                        <label>-</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Refer" ColSpanMd="12">
-                                                                                        <label>@GeneralConsultanService.PPKRujukanName</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Spesialis/Subspesialis" ColSpanMd="12">
-                                                                                        <label>@($"{GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName}/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisName}")</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Note" ColSpanMd="12">
-                                                                                        <label>@GeneralConsultanService.ReferReason</label>
-                                                                                    </DxFormLayoutItem>
-                                                                                    <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="12">
-                                                                                        @if (GeneralConsultanService.ReferDateVisit.HasValue)
-                                                                                        {
-                                                                                            <label>@GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy")</label>
-                                                                                        }
-                                                                                        else
-                                                                                        {
-                                                                                            <label>-</label>
-                                                                                        }
-                                                                                    </DxFormLayoutItem>
-                                                                                </DxFormLayout>
-                                                                            </div>
+                                                                    <DxLoadingPanel @bind-Visible="IsLoadingSendReferral"
+                                                                                    IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                    IsContentBlocked="true"
+                                                                                    ApplyBackgroundShading="true"
+                                                                                    IndicatorAreaVisible="false"
+                                                                                    Text="Sending Data...">
+                                                                        <div class="card-body">
+                                                                            <div class="row w-100">
 
+                                                                                <div class=" row w-100">
+                                                                                    @if (string.IsNullOrWhiteSpace(GeneralConsultanService.ReferralNo))
+                                                                                    {
+                                                                                        <div class="col-sm align-self-end">
+                                                                                            <div class="row justify-content-end">
+                                                                                                <div class="col-auto">
+                                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-paper-plane" Text="Send Referral" Click="OnClickSendRefferal"></DxButton>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
+                                                                                </div>
+
+                                                                                <div class="col-md-12">
+                                                                                    <DxFormLayout CssClass="w-100">
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Visit Number" ColSpanMd="6"> 
+                                                                                            <DxTextBox @bind-Text="@GeneralConsultanService.VisitNumber"
+                                                                                                       NullText="Visit Number"
+                                                                                                       ReadOnly /> 
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Number" ColSpanMd="6"> 
+                                                                                            <DxTextBox @bind-Text="@GeneralConsultanService.ReferralNo"
+                                                                                                       NullText="Referral No"
+                                                                                                       ReadOnly />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Refer" ColSpanMd="6"> 
+                                                                                            <DxTextBox @bind-Text="@GeneralConsultanService.PPKRujukanName"
+                                                                                                       NullText="PPK Refer"
+                                                                                                       ReadOnly />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Spesialis/Subspesialis" ColSpanMd="6">
+                                                                                            <DxTextBox Text="@($"{GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName}/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisName}")"
+                                                                                                       NullText="PPK Refer"
+                                                                                                       TextExpression="@(() => GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName)"
+                                                                                                       ReadOnly /> 
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Note" ColSpanMd="6"> 
+                                                                                            <DxTextBox @bind-Text="@GeneralConsultanService.ReferReason"
+                                                                                                       NullText="Note"
+                                                                                                       ReadOnly />
+                                                                                        </DxFormLayoutItem>
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                                                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="6">
+
+                                                                                            <DxDateEdit @bind-Date="@GeneralConsultanService.ReferDateVisit"
+                                                                                                        DisplayFormat="@Helper.DefaultFormatDate" 
+                                                                                                        NullText="Refer Date Visit"
+                                                                                                ReadOnly />  
+                                                                                        </DxFormLayoutItem>
+                                                                                    </DxFormLayout>
+                                                                                </div>
+
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
+                                                                    </DxLoadingPanel>
                                                                 </div>
                                                             </div>
                                                         </DxTabPage>
@@ -1284,7 +1322,7 @@
                                                                                                                FieldName="TypeClaim"
                                                                                                                Visible="true" />
                                                                                         </TotalSummary>
-                                                                                       
+
                                                                                     </MyGridPaginate>
                                                                                     <div class="row">
                                                                                         <DxFormLayout>

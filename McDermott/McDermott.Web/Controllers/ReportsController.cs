@@ -109,10 +109,22 @@ namespace McDermott.Web.Controllers
                         DateOfBirth = x.Patient.DateOfBirth,
                         Gender = x.Patient.Gender,
                     },
+                    Pratitioner = new User
+                    {
+                        Name = x.Pratitioner.Name,
+                    },
 
                     VisitNumber = x.VisitNumber,
+                    ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                    PPKRujukanName = x.PPKRujukanName,
                     ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
                     InsurancePolicyId = x.InsurancePolicyId,
+                    ReferDiagnosisNm = x.ReferDiagnosisNm,
+                    ReferDateVisit = x.ReferDateVisit,
+                    PracticeScheduleTimeDate = x.PracticeScheduleTimeDate,
+                    ReferralExpiry = x.ReferralExpiry,
+                    ReferSelectFaskesDate = x.ReferSelectFaskesDate,
+                    ReferralNo = x.ReferralNo
                 }
             }) ?? new();
 
@@ -128,27 +140,26 @@ namespace McDermott.Web.Controllers
 
             // Header
             myReport.xrLabelNoKunjungan.Text = gx.VisitNumber;
-            myReport.xrLabelFKTP.Text = gx.ReferVerticalSpesialisSaranaName;
-            myReport.xrLabelKota.Text = gx.VisitNumber;
-            myReport.xrLabelTsDokter.Text = gx.VisitNumber; // Spesialis
-            myReport.xrLabelDi.Text = gx.VisitNumber;
+
+            myReport.xrLabelTsDokter.Text = gx.ReferVerticalSpesialisParentSpesialisName; // Spesialis
+            myReport.xrLabelDi.Text = gx.PPKRujukanName;
 
             // Patient
             myReport.xrLabelNama.Text = gx.Patient?.Name ?? "-";
             myReport.xrLabelBPJS.Text = inspolcy.PolicyNumber;
-            myReport.xrLabelDiagnosaa.Text = gx.VisitNumber; // Diagnosa
+            myReport.xrLabelDiagnosaa.Text = gx.ReferDiagnosisNm; // Diagnosa
             myReport.xrLabelUmur.Text = gx.Patient?.Age.ToString() ?? "-";
             myReport.xrLabelTahun.Text = gx.Patient?.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy");
             myReport.xrLabelStatusTanggunan.Text = inspolcy.JnsKelasKode;
             myReport.xrLabelGender.Text = gx.Patient?.Gender == "Male" ? "L" : "P";
 
-            myReport.xrLabelRencana.Text = gx.VisitNumber;
-            myReport.xrLabelJadwal.Text = gx.ScheduleTime;
-            myReport.xrLabelBerlakuDate.Text = gx.VisitNumber;
-            myReport.xrLabelSalamDate.Text = gx.VisitNumber;
-            myReport.xrLabelDokter.Text = gx.VisitNumber;
+            myReport.xrLabelRencana.Text = gx.ReferDateVisit.GetValueOrDefault().ToString("dd-MMM-yyyy");
+            myReport.xrLabelJadwal.Text = gx.PracticeScheduleTimeDate;
+            myReport.xrLabelBerlakuDate.Text = gx.ReferralExpiry.GetValueOrDefault().ToString("dd-MMM-yyyy");
+            myReport.xrLabelSalamDate.Text = $"Salam sejawat,\r\n{gx.ReferSelectFaskesDate.GetValueOrDefault().ToString("dd MMMM yyyy")}";
+            myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
 
-            myReport.xrBarCode1.Text = "0070B0531124P000486";
+            myReport.xrBarCode1.Text = gx.ReferralNo;
             myReport.xrBarCode1.ShowText = false;
 
             // Export ke PDF
@@ -158,6 +169,89 @@ namespace McDermott.Web.Controllers
             var ar = stream.ToArray();
 
             return File(ar, "application/pdf", "Report_RujukanBPJS.pdf");
+        }
+
+        [HttpGet("rujukan-bpjs-prb/{id}")]
+        public async Task<IActionResult> DownloadReportRujukanBpjsPRB(long id)
+        {
+            using var stream = new MemoryStream();
+            // Buat laporan
+            var myReport = new ReportRujukanBPJS_PRB();
+
+            var gx = await mediator.Send(new GetSingleGeneralConsultanServicesQuery
+            {
+                Predicate = x => x.Id == id,
+                Select = x => new GeneralConsultanService
+                {
+                    Patient = new User
+                    {
+                        Name = x.Patient.Name,
+                        DateOfBirth = x.Patient.DateOfBirth,
+                        Gender = x.Patient.Gender,
+                    },
+                    Pratitioner = new User
+                    {
+                        Name = x.Pratitioner.Name,
+                    },
+
+                    VisitNumber = x.VisitNumber,
+                    ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                    PPKRujukanName = x.PPKRujukanName,
+                    ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                    InsurancePolicyId = x.InsurancePolicyId,
+                    ReferDiagnosisNm = x.ReferDiagnosisNm,
+                    ReferDateVisit = x.ReferDateVisit,
+                    PracticeScheduleTimeDate = x.PracticeScheduleTimeDate,
+                    ReferralExpiry = x.ReferralExpiry,
+                    ReferSelectFaskesDate = x.ReferSelectFaskesDate,
+                    ReferralNo = x.ReferralNo
+                }
+            }) ?? new();
+
+            var inspolcy = await mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.Id == gx.InsurancePolicyId,
+                Select = x => new InsurancePolicy
+                {
+                    PolicyNumber = x.PolicyNumber,
+                    JnsKelasKode = x.JnsKelasKode
+                }
+            }) ?? new();
+
+            // Header
+            myReport.xrLabelNoKunjungan.Text = gx.VisitNumber;
+
+            myReport.xrLabelTsDokter.Text = gx.ReferVerticalSpesialisParentSpesialisName; // Spesialis
+            myReport.xrLabelDi.Text = gx.PPKRujukanName;
+
+            // Patient
+            myReport.xrLabelNama.Text = gx.Patient?.Name ?? "-";
+            myReport.xrLabelBPJS.Text = inspolcy.PolicyNumber;
+            myReport.xrLabelDiagnosaa.Text = gx.ReferDiagnosisNm; // Diagnosa
+            myReport.xrLabelUmur.Text = gx.Patient?.Age.ToString() ?? "-";
+            myReport.xrLabelTahun.Text = gx.Patient?.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy");
+            myReport.xrLabelStatusTanggunan.Text = inspolcy.JnsKelasKode;
+            myReport.xrLabelGender.Text = gx.Patient?.Gender == "Male" ? "L" : "P";
+
+            myReport.xrLabelRencana.Text = gx.ReferDateVisit.GetValueOrDefault().ToString("dd-MMM-yyyy");
+            myReport.xrLabelJadwal.Text = gx.PracticeScheduleTimeDate;
+            myReport.xrLabelBerlakuDate.Text = gx.ReferralExpiry.GetValueOrDefault().ToString("dd-MMM-yyyy");
+            myReport.xrLabelSalamDate.Text = $"Salam sejawat,\r\n{gx.ReferSelectFaskesDate.GetValueOrDefault().ToString("dd MMMM yyyy")}";
+            myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
+
+            myReport.xrBarCode1.Text = gx.ReferralNo;
+            myReport.xrBarCode1.ShowText = false;
+
+
+            myReport.xrLabelRujukanBalikName.Text = gx.Patient?.Name ?? "-";
+
+            // Export ke PDF
+            myReport.ExportToPdf(stream);
+
+            // Kembalikan sebagai array byte
+            var ar = stream.ToArray();
+
+            return File(ar, "application/pdf", "Report_RujukanBPJS_PRB.pdf");
         }
 
         public byte[] GenerateReport()

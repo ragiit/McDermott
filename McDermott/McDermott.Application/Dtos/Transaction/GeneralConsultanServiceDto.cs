@@ -135,24 +135,33 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
 
-        /// <BPJS Rujukan>
-        public string? SerialNo { get; set; }
-
-        public string? VisitNumber { get; set; }
-        public string? ReferVerticalKhususCategoryName { get; set; }
-        public string? ReferVerticalKhususCategoryCode { get; set; }
-        public string? ReferVerticalSpesialisParentSpesialisName { get; set; }
-        public string? ReferVerticalSpesialisParentSpesialisCode { get; set; }
-        public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; }
-        public string? ReferVerticalSpesialisParentSubSpesialisCode { get; set; }
+        #region Rujukan
+        public string? ReferralNo { get; set; } // No. Rujukan
+        public string? SerialNo { get; set; }  // Dari Kiosk
+        public string? VisitNumber { get; set; } // NO Kunjungan
+        public string? ReferDiagnosisKd { get; set; } // Diagnosis
+        public string? ReferDiagnosisNm { get; set; } // Diagnosis
+        public bool? IsReferDiagnosisNonSpesialis { get; set; }  // Diagnosis
+        public string? ReferVerticalKhususCategoryName { get; set; } 
+        public string? ReferVerticalKhususCategoryCode { get; set; } 
+        public DateTime? ReferSelectFaskesDate { get; set; } // Date ketika select faskes, ada di print bagian "Salam sejawat,"
+        public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
+        public string? PracticeScheduleTimeDate { get; set; } // Jadwal Praktek
+        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan, 
+        public string? ReferVerticalSpesialisParentSpesialisName { get; set; } // ANAK
+        public string? ReferVerticalSpesialisParentSpesialisCode { get; set; } // ANA
+        public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; } // Anak
+        public string? ReferVerticalSpesialisParentSubSpesialisCode { get; set; } // Ana
         public string? ReferReason { get; set; } = "-"; // Catatan
+
         public bool? IsSarana { get; set; } = false;
         public string? ReferVerticalSpesialisSaranaName { get; set; }
         public string? ReferVerticalSpesialisSaranaCode { get; set; }
-        public string? PPKRujukanName { get; set; } = "-";
-        public string? PPKRujukanCode { get; set; }
-        public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
-        /// </BPJS Rujukan>
+
+        public string? PPKRujukanName { get; set; } = "-"; // nmppk , RS CHARIS MEDIKA
+        public string? PPKRujukanCode { get; set; } // kdppk, 0070R018
+
+        #endregion
 
         #region Clinical Assesment
 
@@ -493,28 +502,35 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
-        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
-        public string? SerialNo { get; set; } // NoUrut
+        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow; 
+        #region Rujukan
+        public string? ReferralNo { get; set; } // No. Rujukan
+        public string? SerialNo { get; set; }  // Dari Kiosk
         public string? VisitNumber { get; set; } // NO Kunjungan
-
-        /// <BPJS Rujukan>
+        public string? ReferDiagnosisKd { get; set; } // Diagnosis
+        public string? ReferDiagnosisNm { get; set; } // Diagnosis
+        public bool? IsReferDiagnosisNonSpesialis { get; set; }  // Diagnosis
         public string? ReferVerticalKhususCategoryName { get; set; }
-
         public string? ReferVerticalKhususCategoryCode { get; set; }
-        public string? ReferVerticalSpesialisParentSpesialisName { get; set; }
-        public string? ReferVerticalSpesialisParentSpesialisCode { get; set; }
-        public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; }
-        public string? ReferVerticalSpesialisParentSubSpesialisCode { get; set; }
+        public DateTime? ReferSelectFaskesDate { get; set; } // Date ketika select faskes, ada di print bagian "Salam sejawat,"
+        public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
+        public string? PracticeScheduleTimeDate { get; set; } // Jadwal Praktek
+        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan, 
+        public string? ReferVerticalSpesialisParentSpesialisName { get; set; } // ANAK
+        public string? ReferVerticalSpesialisParentSpesialisCode { get; set; } // ANA
+        public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; } // Anak
+        public string? ReferVerticalSpesialisParentSubSpesialisCode { get; set; } // Ana
         public string? ReferReason { get; set; } = "-"; // Catatan
+
         public bool? IsSarana { get; set; } = false;
         public string? ReferVerticalSpesialisSaranaName { get; set; }
         public string? ReferVerticalSpesialisSaranaCode { get; set; }
-        public string? PPKRujukanName { get; set; }
-        public string? PPKRujukanCode { get; set; }
-        public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
 
-        /// </BPJS Rujukan>
-        ///
+        public string? PPKRujukanName { get; set; } = "-"; // nmppk , RS CHARIS MEDIKA
+        public string? PPKRujukanCode { get; set; } // kdppk, 0070R018
+
+        #endregion
+
         public string? LinkMeet { get; set; } //telemedic
 
         public bool IsTelemedicine { get; set; } = false;
