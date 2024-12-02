@@ -304,12 +304,12 @@ namespace McDermott.Web.Controllers
                         Name = x.Patient.Name,
                         DateOfBirth = x.Patient.DateOfBirth,
                         Gender = x.Patient.Gender,
-
                     },
 
-                    VisitNumber = x.VisitNumber,
-                    ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
-                    InsurancePolicyId = x.InsurancePolicyId,
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+                    
                 }
             }) ?? new();
 
