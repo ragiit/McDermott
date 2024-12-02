@@ -2497,6 +2497,17 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         }).ToList();
 
                         GeneralConsultanService.VisitNumber = xz[0].message;
+
+                        var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                        {
+                            GeneralConsultanServiceDto = GeneralConsultanService,
+                            Status = EnumStatusGeneralConsultantService.Physician,
+                            IsReferTo = false
+                        };
+
+                        await Mediator.Send(updateRequest);
+                        Id = GeneralConsultanService.Id;
+                        GeneralConsultanService = await GetGeneralConsultanServiceById();
                     }
                 }
             }
@@ -2519,6 +2530,17 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     {
                         dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
                         GeneralConsultanService.ReferralNo = data.noRujukan;
+
+                        var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                        {
+                            GeneralConsultanServiceDto = GeneralConsultanService,
+                            Status = EnumStatusGeneralConsultantService.Physician,
+                            IsReferTo = false
+                        };
+
+                        await Mediator.Send(updateRequest);
+                        Id = GeneralConsultanService.Id;
+                        GeneralConsultanService = await GetGeneralConsultanServiceById();
                     }
                     else
                     {
@@ -2526,19 +2548,19 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     }
                 }
 
-                if (GeneralConsultanService.VisitNumber is not null || GeneralConsultanService.ReferralNo != null)
-                {
-                    var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
-                    {
-                        GeneralConsultanServiceDto = GeneralConsultanService,
-                        Status = EnumStatusGeneralConsultantService.Physician,
-                        IsReferTo = false
-                    };
+                //if (GeneralConsultanService.VisitNumber is not null || GeneralConsultanService.ReferralNo != null)
+                //{
+                //    var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                //    {
+                //        GeneralConsultanServiceDto = GeneralConsultanService,
+                //        Status = EnumStatusGeneralConsultantService.Physician,
+                //        IsReferTo = false
+                //    };
 
-                    await Mediator.Send(updateRequest);
-                    Id = GeneralConsultanService.Id;
-                    GeneralConsultanService = await GetGeneralConsultanServiceById();
-                }
+                //    await Mediator.Send(updateRequest);
+                //    Id = GeneralConsultanService.Id;
+                //    GeneralConsultanService = await GetGeneralConsultanServiceById();
+                //}
             }
             catch (Exception e)
             {

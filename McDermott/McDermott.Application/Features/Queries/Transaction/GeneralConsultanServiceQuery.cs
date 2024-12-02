@@ -994,6 +994,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             if (isReferTo)
             {
                 entity.ReferDateVisit = dto.ReferDateVisit;
+                entity.VisitNumber = dto.VisitNumber;
                 entity.PracticeScheduleTimeDate = dto.PracticeScheduleTimeDate;
                 entity.ReferralExpiry = dto.ReferralExpiry;
                 entity.ReferSelectFaskesDate = dto.ReferSelectFaskesDate;
@@ -1023,6 +1024,7 @@ namespace McDermott.Application.Features.Queries.Transaction
 
 
                 SetPropertiesModified(entity,
+                    nameof(entity.VisitNumber),
                     nameof(entity.ReferDateVisit),
                     nameof(entity.PracticeScheduleTimeDate),
                     nameof(entity.ReferralExpiry),
@@ -1051,6 +1053,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             else
             {
+                entity.VisitNumber = dto.VisitNumber;
                 entity.ReferralNo = dto.ReferralNo; 
                 entity.LocationId = dto.LocationId;
                 entity.PratitionerId = dto.PratitionerId;
@@ -1069,6 +1072,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 UpdateNurseStationFields(entity, dto); // Including NurseStation fields
 
                 SetPropertiesModified(entity, 
+                    nameof(entity.VisitNumber), 
                     nameof(entity.PratitionerId), 
                     nameof(entity.HomeStatus), 
                     nameof(entity.IsSickLeave),
