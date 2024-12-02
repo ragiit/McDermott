@@ -1,4 +1,5 @@
 ﻿using DevExpress.Blazor.RichEdit;
+using DevExpress.CodeParser;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
 using McDermott.Application.Dtos.Transaction;
@@ -147,8 +148,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                 PanelVisible = true;
                 await GridCppt.StartEditRowAsync(FocusedGridTabCPPTRowVisibleIndex);
 
-                var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
-                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
+                var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new()); 
+                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery
+                {
+                    Predicate = x => x.Id == a.NursingDiagnosesId
+                })).Item1;
                 Diagnoses = (await Mediator.Send(new GetDiagnosisQuery { Predicate = x => x.Id == a.DiagnosisId })).Item1;
 
                 PanelVisible = false;
@@ -888,9 +892,14 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetNursingDiagnosesQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refNursingDiagnosesComboBox?.Text ?? ""));
+                var result = await Mediator.Send(new GetNursingDiagnosesQuery
+                {
+                    SearchTerm = refNursingDiagnosesComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
                 NursingDiagnoses = result.Item1;
-                totalCountNursingDiagnoses = result.pageCount;
+                totalCountNursingDiagnoses = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)

@@ -4,13 +4,34 @@
     {
         #region GET
 
-        public class GetNursingDiagnosesQuery(Expression<Func<NursingDiagnoses, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleNursingDiagnosesQuery : IRequest<NursingDiagnosesDto>
         {
-            public Expression<Func<NursingDiagnoses, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<NursingDiagnoses, object>>> Includes { get; set; }
+            public Expression<Func<NursingDiagnoses, bool>> Predicate { get; set; }
+            public Expression<Func<NursingDiagnoses, NursingDiagnoses>> Select { get; set; }
+
+            public List<(Expression<Func<NursingDiagnoses, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetNursingDiagnosesQuery : IRequest<(List<NursingDiagnosesDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<NursingDiagnoses, object>>> Includes { get; set; }
+            public Expression<Func<NursingDiagnoses, bool>> Predicate { get; set; }
+            public Expression<Func<NursingDiagnoses, NursingDiagnoses>>? Select { get; set; }
+
+            public List<(Expression<Func<NursingDiagnoses, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class BulkValidateNursingDiagnosesQuery(List<NursingDiagnosesDto> NursingDiagnosessToValidate) : IRequest<List<NursingDiagnosesDto>>

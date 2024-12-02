@@ -826,10 +826,10 @@
             {
                 Predicate = x => x.Id == GeneralConsultanService.Id
             });
-        if (GCReferTo.TypeClaim == "Dentist")
+        if (GCReferTo.TypeClaim == "Dentist" || GCReferTo.TypeClaim == null)
         {
             var Ns = await Mediator.Send(new GetGCReferToInternalQuery());
-            var cekNumber = Ns.Item1.Where(x => x.TypeClaim == GCReferTo.TypeClaim).OrderByDescending(x => x.Number).Select(x => x.Number).FirstOrDefault();
+            var cekNumber = Ns.Item1.Where(x => x.TypeClaim != "Glasses" && x.TypeClaim != "Safety Glasses").OrderByDescending(x => x.Number).Select(x => x.Number).FirstOrDefault();
             if (cekNumber == null)
             {
                 var nextNumber = 1;
@@ -840,14 +840,14 @@
                 var lastNumber = 0;
                 if (cekNumber.Contains("McD/RLH/Clinic/"))
                 {
-                    var lastNumberStr = cekNumber.Split('/')[1];
+                    var lastNumberStr = cekNumber.Split('/')[3];
                     int.TryParse(lastNumberStr, out lastNumber);
                 }
                 var nextNumber = lastNumber + 1;
                 GCReferTo.Number = $"McD/RLH/Clinic/{nextNumber.ToString("0000")}";
             }
         }
-        else if (GeneralConsultanService.TypeClaim == "Glasses")
+        else if (GCReferTo.TypeClaim == "Glasses")
         {
             var Ns = await Mediator.Send(new GetGCReferToInternalQuery());
             var cekNumber = Ns.Item1.Where(x => x.TypeClaim == GCReferTo.TypeClaim).OrderByDescending(x => x.Number).Select(x => x.Number).FirstOrDefault();
@@ -861,7 +861,7 @@
                 var lastNumber = 0;
                 if (cekNumber.Contains("McD/RLRP/Clinic/"))
                 {
-                    var lastNumberStr = cekNumber.Split('/')[1];
+                    var lastNumberStr = cekNumber.Split('/')[3];
                     int.TryParse(lastNumberStr, out lastNumber);
                 }
                 var nextNumber = lastNumber + 1;
@@ -870,10 +870,17 @@
         }
         GCReferTo.GeneralConsultanServiceId = GeneralConsultanService.Id;
         var RJMCINT = new CreateGCReferToInternalRequest(GCReferTo);
-
-
         res = await Mediator.Send(RJMCINT);
-
+        if (res.TypeClaim != null)
+        {
+            GeneralConsultanService.TypeClaim = res.TypeClaim;
+            var GcUpdate = new UpdateFormGeneralConsultanServiceNewRequest
+                {
+                    GeneralConsultanServiceDto = GeneralConsultanService,
+                    Status = EnumStatusGeneralConsultantService.Physician,
+                    IsReferTo = true
+                };
+        }
         IsLoadingRJMCINT = false;
 
         ToastService.ClearSuccessToasts();

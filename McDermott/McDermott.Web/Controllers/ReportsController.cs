@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using static McDermott.Application.Features.Commands.Transaction.GCReferToInternalCommand;
 
 namespace McDermott.Web.Controllers
 {
@@ -268,6 +269,48 @@ namespace McDermott.Web.Controllers
                 // Kembalikan sebagai array byte
                 return stream.ToArray();
             }
+        }
+        [HttpGet("mcd-referral/{id}")]
+        public async Task<IActionResult> DownloadReportMcDReferral(long id)
+        {
+            using var stream = new MemoryStream();
+
+            var ExtraReport = new McDReferral();
+            var gs = await mediator.Send(new GetSingleGCReferToInternalQuery
+            {
+                Predicate = x => x.Id == id,
+                Select = x => new GCReferToInternal
+                {
+                    GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                    DateRJMCINT =x.DateRJMCINT
+                }
+            }) ?? new();
+            var gx = await mediator.Send(new GetSingleGeneralConsultanServicesQuery
+            {
+                Predicate = x => x.Id == gs.GeneralConsultanServiceId,
+                Select = x => new GeneralConsultanService
+                {
+                    Patient = new User
+                    {
+                        Name = x.Patient.Name,
+                        DateOfBirth = x.Patient.DateOfBirth,
+                        Gender = x.Patient.Gender,
+                        //Occupational =x.Patient.Occupational.Name,
+                    },
+
+                    VisitNumber = x.VisitNumber,
+                    ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                    InsurancePolicyId = x.InsurancePolicyId,
+                }
+            }) ?? new();
+
+            ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString();
+            // Export ke PDF
+            ExtraReport.ExportToPdf(stream);
+
+            // Kembalikan sebagai array byte
+            var ar = stream.ToArray();
+            return File(ar, "application/pdf", "McD_Referral.pdf");
         }
     }
 }

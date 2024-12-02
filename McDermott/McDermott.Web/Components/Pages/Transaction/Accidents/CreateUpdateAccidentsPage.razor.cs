@@ -139,8 +139,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
                 PanelVisible = true;
                 await GridCppt.StartEditRowAsync(FocusedGridTabCPPTRowVisibleIndex);
 
-                var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
-                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery(predicate: x => x.Id == a.NursingDiagnosesId))).Item1;
+                var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new()); 
+                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery
+                {
+                    Predicate = x => x.Id == a.NursingDiagnosesId
+                })).Item1;
                 Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
                 {
                     Predicate = x => x.Id == a.DiagnosisId
@@ -621,10 +624,15 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
         {
             try
             {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetNursingDiagnosesQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refNursingDiagnosesComboBox?.Text ?? ""));
+                PanelVisible = true; 
+                var result = await Mediator.Send(new GetNursingDiagnosesQuery
+                {
+                    SearchTerm = refNursingDiagnosesComboBox?.Text ?? "",
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                });
                 NursingDiagnoses = result.Item1;
-                totalCountNursingDiagnoses = result.pageCount;
+                totalCountNursingDiagnoses = result.PageCount;
                 PanelVisible = false;
             }
             catch (Exception ex)

@@ -1007,8 +1007,9 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.PPKRujukanName = dto.PPKRujukanName;
                 entity.ReferVerticalSpesialisParentSpesialisName = dto.ReferVerticalSpesialisParentSpesialisName;
                 entity.ReferVerticalSpesialisParentSubSpesialisName = dto.ReferVerticalSpesialisParentSubSpesialisName;
+                entity.ReferVerticalSpesialisParentSubSpesialisCode = dto.ReferVerticalSpesialisParentSubSpesialisCode;
                 entity.ReferReason = dto.ReferReason;
-                entity.TypeClaim = dto.TypeClaim;
+                entity.TypeClaim = dto.TypeClaim; 
                 entity.CategoryRJMCINT = dto.CategoryRJMCINT;
                 entity.DateRJMCINT = dto.DateRJMCINT;
                 entity.Hospital = dto.Hospital;
@@ -1019,6 +1020,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.TempDiagnosis = dto.TempDiagnosis;
                 entity.TherapyProvide = dto.TherapyProvide;
                 entity.InpatientClass = dto.InpatientClass;
+
 
                 SetPropertiesModified(entity,
                     nameof(entity.ReferDateVisit),
@@ -1033,6 +1035,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     nameof(entity.PPKRujukanName),
                     nameof(entity.ReferVerticalSpesialisParentSpesialisName),
                     nameof(entity.ReferVerticalSpesialisParentSubSpesialisName),
+                    nameof(entity.ReferVerticalSpesialisParentSubSpesialisCode),
                     nameof(entity.ReferReason),
                     nameof(entity.TypeClaim),
                     nameof(entity.CategoryRJMCINT),
@@ -1048,7 +1051,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             }
             else
             {
-                entity.ReferralNo = dto.ReferralNo;
+                entity.ReferralNo = dto.ReferralNo; 
                 entity.LocationId = dto.LocationId;
                 entity.PratitionerId = dto.PratitionerId;
                 entity.HomeStatus = dto.HomeStatus;
@@ -1061,23 +1064,24 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.Anamnesa = dto.Anamnesa;
                 entity.BMHP = dto.BMHP;
                 entity.KdPrognosa = dto.KdPrognosa;
+                entity.TypeClaim = dto.TypeClaim;
 
                 UpdateNurseStationFields(entity, dto); // Including NurseStation fields
 
-                SetPropertiesModified(entity, nameof(entity.PratitionerId), nameof(entity.HomeStatus), nameof(entity.IsSickLeave),
+                SetPropertiesModified(entity, 
+                    nameof(entity.PratitionerId), 
+                    nameof(entity.HomeStatus), 
+                    nameof(entity.IsSickLeave),
                     nameof(entity.ReferralNo),
                     nameof(entity.LocationId),
                     nameof(entity.Anamnesa),
                     nameof(entity.BMHP),
-                    nameof(entity.KdPrognosa),
-                    nameof(entity.PPKRujukanCode),
-                    nameof(entity.PPKRujukanName),
-                    nameof(entity.ReferVerticalSpesialisParentSpesialisName),
-                    nameof(entity.ReferVerticalSpesialisParentSubSpesialisName),
+                    nameof(entity.KdPrognosa), 
                     nameof(entity.ReferReason),
                     nameof(entity.StartDateSickLeave),
                     nameof(entity.EndDateSickLeave), nameof(entity.IsMaternityLeave),
-                    nameof(entity.StartMaternityLeave), nameof(entity.EndMaternityLeave));
+                    nameof(entity.StartMaternityLeave), nameof(entity.EndMaternityLeave),
+                    nameof(entity.TypeClaim));
             }
         }
 
