@@ -344,7 +344,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisibleClaim = false; }
         }
 
-        #endregion LoadData
+        #endregion LoadData Claim
 
         #region Click
 
@@ -2774,7 +2774,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private async Task OnPrintRujukanBPJS()
         {
-            var reportUrl = "/api/reports/rujukan-bpjs/id"; // Sesuaikan URL API Anda
+            var reportUrl = $"api/reports/rujukan-bpjs/{GeneralConsultanService.Id.ToString()}";
             await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
         }
 

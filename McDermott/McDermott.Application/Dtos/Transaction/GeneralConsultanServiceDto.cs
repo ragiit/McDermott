@@ -120,6 +120,7 @@ namespace McDermott.Application.Dtos.Transaction
                 }
             }
         }
+
         public bool IsClaim { get; set; } = false;
         public bool IsSickLeave { get; set; } = false;
         public bool IsMaternityLeave { get; set; } = false;
@@ -133,12 +134,12 @@ namespace McDermott.Application.Dtos.Transaction
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
         public bool IsGC { get; set; }
         public bool IsMaternity { get; set; }
-        public string? SerialNo { get; set; } // NoUrut
-        public string? VisitNumber { get; set; } // NoUrut
 
         /// <BPJS Rujukan>
-        public string? ReferVerticalKhususCategoryName { get; set; }
+        public string? SerialNo { get; set; }
 
+        public string? VisitNumber { get; set; }
+        public string? ReferVerticalKhususCategoryName { get; set; }
         public string? ReferVerticalKhususCategoryCode { get; set; }
         public string? ReferVerticalSpesialisParentSpesialisName { get; set; }
         public string? ReferVerticalSpesialisParentSpesialisCode { get; set; }
@@ -279,6 +280,7 @@ namespace McDermott.Application.Dtos.Transaction
         public virtual ProjectDto? Project { get; set; }
 
         #region Mcdermott Internal
+
         public string? TypeClaim { get; set; }
         public string? Number { get; set; }
         public DateTime DateRJMCINT { get; set; } = DateTime.Now;
@@ -292,8 +294,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? TherapyProvide { get; set; }
         public string? InpatientClass { get; set; }
 
-        #endregion
-
+        #endregion Mcdermott Internal
 
         // Add this property
         [NotMapped]
@@ -467,6 +468,7 @@ namespace McDermott.Application.Dtos.Transaction
         }
 
         #region Mcdermott Internal
+
         public string? TypeClaim { get; set; }
         public string? Number { get; set; }
         public DateTime DateRJMCINT { get; set; } = DateTime.Now;
@@ -480,7 +482,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? TherapyProvide { get; set; }
         public string? InpatientClass { get; set; }
 
-        #endregion
+        #endregion Mcdermott Internal
 
         public bool IsSickLeave { get; set; } = false;
         public bool IsMaternityLeave { get; set; } = false;
