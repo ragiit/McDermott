@@ -281,7 +281,7 @@
                                                                 </MyDxComboBox>
                                                                 <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                                                             </DxFormLayoutItem>
-                                                                <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Discharge Plan" ColSpanMd="12">
+                                                            <DxFormLayoutItem Visible="@(GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Finished))" CaptionCssClass="required-caption normal-caption" Caption="Discharge Plan" ColSpanMd="12">
                                                                 <MyDxComboBox Data="@Helper._homeStatusTemps"
                                                                               NullText="Select Discharge Plan"
                                                                               ReadOnly="ReadOnlyForm()"
@@ -1132,7 +1132,7 @@
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
                                                                                                 @*  <MyTextBox @bind-Text="@a.Planning"
                                                                                                                NullText="Name" /> *@ 
-                                                                                                    </DxFormLayoutItem>
+                                                                                                            </DxFormLayoutItem>
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medication Therapy" ColSpanMd="12">
                                                                                                 <MyTextBox @bind-Text="@a.MedicationTherapy"
                                                                                                            NullText="Medication Therapy" />
@@ -1237,6 +1237,89 @@
                                                                 </div>
                                                             </div>
                                                         </DxTabPage>
+                                                        @if (GeneralConsultanService.TypeClaim != null)
+                                                        {
+                                                            <DxTabPage Text="Refer To McHealth Internal" Click="OnClickReferToMCINT">
+                                                                <div class="w-100 mt-2">
+                                                                    <div class="card w-100">
+                                                                        <div class="card-header">
+                                                                            <span class="fw-bolder">Refer To McHealth Internal</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row w-100">
+                                                                        <div class="col-md-12 w-100">
+                                                                            <DxFormLayout CssClass="w-100">
+                                                                                <DxLoadingPanel @bind-Visible="IsLoadingRJMCINT"
+                                                                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
+                                                                                                IsContentBlocked="true"
+                                                                                                ApplyBackgroundShading="true"
+                                                                                                IndicatorAreaVisible="false"
+                                                                                                Text="Fetching Data...">
+                                                                                    <MyGridPaginate @ref="GridRMC"
+                                                                                                    Data="GcRefer"
+                                                                                                    @bind-SelectedDataItems="@SelectedDataItemsRMC"
+                                                                                                    FocusedRowChanged="GridRCM_FocusedRowChanged"
+                                                                                                    KeyFieldName="Id">
+
+                                                                                        <Columns>
+                                                                                            <DxGridSelectionColumn Width="30px" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="TypeClaim" Caption="Type Claim" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Number" Caption="Number" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="DateRJMCINT" Caption="Date" DisplayFormat="@Helper.DefaultFormatDate" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ReferTo" Caption="Refer To" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Hospital" Caption="Hospital" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="CategoryRJMCINT" Caption="Category" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="Specialist" Caption="Specialist" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="ExamFor" Caption="Exam For" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="TempDiagnosis" Caption="Temporary Diagnosis" />
+                                                                                            <DxGridDataColumn MinWidth="150" Width="auto" FieldName="TherapyProvide" Caption="Therapy Provided" />
+                                                                                            <DxGridDataColumn FieldName="InpatientClass" MinWidth="100" Width="auto" Caption="Class Patient">
+                                                                                                <CellDisplayTemplate>
+                                                                                                    @GetIssueGcReferToMCIconHtml((context.DataItem as GCReferToInternalDto).InpatientClass)
+                                                                                                </CellDisplayTemplate>
+                                                                                            </DxGridDataColumn>
+                                                                                        </Columns>
+                                                                                        <TotalSummary>
+                                                                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                                                                               FieldName="TypeClaim"
+                                                                                                               Visible="true" />
+                                                                                        </TotalSummary>
+                                                                                       
+                                                                                    </MyGridPaginate>
+                                                                                    <div class="row">
+                                                                                        <DxFormLayout>
+                                                                                            <div class="col-md-9">
+                                                                                                <DxFormLayoutItem>
+                                                                                                    <DxPager PageCount="totalCountRMC"
+                                                                                                             ActivePageIndexChanged="OnPageIndexChangedRMC"
+                                                                                                             ActivePageIndex="activePageIndexTotalCountRMC"
+                                                                                                             VisibleNumericButtonCount="10"
+                                                                                                             SizeMode="SizeMode.Medium"
+                                                                                                             NavigationMode="PagerNavigationMode.Auto">
+                                                                                                    </DxPager>
+                                                                                                </DxFormLayoutItem>
+                                                                                            </div>
+                                                                                            <div class="col-md-3 d-flex justify-content-end">
+                                                                                                <DxFormLayoutItem Caption="Page Size:">
+                                                                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                                                                                  NullText="Select Page Size"
+                                                                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                                                                                  SelectedItemChanged="((int e ) => OnpageSizeRMCIndexChangedRMC(e))"
+                                                                                                                  @bind-Value="pageSizeRMC">
+                                                                                                    </MyDxComboBox>
+                                                                                                </DxFormLayoutItem>
+                                                                                            </div>
+                                                                                        </DxFormLayout>
+                                                                                    </div>
+                                                                                </DxLoadingPanel>
+                                                                            </DxFormLayout>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </DxTabPage>
+                                                        }
                                                     }
 
                                                     @if (GeneralConsultanService.IsClaim)

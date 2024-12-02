@@ -77,7 +77,7 @@ namespace McDermott.Web.Extentions
         public static List<string> ClaimTypes { get; set; } = new List<string> { "Dentist", "Glasses", "Safety Glasses" };
         public static List<string> ExaminationPurposes { get; set; } = new List<string> { "Dentist", "Internist", "Pulmonologist", "Cardiologist", "Eye", "ENT", "Paediatric", "Surgeon", "Obstetrician", "Neurologist", "Urologist", "Neurosurgeon", "Orthopaedic", "Physiotherapist", "Dermatologist", "Psychiatrist", "Laboratorium" };
         public static List<string> Categories { get; set; } = new List<string> { "KANKER", "ACCIDENT Inside", "EMPLOYEE", "KELAINAN BAWAAN", "ACCIDENT Outside", "DEPENDENT" };
-        public static List<string> ExamFor { get; set; } = new List<string> { "Pemeriksaan / penanganan lebih lanjut", "Pembedahan", "Perawatan", "Bersalin" };
+        public static List<string> ExamFor { get; set; } = new List<string> { "Pemeriksaan / penanganan lebih lanjut", "Pembedahan", "Perawatan", "Bersalin", "Pemeriksaan Refraksi Mata", "Fisioterapy" };
         public static List<string> InpatientClasses { get; set; } = new List<string> { "VIP Class", "Class 1 B", "Class 2" };
 
         public static List<string> InformationFrom =

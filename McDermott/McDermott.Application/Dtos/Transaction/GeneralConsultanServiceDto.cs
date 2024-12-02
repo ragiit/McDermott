@@ -339,7 +339,7 @@ namespace McDermott.Application.Dtos.Transaction
             // Validation for Return Status field
             RuleFor(x => x.HomeStatus)
                 .NotEmpty().WithMessage("Return Status is required")
-                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Physician));
+                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Physician) && string.IsNullOrEmpty(x.ReferTo));
 
             // Optional: If IsAlertInformationSpecialCase needs to be validated
             RuleFor(x => x.IsAlertInformationSpecialCase)

@@ -998,13 +998,35 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.ReferVerticalSpesialisParentSpesialisName = dto.ReferVerticalSpesialisParentSpesialisName;
                 entity.ReferVerticalSpesialisParentSubSpesialisName = dto.ReferVerticalSpesialisParentSubSpesialisName;
                 entity.ReferReason = dto.ReferReason;
+                entity.TypeClaim = dto.TypeClaim;
+                entity.CategoryRJMCINT = dto.CategoryRJMCINT;
+                entity.DateRJMCINT = dto.DateRJMCINT;
+                entity.Hospital = dto.Hospital;
+                entity.Number = dto.Number;
+                entity.ReferTo = dto.ReferTo;
+                entity.Specialist = dto.Specialist;
+                entity.ExamFor = dto.ExamFor;
+                entity.TempDiagnosis = dto.TempDiagnosis;
+                entity.TherapyProvide = dto.TherapyProvide;
+                entity.InpatientClass = dto.InpatientClass;
 
                 SetPropertiesModified(entity,
                     nameof(entity.PPKRujukanCode),
                     nameof(entity.PPKRujukanName),
                     nameof(entity.ReferVerticalSpesialisParentSpesialisName),
                     nameof(entity.ReferVerticalSpesialisParentSubSpesialisName),
-                    nameof(entity.ReferReason));
+                    nameof(entity.ReferReason),
+                    nameof(entity.TypeClaim),
+                    nameof(entity.CategoryRJMCINT),
+                    nameof(entity.DateRJMCINT),
+                    nameof(entity.Hospital),
+                    nameof(entity.Number),
+                    nameof(entity.ReferTo),
+                    nameof(entity.Specialist),
+                    nameof(entity.ExamFor),
+                    nameof(entity.TempDiagnosis),
+                    nameof(entity.TherapyProvide),
+                    nameof(entity.InpatientClass));
             }
             else
             {

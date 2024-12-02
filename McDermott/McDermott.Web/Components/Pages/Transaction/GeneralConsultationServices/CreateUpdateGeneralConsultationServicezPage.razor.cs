@@ -3,6 +3,7 @@ using DevExpress.XtraPrinting;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FluentValidation.Results;
 using GreenDonut;
 using MailKit.Search;
@@ -23,6 +24,7 @@ using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+using static McDermott.Application.Features.Commands.Transaction.GCReferToInternalCommand;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
@@ -95,6 +97,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private IGrid GridClaim { get; set; }
         private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsClaim { get; set; } = [];
+       
         private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
         private int FocusedGridTabClaimRowVisibleIndex { get; set; }
         private List<DiagnosisDto> Diagnoses = [];
@@ -884,6 +887,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     BMHP = x.BMHP,
                     KdPrognosa = x.KdPrognosa,
                     Anamnesa = x.Anamnesa,
+                    TypeClaim = x.TypeClaim,
+
                 }
             });
 
@@ -2834,5 +2839,102 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         #endregion OnClick
+
+        #region ReferToMC
+
+        #region Searching
+
+        private int pageSizeRMC { get; set; } = 10;
+        private int totalCountRMC = 0;
+        private int activePageIndexTotalCountRMC { get; set; } = 0;
+        private string searchTermRMC { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedRMC(string searchText)
+        {
+            searchTermRMC = searchText;
+            await LoadDataRefertoMC(0, pageSizeRMC);
+        }
+
+        private async Task OnpageSizeRMCIndexChangedRMC(int newpageSizeRMC)
+        {
+            pageSizeRMC = newpageSizeRMC;
+            await LoadDataRefertoMC(0, newpageSizeRMC);
+        }
+
+        private async Task OnPageIndexChangedRMC(int newPageIndex)
+        {
+            await LoadDataRefertoMC(newPageIndex, pageSizeRMC);
+        }
+
+        #endregion Searching
+
+
+        private bool IsLoadingRJMCINT { get; set; } = false;
+        private IReadOnlyList<object> SelectedDataItemsRMC { get; set; } = [];
+        private int FocusedRowVisibleRMCIndex { get; set; }
+        private IGrid GridRMC;
+        private List<GCReferToInternalDto> GcRefer { get; set; } = [];
+        private async Task OnClickReferToMCINT()
+        {
+            await LoadDataRefertoMC();
+        }
+        private async Task LoadDataRefertoMC(int pageSize=0, int pageIndex=10 )
+        {
+            IsLoadingRJMCINT = true;
+            var gcs = await Mediator.Send(new GetGCReferToInternalQuery
+            {
+                Predicate =x=>x.GeneralConsultanServiceId == GeneralConsultanService.Id
+
+            });
+            GcRefer = gcs.Item1;
+            totalCountRMC = gcs.PageCount;
+            activePageIndexTotalCountRMC = gcs.PageIndex;
+            
+            IsLoadingRJMCINT = false;
+        }
+
+        public MarkupString GetIssueGcReferToMCIconHtml(string? InpatientClass)
+        {
+            string priorityClass;
+            string title;
+
+            switch (InpatientClass)
+            {
+                case "VIP Class":
+                    priorityClass = "Danger";
+                    title = "VIP Class";
+                    break;
+
+                case "Class 1 B":
+                    priorityClass = "warning";
+                    title = "Class 1 B";
+                    break;
+
+                case "Class 2":
+                    priorityClass = "info";
+                    title = "Class 2";
+                    break;
+
+                //case EnumClaimRequestStatus.InActive:
+                //    priorityClass = "danger";
+                //    title = "InActive";
+                //    break;
+
+                default:
+                    return new MarkupString("");
+            }
+            string html = $"<div class='row '><div class='col-3'>" +
+                         $"<span class='badge text-white bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
+        }
+
+        private void GridRCM_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleRMCIndex = args.VisibleIndex;
+           
+        }
+
+        #endregion
     }
 }
