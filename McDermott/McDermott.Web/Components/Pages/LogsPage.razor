@@ -1,0 +1,104 @@
+﻿@page "/logs"
+
+<div class="wrapper">
+    <section class="content">
+        <div class="container-fluid">
+             
+            <h3 class="mb-4">Log Viewer</h3>
+
+            <div class="mb-3">
+                <label for="logFile" class="form-label">Select Log File:</label>
+                <select @onchange="LoadLogContent" id="logFile" class="form-select">
+                    <option value="">-- Select a Log File --</option>
+                    @foreach (var logFile in LogFiles)
+                    {
+                        <option value="@logFile">@System.IO.Path.GetFileName(logFile)</option>
+                    }
+                </select>
+            </div>
+
+            @if (!string.IsNullOrEmpty(LogContent))
+            {
+                <h4 class="mt-4">Log Content</h4>
+                <div class="card">
+                    <div class="card-body">
+                        @* max-height: 400px; *@
+                        <pre style="border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9; white-space: pre-wrap; overflow-x: auto; ">
+                            @LogContent
+                            </pre>
+                    </div>
+                </div>
+            }
+
+            @if (string.IsNullOrEmpty(LogContent) && LogFiles.Any())
+            {
+                <div class="alert alert-info mt-3">
+                    <p>Select a log file to view its content.</p>
+                </div>
+            }
+            else if (!LogFiles.Any())
+            {
+                <div class="alert alert-warning mt-3">
+                    <p>No log files found in the directory.</p>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+
+@code {
+    private List<string> LogFiles = new(); // Menyimpan daftar file log
+    private string? LogContent;           // Menyimpan isi log yang dipilih
+
+    private readonly string _logFolderPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+
+    protected override void OnInitialized()
+    {
+        // Memuat daftar file log saat komponen diinisialisasi
+        LogFiles = GetLogFiles();
+    }
+
+    private void LoadLogContent(ChangeEventArgs e)
+    {
+        var selectedFile = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(selectedFile))
+        {
+            LogContent = ReadLogContent(System.IO.Path.GetFileName(selectedFile));
+        }
+    }
+
+    private List<string> GetLogFiles()
+    {
+        // Mengecek apakah folder Logs ada dan mengambil semua file dengan ekstensi .txt
+        if (Directory.Exists(_logFolderPath))
+        {
+            return Directory.GetFiles(_logFolderPath, "*.txt").ToList();
+        }
+        return new List<string>();
+    }
+
+    private string ReadLogContent(string fileName)
+    {
+        var filePath = System.IO.Path.Combine(_logFolderPath, fileName);
+        if (!File.Exists(filePath))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            // Membuka file dengan FileStream untuk menghindari konflik akses
+            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
+        catch (IOException ex)
+        {
+            // Log error jika perlu (opsional)
+            Console.WriteLine($"Error reading log file: {ex.Message}");
+            return "Error: Unable to access the file because it is being used by another process.";
+        }
+    }
+
+}
