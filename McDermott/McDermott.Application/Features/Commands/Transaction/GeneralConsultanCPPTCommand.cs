@@ -10,6 +10,11 @@
             public bool RemoveCache { get; } = RemoveCache!;
         }
 
+        public class CheckExistingGeneralConsultanCPPTQuery(Expression<Func<GeneralConsultanCPPT, bool>>? predicate = null) : IRequest<bool>
+        {
+            public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; } = predicate!; 
+        }
+
         public class GetGeneralConsultanCPPTsQuery : IRequest<(List<GeneralConsultanCPPTDto>, int PageIndex, int PageSize, int PageCount)>
         {
             public List<Expression<Func<GeneralConsultanCPPT, object>>> Includes { get; set; }

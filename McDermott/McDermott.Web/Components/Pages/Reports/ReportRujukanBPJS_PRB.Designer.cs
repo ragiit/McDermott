@@ -157,7 +157,7 @@
             this.xrTable3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
             this.xrTable3.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.xrTableRow3});
-            this.xrTable3.SizeF = new System.Drawing.SizeF(780.9999F, 530.0331F);
+            this.xrTable3.SizeF = new System.Drawing.SizeF(782.9999F, 530.0331F);
             // 
             // xrTableRow3
             // 
@@ -521,7 +521,7 @@
             this.xrLabel28.Multiline = true;
             this.xrLabel28.Name = "xrLabel28";
             this.xrLabel28.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel28.SizeF = new System.Drawing.SizeF(238.4326F, 20.59615F);
+            this.xrLabel28.SizeF = new System.Drawing.SizeF(240.4326F, 20.59615F);
             this.xrLabel28.StylePriority.UseBorderWidth = false;
             this.xrLabel28.StylePriority.UseFont = false;
             this.xrLabel28.StylePriority.UseTextAlignment = false;
@@ -563,7 +563,7 @@
             this.xrTable1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
             this.xrTable1.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.xrTableRow1});
-            this.xrTable1.SizeF = new System.Drawing.SizeF(780.9999F, 537.2413F);
+            this.xrTable1.SizeF = new System.Drawing.SizeF(782.9999F, 537.2413F);
             // 
             // xrTableRow1
             // 
@@ -1167,7 +1167,7 @@
             this.xrTable2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
             this.xrTable2.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.xrTableRow2});
-            this.xrTable2.SizeF = new System.Drawing.SizeF(760.9999F, 107.532F);
+            this.xrTable2.SizeF = new System.Drawing.SizeF(762.9999F, 107.532F);
             // 
             // xrTableRow2
             // 
@@ -1199,7 +1199,7 @@
             this.xrBarCode1.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrBarCode1.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrBarCode1.AutoModule = true;
-            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(385.7242F, 15.43909F);
+            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(387.7242F, 15.43909F);
             this.xrBarCode1.Name = "xrBarCode1";
             this.xrBarCode1.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 10, 0, 0, 96F);
             this.xrBarCode1.SizeF = new System.Drawing.SizeF(365.2758F, 76.65382F);
@@ -1338,7 +1338,7 @@
             // 
             this.xrLabel5.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel5.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
-            this.xrLabel5.LocationFloat = new DevExpress.Utils.PointFloat(629.3332F, 32.99999F);
+            this.xrLabel5.LocationFloat = new DevExpress.Utils.PointFloat(631.3332F, 32.99999F);
             this.xrLabel5.Multiline = true;
             this.xrLabel5.Name = "xrLabel5";
             this.xrLabel5.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -1351,7 +1351,7 @@
             // 
             this.xrLabel4.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel4.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
-            this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(629.3332F, 10.00001F);
+            this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(631.3332F, 10.00001F);
             this.xrLabel4.Multiline = true;
             this.xrLabel4.Name = "xrLabel4";
             this.xrLabel4.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -1365,7 +1365,7 @@
             this.xrLabel3.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel3.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrLabel3.Font = new DevExpress.Drawing.DXFont("Arial", 9F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(498.0832F, 32.99999F);
+            this.xrLabel3.LocationFloat = new DevExpress.Utils.PointFloat(500.0832F, 32.99999F);
             this.xrLabel3.Multiline = true;
             this.xrLabel3.Name = "xrLabel3";
             this.xrLabel3.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -1380,7 +1380,7 @@
             this.xrLabel2.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrLabel2.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrLabel2.Font = new DevExpress.Drawing.DXFont("Arial", 9F, DevExpress.Drawing.DXFontStyle.Bold);
-            this.xrLabel2.LocationFloat = new DevExpress.Utils.PointFloat(498.0832F, 10.00001F);
+            this.xrLabel2.LocationFloat = new DevExpress.Utils.PointFloat(500.0832F, 10.00001F);
             this.xrLabel2.Multiline = true;
             this.xrLabel2.Name = "xrLabel2";
             this.xrLabel2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -1400,7 +1400,7 @@
             this.xrLabel1.Multiline = true;
             this.xrLabel1.Name = "xrLabel1";
             this.xrLabel1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel1.SizeF = new System.Drawing.SizeF(195.3077F, 20.59615F);
+            this.xrLabel1.SizeF = new System.Drawing.SizeF(197.3077F, 20.59615F);
             this.xrLabel1.StylePriority.UseFont = false;
             this.xrLabel1.StylePriority.UseTextAlignment = false;
             this.xrLabel1.Text = "Surat Rujukan FKTP\r\n";
@@ -1425,7 +1425,7 @@
             this.GroupHeader1});
             this.DefaultPrinterSettingsUsing.UseLandscape = true;
             this.Font = new DevExpress.Drawing.DXFont(resources.GetString("$this.Font"), 8.25F);
-            this.Margins = new DevExpress.Drawing.DXMargins(34F, 35F, 24.14773F, 21.36422F);
+            this.Margins = new DevExpress.Drawing.DXMargins(34F, 33F, 24.14773F, 21.36422F);
             this.PageHeight = 1220;
             this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Custom;
             this.Version = "23.2";

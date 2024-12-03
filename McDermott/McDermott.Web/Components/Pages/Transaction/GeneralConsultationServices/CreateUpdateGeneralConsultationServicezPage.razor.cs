@@ -1,6 +1,8 @@
-﻿using DevExpress.Blazor.RichEdit;
+﻿using DevExpress.Blazor.Reporting;
+using DevExpress.Blazor.RichEdit;
 using DevExpress.CodeParser;
 using DevExpress.XtraPrinting;
+using DevExpress.XtraReports;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -14,7 +16,9 @@ using McDermott.Application.Dtos.Medical;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using McDermott.Extentions;
+using McDermott.Web.Components.Pages.Reports;
 using McDermott.Web.Extentions;
+using MediatR;
 using Microsoft.AspNetCore.Components.Web;
 using NuGet.Protocol.Plugins;
 using QuestPDF.Fluent;
@@ -30,6 +34,7 @@ using static McDermott.Application.Features.Commands.Transaction.AccidentCommand
 using static McDermott.Application.Features.Commands.Transaction.GCReferToInternalCommand;
 using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
+using ChangeEventArgs = Microsoft.AspNetCore.Components.ChangeEventArgs;
 
 namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 {
@@ -607,7 +612,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private async Task OnSearchPatients()
         {
-            await LoadDataPatient(0, 10);
+            await LoadDataPatients(0, 10);
         }
 
         private async Task OnSearchPatientsIndexIncrement()
@@ -639,7 +644,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             var result = await Mediator.Send(new GetUserQueryNew
             {
                 Predicate = x => x.IsPatient == true,
-                SearchTerm = refPatientComboBox?.Text ?? "",
+                SearchTerm = refPatientsComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
                 Select = x => new User
@@ -998,45 +1003,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         {
                             if ((Convert.ToBoolean(UserLogin.IsUser) || Convert.ToBoolean(UserLogin.IsAdmin)) && Convert.ToBoolean(UserLogin.IsDoctor) && Convert.ToBoolean(UserLogin.IsPhysicion))
                             {
-                                Physicions = (await Mediator.Send(new GetUserQueryNew
-                                {
-                                    Predicate = x => x.IsDoctor == true && x.Id == UserLogin.Id,
-                                    Select = x => new User
-                                    {
-                                        Id = x.Id,
-                                        Name = x.Name,
-                                        NoRm = x.NoRm,
-                                        Email = x.Email,
-                                        MobilePhone = x.MobilePhone,
-                                        Gender = x.Gender,
-                                        PhysicanCode = x.PhysicanCode,
-                                        DateOfBirth = x.DateOfBirth,
-                                        NoId = x.NoId,
-                                        CurrentMobile = x.CurrentMobile
-                                    }
-                                })).Item1;
+                                await LoadPhysicion(predicate: x => x.IsDoctor == true && x.Id == UserLogin.Id && x.IsPhysicion == true);
                                 GeneralConsultanService.PratitionerId = UserLogin.Id;
                             }
                         }
                         else
                         {
-                            Physicions = (await Mediator.Send(new GetUserQueryNew
-                            {
-                                Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
-                                Select = x => new User
-                                {
-                                    Id = x.Id,
-                                    Name = x.Name,
-                                    NoRm = x.NoRm,
-                                    Email = x.Email,
-                                    MobilePhone = x.MobilePhone,
-                                    PhysicanCode = x.PhysicanCode,
-                                    Gender = x.Gender,
-                                    DateOfBirth = x.DateOfBirth,
-                                    NoId = x.NoId,
-                                    CurrentMobile = x.CurrentMobile
-                                }
-                            })).Item1;
+                            await LoadPhysicion(predicate: x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId && x.IsPhysicion == true);
                         }
                         break;
 
@@ -1056,85 +1029,18 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     default:
                         break;
                 }
-                var p = await Mediator.Send(new GetUserQueryNew
-                {
-                    Predicate = x => x.IsPatient == true && x.Id == GeneralConsultanService.PatientId,
-                    Select = x => new User
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NoRm = x.NoRm,
-                        Email = x.Email,
-                        MobilePhone = x.MobilePhone,
-                        Gender = x.Gender,
-                        DateOfBirth = x.DateOfBirth,
-                        NoId = x.NoId,
-                        CurrentMobile = x.CurrentMobile,
 
-                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
-                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
-                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
-                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
-                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
-                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
-
-                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
-                        FamilyMedicalHistory = x.FamilyMedicalHistory,
-                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
-
-                        IsMedicationHistory = x.IsMedicationHistory,
-                        MedicationHistory = x.MedicationHistory,
-                        PastMedicalHistory = x.PastMedicalHistory
-                    }
-                });
-                Patients = p.Item1;
-
-                Services = (await Mediator.Send(new GetServiceQuery
-                {
-                    Predicate = x => x.Id == GeneralConsultanService.ServiceId,
-                })).Item1;
+                await LoadPatient(predicate: x => x.IsPatient == true && x.Id == GeneralConsultanService.PatientId);
+                await LoadService(predicate: x => x.Id == GeneralConsultanService.ServiceId);
 
                 if (!IsStatus(EnumStatusGeneralConsultantService.Physician))
                 {
-                    var ph = await Mediator.Send(new GetUserQueryNew
-                    {
-                        Predicate = x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId,
-                        Select = x => new User
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                            NoRm = x.NoRm,
-                            Email = x.Email,
-                            MobilePhone = x.MobilePhone,
-                            PhysicanCode = x.PhysicanCode,
-                            Gender = x.Gender,
-                            DateOfBirth = x.DateOfBirth,
-                            NoId = x.NoId,
-                            CurrentMobile = x.CurrentMobile
-                        }
-                    });
-                    Physicions = ph.Item1;
+                    await LoadPhysicion(predicate: x => x.IsDoctor == true && x.Id == GeneralConsultanService.PratitionerId && x.IsPhysicion == true);
                 }
 
                 if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
                 {
-                    InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-                    {
-                        Predicate = x => x.Id == GeneralConsultanService.InsurancePolicyId,
-                        Select = x => new InsurancePolicy
-                        {
-                            Id = x.Id,
-                            Insurance = new Insurance
-                            {
-                                Name = x.Insurance == null ? "" : x.Insurance.Name,
-                            },
-                            PolicyNumber = x.PolicyNumber,
-                            NoKartu = x.NoKartu,
-                            KdProviderPstKdProvider = x.KdProviderPstKdProvider,
-                            PstPrb = x.PstPrb,
-                            PstProl = x.PstProl
-                        }
-                    })).Item1;
+                    await LoadDataInsurancePolicy(predicate: x => x.Id == GeneralConsultanService.InsurancePolicyId);
                 }
 
                 if (GeneralConsultanService.RiskOfFalling == "Humpty Dumpty")
@@ -1159,9 +1065,9 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
             else
             {
-                await LoadDataPatient();
-                await LoadDataService();
-                await LoadDataPhysicion();
+                await LoadPatient();
+                await LoadService();
+                await LoadPhysicion();
             }
 
             #region Get Patient Allergies
@@ -1241,76 +1147,62 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         #endregion
 
-        #region ComboboxInsurancePolicy
+        #region ComboBox InsurancePolicy
 
-        private DxComboBox<InsurancePolicyDto, long?> refInsurancePolicyComboBox { get; set; }
-        private int InsurancePolicyComboBoxIndex { get; set; } = 0;
-        private int totalCountInsurancePolicy = 0;
-
-        private async Task OnSearchInsurancePolicy()
+        private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
+        async Task SelectedItemChanged(InsurancePolicyDto e)
         {
-            await LoadDataInsurancePolicy();
-        }
-
-        private async Task OnSearchInsurancePolicyIndexIncrement()
-        {
-            if (InsurancePolicyComboBoxIndex < (totalCountInsurancePolicy - 1))
+            if (e is null)
             {
-                InsurancePolicyComboBoxIndex++;
-                await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
+                SelectedInsurancePolicy = new();
+                await LoadDataInsurancePolicy();
             }
+            else
+                SelectedInsurancePolicy = e;
         }
 
-        private async Task OnSearchInsurancePolicyIndexDecrement()
-        {
-            if (InsurancePolicyComboBoxIndex > 0)
-            {
-                InsurancePolicyComboBoxIndex--;
-                await LoadDataInsurancePolicy(InsurancePolicyComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputInsurancePolicyChanged(string e)
-        {
-            InsurancePolicyComboBoxIndex = 0;
-            await LoadDataInsurancePolicy();
-        }
-
-        private async Task LoadDataInsurancePolicy(int pageIndex = 0, int pageSize = 10)
+        private CancellationTokenSource? _ctsInsurancePolicy;
+        private async Task OnInputInsurancePolicy(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
+                _ctsInsurancePolicy?.Cancel();
+                _ctsInsurancePolicy?.Dispose();
+                _ctsInsurancePolicy = new CancellationTokenSource();
 
-                string input = refInsurancePolicyComboBox?.Text ?? "";
+                await Task.Delay(Helper.CBX_DELAY, _ctsInsurancePolicy.Token);
+
+                await LoadDataInsurancePolicy(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsInsurancePolicy?.Dispose();
+                _ctsInsurancePolicy = null;
+            }
+        }
+
+        private async Task LoadDataInsurancePolicy(string? e = "", Expression<Func<InsurancePolicy, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true;
+
+                string input = e ?? "";
                 string b = input.Split('-')[0].Trim();
 
-                var result = await Mediator.Send(new GetInsurancePolicyQuery
+                InsurancePolicies = await Mediator.QueryGetComboBox<InsurancePolicy, InsurancePolicyDto>(e, predicate, select: x => new InsurancePolicy
                 {
-                    SearchTerm = b,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Includes =
-                    [
-                        x => x.Insurance
-                    ],
-                    Select = x => new InsurancePolicy
+                    Id = x.Id,
+                    PolicyNumber = x.PolicyNumber,
+                    Insurance = new Insurance
                     {
-                        Id = x.Id,
-                        PolicyNumber = x.PolicyNumber,
-                        Insurance = new Insurance
-                        {
-                            Name = x.Insurance == null ? "" : x.Insurance.Name,
-                        },
-                        NoKartu = x.NoKartu,
-                        KdProviderPstKdProvider = x.KdProviderPstKdProvider,
-                        PstPrb = x.PstPrb,
-                        PstProl = x.PstProl
-                    }
+                        Name = x.Insurance == null ? "" : x.Insurance.Name,
+                    },
+                    NoKartu = x.NoKartu,
+                    KdProviderPstKdProvider = x.KdProviderPstKdProvider,
+                    PstPrb = x.PstPrb,
+                    PstProl = x.PstProl
                 });
-                InsurancePolicies = result.Item1;
-                totalCountInsurancePolicy = result.PageCount;
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -1319,7 +1211,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxInsurancePolicy
+        #endregion
+
 
         private void OnSelectRiskOfFalling(string e)
         {
@@ -1393,83 +1286,85 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         #endregion
 
-        #region ComboboxPatient
 
-        private DxComboBox<UserDto, long?> refPatientComboBox { get; set; }
-        private int PatientComboBoxIndex { get; set; } = 0;
-        private int totalCountPatient = 0;
+        #region ComboBox Patient
 
-        private async Task OnSearchPatient()
+        private UserDto SelectedPatient { get; set; } = new();
+        async Task SelectedItemChanged(UserDto e)
         {
-            await LoadDataPatient();
-        }
-
-        private async Task OnSearchPatientIndexIncrement()
-        {
-            if (PatientComboBoxIndex < (totalCountPatient - 1))
+            if (e is null)
             {
-                PatientComboBoxIndex++;
-                await LoadDataPatient(PatientComboBoxIndex, 10);
+                GeneralConsultanService.InsurancePolicyId = null;
+                GeneralConsultanService.PatientId = null;
+                GeneralConsultanService.Patient = new();
+                UserForm = new();
+
+                InsurancePolicies = [];
+                await LoadPatient();
+            }
+            else
+            {
+                GeneralConsultanService.PatientId = e.Id;
+                GeneralConsultanService.Patient = e;
+                UserForm = e;
+                await LoadPatient();
+                await LoadDataInsurancePolicy();
             }
         }
 
-        private async Task OnSearchPatientIndexDecrement()
-        {
-            if (PatientComboBoxIndex > 0)
-            {
-                PatientComboBoxIndex--;
-                await LoadDataPatient(PatientComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputPatientChanged(string e)
-        {
-            PatientComboBoxIndex = 0;
-            await LoadDataPatient();
-        }
-
-        private async Task LoadDataPatient(int pageIndex = 0, int pageSize = 10)
+        private CancellationTokenSource? _ctsPatient;
+        private async Task OnInputPatient(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetUserQueryNew
+                _ctsPatient?.Cancel();
+                _ctsPatient?.Dispose();
+                _ctsPatient = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsPatient.Token);
+
+                await LoadPatient(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsPatient?.Dispose();
+                _ctsPatient = null;
+            }
+        }
+
+        private async Task LoadPatient(string? e = "", Expression<Func<User, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.IsPatient == true;
+
+                Patients = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate, select: x => new User
                 {
-                    Predicate = x => x.IsPatient == true,
-                    SearchTerm = refPatientComboBox?.Text ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Select = x => new User
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        NoRm = x.NoRm,
-                        Email = x.Email,
-                        MobilePhone = x.MobilePhone,
-                        Gender = x.Gender,
-                        DateOfBirth = x.DateOfBirth,
-                        NoId = x.NoId,
-                        CurrentMobile = x.CurrentMobile,
+                    Id = x.Id,
+                    Name = x.Name,
+                    NoRm = x.NoRm,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    DateOfBirth = x.DateOfBirth,
+                    NoId = x.NoId,
+                    CurrentMobile = x.CurrentMobile,
 
-                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
-                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
-                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
-                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
-                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
-                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+                    IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                    IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                    IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                    WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                    FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                    PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
 
-                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
-                        FamilyMedicalHistory = x.FamilyMedicalHistory,
-                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+                    IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                    FamilyMedicalHistory = x.FamilyMedicalHistory,
+                    FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
 
-                        IsMedicationHistory = x.IsMedicationHistory,
-                        MedicationHistory = x.MedicationHistory,
-                        PastMedicalHistory = x.PastMedicalHistory
-                    }
+                    IsMedicationHistory = x.IsMedicationHistory,
+                    MedicationHistory = x.MedicationHistory,
+                    PastMedicalHistory = x.PastMedicalHistory
                 });
-                Patients = result.Item1;
-                totalCountPatient = result.PageCount;
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -1478,42 +1373,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        private async Task SelectedItemPatientChanged(UserDto e)
-        {
-            GeneralConsultanService.InsurancePolicyId = null;
-            InsurancePolicies.Clear();
-            GeneralConsultanService.Patient = new();
-
-            if (e is null)
-                return;
-
-            GeneralConsultanService.Patient = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
-            GeneralConsultanService.PatientId = e.Id;
-            UserForm = Patients.FirstOrDefault(x => x.Id == e.Id) ?? new();
-
-            if (!string.IsNullOrWhiteSpace(GeneralConsultanService.Payment))
-            {
-                InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-                {
-                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true,
-                    Select = x => new InsurancePolicy
-                    {
-                        Id = x.Id,
-                        Insurance = new Insurance
-                        {
-                            Name = x.Insurance == null ? "" : x.Insurance.Name,
-                        },
-                        NoKartu = x.NoKartu,
-                        KdProviderPstKdProvider = x.KdProviderPstKdProvider,
-                        PolicyNumber = x.PolicyNumber,
-                        PstPrb = x.PstPrb,
-                        PstProl = x.PstProl
-                    }
-                })).Item1;
-            }
-        }
-
-        #endregion ComboboxPatient
+        #endregion
 
         private void SelectedDateMaternityChanged(DateTime? e)
         {
@@ -1526,55 +1386,50 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             GeneralConsultanService.EndMaternityLeave = e.GetValueOrDefault().AddMonths(3).Date;
         }
 
-        #region ComboboxService
+        #region ComboBox Service
 
-        private DxComboBox<ServiceDto, long?> refServiceComboBox { get; set; }
-        private int ServiceComboBoxIndex { get; set; } = 0;
-        private int totalCountService = 0;
-
-        private async Task OnSearchService()
+        private ServiceDto SelectedService { get; set; } = new();
+        async Task SelectedItemChanged(ServiceDto e)
         {
-            await LoadDataService();
-        }
-
-        private async Task OnSearchServiceIndexIncrement()
-        {
-            if (ServiceComboBoxIndex < (totalCountService - 1))
+            if (e is null)
             {
-                ServiceComboBoxIndex++;
-                await LoadDataService(ServiceComboBoxIndex, 10);
+                GeneralConsultanService.ServiceId = null;
+                await LoadService();
+                Physicions = [];
+            }
+            else
+            {
+                GeneralConsultanService.ServiceId = e.Id;
+                await LoadPhysicion();
             }
         }
 
-        private async Task OnSearchServiceIndexDecrement()
-        {
-            if (ServiceComboBoxIndex > 0)
-            {
-                ServiceComboBoxIndex--;
-                await LoadDataService(ServiceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputServiceChanged(string e)
-        {
-            ServiceComboBoxIndex = 0;
-            await LoadDataService();
-        }
-
-        private async Task LoadDataService(int pageIndex = 0, int pageSize = 10)
+        private CancellationTokenSource? _ctsService;
+        private async Task OnInputService(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetServiceQuery
-                {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = refServiceComboBox?.Text ?? ""
-                });
-                Services = result.Item1;
-                totalCountService = result.PageCount;
-                PanelVisible = false;
+                _ctsService?.Cancel();
+                _ctsService?.Dispose();
+                _ctsService = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsService.Token);
+
+                await LoadService(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsService?.Dispose();
+                _ctsService = null;
+            }
+        }
+
+        private async Task LoadService(string? e = "", Expression<Func<Service, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.IsVaccination == false && x.IsMaternity == false && x.IsMcu == false;
+                Services = await Mediator.QueryGetComboBox<Service, ServiceDto>(e, predicate);
             }
             catch (Exception ex)
             {
@@ -1583,68 +1438,61 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxService
+        #endregion
 
-        #region ComboboxPhysicion
+        #region ComboBox Physicion
 
-        private DxComboBox<UserDto, long?> refPhysicionComboBox { get; set; }
-        private int PhysicionComboBoxIndex { get; set; } = 0;
-        private int totalCountPhysicion = 0;
-
-        private async Task OnSearchPhysicion()
+        private UserDto SelectedPhysicion { get; set; } = new();
+        async Task SelectedItemChangedPhysicion(UserDto e)
         {
-            await LoadDataPhysicion();
-        }
-
-        private async Task OnSearchPhysicionIndexIncrement()
-        {
-            if (PhysicionComboBoxIndex < (totalCountPhysicion - 1))
+            if (e is null)
             {
-                PhysicionComboBoxIndex++;
-                await LoadDataPhysicion(PhysicionComboBoxIndex, 10);
+                GeneralConsultanService.PratitionerId = null;
+                await LoadPhysicion();
             }
+            else
+                GeneralConsultanService.PratitionerId = e.Id;
         }
 
-        private async Task OnSearchPhysicionIndexDecrement()
-        {
-            if (PhysicionComboBoxIndex > 0)
-            {
-                PhysicionComboBoxIndex--;
-                await LoadDataPhysicion(PhysicionComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputPhysicionChanged(string e)
-        {
-            PhysicionComboBoxIndex = 0;
-            await LoadDataPhysicion();
-        }
-
-        private async Task LoadDataPhysicion(int pageIndex = 0, int pageSize = 10)
+        private CancellationTokenSource? _ctsPhysicion;
+        private async Task OnInputPhysicion(ChangeEventArgs e)
         {
             try
             {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetUserQueryNew
+                _ctsPhysicion?.Cancel();
+                _ctsPhysicion?.Dispose();
+                _ctsPhysicion = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _ctsPhysicion.Token);
+
+                await LoadPhysicion(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                _ctsPhysicion?.Dispose();
+                _ctsPhysicion = null;
+            }
+        }
+
+        private async Task LoadPhysicion(string? e = "", Expression<Func<User, bool>>? predicate = null)
+        {
+            try
+            {
+                predicate ??= x => x.IsDoctor == true && x.IsPhysicion == true && x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(GeneralConsultanService.ServiceId.GetValueOrDefault());
+
+                Physicions = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate, select: x => new User
                 {
-                    Predicate = x => x.IsDoctor == true && x.IsPhysicion == true,
-                    SearchTerm = refPhysicionComboBox?.Text ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    Select = x => new User
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Email = x.Email,
-                        PhysicanCode = x.PhysicanCode,
-                        MobilePhone = x.MobilePhone,
-                        Gender = x.Gender,
-                        DateOfBirth = x.DateOfBirth
-                    }
+                    Id = x.Id,
+                    Name = x.Name,
+                    NoRm = x.NoRm,
+                    Email = x.Email,
+                    MobilePhone = x.MobilePhone,
+                    Gender = x.Gender,
+                    PhysicanCode = x.PhysicanCode,
+                    DateOfBirth = x.DateOfBirth,
+                    NoId = x.NoId,
+                    CurrentMobile = x.CurrentMobile
                 });
-                Physicions = result.Item1;
-                totalCountPhysicion = result.PageCount;
-                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -1653,7 +1501,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion ComboboxPhysicion
+        #endregion 
 
         private async Task SelectedItemPaymentChanged(string e)
         {
@@ -2091,7 +1939,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 if (IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
                 {
-                    if (GeneralConsultanCPPTs.Count == 0)
+                    var isExistingCPPTs = await Mediator.Send(new CheckExistingGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
+                    if (!isExistingCPPTs)
                     {
                         if (IsContinueCPPT)
                             PopUpConfirmation = false;
@@ -2862,17 +2711,201 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
+
+        #region Print Rujukan BPJS
+        DxReportViewer reportViewerRujukanBPJS { get; set; }
+        IReport ReportRujukanBPJS { get; set; }
+        private bool IsPrintRujukanBPJS = false;
+
         private async Task OnPrintRujukanBPJS()
         {
-            var reportUrl = $"api/reports/rujukan-bpjs/{GeneralConsultanService.Id.ToString()}";
-            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+            await LoadPrintRujukanBPJS();
+            IsPrintRujukanBPJS = true;
         }
+
+        private async Task LoadPrintRujukanBPJS()
+        {
+            try
+            {
+                var myReport = new ReportRujukanBPJS();
+
+                var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == GeneralConsultanService.Id,
+                    Select = x => new GeneralConsultanService
+                    {
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                            DateOfBirth = x.Patient.DateOfBirth,
+                            Gender = x.Patient.Gender,
+                        },
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner.Name,
+                        },
+
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                        PPKRujukanName = x.PPKRujukanName,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+                        ReferDiagnosisNm = x.ReferDiagnosisNm,
+                        ReferDateVisit = x.ReferDateVisit,
+                        PracticeScheduleTimeDate = x.PracticeScheduleTimeDate,
+                        ReferralExpiry = x.ReferralExpiry,
+                        ReferSelectFaskesDate = x.ReferSelectFaskesDate,
+                        ReferralNo = x.ReferralNo
+                    }
+                }) ?? new();
+
+                var inspolcy = await Mediator.Send(new GetSingleInsurancePolicyQuery
+                {
+                    Predicate = x => x.Id == gx.InsurancePolicyId,
+                    Select = x => new InsurancePolicy
+                    {
+                        PolicyNumber = x.PolicyNumber,
+                        JnsKelasKode = x.JnsKelasKode
+                    }
+                }) ?? new();
+
+                // Header
+                myReport.xrLabelNoKunjungan.Text = gx.VisitNumber;
+
+                myReport.xrLabelTsDokter.Text = gx.ReferVerticalSpesialisParentSpesialisName; // Spesialis
+                myReport.xrLabelDi.Text = gx.PPKRujukanName;
+
+                // Patient
+                myReport.xrLabelNama.Text = gx.Patient?.Name ?? "-";
+                myReport.xrLabelBPJS.Text = inspolcy.PolicyNumber;
+                myReport.xrLabelDiagnosaa.Text = gx.ReferDiagnosisNm; // Diagnosa
+                myReport.xrLabelUmur.Text = gx.Patient?.Age.ToString() ?? "-";
+                myReport.xrLabelTahun.Text = gx.Patient?.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelStatusTanggunan.Text = inspolcy.JnsKelasKode;
+                myReport.xrLabelGender.Text = gx.Patient?.Gender == "Male" ? "L" : "P";
+
+                myReport.xrLabelRencana.Text = gx.ReferDateVisit.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelJadwal.Text = gx.PracticeScheduleTimeDate;
+                myReport.xrLabelBerlakuDate.Text = gx.ReferralExpiry.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelSalamDate.Text = $"Salam sejawat,\r\n{gx.ReferSelectFaskesDate.GetValueOrDefault().ToString("dd MMMM yyyy")}";
+                myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
+
+                if (!string.IsNullOrWhiteSpace(gx.ReferralNo))
+                { 
+                    myReport.xrBarCode1.Text = gx.ReferralNo;
+                    myReport.xrBarCode1.ShowText = false;
+                }
+
+                ReportRujukanBPJS = myReport;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        #endregion
+
+
+        #region Print Rujukan BPJS + PRB
+        DxReportViewer reportViewerRujukanBPJSPRB { get; set; }
+        IReport ReportRujukanBPJSPRB { get; set; }
+        private bool IsPrintRujukanBPJSPRB = false;
 
         private async Task OnPrintRujukanBPJSPRB()
         {
-            var reportUrl = $"api/reports/rujukan-bpjs-prb/{GeneralConsultanService.Id.ToString()}";
-            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+            await LoadPrintRujukanBPJSPPRB();
+            IsPrintRujukanBPJSPRB = true;
         }
+         
+        private async Task LoadPrintRujukanBPJSPPRB()
+        {
+            try
+            {
+                var myReport = new ReportRujukanBPJS_PRB();
+
+                var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == GeneralConsultanService.Id,
+                    Select = x => new GeneralConsultanService
+                    {
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                            DateOfBirth = x.Patient.DateOfBirth,
+                            Gender = x.Patient.Gender,
+                        },
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner.Name,
+                        },
+
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                        PPKRujukanName = x.PPKRujukanName,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+                        ReferDiagnosisNm = x.ReferDiagnosisNm,
+                        ReferDateVisit = x.ReferDateVisit,
+                        PracticeScheduleTimeDate = x.PracticeScheduleTimeDate,
+                        ReferralExpiry = x.ReferralExpiry,
+                        ReferSelectFaskesDate = x.ReferSelectFaskesDate,
+                        ReferralNo = x.ReferralNo
+                    }
+                }) ?? new();
+
+                var inspolcy = await Mediator.Send(new GetSingleInsurancePolicyQuery
+                {
+                    Predicate = x => x.Id == gx.InsurancePolicyId,
+                    Select = x => new InsurancePolicy
+                    {
+                        PolicyNumber = x.PolicyNumber,
+                        JnsKelasKode = x.JnsKelasKode
+                    }
+                }) ?? new();
+
+                // Header
+                myReport.xrLabelNoKunjungan.Text = gx.VisitNumber;
+
+                myReport.xrLabelTsDokter.Text = gx.ReferVerticalSpesialisParentSpesialisName; // Spesialis
+                myReport.xrLabelDi.Text = gx.PPKRujukanName;
+
+                // Patient
+                myReport.xrLabelNama.Text = gx.Patient?.Name ?? "-";
+                myReport.xrLabelBPJS.Text = inspolcy.PolicyNumber;
+                myReport.xrLabelDiagnosaa.Text = gx.ReferDiagnosisNm; // Diagnosa
+                myReport.xrLabelUmur.Text = gx.Patient?.Age.ToString() ?? "-";
+                myReport.xrLabelTahun.Text = gx.Patient?.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelStatusTanggunan.Text = inspolcy.JnsKelasKode;
+                myReport.xrLabelGender.Text = gx.Patient?.Gender == "Male" ? "L" : "P";
+
+                myReport.xrLabelRencana.Text = gx.ReferDateVisit.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelJadwal.Text = gx.PracticeScheduleTimeDate;
+                myReport.xrLabelBerlakuDate.Text = gx.ReferralExpiry.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelSalamDate.Text = $"Salam sejawat,\r\n{gx.ReferSelectFaskesDate.GetValueOrDefault().ToString("dd MMMM yyyy")}";
+                myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
+
+                if (!string.IsNullOrWhiteSpace(gx.ReferralNo))
+                {
+                    myReport.xrBarCode1.Text = gx.ReferralNo;
+                    myReport.xrBarCode1.ShowText = false;
+                } 
+
+                myReport.xrLabelRujukanBalikName.Text = gx.Patient?.Name ?? "-";
+
+                ReportRujukanBPJSPRB = myReport;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        #endregion
+
+
+
+
         private async Task OnPrintRujukanMCReferTo()
         {
             var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery

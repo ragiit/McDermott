@@ -1,43 +1,43 @@
 
-#region ComboBox Diagnosis
+#region ComboBox Patient
 
-    private DiagnosisDto SelectedDiagnosis { get; set; } = new();
-    async Task SelectedItemChanged(DiagnosisDto e)
+    private UserDto SelectedPatient { get; set; } = new();
+    async Task SelectedItemChanged(UserDto e)
     {
         if (e is null)
         {
-            SelectedDiagnosis = new();
-            await LoadDiagnosis(); 
+            SelectedPatient = new();
+            await LoadPatient(); 
         }
         else
-            SelectedDiagnosis = e;
+            SelectedPatient = e;
     }
 
-    private CancellationTokenSource? _ctsDiagnosis;
-    private async Task OnInputDiagnosis(ChangeEventArgs e)
+    private CancellationTokenSource? _ctsPatient;
+    private async Task OnInputPatient(ChangeEventArgs e)
     {
         try
         { 
-            _ctsDiagnosis?.Cancel();
-            _ctsDiagnosis?.Dispose();
-            _ctsDiagnosis = new CancellationTokenSource();
+            _ctsPatient?.Cancel();
+            _ctsPatient?.Dispose();
+            _ctsPatient = new CancellationTokenSource();
 
-            await Task.Delay(Helper.CBX_DELAY, _ctsDiagnosis.Token);
+            await Task.Delay(Helper.CBX_DELAY, _ctsPatient.Token);
 
-            await LoadDiagnosis(e.Value?.ToString() ?? "");
+            await LoadPatient(e.Value?.ToString() ?? "");
         }
         finally
         { 
-            _ctsDiagnosis?.Dispose();
-            _ctsDiagnosis = null;
+            _ctsPatient?.Dispose();
+            _ctsPatient = null;
         }
     }
 
-    private async Task LoadDiagnosis(string? e = "", Expression<Func<Diagnosis, bool>>? predicate = null)
+    private async Task LoadPatient(string? e = "", Expression<Func<User, bool>>? predicate = null)
     {
         try
         { 
-            Diagnosiss = await Mediator.QueryGetComboBox<Diagnosis, DiagnosisDto>(e, predicate); 
+            Patients = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate); 
         }
         catch (Exception ex)
         {
@@ -49,21 +49,21 @@
 #endregion
 
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnosis" ColSpanMd="12">
-    <MyDxComboBox Data="Diagnosiss"
-                NullText="Select Diagnosis"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
+    <MyDxComboBox Data="Patients"
+                NullText="Select Patient"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputDiagnosis"
-                SelectedItemChanged="((DiagnosisDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.DiagnosisId">
+                @oninput="OnInputPatient"
+                SelectedItemChanged="((UserDto e) => SelectedItemChanged(e))"  
+                @bind-Value="a.PatientId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Diagnosis.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Diagnosis.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(Patient.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Patient.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.DiagnosisId)" />
+    <ValidationMessage For="@(()=>a.PatientId)" />
 </DxFormLayoutItem>
 
 
-Diagnosis
+Patient

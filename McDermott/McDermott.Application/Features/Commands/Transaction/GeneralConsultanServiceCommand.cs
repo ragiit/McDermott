@@ -90,6 +90,7 @@
             public EnumStatusGeneralConsultantService Status { get; set; }
         }
 
+        // Fungsi ini dipakai untuk klik tombol save ketika kondisi tidak di create / sedang edit
         public class UpdateFormGeneralConsultanServiceNewRequest : IRequest<GeneralConsultanServiceDto>
         {
             public GeneralConsultanServiceDto? GeneralConsultanServiceDto { get; set; }

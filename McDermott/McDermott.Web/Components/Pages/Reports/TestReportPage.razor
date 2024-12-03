@@ -4,8 +4,7 @@
 @using DevExpress.XtraReports
 @using DevExpress.XtraReports.UI
  
-<link href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css">
+
 
 
 <DxReportViewer @ref="reportViewer" Report="@Report">
@@ -18,7 +17,73 @@
     protected override async Task OnInitializedAsync()
     {
         // PanelVisible = true;
-        Report = new ReportRujukanBPJS();
+        var myReport = new ReportRujukanBPJS();
+
+        var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+            {
+                Predicate = x => x.Id == 103,
+                Select = x => new GeneralConsultanService
+                {
+                    Patient = new User
+                    {
+                        Name = x.Patient.Name,
+                        DateOfBirth = x.Patient.DateOfBirth,
+                        Gender = x.Patient.Gender,
+                    },
+                    Pratitioner = new User
+                    {
+                        Name = x.Pratitioner.Name,
+                    },
+
+                    VisitNumber = x.VisitNumber,
+                    ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                    PPKRujukanName = x.PPKRujukanName,
+                    ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                    InsurancePolicyId = x.InsurancePolicyId,
+                    ReferDiagnosisNm = x.ReferDiagnosisNm,
+                    ReferDateVisit = x.ReferDateVisit,
+                    PracticeScheduleTimeDate = x.PracticeScheduleTimeDate,
+                    ReferralExpiry = x.ReferralExpiry,
+                    ReferSelectFaskesDate = x.ReferSelectFaskesDate,
+                    ReferralNo = x.ReferralNo
+                }
+            }) ?? new();
+
+        var inspolcy = await Mediator.Send(new GetSingleInsurancePolicyQuery
+            {
+                Predicate = x => x.Id == gx.InsurancePolicyId,
+                Select = x => new InsurancePolicy
+                {
+                    PolicyNumber = x.PolicyNumber,
+                    JnsKelasKode = x.JnsKelasKode
+                }
+            }) ?? new();
+
+        // Header
+        myReport.xrLabelNoKunjungan.Text = gx.VisitNumber;
+
+        myReport.xrLabelTsDokter.Text = gx.ReferVerticalSpesialisParentSpesialisName; // Spesialis
+        myReport.xrLabelDi.Text = gx.PPKRujukanName;
+
+        // Patient
+        myReport.xrLabelNama.Text = gx.Patient?.Name ?? "-";
+        myReport.xrLabelBPJS.Text = inspolcy.PolicyNumber;
+        myReport.xrLabelDiagnosaa.Text = gx.ReferDiagnosisNm; // Diagnosa
+        myReport.xrLabelUmur.Text = gx.Patient?.Age.ToString() ?? "-";
+        myReport.xrLabelTahun.Text = gx.Patient?.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy");
+        myReport.xrLabelStatusTanggunan.Text = inspolcy.JnsKelasKode;
+        myReport.xrLabelGender.Text = gx.Patient?.Gender == "Male" ? "L" : "P";
+
+        myReport.xrLabelRencana.Text = gx.ReferDateVisit.GetValueOrDefault().ToString("dd-MMM-yyyy");
+        myReport.xrLabelJadwal.Text = gx.PracticeScheduleTimeDate;
+        myReport.xrLabelBerlakuDate.Text = gx.ReferralExpiry.GetValueOrDefault().ToString("dd-MMM-yyyy");
+        myReport.xrLabelSalamDate.Text = $"Salam sejawat,\r\n{gx.ReferSelectFaskesDate.GetValueOrDefault().ToString("dd MMMM yyyy")}";
+        myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
+        
+        myReport.xrBarCode1.Text = gx.ReferralNo;
+        myReport.xrBarCode1.ShowText = false;
+
+        Report = myReport;
     }
     // DxReportViewer? reportViewer;
 
