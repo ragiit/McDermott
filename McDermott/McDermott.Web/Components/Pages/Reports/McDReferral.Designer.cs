@@ -54,6 +54,17 @@
             this.xrTableRow2 = new DevExpress.XtraReports.UI.XRTableRow();
             this.xrTableCell3 = new DevExpress.XtraReports.UI.XRTableCell();
             this.xrTableCell4 = new DevExpress.XtraReports.UI.XRTableCell();
+            this.xrLabel50 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLabel51 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLabel52 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLabel49 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrClass2 = new DevExpress.XtraReports.UI.XRCheckBox();
+            this.xrLabel48 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrClass1B = new DevExpress.XtraReports.UI.XRCheckBox();
+            this.xrClassVIP = new DevExpress.XtraReports.UI.XRCheckBox();
+            this.xrLabel47 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLabel45 = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrLabel46 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel41 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel42 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel43 = new DevExpress.XtraReports.UI.XRLabel();
@@ -148,17 +159,6 @@
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
             this.PageFooter = new DevExpress.XtraReports.UI.PageFooterBand();
             this.xrLabel62 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel49 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrClass2 = new DevExpress.XtraReports.UI.XRCheckBox();
-            this.xrLabel48 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrClass1B = new DevExpress.XtraReports.UI.XRCheckBox();
-            this.xrClassVIP = new DevExpress.XtraReports.UI.XRCheckBox();
-            this.xrLabel47 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel45 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel46 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel50 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel51 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel52 = new DevExpress.XtraReports.UI.XRLabel();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
@@ -561,6 +561,125 @@
             this.xrTableCell4.Text = resources.GetString("xrTableCell4.Text");
             this.xrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopJustify;
             this.xrTableCell4.Weight = 3.5277120776084203D;
+            // 
+            // xrLabel50
+            // 
+            this.xrLabel50.LocationFloat = new DevExpress.Utils.PointFloat(253.2287F, 641.1511F);
+            this.xrLabel50.Multiline = true;
+            this.xrLabel50.Name = "xrLabel50";
+            this.xrLabel50.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrLabel50.SizeF = new System.Drawing.SizeF(95.77664F, 23F);
+            this.xrLabel50.Text = "Hormat Kami";
+            // 
+            // xrLabel51
+            // 
+            this.xrLabel51.LocationFloat = new DevExpress.Utils.PointFloat(349.0054F, 641.1511F);
+            this.xrLabel51.Multiline = true;
+            this.xrLabel51.Name = "xrLabel51";
+            this.xrLabel51.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrLabel51.SizeF = new System.Drawing.SizeF(11.1111F, 23F);
+            this.xrLabel51.Text = "/";
+            // 
+            // xrLabel52
+            // 
+            this.xrLabel52.Font = new DevExpress.Drawing.DXFont("Arial", 11F, DevExpress.Drawing.DXFontStyle.Italic);
+            this.xrLabel52.LocationFloat = new DevExpress.Utils.PointFloat(360.1164F, 641.1511F);
+            this.xrLabel52.Multiline = true;
+            this.xrLabel52.Name = "xrLabel52";
+            this.xrLabel52.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrLabel52.SizeF = new System.Drawing.SizeF(93.20871F, 23F);
+            this.xrLabel52.StylePriority.UseFont = false;
+            this.xrLabel52.Text = "Your Truly";
+            // 
+            // xrLabel49
+            // 
+            this.xrLabel49.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Italic);
+            this.xrLabel49.LocationFloat = new DevExpress.Utils.PointFloat(593.7316F, 607.7227F);
+            this.xrLabel49.Multiline = true;
+            this.xrLabel49.Name = "xrLabel49";
+            this.xrLabel49.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.xrLabel49.SizeF = new System.Drawing.SizeF(58.35175F, 15F);
+            this.xrLabel49.StylePriority.UseFont = false;
+            this.xrLabel49.StylePriority.UsePadding = false;
+            this.xrLabel49.Text = "Class 2";
+            // 
+            // xrClass2
+            // 
+            this.xrClass2.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Underline);
+            this.xrClass2.LocationFloat = new DevExpress.Utils.PointFloat(576.9989F, 592.7228F);
+            this.xrClass2.Name = "xrClass2";
+            this.xrClass2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrClass2.SizeF = new System.Drawing.SizeF(75.08444F, 14.99994F);
+            this.xrClass2.StylePriority.UseFont = false;
+            this.xrClass2.Text = "Kelas 2";
+            // 
+            // xrLabel48
+            // 
+            this.xrLabel48.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Italic);
+            this.xrLabel48.LocationFloat = new DevExpress.Utils.PointFloat(512.0149F, 607.7227F);
+            this.xrLabel48.Multiline = true;
+            this.xrLabel48.Name = "xrLabel48";
+            this.xrLabel48.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.xrLabel48.SizeF = new System.Drawing.SizeF(58.35175F, 15F);
+            this.xrLabel48.StylePriority.UseFont = false;
+            this.xrLabel48.StylePriority.UsePadding = false;
+            this.xrLabel48.Text = "Class 1 B";
+            // 
+            // xrClass1B
+            // 
+            this.xrClass1B.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Underline);
+            this.xrClass1B.LocationFloat = new DevExpress.Utils.PointFloat(495.2823F, 592.7228F);
+            this.xrClass1B.Name = "xrClass1B";
+            this.xrClass1B.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrClass1B.SizeF = new System.Drawing.SizeF(75.08444F, 14.99994F);
+            this.xrClass1B.StylePriority.UseFont = false;
+            this.xrClass1B.Text = "Kelas 1 B";
+            // 
+            // xrClassVIP
+            // 
+            this.xrClassVIP.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Underline);
+            this.xrClassVIP.LocationFloat = new DevExpress.Utils.PointFloat(412.987F, 592.7227F);
+            this.xrClassVIP.Name = "xrClassVIP";
+            this.xrClassVIP.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrClassVIP.SizeF = new System.Drawing.SizeF(75.08444F, 14.99994F);
+            this.xrClassVIP.StylePriority.UseFont = false;
+            this.xrClassVIP.Text = "Kelas VIP";
+            // 
+            // xrLabel47
+            // 
+            this.xrLabel47.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Italic);
+            this.xrLabel47.LocationFloat = new DevExpress.Utils.PointFloat(429.7197F, 607.7227F);
+            this.xrLabel47.Multiline = true;
+            this.xrLabel47.Name = "xrLabel47";
+            this.xrLabel47.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.xrLabel47.SizeF = new System.Drawing.SizeF(58.35175F, 15F);
+            this.xrLabel47.StylePriority.UseFont = false;
+            this.xrLabel47.StylePriority.UsePadding = false;
+            this.xrLabel47.Text = "VIP Class";
+            // 
+            // xrLabel45
+            // 
+            this.xrLabel45.Font = new DevExpress.Drawing.DXFont("Arial", 10F, DevExpress.Drawing.DXFontStyle.Italic);
+            this.xrLabel45.LocationFloat = new DevExpress.Utils.PointFloat(13.73516F, 608.7225F);
+            this.xrLabel45.Multiline = true;
+            this.xrLabel45.Name = "xrLabel45";
+            this.xrLabel45.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.xrLabel45.SizeF = new System.Drawing.SizeF(387.3759F, 15F);
+            this.xrLabel45.StylePriority.UseFont = false;
+            this.xrLabel45.StylePriority.UsePadding = false;
+            this.xrLabel45.Text = "If hospitalisation is required, facilities that may be given is";
+            // 
+            // xrLabel46
+            // 
+            this.xrLabel46.Font = new DevExpress.Drawing.DXFont("Arial", 10F, DevExpress.Drawing.DXFontStyle.Underline);
+            this.xrLabel46.LocationFloat = new DevExpress.Utils.PointFloat(13.73519F, 592.7227F);
+            this.xrLabel46.Multiline = true;
+            this.xrLabel46.Name = "xrLabel46";
+            this.xrLabel46.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.xrLabel46.SizeF = new System.Drawing.SizeF(387.3759F, 15F);
+            this.xrLabel46.StylePriority.UseFont = false;
+            this.xrLabel46.StylePriority.UsePadding = false;
+            this.xrLabel46.Text = "Apabila  perlu rawat inap, fasilitas yang dapat diberikan adalah";
             // 
             // xrLabel41
             // 
@@ -1477,9 +1596,9 @@
             // xrLine1
             // 
             this.xrLine1.LineWidth = 2F;
-            this.xrLine1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 102.6667F);
+            this.xrLine1.LocationFloat = new DevExpress.Utils.PointFloat(4F, 102.6667F);
             this.xrLine1.Name = "xrLine1";
-            this.xrLine1.SizeF = new System.Drawing.SizeF(709.0001F, 23F);
+            this.xrLine1.SizeF = new System.Drawing.SizeF(693F, 23F);
             // 
             // xrLabel3
             // 
@@ -1542,125 +1661,6 @@
             this.xrLabel62.Text = "Engineering, Procurement, Construction & Installation services for offshore field" +
     " developments worldwide";
             this.xrLabel62.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
-            // 
-            // xrLabel49
-            // 
-            this.xrLabel49.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Italic);
-            this.xrLabel49.LocationFloat = new DevExpress.Utils.PointFloat(593.7316F, 607.7227F);
-            this.xrLabel49.Multiline = true;
-            this.xrLabel49.Name = "xrLabel49";
-            this.xrLabel49.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
-            this.xrLabel49.SizeF = new System.Drawing.SizeF(58.35175F, 15F);
-            this.xrLabel49.StylePriority.UseFont = false;
-            this.xrLabel49.StylePriority.UsePadding = false;
-            this.xrLabel49.Text = "Class 2";
-            // 
-            // xrClass2
-            // 
-            this.xrClass2.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Underline);
-            this.xrClass2.LocationFloat = new DevExpress.Utils.PointFloat(576.9989F, 592.7228F);
-            this.xrClass2.Name = "xrClass2";
-            this.xrClass2.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrClass2.SizeF = new System.Drawing.SizeF(75.08444F, 14.99994F);
-            this.xrClass2.StylePriority.UseFont = false;
-            this.xrClass2.Text = "Kelas 2";
-            // 
-            // xrLabel48
-            // 
-            this.xrLabel48.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Italic);
-            this.xrLabel48.LocationFloat = new DevExpress.Utils.PointFloat(512.0149F, 607.7227F);
-            this.xrLabel48.Multiline = true;
-            this.xrLabel48.Name = "xrLabel48";
-            this.xrLabel48.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
-            this.xrLabel48.SizeF = new System.Drawing.SizeF(58.35175F, 15F);
-            this.xrLabel48.StylePriority.UseFont = false;
-            this.xrLabel48.StylePriority.UsePadding = false;
-            this.xrLabel48.Text = "Class 1 B";
-            // 
-            // xrClass1B
-            // 
-            this.xrClass1B.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Underline);
-            this.xrClass1B.LocationFloat = new DevExpress.Utils.PointFloat(495.2823F, 592.7228F);
-            this.xrClass1B.Name = "xrClass1B";
-            this.xrClass1B.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrClass1B.SizeF = new System.Drawing.SizeF(75.08444F, 14.99994F);
-            this.xrClass1B.StylePriority.UseFont = false;
-            this.xrClass1B.Text = "Kelas 1 B";
-            // 
-            // xrClassVIP
-            // 
-            this.xrClassVIP.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Underline);
-            this.xrClassVIP.LocationFloat = new DevExpress.Utils.PointFloat(412.987F, 592.7227F);
-            this.xrClassVIP.Name = "xrClassVIP";
-            this.xrClassVIP.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrClassVIP.SizeF = new System.Drawing.SizeF(75.08444F, 14.99994F);
-            this.xrClassVIP.StylePriority.UseFont = false;
-            this.xrClassVIP.Text = "Kelas VIP";
-            // 
-            // xrLabel47
-            // 
-            this.xrLabel47.Font = new DevExpress.Drawing.DXFont("Arial", 8F, DevExpress.Drawing.DXFontStyle.Italic);
-            this.xrLabel47.LocationFloat = new DevExpress.Utils.PointFloat(429.7197F, 607.7227F);
-            this.xrLabel47.Multiline = true;
-            this.xrLabel47.Name = "xrLabel47";
-            this.xrLabel47.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
-            this.xrLabel47.SizeF = new System.Drawing.SizeF(58.35175F, 15F);
-            this.xrLabel47.StylePriority.UseFont = false;
-            this.xrLabel47.StylePriority.UsePadding = false;
-            this.xrLabel47.Text = "VIP Class";
-            // 
-            // xrLabel45
-            // 
-            this.xrLabel45.Font = new DevExpress.Drawing.DXFont("Arial", 10F, DevExpress.Drawing.DXFontStyle.Italic);
-            this.xrLabel45.LocationFloat = new DevExpress.Utils.PointFloat(13.73516F, 608.7225F);
-            this.xrLabel45.Multiline = true;
-            this.xrLabel45.Name = "xrLabel45";
-            this.xrLabel45.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
-            this.xrLabel45.SizeF = new System.Drawing.SizeF(387.3759F, 15F);
-            this.xrLabel45.StylePriority.UseFont = false;
-            this.xrLabel45.StylePriority.UsePadding = false;
-            this.xrLabel45.Text = "If hospitalisation is required, facilities that may be given is";
-            // 
-            // xrLabel46
-            // 
-            this.xrLabel46.Font = new DevExpress.Drawing.DXFont("Arial", 10F, DevExpress.Drawing.DXFontStyle.Underline);
-            this.xrLabel46.LocationFloat = new DevExpress.Utils.PointFloat(13.73519F, 592.7227F);
-            this.xrLabel46.Multiline = true;
-            this.xrLabel46.Name = "xrLabel46";
-            this.xrLabel46.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
-            this.xrLabel46.SizeF = new System.Drawing.SizeF(387.3759F, 15F);
-            this.xrLabel46.StylePriority.UseFont = false;
-            this.xrLabel46.StylePriority.UsePadding = false;
-            this.xrLabel46.Text = "Apabila  perlu rawat inap, fasilitas yang dapat diberikan adalah";
-            // 
-            // xrLabel50
-            // 
-            this.xrLabel50.LocationFloat = new DevExpress.Utils.PointFloat(253.2287F, 641.1511F);
-            this.xrLabel50.Multiline = true;
-            this.xrLabel50.Name = "xrLabel50";
-            this.xrLabel50.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel50.SizeF = new System.Drawing.SizeF(95.77664F, 23F);
-            this.xrLabel50.Text = "Hormat Kami";
-            // 
-            // xrLabel51
-            // 
-            this.xrLabel51.LocationFloat = new DevExpress.Utils.PointFloat(349.0054F, 641.1511F);
-            this.xrLabel51.Multiline = true;
-            this.xrLabel51.Name = "xrLabel51";
-            this.xrLabel51.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel51.SizeF = new System.Drawing.SizeF(11.1111F, 23F);
-            this.xrLabel51.Text = "/";
-            // 
-            // xrLabel52
-            // 
-            this.xrLabel52.Font = new DevExpress.Drawing.DXFont("Arial", 11F, DevExpress.Drawing.DXFontStyle.Italic);
-            this.xrLabel52.LocationFloat = new DevExpress.Utils.PointFloat(360.1164F, 641.1511F);
-            this.xrLabel52.Multiline = true;
-            this.xrLabel52.Name = "xrLabel52";
-            this.xrLabel52.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel52.SizeF = new System.Drawing.SizeF(93.20871F, 23F);
-            this.xrLabel52.StylePriority.UseFont = false;
-            this.xrLabel52.Text = "Your Truly";
             // 
             // McDReferral
             // 

@@ -323,7 +323,7 @@ namespace McDermott.Web.Controllers
                     OccupationalId=x.OccupationalId,
                     Occupational = new Occupational
                     {
-                        Name =x.Name
+                        Name =x.Occupational.Name
                     },
                     Name =x.Name,
                     
@@ -335,7 +335,7 @@ namespace McDermott.Web.Controllers
             ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
             ExtraReport.xrPatientName.Text = gp.Name ?? "-";
             ExtraReport.xrOccupational.Text =gp.Occupational.Name ?? "-";
-            ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
+            ExtraReport.xrNoEmployee.Text = gp.NIP ?? "-";
             ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
             ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
             ExtraReport.xrNotes.Text =  "";
@@ -452,7 +452,7 @@ namespace McDermott.Web.Controllers
                     OccupationalId = x.OccupationalId,
                     Occupational = new Occupational
                     {
-                        Name = x.Name
+                        Name = x.Occupational.Name
                     },
                     Name = x.Name,
 
@@ -544,7 +544,7 @@ namespace McDermott.Web.Controllers
                     OccupationalId = x.OccupationalId,
                     Occupational = new Occupational
                     {
-                        Name = x.Name
+                        Name = x.Occupational.Name
                     },
                     Name = x.Name,
 
