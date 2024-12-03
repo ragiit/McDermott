@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Ocsp;
+using Serilog;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -113,6 +115,11 @@ namespace McDermott.Application.Features.Services
             return (await _mediator.Send(new GetSystemParameterQuery()))?.FirstOrDefault() ?? new();
         }
 
+        private void PrintJsonOutConsole(string e)
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(JsonConvert.DeserializeObject<dynamic>(e), Formatting.Indented));
+        }
+
         public async Task<(dynamic, int)> SendPCareService(string baseURL, string requestURL, HttpMethod method, object? requestBody = null)
         {
             try
@@ -157,15 +164,19 @@ namespace McDermott.Application.Features.Services
 
                 var response = await httpClient.SendAsync(request);
 
+                Log.Information($"Sending PCare");
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Ambil data dari respon
                     var responseData = await response.Content.ReadAsStringAsync();
 
-                    string a = cons + secretKey + t;
-
-                    dynamic responseJson = JsonConvert.DeserializeObject(responseData);
-
+                    Log.Information($"PCare Response1 \n " +
+                        $"{responseData}"); 
+                    PrintJsonOutConsole(responseData);
+                     
+                    string a = cons + secretKey + t; 
+                    dynamic responseJson = JsonConvert.DeserializeObject(responseData); 
                     string r = responseJson.response;
                     dynamic metaData = responseJson.metaData;
 
@@ -177,6 +188,9 @@ namespace McDermott.Application.Features.Services
                     try
                     {
                         string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+                        Log.Information($"PCare Result LZString \n " +
+                        $"{result}");
+                        PrintJsonOutConsole(result);
                         return (result, Convert.ToInt32(response.StatusCode));
                     }
                     catch
@@ -188,6 +202,10 @@ namespace McDermott.Application.Features.Services
                 {
                     // Tangani kesalahan jika diperlukan
                     dynamic errorResponse = await response.Content.ReadAsStringAsync();
+
+                    Log.Error($"PCare Error Response1 \n " +
+                        $"{errorResponse}");
+                    PrintJsonOutConsole(errorResponse);
 
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(errorResponse);
 
@@ -224,7 +242,9 @@ namespace McDermott.Application.Features.Services
                             string LZDecrypted = PCareWebServiceDecrypt(a, Convert.ToString(r));
                             string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
 
-                            Console.WriteLine($"Response: {JsonConvert.DeserializeObject(result)}");
+                            Log.Error($"PCare Error Response1 \n {result}");
+                            PrintJsonOutConsole(result);
+
                             return (result, Convert.ToInt32(response.StatusCode));
                         }
                         catch (Exception)

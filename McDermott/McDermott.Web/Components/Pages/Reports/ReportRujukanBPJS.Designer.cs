@@ -762,10 +762,10 @@
             this.xrBarCode1.AnchorHorizontal = DevExpress.XtraReports.UI.HorizontalAnchorStyles.Right;
             this.xrBarCode1.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top;
             this.xrBarCode1.AutoModule = true;
-            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(404.844F, 10.00001F);
+            this.xrBarCode1.LocationFloat = new DevExpress.Utils.PointFloat(386.9231F, 15.43909F);
             this.xrBarCode1.Name = "xrBarCode1";
             this.xrBarCode1.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 10, 0, 0, 96F);
-            this.xrBarCode1.SizeF = new System.Drawing.SizeF(341.1559F, 76.65382F);
+            this.xrBarCode1.SizeF = new System.Drawing.SizeF(359.0769F, 76.65382F);
             this.xrBarCode1.Symbology = code128Generator1;
             // 
             // xrLabelNoKunjungan

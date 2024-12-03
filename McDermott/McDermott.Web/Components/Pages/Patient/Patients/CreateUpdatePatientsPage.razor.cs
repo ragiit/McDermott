@@ -12,6 +12,7 @@ using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using DocumentFormat.OpenXml.Bibliography;
 using McDermott.Application.Dtos.ClaimUserManagement;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
+using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand;
 
 namespace McDermott.Web.Components.Pages.Patient.Patients
 {
@@ -77,7 +78,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             FocusedRowVisibleIndexFamilyRelation = args.VisibleIndex;
         }
-        
+
         private void DeleteItemFamilyRelation_Click()
         {
             GridFamilyRelation.ShowRowDeleteConfirmation(FocusedRowVisibleIndexFamilyRelation);
@@ -473,7 +474,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             {
                 var count = await Mediator.Send(new GetPharmacyQuery
                 {
-                    Predicate = x=>x.PatientId == UserForm.Id
+                    Predicate = x => x.PatientId == UserForm.Id
                 });
                 PrescriptionCount = count.Item1.Count;
             }
@@ -541,6 +542,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         [Parameter]
         public long InsurancePoliciesCount { get; set; } = 0;
         public long UserClaimCount { get; set; } = 0;
+        public long WellnessAttendanceCount { get; set; } = 0;
 
         [Parameter]
         public long PrescriptionCount { get; set; } = 0;
@@ -550,6 +552,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         private bool PrescriptionPopUp = false;
         private bool DiseasePopUp = false;
         private bool IsVaccinations = false;
+        private bool IsWellnessHistory = false;
         private bool IsUserClaim = false;
 
         private async Task OnClickSmartButton(string text)
@@ -580,15 +583,91 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 //GeneralConsultanServiceVaccinations = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"))).Item1;
                 IsLoadingGeneralConsultantServiceVaccinations = false;
                 return;
-            }else if(text.Equals("User Claim"))
+            }
+            else if (text.Equals("User Claim"))
             {
                 IsUserClaim = true;
                 await LoadData_userClaim();
                 return;
             }
+            else if (text.Equals("Wellness History"))
+            {
+                IsWellnessHistory = true;
+                await LoadDataAttendances();
+                return;
+            }
+
             //TabIndex = text.ToInt32();
         }
 
+        #region Searching
+
+        private int pageSizeAttendances { get; set; } = 10;
+        private int totalCountAttendances = 0;
+        private int activePageIndexAttendances { get; set; } = 0;
+        private string searchTermAttendances { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChangedAttendances(string searchText)
+        {
+            searchTermAttendances = searchText;
+            await LoadDataAttendances(0, pageSizeAttendances);
+        }
+
+        private async Task OnpageSizeAttendancesIndexChanged(int newpageSizeAttendances)
+        {
+            pageSizeAttendances = newpageSizeAttendances;
+            await LoadDataAttendances(0, newpageSizeAttendances);
+        }
+
+        private async Task OnPageIndexChangedAttendances(int newPageIndex)
+        {
+            await LoadDataAttendances(newPageIndex, pageSizeAttendances);
+        }
+
+        private IGrid GridAttendance { get; set; }
+        private IReadOnlyList<object> SelectedDataItemAttendances { get; set; } = [];
+        private List<WellnessProgramAttendanceDto> WellnessProgramAttendances { get; set; } = [];
+        private bool LoadingWellness = false;
+        private async Task LoadDataAttendances(int pageIndex = 0, int pageSizeAttendances = 10)
+        {
+            try
+            {
+                LoadingWellness = true;
+                var a = await Mediator.Send(new GetWellnessProgramAttendanceQuery
+                {
+                    OrderByList =
+                    [
+                        (x => x.Date, true)
+                    ],
+                    Predicate = x => x.PatientId == UserForm.Id,
+                    SearchTerm = searchTermAttendances,
+                    PageIndex = pageIndex,
+                    PageSize = pageSizeAttendances,
+                    Select = x => new WellnessProgramAttendance
+                    {
+                        Date = x.Date,
+                        WellnessProgram = new WellnessProgram
+                        {
+                            Name = x.WellnessProgram.Name
+                        },
+                        WellnessProgramDetail = new WellnessProgramDetail
+                        {
+                            Name = x.WellnessProgramDetail.Name
+                        }
+                    }
+                });
+                WellnessProgramAttendances = a.Item1;
+                totalCountAttendances = a.PageCount;
+                activePageIndexAttendances = pageIndex;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { LoadingWellness = false; }
+        }
+
+        #endregion Searching
         private async Task GetUserInfo()
         {
             try
@@ -810,6 +889,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 PrescriptionCount = await Mediator.Send(new GetPrescriptionCountQuery(x => x.PatientId == UserForm.Id));
                 VaccinationCount = await Mediator.Send(new GetGeneralConsultationCountQuery(x => x.PatientId == UserForm.Id && x.Service != null && x.Service.Name == "Vaccination"));
                 UserClaimCount = await Mediator.Send(new GetClaimHistoryCountQuery(x => x.PatientId == UserForm.Id));
+                WellnessAttendanceCount = await Mediator.Send(new GetWellnessAttendanceCountQuery(x => x.PatientId == UserForm.Id));
             }
         }
 
