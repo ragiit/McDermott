@@ -300,6 +300,7 @@ namespace McDermott.Web.Controllers
                 Predicate = x => x.Id == gs.GeneralConsultanServiceId,
                 Select = x => new GeneralConsultanService
                 {
+                    PatientId = x.PatientId,
                     Patient = new User
                     {
                         Name = x.Patient.Name,
@@ -322,7 +323,7 @@ namespace McDermott.Web.Controllers
                     OccupationalId=x.OccupationalId,
                     Occupational = new Occupational
                     {
-                        Name =x.Name
+                        Name =x.Occupational.Name
                     },
                     Name =x.Name,
                     
@@ -334,7 +335,7 @@ namespace McDermott.Web.Controllers
             ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
             ExtraReport.xrPatientName.Text = gp.Name ?? "-";
             ExtraReport.xrOccupational.Text =gp.Occupational.Name ?? "-";
-            ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
+            ExtraReport.xrNoEmployee.Text = gp.NIP ?? "-";
             ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
             ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
             ExtraReport.xrNotes.Text =  "";
@@ -398,7 +399,7 @@ namespace McDermott.Web.Controllers
             return File(ar, "application/pdf", "McD_Referral.pdf");
         }
 
-        [HttpGet("Mc-Glasess-Referral/{id}")]
+        [HttpGet("mc-glasess-referral/{id}")]
         private async Task<IActionResult> DownloadMcGlasessReferral(long id)
         {
             using var stream = new MemoryStream();
@@ -428,6 +429,7 @@ namespace McDermott.Web.Controllers
                 Predicate = x => x.Id == gs.GeneralConsultanServiceId,
                 Select = x => new GeneralConsultanService
                 {
+                    PatientId = x.PatientId,
                     Patient = new User
                     {
                         Name = x.Patient.Name,
@@ -450,7 +452,7 @@ namespace McDermott.Web.Controllers
                     OccupationalId = x.OccupationalId,
                     Occupational = new Occupational
                     {
-                        Name = x.Name
+                        Name = x.Occupational.Name
                     },
                     Name = x.Name,
 
@@ -485,6 +487,78 @@ namespace McDermott.Web.Controllers
             ExtraReport.xrRefaction.Checked = gs.ExamFor == "Pemeriksaan Refraksi Mata";
             ExtraReport.xrPhysiotherapy.Checked = gs.ExamFor == "Fisioterapy";
 
+            // Export ke PDF
+            ExtraReport.ExportToPdf(stream);
+
+            // Kembalikan sebagai array byte
+            var ar = stream.ToArray();
+            return File(ar, "application/pdf", "Mc_Glasess_Referral.pdf");
+        }
+
+        [HttpGet("safety-glasess-referral/{id}")]
+        private async Task<IActionResult> DownloadSafetyGlassesReferral(long id)
+        {
+            using var stream = new MemoryStream();
+
+            var ExtraReport = new SafetyGlassesReport();
+
+            var gs = await mediator.Send(new GetSingleGCReferToInternalQuery
+            {
+                Predicate = x => x.GeneralConsultanServiceId == id,
+                Select = x => new GCReferToInternal
+                {
+                    GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                    DateRJMCINT = x.DateRJMCINT,
+                    Number = x.Number,
+                    ReferTo = x.ReferTo,
+                    CategoryRJMCINT = x.CategoryRJMCINT,
+                    ExamFor = x.ExamFor,
+                    TempDiagnosis = x.TempDiagnosis,
+                }
+            }) ?? new();
+            var gx = await mediator.Send(new GetSingleGeneralConsultanServicesQuery
+            {
+                Predicate = x => x.Id == gs.GeneralConsultanServiceId,
+                Select = x => new GeneralConsultanService
+                {
+                    PatientId=x.PatientId,
+                    Patient = new User
+                    {
+                        Name = x.Patient.Name,
+                        DateOfBirth = x.Patient.DateOfBirth,
+                        Gender = x.Patient.Gender,
+                    },
+                    
+                    VisitNumber = x.VisitNumber,
+                    ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                    InsurancePolicyId = x.InsurancePolicyId,
+
+                }
+            }) ?? new();
+
+            var gp = await mediator.Send(new GetSingleUserQuery
+            {
+                Predicate = x => x.Id == gx.PatientId,
+                Select = x => new User
+                {
+                    OccupationalId = x.OccupationalId,
+                    Occupational = new Occupational
+                    {
+                        Name = x.Occupational.Name
+                    },
+                    Name = x.Name,
+
+                }
+            });
+
+            ExtraReport.xrDatesRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
+            ExtraReport.xrNumber.Text = gs.Number ?? "-";
+            ExtraReport.xrReferTo.Text = gs.ReferTo ?? "-";
+            ExtraReport.xrPatient.Text = gp.Name ?? "-";
+            ExtraReport.xrOccupational.Text = gp.Occupational.Name ?? "-";
+            ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
+            ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
+          
             // Export ke PDF
             ExtraReport.ExportToPdf(stream);
 

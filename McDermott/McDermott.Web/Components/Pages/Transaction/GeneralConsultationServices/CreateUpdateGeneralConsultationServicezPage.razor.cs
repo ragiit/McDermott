@@ -2930,7 +2930,23 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             });
             if (cekData is not null)
             {
-                var reportUrl = $"api/reports/Mc-Glasess-Referral/{GeneralConsultanService.Id.ToString()}";
+                var reportUrl = $"api/reports/mc-glasess-referral/{GeneralConsultanService.Id.ToString()}";
+                await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+            }
+            else
+            {
+                ToastService.ShowError("Data is Not Found!..");
+            }
+        } 
+        private async Task OnPrintSafetyGlasessReferral()
+        {
+            var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery
+            {
+                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && x.TypeClaim == "Safety Glasses"
+            });
+            if (cekData is not null)
+            {
+                var reportUrl = $"api/reports/safety-glasess-referral/{GeneralConsultanService.Id.ToString()}";
                 await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
             }
             else
