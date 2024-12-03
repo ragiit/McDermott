@@ -172,6 +172,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     .GroupBy(x => x.Id)
                     .Select(group => group.First())
                     .ToList();
+                totalCount = result.pageCount;
+                activePageIndex = result.pageIndex;
 
                 // Mengambil data stok produk dan menghitung jumlahnya
                 TransactionStocks = await Mediator.Send(new GetTransactionStockQuery());

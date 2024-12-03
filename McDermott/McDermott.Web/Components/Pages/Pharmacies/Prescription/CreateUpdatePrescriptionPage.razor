@@ -97,7 +97,7 @@
                                                 <DxComboBox ReadOnly="@(postPharmacy.Status != EnumStatusPharmacy.Draft)"
                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
                                                             FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@Locations"
+                                                            Data="@getLocations"
                                                             NullText="Select Preciption Location..."
                                                             @bind-Value="@postPharmacy.LocationId"
                                                             TextFieldName="NameAndParent"

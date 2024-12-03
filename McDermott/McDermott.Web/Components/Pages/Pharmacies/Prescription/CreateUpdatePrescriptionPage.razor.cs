@@ -105,7 +105,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private List<UserDto> Patients { get; set; } = [];
         private List<UserDto> Practitioners { get; set; } = [];
         private List<UomDto> Uoms { get; set; } = [];
-        private List<LocationDto> Locations { get; set; } = [];
+        private List<LocationDto> getLocations { get; set; } = [];
         private List<ServiceDto> Services { get; set; } = [];
         private List<ProductDto> Products { get; set; } = [];
         private List<SignaDto> Signas { get; set; } = [];
@@ -1021,7 +1021,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         {
             var getLocation = await Mediator.Send(new GetLocationQuery());
 
-            Locations = getLocation.Item1;
+            getLocations = getLocation.Item1;
 
         }
 
@@ -1096,12 +1096,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
         }
 
-        private async Task LoadDataLocation(string? e = "", Expression<Func<Location, bool>>? predicate = null)
+        private async Task LoadDataLocation(string? e = "", Expression<Func<Locations, bool>>? predicate = null)
         {
             try
             {
                 PanelVisible = true;
-                //Locations = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
+                getLocations = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -1157,7 +1157,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             try
             {
                 PanelVisible = true;
-                Products = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate);
+                Products = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate=x=>x.HospitalType=="Medicament");
                 PanelVisible = false;
             }
             catch (Exception ex)
