@@ -347,18 +347,22 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
         {
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
 
-            var result = await Mediator.Send(new GetUserQuery2(x => x.Id == Id && x.IsDoctor == true, 0, 1, includes: []));
+            //var result = await Mediator.Send(new GetUserQuery2(x => x.Id == Id && x.IsDoctor == true, 0, 1, includes: []));
+            var result = await Mediator.Send(new GetSingleUserQuery
+            {
+                Predicate = x => x.Id == Id && x.IsDoctor == true
+            });
             UserForm = new();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
-                if (result.Item1.Count == 0 || !Id.HasValue)
+                if (result is null || !Id.HasValue)
                 {
                     NavigationManager.NavigateTo("medical/practitioners");
                     return;
                 }
 
-                UserForm = result.Item1.FirstOrDefault() ?? new();
+                UserForm = result ?? new();
                 UserForm.Password = Helper.HashMD5(UserForm.Password);
             }
 
@@ -564,6 +568,7 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
                 UserForm.DomicileCountryId = UserForm.IdCardCountryId;
             }
 
+            UserForm.DoctorServiceIds ??= [];
             var ax = SelectedServices.Select(x => x.Id).ToList();
             UserForm.DoctorServiceIds?.AddRange(ax);
 

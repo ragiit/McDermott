@@ -1,7 +1,13 @@
-﻿using DocumentFormat.OpenXml.InkML;
+﻿using DevExpress.Blazor.Reporting.Models;
+using DevExpress.Blazor.Reporting;
+using DevExpress.XtraReports.UI;
+using DocumentFormat.OpenXml.InkML;
 using MediatR;
 using Microsoft.AspNetCore.Components.Web;
 using System.Linq.Expressions;
+using McDermott.Web.Components.Pages.Reports;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DevExpress.XtraReports;
 
 namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 {
@@ -40,6 +46,26 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
+        DxReportViewer reportViewer { get; set; }
+        IReport Report { get; set; }
+        private ElementReference viewerComponent;
+
+        void OnCustomizeToolbar(ToolbarModel toolbarModel)
+        {
+            toolbarModel.AllItems.Add(new ToolbarItem()
+            {
+                // Use Open Iconic's icon.
+                IconCssClass = "oi oi-command",
+                Text = "Full Screen",
+                AdaptiveText = "Full Screen",
+                AdaptivePriority = 1,
+                Click = async (args) =>
+                {
+                    await JsRuntime.InvokeVoidAsync("customApi.requestFullscreen", viewerComponent);
+                }
+            });
+        }
+
         protected override async Task OnInitializedAsync()
         {
             try
@@ -47,6 +73,84 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 PanelVisible = true;
                 await GetUserInfo();
                 await LoadData();
+
+                if (GeneralConsultanServices.Count == 0)
+                    return;
+
+                IsDeleteGC = GeneralConsultanServices.FirstOrDefault()?.Status == EnumStatusGeneralConsultantService.Planned || GeneralConsultanServices.FirstOrDefault()?.Status == EnumStatusGeneralConsultantService.Canceled;
+
+
+
+
+                using var stream = new MemoryStream();
+                // Buat laporan
+                var myReport = new ReportRujukanBPJS();
+
+                var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == 103,
+                    Select = x => new GeneralConsultanService
+                    {
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                            DateOfBirth = x.Patient.DateOfBirth,
+                            Gender = x.Patient.Gender,
+                        },
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner.Name,
+                        },
+
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                        PPKRujukanName = x.PPKRujukanName,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+                        ReferDiagnosisNm = x.ReferDiagnosisNm,
+                        ReferDateVisit = x.ReferDateVisit,
+                        PracticeScheduleTimeDate = x.PracticeScheduleTimeDate,
+                        ReferralExpiry = x.ReferralExpiry,
+                        ReferSelectFaskesDate = x.ReferSelectFaskesDate,
+                        ReferralNo = x.ReferralNo
+                    }
+                }) ?? new();
+
+                var inspolcy = await Mediator.Send(new GetSingleInsurancePolicyQuery
+                {
+                    Predicate = x => x.Id == gx.InsurancePolicyId,
+                    Select = x => new InsurancePolicy
+                    {
+                        PolicyNumber = x.PolicyNumber,
+                        JnsKelasKode = x.JnsKelasKode
+                    }
+                }) ?? new();
+
+                // Header
+                myReport.xrLabelNoKunjungan.Text = gx.VisitNumber;
+
+                myReport.xrLabelTsDokter.Text = gx.ReferVerticalSpesialisParentSpesialisName; // Spesialis
+                myReport.xrLabelDi.Text = gx.PPKRujukanName;
+
+                // Patient
+                myReport.xrLabelNama.Text = gx.Patient?.Name ?? "-";
+                myReport.xrLabelBPJS.Text = inspolcy.PolicyNumber;
+                myReport.xrLabelDiagnosaa.Text = gx.ReferDiagnosisNm; // Diagnosa
+                myReport.xrLabelUmur.Text = gx.Patient?.Age.ToString() ?? "-";
+                myReport.xrLabelTahun.Text = gx.Patient?.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelStatusTanggunan.Text = inspolcy.JnsKelasKode;
+                myReport.xrLabelGender.Text = gx.Patient?.Gender == "Male" ? "L" : "P";
+
+                myReport.xrLabelRencana.Text = gx.ReferDateVisit.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelJadwal.Text = gx.PracticeScheduleTimeDate;
+                myReport.xrLabelBerlakuDate.Text = gx.ReferralExpiry.GetValueOrDefault().ToString("dd-MMM-yyyy");
+                myReport.xrLabelSalamDate.Text = $"Salam sejawat,\r\n{gx.ReferSelectFaskesDate.GetValueOrDefault().ToString("dd MMMM yyyy")}";
+                myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
+
+                myReport.xrBarCode1.Text = gx.ReferralNo;
+                myReport.xrBarCode1.ShowText = false;
+
+                Report = myReport;
             }
             catch (Exception ex)
             {
@@ -75,9 +179,17 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             catch { }
         }
 
+        private bool IsDeleteGC = false;
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+
+            if (args.DataItem is null)
+                return;
+
+            var d = ((GeneralConsultanServiceDto)args.DataItem).Status;
+
+            IsDeleteGC = d == EnumStatusGeneralConsultantService.Planned || d == EnumStatusGeneralConsultantService.Canceled;
         }
 
         private async Task Refresh_Click()

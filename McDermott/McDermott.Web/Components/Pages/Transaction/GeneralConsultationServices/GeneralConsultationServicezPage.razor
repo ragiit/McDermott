@@ -1,4 +1,5 @@
 ﻿@page "/clinic-service/general-consultation-services"
+@using DevExpress.Blazor.Reporting
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - General Consultation Services</PageTitle>
@@ -82,6 +83,7 @@
                                                              Refresh_Click="@Refresh_Click"
                                                              IsImport="false"
                                                              Grid="Grid"
+                                                             EnableDelete="IsDeleteGC"
                                                              VisibleNew="UserAccessCRUID.IsCreate"
                                                              VisibleEdit="UserAccessCRUID.IsUpdate"
                                                              VisibleDelete="UserAccessCRUID.IsDelete" />
@@ -95,6 +97,7 @@
                                                               FilterRowOperatorType="GridFilterRowOperatorType.Contains"
                                                               DisplayFormat="ddd, dd MMM yyyy"
                                                               Caption="Registration Date" />
+                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Reference" Caption="Reference" />
                                             <DxGridDataColumn MinWidth="200" FieldName="VisitNumber" Caption="Visit Number" />
                                             <DxGridDataColumn MinWidth="200" FieldName="SerialNo" Caption="Serial No" />
@@ -105,7 +108,6 @@
                                                     @GetIssueClaimIconHtml((context.DataItem as GeneralConsultanServiceDto))
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
-                                            <DxGridDataColumn MinWidth="200" FieldName="Patient.Name" Caption="Patient" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Pratitioner.Name" Caption="Doctor" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Service.Name" Caption="Service" />
                                             <DxGridDataColumn MinWidth="200" FieldName="Payment" Caption="Payment Method" Visible="false" />
@@ -115,7 +117,7 @@
                                                     @GetIssuePriorityIconHtml((context.DataItem as GeneralConsultanServiceDto))
                                                 </CellDisplayTemplate>
                                             </DxGridDataColumn>
-                                            
+
                                         </Columns>
 
                                         <TotalSummary>
@@ -150,7 +152,23 @@
                                         </DxFormLayout>
                                     </div>
                                 }
+
+
+                                <DxPopup Visible="true">
+                                    <DxReportViewer @ref="reportViewer" Report="@Report">
+                                    </DxReportViewer>
+
+                                </DxPopup>
                             </DxLoadingPanel>
+
+
+                            @* <div @ref="viewerComponent" style="width: 100%; height: 1000px;"> *@
+                            @*     <DxReportViewer @ref="reportViewer" *@
+                            @*                     OnCustomizeToolbar="OnCustomizeToolbar" *@
+                            @*                     Report="Report" /> *@
+                            @* </div> *@
+
+
                         </div>
                     </div>
                 </div>

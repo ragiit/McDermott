@@ -1,9 +1,11 @@
 ﻿@page "/logs"
+ 
+<PageTitle>McHealthCare - Logs</PageTitle>
 
 <div class="wrapper">
     <section class="content">
         <div class="container-fluid">
-             
+
             <h3 class="mb-4">Log Viewer</h3>
 
             <div class="mb-3">
@@ -17,13 +19,15 @@
                 </select>
             </div>
 
+            <!-- Tombol refresh untuk memuat ulang daftar file log -->
+            <button class="btn btn-primary mb-3" @onclick="RefreshLogFiles">Refresh Log Files</button>
+
             @if (!string.IsNullOrEmpty(LogContent))
             {
                 <h4 class="mt-4">Log Content</h4>
                 <div class="card">
                     <div class="card-body">
-                        @* max-height: 400px; *@
-                        <pre style="border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9; white-space: pre-wrap; overflow-x: auto; ">
+                        <pre style="border: 1px solid #ccc; padding: 15px; background-color: #f9f9f9; white-space: pre-wrap; overflow-x: auto;">
                             @LogContent
                             </pre>
                     </div>
@@ -45,7 +49,6 @@
         </div>
     </section>
 </div>
-
 
 @code {
     private List<string> LogFiles = new(); // Menyimpan daftar file log
@@ -101,4 +104,10 @@
         }
     }
 
+    // Method untuk refresh daftar file log
+    private void RefreshLogFiles()
+    {
+        LogFiles = GetLogFiles();  // Ambil ulang daftar file log
+        LogContent = null;          // Reset konten log yang ditampilkan
+    }
 }

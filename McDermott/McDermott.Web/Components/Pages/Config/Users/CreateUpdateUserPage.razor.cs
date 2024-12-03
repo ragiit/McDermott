@@ -230,7 +230,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 Predicate = x => UserForm.DoctorServiceIds != null && UserForm.DoctorServiceIds.Contains(x.Id),
             })).Item1;
 
-            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).ToList();
+            SelectedServices = Services.Where(x => UserForm.DoctorServiceIds is not null && UserForm.DoctorServiceIds.Contains(x.Id)).AsEnumerable();
 
             PanelVisible = false;
         }
@@ -363,18 +363,21 @@ namespace McDermott.Web.Components.Pages.Config.Users
         {
             //var result = await MyQuery.GetGroups(HttpClientFactory, 0, 1, Id.HasValue ? Id.ToString() : "");
 
-            var result = await Mediator.Send(new GetUserQuery2(x => x.Id == Id, 0, 1, includes: []));
+            var result = await Mediator.Send(new GetSingleUserQuery
+            {
+                Predicate = x => x.Id == Id && x.IsDoctor == true
+            });
             UserForm = new();
 
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
-                if (result.Item1.Count == 0 || !Id.HasValue)
+                if (result is null || !Id.HasValue)
                 {
                     NavigationManager.NavigateTo("configuration/users");
                     return;
                 }
 
-                UserForm = result.Item1.FirstOrDefault() ?? new();
+                UserForm = result ?? new();
                 tempPassword = UserForm.Password;
 
                 //UserForm.Password = Helper.HashMD5(UserForm.Password);
@@ -637,6 +640,8 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
                 if (!string.IsNullOrWhiteSpace(UserForm.Password))
                     UserForm.Password = Helper.HashMD5(UserForm.Password);
+
+                UserForm.DoctorServiceIds ??= [];
 
                 var ax = SelectedServices.Select(x => x.Id).ToList();
                 UserForm.DoctorServiceIds?.AddRange(ax);
@@ -1227,7 +1232,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                     PageSize = pageSize,
                     SearchTerm = refServiceComboBox?.Text ?? ""
                 });
-                Services = result.Item1;
+                Services = result.Item1.AsEnumerable();
                 totalCountService = result.PageCount;
 
                 PanelVisible = false;

@@ -979,10 +979,12 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.RiskOfFalling = dto.RiskOfFalling;
             entity.RiskOfFallingDetail = dto.RiskOfFallingDetail;
             entity.IsClaim = dto.IsClaim;
+            entity.BMHP = dto.BMHP;
 
             SetPropertiesModified(entity, nameof(entity.InformationFrom), nameof(entity.AwarenessId), nameof(entity.LocationId), nameof(entity.Weight),
                 nameof(entity.Height), nameof(entity.RR), nameof(entity.SpO2), nameof(entity.WaistCircumference),
                  nameof(entity.LILA),
+                 nameof(entity.BMHP),
                 nameof(entity.BMIIndex), nameof(entity.BMIIndexString), nameof(entity.ScrinningTriageScale), nameof(entity.ClinicVisitTypes),
                 nameof(entity.E), nameof(entity.V), nameof(entity.M), nameof(entity.Temp), nameof(entity.HR),
                 nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState), nameof(entity.IsClaim),
@@ -1384,7 +1386,11 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.RiskOfFalling = request.GeneralConsultanServiceDto.RiskOfFalling;
                     entity.RiskOfFallingDetail = request.GeneralConsultanServiceDto.RiskOfFallingDetail;
                     entity.IsClaim = request.GeneralConsultanServiceDto.IsClaim;
+                    entity.BMHP = request.GeneralConsultanServiceDto.BMHP;
+                    entity.KdPrognosa = request.GeneralConsultanServiceDto.KdPrognosa; 
 
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.BMHP));
+                    _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.KdPrognosa));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.Status));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.PratitionerId));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.InformationFrom));
