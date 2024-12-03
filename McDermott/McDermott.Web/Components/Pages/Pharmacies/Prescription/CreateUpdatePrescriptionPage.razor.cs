@@ -1096,12 +1096,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
         }
 
-        private async Task LoadDataLocation(string? e = "", Expression<Func<Product, bool>>? predicate = null)
+        private async Task LoadDataLocation(string? e = "", Expression<Func<Location, bool>>? predicate = null)
         {
             try
             {
                 PanelVisible = true;
-                Products = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate);
+                //Locations = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
                 PanelVisible = false;
             }
             catch (Exception ex)
