@@ -286,12 +286,12 @@ namespace McDermott.Web.Controllers
                     Number = x.Number,
                     ReferTo = x.ReferTo,
                     Hospital = x.Hospital,
-                    CategoryRJMCINT=x.CategoryRJMCINT,
-                    ExamFor=x.ExamFor,
-                    TempDiagnosis=x.TempDiagnosis,
-                    TherapyProvide=x.TherapyProvide,
-                    InpatientClass =x.InpatientClass,
-                    Specialist=x.Specialist,
+                    CategoryRJMCINT = x.CategoryRJMCINT,
+                    ExamFor = x.ExamFor,
+                    TempDiagnosis = x.TempDiagnosis,
+                    TherapyProvide = x.TherapyProvide,
+                    InpatientClass = x.InpatientClass,
+                    Specialist = x.Specialist,
                 }
             }) ?? new();
             var gx = await mediator.Send(new GetSingleGeneralConsultanServicesQuery
@@ -306,20 +306,37 @@ namespace McDermott.Web.Controllers
                         Gender = x.Patient.Gender,
                     },
 
-                        VisitNumber = x.VisitNumber,
-                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
-                        InsurancePolicyId = x.InsurancePolicyId,
-                    
+                    VisitNumber = x.VisitNumber,
+                    ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                    InsurancePolicyId = x.InsurancePolicyId,
+
                 }
             }) ?? new();
+
+            var gp = await mediator.Send(new GetSingleUserQuery
+            {
+                Predicate = x => x.Id == gx.PatientId,
+                Select = x => new User
+                {
+                    OccupationalId=x.OccupationalId,
+                    Occupational = new Occupational
+                    {
+                        Name =x.Name
+                    },
+                    Name =x.Name,
+                    
+                }
+            });
 
             ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
             ExtraReport.xrNumber.Text = gs.Number ?? "-";
             ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
-            ExtraReport.xrPatientName.Text = gx.Patient.Name ?? "-";
+            ExtraReport.xrPatientName.Text = gp.Name ?? "-";
+            ExtraReport.xrOccupational.Text =gp.Occupational.Name ?? "-";
             ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
             ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
             ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
+            ExtraReport.xrNotes.Text =  "";
 
             // Dynamically set the checkbox for the hospital
             ExtraReport.xrRSE.Checked = gs.Hospital == "RSE";
@@ -330,14 +347,14 @@ namespace McDermott.Web.Controllers
             ExtraReport.xrRSGH.Checked = gs.Hospital == "RSGH";
             ExtraReport.xrRSMA.Checked = gs.Hospital == "RSMA";
             ExtraReport.xrRSHBH.Checked = gs.Hospital == "RSHBH";
-            ExtraReport.xrRSSD.Checked = gs.Hospital == "RSSD"; 
-            
+            ExtraReport.xrRSSD.Checked = gs.Hospital == "RSSD";
+
             // Dynamically set the checkbox for Category
-            ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "Kanker";
-            ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "Dependent";
+            ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "KANKER";
+            ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "DEPENDENT";
             ExtraReport.xrEmployee.Checked = gs.CategoryRJMCINT == "EMPLOYEE";
             ExtraReport.xrAccidentInside.Checked = gs.CategoryRJMCINT == "ACCIDENT Inside";
-            ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "Accident Outside";
+            ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "ACCIDENT Outside";
             ExtraReport.xrKelainan.Checked = gs.CategoryRJMCINT == "KELAINAN BAWAAN";
 
             // Dynamically set the checkbox for Inpatient Class

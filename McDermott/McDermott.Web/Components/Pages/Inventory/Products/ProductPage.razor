@@ -22,48 +22,26 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
-                                <DxGrid @ref="Grid" PagerNavigationMode="PagerNavigationMode.InputBox"
-                                        Data="Products"
-                                        PageSize="10"
-                                        @bind-SelectedDataItems="@SelectedDataItems"
-                                        FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
-                                        KeyFieldName="Id"
-                                        DataItemDeleting="OnDelete"
-                                        CustomizeDataRowEditor="Grid_CustomizeDataRowEditor"
-                                        EditorRenderMode="GridEditorRenderMode.Detached"
-                                        PagerPosition="GridPagerPosition.Bottom"
-                                        AllowSelectRowByClick="true"
-                                        PageSizeSelectorVisible="true"
-                                        PageSizeSelectorItems="@(new int[] { 10, 20, 50, 100 })"
-                                        PageSizeSelectorAllRowsItemVisible="true"
-                                        PagerSwitchToInputBoxButtonCount="10"
-                                        FocusedRowEnabled="true"
-                                        PagerVisibleNumericButtonCount="10"
-                                        FocusedRowChanged="Grid_FocusedRowChanged"
-                                        ShowGroupPanel="true"
-                                        AutoExpandAllGroupRows="true"
-                                        CssClass="ch-480"
-                                        ShowFilterRow="true"
-                                        RowDoubleClick="OnRowDoubleClick"
-                                        TextWrapEnabled="false"
-                                        CustomizeElement="Grid_CustomizeElement"
-                                        ShowSearchBox="true"
-                                        SelectAllCheckboxMode="GridSelectAllCheckboxMode.Mixed"
-                                        KeyboardNavigationEnabled="true">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="Products"
+                                                @bind-SelectedDataItems="@SelectedDataItems"
+                                                DataItemDeleting="OnDelete"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                KeyFieldName="Id">
                                     <ToolbarTemplate>
-                                        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
-                                            <DxToolbarItem Visible="@UserAccessCRUID.IsCreate" Text="New" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.IsUpdate" Text="Edit" Click="() => EditItem_Click()" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
-                                            <DxToolbarItem Visible="@UserAccessCRUID.IsDelete" Text="Delete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Products.Count > 0" />
-                                            <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
-                                            <DxToolbarItem Text="Import" IconCssClass="fa-solid fa-file-import">
-                                                <Items>
-                                                    <DxToolbarItem Text="Medical Equipment Template" Click="ExportMedicalEquipmentTemplate" />
-                                                    <DxToolbarItem Text="Import Medical Equipment" Click="ImportFileMedicalEquipmentTemplate" />
-                                                    @* <DxToolbarItem Text="Import" Click="ImportFile" /> *@
-                                                </Items>
-                                            </DxToolbarItem>
-                                        </DxToolbar>
+                                        <MyDxToolbarBase TItem="ProductDto"
+                                                         Items="@Products"
+                                                         Grid="Grid"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@(async () => await EditItem_Click())"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         IsImport="false"
+                                                         VisibleNew="false"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
@@ -78,7 +56,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
-                                </DxGrid>
+                                </MyGridPaginate>
                                 <div class="row">
                                     <DxFormLayout>
                                         <div class="col-md-9">
