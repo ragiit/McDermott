@@ -81,7 +81,7 @@
             this.xrLabel28 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel27 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel26 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrOcuption = new DevExpress.XtraReports.UI.XRLabel();
+            this.xrOccupational = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel23 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel22 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel20 = new DevExpress.XtraReports.UI.XRLabel();
@@ -235,7 +235,7 @@
             this.xrLabel28,
             this.xrLabel27,
             this.xrLabel26,
-            this.xrOcuption,
+            this.xrOccupational,
             this.xrLabel23,
             this.xrLabel22,
             this.xrLabel20,
@@ -863,16 +863,16 @@
             this.xrLabel26.StylePriority.UsePadding = false;
             this.xrLabel26.Text = "No.Kar";
             // 
-            // xrOcuption
+            // xrOccupational
             // 
-            this.xrOcuption.Font = new DevExpress.Drawing.DXFont("Arial", 10F);
-            this.xrOcuption.LocationFloat = new DevExpress.Utils.PointFloat(200.3474F, 378.125F);
-            this.xrOcuption.Multiline = true;
-            this.xrOcuption.Name = "xrOcuption";
-            this.xrOcuption.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrOcuption.SizeF = new System.Drawing.SizeF(176.8666F, 23F);
-            this.xrOcuption.StylePriority.UseFont = false;
-            this.xrOcuption.Text = "Job";
+            this.xrOccupational.Font = new DevExpress.Drawing.DXFont("Arial", 10F);
+            this.xrOccupational.LocationFloat = new DevExpress.Utils.PointFloat(200.3474F, 378.125F);
+            this.xrOccupational.Multiline = true;
+            this.xrOccupational.Name = "xrOccupational";
+            this.xrOccupational.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrOccupational.SizeF = new System.Drawing.SizeF(176.8666F, 23F);
+            this.xrOccupational.StylePriority.UseFont = false;
+            this.xrOccupational.Text = "Job";
             // 
             // xrLabel23
             // 
@@ -1746,7 +1746,7 @@
         public DevExpress.XtraReports.UI.XRLabel xrLabel24;
         public DevExpress.XtraReports.UI.XRLabel xrLabel25;
         public DevExpress.XtraReports.UI.XRLabel xrPatientName;
-        public DevExpress.XtraReports.UI.XRLabel xrOcuption;
+        public DevExpress.XtraReports.UI.XRLabel xrOccupational;
         private DevExpress.XtraReports.UI.XRLabel xrLabel23;
         public DevExpress.XtraReports.UI.XRLabel xrLabel22;
         public DevExpress.XtraReports.UI.XRLabel xrLabel20;

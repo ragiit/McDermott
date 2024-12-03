@@ -441,6 +441,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             if (Data.Id != 0)
             {
                 Data.Status = EnumClaimRequestStatus.Done;
+                if(Data.PatientId == null)
+                {
+                    Data.PhycisianId = UserLogin.Id;
+                }
                 Data.GeneralConsultanServiceId = GeneralConsultanService.Id;
                 item = await Mediator.Send(new UpdateClaimRequestRequest(Data));
 
@@ -2869,7 +2873,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             var reportUrl = $"api/reports/rujukan-bpjs-prb/{GeneralConsultanService.Id.ToString()}";
             await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
         }
-          private async Task OnPrintRujukanMCReferTo()
+        private async Task OnPrintRujukanMCReferTo()
+        {
+            var reportUrl = $"api/reports/mcd-referral/{GeneralConsultanService.Id.ToString()}";
+            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+        } 
+        private async Task OnPrintMcDGlasessReferral()
         {
             var reportUrl = $"api/reports/mcd-referral/{GeneralConsultanService.Id.ToString()}";
             await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
