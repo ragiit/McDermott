@@ -441,7 +441,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             if (Data.Id != 0)
             {
                 Data.Status = EnumClaimRequestStatus.Done;
-                if(Data.PatientId == null)
+                if (Data.PatientId == null)
                 {
                     Data.PhycisianId = UserLogin.Id;
                 }
@@ -2875,13 +2875,35 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
         private async Task OnPrintRujukanMCReferTo()
         {
-            var reportUrl = $"api/reports/mcd-referral/{GeneralConsultanService.Id.ToString()}";
-            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
-        } 
+            var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery
+            {
+                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && (x.TypeClaim == "Dentist" || x.TypeClaim == null)
+            });
+            if (cekData is not null)
+            {
+                var reportUrl = $"api/reports/mcd-referral/{GeneralConsultanService.Id.ToString()}";
+                await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+            }
+            else
+            {
+                ToastService.ShowError("Data is Not Found!..");
+            }
+        }
         private async Task OnPrintMcDGlasessReferral()
         {
-            var reportUrl = $"api/reports/mcd-referral/{GeneralConsultanService.Id.ToString()}";
-            await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+            var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery
+            {
+                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && x.TypeClaim == "Glasses"
+            });
+            if (cekData is not null)
+            {
+                var reportUrl = $"api/reports/Mc-Glasess-Referral/{GeneralConsultanService.Id.ToString()}";
+                await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
+            }
+            else
+            {
+                ToastService.ShowError("Data is Not Found!..");
+            }
         }
 
         private async Task OnPrint()
