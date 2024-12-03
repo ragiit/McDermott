@@ -967,7 +967,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 GeneralConsultanService = result;
                 UserForm = result.Patient ?? new();
-                await LoadDataRefertoMC();
                 switch (GeneralConsultanService.Status)
                 {
                     case EnumStatusGeneralConsultantService.Planned:

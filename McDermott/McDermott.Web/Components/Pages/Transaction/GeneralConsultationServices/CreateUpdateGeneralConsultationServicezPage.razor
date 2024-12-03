@@ -1111,7 +1111,7 @@
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
                                                                                                 @*  <MyTextBox @bind-Text="@a.Planning"
                                                                                                                NullText="Name" /> *@ 
-                                                                                                                                                                            </DxFormLayoutItem>
+                                                                                                                                                                                    </DxFormLayoutItem>
                                                                                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medication Therapy" ColSpanMd="12">
                                                                                                 <MyTextBox @bind-Text="@a.MedicationTherapy"
                                                                                                            NullText="Medication Therapy" />
@@ -1253,7 +1253,9 @@
                                                                 </div>
                                                             </div>
                                                         </DxTabPage>
-
+                                                    }
+                                                    @if (IsStatus(EnumStatusGeneralConsultantService.Physician) ||IsStatus(EnumStatusGeneralConsultantService.Finished)  )
+                                                    {
                                                         <DxTabPage Text="Refer To McHealth Internal" Click="OnClickReferToMCINT">
                                                             <div class="w-100 mt-2">
                                                                 <div class="card w-100">

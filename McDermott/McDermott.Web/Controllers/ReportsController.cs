@@ -324,13 +324,13 @@ namespace McDermott.Web.Controllers
             // Dynamically set the checkbox for the hospital
             ExtraReport.xrRSE.Checked = gs.Hospital == "RSE";
             ExtraReport.xrRSBK.Checked = gs.Hospital == "RSBK";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSHB";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSBP";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSAB";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSGH";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSMA";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSHBH";
-            ExtraReport.xrRSBK.Checked = gs.Hospital == "RSSD"; 
+            ExtraReport.xrRSHB.Checked = gs.Hospital == "RSHB";
+            ExtraReport.xrRSBP.Checked = gs.Hospital == "RSBP";
+            ExtraReport.xrRSAB.Checked = gs.Hospital == "RSAB";
+            ExtraReport.xrRSGH.Checked = gs.Hospital == "RSGH";
+            ExtraReport.xrRSMA.Checked = gs.Hospital == "RSMA";
+            ExtraReport.xrRSHBH.Checked = gs.Hospital == "RSHBH";
+            ExtraReport.xrRSSD.Checked = gs.Hospital == "RSSD"; 
             
             // Dynamically set the checkbox for Category
             ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "Kanker";
