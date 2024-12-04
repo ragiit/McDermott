@@ -1,43 +1,43 @@
 
-#region ComboBox Patient
+#region ComboBox Location
 
-    private UserDto SelectedPatient { get; set; } = new();
+    private UserDto SelectedLocation { get; set; } = new();
     async Task SelectedItemChanged(UserDto e)
     {
         if (e is null)
         {
-            SelectedPatient = new();
-            await LoadPatient(); 
+            SelectedLocation = new();
+            await LoadLocation(); 
         }
         else
-            SelectedPatient = e;
+            SelectedLocation = e;
     }
 
-    private CancellationTokenSource? _ctsPatient;
-    private async Task OnInputPatient(ChangeEventArgs e)
+    private CancellationTokenSource? _ctsLocation;
+    private async Task OnInputLocation(ChangeEventArgs e)
     {
         try
         { 
-            _ctsPatient?.Cancel();
-            _ctsPatient?.Dispose();
-            _ctsPatient = new CancellationTokenSource();
+            _ctsLocation?.Cancel();
+            _ctsLocation?.Dispose();
+            _ctsLocation = new CancellationTokenSource();
 
-            await Task.Delay(Helper.CBX_DELAY, _ctsPatient.Token);
+            await Task.Delay(Helper.CBX_DELAY, _ctsLocation.Token);
 
-            await LoadPatient(e.Value?.ToString() ?? "");
+            await LoadLocation(e.Value?.ToString() ?? "");
         }
         finally
         { 
-            _ctsPatient?.Dispose();
-            _ctsPatient = null;
+            _ctsLocation?.Dispose();
+            _ctsLocation = null;
         }
     }
 
-    private async Task LoadPatient(string? e = "", Expression<Func<User, bool>>? predicate = null)
+    private async Task LoadLocation(string? e = "", Expression<Func<User, bool>>? predicate = null)
     {
         try
         { 
-            Patients = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate); 
+            Locations = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate); 
         }
         catch (Exception ex)
         {
@@ -49,21 +49,21 @@
 #endregion
 
 
-<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Patient" ColSpanMd="12">
-    <MyDxComboBox Data="Patients"
-                NullText="Select Patient"
+<DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Location" ColSpanMd="12">
+    <MyDxComboBox Data="Locations"
+                NullText="Select Location"
                 TextFieldName="Name"
                 ValueFieldName="Id"
-                @oninput="OnInputPatient"
+                @oninput="OnInputLocation"
                 SelectedItemChanged="((UserDto e) => SelectedItemChanged(e))"  
-                @bind-Value="a.PatientId">
+                @bind-Value="a.LocationId">
         <Columns>
-            <DxListEditorColumn FieldName="@nameof(Patient.Name)" Caption="Name" />
-            <DxListEditorColumn FieldName="@nameof(Patient.Code)" Caption="Code" />
+            <DxListEditorColumn FieldName="@nameof(Location.Name)" Caption="Name" />
+            <DxListEditorColumn FieldName="@nameof(Location.Code)" Caption="Code" />
         </Columns>
     </MyDxComboBox>
-    <ValidationMessage For="@(()=>a.PatientId)" />
+    <ValidationMessage For="@(()=>a.LocationId)" />
 </DxFormLayoutItem>
 
 
-Patient
+Location

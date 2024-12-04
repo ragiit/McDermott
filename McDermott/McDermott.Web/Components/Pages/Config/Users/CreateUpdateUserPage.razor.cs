@@ -365,7 +365,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
 
             var result = await Mediator.Send(new GetSingleUserQuery
             {
-                Predicate = x => x.Id == Id && x.IsDoctor == true
+                Predicate = x => x.Id == Id
             });
             UserForm = new();
 

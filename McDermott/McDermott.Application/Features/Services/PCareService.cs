@@ -172,11 +172,11 @@ namespace McDermott.Application.Features.Services
                     var responseData = await response.Content.ReadAsStringAsync();
 
                     Log.Information($"PCare Response1 \n " +
-                        $"{responseData}"); 
+                        $"{responseData}");
                     PrintJsonOutConsole(responseData);
-                     
-                    string a = cons + secretKey + t; 
-                    dynamic responseJson = JsonConvert.DeserializeObject(responseData); 
+
+                    string a = cons + secretKey + t;
+                    dynamic responseJson = JsonConvert.DeserializeObject(responseData);
                     string r = responseJson.response;
                     dynamic metaData = responseJson.metaData;
 
@@ -229,7 +229,11 @@ namespace McDermott.Application.Features.Services
 
                                 rr += $"{field} {message} ";
                             }
-                            return (rr, Convert.ToInt32(response.StatusCode));
+
+                            if (string.IsNullOrWhiteSpace(rr))
+                                return (metaData, Convert.ToInt32(response.StatusCode));
+                            else
+                                return (rr, Convert.ToInt32(response.StatusCode));
                         }
 
                         if (r is null)

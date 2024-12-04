@@ -312,7 +312,7 @@ namespace McDermott.Web.Extentions
                 var result = (await mediator.Send(new GetLocationQuery
                 {
                     Predicate = predicate as Expression<Func<Locations, bool>> ?? (x => true),
-                    Select = x => new Locations
+                    Select = select is null ? x => new Locations
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -321,7 +321,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.ParentLocation == null ? "" : x.ParentLocation.Name,
                         }
-                    },
+                    } : select as Expression<Func<Locations, Locations>>,
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
                 })).Item1;
@@ -460,6 +460,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        NoKartu = x.NoKartu,
                         PstPrb = x.PstPrb,
                         PstProl = x.PstProl
                     } : select as Expression<Func<InsurancePolicy, InsurancePolicy>>,

@@ -400,7 +400,7 @@ namespace McDermott.Web.Controllers
         }
 
         [HttpGet("mc-glasess-referral/{id}")]
-        private async Task<IActionResult> DownloadMcGlasessReferral(long id)
+        public async Task<IActionResult> DownloadMcGlasessReferral(long id)
         {
             using var stream = new MemoryStream();
 
@@ -496,7 +496,7 @@ namespace McDermott.Web.Controllers
         }
 
         [HttpGet("safety-glasess-referral/{id}")]
-        private async Task<IActionResult> DownloadSafetyGlassesReferral(long id)
+        public async Task<IActionResult> DownloadSafetyGlassesReferral(long id)
         {
             using var stream = new MemoryStream();
 
