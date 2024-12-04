@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 DevExpress.Blazor.CompatibilitySettings.AddSpaceAroundFormLayoutContent = true;
 
@@ -37,6 +38,8 @@ builder.Services
     .AddQueryableOffsetPagingProvider();
 
 builder.Services.AddPersistenceLayer(builder.Configuration);
+
+builder.Services.AddSpeechSynthesis();
 
 builder.Services.AddAntiforgery();
 

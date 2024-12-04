@@ -33,6 +33,7 @@
 @inject IDocumentProvider DocumentProvider
 @inject IFileExportService FileExportService
 @inject IHttpClientFactory HttpClientFactory
+@inject SpeechSynthesis SpeechSynthesis
 
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
@@ -47,6 +48,7 @@
 @using McDermott.Application.Dtos.Queue
 @using McDermott.Application.Dtos.Medical
 @using McDermott.Application.Dtos.Transaction
+@using Toolbelt.Blazor.SpeechSynthesis
 
 @using static McDermott.Application.Extentions.EnumHelper
 @using static McDermott.Web.Components.Pages.Medical.DoctorScheduleSlotPage
