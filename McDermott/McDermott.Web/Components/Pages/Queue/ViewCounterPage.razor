@@ -80,9 +80,8 @@
                                                 <DxLoadingPanel @bind-Visible="PanelVisible"
                                                                 IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
                                                                 IsContentBlocked="true"
-                                                                ApplyBackgroundShading="true"
-                                                                IndicatorAreaVisible="false"
-                                                                Text="Fetching Data...">
+                                                                ApplyBackgroundShading="false"
+                                                                IndicatorAreaVisible="false">
                                                     <DxGrid @ref="Grid"
                                                             Data="@KiosksQueue"
                                                             PageSize="10"
