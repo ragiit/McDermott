@@ -23,7 +23,7 @@
         {
             public List<Expression<Func<Project, object>>> Includes { get; set; }
             public Expression<Func<Project, bool>> Predicate { get; set; }
-            public Expression<Func<Project, Project>> Select { get; set; }
+            public Expression<Func<Project, Project>>? Select { get; set; }
 
             public List<(Expression<Func<Project, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
 

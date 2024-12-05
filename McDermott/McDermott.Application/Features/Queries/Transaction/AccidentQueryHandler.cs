@@ -64,6 +64,16 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new Accident
                     {
                         Id = x.Id,
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        SafetyPersonnelId = x.SafetyPersonnelId,
+                        EmployeeClass = x.EmployeeClass,
+                        Sent = x.Sent,
+                        AccidentLocation = x.AccidentLocation,
+                        DateOfOccurrence = x.DateOfOccurrence,
+                        DateOfFirstTreatment = x.DateOfFirstTreatment,
+                        AreaOfYard = x.AreaOfYard,
+                        ProjectId = x.ProjectId,
+                        Status = x.Status,
                     });
 
                 if (!request.IsGetAll)
@@ -138,6 +148,16 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new Accident
                     {
                         Id = x.Id,
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        SafetyPersonnelId = x.SafetyPersonnelId,
+                        EmployeeClass = x.EmployeeClass,
+                        Sent = x.Sent,
+                        AccidentLocation = x.AccidentLocation,
+                        DateOfOccurrence = x.DateOfOccurrence,
+                        DateOfFirstTreatment = x.DateOfFirstTreatment,
+                        AreaOfYard = x.AreaOfYard,
+                        ProjectId = x.ProjectId,
+                        Status = x.Status,
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<AccidentDto>();

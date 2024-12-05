@@ -118,11 +118,11 @@
                                                           SelectedItemChanged="((DiagnosisDto e) => SelectedItemChanged(e))"
                                                           @bind-Value="a.DiagnosisId">
                                                 <Columns>
+                                                    <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)" />
                                                     <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)" Caption="Name" />
-                                                    <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)" Caption="Code" />
-                                                    <DxListEditorColumn FieldName="DiseaseCategory.Name" Caption="Disease Category" />
-                                                    <DxListEditorColumn FieldName="CronisCategory.Name" Caption="Cronis Category" />
+                                                    <DxListEditorColumn FieldName="CronisCategory.Name" Caption="Chronic Category" />
                                                 </Columns>
+
                                             </MyDxComboBox>
                                             <ValidationMessage For="@(()=>a.DiagnosisId)" />
                                         </DxFormLayoutItem>
