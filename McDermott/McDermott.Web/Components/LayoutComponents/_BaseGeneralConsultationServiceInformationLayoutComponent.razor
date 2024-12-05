@@ -233,6 +233,7 @@
                             <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
                                         @bind-Date="@GeneralConsultanService.RegistrationDate"
                                         Mask="@DateTimeMask.ShortDate"
+                                        DisplayFormat="@Helper.DefaultFormatDate"
                                         NullText="Select Registration Date">
                             </DxDateEdit>
                             <ValidationMessage For="@(() => GeneralConsultanService.RegistrationDate)" />
@@ -274,6 +275,7 @@
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Follow Up" ColSpanMd="12">
                                 <DxDateEdit @bind-Date="@GeneralConsultanService.AppointmentDate"
                                             Mask="@DateTimeMask.ShortDate"
+                                            DisplayFormat="@Helper.DefaultFormatDate"
                                             ReadOnly
                                             NullText="Select Follow Up Date">
                                 </DxDateEdit>
@@ -298,12 +300,20 @@
                                     <Items>
                                         <DxGridLayoutItem Row="0" Column="0">
                                             <Template>
-                                                <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Date="@GeneralConsultanService.StartDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select Start Date" />
+                                                <DxDateEdit DisplayFormat="@Helper.DefaultFormatDate"
+                                                            ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                            @bind-Date="@GeneralConsultanService.StartDateSickLeave"
+                                                            Mask="@DateTimeMask.ShortDate"
+                                                            NullText="Select Start Date" />
                                             </Template>
                                         </DxGridLayoutItem>
                                         <DxGridLayoutItem Row="0" Column="1">
                                             <Template>
-                                                <DxDateEdit ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))" @bind-Date="@GeneralConsultanService.EndDateSickLeave" Mask="@DateTimeMask.ShortDate" NullText="Select End Date" />
+                                                <DxDateEdit DisplayFormat="@Helper.DefaultFormatDate"
+                                                            ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))"
+                                                            @bind-Date="@GeneralConsultanService.EndDateSickLeave"
+                                                            Mask="@DateTimeMask.ShortDate"
+                                                            NullText="Select End Date" />
                                             </Template>
                                         </DxGridLayoutItem>
                                     </Items>
@@ -339,6 +349,7 @@
                                                                 Date="@GeneralConsultanService.StartMaternityLeave"
                                                                 DateExpression="@(() => GeneralConsultanService.StartMaternityLeave)"
                                                                 DateChanged="@((DateTime? newValue) => SelectedItemMaternityChanged(newValue))"
+                                                                DisplayFormat="@Helper.DefaultFormatDate"
                                                                 NullText="Select Start Date">
                                                     </DxDateEdit>
                                                 </Template>

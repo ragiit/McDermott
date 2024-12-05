@@ -2320,8 +2320,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                     if (responseApi.Item2 != 201)
                     {
-                        //dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                        dynamic dataz = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                        dynamic dataz = JsonConvert.DeserializeObject(responseApi.Item1);
 
                         ToastService.ShowError($"{dataz.metadata.message}");
 
