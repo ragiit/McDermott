@@ -3,6 +3,8 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
 using System.ComponentModel.DataAnnotations;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
@@ -1655,5 +1657,50 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
         #endregion ComboboxDistrictResidence
 
         #endregion Residence Address
+
+        #region Test Upload File
+
+        private async Task SelectFile()
+        {
+        }
+
+        private async Task HandleFileSelected(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+
+            // Periksa apakah file adalah PDF
+            if (file.ContentType != "application/pdf")
+            {
+                StatusMessage = "Hanya file PDF yang diizinkan.";
+                return;
+            }
+
+            // Batasi ukuran file (contoh: max 2MB)
+            const long MaxFileSize = 2 * 1024 * 1024;
+            if (file.Size > MaxFileSize)
+            {
+                StatusMessage = "Ukuran file terlalu besar (maksimal 2MB).";
+                return;
+            }
+
+            // Baca konten file sebagai byte array
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream(MaxFileSize).ReadAsync(buffer);
+
+            // Simpan file ke database
+            var uploadedFile = new UploadedFile
+            {
+                FileName = file.Name,
+                FileContent = buffer,
+                ContentType = file.ContentType
+            };
+
+            DbContext.UploadedFiles.Add(uploadedFile);
+            await DbContext.SaveChangesAsync();
+
+            StatusMessage = "File berhasil diunggah!";
+        }
+
+        #endregion Test Upload File
     }
 }
