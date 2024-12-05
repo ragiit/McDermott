@@ -11,6 +11,7 @@ using McDermott.Extentions;
 using McDermott.Web.Components.Pages.Reports;
 using McDermott.Web.Extentions;
 using Microsoft.AspNetCore.Components.Web;
+using Newtonsoft.Json.Linq;
 using QuestPDF.Fluent;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;
@@ -1987,12 +1988,31 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                 if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife))
                 {
-                    var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+                    if (string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                        await SendPcareRequestKunjungan();
 
-                    if (!isSuccessAddKunjungan)
+                    if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
                     {
-                        IsLoading = false;
-                        return;
+                        var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan/rujukan/{GeneralConsultanService.VisitNumber}", HttpMethod.Get);
+                        if (result.Item2 == 200)
+                        {
+                            dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                            GeneralConsultanService.ReferralNo = data.noRujukan;
+
+                            var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                            {
+                                GeneralConsultanServiceDto = GeneralConsultanService,
+                                Status = EnumStatusGeneralConsultantService.Physician,
+                                IsReferTo = false
+                            };
+
+                            await Mediator.Send(updateRequest);
+                            GeneralConsultanService = await GetGeneralConsultanServiceById();
+                        }
+                        else
+                        {
+                            ToastService.ShowError($"Error when Sending Refferal, {result.Item2}");
+                        }
                     }
                 }
 
@@ -2159,18 +2179,22 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                                 Id = x.Id
                             }
                         });
-                        var searchAnc = (await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
+
+                        if (a is not null)
                         {
-                            IsGetAll = true,
-                            Predicate = x => x.GeneralConsultanServiceAncId == a.Id && x.IsReadOnly == false,
-                            Select = x => x
-                        })).Item1;
+                            var searchAnc = (await Mediator.Send(new GetGeneralConsultanServiceAncDetailQuery
+                            {
+                                IsGetAll = true,
+                                Predicate = x => x.GeneralConsultanServiceAncId == a.Id && x.IsReadOnly == false,
+                                Select = x => x
+                            })).Item1;
 
-                        searchAnc.ForEach(x => x.IsReadOnly = true);
+                            searchAnc.ForEach(x => x.IsReadOnly = true);
 
-                        await Mediator.Send(new UpdateListGeneralConsultanServiceAncDetailRequest(searchAnc));
+                            await Mediator.Send(new UpdateListGeneralConsultanServiceAncDetailRequest(searchAnc));
 
-                        await LoadDataAnc();
+                            await LoadDataAnc();
+                        }
                     }
 
                     ToastService.ClearSuccessToasts();
@@ -2228,7 +2252,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         private async Task<bool> SendPcareRequestKunjungan()
         {
-            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
+            if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
             {
                 var ins = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
                 if (ins is null)
@@ -2320,9 +2344,10 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
                     if (responseApi.Item2 != 201)
                     {
-                        dynamic dataz = JsonConvert.DeserializeObject(responseApi.Item1);
+                        var json = JObject.Parse(responseApi.Item1.ToString());
+                        string message = json["message"]?.ToString() ?? "Error When sending PCare 'Kunjungan'";
 
-                        ToastService.ShowError($"{dataz.metadata.message}");
+                        ToastService.ShowError(message);
 
                         IsLoading = false;
                         return false;
@@ -2344,7 +2369,7 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
                             var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
                             {
                                 GeneralConsultanServiceDto = GeneralConsultanService,
-                                Status = EnumStatusGeneralConsultantService.Physician,
+                                Status = EnumStatusGeneralConsultantService.Midwife,
                                 IsReferTo = false
                             };
 

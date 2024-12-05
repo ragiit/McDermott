@@ -20,6 +20,7 @@ using McDermott.Web.Components.Pages.Reports;
 using McDermott.Web.Extentions;
 using MediatR;
 using Microsoft.AspNetCore.Components.Web;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol.Plugins;
 using QuestPDF.Fluent;
 using System.Linq.Expressions;
@@ -1677,12 +1678,29 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
                     {
-                        var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+                        //var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
-                        if (!isSuccessAddKunjungan)
+                        //if (!isSuccessAddKunjungan)
+                        //{
+                        //    IsLoading = false;
+                        //    return;
+                        //}
+
+                        if (string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                            await SendPcareRequestKunjungan(false);
+
+                        if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
                         {
-                            IsLoading = false;
-                            return;
+                            var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan/rujukan/{GeneralConsultanService.VisitNumber}", HttpMethod.Get);
+                            if (result.Item2 == 200)
+                            {
+                                dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                                GeneralConsultanService.ReferralNo = data.noRujukan;
+                            }
+                            else
+                            {
+                                ToastService.ShowError($"Error when Sending Refferal, {result.Item2}");
+                            }
                         }
                     }
 
@@ -1927,7 +1945,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
         }
 
-        private async Task<bool> SendPcareRequestKunjungan()
+        private async Task<bool> SendPcareRequestKunjungan(bool? isSave = false)
         {
             if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
             {
@@ -2021,10 +2039,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                     if (responseApi.Item2 != 201)
                     {
-                        //dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                        dynamic dataz = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                        var json = JObject.Parse(responseApi.Item1.ToString());
+                        string message = json["message"]?.ToString() ?? "Error When sending PCare 'Kunjungan'";
 
-                        ToastService.ShowError($"{dataz.metadata.message}");
+                        ToastService.ShowError(message);
+
+                        return false;
 
                         IsLoading = false;
                         return false;
@@ -2042,6 +2062,9 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             }).ToList();
 
                             GeneralConsultanService.VisitNumber = xz[0].message;
+
+                            if (!Convert.ToBoolean(isSave))
+                                return true;
 
                             var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
                             {

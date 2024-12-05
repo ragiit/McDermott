@@ -337,7 +337,7 @@
                 if (responseApi.Item2 != 201)
                 { 
                     var json = JObject.Parse(responseApi.Item1.ToString());
-                    string message = json["metaData"]["message"]?.ToString() ?? "Error When sending PCare 'Kunjungan'";
+                    string message = json["message"]?.ToString() ?? "Error When sending PCare 'Kunjungan'";
 
                     ToastService.ShowError(message);
 

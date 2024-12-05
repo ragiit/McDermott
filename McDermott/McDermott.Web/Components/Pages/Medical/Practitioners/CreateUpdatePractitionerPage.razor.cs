@@ -1658,49 +1658,91 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
 
         #endregion Residence Address
 
-        #region Test Upload File
+        #region SIP File
+
+        // Unduh file
+        private async Task DownloadFile()
+        {
+            if (UserForm.SipFileContent != null && !string.IsNullOrEmpty(UserForm.SipFile))
+            {
+                var fileBytes = UserForm.SipFileContent;
+                var contentType = UserForm.SipFileContentType;
+                var fileName = UserForm.SipFile;
+
+                // Unduh file menggunakan Blazor download
+                var fileBase64 = Convert.ToBase64String(fileBytes);
+                var href = $"data:{contentType};base64,{fileBase64}";
+
+                await JsRuntime.InvokeVoidAsync("downloadFileNew", href, fileName);
+            }
+        }
+
+        private void RemoveSelectedFile()
+        {
+            UserForm.SipFile = null;
+            UserForm.SipFileContent = [];
+            UserForm.SipFileContentType = null;
+        }
 
         private async Task SelectFile()
         {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
         }
 
-        //private async Task HandleFileSelected(InputFileChangeEventArgs e)
-        //{
-        //    var file = e.File;
+        private async Task HandleFileSelected(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
 
-        //    // Periksa apakah file adalah PDF
-        //    if (file.ContentType != "application/pdf")
-        //    {
-        //        StatusMessage = "Hanya file PDF yang diizinkan.";
-        //        return;
-        //    }
+            // Check if the file is a PDF
+            if (file.ContentType != "application/pdf")
+            {
+                ToastService.ShowInfo("Only PDF files are allowed.");
+                return;
+            }
 
-        //    // Batasi ukuran file (contoh: max 2MB)
-        //    const long MaxFileSize = 2 * 1024 * 1024;
-        //    if (file.Size > MaxFileSize)
-        //    {
-        //        StatusMessage = "Ukuran file terlalu besar (maksimal 2MB).";
-        //        return;
-        //    }
+            // Limit file size (example: max 2MB)
+            const long MaxFileSize = 2 * 1024 * 1024;
+            if (file.Size > MaxFileSize)
+            {
+                ToastService.ShowInfo("The file size is too large (maximum is 2MB).");
+                return;
+            }
 
-        //    // Baca konten file sebagai byte array
-        //    var buffer = new byte[file.Size];
-        //    await file.OpenReadStream(MaxFileSize).ReadAsync(buffer);
+            try
+            {
+                // Read the file in chunks
+                const int ChunkSize = 64 * 1024; // 64KB per chunk
+                var buffer = new byte[file.Size];
+                long totalBytesRead = 0;
 
-        //    // Simpan file ke database
-        //    var uploadedFile = new UploadedFile
-        //    {
-        //        FileName = file.Name,
-        //        FileContent = buffer,
-        //        ContentType = file.ContentType
-        //    };
+                using var stream = file.OpenReadStream(MaxFileSize);
+                while (totalBytesRead < file.Size)
+                {
+                    // Calculate chunk size to read (last chunk might be smaller)
+                    var bytesToRead = (int)Math.Min(ChunkSize, file.Size - totalBytesRead);
 
-        //    DbContext.UploadedFiles.Add(uploadedFile);
-        //    await DbContext.SaveChangesAsync();
+                    // Read the chunk into the buffer
+                    var chunkBuffer = new byte[bytesToRead];
+                    var bytesRead = await stream.ReadAsync(chunkBuffer, 0, bytesToRead);
 
-        //    StatusMessage = "File berhasil diunggah!";
-        //}
+                    // Copy the chunk into the main buffer
+                    Array.Copy(chunkBuffer, 0, buffer, totalBytesRead, bytesRead);
+                    totalBytesRead += bytesRead;
+                }
 
-        #endregion Test Upload File
+                UserForm.SipFile = file.Name;
+                UserForm.SipFileContentType = file.ContentType;
+                UserForm.SipFileContent = buffer;
+
+                ToastService.ShowSuccess($"The file '{file.Name}' has been uploaded successfully.");
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"An error occurred while uploading the file: {ex.Message}");
+            }
+        }
+
+        #endregion SIP File
+
     }
 }

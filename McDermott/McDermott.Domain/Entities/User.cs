@@ -53,6 +53,7 @@
         public string? NoBpjsTk { get; set; }
         public string? SipNo { get; set; }
         public string? SipFile { get; set; }
+        public string? SipFileContentType { get; set; }
         public byte[] SipFileContent { get; set; } = [];
         public DateTime? SipExp { get; set; }
         public string? StrNo { get; set; }

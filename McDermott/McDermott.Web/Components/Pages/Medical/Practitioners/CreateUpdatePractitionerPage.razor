@@ -560,10 +560,13 @@
                                                                                    ReadOnly="true"
                                                                                    MaskMode="MaskMode.RegEx">
                                                                         <Buttons>
-                                                                           @*  <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@HandleFileSelected" multiple="false" style="display:none" />
-                                                                            <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" /> *@
-                                                                          @*   <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
-                                                                            <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" /> *@
+                                                                            <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@HandleFileSelected" multiple="false" style="display:none" />
+                                                                            <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+                                                                            @if (!string.IsNullOrEmpty(UserForm.SipFile))
+                                                                            {
+                                                                                <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
+                                                                                <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                                                            } 
                                                                         </Buttons>
                                                                     </DxMaskedInput>
                                                                 </DxFormLayoutItem>
