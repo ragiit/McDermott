@@ -2904,57 +2904,336 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         #endregion
 
 
-
+        #region Print Refert To Mcd
+        DxReportViewer reportViewerReferToMcD { get; set; }
+        IReport ReportReferToMcD { get; set; }
+        private bool IsPrintReferToMcD = false;
 
         private async Task OnPrintRujukanMCReferTo()
         {
-            var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery
-            {
-                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && (x.TypeClaim == "Dentist" || x.TypeClaim == null)
-            });
-            if (cekData is not null)
-            {
-                var reportUrl = $"api/reports/mcd-referral/{GeneralConsultanService.Id.ToString()}";
-                await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
-            }
-            else
-            {
-                ToastService.ShowError("Data is Not Found!..");
-            }
-        }
-        private async Task OnPrintMcDGlasessReferral()
-        {
-            var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery
-            {
-                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && x.TypeClaim == "Glasses"
-            });
-            if (cekData is not null)
-            {
-                var reportUrl = $"api/reports/mc-glasess-referral/{GeneralConsultanService.Id.ToString()}";
-                await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
-            }
-            else
-            {
-                ToastService.ShowError("Data is Not Found!..");
-            }
-        } 
-        private async Task OnPrintSafetyGlasessReferral()
-        {
-            var cekData = await Mediator.Send(new GetSingleGCReferToInternalQuery
-            {
-                Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id && x.TypeClaim == "Safety Glasses"
-            });
-            if (cekData is not null)
-            {
-                var reportUrl = $"api/reports/safety-glasess-referral/{GeneralConsultanService.Id.ToString()}";
-                await JsRuntime.InvokeVoidAsync("open", reportUrl, "_blank");
-            }
-            else
-            {
-                ToastService.ShowError("Data is Not Found!..");
-            }
+            await LoadPrintReferToMcD();
+            IsPrintReferToMcD = true;
         }
 
+        private async Task LoadPrintReferToMcD()
+        {
+            try
+            {
+                
+                var ExtraReport = new McDReferral();
+                var gs = await Mediator.Send(new GetSingleGCReferToInternalQuery
+                {
+                    Predicate = x => x.GeneralConsultanServiceId ==GeneralConsultanService.Id,
+                    Select = x => new GCReferToInternal
+                    {
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        DateRJMCINT = x.DateRJMCINT,
+                        Number = x.Number,
+                        ReferTo = x.ReferTo,
+                        Hospital = x.Hospital,
+                        CategoryRJMCINT = x.CategoryRJMCINT,
+                        ExamFor = x.ExamFor,
+                        TempDiagnosis = x.TempDiagnosis,
+                        TherapyProvide = x.TherapyProvide,
+                        InpatientClass = x.InpatientClass,
+                        Specialist = x.Specialist,
+                    }
+                }) ?? new();
+                var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == gs.GeneralConsultanServiceId,
+                    Select = x => new GeneralConsultanService
+                    {
+                        PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                            DateOfBirth = x.Patient.DateOfBirth,
+                            Gender = x.Patient.Gender,
+                        },
+
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+
+                    }
+                }) ?? new();
+
+                var gp = await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.Id == gx.PatientId,
+                    Select = x => new User
+                    {
+                        OccupationalId = x.OccupationalId,
+                        Occupational = new Occupational
+                        {
+                            Name = x.Occupational.Name
+                        },
+                        Name = x.Name,
+
+                    }
+                });
+
+                ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
+                ExtraReport.xrNumber.Text = gs.Number ?? "-";
+                ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
+                ExtraReport.xrPatientName.Text = gp.Name ??"-";
+                ExtraReport.xrOccupational.Text = gp.Occupational.Name ?? "-";
+                ExtraReport.xrNoEmployee.Text = gp.NIP ?? "-";
+                ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
+                ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
+                ExtraReport.xrNotes.Text = "";
+
+                // Dynamically set the checkbox for the hospital
+                ExtraReport.xrRSE.Checked = gs.Hospital == "RSE";
+                ExtraReport.xrRSBK.Checked = gs.Hospital == "RSBK";
+                ExtraReport.xrRSHB.Checked = gs.Hospital == "RSHB";
+                ExtraReport.xrRSBP.Checked = gs.Hospital == "RSBP";
+                ExtraReport.xrRSAB.Checked = gs.Hospital == "RSAB";
+                ExtraReport.xrRSGH.Checked = gs.Hospital == "RSGH";
+                ExtraReport.xrRSMA.Checked = gs.Hospital == "RSMA";
+                ExtraReport.xrRSHBH.Checked = gs.Hospital == "RSHBH";
+                ExtraReport.xrRSSD.Checked = gs.Hospital == "RSSD";
+
+                // Dynamically set the checkbox for Category
+                ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "KANKER";
+                ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "DEPENDENT";
+                ExtraReport.xrEmployee.Checked = gs.CategoryRJMCINT == "EMPLOYEE";
+                ExtraReport.xrAccidentInside.Checked = gs.CategoryRJMCINT == "ACCIDENT Inside";
+                ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "ACCIDENT Outside";
+                ExtraReport.xrKelainan.Checked = gs.CategoryRJMCINT == "KELAINAN BAWAAN";
+
+                // Dynamically set the checkbox for Inpatient Class
+                ExtraReport.xrClassVIP.Checked = gs.InpatientClass == "VIP Class";
+                ExtraReport.xrClass1B.Checked = gs.InpatientClass == "Class 1 B";
+                ExtraReport.xrClass2.Checked = gs.InpatientClass == "Class 2";
+
+                // Dynamically set the checkbox for Examp For
+                ExtraReport.xrFurther.Checked = gs.ExamFor == "Pemeriksaan / penanganan lebih lanjut";
+                ExtraReport.xrSurgery.Checked = gs.ExamFor == "Pembedahan";
+                ExtraReport.xrHospitalization.Checked = gs.ExamFor == "Perawatan";
+                ExtraReport.xrMaternity.Checked = gs.ExamFor == "Bersalin";
+                ExtraReport.xrRefaction.Checked = gs.ExamFor == "Pemeriksaan Refraksi Mata";
+                ExtraReport.xrPhysiotherapy.Checked = gs.ExamFor == "Fisioterapy";
+
+                // Dynamically set the checkbox for Specialist
+                ExtraReport.xrDentist.Checked = gs.Specialist == "Dentist";
+                ExtraReport.xrInternist.Checked = gs.Specialist == "Internist";
+                ExtraReport.xrPulmonologist.Checked = gs.Specialist == "Pulmonologist";
+                ExtraReport.xrCardiologist.Checked = gs.Specialist == "Cardiologist";
+                ExtraReport.xrEye.Checked = gs.Specialist == "Eye";
+                ExtraReport.xrENT.Checked = gs.Specialist == "ENT";
+                ExtraReport.xrPaediatric.Checked = gs.Specialist == "Paediatric";
+                ExtraReport.xrSurgeon.Checked = gs.Specialist == "Surgeon";
+                ExtraReport.xrObstetrician.Checked = gs.Specialist == "Obstetrician";
+                ExtraReport.xrNeurologist.Checked = gs.Specialist == "Neurologist";
+                ExtraReport.xrUrologist.Checked = gs.Specialist == "Urologist";
+                ExtraReport.xrNeurosurgeon.Checked = gs.Specialist == "Neurosurgeon";
+                ExtraReport.xrOrthopaedic.Checked = gs.Specialist == "Orthopaedic";
+                ExtraReport.xrPhysiotherapist.Checked = gs.Specialist == "Physiotherapist";
+                ExtraReport.xrDermatologist.Checked = gs.Specialist == "Dermatologist";
+                ExtraReport.xrPsychiatrist.Checked = gs.Specialist == "Psychiatrist";
+                ExtraReport.xrLaboratorium.Checked = gs.Specialist == "Laboratorium";
+
+                ReportReferToMcD = ExtraReport;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region McD Glasses Referal
+        DxReportViewer reportViewerMcDGlasessReferral { get; set; }
+        IReport ReportMcDGlasessReferral { get; set; }
+        private bool IsPrintMcDGlasessReferral = false;
+
+        private async Task OnPrintMcDGlasessReferral()
+        {
+            await LoadPrintMcDGlasessReferral();
+            IsPrintMcDGlasessReferral = true;
+        }
+
+        private async Task LoadPrintMcDGlasessReferral()
+        {
+            try
+            {
+                var ExtraReport = new McGlassesReport();
+
+                var gs = await Mediator.Send(new GetSingleGCReferToInternalQuery
+                {
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id,
+                    Select = x => new GCReferToInternal
+                    {
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        DateRJMCINT = x.DateRJMCINT,
+                        Number = x.Number,
+                        ReferTo = x.ReferTo,
+                        Hospital = x.Hospital,
+                        CategoryRJMCINT = x.CategoryRJMCINT,
+                        ExamFor = x.ExamFor,
+                        TempDiagnosis = x.TempDiagnosis,
+                        TherapyProvide = x.TherapyProvide,
+                        InpatientClass = x.InpatientClass,
+                        Specialist = x.Specialist,
+                    }
+                }) ?? new();
+                var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == gs.GeneralConsultanServiceId,
+                    Select = x => new GeneralConsultanService
+                    {
+                        PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                            DateOfBirth = x.Patient.DateOfBirth,
+                            Gender = x.Patient.Gender,
+                        },
+
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+
+                    }
+                }) ?? new();
+
+                var gp = await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.Id == gx.PatientId,
+                    Select = x => new User
+                    {
+                        OccupationalId = x.OccupationalId,
+                        Occupational = new Occupational
+                        {
+                            Name = x.Occupational.Name
+                        },
+                        Name = x.Name,
+
+                    }
+                });
+
+                ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
+                ExtraReport.xrNumber.Text = gs.Number ?? "-";
+                ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
+                ExtraReport.xrPatientName.Text = gp.Name ?? "-";
+                ExtraReport.xrOccupational.Text = gp.Occupational.Name ?? "-";
+                ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
+                ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
+                ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
+                ExtraReport.xrNotes.Text = "";
+
+
+                // Dynamically set the checkbox for Category
+                ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "KANKER";
+                ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "DEPENDENT";
+                ExtraReport.xrEmployee.Checked = gs.CategoryRJMCINT == "EMPLOYEE";
+                ExtraReport.xrAccidentInside.Checked = gs.CategoryRJMCINT == "ACCIDENT Inside";
+                ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "ACCIDENT Outside";
+                ExtraReport.xrKelainan.Checked = gs.CategoryRJMCINT == "KELAINAN BAWAAN";
+
+
+                // Dynamically set the checkbox for Examp For
+                ExtraReport.xrFurther.Checked = gs.ExamFor == "Pemeriksaan / penanganan lebih lanjut";
+                ExtraReport.xrSurgery.Checked = gs.ExamFor == "Pembedahan";
+                ExtraReport.xrHospitalization.Checked = gs.ExamFor == "Perawatan";
+                ExtraReport.xrMaternity.Checked = gs.ExamFor == "Bersalin";
+                ExtraReport.xrRefaction.Checked = gs.ExamFor == "Pemeriksaan Refraksi Mata";
+                ExtraReport.xrPhysiotherapy.Checked = gs.ExamFor == "Fisioterapy";
+
+                ReportMcDGlasessReferral = ExtraReport;
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
+
+        #region Safety Glasses Referral
+        DxReportViewer reportViewerSafetyGlasessReferral { get; set; }
+        IReport ReportSafetyGlasessReferral { get; set; }
+        private bool IsPrintSafetyGlasessReferral = false;
+
+      
+        private async Task OnPrintSafetyGlasessReferral()
+        {
+            await LoadPrintSafetyGlasessReferral();
+            IsPrintSafetyGlasessReferral = true;
+        }
+
+        private async Task LoadPrintSafetyGlasessReferral()
+        {
+            try
+            {
+                var ExtraReport = new SafetyGlassesReport();
+
+                var gs = await Mediator.Send(new GetSingleGCReferToInternalQuery
+                {
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id,
+                    Select = x => new GCReferToInternal
+                    {
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
+                        DateRJMCINT = x.DateRJMCINT,
+                        Number = x.Number,
+                        ReferTo = x.ReferTo,
+                        CategoryRJMCINT = x.CategoryRJMCINT,
+                        ExamFor = x.ExamFor,
+                        TempDiagnosis = x.TempDiagnosis,
+                    }
+                }) ?? new();
+                var gx = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+                {
+                    Predicate = x => x.Id == gs.GeneralConsultanServiceId,
+                    Select = x => new GeneralConsultanService
+                    {
+                        PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                            DateOfBirth = x.Patient.DateOfBirth,
+                            Gender = x.Patient.Gender,
+                        },
+
+                        VisitNumber = x.VisitNumber,
+                        ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
+                        InsurancePolicyId = x.InsurancePolicyId,
+
+                    }
+                }) ?? new();
+
+                var gp = await Mediator.Send(new GetSingleUserQuery
+                {
+                    Predicate = x => x.Id == gx.PatientId,
+                    Select = x => new User
+                    {
+                        OccupationalId = x.OccupationalId,
+                        Occupational = new Occupational
+                        {
+                            Name = x.Occupational.Name
+                        },
+                        Name = x.Name,
+
+                    }
+                });
+
+                ExtraReport.xrDatesRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
+                ExtraReport.xrNumber.Text = gs.Number ?? "-";
+                ExtraReport.xrReferTo.Text = gs.ReferTo ?? "-";
+                ExtraReport.xrPatient.Text = gp.Name ?? "-";
+                ExtraReport.xrOccupational.Text = gp.Occupational.Name ?? "-";
+                ExtraReport.xrNoEmployee.Text = gx.Patient.Legacy ?? "-";
+                ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
+
+                ReportSafetyGlasessReferral = ExtraReport;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
         private async Task OnPrint()
         {
             try

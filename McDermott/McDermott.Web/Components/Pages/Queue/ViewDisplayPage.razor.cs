@@ -31,6 +31,8 @@ namespace McDermott.Web.Components.Pages.Queue
         private HubConnection hubConnection;
         private List<long> CounterCount = new List<long>();
         private string currentTime;
+        private string daysNow;
+        private string datesNow;
         private long? Cids { get; set; }
         private long? cId { get; set; }
         private long? IdQueue { get; set; }
@@ -48,6 +50,8 @@ namespace McDermott.Web.Components.Pages.Queue
             while (true)
             {
                 currentTime = DateTime.Now.ToString("HH:mm:ss");
+                datesNow = DateTime.Now.ToString("dd MMMM yyyy");
+                daysNow = DateTime.Now.ToString("dddd");
                 StateHasChanged();
                 await Task.Delay(100); // Update every 1 second
             }

@@ -1766,3 +1766,16 @@ else
     </DxReportViewer>
 
 </DxPopup>
+
+    <DxPopup HeaderText="Print Refer To McDermott internal"
+         @bind-Visible="@IsPrintReferToMcD"
+         HeaderCssClass="fw-bold"
+         CloseOnOutsideClick="false"
+         Closed="(() => IsPrintReferToMcD = false)"
+         Width="90%">
+
+    <DxReportViewer @ref="reportViewerReferToMcD"
+                    Report="@ReportReferToMcD">
+    </DxReportViewer>
+
+</DxPopup>

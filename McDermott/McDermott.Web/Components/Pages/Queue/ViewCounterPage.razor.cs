@@ -184,119 +184,6 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-
-        //private async Task LoadData()
-        //{
-        //    try
-        //    {
-        //        await InvokeAsync(() =>
-        //        {
-        //            PanelVisible = true;
-        //        });
-
-        //        var us = await JsRuntime.GetCookieUserLogin();
-
-        //        userBy = UserLogin.Name;
-
-        //        ShowPresent = false;
-        //        var general = await Mediator.Send(new GetSingleCounterQuery
-        //        {
-        //            Predicate = x => x.Id == CounterId
-        //        });
-        //        var resultService = await Mediator.Send(new GetServiceQuery());
-        //        var physician = await Mediator.Send(new GetUserQuery());
-        //        DataKiosksQueue = await Mediator.Send(new GetKioskQueueQuery());
-        //        ServiceK = resultService.Item1.Where(x => x.IsKiosk == true).ToList();
-        //        var GetClass = await Mediator.Send(new GetClassTypeQuery());
-
-        //        //var cekServicesK = service
-        //        if (general.ServiceId == null && general.PhysicianId == null)
-        //        {
-        //            KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present"))];
-        //        }
-        //        else if (general.ServiceId != null && general.PhysicianId == null)
-        //        {
-        //            KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.ServiceId == general.ServiceId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present"))];
-        //        }
-        //        else if (general.ServiceId == null && general.PhysicianId != null)
-        //        {
-        //            KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.Kiosk.PhysicianId == general.PhysicianId && x.CreatedDate.Value.Date == DateTime.Now.Date && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
-        //        }
-        //        else if (general.ServiceId != null && general.PhysicianId != null)
-        //        {
-        //            KiosksQueue = [.. DataKiosksQueue.Where(x => x.ServiceKId == general.ServiceKId && x.CreatedDate.Value.Date == DateTime.Now.Date && (x.Kiosk.PhysicianId == general.PhysicianId || x.Kiosk.PhysicianId == null) && x.ServiceId == general.ServiceId && x.QueueStage == null || x.QueueStage == "call" || x.QueueStage == "present")];
-        //        }
-        //        foreach (var cl in KiosksQueue)
-        //        {
-        //            var ClassId = KiosksQueue.Where(x => x.ClassTypeId == cl.ClassTypeId).Select(x => x.ClassTypeId).FirstOrDefault();
-        //            var classList = GetClass.Where(x => x.Id == ClassId).FirstOrDefault();
-        //            if (classList == null)
-        //            {
-        //                cl.NameClass = "-";
-        //            }
-        //            else
-        //            {
-        //                cl.NameClass = classList.Name;
-        //            }
-        //        }
-        //        NameCounter = $"Queue Counter {general.Name}";
-
-        //        sId = general.ServiceId;
-        //        var Phys = await Mediator.Send(new GetSingleUserQuery
-        //        {
-        //            Predicate = x => x.Id == general.PhysicianId,
-        //            Select = x => new User
-        //            {
-        //                Id = x.Id,
-        //                Name = x.Name
-        //            }
-        //        });
-
-        //        var skId = general.ServiceKId;
-        //        var servk = await Mediator.Send(new GetSingleServiceQuery
-        //        {
-        //            Predicate = x => x.Id == skId,
-        //            Select = x => new Service
-        //            {
-        //                Id = x.Id,
-        //                Name = x.Name
-        //            }
-        //        });
-        //        NameServicesK = servk.Name ?? "-";
-
-        //        var serv = await Mediator.Send(new GetSingleServiceQuery
-        //        {
-        //            Predicate = x => x.Id == sId,
-        //            Select = x => new Service
-        //            {
-        //                Id = x.Id,
-        //                Name = x.Name
-        //            }
-        //        });
-        //        NameServices = serv.Name ?? "-";
-        //        if (general.PhysicianId is not null)
-        //        {
-        //            PhysicianId = general.PhysicianId;
-        //            Phy = Phys.Name ?? "-";
-        //        }
-        //        await InvokeAsync(() =>
-        //        {
-        //            PanelVisible = false; // Jika diperlukan, panel disembunyikan di sini
-        //            StateHasChanged(); // Memastikan bahwa perubahan UI diterapkan
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(
-        //          "\n" +
-        //          "==================== START ERROR ====================" + "\n" +
-        //          "Message: " + ex.Message + "\n" +
-        //          "Inner Message: " + ex.InnerException?.Message + "\n" +
-        //          "Stack Trace: " + ex.StackTrace + "\n" +
-        //          "==================== END ERROR ====================" + "\n");
-        //    }
-        //}
-
         #endregion Async Data
 
         #region Grid Configuration
@@ -382,6 +269,7 @@ namespace McDermott.Web.Components.Pages.Queue
             try
             {
                 var z = context;
+                
 
                 context.QueueStage = "call";
                 context.QueueStatus = "calling";
@@ -398,7 +286,7 @@ namespace McDermott.Web.Components.Pages.Queue
                     var data = await Mediator.Send(new CreateDetailQueueDisplayRequest(displayDet));
 
                     //await hubConnection.SendAsync("CallPatient", CounterId, context.Id);
-                    await PlayAudioCall(data.NumberQueue ?? 0);
+                    await PlayAudioCall(data.NumberQueue ?? 0, context.ServiceK.Name);
 
                 }
                 var cek = CounterId;
@@ -412,16 +300,16 @@ namespace McDermott.Web.Components.Pages.Queue
             }
         }
 
-        private async Task PlayAudioCall(long queueNumber)
+        private async Task PlayAudioCall(long queueNumber, string counters)
         {
             var queueText = ConvertNumberToIndonesianWords(queueNumber);
             // Menggunakan System.Speech.Synthesis untuk Text-to-Speech (TTS)
             var utterancet = new SpeechSynthesisUtterance
             {
-                Text = $"Nomor Antrian {queueText}",
+                Text = $"Nomor Antrian {queueText}, menuju ke Counter {counters}",
                 Lang = "id-ID", // BCP 47 language tag
-                Pitch = 1.0, // 0.0 ~ 2.0 (Default 1.0)
-                Rate = 0.6, // 0.1 ~ 10.0 (Default 1.0)
+                Pitch = 1.5, // 0.0 ~ 2.0 (Default 1.0)
+                Rate = 0.7, // 0.1 ~ 10.0 (Default 1.0)
                 Volume = 1.0 // 0.0 ~ 1.0 (Default 1.0)
             };
             await this.SpeechSynthesis.SpeakAsync(utterancet);
