@@ -56,10 +56,6 @@ namespace McDermott.Application.Features.Commands.Config
             public Expression<Func<Village, bool>>? Predicate { get; set; }
         }
 
-        public class GetVillageQuerylable : IRequest<IQueryable<Village>>
-        {
-        }
-
         public class GetDistrictsQuery : IRequest<PaginatedList<VillageDto>>
         {
             public int PageNumber { get; set; }

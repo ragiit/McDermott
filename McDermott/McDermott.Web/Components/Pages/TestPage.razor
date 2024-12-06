@@ -1,2 +1,26 @@
 ﻿@page "/test"
 
+
+<h3>Canvas Image Editor (Fabric.js)</h3>
+
+<canvas id="imageCanvas" width="800" height="600" style="border: 1px solid black;"></canvas>
+
+<button @onclick="ClearCanvas">Clear Canvas</button>
+
+
+@code { 
+
+    private async Task ClearCanvas()
+    {
+        await JsRuntime.InvokeVoidAsync("fabricEditor.clearCanvas");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var baseUri = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "images/aciddent.png");
+            await JsRuntime.InvokeVoidAsync("fabricEditor.initCanvas", "http://localhost:5000/image/aciddent.png");
+        }
+    }
+}

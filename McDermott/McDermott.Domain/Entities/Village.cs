@@ -2,10 +2,14 @@
 {
     public partial class Village : BaseAuditableEntity // Kelurahan
     {
-        public long ProvinceId { get; set; }
-        public long CityId { get; set; } // Kabupaten
+        [Required]
+        public long? ProvinceId { get; set; }
 
-        public long DistrictId { get; set; } // Kecamatan
+        [Required]
+        public long? CityId { get; set; } // Kabupaten
+
+        [Required]
+        public long? DistrictId { get; set; } // Kecamatan
 
         [StringLength(200)]
         public string Name { get; set; } = string.Empty; // Kelurahan

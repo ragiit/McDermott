@@ -1,6 +1,7 @@
 ﻿using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.VillageCommand;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {
@@ -10,7 +11,7 @@ namespace McDermott.Application.Features.Queries.Config
         IRequestHandler<ValidateVillageQuery, bool>,
         IRequestHandler<BulkValidateVillageQuery, List<VillageDto>>,
         IRequestHandler<GetVillageQuery2, IQueryable<VillageDto>>,
-        IRequestHandler<GetVillageQuerylable, IQueryable<Village>>,
+        //IRequestHandler<GetVillageQuerylable, IQueryable<VillageDto>>,
         IRequestHandler<GetPagedDataQuery, (List<VillageDto> Data, int TotalCount)>,
         IRequestHandler<CreateVillageRequest, VillageDto>,
         IRequestHandler<CreateListVillageRequest, List<VillageDto>>,
@@ -391,10 +392,23 @@ namespace McDermott.Application.Features.Queries.Config
             return (aa, totalCount);
         }
 
-        public async Task<IQueryable<Village>> Handle(GetVillageQuerylable request, CancellationToken cancellationToken)
-        {
-            return await Task.FromResult(_unitOfWork.Repository<Village>().GetAllQuerylable());
-        }
+        //public async Task<IQueryable<Village>> Handle(GetVillageQuerylable request, CancellationToken cancellationToken)
+        //{
+        //    return await Task.FromResult(_unitOfWork.Repository<Village>().GetAllQuerylable());
+        //}
+
+        //public Task<IQueryable<VillageDto>> Handle(GetVillageQuerylable request, CancellationToken cancellationToken)
+        //{
+        //    var query = _unitOfWork.Repository<Village>()
+        //           .Entities
+        //           .Include(x => x.Province)
+        //           .Include(x => x.City)
+        //           .Include(x => x.District)
+        //           .AsNoTracking()
+        //           .AsQueryable();
+
+        //    return Task.FromResult(query.Adapt<IQueryable<VillageDto>>());
+        //}
 
         public async Task<List<VillageDto>> Handle(BulkValidateVillageQuery request, CancellationToken cancellationToken)
         {
