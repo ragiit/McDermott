@@ -194,6 +194,7 @@
         height: auto;
     }
 
+
 .headerx {
     display: flex;
     flex-wrap: wrap;
@@ -205,63 +206,92 @@
     border-bottom-right-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
-    z-index =1;
 }
 
-    .headerx > * {
-        flex: 1;
-        text-align: center;
-    }
-
-    .headerx .logo {
-        display: flex;
-        justify-content: left;
-        align-items: center;
-    }
-
-        .headerx .logo img {
-            max-height: 50px;
-            width: auto;
-        }
-
-    .headerx .title {
-        flex-direction: column;
-    }
-
-        .headerx .title h1 {
-            font-size: 1.5rem;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .headerx .title h2 {
-            font-size: 1rem;
-            color: #777;
-        }
-
-
-.headerx .days{
-    font-size:1rem;
-    font-weight:bold;
-    color:#0a350a;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-style:normal;
+.headerx > * {
+    flex: 1;
     text-align: center;
+}
 
+.headerx .logo {
+    justify-content: left;
+    align-items: center;
+}
+
+    .headerx .logo img {
+        max-height: 50px;
+        width: auto;
+    }
+
+.headerx .title {
+    flex-direction: column;
+}
+
+    .headerx .title h1 {
+        font-size: 1.5rem;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .headerx .title h2 {
+        font-size: 1rem;
+        color: #777;
+    }
+
+
+.headerx .days {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #0a350a;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-style: normal;
+    text-align: center;
 }
 
 .headerx .time {
     font-size: 2.6rem;
     font-weight: bold;
     color: #2a2a2a;
-    font-family:'Cascadia Code';
+    font-family: 'Cascadia Code';
     font-optical-sizing: auto;
     font-style: normal;
 }
+
+.running-text-wrapper {
+    width: 100%;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border-top: 2px solid #dc3545; /* garis merah di atas */
+}
+
+.running-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 15s linear infinite;
+    font-size: 1.2rem;
+    color: #343a40; /* warna teks */
+    padding: 10px 0;
+}
+
+    .running-text span {
+        padding-left: 100%; /* mulai di luar layar */
+        display: inline-block;
+    }
+
+@keyframes scrollText {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
 .no-gutter {
     --bs-gutter-x: 0;
-    margin-right:0 !important;
-    margin-left:0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
 }
 /* Background Section */
 .cx {
@@ -284,17 +314,67 @@
     }
 /* Media query untuk layar kecil */
 
-.main-content {
-    background-color: #ffffff;
+.custom-card-height {
+    height: 40vh; /* Tinggi card menjadi 30% dari tinggi viewport */
 }
 
-.current-queue {
-    background-color: #ffffff;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    /* Opsional: untuk memastikan card tidak overflow */
+    .custom-card-height .card-body {
+        overflow-y: auto;
+    }
+
+.embed-responsive {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding-top: 56.25%; /* Aspect ratio 16:9 */
 }
+
+.embed-responsive-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+
+.padding-body {
+    padding: 3px !important;
+    border-radius: 6px !important;
+    background: rgba(64, 75, 107, 0.10) !important;
+}
+
+iframe {
+    border-radius: 3px !important
+}
+
+.ticket-number {
+    font-size: 7rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.ticket-arrow {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.ticket-text {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.text-number-footer {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
 
 @media (max-width: 768px) {
 

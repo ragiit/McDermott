@@ -117,6 +117,7 @@
                     OrderByList =
                     [
                         (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
+                        (x => x.Reference, true),               // OrderByDescending RegistrationDate
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
                         (x => x.ClassType != null, true)               // ThenByDescending ClassType is not null
                     ],

@@ -9,7 +9,6 @@ namespace McDermott.Application.Dtos.Queue
 
         [Required]
         public string Name { get; set; }
-
         public bool IsActive { get; set; }
         public long? ServiceId { get; set; }
         public long? ServiceKId { get; set; }

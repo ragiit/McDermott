@@ -78,6 +78,8 @@ namespace McDermott.Application.Dtos.Config
         public string? SipNo { get; set; }
 
         public string? SipFile { get; set; }
+        public string? SipFileContentType { get; set; }
+        public byte[] SipFileContent { get; set; } = [];
         public DateTime? SipExp { get; set; }
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }
@@ -300,6 +302,7 @@ namespace McDermott.Application.Dtos.Config
         public string? SipNo { get; set; }
 
         public string? SipFile { get; set; }
+        public byte[] SipFileContent { get; set; } = [];
         public DateTime? SipExp { get; set; }
         public string? StrNo { get; set; }
         public string? StrFile { get; set; }

@@ -6,6 +6,7 @@ using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;
+using Project = McDermott.Domain.Entities.Project;
 
 namespace McDermott.Web.Extentions
 {
@@ -312,7 +313,7 @@ namespace McDermott.Web.Extentions
                 var result = (await mediator.Send(new GetLocationQuery
                 {
                     Predicate = predicate as Expression<Func<Locations, bool>> ?? (x => true),
-                    Select = x => new Locations
+                    Select = select is null ? x => new Locations
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -321,7 +322,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.ParentLocation == null ? "" : x.ParentLocation.Name,
                         }
-                    },
+                    } : select as Expression<Func<Locations, Locations>>,
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
                 })).Item1;
@@ -411,6 +412,24 @@ namespace McDermott.Web.Extentions
                 return ((List<TDto>)(object)result);
             }
 
+            if (typeof(TDto) == typeof(ProjectDto))
+            {
+                var result = (await mediator.Send(new GetProjectQuery
+                {
+                    Predicate = predicate as Expression<Func<Project, bool>> ?? (x => true),
+                    Select = select is null ? x => new Project
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code,
+                    } : select as Expression<Func<Project, Project>>,
+                    SearchTerm = searchTerm,
+                    PageSize = PAGE_SIZE,
+                })).Item1;
+
+                return ((List<TDto>)(object)result);
+            }
+
             if (typeof(TDto) == typeof(NursingDiagnosesDto))
             {
                 var result = (await mediator.Send(new GetNursingDiagnosesQuery
@@ -439,6 +458,10 @@ namespace McDermott.Web.Extentions
                         Id = x.Id,
                         Name = x.Name,
                         Code = x.Code,
+                        CronisCategory = new CronisCategory
+                        {
+                            Name = x.CronisCategory == null ? "-" : x.CronisCategory.Name,
+                        }
                     } : select as Expression<Func<Diagnosis, Diagnosis>>,
                     SearchTerm = searchTerm,
                     PageSize = PAGE_SIZE,
@@ -460,6 +483,7 @@ namespace McDermott.Web.Extentions
                         {
                             Name = x.Insurance == null ? "" : x.Insurance.Name,
                         },
+                        NoKartu = x.NoKartu,
                         PstPrb = x.PstPrb,
                         PstProl = x.PstProl
                     } : select as Expression<Func<InsurancePolicy, InsurancePolicy>>,

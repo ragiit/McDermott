@@ -980,11 +980,17 @@ namespace McDermott.Application.Features.Queries.Transaction
             entity.RiskOfFallingDetail = dto.RiskOfFallingDetail;
             entity.IsClaim = dto.IsClaim;
             entity.BMHP = dto.BMHP;
+            entity.PratitionerId = dto.PratitionerId;
+            entity.HomeStatus = dto.HomeStatus;
+            entity.KdPrognosa = dto.KdPrognosa;
 
             SetPropertiesModified(entity, nameof(entity.InformationFrom), nameof(entity.AwarenessId), nameof(entity.LocationId), nameof(entity.Weight),
                 nameof(entity.Height), nameof(entity.RR), nameof(entity.SpO2), nameof(entity.WaistCircumference),
-                 nameof(entity.LILA),
-                 nameof(entity.BMHP),
+                nameof(entity.LILA),
+                nameof(entity.HomeStatus),
+                nameof(entity.KdPrognosa),
+                nameof(entity.PratitionerId),
+                nameof(entity.BMHP),
                 nameof(entity.BMIIndex), nameof(entity.BMIIndexString), nameof(entity.ScrinningTriageScale), nameof(entity.ClinicVisitTypes),
                 nameof(entity.E), nameof(entity.V), nameof(entity.M), nameof(entity.Temp), nameof(entity.HR),
                 nameof(entity.Systolic), nameof(entity.DiastolicBP), nameof(entity.PainScale), nameof(entity.BMIState), nameof(entity.IsClaim),
@@ -1012,7 +1018,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.ReferVerticalSpesialisParentSubSpesialisName = dto.ReferVerticalSpesialisParentSubSpesialisName;
                 entity.ReferVerticalSpesialisParentSubSpesialisCode = dto.ReferVerticalSpesialisParentSubSpesialisCode;
                 entity.ReferReason = dto.ReferReason;
-                entity.TypeClaim = dto.TypeClaim; 
+                entity.TypeClaim = dto.TypeClaim;
                 entity.CategoryRJMCINT = dto.CategoryRJMCINT;
                 entity.DateRJMCINT = dto.DateRJMCINT;
                 entity.Hospital = dto.Hospital;
@@ -1023,7 +1029,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                 entity.TempDiagnosis = dto.TempDiagnosis;
                 entity.TherapyProvide = dto.TherapyProvide;
                 entity.InpatientClass = dto.InpatientClass;
-
 
                 SetPropertiesModified(entity,
                     nameof(entity.VisitNumber),
@@ -1056,7 +1061,7 @@ namespace McDermott.Application.Features.Queries.Transaction
             else
             {
                 entity.VisitNumber = dto.VisitNumber;
-                entity.ReferralNo = dto.ReferralNo; 
+                entity.ReferralNo = dto.ReferralNo;
                 entity.LocationId = dto.LocationId;
                 entity.PratitionerId = dto.PratitionerId;
                 entity.HomeStatus = dto.HomeStatus;
@@ -1073,16 +1078,16 @@ namespace McDermott.Application.Features.Queries.Transaction
 
                 UpdateNurseStationFields(entity, dto); // Including NurseStation fields
 
-                SetPropertiesModified(entity, 
-                    nameof(entity.VisitNumber), 
-                    nameof(entity.PratitionerId), 
-                    nameof(entity.HomeStatus), 
+                SetPropertiesModified(entity,
+                    nameof(entity.VisitNumber),
+                    nameof(entity.PratitionerId),
+                    nameof(entity.HomeStatus),
                     nameof(entity.IsSickLeave),
                     nameof(entity.ReferralNo),
                     nameof(entity.LocationId),
                     nameof(entity.Anamnesa),
                     nameof(entity.BMHP),
-                    nameof(entity.KdPrognosa), 
+                    nameof(entity.KdPrognosa),
                     nameof(entity.ReferReason),
                     nameof(entity.StartDateSickLeave),
                     nameof(entity.EndDateSickLeave), nameof(entity.IsMaternityLeave),
@@ -1387,7 +1392,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                     entity.RiskOfFallingDetail = request.GeneralConsultanServiceDto.RiskOfFallingDetail;
                     entity.IsClaim = request.GeneralConsultanServiceDto.IsClaim;
                     entity.BMHP = request.GeneralConsultanServiceDto.BMHP;
-                    entity.KdPrognosa = request.GeneralConsultanServiceDto.KdPrognosa; 
+                    entity.KdPrognosa = request.GeneralConsultanServiceDto.KdPrognosa;
 
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.BMHP));
                     _unitOfWork.Repository<GeneralConsultanService>().SetPropertyModified(entity, nameof(entity.KdPrognosa));

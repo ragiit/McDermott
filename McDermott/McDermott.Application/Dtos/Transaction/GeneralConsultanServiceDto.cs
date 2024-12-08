@@ -136,18 +136,19 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsMaternity { get; set; }
 
         #region Rujukan
+
         public string? ReferralNo { get; set; } // No. Rujukan
         public string? SerialNo { get; set; }  // Dari Kiosk
         public string? VisitNumber { get; set; } // NO Kunjungan
         public string? ReferDiagnosisKd { get; set; } // Diagnosis
         public string? ReferDiagnosisNm { get; set; } // Diagnosis
         public bool? IsReferDiagnosisNonSpesialis { get; set; }  // Diagnosis
-        public string? ReferVerticalKhususCategoryName { get; set; } 
-        public string? ReferVerticalKhususCategoryCode { get; set; } 
+        public string? ReferVerticalKhususCategoryName { get; set; }
+        public string? ReferVerticalKhususCategoryCode { get; set; }
         public DateTime? ReferSelectFaskesDate { get; set; } // Date ketika select faskes, ada di print bagian "Salam sejawat,"
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         public string? PracticeScheduleTimeDate { get; set; } // Jadwal Praktek
-        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan, 
+        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan,
         public string? ReferVerticalSpesialisParentSpesialisName { get; set; } // ANAK
         public string? ReferVerticalSpesialisParentSpesialisCode { get; set; } // ANA
         public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; } // Anak
@@ -161,7 +162,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? PPKRujukanName { get; set; } = "-"; // nmppk , RS CHARIS MEDIKA
         public string? PPKRujukanCode { get; set; } // kdppk, 0070R018
 
-        #endregion
+        #endregion Rujukan
 
         #region Clinical Assesment
 
@@ -349,7 +350,7 @@ namespace McDermott.Application.Dtos.Transaction
             // Validation for Return Status field
             RuleFor(x => x.HomeStatus)
                 .NotEmpty().WithMessage("Return Status is required")
-                .When(x => x.Status.Equals(EnumStatusGeneralConsultantService.Physician) && string.IsNullOrEmpty(x.ReferTo));
+                .When(x => (x.Status.Equals(EnumStatusGeneralConsultantService.Physician) || x.Status.Equals(EnumStatusGeneralConsultantService.Midwife)) && string.IsNullOrEmpty(x.ReferTo));
 
             // Optional: If IsAlertInformationSpecialCase needs to be validated
             RuleFor(x => x.IsAlertInformationSpecialCase)
@@ -502,8 +503,10 @@ namespace McDermott.Application.Dtos.Transaction
         public bool IsWeather { get; set; } = false;
         public bool IsPharmacology { get; set; } = false;
         public bool IsFood { get; set; } = false;
-        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow; 
+        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
+
         #region Rujukan
+
         public string? ReferralNo { get; set; } // No. Rujukan
         public string? SerialNo { get; set; }  // Dari Kiosk
         public string? VisitNumber { get; set; } // NO Kunjungan
@@ -515,7 +518,7 @@ namespace McDermott.Application.Dtos.Transaction
         public DateTime? ReferSelectFaskesDate { get; set; } // Date ketika select faskes, ada di print bagian "Salam sejawat,"
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         public string? PracticeScheduleTimeDate { get; set; } // Jadwal Praktek
-        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan, 
+        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan,
         public string? ReferVerticalSpesialisParentSpesialisName { get; set; } // ANAK
         public string? ReferVerticalSpesialisParentSpesialisCode { get; set; } // ANA
         public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; } // Anak
@@ -529,7 +532,7 @@ namespace McDermott.Application.Dtos.Transaction
         public string? PPKRujukanName { get; set; } = "-"; // nmppk , RS CHARIS MEDIKA
         public string? PPKRujukanCode { get; set; } // kdppk, 0070R018
 
-        #endregion
+        #endregion Rujukan
 
         public string? LinkMeet { get; set; } //telemedic
 

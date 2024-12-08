@@ -20,9 +20,11 @@ using McDermott.Web.Components.Pages.Reports;
 using McDermott.Web.Extentions;
 using MediatR;
 using Microsoft.AspNetCore.Components.Web;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol.Plugins;
 using QuestPDF.Fluent;
 using System.Linq.Expressions;
+using static DevExpress.Xpo.Helpers.AssociatedCollectionCriteriaHelper;
 using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
@@ -82,6 +84,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         private IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
+        private IEnumerable<AllergyDto> SelectedFoodAOnInputNursingDiagnosesllergies { get; set; } = [];
         private IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
 
         private string FormUrl = "clinic-service/general-consultation-services";
@@ -98,174 +101,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private GeneralConsultanMedicalSupportDto GeneralConsultanMedicalSupport { get; set; } = new();
 
         #endregion Binding
-
-        #region CPPT
-
-        private IGrid GridCppt { get; set; }
-        private IGrid GridClaim { get; set; }
-        private IReadOnlyList<object> SelectedDataItemsCPPT { get; set; } = [];
-        private IReadOnlyList<object> SelectedDataItemsClaim { get; set; } = [];
-
-        private int FocusedGridTabCPPTRowVisibleIndex { get; set; }
-        private int FocusedGridTabClaimRowVisibleIndex { get; set; }
-        private List<DiagnosisDto> Diagnoses = [];
-        private List<GeneralConsultanCPPTDto> GeneralConsultanCPPTs = [];
-        private List<NursingDiagnosesDto> NursingDiagnoses = [];
-
-        private async Task NewItemCPPT_Click()
-        {
-            await GridCppt.StartEditNewRowAsync();
-        }
-
-        private async Task RefreshCPPT_Click()
-        {
-            await LoadDataCPPT();
-        }
-
-        #region Searching
-
-        private int pageSizeGridCPPT { get; set; } = 10;
-        private int totalCountGridCPPT = 0;
-        private int activePageIndexTotalCountGridCPPT { get; set; } = 0;
-        private string searchTermGridCPPT { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChangedGridCPPT(string searchText)
-        {
-            searchTermGridCPPT = searchText;
-            await LoadDataCPPT(0, pageSizeGridCPPT);
-        }
-
-        private async Task OnpageSizeGridCPPTIndexChangedGridCPPT(int newpageSizeGridCPPT)
-        {
-            pageSizeGridCPPT = newpageSizeGridCPPT;
-            await LoadDataCPPT(0, newpageSizeGridCPPT);
-        }
-
-        private async Task OnPageIndexChangedGridCPPT(int newPageIndex)
-        {
-            await LoadDataCPPT(newPageIndex, pageSizeGridCPPT);
-        }
-
-        #endregion Searching
-
-        private async Task LoadDataCPPT(int pageIndex = 0, int pageSizeGridCPPT = 10)
-        {
-            try
-            {
-                PanelVisible = true;
-                SelectedDataItemsCPPT = [];
-                var ab = await Mediator.Send(new GetGeneralConsultanCPPTsQuery
-                {
-                    SearchTerm = searchTermGridCPPT ?? "",
-                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id
-                });
-                GeneralConsultanCPPTs = ab.Item1;
-                totalCountGridCPPT = ab.PageCount;
-                activePageIndexTotalCountGridCPPT = pageIndex;
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        private async Task EditItemCPPT_Click()
-        {
-            try
-            {
-                PanelVisible = true;
-                await GridCppt.StartEditRowAsync(FocusedGridTabCPPTRowVisibleIndex);
-
-                var a = (GridCppt.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPTDto ?? new());
-                NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery
-                {
-                    Predicate = x => x.Id == a.NursingDiagnosesId
-                })).Item1;
-                Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
-                {
-                    Predicate = x => x.Id == a.DiagnosisId
-                })).Item1;
-
-                PanelVisible = false;
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        private void DeleteItemCPPT_Click()
-        {
-            GridCppt.ShowRowDeleteConfirmation(FocusedGridTabCPPTRowVisibleIndex);
-        }
-
-        private void GridCPPT_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedGridTabCPPTRowVisibleIndex = args.VisibleIndex;
-        }
-
-        private void GridTabCPPT_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
-        {
-            FocusedGridTabCPPTRowVisibleIndex = args.VisibleIndex;
-        }
-
-        private async Task OnSaveCPPT(GridEditModelSavingEventArgs e)
-        {
-            try
-            {
-                PanelVisible = true;
-
-                var editModel = (GeneralConsultanCPPTDto)e.EditModel;
-
-                editModel.GeneralConsultanServiceId = GeneralConsultanService.Id;
-
-                editModel.Planning = $"{editModel.MedicationTherapy} {editModel.NonMedicationTherapy}";
-
-                if (editModel.Id == 0)
-                {
-                    await Mediator.Send(new CreateGeneralConsultanCPPTRequest(editModel));
-                }
-                else
-                {
-                    await Mediator.Send(new UpdateGeneralConsultanCPPTRequest(editModel));
-                }
-
-                await LoadDataCPPT(activePageIndexTotalCountGridCPPT, pageSizeGridCPPT);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        private async Task OnDeleteCPPT(GridDataItemDeletingEventArgs e)
-        {
-            try
-            {
-                PanelVisible = true;
-                if (SelectedDataItemsCPPT.Count == 0)
-                {
-                    await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(((GeneralConsultanCPPTDto)e.DataItem).Id));
-                }
-                else
-                {
-                    var selectedGeneralConsultanCPPTs = SelectedDataItemsCPPT.Adapt<List<GeneralConsultanCPPTDto>>();
-                    await Mediator.Send(new DeleteGeneralConsultanCPPTRequest(ids: selectedGeneralConsultanCPPTs.Select(x => x.Id).ToList()));
-                }
-
-                await LoadDataCPPT(activePageIndexTotalCountGridCPPT, pageSizeGridCPPT);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        #endregion CPPT
 
         #region Claim User
 
@@ -825,6 +660,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         NoRm = x.Patient == null ? string.Empty : x.Patient.NoRm,
                         NoId = x.Patient == null ? string.Empty : x.Patient.NoId,
                         CurrentMobile = x.Patient == null ? string.Empty : x.Patient.CurrentMobile,
+                        OccupationalId = x.Patient == null ? null : x.Patient.OccupationalId,
                         DateOfBirth = x.Patient == null ? null : x.Patient.DateOfBirth,
 
                         IsWeatherPatientAllergyIds = x.Patient != null && x.Patient.IsWeatherPatientAllergyIds,
@@ -863,6 +699,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     TypeRegistration = x.TypeRegistration,
 
                     InformationFrom = x.InformationFrom,
+                    ClinicVisitTypes = x.ClinicVisitTypes,
                     AwarenessId = x.AwarenessId,
                     Weight = x.Weight,
                     Height = x.Height,
@@ -906,7 +743,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                     ReferDateVisit = x.ReferDateVisit,
                     ReferralNo = x.ReferralNo,
-                    ReferVerticalSpesialisParentSubSpesialisCode = x.ReferVerticalSpesialisParentSubSpesialisCode
+                    ReferVerticalSpesialisParentSubSpesialisCode = x.ReferVerticalSpesialisParentSubSpesialisCode,
                 }
             });
 
@@ -1015,7 +852,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                     case EnumStatusGeneralConsultantService.Finished:
                         StagingText = EnumStatusGeneralConsultantService.Finished;
-                        GeneralConsultanCPPTs = await Mediator.Send(new GetGeneralConsultanCPPTQuery(x => x.GeneralConsultanServiceId == GeneralConsultanService.Id));
                         break;
 
                     case EnumStatusGeneralConsultantService.Canceled:
@@ -1086,71 +922,15 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             Awareness = await Mediator.Send(new GetAwarenessQuery());
         }
 
-        private async Task OnClickTabCPPT()
-        {
-            await LoadDataCPPT();
+        private IGrid GridClaim { get; set; }
 
-            if (IsStatus(EnumStatusGeneralConsultantService.NurseStation) || IsStatus(EnumStatusGeneralConsultantService.Physician))
-            {
-                await LoadDataNursingDiagnoses();
-                await LoadDataDiagnoses();
-            }
-        }
-
-
-        #region ComboBox NursingDiagnoses
-
-        private NursingDiagnosesDto SelectedNursingDiagnoses { get; set; } = new();
-        async Task SelectedItemChanged(NursingDiagnosesDto e)
-        {
-            if (e is null)
-            {
-                SelectedNursingDiagnoses = new();
-                await LoadDataNursingDiagnoses();
-            }
-            else
-                SelectedNursingDiagnoses = e;
-        }
-
-        private CancellationTokenSource? _ctsNursingDiagnoses;
-        private async Task OnInputNursingDiagnoses(Microsoft.AspNetCore.Components.ChangeEventArgs e)
-        {
-            try
-            {
-                _ctsNursingDiagnoses?.Cancel();
-                _ctsNursingDiagnoses?.Dispose();
-                _ctsNursingDiagnoses = new CancellationTokenSource();
-
-                await Task.Delay(Helper.CBX_DELAY, _ctsNursingDiagnoses.Token);
-
-                await LoadDataNursingDiagnoses(e.Value?.ToString() ?? "");
-            }
-            finally
-            {
-                _ctsNursingDiagnoses?.Dispose();
-                _ctsNursingDiagnoses = null;
-            }
-        }
-
-        private async Task LoadDataNursingDiagnoses(string? e = "", Expression<Func<NursingDiagnoses, bool>>? predicate = null)
-        {
-            try
-            {
-                NursingDiagnoses = await Mediator.QueryGetComboBox<NursingDiagnoses, NursingDiagnosesDto>(e, predicate);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        #endregion
+        private IReadOnlyList<object> SelectedDataItemsClaim { get; set; } = [];
 
         #region ComboBox InsurancePolicy
 
         private InsurancePolicyDto SelectedInsurancePolicy { get; set; } = new();
-        async Task SelectedItemChanged(InsurancePolicyDto e)
+
+        private async Task SelectedItemChanged(InsurancePolicyDto e)
         {
             if (e is null)
             {
@@ -1162,6 +942,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private CancellationTokenSource? _ctsInsurancePolicy;
+
         private async Task OnInputInsurancePolicy(ChangeEventArgs e)
         {
             try
@@ -1211,8 +992,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion
-
+        #endregion ComboBox InsurancePolicy
 
         private void OnSelectRiskOfFalling(string e)
         {
@@ -1237,60 +1017,9 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
         }
 
-        #region ComboBox Diagnosis
-
-        private DiagnosisDto SelectedDiagnosis { get; set; } = new();
-        async Task SelectedItemChanged(DiagnosisDto e)
-        {
-            if (e is null)
-            {
-                SelectedDiagnosis = new();
-                await LoadDataDiagnoses();
-            }
-            else
-                SelectedDiagnosis = e;
-        }
-
-        private CancellationTokenSource? _ctsDiagnosis;
-        private async Task OnInputDiagnosis(Microsoft.AspNetCore.Components.ChangeEventArgs e)
-        {
-            try
-            {
-                _ctsDiagnosis?.Cancel();
-                _ctsDiagnosis?.Dispose();
-                _ctsDiagnosis = new CancellationTokenSource();
-
-                await Task.Delay(Helper.CBX_DELAY, _ctsDiagnosis.Token);
-
-                await LoadDataDiagnoses(e.Value?.ToString() ?? "");
-            }
-            finally
-            {
-                _ctsDiagnosis?.Dispose();
-                _ctsDiagnosis = null;
-            }
-        }
-
-        private async Task LoadDataDiagnoses(string? e = "", Expression<Func<Diagnosis, bool>>? predicate = null)
-        {
-            try
-            {
-                Diagnoses = await Mediator.QueryGetComboBox<Diagnosis, DiagnosisDto>(e, predicate);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
-        }
-
-        #endregion
-
-
         #region ComboBox Patient
 
-        private UserDto SelectedPatient { get; set; } = new();
-        async Task SelectedItemChanged(UserDto e)
+        private async Task SelectedItemChanged(UserDto e)
         {
             if (e is null)
             {
@@ -1307,12 +1036,12 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 GeneralConsultanService.PatientId = e.Id;
                 GeneralConsultanService.Patient = e;
                 UserForm = e;
-                await LoadPatient();
                 await LoadDataInsurancePolicy();
             }
         }
 
         private CancellationTokenSource? _ctsPatient;
+
         private async Task OnInputPatient(ChangeEventArgs e)
         {
             try
@@ -1373,7 +1102,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Patient
 
         private void SelectedDateMaternityChanged(DateTime? e)
         {
@@ -1389,7 +1118,8 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         #region ComboBox Service
 
         private ServiceDto SelectedService { get; set; } = new();
-        async Task SelectedItemChanged(ServiceDto e)
+
+        private async Task SelectedItemChanged(ServiceDto e)
         {
             if (e is null)
             {
@@ -1405,6 +1135,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private CancellationTokenSource? _ctsService;
+
         private async Task OnInputService(ChangeEventArgs e)
         {
             try
@@ -1438,12 +1169,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Service
 
         #region ComboBox Physicion
 
         private UserDto SelectedPhysicion { get; set; } = new();
-        async Task SelectedItemChangedPhysicion(UserDto e)
+
+        private async Task SelectedItemChangedPhysicion(UserDto e)
         {
             if (e is null)
             {
@@ -1455,6 +1187,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private CancellationTokenSource? _ctsPhysicion;
+
         private async Task OnInputPhysicion(ChangeEventArgs e)
         {
             try
@@ -1501,7 +1234,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-        #endregion 
+        #endregion ComboBox Physicion
 
         private async Task SelectedItemPaymentChanged(string e)
         {
@@ -1511,23 +1244,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             if (e is null)
                 return;
 
-            InsurancePolicies = (await Mediator.Send(new GetInsurancePolicyQuery
-            {
-                Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == e.Equals("BPJS") && x.Active == true,
-                Select = x => new InsurancePolicy
-                {
-                    Id = x.Id,
-                    Insurance = new Insurance
-                    {
-                        Name = x.Insurance == null ? "" : x.Insurance.Name,
-                    },
-                    NoKartu = x.NoKartu,
-                    KdProviderPstKdProvider = x.KdProviderPstKdProvider,
-                    PolicyNumber = x.PolicyNumber,
-                    PstPrb = x.PstPrb,
-                    PstProl = x.PstProl
-                }
-            })).Item1;
+            await LoadDataInsurancePolicy();
         }
 
         #region OnClick
@@ -1961,12 +1678,29 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     if (GeneralConsultanService.InsurancePolicyId is not null && GeneralConsultanService.InsurancePolicyId != 0 && GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
                     {
-                        var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
+                        //var isSuccessAddKunjungan = await SendPcareRequestKunjungan();
 
-                        if (!isSuccessAddKunjungan)
+                        //if (!isSuccessAddKunjungan)
+                        //{
+                        //    IsLoading = false;
+                        //    return;
+                        //}
+
+                        if (string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                            await SendPcareRequestKunjungan(false);
+
+                        if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
                         {
-                            IsLoading = false;
-                            return;
+                            var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan/rujukan/{GeneralConsultanService.VisitNumber}", HttpMethod.Get);
+                            if (result.Item2 == 200)
+                            {
+                                dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                                GeneralConsultanService.ReferralNo = data.noRujukan;
+                            }
+                            else
+                            {
+                                ToastService.ShowError($"Error when Sending Refferal, {result.Item2}");
+                            }
                         }
                     }
 
@@ -2211,7 +1945,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
         }
 
-        private async Task<bool> SendPcareRequestKunjungan()
+        private async Task<bool> SendPcareRequestKunjungan(bool? isSave = false)
         {
             if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
             {
@@ -2244,30 +1978,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     return false;
                 }
 
-                //if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.NurseStation))
-                //{
-                //    if (GeneralConsultanCPPTs.Count > 0)
-                //    {
-                //        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
-                //        if (g is not null)
-                //        {
-                //            diag1 = NursingDiagnoses.FirstOrDefault(x => x.Problem.Equals(g.Body))!.Code ?? null!;
-                //        }
-                //    }
-                //}
-
-                //if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Physician))
-                //{
-                //    if (GeneralConsultanCPPTs.Count > 0)
-                //    {
-                //        var g = GeneralConsultanCPPTs.LastOrDefault(x => x.Title.Equals("Diagnosis"));
-                //        if (g is not null)
-                //        {
-                //            diag1 = Diagnoses.FirstOrDefault(x => x.Name.Equals(g.Body))!.Code ?? null!;
-                //        }
-                //    }
-                //}
-
                 var statusTemp = Helper._homeStatusTemps.FirstOrDefault(x => x.Code == GeneralConsultanService.HomeStatus);
 
                 if (statusTemp is null)
@@ -2283,7 +1993,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     kunj = new KunjunganRequest
                     {
                         NoKunjungan = GeneralConsultanService.VisitNumber ?? string.Empty,
-                        NoKartu = ins.NoKartu ?? "",
+                        NoKartu = ins.PolicyNumber ?? "",
                         TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
                         KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
                         Keluhan = g.Subjective ?? "",
@@ -2323,44 +2033,55 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         Bmhp = GeneralConsultanService.BMHP ?? "",
                         Suhu = "36",
                     };
-                }
+                    Console.WriteLine(JsonConvert.SerializeObject(kunj, (Newtonsoft.Json.Formatting)System.Xml.Formatting.Indented));
 
-                Console.WriteLine(JsonConvert.SerializeObject(kunj, (Newtonsoft.Json.Formatting)System.Xml.Formatting.Indented));
+                    var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
 
-                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
+                    if (responseApi.Item2 != 201)
+                    {
+                        var json = JObject.Parse(responseApi.Item1.ToString());
+                        string message = json["message"]?.ToString() ?? "Error When sending PCare 'Kunjungan'";
 
-                if (responseApi.Item2 != 201)
-                {
-                    ToastService.ShowError($"{responseApi.Item1}");
+                        ToastService.ShowError(message);
 
-                    IsLoading = false;
-                    return false;
+                        return false;
+
+                        IsLoading = false;
+                        return false;
+                    }
+                    else
+                    {
+                        if (responseApi.Item1 is not null)
+                        {
+                            dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                            var dynamicList = (IEnumerable<dynamic>)data;
+
+                            var xz = dynamicList.Select(item => new
+                            {
+                                message = item.message
+                            }).ToList();
+
+                            GeneralConsultanService.VisitNumber = xz[0].message;
+
+                            if (!Convert.ToBoolean(isSave))
+                                return true;
+
+                            var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                            {
+                                GeneralConsultanServiceDto = GeneralConsultanService,
+                                Status = EnumStatusGeneralConsultantService.Physician,
+                                IsReferTo = false
+                            };
+
+                            await Mediator.Send(updateRequest);
+                            Id = GeneralConsultanService.Id;
+                            GeneralConsultanService = await GetGeneralConsultanServiceById();
+                        }
+                    }
                 }
                 else
                 {
-                    if (responseApi.Item1 is not null)
-                    {
-                        dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
-                        var dynamicList = (IEnumerable<dynamic>)data;
-
-                        var xz = dynamicList.Select(item => new
-                        {
-                            message = item.message
-                        }).ToList();
-
-                        GeneralConsultanService.VisitNumber = xz[0].message;
-
-                        var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
-                        {
-                            GeneralConsultanServiceDto = GeneralConsultanService,
-                            Status = EnumStatusGeneralConsultantService.Physician,
-                            IsReferTo = false
-                        };
-
-                        await Mediator.Send(updateRequest);
-                        Id = GeneralConsultanService.Id;
-                        GeneralConsultanService = await GetGeneralConsultanServiceById();
-                    }
+                    ToastService.ShowInfo("Please select 'Rujuk Vertical' in the Discharge Plan field when sending a Referral.");
                 }
             }
 
@@ -2368,6 +2089,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private bool IsLoadingSendReferral = false;
+
         private async Task OnClickSendRefferal()
         {
             try
@@ -2419,6 +2141,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 e.HandleException(ToastService);
             }
         }
+
         private async Task<bool> SendPcareRequestRegistration()
         {
             if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
@@ -2434,7 +2157,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     kdProviderPeserta = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId)?.KdProviderPstKdProvider ?? "",
                     tglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
-                    noKartu = ins.NoKartu ?? "",
+                    noKartu = ins.PolicyNumber ?? "",
                     kdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
                     keluhan = null,
                     kunjSakit = true,
@@ -2533,9 +2256,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             IsReferTo = true;
         }
 
-        private void HandleClosePopupReferTo()
+        private async Task HandleClosePopupReferTo()
         {
             IsReferTo = false; // Tutup popup
+
+            await LoadData();
         }
 
         private void OnAppoimentPopUpClick()
@@ -2711,10 +2436,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             finally { PanelVisible = false; }
         }
 
-
         #region Print Rujukan BPJS
-        DxReportViewer reportViewerRujukanBPJS { get; set; }
-        IReport ReportRujukanBPJS { get; set; }
+
+        private DxReportViewer reportViewerRujukanBPJS { get; set; }
+        private IReport ReportRujukanBPJS { get; set; }
         private bool IsPrintRujukanBPJS = false;
 
         private async Task OnPrintRujukanBPJS()
@@ -2791,25 +2516,27 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 myReport.xrLabelDokter.Text = gx.Pratitioner?.Name ?? "-";
 
                 if (!string.IsNullOrWhiteSpace(gx.ReferralNo))
-                { 
+                {
                     myReport.xrBarCode1.Text = gx.ReferralNo;
                     myReport.xrBarCode1.ShowText = false;
                 }
+                else
+                    myReport.xrBarCode1.Visible = false;
 
                 ReportRujukanBPJS = myReport;
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
-        #endregion
 
+        #endregion Print Rujukan BPJS
 
         #region Print Rujukan BPJS + PRB
-        DxReportViewer reportViewerRujukanBPJSPRB { get; set; }
-        IReport ReportRujukanBPJSPRB { get; set; }
+
+        private DxReportViewer reportViewerRujukanBPJSPRB { get; set; }
+        private IReport ReportRujukanBPJSPRB { get; set; }
         private bool IsPrintRujukanBPJSPRB = false;
 
         private async Task OnPrintRujukanBPJSPRB()
@@ -2817,7 +2544,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             await LoadPrintRujukanBPJSPPRB();
             IsPrintRujukanBPJSPRB = true;
         }
-         
+
         private async Task LoadPrintRujukanBPJSPPRB()
         {
             try
@@ -2889,7 +2616,9 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     myReport.xrBarCode1.Text = gx.ReferralNo;
                     myReport.xrBarCode1.ShowText = false;
-                } 
+                }
+                else
+                    myReport.xrBarCode1.Visible = false;
 
                 myReport.xrLabelRujukanBalikName.Text = gx.Patient?.Name ?? "-";
 
@@ -2897,7 +2626,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -3324,23 +3052,23 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
         #endregion Searching
 
-
         private bool IsLoadingRJMCINT { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItemsRMC { get; set; } = [];
         private int FocusedRowVisibleRMCIndex { get; set; }
         private IGrid GridRMC;
         private List<GCReferToInternalDto> GcRefer { get; set; } = [];
+
         private async Task OnClickReferToMCINT()
         {
             await LoadDataRefertoMC();
         }
+
         private async Task LoadDataRefertoMC(int pageSize = 0, int pageIndex = 10)
         {
             IsLoadingRJMCINT = true;
             var gcs = await Mediator.Send(new GetGCReferToInternalQuery
             {
                 Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id
-
             });
             GcRefer = gcs.Item1;
             totalCountRMC = gcs.PageCount;
@@ -3388,13 +3116,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private void GridRCM_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleRMCIndex = args.VisibleIndex;
-
         }
 
         private async Task RefreshReferToMc_Click()
         {
             await LoadDataRefertoMC();
         }
-        #endregion
+
+        #endregion ReferToMC
     }
 }

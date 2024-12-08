@@ -1,4 +1,5 @@
 ﻿using McDermott.Domain.Entities;
+using static McDermott.Application.Features.Commands.Patient.DiseaseHistoryCommand;
 
 namespace McDermott.Web.Components.Pages.Patient
 {
@@ -78,56 +79,117 @@ namespace McDermott.Web.Components.Pages.Patient
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
+            await LoadData();
+            PanelVisible = false;
         }
 
-        private async Task LoadData()
+        //private async Task LoadData()
+        //{
+        //    PanelVisible = true;
+
+        //    // Load data asynchronously
+        //    getGeneralConsultan = (await Mediator.Send(new GetGeneralConsultanServiceQuery())).Item1;
+        //    getGeneralConsultanCPPT = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
+        //    getDiagnosis = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+
+        //    // Clear the getDisease list before populating it
+        //    getDisease.Clear();
+
+        //    // Iterate through each GeneralConsultanServiceDto
+        //    foreach (var Gc in getGeneralConsultan)
+        //    {
+        //        // Find all CPPT records associated with the current GeneralConsultanServiceDto
+        //        var relatedCppts = getGeneralConsultanCPPT
+        //            .Where(x => x.GeneralConsultanServiceId == Gc.Id && x.Title == "Diagnosis")
+        //            .OrderBy(x => x.CreatedDate)
+        //            .ToList();
+
+        //        // Iterate through each related CPPT record
+        //        foreach (var cppt in relatedCppts)
+        //        {
+        //            // Find the corresponding disease based on the CPPT body and diagnosis name
+        //            var getDataDisease = getDiagnosis
+        //                .Where(x => x.Name == cppt.Body && x.CronisCategoryId is not null)
+        //                .FirstOrDefault();
+
+        //            // Create a new DiseaseDto based on the current data
+        //            var diseases = new DiseaseDto()
+        //            {
+        //                DiseaseName = getDataDisease?.Name ?? "",
+        //                PatientName = Gc.Patient?.Name ?? "Unknown",
+        //                PhycisianName = Gc.Pratitioner?.Name ?? "Unknown",
+        //                DateDisease = cppt.DateTime // Assuming DateTime is a property in CPPT
+        //            };
+
+        //            // Add the DiseaseDto to the list
+        //            getDisease.Add(diseases);
+        //        }
+        //    }
+
+        //    // Reload the grid to reflect the updated data
+        //    Grid.Reload();
+
+        //    // Hide the panel
+        //    PanelVisible = false;
+        //}
+
+        private List<CountryDto> Countries = new();
+        private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
+        private int FocusedRowVisibleIndex { get; set; }
+
+        #region Searching
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
+
+        private async Task OnSearchBoxChanged(string searchText)
         {
-            PanelVisible = true;
+            searchTerm = searchText;
+            await LoadData(0, pageSize);
+        }
 
-            // Load data asynchronously
-            getGeneralConsultan = (await Mediator.Send(new GetGeneralConsultanServiceQuery())).Item1;
-            getGeneralConsultanCPPT = await Mediator.Send(new GetGeneralConsultanCPPTQuery());
-            getDiagnosis = (await Mediator.Send(new GetDiagnosisQuery())).Item1;
+        private async Task OnPageSizeIndexChanged(int newPageSize)
+        {
+            pageSize = newPageSize;
+            await LoadData(0, newPageSize);
+        }
 
-            // Clear the getDisease list before populating it
-            getDisease.Clear();
+        private async Task OnPageIndexChanged(int newPageIndex)
+        {
+            await LoadData(newPageIndex, pageSize);
+        }
 
-            // Iterate through each GeneralConsultanServiceDto
-            foreach (var Gc in getGeneralConsultan)
+        private List<DiseaseHistoryTemp> DiseaseHistories { get; set; } = [];
+
+        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        {
+            try
             {
-                // Find all CPPT records associated with the current GeneralConsultanServiceDto
-                var relatedCppts = getGeneralConsultanCPPT
-                    .Where(x => x.GeneralConsultanServiceId == Gc.Id && x.Title == "Diagnosis")
-                    .OrderBy(x => x.CreatedDate)
-                    .ToList();
-
-                // Iterate through each related CPPT record
-                foreach (var cppt in relatedCppts)
+                PanelVisible = true;
+                var result = await Mediator.Send(new GetDiseaseHistoryQuery
                 {
-                    // Find the corresponding disease based on the CPPT body and diagnosis name
-                    var getDataDisease = getDiagnosis
-                        .Where(x => x.Name == cppt.Body && x.CronisCategoryId is not null)
-                        .FirstOrDefault();
-
-                    // Create a new DiseaseDto based on the current data
-                    var diseases = new DiseaseDto()
-                    {
-                        DiseaseName = getDataDisease?.Name ?? "",
-                        PatientName = Gc.Patient?.Name ?? "Unknown",
-                        PhycisianName = Gc.Pratitioner?.Name ?? "Unknown",
-                        DateDisease = cppt.DateTime // Assuming DateTime is a property in CPPT
-                    };
-
-                    // Add the DiseaseDto to the list
-                    getDisease.Add(diseases);
-                }
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    SearchTerm = searchTerm ?? ""
+                });
+                DiseaseHistories = result.Item1;
+                totalCount = result.PageCount;
+                activePageIndex = pageIndex;
             }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
 
-            // Reload the grid to reflect the updated data
-            Grid.Reload();
+        #endregion Searching
 
-            // Hide the panel
-            PanelVisible = false;
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
         }
     }
 }

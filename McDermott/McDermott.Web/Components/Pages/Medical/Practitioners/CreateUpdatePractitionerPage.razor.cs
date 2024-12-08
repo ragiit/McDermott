@@ -3,6 +3,8 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Application.Features.Services;
 using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
 using System.ComponentModel.DataAnnotations;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
@@ -1655,5 +1657,92 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
         #endregion ComboboxDistrictResidence
 
         #endregion Residence Address
+
+        #region SIP File
+
+        // Unduh file
+        private async Task DownloadFile()
+        {
+            if (UserForm.SipFileContent != null && !string.IsNullOrEmpty(UserForm.SipFile))
+            {
+                var fileBytes = UserForm.SipFileContent;
+                var contentType = UserForm.SipFileContentType;
+                var fileName = UserForm.SipFile;
+
+                // Unduh file menggunakan Blazor download
+                var fileBase64 = Convert.ToBase64String(fileBytes);
+                var href = $"data:{contentType};base64,{fileBase64}";
+
+                await JsRuntime.InvokeVoidAsync("downloadFileNew", href, fileName);
+            }
+        }
+
+        private void RemoveSelectedFile()
+        {
+            UserForm.SipFile = null;
+            UserForm.SipFileContent = [];
+            UserForm.SipFileContentType = null;
+        }
+
+        private async Task SelectFile()
+        {
+            await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+        }
+
+        private async Task HandleFileSelected(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+
+            // Check if the file is a PDF
+            if (file.ContentType != "application/pdf")
+            {
+                ToastService.ShowInfo("Only PDF files are allowed.");
+                return;
+            }
+
+            // Limit file size (example: max 2MB)
+            const long MaxFileSize = 2 * 1024 * 1024;
+            if (file.Size > MaxFileSize)
+            {
+                ToastService.ShowInfo("The file size is too large (maximum is 2MB).");
+                return;
+            }
+
+            try
+            {
+                // Read the file in chunks
+                const int ChunkSize = 64 * 1024; // 64KB per chunk
+                var buffer = new byte[file.Size];
+                long totalBytesRead = 0;
+
+                using var stream = file.OpenReadStream(MaxFileSize);
+                while (totalBytesRead < file.Size)
+                {
+                    // Calculate chunk size to read (last chunk might be smaller)
+                    var bytesToRead = (int)Math.Min(ChunkSize, file.Size - totalBytesRead);
+
+                    // Read the chunk into the buffer
+                    var chunkBuffer = new byte[bytesToRead];
+                    var bytesRead = await stream.ReadAsync(chunkBuffer, 0, bytesToRead);
+
+                    // Copy the chunk into the main buffer
+                    Array.Copy(chunkBuffer, 0, buffer, totalBytesRead, bytesRead);
+                    totalBytesRead += bytesRead;
+                }
+
+                UserForm.SipFile = file.Name;
+                UserForm.SipFileContentType = file.ContentType;
+                UserForm.SipFileContent = buffer;
+
+                ToastService.ShowSuccess($"The file '{file.Name}' has been uploaded successfully.");
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowError($"An error occurred while uploading the file: {ex.Message}");
+            }
+        }
+
+        #endregion SIP File
+
     }
 }

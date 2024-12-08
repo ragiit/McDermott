@@ -6,10 +6,10 @@
     <PageTitle>McHealthCare - Disease History</PageTitle>
  } 
 
-@if (IsAccess)
+@if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
     <div class="wrapper">
-        <BaseHeaderPage Title="Patients" OnClickBack="@(async () => await LoadData())" ShowBackButton="ShowForm" />
+        <BaseHeaderPage Title="Disease History" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
             <div class="container-fluid">
@@ -22,16 +22,82 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="false"
                                             Text="Fetching Data...">
-                                <MyGrid @ref="Grid"
-                                        Data="getDisease">
+                                <MyGridPaginate @ref="Grid"
+                                                Data="DiseaseHistories"
+                                                @bind-SelectedDataItems="@SelectedDataItems" 
+                                                SearchTextChanged="OnSearchBoxChanged"
+                                                FocusedRowChanged="Grid_FocusedRowChanged"
+                                                KeyFieldName="Id">
 
-                                    <Columns>
-                                        <DxGridDataColumn FieldName="PatientName" GroupIndex="0" Caption="Patient" />
-                                        <DxGridDataColumn FieldName="DiseaseName" Caption="Disease" />
-                                        <DxGridDataColumn FieldName="PhycisianName" Caption="Phicisian " />
-                                        <DxGridDataColumn FieldName="DateDisease" DisplayFormat="dd MMMM yyyy" />
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="DiseaseHistoryTemp"
+                                                         Items="@DiseaseHistories"
+                                                         Grid="Grid"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         Refresh_Click="@(async () => await LoadData())"
+                                                         IsImport="false"
+                                                         VisibleNew="false"
+                                                         VisibleEdit="false"
+                                                         VisibleDelete="false" />
+                                    </ToolbarTemplate>
+
+                                    <Columns> 
+                                        <DxGridDataColumn MinWidth="200" FieldName="Id" Visible="false" ShowInColumnChooser="false"/>
+                                        <DxGridDataColumn MinWidth="200" FieldName="Patient" GroupIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Disease" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="CronisCategory" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Physician" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="DiseaseDate"  DisplayFormat="@Helper.DefaultFormatDateTime"/>
+                                        <DxGridDataColumn MinWidth="200" FieldName="Reference"/>
                                     </Columns>
-                                </MyGrid>
+                                    <EditFormTemplate Context="EditFormContext">
+                                        @{
+                                            var a = (CountryDto)EditFormContext.EditModel;
+                                        }
+                                        <DxFormLayout CssClass="w-100">
+                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                                <ValidationMessage For="@(()=> a.Name)"   />
+                                            </DxFormLayoutItem>
+                                            <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Code" ColSpanMd="12">
+                                                <DxTextBox @bind-Text="@a.Code" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Code" />
+                                                <ValidationMessage For="@(()=> a.Code)"   />
+                                            </DxFormLayoutItem>
+                                        </DxFormLayout>
+                                    </EditFormTemplate>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Name"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </MyGridPaginate>
+
+                                <div class="row">
+                                    <DxFormLayout>
+                                        <div class="col-md-9">
+                                            <DxFormLayoutItem>
+                                                <DxPager PageCount="totalCount"
+                                                         ActivePageIndexChanged="OnPageIndexChanged"
+                                                         ActivePageIndex="activePageIndex"
+                                                         VisibleNumericButtonCount="10"
+                                                         SizeMode="SizeMode.Medium"
+                                                         NavigationMode="PagerNavigationMode.Auto">
+                                                </DxPager>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                        <div class="col-md-3 d-flex justify-content-end">
+                                            <DxFormLayoutItem Caption="Page Size:">
+                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
+                                                              NullText="Select Page Size"
+                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
+                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
+                                                              @bind-Value="pageSize">
+                                                </MyDxComboBox>
+                                            </DxFormLayoutItem>
+                                        </div>
+                                    </DxFormLayout>
+                                </div>
                             </DxLoadingPanel>
                         </div>
                     </div>
@@ -39,4 +105,12 @@
             </div>
         </section>
     </div>
+}
+else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)
+{
+    <InvalidPermissionPage />
+}
+else
+{
+    <LoadingIndicatorLayout />
 }

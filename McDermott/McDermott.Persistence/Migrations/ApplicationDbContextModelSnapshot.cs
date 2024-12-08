@@ -6454,6 +6454,13 @@ namespace McDermott.Persistence.Migrations
                     b.Property<string>("SipFile")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("SipFileContent")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("SipFileContentType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SipNo")
                         .HasColumnType("nvarchar(max)");
 

@@ -1,0 +1,381 @@
+﻿@using Newtonsoft.Json.Linq
+@if (GeneralConsultanService.Payment != null && GeneralConsultanService.Payment.Equals("BPJS") && (IsStatus(EnumStatusGeneralConsultantService.Physician) || IsStatus(EnumStatusGeneralConsultantService.Finished) || IsStatus(EnumStatusGeneralConsultantService.Midwife) || IsStatus(EnumStatusGeneralConsultantService.Canceled)))
+{
+    <DxTabPage Text="BPJS Integration">
+        <div class="w-100 mt-2">
+            <div class="card">
+                <div class="card-header">
+                    <span class="fw-bolder">BPJS Integration</span>
+                </div>
+                <div class="card-body">
+                    <div class="row w-100">
+
+                        <div class=" row w-100">
+                            @if (string.IsNullOrWhiteSpace(GeneralConsultanService.ReferralNo))
+                            {
+                                <div class="col-sm align-self-end">
+                                    <div class="row justify-content-end">
+                                        <div class="col-auto">
+                                            <DxButton RenderStyle="ButtonRenderStyle.Success" RenderStyleMode="@ButtonRenderStyleMode.Contained" IconCssClass="fa-solid fa-paper-plane" Text="Send Referral" Click="OnClickSendRefferal"></DxButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-md-12">
+                            <DxFormLayout CssClass="w-100">
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Visit Number" ColSpanMd="6">
+                                    <DxTextBox @bind-Text="@GeneralConsultanService.VisitNumber"
+                                               NullText="Visit Number"
+                                               ReadOnly />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Number" ColSpanMd="6">
+                                    <DxTextBox @bind-Text="@GeneralConsultanService.ReferralNo"
+                                               NullText="Referral No"
+                                               ReadOnly />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PPK Refer" ColSpanMd="6">
+                                    <DxTextBox @bind-Text="@GeneralConsultanService.PPKRujukanName"
+                                               NullText="PPK Refer"
+                                               ReadOnly />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Spesialis/Subspesialis" ColSpanMd="6">
+                                    <DxTextBox Text="@($"{GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName}/{GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisName}")"
+                                               NullText="PPK Refer"
+                                               TextExpression="@(() => GeneralConsultanService.ReferVerticalSpesialisParentSpesialisName)"
+                                               ReadOnly />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Note" ColSpanMd="6">
+                                    <DxTextBox @bind-Text="@GeneralConsultanService.ReferReason"
+                                               NullText="Note"
+                                               ReadOnly />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="6" />
+
+                                <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Refer Date Visit" ColSpanMd="6">
+
+                                    <DxDateEdit @bind-Date="@GeneralConsultanService.ReferDateVisit"
+                                                DisplayFormat="@Helper.DefaultFormatDate"
+                                                NullText="Refer Date Visit"
+                                                ReadOnly />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </DxTabPage>
+}
+
+@code {
+    [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+
+    private bool IsStatus(EnumStatusGeneralConsultantService status) => GeneralConsultanService.Status == status;
+
+    private bool IsLoadingSendReferral = false;
+
+    private async Task OnClickSendRefferal()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+                await SendPcareRequestKunjungan();
+
+            if (!string.IsNullOrWhiteSpace(GeneralConsultanService.VisitNumber))
+            {
+                var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan/rujukan/{GeneralConsultanService.VisitNumber}", HttpMethod.Get);
+                if (result.Item2 == 200)
+                {
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(result.Item1);
+                    GeneralConsultanService.ReferralNo = data.noRujukan;
+
+                    var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                        {
+                            GeneralConsultanServiceDto = GeneralConsultanService,
+                            Status = EnumStatusGeneralConsultantService.Physician,
+                            IsReferTo = false
+                        };
+
+                    await Mediator.Send(updateRequest);
+                    GeneralConsultanService = await GetGeneralConsultanServiceById();
+                }
+                else
+                {
+                    ToastService.ShowError($"Error when Sending Refferal, {result.Item2}");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.HandleException(ToastService);
+        }
+    }
+    private async Task<GeneralConsultanServiceDto> GetGeneralConsultanServiceById()
+    {
+        var result = await Mediator.Send(new GetSingleGeneralConsultanServicesQuery
+            {
+                Predicate = x => x.Id == this.GeneralConsultanService.Id,
+
+                Select = x => new GeneralConsultanService
+                {
+                    Id = x.Id,
+                    Status = x.Status,
+                    PatientId = x.PatientId,
+                    Patient = new User
+                    {
+                        Id = x.PatientId.GetValueOrDefault(),
+                        Name = x.Patient == null ? string.Empty : x.Patient.Name,
+                        NoRm = x.Patient == null ? string.Empty : x.Patient.NoRm,
+                        NoId = x.Patient == null ? string.Empty : x.Patient.NoId,
+                        CurrentMobile = x.Patient == null ? string.Empty : x.Patient.CurrentMobile,
+                        DateOfBirth = x.Patient == null ? null : x.Patient.DateOfBirth,
+
+                        IsWeatherPatientAllergyIds = x.Patient != null && x.Patient.IsWeatherPatientAllergyIds,
+                        IsFoodPatientAllergyIds = x.Patient != null && x.Patient.IsFoodPatientAllergyIds,
+                        IsPharmacologyPatientAllergyIds = x.Patient == null ? false : x.Patient.IsPharmacologyPatientAllergyIds,
+                        WeatherPatientAllergyIds = x.Patient == null ? new() : x.Patient.WeatherPatientAllergyIds,
+                        FoodPatientAllergyIds = x.Patient == null ? new() : x.Patient.FoodPatientAllergyIds,
+                        PharmacologyPatientAllergyIds = x.Patient == null ? new() : x.Patient.PharmacologyPatientAllergyIds,
+
+                        IsFamilyMedicalHistory = x.Patient == null ? string.Empty : x.Patient.IsFamilyMedicalHistory,
+                        FamilyMedicalHistory = x.Patient == null ? string.Empty : x.Patient.FamilyMedicalHistory,
+                        FamilyMedicalHistoryOther = x.Patient == null ? string.Empty : x.Patient.FamilyMedicalHistoryOther,
+
+                        IsMedicationHistory = x.Patient == null ? string.Empty : x.Patient.IsMedicationHistory,
+                        MedicationHistory = x.Patient == null ? string.Empty : x.Patient.MedicationHistory,
+                        PastMedicalHistory = x.Patient == null ? string.Empty : x.Patient.PastMedicalHistory,
+
+                        Gender = x.Patient == null ? string.Empty : x.Patient.Gender
+                    },
+                    PratitionerId = x.PratitionerId,
+                    Pratitioner = new User
+                    {
+                        Name = x.Pratitioner == null ? string.Empty : x.Pratitioner.Name,
+                    },
+                    ServiceId = x.ServiceId,
+                    Service = new Service
+                    {
+                        Name = x.Service == null ? string.Empty : x.Service.Name,
+                    },
+                    Payment = x.Payment,
+                    InsurancePolicyId = x.InsurancePolicyId,
+                    AppointmentDate = x.AppointmentDate,
+                    IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
+                    RegistrationDate = x.RegistrationDate,
+                    ClassType = x.ClassType,
+                    TypeRegistration = x.TypeRegistration,
+
+                    InformationFrom = x.InformationFrom,
+                    ClinicVisitTypes = x.ClinicVisitTypes,
+                    AwarenessId = x.AwarenessId,
+                    Weight = x.Weight,
+                    Height = x.Height,
+                    RR = x.RR,
+                    SpO2 = x.SpO2,
+                    WaistCircumference = x.WaistCircumference,
+                    BMIIndex = x.BMIIndex,
+                    BMIIndexString = x.BMIIndexString,
+                    ScrinningTriageScale = x.ScrinningTriageScale,
+                    E = x.E,
+                    V = x.V,
+                    M = x.M,
+                    Temp = x.Temp,
+                    HR = x.HR,
+                    Systolic = x.Systolic,
+                    DiastolicBP = x.DiastolicBP,
+                    PainScale = x.PainScale,
+                    BMIState = x.BMIState,
+                    RiskOfFalling = x.RiskOfFalling,
+                    RiskOfFallingDetail = x.RiskOfFallingDetail,
+                    Reference = x.Reference,
+                    HomeStatus = x.HomeStatus,
+                    IsSickLeave = x.IsSickLeave,
+                    StartDateSickLeave = x.StartDateSickLeave,
+                    EndDateSickLeave = x.EndDateSickLeave,
+                    IsMaternityLeave = x.IsMaternityLeave,
+                    StartMaternityLeave = x.StartMaternityLeave,
+                    EndMaternityLeave = x.EndMaternityLeave,
+                    IsClaim = x.IsClaim,
+
+                    PPKRujukanCode = x.PPKRujukanCode,
+                    PPKRujukanName = x.PPKRujukanName,
+                    ReferVerticalSpesialisParentSpesialisName = x.ReferVerticalSpesialisParentSpesialisName,
+                    ReferVerticalSpesialisParentSubSpesialisName = x.ReferVerticalSpesialisParentSubSpesialisName,
+                    ReferReason = x.ReferReason,
+                    VisitNumber = x.VisitNumber,
+                    BMHP = x.BMHP,
+                    KdPrognosa = x.KdPrognosa,
+                    Anamnesa = x.Anamnesa,
+                    TypeClaim = x.TypeClaim,
+
+                    ReferDateVisit = x.ReferDateVisit,
+                    ReferralNo = x.ReferralNo,
+                    ReferVerticalSpesialisParentSubSpesialisCode = x.ReferVerticalSpesialisParentSubSpesialisCode
+                }
+            });
+
+        return result;
+    }
+
+    [Parameter] public List<InsurancePolicyDto> InsurancePolicies { get; set; } = [];
+    [Parameter] public List<ServiceDto> Services { get; set; } = [];
+    [Parameter] public List<AwarenessDto> Awareness { get; set; } = [];
+    [Parameter] public List<UserDto> Physicions { get; set; } = [];
+
+    [Parameter] public IEnumerable<AllergyDto> SelectedWeatherAllergies { get; set; } = [];
+    [Parameter] public IEnumerable<AllergyDto> SelectedFoodAllergies { get; set; } = [];
+    [Parameter] public IEnumerable<AllergyDto> SelectedPharmacologyAllergies { get; set; } = [];
+
+    private async Task<bool> SendPcareRequestKunjungan()
+    {
+        if (GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife) && GeneralConsultanService.Payment is not null && GeneralConsultanService.Payment.Equals("BPJS") && GeneralConsultanService.InsurancePolicyId is not null)
+        {
+            var ins = InsurancePolicies.FirstOrDefault(x => x.Id == GeneralConsultanService.InsurancePolicyId);
+            if (ins is null)
+            {
+                ToastService.ShowInfo("Please select the Insurance Policy");
+                return false;
+            }
+
+            var g = (await Mediator.Send(new GetSingleGeneralConsultanCPPTsQuery
+                {
+                    OrderByList =
+                            [
+                                (x => x.CreatedDate, true),
+                    ],
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id,
+                    Select = x => new GeneralConsultanCPPT
+                    {
+                        Diagnosis = new Diagnosis
+                        {
+                            Code = x.Diagnosis == null ? "" : x.Diagnosis.Code,
+                        }
+                    }
+                }));
+
+            if (g is null)
+            {
+                ToastService.ShowInfo("Please add the CPPT");
+                return false;
+            }
+
+            var statusTemp = Helper._homeStatusTemps.FirstOrDefault(x => x.Code == GeneralConsultanService.HomeStatus);
+
+            if (statusTemp is null)
+            {
+                ToastService.ShowInfo("Please select the Return Status");
+                return false;
+            }
+
+            var kunj = new KunjunganRequest();
+
+            if (statusTemp.Code == "4")
+            {
+                kunj = new KunjunganRequest
+                    {
+                        NoKunjungan = GeneralConsultanService.VisitNumber ?? string.Empty,
+                        NoKartu = ins.NoKartu ?? "",
+                        TglDaftar = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
+                        KdPoli = Services.FirstOrDefault(x => x.Id == GeneralConsultanService.ServiceId)!.Code,
+                        Keluhan = g.Subjective ?? "",
+                        KdSadar = Awareness.FirstOrDefault(x => x.Id == GeneralConsultanService.AwarenessId)!.KdSadar,
+                        Sistole = GeneralConsultanService.Systolic.ToInt32(),
+                        Diastole = GeneralConsultanService.DiastolicBP.ToInt32(),
+                        BeratBadan = GeneralConsultanService.Weight.ToInt32(),
+                        TinggiBadan = GeneralConsultanService.Height.ToInt32(),
+                        RespRate = GeneralConsultanService.RR.ToInt32(),
+                        HeartRate = GeneralConsultanService.HR.ToInt32(),
+                        LingkarPerut = GeneralConsultanService.WaistCircumference.ToInt32(),
+                        KdStatusPulang = statusTemp.Code,
+                        TglPulang = GeneralConsultanService.RegistrationDate.ToString("dd-MM-yyyy"),
+                        KdDokter = Physicions.FirstOrDefault(x => x.Id == GeneralConsultanService.PratitionerId)!.PhysicanCode,
+                        KdDiag1 = g.Diagnosis?.Code ?? null,
+                        KdDiag2 = null,
+                        KdDiag3 = null,
+                        KdPoliRujukInternal = null,
+                        RujukLanjut = new RujukLanjutRequest
+                        {
+                            Kdppk = GeneralConsultanService.PPKRujukanCode ?? "",
+                            TglEstRujuk = GeneralConsultanService.ReferDateVisit.GetValueOrDefault().ToString("dd-MM-yyyy"),
+                            SubSpesialis = new SubSpesialisRequestRujuk
+                            {
+                                KdSubSpesialis1 = GeneralConsultanService.ReferVerticalSpesialisParentSubSpesialisCode ?? ""
+                            }
+                        },
+                        KdTacc = -1,
+                        AlasanTacc = null,
+                        Anamnesa = g.Anamnesa,
+                        AlergiMakan = SelectedFoodAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        AlergiUdara = SelectedWeatherAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        AlergiObat = SelectedPharmacologyAllergies.FirstOrDefault()?.KdAllergy ?? null,
+                        KdPrognosa = GeneralConsultanService.KdPrognosa ?? "",
+                        TerapiObat = g.MedicationTherapy ?? "",
+                        TerapiNonObat = g.NonMedicationTherapy ?? "",
+                        Bmhp = GeneralConsultanService.BMHP ?? "",
+                        Suhu = "36",
+                    };
+                Console.WriteLine(JsonConvert.SerializeObject(kunj, (Newtonsoft.Json.Formatting)System.Xml.Formatting.Indented));
+
+                var responseApi = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"kunjungan", HttpMethod.Post, kunj);
+
+                if (responseApi.Item2 != 201)
+                { 
+                    var json = JObject.Parse(responseApi.Item1.ToString());
+                    string message = json["message"]?.ToString() ?? "Error When sending PCare 'Kunjungan'";
+
+                    ToastService.ShowError(message);
+
+                    return false;
+                }
+                else
+                {
+                    if (responseApi.Item1 is not null)
+                    {
+                        dynamic data = JsonConvert.DeserializeObject<dynamic>(responseApi.Item1);
+                        var dynamicList = (IEnumerable<dynamic>)data;
+
+                        var xz = dynamicList.Select(item => new
+                        {
+                            message = item.message
+                        }).ToList();
+
+                        GeneralConsultanService.VisitNumber = xz[0].message;
+
+                        var updateRequest = new UpdateFormGeneralConsultanServiceNewRequest
+                            {
+                                GeneralConsultanServiceDto = GeneralConsultanService,
+                                Status = EnumStatusGeneralConsultantService.Physician,
+                                IsReferTo = false
+                            };
+
+                        await Mediator.Send(updateRequest);
+
+                        GeneralConsultanService = await GetGeneralConsultanServiceById();
+                    }
+                }
+            }
+            else
+            {
+                ToastService.ShowInfo("Please select 'Rujuk Vertical' in the Discharge Plan field when sending a Referral.");
+            }
+        }
+
+        return true;
+    }
+}

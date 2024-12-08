@@ -77,7 +77,6 @@ namespace McDermott.Application.Features.Queries.Medical
                     query = query.Where(v =>
                        EF.Functions.Like(v.Name, $"%{request.SearchTerm}%") ||
                        EF.Functions.Like(v.NameInd, $"%{request.SearchTerm}%") ||
-                       EF.Functions.Like(v.NameInd, $"%{request.SearchTerm}%") ||
                        EF.Functions.Like(v.CronisCategory.Name, $"%{request.SearchTerm}%") ||
                        EF.Functions.Like(v.Code, $"%{request.SearchTerm}%"));
                 }
@@ -95,7 +94,7 @@ namespace McDermott.Application.Features.Queries.Medical
                         CronisCategoryId = x.CronisCategoryId,
                         CronisCategory = new CronisCategory
                         {
-                            Name = x.CronisCategory == null ? "" : x.CronisCategory.Name,
+                            Name = x.CronisCategory == null ? "-" : x.CronisCategory.Name,
                         }
                     });
 
