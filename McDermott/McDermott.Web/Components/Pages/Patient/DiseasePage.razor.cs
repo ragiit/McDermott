@@ -1,5 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Patient.DiseaseHistoryCommand;
+﻿using static McDermott.Application.Features.Commands.Patient.DiseaseHistoryCommand;
 
 namespace McDermott.Web.Components.Pages.Patient
 {

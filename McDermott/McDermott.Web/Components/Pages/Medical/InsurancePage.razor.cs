@@ -1,8 +1,4 @@
-﻿using McDermott.Application.Dtos.Medical;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class InsurancePage
     {

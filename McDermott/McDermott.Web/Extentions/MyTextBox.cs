@@ -2,7 +2,8 @@
 {
     public class MyTextBox : DxTextBox
     {
-        bool _initialParametersSet;
+        private bool _initialParametersSet;
+
         protected override Task SetParametersAsyncCore(ParameterView parameters)
         {
             if (!_initialParametersSet)

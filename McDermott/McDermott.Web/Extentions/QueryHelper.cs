@@ -1,8 +1,5 @@
-﻿using MailKit.Search;
-using MediatR;
+﻿using MediatR;
 using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 
 namespace McDermott.Web.Extentions

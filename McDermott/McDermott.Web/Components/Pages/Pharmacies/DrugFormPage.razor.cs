@@ -1,7 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacies
 {

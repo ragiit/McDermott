@@ -1,6 +1,4 @@
-﻿using MailKit.Search;
-using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+﻿using System.Linq.Expressions;
 
 namespace McDermott.Web.Components.Pages.Employee.Employees
 {
@@ -94,7 +92,7 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
 
         protected override async Task OnInitializedAsync()
         {
-            PanelVisible = true; 
+            PanelVisible = true;
             await GetUserInfo();
             await LoadData();
             PanelVisible = false;

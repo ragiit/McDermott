@@ -1,18 +1,12 @@
-﻿using QuestPDF.Fluent;
-using System.ComponentModel;
-using Microsoft.Extensions.Caching.Memory;
-using static McDermott.Web.Components.Pages.Queue.KioskPage;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using McDermott.Extentions;
-using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
-using MediatR;
-using DevExpress.Blazor.RichEdit;
-using static McDermott.Web.Components.Pages.Transaction.ProcedureRoomPage;
-using Microsoft.AspNetCore.HttpLogging;
-using Mapster;
-using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
-using FluentValidation.Results;
+﻿using DevExpress.Blazor.RichEdit;
 using FluentValidation;
+using FluentValidation.Results;
+using McDermott.Extentions;
+using Microsoft.Extensions.Caching.Memory;
+using QuestPDF.Fluent;
+using System.ComponentModel;
+using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
+using static McDermott.Web.Components.Pages.Queue.KioskPage;
 using Path = System.IO.Path;
 
 namespace McDermott.Web.Components.Pages.Transaction

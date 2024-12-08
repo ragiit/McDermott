@@ -1,27 +1,20 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using McDermott.Application.Dtos.Medical;
-using McDermott.Application.Features.Services;
-using McDermott.Application.Interfaces.Repositories;
-using McDermott.Domain.Entities;
-using McDermott.Extentions;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using McDermott.Application.Interfaces.Repositories;
 using Microsoft.AspNetCore.Components.Web;
-using System.Net;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
-
 
 namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 {
     public partial class MaintenanceRecordPage
     {
         #region Relation Data
+
         private List<MaintenanceRecordDto> GetMaintenanceRecords = [];
         private List<MaintenanceDto> GetMaintenances = [];
         private List<ProductDto> GetProducts = [];
         private MaintenanceRecordDto PostMaintenanceRecords = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Variable Static
 
@@ -40,7 +33,8 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
         private int FocusedRowVisibleIndex { get; set; }
         public IGrid Grid { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
+
+        #endregion Variable Static
 
         #region UserLoginAndAccessRole
 
@@ -119,7 +113,6 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             await Task.WhenAll(loadDataTask, getUserInfoTask);
 
             PanelVisible = false;
-
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -132,10 +125,10 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
             var result = await Mediator.Send(new GetMaintenanceRecordQuery
             {
-                Predicate=x=>x.ProductId == Id,
-                SearchTerm=searchTerm,
-                PageSize= pageSize, 
-                PageIndex= pageIndex
+                Predicate = x => x.ProductId == Id,
+                SearchTerm = searchTerm,
+                PageSize = pageSize,
+                PageIndex = pageIndex
             });
             GetMaintenanceRecords = result.Item1;
             totalCount = result.PageCount;
@@ -146,6 +139,7 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
         #endregion LoadData
 
         #region KeyPress
+
         private void KeyPressHandler(KeyboardEventArgs args)
         {
             if (args.Key == "Enter")
@@ -157,17 +151,18 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
         private async Task HandleValidSubmit()
         {
-            if(FormValidationState )
+            if (FormValidationState)
             {
                 await OnSave();
             }
-         
-        }private async Task HandleInvalidSubmit()
+        }
+
+        private async Task HandleInvalidSubmit()
         {
             FormValidationState = false;
-         
         }
-        #endregion
+
+        #endregion KeyPress
 
         #region SaveDelete
 
@@ -182,7 +177,6 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
                 foreach (var id in MaintenanceRecordsIds)
                 {
-
                     await Mediator.Send(new DeleteLabTestRequest(id));
                 }
 
@@ -196,8 +190,8 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
         private async Task OnSave()
         {
-
         }
+
         private List<UploadFileInfo> SelectedFiles = new List<UploadFileInfo>();
 
         // Event handler untuk `FilesChanged`
@@ -206,9 +200,8 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             var files = e.GetMultipleFiles();
             foreach (var file in files)
             {
-               
-                    var allowedExtensions = new[] { ".pdf" };
-                    var (status, fileName) = await UploadDocumentService.UploadDocumentAsync(file, 1048576, allowedExtensions);
+                var allowedExtensions = new[] { ".pdf" };
+                var (status, fileName) = await UploadDocumentService.UploadDocumentAsync(file, 1048576, allowedExtensions);
 
                 if (status == 1)
                 {
@@ -230,11 +223,13 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
 
             InvokeAsync(StateHasChanged);
         }
+
         #endregion SaveDelete
 
         #region Load ComboBox
 
         #region ComboBox Maintenance
+
         private DxComboBox<MaintenanceDto, long?> refMaintenanceComboBox { get; set; }
         private int MaintenanceComboBoxIndex { get; set; } = 0;
         private int totalCountMaintenance = 0;
@@ -277,9 +272,11 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion ComboBox Maintenance
 
         #region Combo Box Product
+
         private DxComboBox<ProductDto, long?> refProductComboBox { get; set; }
         private int ProductComboBoxIndex { get; set; } = 0;
         private int totalCountProduct = 0;
@@ -322,19 +319,22 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             totalCount = result.pageCount;
             PanelVisible = false;
         }
-        #endregion
-        #endregion
 
+        #endregion Combo Box Product
 
+        #endregion Load ComboBox
 
         #region Grid Configure
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-        #endregion
+
+        #endregion Grid Configure
 
         #region Function Button
+
         private async Task Refresh_Click()
         {
             await LoadData();
@@ -437,7 +437,6 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
             ]);
         }
 
-        #endregion
-
+        #endregion Function Button
     }
 }

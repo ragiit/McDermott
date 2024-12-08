@@ -1,9 +1,4 @@
-﻿using Google.Apis.Http;
-using McDermott.Domain.Entities;
-using McDermott.Web.Components.Layout;
-using OfficeOpenXml.Style;
-using System.Linq.Expressions;
-using System.Reactive.Subjects;
+﻿using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config

@@ -1,20 +1,13 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-
-using DevExpress.Blazor.RichEdit;
+﻿using DevExpress.Blazor.RichEdit;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
-using MailKit.Search;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 using QuestPDF.Fluent;
-
-using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;
-using DevExpress.CodeParser;
-using McDermott.Web.Extentions;
 using System.Linq.Expressions;
-using DevExpress.Printing.ExportHelpers;
+using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 {

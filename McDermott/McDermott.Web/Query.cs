@@ -1,11 +1,6 @@
-﻿using Google.Apis.Http;
-using GreenDonut;
-using MailKit.Search;
-using McDermott.Persistence.Context;
-using Microsoft.AspNetCore.Razor.Language;
+﻿using McDermott.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace McDermott.Web

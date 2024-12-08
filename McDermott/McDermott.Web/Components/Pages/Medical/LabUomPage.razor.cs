@@ -1,7 +1,4 @@
-﻿using MailKit.Search;
-using McDermott.Domain.Entities;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class LabUomPage
     {

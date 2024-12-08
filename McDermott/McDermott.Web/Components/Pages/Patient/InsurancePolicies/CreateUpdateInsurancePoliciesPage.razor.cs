@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components.Web;
-using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
+﻿using Microsoft.AspNetCore.Components.Web;
 
 namespace McDermott.Web.Components.Pages.Patient.InsurancePolicies
 {

@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Web.Extentions;
-using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Medical.LocationCommand;
+﻿using System.Linq.Expressions;
 
 namespace McDermott.Web.Components.Pages.Medical
 {
@@ -96,8 +92,8 @@ namespace McDermott.Web.Components.Pages.Medical
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            await LoadLocation(); 
-            await LoadCompany(); 
+            await LoadLocation();
+            await LoadCompany();
             PanelVisible = false;
 
             return;
@@ -141,7 +137,6 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region Load ComboBox
 
-      
         private DxComboBox<CompanyDto, long?> refCompaniesComboBox { get; set; }
         private int CompaniesComboBoxIndex { get; set; } = 0;
         private int totalCountCompanies = 0;
@@ -271,8 +266,8 @@ namespace McDermott.Web.Components.Pages.Medical
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as LocationDto ?? new());
-                await LoadLocation(predicate: x => x.Id == a.ParentLocationId); 
-                await LoadCompany(predicate: x => x.Id == a.CompanyId);  
+                await LoadLocation(predicate: x => x.Id == a.ParentLocationId);
+                await LoadCompany(predicate: x => x.Id == a.CompanyId);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -461,6 +456,7 @@ namespace McDermott.Web.Components.Pages.Medical
         #region ComboBox Location
 
         private CancellationTokenSource? _ctsLocation;
+
         private async Task OnInputLocation(ChangeEventArgs e)
         {
             try
@@ -500,11 +496,12 @@ namespace McDermott.Web.Components.Pages.Medical
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Location
 
         #region ComboBox Company
 
         private CancellationTokenSource? _ctsCompany;
+
         private async Task OnInputCompany(ChangeEventArgs e)
         {
             try
@@ -544,6 +541,6 @@ namespace McDermott.Web.Components.Pages.Medical
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Company
     }
 }

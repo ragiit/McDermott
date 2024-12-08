@@ -1,9 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using McDermott.Application.Dtos.Medical;
-using McDermott.Domain.Entities;
-using McDermott.Extentions;
-using Microsoft.AspNetCore.Components.Web;
+﻿using McDermott.Extentions;
 
 namespace McDermott.Web.Components.Pages.Medical.LabTests
 {

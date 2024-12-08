@@ -1,6 +1,4 @@
-﻿using DevExpress.Blazor;
-
-namespace McDermott.Web.Extentions
+﻿namespace McDermott.Web.Extentions
 {
     public class MyDxComboBox<TData, TValue> : DxComboBox<TData, TValue>
     {

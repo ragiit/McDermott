@@ -1,13 +1,7 @@
-﻿using DevExpress.Blazor.Reporting.Models;
-using DevExpress.Blazor.Reporting;
-using DevExpress.XtraReports.UI;
-using DocumentFormat.OpenXml.InkML;
-using MediatR;
-using Microsoft.AspNetCore.Components.Web;
-using System.Linq.Expressions;
-using McDermott.Web.Components.Pages.Reports;
-using DocumentFormat.OpenXml.Office2010.Excel;
+﻿using DevExpress.Blazor.Reporting;
+using DevExpress.Blazor.Reporting.Models;
 using DevExpress.XtraReports;
+using McDermott.Web.Components.Pages.Reports;
 
 namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 {
@@ -46,11 +40,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
-        DxReportViewer reportViewer { get; set; }
-        IReport Report { get; set; }
+        private DxReportViewer reportViewer { get; set; }
+        private IReport Report { get; set; }
         private ElementReference viewerComponent;
 
-        void OnCustomizeToolbar(ToolbarModel toolbarModel)
+        private void OnCustomizeToolbar(ToolbarModel toolbarModel)
         {
             toolbarModel.AllItems.Add(new ToolbarItem()
             {
@@ -78,9 +72,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     return;
 
                 IsDeleteGC = GeneralConsultanServices.FirstOrDefault()?.Status == EnumStatusGeneralConsultantService.Planned || GeneralConsultanServices.FirstOrDefault()?.Status == EnumStatusGeneralConsultantService.Canceled;
-
-
-
 
                 using var stream = new MemoryStream();
                 // Buat laporan
@@ -180,6 +171,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         private bool IsDeleteGC = false;
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;

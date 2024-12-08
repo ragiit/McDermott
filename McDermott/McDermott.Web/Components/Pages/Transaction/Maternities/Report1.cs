@@ -1,10 +1,4 @@
-﻿using DevExpress.XtraReports.UI;
-using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Drawing;
-
-namespace McDermott.Web.Components.Pages.Transaction.Maternities
+﻿namespace McDermott.Web.Components.Pages.Transaction.Maternities
 {
     public partial class Report1 : DevExpress.XtraReports.UI.XtraReport
     {

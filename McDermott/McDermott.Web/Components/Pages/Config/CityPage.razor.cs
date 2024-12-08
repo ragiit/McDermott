@@ -1,8 +1,4 @@
-﻿using DevExpress.XtraRichEdit.Model;
-using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-using System.Linq.Expressions;
-using System.Reactive.Subjects;
+﻿using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config

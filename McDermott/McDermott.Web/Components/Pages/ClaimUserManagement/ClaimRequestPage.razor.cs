@@ -1,8 +1,4 @@
-﻿using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Application.Dtos.ClaimUserManagement;
-using McDermott.Domain.Entities;
-using MediatR;
-using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
+﻿using McDermott.Application.Dtos.ClaimUserManagement;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimRequestCommand;
@@ -52,14 +48,17 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion UserLoginAndAccessRole
 
         #region Relation Data
+
         private List<BenefitConfigurationDto> GetBenefitConfigurations { get; set; } = [];
         private List<ClaimRequestDto> GetClaimRequests { get; set; } = [];
         private List<UserDto> GetPatient { get; set; } = [];
         private List<UserDto> GetPhycisian { get; set; } = [];
         private ClaimRequestDto PostClaimRequests = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Variable Static
+
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool VisibleButton { get; set; } = true;
@@ -68,6 +67,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #region Enum Status
+
         public MarkupString GetIssueStatusIconHtml(EnumClaimRequestStatus? status)
         {
             string priorityClass;
@@ -103,8 +103,10 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
             return new MarkupString(html);
         }
-        #endregion
-        #endregion
+
+        #endregion Enum Status
+
+        #endregion Variable Static
 
         #region Searching
 
@@ -133,6 +135,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion Searching
 
         #region Async Load
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -143,6 +146,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             await LoadData();
             PanelVisible = false;
         }
+
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
@@ -163,7 +167,8 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Async Load
 
         #region ComboBox Patient
 
@@ -202,7 +207,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         private async Task LoadDataPatient(int pageIndex = 0, int pageSize = 10)
         {
-
             var result = await Mediator.Send(new GetUserQueryNew
             {
                 Predicate = x => x.IsPatient == true,
@@ -264,7 +268,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         {
             var result = await Mediator.Send(new GetBenefitConfigurationQuery
             {
-                Predicate = x=>x.Status == EnumBenefitStatus.Active,
+                Predicate = x => x.Status == EnumBenefitStatus.Active,
                 SearchTerm = refBenefitComboBox?.Text ?? "",
                 PageIndex = pageIndex,
                 PageSize = pageSize,
@@ -273,7 +277,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             totalCountBenefit = result.PageCount;
         }
 
-        #endregion
+        #endregion ComboBox Benefit
 
         #region ComboBox Phycisian
 
@@ -332,23 +336,25 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             totalCountPhycisian = result.PageCount;
         }
 
-        #endregion
+        #endregion ComboBox Phycisian
 
         #region Click
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             try
             {
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-                
+
                 PanelVisible = false;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 e.HandleException(ToastService);
             }
@@ -365,6 +371,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         }
 
         private bool isActiveButton { get; set; } = true;
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -380,7 +387,9 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 ex.HandleException(ToastService);
             }
         }
+
         private ClaimHistoryDto postClaimhistory = new();
+
         private async Task OnDone(ClaimRequestDto Data)
         {
             // Lakukan validasi klaim terlebih dahulu
@@ -415,10 +424,10 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             StateHasChanged();
         }
 
-
-        #endregion
+        #endregion Click
 
         #region Delete
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             try
@@ -443,9 +452,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             }
             finally { PanelVisible = false; }
         }
-        #endregion
+
+        #endregion Delete
 
         #region save
+
         private async Task OnSave()
         {
             try
@@ -471,9 +482,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                 Ex.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion save
 
         #region Validasi
+
         private async Task cekValidasi(BenefitConfigurationDto data)
         {
             if (data is not null)
@@ -493,14 +506,15 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             {
                 PostClaimRequests.BenefitId = null;
             }
-
         }
 
         private async Task CekPatient(UserDto data)
         {
             VisibleButton = true;
         }
+
         private DateTime nextEligibleDate { get; set; }
+
         public async Task ValidateClaimRequest(long? patientId, long? benefitId)
         {
             // Dapatkan konfigurasi benefit
@@ -523,29 +537,27 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                     (x=>x.ClaimDate, true)
                     ]
             });
-            
+
             var lastClaimCount = await Mediator.Send(new GetClaimHistoryQuery
             {
-                Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,              
-                
+                Predicate = c => c.PatientId == patientId && c.BenefitId == benefitId,
             });
             int counts = 0;
             if (benefitConfig.TypeOfBenefit == "Amount")
             {
-                 counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
+                counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
             }
-            else if(benefitConfig.TypeOfBenefit == "Qty")
+            else if (benefitConfig.TypeOfBenefit == "Qty")
             {
                 counts = lastClaimCount.Item1.Select(x => x.ClaimedValue).Count();
             }
-            
 
             // Cek apakah klaim melebihi durasi yang diizinkan
             if (lastClaims != null)
             {
-                 nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
+                nextEligibleDate = CalculateNextEligibleDate(lastClaims.ClaimDate, benefitConfig);
 
-                bool isEligibleForClaim = DateTime.Now <= nextEligibleDate && counts >= benefitConfig.BenefitValue ;
+                bool isEligibleForClaim = DateTime.Now <= nextEligibleDate && counts >= benefitConfig.BenefitValue;
 
                 if (isEligibleForClaim)
                 {
@@ -554,7 +566,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                     VisibleButton = false;
                     return;
                 }
-
             }
 
             // Jika validasi berhasil
@@ -576,8 +587,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             };
         }
 
-        #endregion
-
-
+        #endregion Validasi
     }
 }

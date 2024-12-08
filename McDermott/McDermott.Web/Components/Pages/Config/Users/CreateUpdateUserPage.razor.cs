@@ -1,17 +1,8 @@
-﻿using DevExpress.Data.Access;
-using DevExpress.Office.Services.Implementation;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using GreenDonut;
-using HotChocolate.Utilities;
-using Humanizer;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using MediatR;
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using Department = McDermott.Domain.Entities.Department;
 using Group = McDermott.Domain.Entities.Group;
 

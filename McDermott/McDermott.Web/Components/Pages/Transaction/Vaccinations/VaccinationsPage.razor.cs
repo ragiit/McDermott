@@ -1,6 +1,4 @@
-﻿using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
-
-namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
+﻿namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
 {
     public partial class VaccinationsPage
     {

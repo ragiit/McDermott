@@ -1,9 +1,4 @@
 ﻿using DevExpress.Data.Linq;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-using McDermott.Web.Components.Layout;
-using Microsoft.AspNetCore.HttpLogging;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.GetDataCommand;
 

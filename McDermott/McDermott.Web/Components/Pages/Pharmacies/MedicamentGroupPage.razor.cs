@@ -1,7 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using Microsoft.CodeAnalysis.Host.Mef;
-using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacies
@@ -45,6 +42,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
         private int FocusedRowVisibleIndexMedicamentGroup { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedMedicamentGroupDetailDataItems { get; set; } = new ObservableRangeCollection<object>();
+
         private async Task SelectChangeItem(ProductDto product)
         {
             try
@@ -93,6 +91,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task SelectChangeFrequency(DrugDosageDto datas)
         {
             var data = Frequencys.Where(f => f.Id == datas.Id).FirstOrDefault();
@@ -101,6 +100,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
             FormMedicamenDetails.Days = data.Days.ToLong();
             FormMedicamenDetails.TotalQty = FormMedicamenDetails?.Dosage * FormMedicamenDetails?.QtyByDay;
         }
+
         private bool IsNumeric(string value)
         {
             return double.TryParse(value, out _);
@@ -141,7 +141,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                         await Grid.WaitForDataLoadAsync();
                         Grid.ExpandGroupRow(2);
                         StateHasChanged();
-
                     }
                 }
                 catch { }
@@ -188,6 +187,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
             }
             catch { }
         }
+
         private async Task LoadData()
         {
             PanelVisible = true;
@@ -508,7 +508,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                         }
                     }
                     getMedicament = await Mediator.Send(new UpdateMedicamentGroupRequest(MGForm));
-                     
+
                     var medicament_group = await Mediator.Send(new GetMedicamentGroupQuery
                     {
                         Predicate = x => x.Id == MGForm.Id
@@ -576,7 +576,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                                 FormMedicamenGroupDetailss.ActiveComponentId = listActiveComponentIds;
 
                             medicamentGroupDetails.Add(FormMedicamenGroupDetailss);
-
                         }
                         else
                         {
@@ -614,7 +613,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                     }
                     await LoadMedicamentGroupDetail();
                 }
-
             }
             catch (Exception ex)
             {

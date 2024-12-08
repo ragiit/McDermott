@@ -1,5 +1,4 @@
-﻿using DevExpress.Data.Filtering.Helpers;
-using SignaturePad;
+﻿using SignaturePad;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 

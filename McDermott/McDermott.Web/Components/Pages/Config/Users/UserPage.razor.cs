@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
+﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using Group = McDermott.Domain.Entities.Group;
 

@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using System.Linq;
-using static McDermott.Application.Features.Commands.Config.CountryCommand;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.QueueDisplayCommand;
 

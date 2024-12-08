@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Razor.Language.Extensions;
-using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Medical

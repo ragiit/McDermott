@@ -1,6 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using MediatR;
-using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacies
 {

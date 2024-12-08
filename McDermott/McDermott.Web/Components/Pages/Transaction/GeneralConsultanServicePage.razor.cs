@@ -1,10 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Humanizer;
-using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using McDermott.Extentions;
+﻿using McDermott.Extentions;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.JSInterop;
 using QuestPDF.Fluent;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -703,10 +698,10 @@ namespace McDermott.Web.Components.Pages.Transaction
                     GeneralConsultanMedicalSupport.GeneralConsultanServiceId = FormRegis.Id;
                     GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
 
-                //    generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id/*;*/
-                //    generalLog.UserById = NameUser.Id;
-                //    generalLog.Status = GeneralConsultanMedicalSupport.Status.GetDisplayName();
-                //    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
+                    //    generalLog.ProcedureRoomId = GeneralConsultanMedicalSupport.Id/*;*/
+                    //    generalLog.UserById = NameUser.Id;
+                    //    generalLog.Status = GeneralConsultanMedicalSupport.Status.GetDisplayName();
+                    //    await Mediator.Send(new CreateGeneralConsultationLogRequest(generalLog));
                 }
                 else
                     GeneralConsultanMedicalSupport = await Mediator.Send(new UpdateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));

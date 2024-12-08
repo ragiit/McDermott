@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-
+﻿using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 {
@@ -11,8 +7,8 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         #region Relation Data
 
         private List<GoodsReceiptDto> getGoodsReceipts = [];
-        private List<TransactionStockDto> TransactionStocks = []; 
-        
+        private List<TransactionStockDto> TransactionStocks = [];
+
         private GoodsReceiptDto GetGoodsReceipt = new();
         private StockProductDto FormStockProduct = new();
         private GoodsReceiptDto postGoodsReceipts = new();
@@ -44,7 +40,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            
         }
 
         private async Task GetUserInfo()
@@ -190,27 +185,26 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 ex.HandleException(ToastService);
             }
         }
-               
+
         private async Task OnRowDoubleClick(GridRowClickEventArgs e)
         {
             var Id = e.VisibleIndex;
             NavigationManager.NavigateTo($"inventory/goods-receipts/{EnumPageMode.Update.GetDisplayName()}?Id={Id}");
         }
-               
+
         #endregion Configuration Grid
 
         #region Click Button
 
         private async Task NewItem_Click()
         {
-            NavigationManager.NavigateTo($"inventory/goods-receipts/{EnumPageMode.Create.GetDisplayName()}");            
+            NavigationManager.NavigateTo($"inventory/goods-receipts/{EnumPageMode.Create.GetDisplayName()}");
         }
 
         private async Task EditItem_Click()
         {
             var data = SelectedDataItems[0].Adapt<GoodsReceiptDto>();
             NavigationManager.NavigateTo($"inventory/goods-receipts/{EnumPageMode.Update.GetDisplayName()}?Id={data.Id}");
-
         }
 
         private async Task DeleteItem_Click()
@@ -293,7 +287,5 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         }
 
         #endregion Function Delete
-
-        
     }
 }

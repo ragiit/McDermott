@@ -1,5 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionCommand;
+﻿using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
@@ -19,7 +18,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-
         }
 
         private async Task GetUserInfo()
@@ -52,10 +50,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         {
             get; set;
         }
+
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         [Parameter]
         public bool IsPopUpForm { get; set; } = true;
+
         private bool PanelVisible { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private string header { get; set; } = string.Empty;
@@ -154,7 +154,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 {
                     SearchTerm = searchTerm,
                     PageIndex = pageIndex,
-                    PageSize =pageSize
+                    PageSize = pageSize
                 });
                 getPharmacy = result.Item1;
                 totalCount = result.PageCount;
@@ -164,8 +164,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
             catch (Exception ex) { ex.HandleException(ToastService); }
         }
-
-
 
         #endregion Load Data
 
@@ -308,14 +306,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
 
         #endregion Delete Grid Config
-
-
-
     }
 }

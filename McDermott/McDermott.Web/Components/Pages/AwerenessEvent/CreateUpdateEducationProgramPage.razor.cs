@@ -1,27 +1,22 @@
 ﻿using Blazored.TextEditor;
-using DevExpress.SpreadsheetSource.Xlsx.Import;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Vml;
-using MailKit.Search;
 using McDermott.Application.Dtos.AwarenessEvent;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
-using System.Security.Policy;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand;
 using static McDermott.Application.Features.Commands.AwarenessEvent.ParticipanEduCommand;
-using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;
 
 namespace McDermott.Web.Components.Pages.AwerenessEvent
 {
     public partial class CreateUpdateEducationProgramPage
     {
         #region Relation  Data
+
         private List<EducationProgramDto> getEducationPrograms { get; set; } = [];
         private List<AwarenessEduCategoryDto> getAwarenessEduCategories { get; set; } = [];
         private EducationProgramDto postEducationPrograms = new();
         private List<ParticipanEduDto> GetParticipanEdus { get; set; } = [];
-        #endregion
+
+        #endregion Relation  Data
 
         #region variable static
 
@@ -43,7 +38,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         private bool IsReadOnlyEvent => postEducationPrograms.Status != EnumStatusEducationProgram.Draft && postEducationPrograms.Status != EnumStatusEducationProgram.Active;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private IReadOnlyList<object> SelectedDataItemsEducation { get; set; } = [];
-        #endregion
+
+        #endregion variable static
 
         #region UserLoginAndAccessRole
 
@@ -56,8 +52,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-
         }
+
         private async Task GetUserInfo()
         {
             try
@@ -99,6 +95,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion Searching
 
         #region Load data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -115,7 +112,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             };
 
                 await Task.WhenAll(loadTasks);
-
             }
             catch (Exception ex)
             {
@@ -133,8 +129,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
             var result = await Mediator.Send(new GetSingleEducationProgramQuery
             {
-                Predicate = x => x.Id == Id,                
-
+                Predicate = x => x.Id == Id,
             });
             if (PageMode == EnumPageMode.Update.GetDisplayName())
             {
@@ -155,12 +150,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
                 await LoadData_Participant();
                 // log
-
             }
             PanelVisible = false;
         }
 
-        #endregion
+        #endregion Load data
 
         #region HTML Editor
 
@@ -180,6 +174,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 preview = (MarkupString)await QuillHtml.GetHTML();
             }
         }
+
         private async Task ShowAoutPutPreview2(bool b)
         {
             IsShowPreviewOutput2 = b;
@@ -193,7 +188,9 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion HTML Editor
 
         #region select File
+
         private IBrowserFile BrowserFile;
+
         private void RemoveSelectedFile()
         {
             postEducationPrograms.Attendance = null;
@@ -209,7 +206,9 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         {
             await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
         }
+
         private bool isShowPopUp { get; set; } = false;
+
         private async Task DownloadFile()
         {
             if (postEducationPrograms.Id != 0 && !string.IsNullOrWhiteSpace(postEducationPrograms.Attendance))
@@ -229,7 +228,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
                 // Invoke JavaScript to open and close the tab
                 await JsRuntime.InvokeVoidAsync("openAndCloseTab", absoluteUrl);
-                isShowPopUp= false;
+                isShowPopUp = false;
             }
             catch (Exception ex)
             {
@@ -238,7 +237,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             }
         }
 
-        #endregion
+        #endregion select File
 
         #region ComboBox Category
 
@@ -292,20 +291,22 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion ComboBox Category
 
         #region Grid
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-        #endregion
+
+        #endregion Grid
 
         #region HandleSubmit
+
         private async Task HandleValidSubmit()
         {
             if (FormValidationState)
                 await OnSave();
             else
                 FormValidationState = true;
-
         }
 
         private async Task HandleInvalidSubmit()
@@ -321,9 +322,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 return;
             }
         }
-        #endregion
+
+        #endregion HandleSubmit
 
         #region Save
+
         private async Task OnSave()
         {
             try
@@ -360,7 +363,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     var cekdata = await Mediator.Send(new GetSingleEducationProgramQuery
                     {
                         Predicate = x => x.Id == Id,
-
                     });
 
                     if (postEducationPrograms.Attendance != cekdata.Attendance)
@@ -386,7 +388,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
                     data = await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
                     ToastService.ShowSuccess("Update Data Success...");
-
                 }
 
                 ToastService.ClearSuccessToasts();
@@ -403,14 +404,13 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         {
             if (!string.IsNullOrWhiteSpace(await QuillHtml2.GetContent()))
             {
-                postEducationPrograms.HTMLMaterial= await QuillHtml2.GetHTML();
+                postEducationPrograms.HTMLMaterial = await QuillHtml2.GetHTML();
             }
             await FileUploadService.UploadFileAsync(BrowserFile);
 
             var cekdata = await Mediator.Send(new GetSingleEducationProgramQuery
             {
                 Predicate = x => x.Id == Id,
-
             });
 
             if (postEducationPrograms.Attendance != cekdata.Attendance)
@@ -431,9 +431,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             await Mediator.Send(new UpdateEducationProgramRequest(postEducationPrograms));
             ToastService.ShowSuccess("Save Material Data Success...");
         }
-        #endregion
+
+        #endregion Save
 
         #region Click
+
         private void onDiscard()
         {
             NavigationManager.NavigateTo($"awereness-event/education-program/{EnumPageMode.Create.GetDisplayName()}");
@@ -474,6 +476,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 Console.WriteLine($"Failed to activate program: {ex.Message}");
             }
         }
+
         private async Task onInActive()
         {
             try
@@ -485,13 +488,13 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 {
                     NavigationManager.NavigateTo($"{currentUri}", forceLoad: true);
                 }
-                
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to activate program: {ex.Message}");
             }
         }
+
         private async Task onCancel()
         {
             try
@@ -509,6 +512,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 Console.WriteLine($"Failed to activate program: {ex.Message}");
             }
         }
+
         private async Task onDone()
         {
             try
@@ -531,10 +535,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         {
             if (postEducationPrograms.Slug != null)
             {
-               
-                    var url =$"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
-                    await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
-                
+                var url = $"awereness-event/education-program/join-participant/{postEducationPrograms.Slug}";
+                await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
             }
         }
 
@@ -549,7 +551,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         private async Task SendToDraft()
         {
-
             try
             {
                 postEducationPrograms.Status = EnumStatusEducationProgram.Draft;
@@ -564,7 +565,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             {
                 Console.WriteLine($"Failed to activate program: {ex.Message}");
             }
-
         }
 
         private async Task LoadData_Participant()
@@ -581,7 +581,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         {
             await LoadData_Participant();
         }
-        #endregion
 
+        #endregion Click
     }
 }

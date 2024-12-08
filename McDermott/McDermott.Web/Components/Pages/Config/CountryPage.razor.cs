@@ -1,14 +1,9 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
+﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
-using iTextSharp.text;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using McDermott.Web.Components.Layout;
-using Document = iTextSharp.text.Document;
-using DevExpress.Printing.Core.Native;
-using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using static McDermott.Application.Features.Commands.GetDataCommand;
+using Document = iTextSharp.text.Document;
 
 namespace McDermott.Web.Components.Pages.Config
 {

@@ -1,8 +1,8 @@
 ﻿using McDermott.Application.Features.Services;
 using Microsoft.AspNetCore.Components.Web;
-using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
-using System.Linq.Expressions;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Employee.Employees
 {

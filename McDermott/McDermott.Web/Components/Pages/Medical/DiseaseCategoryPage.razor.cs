@@ -1,9 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Spreadsheet;
-using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
-using static McDermott.Application.Features.Commands.Medical.DiseaseCategoryCommand;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class DiseaseCategoryPage
     {

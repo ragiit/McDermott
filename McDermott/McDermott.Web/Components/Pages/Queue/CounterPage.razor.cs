@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 
@@ -353,7 +352,6 @@ namespace McDermott.Web.Components.Pages.Queue
         {
             try
             {
-                
                 NavigationManager.NavigateTo($"queue/queue-counters/view/{Id}");
             }
             catch (Exception ex)

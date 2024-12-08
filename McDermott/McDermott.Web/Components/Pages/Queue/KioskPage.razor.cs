@@ -1,5 +1,4 @@
-﻿using DevExpress.CodeParser;
-using McDermott.Application.Dtos.Queue;
+﻿using McDermott.Application.Dtos.Queue;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
 

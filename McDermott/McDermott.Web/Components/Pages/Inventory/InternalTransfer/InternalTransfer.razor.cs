@@ -1,9 +1,4 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.TransferStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 {
@@ -11,7 +6,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
     {
         #region relation Data
 
-        private List<TransferStockDto> getTransferStocks = [];        
+        private List<TransferStockDto> getTransferStocks = [];
 
         #endregion relation Data
 
@@ -75,9 +70,9 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         #region static Variable
 
         private IGrid? Grid { get; set; }
-        private bool PanelVisible { get; set; } = false;       
-        private bool isActiveButton { get; set; } = false;       
-        private bool FormValidationState { get; set; } = false;      
+        private bool PanelVisible { get; set; } = false;
+        private bool isActiveButton { get; set; } = false;
+        private bool FormValidationState { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
 
@@ -241,7 +236,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 if ((TransferStockDto)args.DataItem is null)
                     return;
 
-                isActiveButton = ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Draft ) || ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Cancel);
+                isActiveButton = ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Draft) || ((TransferStockDto)args.DataItem)!.Status!.Equals(EnumStatusInternalTransfer.Cancel);
             }
             catch (Exception ex)
             {
@@ -269,12 +264,10 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={data.Id}");
         }
 
-
         private void DeleteItem_Click()
         {
             Grid!.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
-               
 
         private async Task Refresh_Click()
         {
@@ -347,9 +340,8 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             {
                 ex.HandleException(ToastService);
             }
-        }        
+        }
 
         #endregion function Delete
-
     }
 }

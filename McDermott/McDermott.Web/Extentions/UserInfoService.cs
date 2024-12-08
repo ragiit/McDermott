@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using MediatR;
+﻿using MediatR;
 
 namespace McDermott.Web.Extentions
 {

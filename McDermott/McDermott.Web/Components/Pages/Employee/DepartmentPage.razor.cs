@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using McDermott.Domain.Entities;
-using static McDermott.Web.Components.Pages.TestPage;
-
-namespace McDermott.Web.Components.Pages.Employee
+﻿namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class DepartmentPage
     {

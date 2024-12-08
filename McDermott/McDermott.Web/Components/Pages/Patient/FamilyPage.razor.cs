@@ -1,9 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.HttpLogging;
-using NuGet.Frameworks;
-using System.ComponentModel.DataAnnotations;
-
-namespace McDermott.Web.Components.Pages.Patient
+﻿namespace McDermott.Web.Components.Pages.Patient
 {
     public partial class FamilyPage
     {

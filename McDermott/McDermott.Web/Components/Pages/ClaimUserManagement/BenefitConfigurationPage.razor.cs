@@ -1,7 +1,5 @@
-﻿
-using McDermott.Application.Dtos.ClaimUserManagement;
+﻿using McDermott.Application.Dtos.ClaimUserManagement;
 using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.BenefitConfigurationCommand;
 
 namespace McDermott.Web.Components.Pages.ClaimUserManagement
@@ -49,11 +47,14 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion UserLoginAndAccessRole
 
         #region Relation Data
+
         private List<BenefitConfigurationDto> GetBenefitConfigurations { get; set; } = [];
         private BenefitConfigurationDto PostBenefitConfigurations = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Variable Static
+
         private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
@@ -61,6 +62,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #region Enum Status
+
         public MarkupString GetIssueStatusIconHtml(EnumBenefitStatus? status)
         {
             string priorityClass;
@@ -78,7 +80,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
                     title = "Active";
                     break;
 
-
                 case EnumBenefitStatus.InActive:
                     priorityClass = "danger";
                     title = "InActive";
@@ -92,8 +93,10 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
             return new MarkupString(html);
         }
-        #endregion
-        #endregion
+
+        #endregion Enum Status
+
+        #endregion Variable Static
 
         #region Searching
 
@@ -122,6 +125,7 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion Searching
 
         #region Async Load
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -135,7 +139,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             PanelVisible = true;
             var result = await Mediator.Send(new GetBenefitConfigurationQuery
             {
-
                 SearchTerm = searchTerm,
                 PageSize = pageSize,
                 PageIndex = pageIndex,
@@ -148,7 +151,8 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Async Load
 
         #region ImportExport
 
@@ -217,13 +221,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
                         // Parse enum values
 
-
                         if (!Enum.TryParse<EnumWorksDays>(durationOfBenefit, true, out var parsedDurationOfBenefit))
                         {
                             ToastService.ShowErrorImport(row, 4, durationOfBenefit ?? string.Empty);
                             isValid = false;
                         }
-
 
                         if (!Enum.TryParse<EnumBenefitStatus>(status, true, out var parsedStatus))
                         {
@@ -275,10 +277,12 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
         #endregion ImportExport
 
         #region Click
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click()
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
@@ -301,7 +305,6 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         private async Task onActive(BenefitConfigurationDto? data)
         {
-          
             if (data.Id == 0)
             {
                 ToastService.ShowError("Data Not Found. Try Check Again!");
@@ -346,9 +349,11 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
             ToastService.ShowSuccess("Back To Draft Success");
             await LoadData();
         }
-        #endregion
+
+        #endregion Click
 
         #region Save & Delete
+
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
             try
@@ -387,9 +392,8 @@ namespace McDermott.Web.Components.Pages.ClaimUserManagement
 
         private async Task OnDelete()
         {
-
         }
-        #endregion
 
+        #endregion Save & Delete
     }
 }

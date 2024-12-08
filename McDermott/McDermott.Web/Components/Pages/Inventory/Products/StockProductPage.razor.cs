@@ -1,27 +1,32 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.Products
 {
     public partial class StockProductPage
     {
         #region relation data
+
         private List<ProductDto> GetProducts = [];
         private List<TransactionStockDto> GetTransactionStocks = [];
         private List<StockProductDto> GetStockProducts = [];
         private ProductDto PostProducts = new();
-        #endregion
+
+        #endregion relation data
 
         #region variable static
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
+
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
+
         private IGrid Grid;
         private bool PanelVisible { get; set; } = false;
         private string? NameProduct { get; set; }
         private bool? FieldHideStock { get; set; } = false;
-        #endregion
+
+        #endregion variable static
 
         #region UserLoginAndAccessRole
 
@@ -60,8 +65,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     }
                 }
                 catch { }
-
-               
             }
         }
 
@@ -105,8 +108,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
         #endregion Searching
 
-
         #region Load Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -116,7 +119,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         {
             try
             {
-                var result = await Mediator.Send(new GetProductQuery(x => x.Id == Id, pageIndex : pageIndex, pageSize : pageSize));
+                var result = await Mediator.Send(new GetProductQuery(x => x.Id == Id, pageIndex: pageIndex, pageSize: pageSize));
                 GetProducts = result.Item1;
                 totalCount = result.pageCount;
                 GetTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
@@ -172,13 +175,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                     NameProduct = PostProducts.Name;
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-
         }
-        #endregion
+
+        #endregion Load Data
 
         private void Back_Click()
         {
