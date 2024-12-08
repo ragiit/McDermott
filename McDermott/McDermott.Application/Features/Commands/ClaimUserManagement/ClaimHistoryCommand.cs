@@ -52,8 +52,6 @@ namespace McDermott.Application.Features.Commands.ClaimUserManagement
             public Expression<Func<ClaimHistory, bool>> Predicate { get; } = predicate!;
         }
 
-       
-
         #endregion GET Claim History
 
         #region CREATE Claim History

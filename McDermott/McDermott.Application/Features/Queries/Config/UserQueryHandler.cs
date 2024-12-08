@@ -526,7 +526,6 @@ namespace McDermott.Application.Features.Queries.Config
                         // Create a list to accumulate family members' data
                         List<UserDto> familyMembersData = [];
 
-
                         // Fetch family members based on the relation's FamilyMemberId
                         var Familys = await _unitOfWork.Repository<PatientFamilyRelation>().GetAllAsync(x => x.FamilyMemberId.Equals(DataPatient.Id));
                         foreach (var relation in Familys)

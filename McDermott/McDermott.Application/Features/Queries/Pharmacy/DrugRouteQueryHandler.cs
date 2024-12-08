@@ -69,7 +69,7 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Route, $"%{request.SearchTerm}%") );
+                        EF.Functions.Like(v.Route, $"%{request.SearchTerm}%"));
                 }
 
                 // Apply dynamic select if provided
@@ -80,7 +80,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     {
                         Id = x.Id,
                         Route = x.Route,
-                        
                     });
 
                 if (!request.IsGetAll)
@@ -154,7 +153,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     {
                         Id = x.Id,
                         Route = x.Route,
-                        
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<DrugRouteDto>();

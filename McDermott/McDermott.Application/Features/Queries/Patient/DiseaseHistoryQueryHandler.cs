@@ -1,13 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Wordprocessing;
-using McDermott.Application.Features.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static McDermott.Application.Features.Commands.Config.CityCommand;
-using static McDermott.Application.Features.Commands.Patient.DiseaseHistoryCommand;
+﻿using static McDermott.Application.Features.Commands.Patient.DiseaseHistoryCommand;
 
 namespace McDermott.Application.Features.Queries.Patient
 {

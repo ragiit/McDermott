@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,7 +10,6 @@ namespace McDermott.Persistence.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-           
             migrationBuilder.CreateTable(
                 name: "GCReferToInternals",
                 columns: table => new
@@ -51,18 +49,13 @@ namespace McDermott.Persistence.Migrations
                 name: "IX_GCReferToInternals_GeneralConsultanServiceId",
                 table: "GCReferToInternals",
                 column: "GeneralConsultanServiceId");
-
-            
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-           
             migrationBuilder.DropTable(
                 name: "GCReferToInternals");
-
-           
         }
     }
 }

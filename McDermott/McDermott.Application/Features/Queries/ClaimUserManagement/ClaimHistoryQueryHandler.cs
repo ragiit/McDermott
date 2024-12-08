@@ -17,8 +17,6 @@ namespace McDermott.Application.Features.Queries.ClaimUserManagement
     {
         #region GET Education Program
 
-      
-
         public async Task<List<ClaimHistoryDto>> Handle(GetAllClaimHistoryQuery request, CancellationToken cancellationToken)
         {
             try

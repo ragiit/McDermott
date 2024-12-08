@@ -1,7 +1,6 @@
 ﻿using McDermott.Application.Dtos;
 using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.VillageCommand;
-using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Application.Features.Queries.Config
 {

@@ -1,43 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands
+﻿namespace McDermott.Application.Features.Commands
 {
     public class GetDataCommand
     {
+        public class GetQueryUserlable : BaseQuery<User>
+        { }
+
         #region Configurations
 
-        public class GetDistrictQuerylable : IRequest<IQueryable<District>>
-        {
-            public List<Expression<Func<District, object>>>? Includes { get; set; }
-            public Expression<Func<District, bool>>? Predicate { get; set; }
-            public Expression<Func<District, District>>? Select { get; set; }
-            public List<(Expression<Func<District, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public class GetQueryGrouplable : BaseQuery<Group>
+        { }
 
-            public bool IsDescending { get; set; } = false;
-            public int PageIndex { get; set; } = 0;
-            public int PageSize { get; set; } = 10;
-            public bool IsGetAll { get; set; } = false;
-            public string? SearchTerm { get; set; }
-        }
+        public class GetQueryGroupMenulable : BaseQuery<GroupMenu>
+        { }
 
-        public class GetVillageQuerylable : IRequest<IQueryable<Village>>
-        {
-            public List<Expression<Func<Village, object>>>? Includes { get; set; }
-            public Expression<Func<Village, bool>>? Predicate { get; set; }
-            public Expression<Func<Village, Village>>? Select { get; set; }
-            public List<(Expression<Func<Village, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+        public class GetQueryMenulable : BaseQuery<Menu>
+        { }
 
-            public bool IsDescending { get; set; } = false;
-            public int PageIndex { get; set; } = 0;
-            public int PageSize { get; set; } = 10;
-            public bool IsGetAll { get; set; } = false;
-            public string? SearchTerm { get; set; }
-        }
+        public class GetQueryCompanylable : BaseQuery<Company>
+        { }
+
+        public class GetQueryCountrylable : BaseQuery<Country>
+        { }
+
+        public class GetQueryProvincelable : BaseQuery<Province>
+        { }
+
+        public class GetQueryCitylable : BaseQuery<City>
+        { }
+
+        public class GetQueryOccupationallable : BaseQuery<Occupational>
+        { }
+
+        public class GetQueryDistrict : BaseQuery<District>
+        { }
+
+        public class GetQueryVillage : BaseQuery<Village>
+        { }
+
+        public class GetQueryUser : BaseQuery<User>
+        { }
 
         #endregion Configurations
+
+        // buat di copy"
+        //public class GetQuerylable : BaseQuery<>{ }
+    }
+
+    public class BaseQuery<TEntity> : IRequest<IQueryable<TEntity>>
+    {
+        public List<Expression<Func<TEntity, object>>>? Includes { get; set; }
+        public Expression<Func<TEntity, bool>>? Predicate { get; set; }
+        public Expression<Func<TEntity, TEntity>>? Select { get; set; }
+        public List<(Expression<Func<TEntity, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+        public bool IsDescending { get; set; } = false;
+        public int PageIndex { get; set; } = 0;
+        public int PageSize { get; set; } = 10;
+        public bool IsGetAll { get; set; } = false;
+        public string? SearchTerm { get; set; }
     }
 }

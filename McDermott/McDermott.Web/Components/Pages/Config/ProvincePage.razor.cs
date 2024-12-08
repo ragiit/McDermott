@@ -2,6 +2,7 @@
 using McDermott.Web.Components.Layout;
 using System.Linq.Expressions;
 using System.Reactive.Subjects;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -51,51 +52,23 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion UserLoginAndAccessRole
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetProvinceQuery
+                var dataSource = new GridDevExtremeDataSource<Province>(await Mediator.Send(new GetQueryProvincelable()))
                 {
-                    OrderByList =
-                    [
-                        (x => x.Name, true)
-                    ],
-                    SearchTerm = searchTerm,
-                    PageSize = pageSize,
-                    PageIndex = pageIndex,
-                });
-                Provinces = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -180,7 +153,7 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new DeleteProvinceRequest(ids: selectedProvinces.Select(x => x.Id).ToList()));
                 }
 
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -258,7 +231,7 @@ namespace McDermott.Web.Components.Pages.Config
                     await Mediator.Send(new UpdateProvinceRequest(editModel));
                 }
 
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -373,7 +346,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListProvinceRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

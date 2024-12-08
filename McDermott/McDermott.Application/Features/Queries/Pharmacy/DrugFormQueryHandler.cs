@@ -84,7 +84,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         Id = x.Id,
                         Name = x.Name,
                         Code = x.Code,
-
                     });
 
                 if (!request.IsGetAll)

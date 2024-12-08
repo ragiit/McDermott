@@ -17,13 +17,12 @@
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
                             <_BaseMyGrid @ref="Grid"
-                                         Data="@Data" 
+                                         Data="@Data"
                                          @bind-SelectedDataItems="@SelectedDataItems"
                                          EditModelSaving="OnSave"
                                          DataItemDeleting="OnDelete"
                                          FocusedRowChanged="Grid_FocusedRowChanged"
-                                         KeyFieldName="Id"
-                                         TextWrapEnabled="false">
+                                         KeyFieldName="Id">
 
                                 <ToolbarTemplate>
                                     <MyDxToolbarBase TItem="Village"
@@ -42,13 +41,14 @@
                                 </ToolbarTemplate>
 
                                 <Columns>
-                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridSelectionColumn Width="15px" /> 
                                     <DxGridDataColumn FieldName="Name" SortIndex="0" />
                                     <DxGridDataColumn FieldName="PostalCode" />
                                     <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
                                     <DxGridDataColumn FieldName="City.Name" Caption="City" />
                                     <DxGridDataColumn FieldName="District.Name" Caption="District" />
                                 </Columns>
+
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
 
@@ -68,6 +68,7 @@
                                             a.DistrictId = null;
                                         }
                                     }
+
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
                                             <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
@@ -128,6 +129,7 @@
                                         </DxFormLayoutItem>
                                     </DxFormLayout>
                                 </EditFormTemplate>
+
                             </_BaseMyGrid>
 
                             @*  <DxLoadingPanel @bind-Visible="PanelVisible"

@@ -9,7 +9,7 @@
             if (!_initialParametersSet)
             {
                 ShowGroupPanel = true;
-                VirtualScrollingEnabled = true;
+                VirtualScrollingEnabled = false;
                 AutoExpandAllGroupRows = true;
                 KeyboardNavigationEnabled = true;
                 FocusedRowEnabled = true;
@@ -18,6 +18,7 @@
                 PageSizeSelectorVisible = true;
                 ShowSearchBox = true;
                 ShowFilterRow = true;
+                TextWrapEnabled = false;
 
                 PageSizeSelectorItems = ([10, 20, 50, 100, 200]);
                 PageSize = 20;

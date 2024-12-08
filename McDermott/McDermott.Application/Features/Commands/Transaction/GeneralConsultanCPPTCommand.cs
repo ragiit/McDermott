@@ -12,7 +12,7 @@
 
         public class CheckExistingGeneralConsultanCPPTQuery(Expression<Func<GeneralConsultanCPPT, bool>>? predicate = null) : IRequest<bool>
         {
-            public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; } = predicate!; 
+            public Expression<Func<GeneralConsultanCPPT, bool>> Predicate { get; } = predicate!;
         }
 
         public class GetGeneralConsultanCPPTsQuery : IRequest<(List<GeneralConsultanCPPTDto>, int PageIndex, int PageSize, int PageCount)>

@@ -16,8 +16,10 @@ namespace McDermott.Application.Dtos.Queue
         public long? PhysicianId { get; set; }
 
         public string? Status { get; set; } = string.Empty;
+
         [SetToNull]
         public virtual ServiceDto? Service { get; set; }
+
         [SetToNull]
         public virtual UserDto? Physician { get; set; }
     }

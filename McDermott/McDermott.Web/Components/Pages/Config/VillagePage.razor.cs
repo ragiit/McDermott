@@ -11,38 +11,12 @@ namespace McDermott.Web.Components.Pages.Config
 {
     public partial class VillagePage
     {
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         private EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
 
         //private IEnumerable<VillageDto> Data { get; set; } = [];
         private object Data { get; set; }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
@@ -55,12 +29,10 @@ namespace McDermott.Web.Components.Pages.Config
                 //    e.QueryableSource = z;
                 //});
 
-                var dataSource = new GridDevExtremeDataSource<Village>(await Mediator.Send(new GetVillageQuerylable()))
+                var dataSource = new GridDevExtremeDataSource<Village>(await Mediator.Send(new GetQueryVillage()))
                 {
                     CustomizeLoadOptions = (loadOptions) =>
                     {
-                        // If underlying data is a large SQL table, specify PrimaryKey and PaginateViaPrimaryKey.
-                        // This can make SQL execution plans more efficient.
                         loadOptions.PrimaryKey = ["Id"];
                         loadOptions.PaginateViaPrimaryKey = true;
                     }
@@ -178,8 +150,8 @@ namespace McDermott.Web.Components.Pages.Config
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
                 var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as Village ?? new());
                 await LoadProvince(predicate: x => x.Id == a.ProvinceId);
-                await LoadCity(predicate: x => x.Id == a.CityId && x.ProvinceId == a.ProvinceId);
-                await LoadDistrict(predicate: x => x.Id == a.DistrictId && x.CityId == a.CityId && x.ProvinceId == a.ProvinceId);
+                await LoadCity(predicate: x => x.Id == a.CityId);
+                await LoadDistrict(predicate: x => x.Id == a.DistrictId);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -411,7 +383,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListVillageRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

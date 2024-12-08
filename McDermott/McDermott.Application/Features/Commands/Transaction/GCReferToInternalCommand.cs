@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace McDermott.Application.Features.Commands.Transaction
+﻿namespace McDermott.Application.Features.Commands.Transaction
 {
     public class GCReferToInternalCommand
     {
         #region GET
-
 
         #region GET GC Refer To Internal
 
@@ -55,11 +48,9 @@ namespace McDermott.Application.Features.Commands.Transaction
 
         #endregion GET GC Refer To Internal
 
-
         #endregion GET
 
         #region CREATE
-
 
         #region CREATE GC Refer To Internal
 
@@ -75,11 +66,9 @@ namespace McDermott.Application.Features.Commands.Transaction
 
         #endregion CREATE GC Refer To Internal
 
-
         #endregion CREATE
 
         #region UPDATE
-
 
         #region UPDATE GC Refer To Internal
 
@@ -94,7 +83,6 @@ namespace McDermott.Application.Features.Commands.Transaction
         }
 
         #endregion UPDATE GC Refer To Internal
-
 
         #endregion UPDATE
 
@@ -121,6 +109,5 @@ namespace McDermott.Application.Features.Commands.Transaction
         #endregion DELETE GC Refer To Internal Log
 
         #endregion DELETE
-
     }
 }
