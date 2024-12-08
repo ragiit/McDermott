@@ -1,9 +1,9 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using System.Net.NetworkInformation;
 using Toolbelt.Blazor.SpeechSynthesis;
 using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.DetailQueueDisplayCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskQueueCommand;
+
 namespace McDermott.Web.Components.Pages.Queue
 {
     public partial class ViewCounterPage
@@ -19,7 +19,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-
         }
 
         private async Task GetUserInfo()
@@ -85,6 +84,7 @@ namespace McDermott.Web.Components.Pages.Queue
         private string currentTime;
         private Timer timer;
         private CancellationTokenSource cts = new();
+
         private async Task UpdateTimeAsync(CancellationToken token)
         {
             try
@@ -101,6 +101,7 @@ namespace McDermott.Web.Components.Pages.Queue
                 // Dilewati saat dibatalkan
             }
         }
+
         protected override async Task OnInitializedAsync()
         {
             cts = new CancellationTokenSource();
@@ -314,6 +315,7 @@ namespace McDermott.Web.Components.Pages.Queue
             };
             await this.SpeechSynthesis.SpeakAsync(utterancet);
         }
+
         private async Task Click_Finish()
         {
             try
@@ -503,6 +505,5 @@ namespace McDermott.Web.Components.Pages.Queue
 
             return words.Trim();
         }
-
     }
 }

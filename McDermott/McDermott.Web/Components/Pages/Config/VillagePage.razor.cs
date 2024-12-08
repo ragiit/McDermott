@@ -1,50 +1,38 @@
-﻿using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-using McDermott.Web.Components.Layout;
-using Microsoft.AspNetCore.HttpLogging;
+﻿using DevExpress.Data.Linq;
 using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
     public partial class VillagePage
     {
-        #region Searching
+        private EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
+        //private IEnumerable<VillageDto> Data { get; set; } = [];
+        private object Data { get; set; }
 
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.QueryGetHelper<Village, VillageDto>(pageIndex, pageSize, searchTerm);
-                Villages = result.Item1;
-                totalCount = result.pageCount;
-                activePageIndex = pageIndex;
+                //var z = await Mediator.Send(new GetVillageQuerylable());
+                //InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
+                //{
+                //    e.KeyExpression = "Id";
+                //    e.QueryableSource = z;
+                //});
+
+                var dataSource = new GridDevExtremeDataSource<Village>(await Mediator.Send(new GetQueryVillage()))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -70,6 +58,15 @@ namespace McDermott.Web.Components.Pages.Config
             if (firstRender)
             {
                 await GetUserInfo();
+
+                try
+                {
+                    await Grid.WaitForDataLoadAsync();
+                    Grid.ExpandGroupRow(1);
+                    await Grid.WaitForDataLoadAsync();
+                    Grid.ExpandGroupRow(2);
+                }
+                catch { }
             }
         }
 
@@ -95,7 +92,6 @@ namespace McDermott.Web.Components.Pages.Config
         private List<VillageDto> Villages = [];
 
         //private object Data { get; set; }
-        private IEnumerable<VillageDto> Data { get; set; } = [];
 
         private bool PanelVisible { get; set; } = true;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
@@ -126,16 +122,31 @@ namespace McDermott.Web.Components.Pages.Config
             await LoadData();
         }
 
+        private void Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+        {
+            if (e.IsNew)
+            {
+                // Create a new edit model for a new entry
+                e.EditModel = new Village();
+            }
+            //else
+            //{
+            //    e.EditModel = (Village)e.DataItem;
+
+            //    var originalItem = Grid.GetDataItem(e.) as Village;
+            //}
+        }
+
         private async Task EditItem_Click()
         {
             try
             {
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as VillageDto ?? new());
+                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as Village ?? new());
                 await LoadProvince(predicate: x => x.Id == a.ProvinceId);
-                await LoadCity(predicate: x => x.Id == a.CityId && x.ProvinceId == a.ProvinceId);
-                await LoadDistrict(predicate: x => x.Id == a.DistrictId && x.CityId == a.CityId && x.ProvinceId == a.ProvinceId);
+                await LoadCity(predicate: x => x.Id == a.CityId);
+                await LoadDistrict(predicate: x => x.Id == a.DistrictId);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -174,7 +185,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (VillageDto)e.EditModel;
+            var editModel = (Village)e.EditModel;
 
             bool validate = await Mediator.Send(new ValidateVillageQuery(x => x.Id != editModel.Id && x.DistrictId == editModel.DistrictId && x.PostalCode == editModel.PostalCode && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId && x.CityId == editModel.CityId));
 
@@ -186,9 +197,9 @@ namespace McDermott.Web.Components.Pages.Config
             }
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateVillageRequest(editModel));
+                await Mediator.Send(new CreateVillageRequest(editModel.Adapt<VillageDto>()));
             else
-                await Mediator.Send(new UpdateVillageRequest(editModel));
+                await Mediator.Send(new UpdateVillageRequest(editModel.Adapt<VillageDto>()));
 
             await LoadData();
         }
@@ -367,7 +378,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListVillageRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

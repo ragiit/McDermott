@@ -23,6 +23,6 @@ namespace McDermott.Application.Dtos.Bpjs
         public string KdSubSpesialis1 { get; set; }
 
         [JsonProperty("kdSarana")]
-        public object KdSarana { get; set; } 
+        public object KdSarana { get; set; }
     }
 }

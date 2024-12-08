@@ -1,15 +1,11 @@
 ﻿using DevExpress.Blazor.Reporting;
 using DevExpress.Blazor.RichEdit;
-using DevExpress.CodeParser;
 using DevExpress.XtraReports;
 using DocumentFormat.OpenXml.Spreadsheet;
 using FluentValidation.Results;
-using McDermott.Application.Dtos.Transaction;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
 using McDermott.Extentions;
 using McDermott.Web.Components.Pages.Reports;
-using McDermott.Web.Extentions;
 using Microsoft.AspNetCore.Components.Web;
 using Newtonsoft.Json.Linq;
 using QuestPDF.Fluent;

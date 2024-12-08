@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
+﻿using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction.Accidents
 {

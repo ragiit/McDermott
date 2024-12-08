@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
@@ -51,6 +47,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
+
         #endregion variable Static
 
         #region Boolean Data
@@ -204,8 +201,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             postMaintenance.LocationId = value.Id;
         }
 
-       
-
         #endregion Boolean Data
 
         #region UserLoginAndAccessRole
@@ -304,9 +299,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
         {
             getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
         }
+
         private async Task LoadData()
         {
-
             await InvokeAsync(() => PanelVisible = true);
             try
             {
@@ -328,7 +323,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             {
                 await InvokeAsync(() => PanelVisible = false);
             }
-
         }
 
         private async Task selectedStatus(long? Id, string value)
@@ -411,7 +405,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             await LoadDataDetail();
         }
 
-
         private async Task LoadDataDetail(int pageIndex = 0, int pageSize = 10)
         {
             await InvokeAsync(() => PanelVisibleProduct = true);
@@ -420,7 +413,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             {
                 var result = await Mediator.Send(new GetMaintenanceProductQuery
                 {
-                  Predicate =  x => x.MaintenanceId == postMaintenance.Id
+                    Predicate = x => x.MaintenanceId == postMaintenance.Id
                 });
                 getMaintenanceProduct = result.Item1;
                 totalCount = result.PageCount;
@@ -434,8 +427,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 
         private async Task HandlerData()
         {
-
-
             foreach (var item in getMaintenanceProduct)
             {
                 postMaintenanceProduct = item ?? new();
@@ -781,28 +772,34 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
         #endregion function step
 
         #region Click Button
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
         }
+
         private async Task EditItem_Click(IGrid context)
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
             postMaintenanceProduct = (MaintenanceProductDto)context.SelectedDataItem;
-
         }
+
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
+
         private async Task Refresh_Click()
         {
             await LoadDataDetail();
         }
-        #endregion
+
+        #endregion Click Button
 
         #region save
+
         private string Message = string.Empty;
+
         private async Task OnSave()
         {
             try
@@ -863,6 +860,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
                 PanelVisible = false;
             }
         }
+
         private async Task OnSaveProduct()
         {
             try
@@ -912,9 +910,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
                 ToastService.ShowError(ex.Message);
             }
         }
+
         #endregion save
 
         #region Delete
+
         private async Task DeleteProduct(GridDataItemDeletingEventArgs e)
         {
             try
@@ -951,7 +951,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             }
         }
 
-        #endregion
+        #endregion Delete
 
         #region Handler Vaidation
 
@@ -965,7 +965,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 
         private async Task HandleInvalidSubmit()
         {
-
             FormValidationState = false;
         }
 

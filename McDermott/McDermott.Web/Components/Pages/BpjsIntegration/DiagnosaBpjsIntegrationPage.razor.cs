@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace McDermott.Web.Components.Pages.BpjsIntegration
+﻿namespace McDermott.Web.Components.Pages.BpjsIntegration
 {
     public partial class DiagnosaBpjsIntegrationPage
     {

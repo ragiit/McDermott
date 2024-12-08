@@ -168,7 +168,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 {
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<ConcoctionDto>>(), 0, 1, 1);
                 }
-
             }
             catch (Exception ex)
             {

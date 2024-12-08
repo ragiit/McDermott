@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
-using static McDermott.Application.Features.Commands.Medical.CronisCategoryCommand;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

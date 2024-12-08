@@ -1,9 +1,7 @@
 ﻿using Blazored.TextEditor;
 using DevExpress.Blazor.RichEdit;
 using MailKit.Net.Smtp;
-using Microsoft.IdentityModel.Tokens;
 using MimeKit;
-using MimeKit.Text;
 using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
 using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 
@@ -16,8 +14,10 @@ namespace McDermott.Web.Components.Pages.Config
         private List<EmailTemplateDto> EmailTemplates = new();
         private List<EmailSettingDto> EmailSettings = [];
         private EmailTemplateDto EmailFormTemplate = new();
+
         //private List<string>? CcBy = new List<string>();
         private IEnumerable<string> CcBy;
+
         private List<UserDto> ToPartner;
         private User? User = new();
 
@@ -98,7 +98,6 @@ namespace McDermott.Web.Components.Pages.Config
         private List<string>? EmailCc;
         private DxRichEdit richEdit;
         private DevExpress.Blazor.RichEdit.Document documentAPI;
-
 
         #endregion Variable
 
@@ -235,7 +234,6 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-       
         #endregion function button
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -311,7 +309,6 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-
         private async Task SendEmail()
         {
             try
@@ -355,7 +352,6 @@ namespace McDermott.Web.Components.Pages.Config
                 // Add Cc recipients
                 if (CcBy is not null)
                 {
-                    
                     foreach (var cc in CcBy.ToList())
                     {
                         message.Cc.Add(MailboxAddress.Parse(cc.Trim()));
@@ -393,6 +389,5 @@ namespace McDermott.Web.Components.Pages.Config
                 StateHasChanged(); // Ensure the component re-renders
             }
         }
-
     }
 }

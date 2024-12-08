@@ -2,8 +2,8 @@
 
 <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
     <DxToolbarItem Text="@BtnNewName" Visible="VisibleNew" Click="NewItem_Click" IconCssClass="fa-solid fa-plus" Enabled="EnableCreate" />
-    <DxToolbarItem Text="Edit" Visible="VisibleEdit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0 && EnableUpdate" />
-    <DxToolbarItem Text="Delete" Visible="VisibleDelete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0 && Items.Count > 0 && EnableDelete" />
+    <DxToolbarItem Text="Edit" Visible="VisibleEdit" Click="EditItem_Click" IconCssClass="fa-solid fa-pen-to-square" Enabled="SelectedDataItems.Count > 0  && EnableUpdate" />
+    <DxToolbarItem Text="Delete" Visible="VisibleDelete" Click="DeleteItem_Click" IconCssClass="fa-solid fa-trash" Enabled="SelectedDataItems.Count > 0  && EnableDelete" />
     <DxToolbarItem BeginGroup="true" Text="Refresh" Click="Refresh_Click" IconCssClass="fa-solid fa-arrows-rotate" />
     <DxToolbarItem Text="Column Chooser" Click="(() => GridExtention.ColumnChooserButton_Click(Grid))" BeginGroup="true" IconCssClass="fa-solid fa-table-columns" />
     <DxToolbarItem Text="Export" Visible="IsExport" BeginGroup="true" IconCssClass="fa-solid fa-file-export">

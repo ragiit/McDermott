@@ -175,8 +175,10 @@ namespace McDermott.Application.Extentions
         {
             [Display(Name = "Dentist")]
             Dentist = 1,
+
             [Display(Name = "Glasses")]
             Glasses = 2,
+
             [Display(Name = "Safety Glasses")]
             SafetyGlasses = 3
         }

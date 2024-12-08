@@ -1,5 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
@@ -137,14 +136,14 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         PharmacyId = x.PharmacyId,
                         ProductId = x.ProductId,
                         SignaId = x.SignaId,
-                        Dosage=x.Dosage,
+                        Dosage = x.Dosage,
                         DrugDosageId = x.DrugDosageId,
                         DrugFromId = x.DrugFromId,
                         DrugRouteId = x.DrugRouteId,
                         ActiveComponentId = x.ActiveComponentId,
                         DosageFrequency = x.DosageFrequency,
                         Stock = x.Stock,
-                        GivenAmount=x.GivenAmount,
+                        GivenAmount = x.GivenAmount,
                         Product = new Product
                         {
                             Name = x.Product == null ? string.Empty : x.Product.Name,
@@ -169,7 +168,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         //{
                         //    Name = ac.Name
                         //}).ToList()
-
                     });
 
                 if (!request.IsGetAll)
@@ -244,10 +242,10 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                     query = query.Select(x => new Prescription
                     {
                         Id = x.Id,
-                        PharmacyId=x.PharmacyId,
+                        PharmacyId = x.PharmacyId,
                         ProductId = x.ProductId,
                         SignaId = x.SignaId,
-                        Dosage=x.Dosage,
+                        Dosage = x.Dosage,
                         DrugDosageId = x.DrugDosageId,
                         DrugFromId = x.DrugFromId,
                         DrugRouteId = x.DrugRouteId,
@@ -279,7 +277,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         //{
                         //    Name = ac.Name
                         //}).ToList(),
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<PrescriptionDto>();

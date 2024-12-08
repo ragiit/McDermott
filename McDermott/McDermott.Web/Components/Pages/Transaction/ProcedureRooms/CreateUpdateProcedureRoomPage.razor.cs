@@ -1,5 +1,4 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using SignaturePad;
 using System.Text.RegularExpressions;
@@ -274,7 +273,6 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
                             default:
                                 break;
                         }
-
                     }
 
                     var resultLog = await Mediator.Send(new GetGeneralConsultanMedicalSupportLogQuery
@@ -353,7 +351,7 @@ namespace McDermott.Web.Components.Pages.Transaction.ProcedureRooms
 
                         GeneralConsultanMedicalSupport = await Mediator.Send(new CreateGeneralConsultanMedicalSupportRequest(GeneralConsultanMedicalSupport));
 
-                        if(GeneralConsultanMedicalSupport is not null)
+                        if (GeneralConsultanMedicalSupport is not null)
                         {
                             PostProsedureRoomLog.GeneralConsultationMedicalSupportId = GeneralConsultanMedicalSupport.Id;
                             PostProsedureRoomLog.UserById = UserLogin.Id;

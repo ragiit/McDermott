@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
-using static McDermott.Application.Features.Commands.Medical.DoctorScheduleCommand;
-using static McDermott.Application.Features.Commands.Medical.DoctorScheduledCommand;
-using static McDermott.Application.Features.Commands.Medical.DoctorScheduleDetailCommand;
 
 namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
 {

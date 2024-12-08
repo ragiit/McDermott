@@ -1,17 +1,12 @@
-﻿using McDermott.Application.Features.Services;
-using MediatR;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
-using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
-using System.Linq.Expressions;
-using System.ComponentModel.DataAnnotations;
-using McDermott.Domain.Entities;
-using DocumentFormat.OpenXml.Spreadsheet;
-using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
-using DocumentFormat.OpenXml.Bibliography;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Application.Dtos.ClaimUserManagement;
+using McDermott.Application.Features.Services;
+using Microsoft.AspNetCore.Components.Web;
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.AllQueries.CountModelCommand;
 using static McDermott.Application.Features.Commands.ClaimUserManagement.ClaimHistoryCommand;
+using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand;
 
 namespace McDermott.Web.Components.Pages.Patient.Patients
@@ -88,7 +83,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             FocusedRowVisibleIndexUserClaim = args.VisibleIndex;
         }
-
 
         #region Searching
 
@@ -541,6 +535,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
         [Parameter]
         public long InsurancePoliciesCount { get; set; } = 0;
+
         public long UserClaimCount { get; set; } = 0;
         public long WellnessAttendanceCount { get; set; } = 0;
 
@@ -628,6 +623,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         private IReadOnlyList<object> SelectedDataItemAttendances { get; set; } = [];
         private List<WellnessProgramAttendanceDto> WellnessProgramAttendances { get; set; } = [];
         private bool LoadingWellness = false;
+
         private async Task LoadDataAttendances(int pageIndex = 0, int pageSizeAttendances = 10)
         {
             try
@@ -668,6 +664,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         }
 
         #endregion Searching
+
         private async Task GetUserInfo()
         {
             try

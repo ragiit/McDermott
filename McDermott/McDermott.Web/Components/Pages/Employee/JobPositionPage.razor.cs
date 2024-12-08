@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-
-namespace McDermott.Web.Components.Pages.Employee
+﻿namespace McDermott.Web.Components.Pages.Employee
 {
     public partial class JobPositionPage
     {

@@ -21,7 +21,7 @@
 
     <base href="@AppSettings.BaseHref" />
     <link rel="icon" type="image/png" href="image/logo.png" />
-                
+
     <link rel="stylesheet" href="css/site.min.css" />
     <link href="McDermott.Web.styles.css" rel="stylesheet">
 
@@ -44,6 +44,14 @@
         .dxbl-fl-ctrl {
             /* margin-top:5px;  */
         }
+
+        .dxbl-grid {
+            height: 70vh;
+            /* height: 522px; */
+        }
+    </style>
+
+    <style>
     </style>
 
     @*  < link rel="stylesheet" href="bootstrap/bootstrap.min.css" /> *@
@@ -58,7 +66,7 @@
     @* <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"> *@
 
     @* <link rel="stylesheet" href="/css/Ticket.css" /> *@
-   @*  <link rel="stylesheet" href="css/pale.css" />  *@
+    @*  <link rel="stylesheet" href="css/pale.css" />  *@
     @* <link rel="stylesheet" href="_content/DevExpress.Blazor.RichEdit/dx-blazor-richedit.bs5.css" /> *@
 
     @*...*@
@@ -106,12 +114,67 @@
     <script src="js/site.min.js"></script>
     <script src="canvasScript.js"></script>
 
+
     <script>
         function openInNewTab(url) {
             window.open(url, '_blank');
         }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script>
+            window.fabricEditor = {
+            canvas: null,
+            initCanvas: function (baseUri) {
+                this.canvas = new fabric.Canvas('imageCanvas');
+                const img = new Image();
+                img.src = baseUri; // Dinamis berdasarkan BaseUri
+                img.onload = () => {
+                    const fabricImage = new fabric.Image(img, {
+                        left: 0,
+                        top: 0,
+                        selectable: false
+                    });
+                    this.canvas.add(fabricImage);
+                };
 
+                // Tambah event klik untuk menggambar lingkaran dengan angka
+                let currentNumber = 1;
+                       this.canvas.on('mouse:down', function (e) {
+                const pointer = this.canvas.getPointer(e.e);
+
+                // Lingkaran
+                const circle = new fabric.Circle({
+                    left: pointer.x - 20,
+                    top: pointer.y - 20,
+                    radius: 20,
+                    fill: 'transparent',
+                    stroke: 'red'
+                });
+
+                // Teks di tengah lingkaran
+                const text = new fabric.Text(currentNumber.toString(), {
+                    left: pointer.x,
+                    top: pointer.y,
+                    fontSize: 18, // Ukuran font lebih besar
+                    fontWeight: 'bold', // Teks bold
+                    fill: 'black',
+                    originX: 'center', // Posisikan teks ke tengah horizontal
+                    originY: 'center'  // Posisikan teks ke tengah vertikal
+                });
+
+                this.canvas.add(circle);
+                this.canvas.add(text);
+                currentNumber++;
+                }.bind(this));
+
+            },
+
+            clearCanvas: function () {
+                this.canvas.clear();
+            }
+        };
+
+    </script>
 
     @* <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> *@
     @* <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> *@

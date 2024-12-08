@@ -1,8 +1,6 @@
 ﻿using DevExpress.Blazor.Internal;
-using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
 using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory
@@ -731,7 +729,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                                 await Mediator.Send(new CreateInventoryAdjusmentLogRequest(postInventoryAdjusmentLog));
                             }
 
-                            var temps = new List<InventoryAdjusmentDetailDto>();        
+                            var temps = new List<InventoryAdjusmentDetailDto>();
                             foreach (var o in Products)
                             {
                                 var sp = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == o.Id && s.LocationId == InventoryAdjusment.LocationId && s.Validate == true));
@@ -1054,7 +1052,9 @@ namespace McDermott.Web.Components.Pages.Inventory
         }
 
         #region Products Combobox
+
         private CancellationTokenSource? _ctsProduct;
+
         private async Task OnInputProduct(ChangeEventArgs e)
         {
             try
@@ -1078,6 +1078,7 @@ namespace McDermott.Web.Components.Pages.Inventory
                 _ctsProduct = null;
             }
         }
+
         private async Task LoadProduct(string? e = "", Expression<Func<Product, bool>>? predicate = null)
         {
             try
@@ -1093,8 +1094,7 @@ namespace McDermott.Web.Components.Pages.Inventory
             finally { PanelVisible = false; }
         }
 
-
-        #endregion
+        #endregion Products Combobox
 
         private async Task OnSelectProduct(ProductDto e)
         {

@@ -1,9 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using MailKit.Search;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel;
-using System.Security.Policy;
+﻿using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Transaction.VaccinationPlanCommand;

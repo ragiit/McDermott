@@ -90,13 +90,12 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         Id = x.Id,
                         Frequency = x.Frequency,
                         TotalQtyPerDay = x.TotalQtyPerDay,
-                        Days = x.Days ,
+                        Days = x.Days,
                         DrugRouteId = x.DrugRouteId,
                         DrugRoute = new DrugRoute
                         {
-                            Route = x.DrugRoute == null ? string.Empty: x.DrugRoute.Route,
+                            Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
                         },
-                        
                     });
 
                 if (!request.IsGetAll)
@@ -181,7 +180,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         {
                             Route = x.DrugRoute == null ? string.Empty : x.DrugRoute.Route,
                         },
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<DrugDosageDto>();

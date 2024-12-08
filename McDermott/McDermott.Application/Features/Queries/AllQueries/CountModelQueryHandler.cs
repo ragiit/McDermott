@@ -6,7 +6,7 @@ namespace McDermott.Application.Features.Queries.AllQueries
         IRequestHandler<GetInsurancePolicyCountQuery, int>,
         IRequestHandler<GetPrescriptionCountQuery, int>,
         IRequestHandler<GetWellnessAttendanceCountQuery, int>,
-        IRequestHandler<GetClaimHistoryCountQuery, int>, 
+        IRequestHandler<GetClaimHistoryCountQuery, int>,
         IRequestHandler<GetGeneralConsultationCountQuery, int>
     {
         public async Task<int> Handle(GetWellnessAttendanceCountQuery request, CancellationToken cancellationToken)
@@ -42,6 +42,7 @@ namespace McDermott.Application.Features.Queries.AllQueries
                 throw;
             }
         }
+
         public async Task<int> Handle(GetClaimHistoryCountQuery request, CancellationToken cancellationToken)
         {
             try
@@ -58,6 +59,7 @@ namespace McDermott.Application.Features.Queries.AllQueries
                 throw;
             }
         }
+
         public async Task<int> Handle(GetPrescriptionCountQuery request, CancellationToken cancellationToken)
         {
             try

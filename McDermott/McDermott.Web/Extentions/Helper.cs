@@ -1,8 +1,4 @@
-﻿using DevExpress.Utils.Filtering.Internal;
-using McDermott.Application.Dtos;
-using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using Microsoft.AspNetCore.Components.Web;
+﻿using McDermott.Application.Features.Services;
 using Serilog;
 using Path = System.IO.Path;
 

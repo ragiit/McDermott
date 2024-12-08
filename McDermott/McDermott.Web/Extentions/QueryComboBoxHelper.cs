@@ -1,8 +1,5 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using MediatR;
+﻿using MediatR;
 using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
-using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Transaction.GeneralConsultanServiceAncCommand;

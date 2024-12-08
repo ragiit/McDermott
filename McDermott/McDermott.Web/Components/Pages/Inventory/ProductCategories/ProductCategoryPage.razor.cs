@@ -1,6 +1,4 @@
-﻿using static HotChocolate.ErrorCodes;
-
-namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
+﻿namespace McDermott.Web.Components.Pages.Inventory.ProductCategories
 {
     public partial class ProductCategoryPage
     {

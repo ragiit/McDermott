@@ -1,12 +1,7 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Shared;
 using System.ComponentModel.DataAnnotations;
-using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 
 namespace McDermott.Web.Components.Pages.Medical.Practitioners
 {
@@ -1743,6 +1738,5 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
         }
 
         #endregion SIP File
-
     }
 }

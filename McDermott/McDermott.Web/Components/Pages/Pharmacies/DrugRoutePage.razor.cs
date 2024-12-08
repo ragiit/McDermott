@@ -1,7 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
-
-namespace McDermott.Web.Components.Pages.Pharmacies
+﻿namespace McDermott.Web.Components.Pages.Pharmacies
 {
     public partial class DrugRoutePage
     {

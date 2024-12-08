@@ -17,7 +17,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-
         }
 
         private async Task GetUserInfo()
@@ -35,6 +34,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         #endregion UserLoginAndAccessRole
 
         #region Relation Data
+
         private List<TransferStockDto> getTransferStocks = [];
         private List<ProductDto> getProducts = [];
         private List<TransactionStockDto> getTransactionStocks = [];
@@ -49,7 +49,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         private TransferStockLogDto postTransferStockLogs = new();
         private TransactionStockDto postTransactionStocks = new();
 
-        #endregion
+        #endregion Relation Data
 
         #region Variabel Static
 
@@ -67,7 +67,8 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         private DateTime? SelectedBatchExpired { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
-        #endregion
+
+        #endregion Variabel Static
 
         #region Searching
 
@@ -95,8 +96,8 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
         #endregion Searching
 
-
         #region Load Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -138,7 +139,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             }
             catch
             {
-
             }
         }
 
@@ -150,14 +150,12 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 var result = await Mediator.Send(new GetTransferStockProductQuery
                 {
                     Predicate = x => x.TransferStockId == postTransferStocks.Id
-
                 });
                 getTransferStockProducts = result.Item1;
                 PanelVisible = false;
             }
             catch
             {
-
             }
         }
 
@@ -174,7 +172,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             PanelVisible = false;
         }
 
-        #endregion
+        #endregion Load Data
 
         #region Load ComboBox
 
@@ -336,16 +334,18 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             PanelVisible = false;
         }
 
-        #endregion Combo Box DrugForm
+        #endregion Combo Box Source
 
         #endregion Load ComboBox
 
         #region Grid
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-        #endregion
+
+        #endregion Grid
 
         #region Select change data
 
@@ -410,7 +410,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
             //Products = AllProducts.Where(x => st.Select(s => s.ProductId).Contains(x.Id)).ToList();
         }
-
 
         private async Task SelectedItemByProduct(ProductDto e)
         {
@@ -479,7 +478,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             {
                 ToastService.ClearCustomToasts();
                 ToastService.ShowWarning("The stock sent is less than the available stock!!");
-
             }
             else
             {
@@ -487,16 +485,16 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             }
         }
 
-        #endregion
+        #endregion Select change data
 
         #region HandleSubmit
+
         private async Task HandleValidSubmit()
         {
             if (FormValidationState)
                 await OnSave();
             else
                 FormValidationState = true;
-
         }
 
         private async Task HandleInvalidSubmit()
@@ -512,7 +510,8 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 return;
             }
         }
-        #endregion
+
+        #endregion HandleSubmit
 
         #region Function Save
 
@@ -562,16 +561,14 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
 
                     await Mediator.Send(new CreateTransferStockLogRequest(postTransferStockLogs));
                     NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}", true);
-
                 }
                 else
                 {
                     var tempTransferStock = await Mediator.Send(new UpdateTransferStockRequest(postTransferStocks));
                     ToastService.ShowSuccess("Update Data Success...");
-                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}",true);
+                    NavigationManager.NavigateTo($"inventory/internal-transfers/{EnumPageMode.Update.GetDisplayName()}?Id={tempTransferStock.Id}", true);
                 }
 
-               
                 StateHasChanged();
             }
             catch (Exception ex)
@@ -584,7 +581,7 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         {
             try
             {
-                if(postTransferStockProducts.Id == 0)
+                if (postTransferStockProducts.Id == 0)
                 {
                     postTransferStockProducts.TransferStockId = postTransferStocks.Id;
                     await Mediator.Send(new CreateTransferStockProductRequest(postTransferStockProducts));
@@ -608,13 +605,15 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         #endregion Function Save
 
         #region Delete
+
         private async Task OnDelete()
         {
-
         }
-        #endregion
+
+        #endregion Delete
 
         #region Click Button
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -641,7 +640,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             }
         }
 
-
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
@@ -651,15 +649,16 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
         {
             await LoadData();
         }
-        #endregion
+
+        #endregion Click Button
 
         #region Stage
+
         private async Task Request()
         {
             try
             {
                 PanelVisible = true;
-
 
                 if (postTransferStocks is null)
                 {
@@ -745,7 +744,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
                 //Save Status InternalTransfer
                 postTransferStocks.Status = EnumStatusInternalTransfer.Ready;
                 await Mediator.Send(new UpdateTransferStockRequest(postTransferStocks));
-
 
                 //Save Log
                 postTransferStockLogs.TransferStockId = postTransferStocks.Id;
@@ -845,7 +843,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             {
                 var TransferProductStock = await Mediator.Send(new GetTransferStockProductQuery());
 
-
                 if (postTransferStocks is null)
                 {
                     return;
@@ -868,7 +865,6 @@ namespace McDermott.Web.Components.Pages.Inventory.InternalTransfer
             }
         }
 
-        #endregion
-
+        #endregion Stage
     }
 }

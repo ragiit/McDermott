@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-
-namespace McDermott.Web.Components.Pages.Pharmacies
+﻿namespace McDermott.Web.Components.Pages.Pharmacies
 {
     public partial class UomPage
     {
@@ -430,7 +427,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                         list = list.Where(Uom =>
                             !existingLabTests2.Any(ev =>
                                 ev.Name == Uom.Name &&
-                                ev.Type == Uom.Type 
+                                ev.Type == Uom.Type
                             )
                         ).ToList();
 

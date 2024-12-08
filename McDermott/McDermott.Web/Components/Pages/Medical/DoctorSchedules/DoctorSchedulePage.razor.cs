@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using static McDermott.Application.Features.Commands.Medical.DoctorScheduledCommand;
-using static McDermott.Application.Features.Commands.Medical.DoctorScheduleDetailCommand;
-
-namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
+﻿namespace McDermott.Web.Components.Pages.Medical.DoctorSchedules
 {
     public partial class DoctorSchedulePage
     {

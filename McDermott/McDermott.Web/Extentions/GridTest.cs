@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Components.Rendering;
-
-namespace McDermott.Web.Extentions
+﻿namespace McDermott.Web.Extentions
 {
     public class GridTest : DxGrid
     {
-        bool _initialParametersSet;
+        private bool _initialParametersSet;
+
         protected override Task SetParametersAsyncCore(ParameterView parameters)
         {
             if (!_initialParametersSet)

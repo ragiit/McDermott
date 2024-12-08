@@ -39,9 +39,10 @@ namespace McDermott.Domain.Entities
 
         public DateTime? AppointmentDate { get; set; }
         public TimeSpan? WorkFrom { get; set; }
-        public TimeSpan? WorkTo { get; set; } 
+        public TimeSpan? WorkTo { get; set; }
 
         #region Rujukan
+
         public string? ReferralNo { get; set; } // No. Rujukan
         public string? SerialNo { get; set; }  // Dari Kiosk
         public string? VisitNumber { get; set; } // NO Kunjungan
@@ -53,7 +54,7 @@ namespace McDermott.Domain.Entities
         public DateTime? ReferSelectFaskesDate { get; set; } // Date ketika select faskes, ada di print bagian "Salam sejawat,"
         public DateTime? ReferDateVisit { get; set; } // Tgl. Rencana Berkunjung
         public string? PracticeScheduleTimeDate { get; set; } // Jadwal Praktek
-        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan, 
+        public DateTime? ReferralExpiry { get; set; } // Surat rujukan berlaku 1[satu] kali kunjungan,
         public string? ReferVerticalSpesialisParentSpesialisName { get; set; } // ANAK
         public string? ReferVerticalSpesialisParentSpesialisCode { get; set; } // ANA
         public string? ReferVerticalSpesialisParentSubSpesialisName { get; set; } // Anak
@@ -67,16 +68,16 @@ namespace McDermott.Domain.Entities
         public string? PPKRujukanName { get; set; } = "-"; // nmppk , RS CHARIS MEDIKA
         public string? PPKRujukanCode { get; set; } // kdppk, 0070R018
 
-        #endregion
+        #endregion Rujukan
 
         /// <BPJS Rujukan>
         public string? KdPrognosa { get; set; }
 
         public string? Anamnesa { get; set; }
-        public string? BMHP { get; set; } 
+        public string? BMHP { get; set; }
         public string? ImageToBase64 { get; set; }
         public string? Description { get; set; }
-        public string? Markers { get; set; } 
+        public string? Markers { get; set; }
 
         /// </BPJS Rujukan>
         public string? MedexType { get; set; }
@@ -92,20 +93,21 @@ namespace McDermott.Domain.Entities
         public string? AccidentExaminationBase64 { get; set; }
 
         #region Mcdermott Internal
+
         public string? TypeClaim { get; set; }
         public string? Number { get; set; }
         public DateTime? DateRJMCINT { get; set; }
         public string? ReferTo { get; set; }
-        public string? Hospital {  get; set; }
-        public string? Specialist {  get; set; }
+        public string? Hospital { get; set; }
+        public string? Specialist { get; set; }
         public string? CategoryRJMCINT { get; set; }
-        public string? ExamFor {  get; set; }
+        public string? ExamFor { get; set; }
         public long? OccupationalId { get; set; }
-        public string? TempDiagnosis {  get; set; }
-        public string? TherapyProvide {  get; set; }
+        public string? TempDiagnosis { get; set; }
+        public string? TherapyProvide { get; set; }
         public string? InpatientClass { get; set; }
 
-        #endregion
+        #endregion Mcdermott Internal
 
         #region Clinical Assesment
 
@@ -170,8 +172,10 @@ namespace McDermott.Domain.Entities
         #endregion ANC
 
         #region Claim
-        public bool? IsClaim { get; set; } 
-        #endregion
+
+        public bool? IsClaim { get; set; }
+
+        #endregion Claim
 
         public long? ProjectId { get; set; }
         public bool IsAccident { get; set; }

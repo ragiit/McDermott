@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-
-namespace McDermott.Web.Components.Pages.Medical.Practitioners
+﻿namespace McDermott.Web.Components.Pages.Medical.Practitioners
 {
     public partial class PractitionerPage
     {

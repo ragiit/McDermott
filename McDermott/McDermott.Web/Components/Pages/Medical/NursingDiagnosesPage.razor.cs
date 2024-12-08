@@ -103,7 +103,7 @@
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
-            PanelVisible = true; 
+            PanelVisible = true;
             var result = await Mediator.Send(new GetNursingDiagnosesQuery
             {
                 SearchTerm = searchTerm ?? "",

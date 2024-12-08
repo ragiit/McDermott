@@ -1,14 +1,10 @@
-﻿using DevExpress.Blazor.RichEdit;
+﻿using Blazor.Extensions;
+using Blazor.Extensions.Canvas.Canvas2D;
+using DevExpress.Blazor.RichEdit;
 using DocumentFormat.OpenXml.Drawing.Charts;
-using McDermott.Domain.Entities;
+using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel;
 using static McDermott.Application.Features.Commands.Transaction.AccidentCommand;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
-
-using System.Text.Json;
-using Microsoft.AspNetCore.Components.Web;
-using Blazor.Extensions.Canvas.Canvas2D;
-using Blazor.Extensions;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {

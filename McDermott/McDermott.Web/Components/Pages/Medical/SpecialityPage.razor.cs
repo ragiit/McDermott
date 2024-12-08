@@ -1,6 +1,4 @@
-﻿using GreenDonut;
-using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
+﻿using McDermott.Application.Features.Services;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

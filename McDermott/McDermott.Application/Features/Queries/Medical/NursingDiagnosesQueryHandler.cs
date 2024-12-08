@@ -31,7 +31,7 @@ namespace McDermott.Application.Features.Queries.Medical
 
             return existingNursingDiagnosess.Adapt<List<NursingDiagnosesDto>>();
         }
-         
+
         public async Task<(List<NursingDiagnosesDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetNursingDiagnosesQuery request, CancellationToken cancellationToken)
         {
             try
@@ -167,7 +167,6 @@ namespace McDermott.Application.Features.Queries.Medical
                 throw;
             }
         }
-
 
         public async Task<bool> Handle(ValidateNursingDiagnosesQuery request, CancellationToken cancellationToken)
         {

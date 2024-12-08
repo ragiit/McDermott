@@ -1,8 +1,5 @@
 ﻿using DevExpress.Blazor.RichEdit;
-using DevExpress.Data.Helpers;
 using McDermott.Extentions;
-using Microsoft.AspNetCore.Components;
-using System.Net;
 
 namespace McDermott.Web.Components.Pages.Transaction
 {
@@ -11,9 +8,12 @@ namespace McDermott.Web.Components.Pages.Transaction
         private List<GeneralConsultanServiceDto> getGeneralConsultanServices = [];
         private List<UserDto> getPatient = [];
         private GenerateMedicalcertificatesDto postGenerateMedicalcertificates = new();
+
         #region Variabel Static
+
         [Parameter]
         public string IdEncrypt { get; set; } = string.Empty;
+
         private long? Ids { get; set; }
         public bool PanelVisible { get; set; } = false;
         public bool ViewVisible { get; set; } = false;
@@ -21,7 +21,8 @@ namespace McDermott.Web.Components.Pages.Transaction
         private DevExpress.Blazor.RichEdit.Document documentAPI;
         public byte[]? DocumentContent;
 
-        #endregion
+        #endregion Variabel Static
+
         // Metode untuk mendekripsi ID
         private async Task Decrypt()
         {
@@ -79,7 +80,6 @@ namespace McDermott.Web.Components.Pages.Transaction
 
         #endregion UserLoginAndAccessRole
 
-
         // Override OnParametersSetAsync untuk mendekripsi setelah parameter diatur
         protected override async Task OnInitializedAsync()
         {
@@ -89,7 +89,6 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
             catch { }
 
-            
             await LoadData();
             await Decrypt();
         }
@@ -115,24 +114,31 @@ namespace McDermott.Web.Components.Pages.Transaction
                 case "AUTHORIZATION FOR RELEASE OF MEDICAL":
                     await AuthorizationForReleaseOfMedical();
                     break;
+
                 case "INFORMED CONSENT MEDICAL ACTIONS":
                     await InformedConsentMedicalActions();
                     break;
+
                 case "REFERENCE ANSWER":
                     await ReferenceAnswer();
                     break;
+
                 case "REFUSAL OF MEDICAL TREATMENT":
                     await RefusalOfMedicalTreatment();
                     break;
+
                 case "ACCIDENT REFERRAL":
                     await AccidentReferral();
                     break;
+
                 case "GENERAL REFERRAL":
                     await GeneralReferral();
                     break;
+
                 case "CERTIFICATE OF FITNESS":
                     await CertificateOfFitness();
                     break;
+
                 default: break;
             }
         }
@@ -140,21 +146,26 @@ namespace McDermott.Web.Components.Pages.Transaction
         private async Task AuthorizationForReleaseOfMedical()
         {
             ViewVisible = true;
-
         }
 
         private async Task InformedConsentMedicalActions()
         {
-
         }
 
-        private async Task ReferenceAnswer() { }
-        private async Task RefusalOfMedicalTreatment() { }
-        private async Task AccidentReferral() { }
-        private async Task GeneralReferral() { }
+        private async Task ReferenceAnswer()
+        { }
+
+        private async Task RefusalOfMedicalTreatment()
+        { }
+
+        private async Task AccidentReferral()
+        { }
+
+        private async Task GeneralReferral()
+        { }
+
         private async Task CertificateOfFitness()
         {
-
         }
     }
 }

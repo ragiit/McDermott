@@ -14,10 +14,12 @@ namespace McDermott.Application.Features.Queries.Transaction
         IRequestHandler<DeleteGeneralConsultanCPPTRequest, bool>
     {
         #region GET
+
         public async Task<bool> Handle(CheckExistingGeneralConsultanCPPTQuery request, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Repository<GeneralConsultanCPPT>().Entities.AsNoTracking().AnyAsync(request.Predicate);
         }
+
         public async Task<(List<GeneralConsultanCPPTDto>, int pageIndex, int pageSize, int pageCount)> Handle(GetGeneralConsultanCPPTsQuery request, CancellationToken cancellationToken)
         {
             try
@@ -359,8 +361,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                 throw;
             }
         }
-
-        
 
         #endregion DELETE
     }

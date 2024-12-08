@@ -1,8 +1,6 @@
 ﻿using Blazored.TextEditor;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Domain.Entities;
 using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramAttendanceCommand;
 using static McDermott.Application.Features.Commands.Transaction.WellnessProgramCommand;

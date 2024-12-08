@@ -1,8 +1,4 @@
-﻿using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
-
-namespace McDermott.Web.Components.Pages.Pharmacies
+﻿namespace McDermott.Web.Components.Pages.Pharmacies
 {
     public partial class ActiveComponentPage
     {
@@ -139,7 +135,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
         {
             PanelVisible = true;
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ActiveComponentDto ?? new()); 
+            var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ActiveComponentDto ?? new());
             Uoms = (await Mediator.Send(new GetUomQuery
             {
                 Predicate = x => x.Id == a.UomId
@@ -246,7 +242,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                         if (!string.IsNullOrEmpty(a))
                             aa.Add(a.ToLower());
                     }
-                     
 
                     list1 = (await Mediator.Send(new GetUomQuery
                     {

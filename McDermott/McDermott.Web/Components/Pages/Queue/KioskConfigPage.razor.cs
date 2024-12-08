@@ -1,6 +1,4 @@
 ﻿using McDermott.Application.Dtos.Queue;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Queue.CounterCommand;
 using static McDermott.Application.Features.Commands.Queue.KioskConfigCommand;
 
 namespace McDermott.Web.Components.Pages.Queue

@@ -4,7 +4,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 {
     public partial class MaintenancePage
     {
-        private List<MaintenanceDto> getMaintenance = [];       
+        private List<MaintenanceDto> getMaintenance = [];
         private MaintenanceDto postMaintenance = new();
 
         #region Variable
@@ -135,11 +135,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             {
                 PanelVisible = true;
                 showForm = false;
-                var result = await Mediator.Send(new GetMaintenanceQuery(searchTerm:searchTerm, pageSize: pageSize, pageIndex: pageIndex));
+                var result = await Mediator.Send(new GetMaintenanceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
                 getMaintenance = result.Item1;
                 totalCount = result.pageCount;
-
-
             }
             catch (Exception ex)
             {
@@ -246,7 +244,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 
         #region button
 
-       
         private async Task NewItem_Click()
         {
             NavigationManager.NavigateTo($"inventory/Maintenance/{EnumPageMode.Create.GetDisplayName()}");
@@ -260,7 +257,6 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             return;
         }
 
-       
         private async Task Refresh_Click()
         {
             await LoadData();
@@ -303,6 +299,5 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
         }
 
         #endregion Delete
-
     }
 }

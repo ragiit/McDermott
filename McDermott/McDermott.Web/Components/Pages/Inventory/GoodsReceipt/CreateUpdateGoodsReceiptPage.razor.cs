@@ -1,13 +1,7 @@
-﻿using DevExpress.XtraPrinting.Native.Properties;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using GreenDonut;
-using MailKit.Search;
-using McDermott.Domain.Entities;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 {
@@ -75,6 +69,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         #endregion UserLoginAndAccessRole
 
         #region Relation Data
+
         private List<GoodsReceiptDto> getGoodsReceipts = [];
         private List<GoodsReceiptLogDto> getGoodsReceiptLogs = [];
         private List<GoodsReceiptDetailDto> getGoodsReceiptDetails = [];
@@ -88,7 +83,8 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         private GoodsReceiptLogDto postGoodsReceiptLogs = new();
         private GoodsReceiptDetailDto postGoodsReceiptDetail = new();
         private TransactionStockDto postTransaction = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region variabel Data
 
@@ -105,7 +101,8 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         private bool isGrChecked { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
+
+        #endregion variabel Data
 
         #region Searching
 
@@ -134,6 +131,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         #endregion Searching
 
         #region Load data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -189,7 +187,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 getGoodsReceiptLogs = resultLog.Item1 ?? new();
             }
 
-
             PanelVisible = false;
         }
 
@@ -197,7 +194,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         {
             getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery()).ConfigureAwait(false); ;
             getUoms = await Mediator.Send(new GetAllUomQuery()).ConfigureAwait(false); ;
-
         }
 
         private async Task LoadDetailData(int pageIndex = 0, int pageSize = 10)
@@ -223,7 +219,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             }
             catch
             {
-
             }
         }
 
@@ -241,9 +236,11 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 postGoodsReceiptDetail.Batch = value;
             }
         }
-        #endregion
+
+        #endregion Load data
 
         #region Change Data
+
         private void SelectedChangeProduct(ProductDto e)
         {
             try
@@ -316,14 +313,16 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             return new MarkupString(html);
         }
 
-        #endregion
+        #endregion Change Data
 
         #region Grid
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
         }
-        #endregion
+
+        #endregion Grid
 
         #region Load ComboBox
 
@@ -429,7 +428,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             PanelVisible = false;
         }
 
-        #endregion ComboBox Uom
+        #endregion ComboBox Product
 
         #region Combo Box Source
 
@@ -486,7 +485,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             PanelVisible = false;
         }
 
-        #endregion Combo Box DrugForm
+        #endregion Combo Box Source
 
         //#region Combo Box DrugRoute
 
@@ -629,17 +628,16 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
         //#endregion ComboBox Uom
 
-
         #endregion Load ComboBox
 
         #region HandleSubmit
+
         private async Task HandleValidSubmit()
         {
             if (FormValidationState)
                 await OnSave();
             else
                 FormValidationState = true;
-
         }
 
         private async Task HandleInvalidSubmit()
@@ -655,9 +653,11 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 return;
             }
         }
-        #endregion
+
+        #endregion HandleSubmit
 
         #region Save
+
         private async Task OnSave()
         {
             try
@@ -694,7 +694,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                     postGoodsReceipt.Status = EnumStatusGoodsReceipt.Draft;
 
                     goodsReceipt = await Mediator.Send(new CreateGoodsReceiptRequest(postGoodsReceipt));
-
 
                     ToastService.ShowSuccess("Add Data Success...");
 
@@ -736,20 +735,18 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                     await Mediator.Send(new UpdateGoodsReceiptDetailRequest(postGoodsReceiptDetail));
                 }
                 await LoadDetailData();
-
             }
             catch
             {
-
             }
         }
 
-        #endregion
+        #endregion Save
 
         #region Delete
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
-
             try
             {
                 var data = (GoodsReceiptDetailDto)e.DataItem;
@@ -771,8 +768,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             }
         }
 
-
-        #endregion
+        #endregion Delete
 
         #region Process
 
@@ -826,7 +822,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                     postTransaction.Batch = a.Batch;
                     postTransaction.ExpiredDate = a.ExpiredDate;
                     postTransaction.Reference = referenceNumber;
-                    postTransaction.Quantity =quantity.ToLong();
+                    postTransaction.Quantity = quantity.ToLong();
                     postTransaction.LocationId = postGoodsReceipt.DestinationId;
                     postTransaction.UomId = a.Product?.UomId;
                     postTransaction.Validate = false;
@@ -834,7 +830,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                     // Kirim transaksi menggunakan Mediator
                     await Mediator.Send(new CreateTransactionStockRequest(postTransaction));
                 }
-
 
                 //UpdateReceiving Stock
                 postGoodsReceipt.Status = EnumStatusGoodsReceipt.Process;
@@ -849,8 +844,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 await Mediator.Send(new CreateGoodsReceiptLogRequest(postGoodsReceiptLogs));
                 await LoadData();
                 PanelVisible = false;
-
-
             }
         }
 
@@ -899,13 +892,14 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         #endregion Validation
 
         #region Cancel
+
         private async Task onDiscard()
         {
             NavigationManager.NavigateTo($"inventory/goods-receipts");
         }
+
         private async Task onCancel()
         {
-
             var tempGoodsReceipts = getGoodsReceipts.Where(x => x.Id == postGoodsReceipt.Id).FirstOrDefault()!;
 
             if (tempGoodsReceipts is null)
@@ -927,9 +921,10 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             await Mediator.Send(new CreateGoodsReceiptLogRequest(postGoodsReceiptLogs));
         }
 
-        #endregion
+        #endregion Cancel
 
         #region Click Button
+
         private async Task NewItem_Click()
         {
             await Grid.StartEditNewRowAsync();
@@ -939,7 +934,6 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         {
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
             postGoodsReceiptDetail = (GoodsReceiptDetailDto)context.SelectedDataItem;
-
         }
 
         private void DeleteItem_Click()
@@ -951,8 +945,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         {
             await LoadData();
         }
-        #endregion
 
-
+        #endregion Click Button
     }
 }

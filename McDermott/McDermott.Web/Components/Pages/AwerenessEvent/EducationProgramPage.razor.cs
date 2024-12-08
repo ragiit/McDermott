@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using MailKit.Search;
-using McDermott.Application.Dtos.AwarenessEvent;
-using static McDermott.Application.Features.Commands.AwarenessEvent.AwarenessEduCategoryCommand;
+﻿using McDermott.Application.Dtos.AwarenessEvent;
 using static McDermott.Application.Features.Commands.AwarenessEvent.EducationProgramCommand;
 
 namespace McDermott.Web.Components.Pages.AwerenessEvent
@@ -9,23 +6,28 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
     public partial class EducationProgramPage
     {
         #region Data Relation
+
         private List<EducationProgramDto> getEducationPrograms = [];
         private EducationProgramDto postEducationPrograms = new();
-        #endregion
+
+        #endregion Data Relation
 
         #region variabel static
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
-        private IGrid Grid {  get; set; }
+
+        private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; }
         private bool FormValidationState { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
 
         #region Enum Status
+
         public MarkupString GetIssueStatusIconHtml(EnumStatusEducationProgram? status)
         {
             string priorityClass;
@@ -47,12 +49,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                     priorityClass = "danger";
                     title = "InActive";
                     break;
+
                 case EnumStatusEducationProgram.Done:
                     priorityClass = "success";
                     title = "Done";
                     break;
-
-               
 
                 default:
                     return new MarkupString("");
@@ -62,9 +63,10 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
             return new MarkupString(html);
         }
-        #endregion
 
-        #endregion
+        #endregion Enum Status
+
+        #endregion variabel static
 
         #region Searching
 
@@ -103,7 +105,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-
         }
 
         private async Task GetUserInfo()
@@ -121,6 +122,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion UserLoginAndAccessRole
 
         #region Load async Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -148,10 +150,13 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
 
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Load async Data
 
         #region Grid Events
+
         private bool isActiveButton { get; set; } = true;
+
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
@@ -225,19 +230,16 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 ToastService.ShowSuccess("Copy link Success");
             }
         }
+
         private async Task ClickOpenTo(EducationProgramDto data)
         {
             if (data.Slug != null)
             {
-                
-                    var url = $"awereness-event/education-program/join-participant/{data.Slug}";
-                    await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
-                
+                var url = $"awereness-event/education-program/join-participant/{data.Slug}";
+                await JsRuntime.InvokeVoidAsync("openInNewTab", NavigationManager.ToAbsoluteUri(url).ToString());
             }
         }
 
         #endregion Grid Events
-
-
     }
 }

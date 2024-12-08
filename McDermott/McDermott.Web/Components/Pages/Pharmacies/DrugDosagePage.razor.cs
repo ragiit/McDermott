@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Application.Dtos.Pharmacies;
-
-namespace McDermott.Web.Components.Pages.Pharmacies
+﻿namespace McDermott.Web.Components.Pages.Pharmacies
 {
     public partial class DrugDosagePage
     {
@@ -141,7 +138,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies
                 SelectedDataItems = [];
                 var result = await Mediator.Send(new GetDrugDosageQuery
                 {
-                    SearchTerm=searchTerm,
+                    SearchTerm = searchTerm,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
                 });

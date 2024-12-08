@@ -1,6 +1,4 @@
-﻿using DevExpress.Pdf.Native.BouncyCastle.Utilities;
-using DevExpress.XtraRichEdit.Model;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Web;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;

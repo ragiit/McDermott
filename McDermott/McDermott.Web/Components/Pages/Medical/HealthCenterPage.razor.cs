@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using McDermott.Domain.Entities;
-
-namespace McDermott.Web.Components.Pages.Medical
+﻿namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class HealthCenterPage
     {

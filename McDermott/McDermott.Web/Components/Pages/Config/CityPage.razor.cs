@@ -1,8 +1,5 @@
-﻿using DevExpress.XtraRichEdit.Model;
-using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-using System.Linq.Expressions;
-using System.Reactive.Subjects;
+﻿using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -71,45 +68,23 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = false;
         }
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetCityQuery
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<City>(await Mediator.Send(new GetQueryCitylable()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
-                Cities = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -245,7 +220,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListCityRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -314,7 +289,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var a = SelectedDataItems.Adapt<List<CityDto>>();
                     await Mediator.Send(new DeleteCityRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex) { ex.HandleException(ToastService); }
             finally { PanelVisible = false; }

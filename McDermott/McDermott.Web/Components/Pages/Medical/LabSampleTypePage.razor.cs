@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

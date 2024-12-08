@@ -1,15 +1,8 @@
-﻿using MimeKit;
-using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
-using System.Net.Mail;
-using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
-using McDermott.Extentions;
-using Document = DocumentFormat.OpenXml.Wordprocessing.Document;
-using Aspose.Words;
-using Aspose.Words.Saving;
-using DocumentFormat.OpenXml.Packaging;
+﻿using McDermott.Extentions;
+using MimeKit;
 using static McDermott.Application.Features.Commands.Config.EmailEmailTemplateCommand;
-using Microsoft.IdentityModel.Tokens;
-using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
+using static McDermott.Application.Features.Commands.Config.EmailSettingCommand;
+using static McDermott.Application.Features.Commands.Employee.SickLeaveCommand;
 
 namespace McDermott.Web.Components.Pages.Employee
 {

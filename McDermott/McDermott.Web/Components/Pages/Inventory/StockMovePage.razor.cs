@@ -13,8 +13,6 @@ namespace McDermott.Web.Components.Pages.Inventory
         private User UserLogin { get; set; } = new();
         private bool IsAccess = false;
 
-      
-
         private async Task GetUserInfo()
         {
             try
@@ -57,7 +55,7 @@ namespace McDermott.Web.Components.Pages.Inventory
         private void Grid_CustomSummary(GridCustomGroupEventArgs e)
         {
             //if (e.s)
-            //{ 
+            //{
             //}
             var a = "adwad";
             var ad = "adwad";

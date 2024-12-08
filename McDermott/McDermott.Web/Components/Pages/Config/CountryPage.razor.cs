@@ -1,13 +1,9 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
+﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
-using iTextSharp.text;
 using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using McDermott.Web.Components.Layout;
-using Document = iTextSharp.text.Document;
-using DevExpress.Printing.Core.Native;
-using System.Reactive.Subjects;
 using System.Reactive.Linq;
+using static McDermott.Application.Features.Commands.GetDataCommand;
+using Document = iTextSharp.text.Document;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -15,32 +11,6 @@ namespace McDermott.Web.Components.Pages.Config
     {
         private List<CountryDto> Countries = new();
         private Timer _timer;
-
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
 
         #region UserLoginAndAccessRole
 
@@ -90,19 +60,24 @@ namespace McDermott.Web.Components.Pages.Config
             PanelVisible = false;
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private object Data { get; set; }
+
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetCountryQuery
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<Country>(await Mediator.Send(new GetQueryCountrylable()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
-                Countries = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -195,7 +170,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListCountryRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -257,7 +232,7 @@ namespace McDermott.Web.Components.Pages.Config
                 }
 
                 SelectedDataItems = [];
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {

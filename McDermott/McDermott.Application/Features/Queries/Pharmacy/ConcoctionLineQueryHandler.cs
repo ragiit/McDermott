@@ -1,6 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCommand;
 
 namespace McDermott.Application.Features.Queries.Pharmacies
@@ -160,7 +158,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                         }).ToList(),
                     });
 
-
                 // Ensure single query mode or apply pagination
                 if (!request.IsGetAll)
                 {
@@ -177,7 +174,6 @@ namespace McDermott.Application.Features.Queries.Pharmacies
                 {
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<ConcoctionLineDto>>(), 0, 1, 1);
                 }
-
             }
             catch (Exception ex)
             {

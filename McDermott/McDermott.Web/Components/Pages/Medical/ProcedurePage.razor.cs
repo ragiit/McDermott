@@ -1,6 +1,4 @@
-﻿using McDermott.Domain.Entities;
-using System.Security.Policy;
-using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
+﻿using static McDermott.Application.Features.Commands.Medical.ProcedureCommand;
 
 namespace McDermott.Web.Components.Pages.Medical
 {

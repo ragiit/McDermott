@@ -1,7 +1,4 @@
-﻿using MailKit.Search;
-using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Domain.Entities;
-using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;

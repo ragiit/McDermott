@@ -1,7 +1,4 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Application.Dtos.AwarenessEvent;
-using McDermott.Domain.Entities;
-using McDermott.Web.Extentions;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionCommand;
@@ -9,13 +6,13 @@ using static McDermott.Application.Features.Commands.Pharmacies.ConcoctionLineCo
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
-using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
 
 namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 {
     public partial class CreateUpdateConcoctionPage
     {
         #region Relation Data
+
         private List<ConcoctionDto> GetConcoctions { get; set; } = [];
         private List<ConcoctionLineDto> GetConcoctionLine { get; set; } = [];
         private List<StockOutLinesDto> GetStockOutLines { get; set; } = [];
@@ -37,14 +34,17 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private StockOutLinesDto PostStockOutLines { get; set; } = new();
         private PharmacyDto PostPharmacy { get; set; } = new();
         private TransactionStockDto PostTransactionStock { get; set; } = new();
-        #endregion
+
+        #endregion Relation Data
 
         #region Static Variabel
+
         [SupplyParameterFromQuery]
         private long? Id { get; set; }
 
         [Parameter]
         public string PageMode { get; set; } = EnumPageMode.Create.GetDisplayName();
+
         [SupplyParameterFromQuery]
         public long? PId { get; set; }
 
@@ -59,7 +59,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         private int FocusedRowVisibleIndex { get; set; }
         private int FocusedRowVisibleIndexCl { get; set; }
 
-        #endregion
+        #endregion Static Variabel
 
         #region UserLoginAndAccessRole
 
@@ -72,7 +72,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-
         }
 
         private async Task GetUserInfo()
@@ -116,6 +115,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         #endregion Searching
 
         #region Load Data
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -133,6 +133,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
             PanelVisible = false;
         }
+
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -142,7 +143,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 SelectedDataItemsCl = [];
                 if (PId.HasValue)
                 {
-
                     var cekPharmacy = await Mediator.Send(new GetSinglePharmacyQuery
                     {
                         Predicate = x => x.Id == PId
@@ -151,7 +151,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
                     PostConcoction.PharmacyId = PostPharmacy.Id;
                     PostConcoction.PractitionerId = PostPharmacy.PractitionerId;
-
                 }
                 else
                 {
@@ -176,6 +175,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
             catch (Exception ex) { ex.HandleException(ToastService); }
         }
+
         private async Task LoadDataConcoctionLine(int pageIndex = 0, int pageSize = 10)
         {
             try
@@ -192,7 +192,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 PanelVisibleCl = false;
             }
             catch { }
-
         }
 
         private async Task LoadDataPractitioner()
@@ -200,16 +199,15 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             var getPractitioner = await Mediator.Send(new GetUserQueryNew
             {
                 Predicate = x => x.Id == PostPharmacy.PractitionerId,
-
             });
 
             GetPractitioners = getPractitioner.Item1;
-
         }
 
-        #endregion
+        #endregion Load Data
 
         #region Selected Change
+
         private async Task SelectedMedicamentGroupConcoction(MedicamentGroupDto value)
         {
             try
@@ -326,7 +324,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             }
         }
 
-
         private void ChangeTotalQtyInHeader(long value)
         {
             PostConcoction.ConcoctionQty = value;
@@ -365,27 +362,32 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 }
             }
         }
-        #endregion
+
+        #endregion Selected Change
 
         #region Grid
+
         private void GridCl_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndexCl = args.VisibleIndex;
         }
-        #endregion
+
+        #endregion Grid
 
         #region ComboBox
+
         private CancellationTokenSource? _cts;
 
         #region ComboBox Product
 
         private ProductDto SelectedProducts { get; set; } = new();
-        async Task SelectedItemChanged(ProductDto e)
+
+        private async Task SelectedItemChanged(ProductDto e)
         {
             if (e is null)
             {
                 SelectedProducts = new();
-                await LoadProduct(); // untuk refresh lagi ketika user klik clear 
+                await LoadProduct(); // untuk refresh lagi ketika user klik clear
             }
             else
                 SelectedProducts = e;
@@ -430,17 +432,18 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Product
 
         #region ComboBox Drug Route
 
         private DrugRouteDto SelectedRoute { get; set; } = new();
-        async Task SelectedItemChanged(DrugRouteDto e)
+
+        private async Task SelectedItemChanged(DrugRouteDto e)
         {
             if (e is null)
             {
                 SelectedRoute = new();
-                await LoadRoute(); // untuk refresh lagi ketika user klik clear 
+                await LoadRoute(); // untuk refresh lagi ketika user klik clear
             }
             else
                 SelectedRoute = e;
@@ -485,17 +488,18 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Drug Route
 
         #region ComboBox Drug Form
 
         private DrugFormDto SelectedForm { get; set; } = new();
-        async Task SelectedItemChanged(DrugFormDto e)
+
+        private async Task SelectedItemChanged(DrugFormDto e)
         {
             if (e is null)
             {
                 SelectedForm = new();
-                await LoadForm(); // untuk refresh lagi ketika user klik clear 
+                await LoadForm(); // untuk refresh lagi ketika user klik clear
             }
             else
                 SelectedForm = e;
@@ -540,17 +544,18 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Drug Form
 
         #region ComboBox Drug Dosage
 
         private DrugDosageDto SelectedDosage { get; set; } = new();
-        async Task SelectedItemChanged(DrugDosageDto e)
+
+        private async Task SelectedItemChanged(DrugDosageDto e)
         {
             if (e is null)
             {
                 SelectedDosage = new();
-                await LoadDosage(); // untuk refresh lagi ketika user klik clear 
+                await LoadDosage(); // untuk refresh lagi ketika user klik clear
             }
             else
                 SelectedDosage = e;
@@ -595,9 +600,9 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
             finally { PanelVisible = false; }
         }
 
-        #endregion
+        #endregion ComboBox Drug Dosage
 
-        #endregion
+        #endregion ComboBox
 
         #region New Edit Delete Refresh Click
 
@@ -620,13 +625,16 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         {
             await LoadDataConcoctionLine();
         }
+
         private async Task OnDiscard()
         {
             NavigationManager.NavigateTo($"pharmacy/prescriptions/{EnumPageMode.Update.GetDisplayName()}/?Id={PostConcoction.PharmacyId}");
         }
-        #endregion
+
+        #endregion New Edit Delete Refresh Click
 
         #region Delete Function
+
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
         {
             PanelVisibleCl = true;
@@ -641,12 +649,12 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 {
                     var ClToDelete = SelectedDataItemsCl.Adapt<List<ConcoctionLineDto>>();
                     await Mediator.Send(new DeleteConcoctionLineRequest(ids: ClToDelete.Select(x => x.Id).ToList()));
-
                 }
             }
             PanelVisibleCl = false;
         }
-        #endregion
+
+        #endregion Delete Function
 
         #region Function Save
 
@@ -687,6 +695,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 ex.HandleException(ToastService);
             }
         }
+
         private async Task OnSaveCl()
         {
             try
@@ -710,7 +719,8 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                 ex.HandleException(ToastService);
             }
         }
-        #endregion
+
+        #endregion Function Save
 
         #region Cut Stock
 
@@ -730,7 +740,6 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
         private async Task ShowCutStockLines(long LinesId)
         {
-            
             PanelVisible = true;
             Lines_Id = LinesId;
             //Get the ConcoctionLines by ID
@@ -775,7 +784,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
             if (product.TraceAbility)
             {
-                var dataStock = await Mediator.Send(new GetStockOutLinesQuery {Predicate = x => x.LinesId == LinesId });
+                var dataStock = await Mediator.Send(new GetStockOutLinesQuery { Predicate = x => x.LinesId == LinesId });
                 if (dataStock.Item1 == null || dataStock.Item1.Count == 0)
                 {
                     long currentStockInput = 0;
@@ -934,7 +943,7 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
                         LinesId = item.LinesId
                     };
 
-                    var existingStock = await Mediator.Send(new GetStockOutLinesQuery {Predicate= x => x.TransactionStockId == item.TransactionStockId && x.LinesId == item.LinesId });
+                    var existingStock = await Mediator.Send(new GetStockOutLinesQuery { Predicate = x => x.TransactionStockId == item.TransactionStockId && x.LinesId == item.LinesId });
 
                     if (!existingStock.Item1.Any())
                     {
@@ -958,14 +967,13 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 
         private DateTime? SelectedBatchExpired { get; set; }
 
-
         private async Task ChangeOutStockLines(string value)
         {
             SelectedBatchExpired = null;
 
             if (value is not null)
             {
-                var line = await Mediator.Send(new GetSingleConcoctionLineQuery{Predicate = x => x.Id == Lines_Id});
+                var line = await Mediator.Send(new GetSingleConcoctionLineQuery { Predicate = x => x.Id == Lines_Id });
                 PostStockOutLines.Batch = value;
 
                 var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s =>
@@ -990,7 +998,5 @@ namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
         }
 
         #endregion Cut Stock
-
-
     }
 }

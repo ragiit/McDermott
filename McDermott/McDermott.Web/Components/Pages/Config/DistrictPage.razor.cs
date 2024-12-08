@@ -1,9 +1,5 @@
-﻿using Google.Apis.Http;
-using McDermott.Domain.Entities;
-using McDermott.Web.Components.Layout;
-using OfficeOpenXml.Style;
-using System.Linq.Expressions;
-using System.Reactive.Subjects;
+﻿using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {
@@ -241,7 +237,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListDistrictRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -255,31 +251,7 @@ namespace McDermott.Web.Components.Pages.Config
             }
         }
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
+        private object Data { get; set; }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
@@ -287,24 +259,22 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetDistrictQuery
+                var dataSource = new GridDevExtremeDataSource<District>(await Mediator.Send(new GetQueryDistrict()))
                 {
-                    SearchTerm = searchTerm,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
-                Districts = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-            finally
-            {
-                PanelVisible = false;
-            }
+            finally { PanelVisible = false; }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -361,7 +331,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var a = SelectedDataItems.Adapt<List<DistrictDto>>();
                     await Mediator.Send(new DeleteDistrictRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData(0, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -391,7 +361,7 @@ namespace McDermott.Web.Components.Pages.Config
                 else
                     await Mediator.Send(new UpdateDistrictRequest(editModel));
 
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {

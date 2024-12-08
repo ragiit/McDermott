@@ -1,10 +1,4 @@
 ﻿using McDermott.Application.Features.Services;
-using McDermott.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static McDermott.Application.Features.Commands.Transaction.GCReferToInternalCommand;
 
 namespace McDermott.Application.Features.Queries.Transaction
@@ -105,16 +99,15 @@ namespace McDermott.Application.Features.Queries.Transaction
                         ReferTo = x.ReferTo,
                         DateRJMCINT = x.DateRJMCINT,
                         Specialist = x.Specialist,
-                        GeneralConsultanServiceId =x.GeneralConsultanServiceId,
+                        GeneralConsultanServiceId = x.GeneralConsultanServiceId,
                         GeneralConsultanService = new GeneralConsultanService
                         {
-                            PatientId =x.GeneralConsultanService.PatientId,
-                            Patient= new User
+                            PatientId = x.GeneralConsultanService.PatientId,
+                            Patient = new User
                             {
-                               Name = x.GeneralConsultanService.Patient == null ? string.Empty :x.GeneralConsultanService.Patient.Name
+                                Name = x.GeneralConsultanService.Patient == null ? string.Empty : x.GeneralConsultanService.Patient.Name
                             }
                         }
-
                     });
 
                 if (!request.IsGetAll)
@@ -189,16 +182,16 @@ namespace McDermott.Application.Features.Queries.Transaction
                     query = query.Select(x => new GCReferToInternal
                     {
                         Id = x.Id,
-                        TypeClaim=x.TypeClaim,
-                        ExamFor=x.ExamFor,
-                        CategoryRJMCINT=x.CategoryRJMCINT,
-                        Hospital=x.Hospital,
-                        Number=x.Number,
-                        TempDiagnosis=x.TempDiagnosis,
+                        TypeClaim = x.TypeClaim,
+                        ExamFor = x.ExamFor,
+                        CategoryRJMCINT = x.CategoryRJMCINT,
+                        Hospital = x.Hospital,
+                        Number = x.Number,
+                        TempDiagnosis = x.TempDiagnosis,
                         TherapyProvide = x.TherapyProvide,
-                        ReferTo=x.ReferTo,
-                        DateRJMCINT=x.DateRJMCINT,
-                        Specialist=x.Specialist,
+                        ReferTo = x.ReferTo,
+                        DateRJMCINT = x.DateRJMCINT,
+                        Specialist = x.Specialist,
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
                         GeneralConsultanService = new GeneralConsultanService
                         {
@@ -208,8 +201,6 @@ namespace McDermott.Application.Features.Queries.Transaction
                                 Name = x.GeneralConsultanService.Patient == null ? string.Empty : x.GeneralConsultanService.Patient.Name
                             }
                         }
-
-
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GCReferToInternalDto>();
@@ -332,8 +323,5 @@ namespace McDermott.Application.Features.Queries.Transaction
         }
 
         #endregion DELETE Goods Receipt
-
-
-
     }
 }

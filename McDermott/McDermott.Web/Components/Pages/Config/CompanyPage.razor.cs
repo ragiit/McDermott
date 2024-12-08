@@ -1,10 +1,5 @@
 using DevExpress.Blazor.Internal;
-using DevExpress.XtraRichEdit.Model;
-using DocumentFormat.OpenXml.Spreadsheet;
-using McDermott.Domain.Entities;
-using McDermott.Web.Extentions;
 using System.Linq.Expressions;
-using static McDermott.Application.Features.Commands.Medical.DiagnosisCommand;
 
 namespace McDermott.Web.Components.Pages.Config
 {

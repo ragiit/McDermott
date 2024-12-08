@@ -105,7 +105,6 @@ namespace McDermott.Web.Components.Pages.Queue
 
             // Setelah foreach selesai, getCount hanya berisi counter dengan status "On Process".
 
-
             await LoadData();
 
             timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));

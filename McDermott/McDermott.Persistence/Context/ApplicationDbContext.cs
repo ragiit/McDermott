@@ -102,7 +102,7 @@ namespace McDermott.Persistence.Context
         public DbSet<VaccinationPlan> VaccinationPlans { get; set; }
         public DbSet<GeneralConsultanServiceAnc> GeneralConsultanServiceAncs { get; set; }
         public DbSet<GeneralConsultanServiceAncDetail> GeneralConsultanServiceAncDetails { get; set; }
-        public DbSet<GCReferToInternal>GCReferToInternals {  get; set; }
+        public DbSet<GCReferToInternal> GCReferToInternals { get; set; }
 
         #endregion Transfer
 

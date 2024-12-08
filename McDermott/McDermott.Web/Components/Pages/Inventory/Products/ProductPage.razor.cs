@@ -1,12 +1,4 @@
-﻿using DevExpress.XtraCharts.Native;
-using DocumentFormat.OpenXml.Bibliography;
-using MailKit.Search;
-using McDermott.Application.Dtos.Pharmacies;
-using McDermott.Domain.Entities;
-using Microsoft.IdentityModel.Tokens;
-using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
-using static McDermott.Application.Features.Commands.Inventory.StockProductCommand;
-using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+﻿using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
 
 namespace McDermott.Web.Components.Pages.Inventory.Products
@@ -170,7 +162,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 // Mengambil data produk
                 var result = await Mediator.Send(new GetProductQueryNew
                 {
-                    SearchTerm= searchTerm, PageSize= pageSize, PageIndex= pageIndex
+                    SearchTerm = searchTerm,
+                    PageSize = pageSize,
+                    PageIndex = pageIndex
                 });
                 Products = result.Item1
                     .GroupBy(x => x.Id)

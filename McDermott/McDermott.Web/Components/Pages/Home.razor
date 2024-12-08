@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using System.Drawing
 @using DevExpress.Blazor.Reporting
+@using DevExpress.Data.Linq
 @using DevExpress.XtraReports
 @using DinkToPdf
 @using DinkToPdf.Contracts
@@ -31,6 +32,8 @@
 
 <PageTitle>McHealthCare</PageTitle>
 
+
+
 @if (IsAccess)
 {
     <div class="content-header">
@@ -40,7 +43,33 @@
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
 
-            
+          @*   <div class="row">
+                <div class="col">
+                    <div class="card"> 
+                        <div class="grid-container">
+                            <DxGrid @ref="Grid"
+                                    Data="@InstantFeedbackSource"
+                                    ShowGroupPanel="true"
+                                    VirtualScrollingEnabled="true"
+                                    PageSize="20"
+                                    FilterMenuButtonDisplayMode="GridFilterMenuButtonDisplayMode.Always"
+                                    ColumnResizeMode="GridColumnResizeMode.NextColumn"
+                                    TextWrapEnabled="false">
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="PostalCode" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="Province.Name" Caption="Province" />
+                                    <DxGridDataColumn FieldName="City.Name" Caption="City" />
+                                    <DxGridDataColumn FieldName="District.Name" Caption="District" />
+                                </Columns>
+                            </DxGrid>
+                        </div>
+                    </div>
+                </div>
+            </div> *@
+
+
 
             @*  <div class="form-group">
                 <label for="consultationType">Pilih Jenis Konsultasi:</label>
@@ -81,6 +110,8 @@
         <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
         </Columns>
         </DxGrid> *@
+
+
         </div>
     </div>
 }
@@ -652,11 +683,18 @@ else
     }
     DxReportViewer reportViewer { get; set; }
     IReport Report { get; set; }
-
+    EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
     protected override async Task OnInitializedAsync()
     {
         PanelVisible = true;
-        Report = new ReportRujukanBPJS();
+        // var z = await Mediator.Send(new GetVillageQuerylable());
+        // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
+        // {
+        //     e.KeyExpression = "Id";
+        //     e.QueryableSource = z;
+        // });
+
+        // Report = new ReportRujukanBPJS();
         // var client = ClientFactory.CreateClient("ServerAPI");
         // var response = await client.GetAsync($"api/file/yeay");
 

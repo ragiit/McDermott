@@ -49,17 +49,21 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion UserLoginAndAccessRole
 
         #region relation data
+
         private List<AwarenessEduCategoryDto> getAwarenessEduCategory { get; set; } = [];
         private AwarenessEduCategoryDto postAwarenessEducategory = new();
-        #endregion
+
+        #endregion relation data
 
         #region variabel static
-        private IGrid Grid {  get; set; }
+
+        private IGrid Grid { get; set; }
         private bool PanelVisible { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
         private int FocusedRowVisibleIndex { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        #endregion
+
+        #endregion variabel static
 
         #region Searching
 
@@ -88,6 +92,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         #endregion Searching
 
         #region Async Load
+
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -101,7 +106,6 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             PanelVisible = true;
             var result = await Mediator.Send(new GetAwarenessEduCategoryQuery
             {
-                
                 SearchTerm = searchTerm,
                 PageSize = pageSize,
                 PageIndex = pageIndex,
@@ -111,7 +115,8 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
             activePageIndex = pageIndex;
             PanelVisible = false;
         }
-        #endregion
+
+        #endregion Async Load
 
         #region ImportExport
 
@@ -182,7 +187,7 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                         // Filter Country baru yang tidak ada di database
                         list = list.Where(AwarenessEducategory =>
                             !existingCountrys.Any(ev =>
-                                ev.Name == AwarenessEducategory.Name 
+                                ev.Name == AwarenessEducategory.Name
                             )
                         ).ToList();
 
@@ -263,11 +268,11 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
                 PanelVisible = true;
                 var editModel = (AwarenessEduCategoryDto)e.EditModel;
 
-                bool validate = await Mediator.Send(new ValidateAwarenessEduCategoryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name ));
+                bool validate = await Mediator.Send(new ValidateAwarenessEduCategoryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
 
                 if (validate)
                 {
-                    ToastService.ShowInfo($"Category with name '{editModel.Name}'" );
+                    ToastService.ShowInfo($"Category with name '{editModel.Name}'");
                     e.Cancel = true;
                     return;
                 }
@@ -288,7 +293,5 @@ namespace McDermott.Web.Components.Pages.AwerenessEvent
         }
 
         #endregion Grid Events
-
-
     }
 }

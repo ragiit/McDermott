@@ -1,8 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using MailKit.Search;
-using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Services;
 using Microsoft.AspNetCore.Components.Routing;
-using OfficeOpenXml.Style;
 
 namespace McDermott.Web.Components.Layout
 {
