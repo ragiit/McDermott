@@ -141,7 +141,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<MaintenanceProductDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;

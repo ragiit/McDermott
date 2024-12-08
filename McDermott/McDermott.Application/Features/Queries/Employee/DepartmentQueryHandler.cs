@@ -120,7 +120,7 @@ namespace McDermott.Application.Features.Queries.Employee
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<DepartmentDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
@@ -197,7 +197,7 @@ namespace McDermott.Application.Features.Queries.Employee
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<DepartmentDto>();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;

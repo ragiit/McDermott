@@ -4,7 +4,6 @@
 
 <PageTitle>McHealthCare - View Display</PageTitle>
 
-<div class="wrapper">
     <section class="cx">
         <div class="row no-gutter">
             <div class="headerx">
@@ -21,7 +20,7 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="row justify-content-end">
-                        <div class="col-md-4"><div class="days">@daysNow<br /><span>@datesNow</span></div></div>
+                        <div class="col-md-4 align-self-center"><div class="days">@daysNow<br /><span>@datesNow</span></div></div>
                         <div class="col-md-6">
                             <div class="time" id="currentTime">@currentTime</div>
                         </div>
@@ -29,21 +28,62 @@
                 </div>
             </div>
         </div>
-        <div class="row no-gutter justify-content-center">
-            <div class="col-6 align-items-center">
-                <div class="card bg-red">
-                    <div class="card-header">Memanggil Antrian</div>
-                    <div class="card-body bg-white"><h1>hihihihi</h1></div>
+        <div class="row no-gutter mt-4">
+            <!-- Card kiri -->
+            <div class="col-md-6 align-self-center">
+                <div class="card ">
+                    <div class="card-header bg-red">
+                        <h1 class="ticket-text">Memanggil Antrian</h1>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="ticket-number">001</h5>
+                    </div>
+                    <div class="card-footer">
+                        <h1 class="ticket-text">Counter Accident</h1>
+                    </div>
                 </div>
             </div>
-            <div class="col-6">
-
+            <!-- Card kanan -->
+            <div class="col-md-6">
+                <div class="card ">
+                    <div class="card-body padding-body">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item"
+                                    src="https://www.youtube.com/embed/hKGPH9C-EFc?autoplay=1&loop=1&controls=0&rel=0&showinfo=0"
+                                    title="YouTube video player"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; muted; encrypted-media;"
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="row no-gutter mt-3 justify-content-center">
+            @foreach (var i in getCount)
+            {
+                <div class="col-md-3 align-self-center">
+                    <div class="card ">
+                        <div class="card-body ">
+                            <h4 class="ticket-text"></h4>
+                        </div>
+                        <div class="card-footer bg-red">
+                            <h1 class="text-number-footer">@i.Name</h1>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <div class="running-text-wrapper">
+            <div class="running-text">
+            <span><i class="fa-solid fa-jet-fighter fa-rotate-180"></i>Selamat datang di Klinik Pratama PT. McDermott Indonesia. Tetap jaga kesehatan Anda! | Informasi terkini dapat diakses di website kami. </span>
+            </div>
+        </div>
+
     </section>
 
-
-</div>
 
 <script>
     window.openFullScreen = function () {

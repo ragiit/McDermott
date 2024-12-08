@@ -42,6 +42,10 @@
 
         #endregion Configurations
 
+        #region Inventory
+        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt> { }
+        #endregion
+
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }
     }

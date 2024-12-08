@@ -1,7 +1,9 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Web;
+using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+using DevExpress.Blazor;
 
 namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 {
@@ -18,40 +20,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            //await base.OnAfterRenderAsync(firstRender);
-
-            //if (firstRender)
-            //{
-            //    try
-            //    {
-            //        await GetUserInfo();
-            //        StateHasChanged();
-            //    }
-            //    catch { }
-
-            //    await LoadData();
-            //    StateHasChanged();
-
-            //    try
-            //    {
-            //        if (Grid is not null)
-            //        {
-            //            await Grid.WaitForDataLoadAsync();
-            //            Grid.ExpandGroupRow(1);
-            //            await Grid.WaitForDataLoadAsync();
-            //            Grid.ExpandGroupRow(2);
-            //            StateHasChanged();
-            //        }
-            //    }
-            //    catch { }
-
-            //    var user_group = await Mediator.Send(new GetUserQuery());
-            //    NameUser = user_group.FirstOrDefault(x => x.GroupId == UserAccessCRUID.GroupId && x.Id == UserLogin.Id) ?? new();
-            //    StateHasChanged();
-
-            //    await LoadAsyncData();
-            //    StateHasChanged();
-            //}
+            
         }
 
         private async Task GetUserInfo()
@@ -143,10 +112,9 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
                 var loadTasks = new[]
                 {
                  GetUserInfo(),
-                 LoadDataDestination(),
-                 LoadDataSource(),
+                 LoadDataLocationDestination(),
+                 LoadProduct(),
                  LoadAsyncData(),
-                 LoadDataProduct(),
                  LoadData()
             };
 
@@ -325,107 +293,117 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         #endregion Grid
 
         #region Load ComboBox
+        private CancellationTokenSource? _cts;
 
         #region ComboBox Destination
 
-        private DxComboBox<LocationDto, long?> refDestinationComboBox { get; set; }
-        private int DestinationComboBoxIndex { get; set; } = 0;
-        private int totalCountDestination = 0;
+        private LocationDto SelectedLocationDestination { get; set; } = new();
 
-        private async Task OnSearchDestination()
+        private async Task SelectedItemChangedDestination(LocationDto e)
         {
-            await LoadDataDestination(0, 10);
+            if (e is null)
+            {
+                SelectedLocationDestination = new();
+                await LoadDataLocationDestination(); // untuk refresh lagi ketika user klik clear
+            }
+            else
+                SelectedLocationDestination = e;
         }
 
-        private async Task OnSearchDestinationIndexIncrement()
+        private async Task OnInputLocationDestination(ChangeEventArgs e)
         {
-            if (DestinationComboBoxIndex < (totalCountDestination - 1))
+            try
             {
-                DestinationComboBoxIndex++;
-                await LoadDataDestination(DestinationComboBoxIndex, 10);
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadDataLocationDestination(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 
-        private async Task OnSearchDestinationIndexDecrement()
+        private async Task LoadDataLocationDestination(string? e = "", Expression<Func<Locations, bool>>? predicate = null)
         {
-            if (DestinationComboBoxIndex > 0)
+            try
             {
-                DestinationComboBoxIndex--;
-                await LoadDataDestination(DestinationComboBoxIndex, 10);
+                PanelVisible = true;
+                getDestination = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnInputDestinationChanged(string e)
-        {
-            DestinationComboBoxIndex = 0;
-            await LoadDataDestination(0, 10);
-        }
-
-        private async Task LoadDataDestination(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery
+            catch (Exception ex)
             {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refDestinationComboBox?.Text ?? "",
-                Select = x => new Locations
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                }
-            }); getDestination = result.Item1;
-            totalCount = result.PageCount;
-            PanelVisible = false;
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboBox Destination
 
         #region ComboBox Product
 
-        private DxComboBox<ProductDto, long?> refProductComboBox { get; set; }
-        private int ProductComboBoxIndex { get; set; } = 0;
-        private int totalCountProduct = 0;
+        private ProductDto SelectedProduct { get; set; } = new();
 
-        private async Task OnSearchProduct()
+        private async Task SelectedItemChanged(ProductDto e)
         {
-            await LoadDataProduct(0, 10);
+            if (e is null)
+            {
+                SelectedProduct = new();
+                await LoadProduct(); // untuk refresh lagi ketika user klik clear
+            }
+            else
+                SelectedProduct = e;
         }
 
-        private async Task OnSearchProductIndexIncrement()
+
+        private async Task OnInputProduct(ChangeEventArgs e)
         {
-            if (ProductComboBoxIndex < (totalCountProduct - 1))
+            try
             {
-                ProductComboBoxIndex++;
-                await LoadDataProduct(ProductComboBoxIndex, 10);
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadProduct(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 
-        private async Task OnSearchProductIndexDecrement()
+        private async Task LoadProduct(string? e = "", Expression<Func<Product, bool>>? predicate = null)
         {
-            if (ProductComboBoxIndex > 0)
+            try
             {
-                ProductComboBoxIndex--;
-                await LoadDataProduct(ProductComboBoxIndex, 10);
+                PanelVisible = true;
+                getProduct = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate = x => x.HospitalType == "Medicament");
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnInputProductChanged(string e)
-        {
-            // Reset UomComboBoxIndex and load new data based on user input
-            ProductComboBoxIndex = 0;
-            await LoadDataProduct(0, 10);
-        }
-
-        private async Task LoadDataProduct(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getProduct = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboBox Product

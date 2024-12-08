@@ -8,6 +8,7 @@ using static McDermott.Application.Features.Commands.Pharmacies.MedicamentGroupC
 using static McDermott.Application.Features.Commands.Pharmacies.PharmacyCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.PrescriptionCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
+using DevExpress.Blazor;
 
 namespace McDermott.Web.Components.Pages.Pharmacies.Prescription
 {

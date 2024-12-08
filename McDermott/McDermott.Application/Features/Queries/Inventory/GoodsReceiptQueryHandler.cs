@@ -139,7 +139,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<GoodsReceiptDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
@@ -213,7 +213,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptDto>();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
@@ -371,7 +371,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<GoodsReceiptDetailDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
@@ -440,7 +440,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptDetailDto>();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
@@ -595,7 +595,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<GoodsReceiptLogDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
@@ -672,7 +672,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptLogDto>();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;

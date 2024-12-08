@@ -1,5 +1,5 @@
 ﻿@page "/inventory/goods-receipts/{PageMode}"
-@using McDermott.Web.Components.Layout
+
 @rendermode InteractiveServer
 
 <PageTitle>McHealthCare - Good Receipt</PageTitle>
@@ -113,23 +113,12 @@
                                             <DxFormLayoutItem Caption="Destination Location" CaptionCssClass="normal-caption warcing-caption" ColSpanMd="12">
                                                 <MyDxComboBox Data="@getDestination"
                                                               NullText="Select Destination"
-                                                              @ref="refDestinationComboBox"
+                                                              AllowUserInput="true"
                                                               @bind-Value="@postGoodsReceipt.DestinationId"
                                                               ReadOnly="@(postGoodsReceipt.Id != 0 && postGoodsReceipt.Status != EnumStatusGoodsReceipt.Draft)"
                                                               TextFieldName="Name"
                                                               ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputDestinationChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchDestinationIndexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchDestination"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchDestinationIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
+                                                              @oninput="OnInputLocationDestination">
                                                     <Columns>
                                                         <DxListEditorColumn FieldName="@nameof(Locations.Name)" Caption="Name" />
                                                         <DxListEditorColumn FieldName="@nameof(Locations.ParentLocation.Name)" Caption="Parent" />
@@ -207,12 +196,14 @@
                                                                                 <DxComboBox Data="@getProduct"
                                                                                             @bind-Value="@postGoodsReceiptDetail.ProductId"
                                                                                             NullText="Select Product Name.."
+                                                                                            AllowUserInput="true"
                                                                                             TextFieldName="Name"
                                                                                             ValueFieldName="Id"
                                                                                             FilteringMode="@DataGridFilteringMode.Contains"
                                                                                             SelectedItemChanged="@((ProductDto product)=> SelectedChangeProduct(product))"
                                                                                             ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                                                            ShowValidationIcon="true"></DxComboBox>
+                                                                                            ShowValidationIcon="true"
+                                                                                            @oninput="OnInputProduct"></DxComboBox>
                                                                                 <ValidationMessage For="@(()=>postGoodsReceiptDetail.ProductId)"></ValidationMessage>
                                                                             </DxFormLayoutItem>
                                                                         </div>

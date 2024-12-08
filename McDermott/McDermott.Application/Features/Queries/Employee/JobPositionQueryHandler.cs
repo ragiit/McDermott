@@ -173,7 +173,7 @@ namespace McDermott.Application.Features.Queries.Employee
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<JobPositionDto>();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;

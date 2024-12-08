@@ -211,7 +211,7 @@ namespace McDermott.Application.Features.Queries.Employee
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<CompanyDto>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;

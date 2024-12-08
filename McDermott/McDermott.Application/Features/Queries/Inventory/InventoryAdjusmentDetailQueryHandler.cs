@@ -108,7 +108,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<InventoryAdjusmentDetailDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
@@ -186,7 +186,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<InventoryAdjusmentDetailDto>();
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 // Consider logging the exception
                 throw;
