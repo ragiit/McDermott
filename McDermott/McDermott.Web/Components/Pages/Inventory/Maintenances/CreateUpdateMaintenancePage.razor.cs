@@ -1,9 +1,12 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using McDermott.Web.Extentions;
+using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.Maintenance
+namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 {
     public partial class CreateUpdateMaintenancePage
     {
@@ -15,6 +18,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
         private List<UserDto> getRequestBy = [];
         private List<ProductDto> getProduct = [];
         private List<LocationDto> getLocation = [];
+        private object DataDetailProduct { get; set; }
         private List<TransactionStockDto> getTransactionStocks = [];
         private MaintenanceDto postMaintenance = new();
         private MaintenanceDto getMaintenanceById = new();
@@ -276,7 +280,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
                 var loadTasks = new[]
                 {
                     LoadDataAsync(),
-                    LoadDataProducts(),
+                    LoadProduct(),
                     LoadDataLocation(),
                     LoadDataRequestBy(),
                     LoadDataResponsibleBy(),
@@ -305,17 +309,20 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             await InvokeAsync(() => PanelVisible = true);
             try
             {
-                var result = await Mediator.Send(new GetMaintenanceQuery(x => x.Id == Id, pageSize: 1, pageIndex: 0));
+                var result = await Mediator.Send(new GetSingleMaintenanceQuery
+                {
+                    Predicate = x => x.Id == Id
+                });
                 postMaintenance = new();
                 if (PageMode == EnumPageMode.Update.GetDisplayName())
                 {
-                    if (result.Item1 == null || result.Item1.Count == 0 || !Id.HasValue)
+                    if (result == null || !Id.HasValue)
                     {
                         NavigationManager.NavigateTo("inventory/Maintenance");
                         return;
                     }
 
-                    postMaintenance = result.Item1.FirstOrDefault() ?? new();
+                    postMaintenance = result ?? new();
                     await LoadDataDetail();
                 }
             }
@@ -348,8 +355,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
                     PanelVisibleProduct = true;
                     getTransactionStocks = await Mediator.Send(new GetTransactionStockQuery());
 
-                    var result = await Mediator.Send(new GetAllMaintenanceProductQuery());
-                    getMaintenanceProduct = result.Where(x => x.Id == Id).ToList();
+                    var result = await Mediator.Send(new GetMaintenanceProductQuery
+                    {
+                        Predicate = x => x.Id == Id,
+                    });
+                    getMaintenanceProduct = result.Item1;
 
                     var cekReference = getTransactionStocks
                         .Where(x => x.SourceTable == nameof(Maintenance))
@@ -411,12 +421,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 
             try
             {
-                var result = await Mediator.Send(new GetMaintenanceProductQuery
+                DataDetailProduct = new GridDevExtremeDataSource<MaintenanceProduct>(await Mediator.Send(new GetQueryMaintenanceProduct()))
                 {
-                    Predicate = x => x.MaintenanceId == postMaintenance.Id
-                });
-                getMaintenanceProduct = result.Item1;
-                totalCount = result.PageCount;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
                 await HandlerData();
             }
             finally
@@ -468,196 +480,230 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
 
         #region Load ComboBox
 
+        private CancellationTokenSource? _cts;
+
+        #region ComboBox Location
+
+        private LocationDto SelectedLocation { get; set; } = new();
+
+        private async Task SelectedItemChangedDestination(LocationDto e)
+        {
+            if (e is null)
+            {
+                SelectedLocation = new();
+                await LoadDataLocation(); // untuk refresh lagi ketika user klik clear
+            }
+            else
+                SelectedLocation = e;
+        }
+
+        private async Task OnInputLocation(ChangeEventArgs e)
+        {
+            try
+            {
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadDataLocation(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
+            }
+        }
+
+        private async Task LoadDataLocation(string? e = "", Expression<Func<Locations, bool>>? predicate = null)
+        {
+            try
+            {
+                PanelVisible = true;
+                getLocation = await Mediator.QueryGetComboBox<Locations, LocationDto>(e, predicate);
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
+        }
+
+        #endregion ComboBox Location
+
         #region ComboBox Product
 
-        private DxComboBox<ProductDto, long?> refProductsComboBox { get; set; }
-        private int ProductsComboBoxIndex { get; set; } = 0;
-        private int totalCountProducts = 0;
+        private ProductDto SelectedProduct { get; set; } = new();
 
-        private async Task OnSearchProducts()
+        private async Task SelectedItemChanged(ProductDto e)
         {
-            await LoadDataProducts(0, 10);
+            if (e is null)
+            {
+                SelectedProduct = new();
+                await LoadProduct(); // untuk refresh lagi ketika user klik clear
+            }
+            else
+                SelectedProduct = e;
         }
 
-        private async Task OnSearchProductsIndexIncrement()
+
+        private async Task OnInputProduct(ChangeEventArgs e)
         {
-            if (ProductsComboBoxIndex < (totalCountProducts - 1))
+            try
             {
-                ProductsComboBoxIndex++;
-                await LoadDataProducts(ProductsComboBoxIndex, 10);
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadProduct(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 
-        private async Task OnSearchProductsIndexDecrement()
+        private async Task LoadProduct(string? e = "", Expression<Func<Product, bool>>? predicate = null)
         {
-            if (ProductsComboBoxIndex > 0)
+            try
             {
-                ProductsComboBoxIndex--;
-                await LoadDataProducts(ProductsComboBoxIndex, 10);
+                PanelVisible = true;
+                getProduct = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate = x => x.HospitalType == "Medical Equipment");
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnInputProductsChanged(string e)
-        {
-            ProductsComboBoxIndex = 0;
-            await LoadDataProducts(0, 10);
-        }
-
-        private async Task LoadDataProducts(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProductQuery(searchTerm: refProductsComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getProduct = result.Item1.Where(x => x.HospitalType == "Medical Equipment").ToList();
-            totalCount = result.pageCount;
-            PanelVisible = false;
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion ComboBox Product
 
         #region Combo Box Request By
+        private UserDto SelectedRequestBy { get; set; } = new();
 
-        private DxComboBox<UserDto, long?> refRequestByComboBox { get; set; }
-        private int RequestByComboBoxIndex { get; set; } = 0;
-        private int totalCountRequestBy = 0;
-
-        private async Task OnSearchRequestBy()
+        private async Task SelectedItemChanged(UserDto e)
         {
-            await LoadDataRequestBy(0, 10);
+            if (e is null)
+            {
+                SelectedRequestBy = new();
+                await LoadDataRequestBy(); // untuk refresh lagi ketika user klik clear
+            }
+            else
+                SelectedRequestBy = e;
         }
 
-        private async Task OnSearchRequestByIndexIncrement()
+
+        private async Task OnInputRequestBy(ChangeEventArgs e)
         {
-            if (RequestByComboBoxIndex < (totalCountRequestBy - 1))
+            try
             {
-                RequestByComboBoxIndex++;
-                await LoadDataRequestBy(RequestByComboBoxIndex, 10);
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadDataRequestBy(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 
-        private async Task OnSearchRequestByIndexDecrement()
+        private async Task LoadDataRequestBy(string? e = "", Expression<Func<User, bool>>? predicate = null)
         {
-            if (RequestByComboBoxIndex > 0)
+            try
             {
-                RequestByComboBoxIndex--;
-                await LoadDataRequestBy(RequestByComboBoxIndex, 10);
+                PanelVisible = true;
+                getRequestBy = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate = x => x.IsEmployee);
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnInputRequestByChanged(string e)
-        {
-            RequestByComboBoxIndex = 0;
-            await LoadDataRequestBy(0, 10);
-        }
-
-        private async Task LoadDataRequestBy(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(searchTerm: refRequestByComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getRequestBy = result.Item1;
-            totalCount = result.pageCount;
-            PanelVisible = false;
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Combo Box Request By
 
-        #region Combo Box Location
-
-        private DxComboBox<LocationDto, long?> refLocationComboBox { get; set; }
-        private int LocationComboBoxIndex { get; set; } = 0;
-        private int totalCountLocation = 0;
-
-        private async Task OnSearchLocation()
-        {
-            await LoadDataLocation(0, 10);
-        }
-
-        private async Task OnSearchLocationIndexIncrement()
-        {
-            if (LocationComboBoxIndex < (totalCountLocation - 1))
-            {
-                LocationComboBoxIndex++;
-                await LoadDataLocation(LocationComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchLocationIndexDecrement()
-        {
-            if (LocationComboBoxIndex > 0)
-            {
-                LocationComboBoxIndex--;
-                await LoadDataLocation(LocationComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputLocationChanged(string e)
-        {
-            LocationComboBoxIndex = 0;
-            await LoadDataLocation(0, 10);
-        }
-
-        private async Task LoadDataLocation(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLocationQuery
-            {
-                SearchTerm = refLocationComboBox?.Text ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-            });
-            activePageIndex = pageIndex;
-            totalCount = result.PageCount;
-            getLocation = result.Item1;
-            PanelVisible = false;
-        }
-
-        #endregion Combo Box Location
-
         #region Combo Box Responsible
 
-        private DxComboBox<UserDto, long?> refResponsibleByComboBox { get; set; }
-        private int ResponsibleByComboBoxIndex { get; set; } = 0;
-        private int totalCountResponsibleBy = 0;
+        private UserDto SelectedResponsibleBy { get; set; } = new();
 
-        private async Task OnSearchResponsibleBy()
+        private async Task SelectedItemResponsibleChanged(UserDto e)
         {
-            await LoadDataResponsibleBy(0, 10);
+            if (e is null)
+            {
+                SelectedResponsibleBy = new();
+                await LoadDataResponsibleBy(); // untuk refresh lagi ketika user klik clear
+            }
+            else
+                SelectedResponsibleBy = e;
         }
 
-        private async Task OnSearchResponsibleByIndexIncrement()
+
+        private async Task OnInputResponsibleBy(ChangeEventArgs e)
         {
-            if (ResponsibleByComboBoxIndex < (totalCountResponsibleBy - 1))
+            try
             {
-                ResponsibleByComboBoxIndex++;
-                await LoadDataResponsibleBy(ResponsibleByComboBoxIndex, 10);
+                PanelVisible = true;
+
+                _cts?.Cancel();
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+
+                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
+
+                await LoadDataResponsibleBy(e.Value?.ToString() ?? "");
+            }
+            finally
+            {
+                PanelVisible = false;
+
+                // Untuk menghindari kebocoran memori (memory leaks).
+                _cts?.Dispose();
+                _cts = null;
             }
         }
 
-        private async Task OnSearchResponsibleByIndexDecrement()
+        private async Task LoadDataResponsibleBy(string? e = "", Expression<Func<User, bool>>? predicate = null)
         {
-            if (ResponsibleByComboBoxIndex > 0)
+            try
             {
-                ResponsibleByComboBoxIndex--;
-                await LoadDataResponsibleBy(ResponsibleByComboBoxIndex, 10);
+                PanelVisible = true;
+                getResponsibleBy = await Mediator.QueryGetComboBox<User, UserDto>(e, predicate = x => x.IsEmployee);
+                PanelVisible = false;
             }
-        }
-
-        private async Task OnInputResponsibleByChanged(string e)
-        {
-            ResponsibleByComboBoxIndex = 0;
-            await LoadDataResponsibleBy(0, 10);
-        }
-
-        private async Task LoadDataResponsibleBy(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(searchTerm: refResponsibleByComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            getResponsibleBy = result.Item1.Where(x => x.IsEmployee == true).ToList();
-            totalCount = result.pageCount;
-            PanelVisible = false;
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         #endregion Combo Box Responsible
@@ -861,25 +907,26 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             }
         }
 
-        private async Task OnSaveProduct()
+        private async Task OnSaveProduct(GridEditModelSavingEventArgs e)
         {
             try
             {
-                if (postMaintenanceProduct is null || postMaintenance is null)
+                var dataItems = (MaintenanceProduct)e.EditModel; 
+                if (dataItems is null || dataItems is null)
                 {
                     ToastService.ShowError("Maintenance product or main data is null.");
                     return;
                 }
 
                 // Create a new Maintenance product
-                if (postMaintenanceProduct.Id == 0)
+                if (dataItems.Id == 0)
                 {
-                    postMaintenanceProduct.MaintenanceId = postMaintenance.Id;
+                    postMaintenanceProduct.MaintenanceId = dataItems.Id;
                     if (postMaintenance.Recurrent == false)
                     {
                         postMaintenanceProduct.Expired = currentExpiryDate;
                     }
-                    var tempDataProduct = await Mediator.Send(new CreateMaintenanceProductRequest(postMaintenanceProduct));
+                    var tempDataProduct = await Mediator.Send(new CreateMaintenanceProductRequest(dataItems.Adapt<MaintenanceProductDto>()));
 
                     // If Maintenance is recurrent, update transaction stock's expired date
                     if (postMaintenance.Recurrent == true && tempDataProduct != null)
@@ -898,7 +945,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
                 else
                 {
                     // Update existing Maintenance product
-                    await Mediator.Send(new UpdateMaintenanceProductRequest(postMaintenanceProduct));
+                    await Mediator.Send(new UpdateMaintenanceProductRequest(dataItems.Adapt<MaintenanceProductDto>()));
                     ToastService.ShowSuccess("Update Data Product Success.");
                 }
 

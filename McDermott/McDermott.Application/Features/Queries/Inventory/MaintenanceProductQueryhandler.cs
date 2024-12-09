@@ -1,12 +1,17 @@
-﻿using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Commands;
+using McDermott.Application.Features.Services;
+using McDermott.Domain.Common;
+using static McDermott.Application.Features.Commands.GetDataCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class MaintenanceProductQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-    IRequestHandler<GetAllMaintenanceProductQuery, List<MaintenanceProductDto>>,
-    IRequestHandler<GetMaintenanceProductQuery, (List<MaintenanceProductDto>, int pageIndex, int pageSize, int pageCount)>, //GoodsReceipt
-    IRequestHandler<GetSingleMaintenanceProductQuery, MaintenanceProductDto>,
+     IRequestHandler<GetMaintenanceProductQuery, (List<MaintenanceProductDto>, int pageIndex, int pageSize, int pageCount)>, //Maintenance
+     IRequestHandler<GetQueryMaintenanceProduct, IQueryable<MaintenanceProduct>>,
+     IRequestHandler<GetSingleMaintenanceProductQuery, MaintenanceProductDto>,
+     IRequestHandler<GetAllMaintenanceProductQuery, List<MaintenanceProductDto>>,
     IRequestHandler<ValidateMaintenanceProductQuery, bool>,
     IRequestHandler<CreateMaintenanceProductRequest, MaintenanceProductDto>,
     IRequestHandler<CreateListMaintenanceProductRequest, List<MaintenanceProductDto>>,
@@ -87,8 +92,9 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
+                            EF.Functions.Like(v.SerialNumber, $"%{request.SearchTerm}%") ||
                             EF.Functions.Like(v.Product.Name, $"%{request.SearchTerm}%") ||
-                            EF.Functions.Like(v.SerialNumber, $"%{request.SearchTerm}%")
+                            EF.Functions.Like(v.Note, $"%{request.SearchTerm}%")
                             );
                 }
 
@@ -98,30 +104,15 @@ namespace McDermott.Application.Features.Queries.Inventory
                 else
                     query = query.Select(x => new MaintenanceProduct
                     {
-                        Id = x.Id,
                         SerialNumber = x.SerialNumber,
                         Note = x.Note,
                         Expired = x.Expired,
-                        ProductId = x.ProductId,
                         Status = x.Status,
+                        MaintenanceId = x.MaintenanceId,
+                        ProductId = x.ProductId,
                         Product = new Product
                         {
-                            Name = x.Product == null ? string.Empty : x.Product.Name,
-                        },
-                        MaintenanceId = x.MaintenanceId,
-                        Maintenance = new Maintenance
-                        {
-                            Title = x.Maintenance == null ? string.Empty : x.Maintenance.Title,
-                            RequestById = x.Maintenance.RequestById,
-                            ResponsibleById = x.Maintenance.ResponsibleById,
-                            ResponsibleBy = new User
-                            {
-                                Name = x.Maintenance.ResponsibleBy == null ? string.Empty : x.Maintenance.ResponsibleBy.Name
-                            },
-                            RequestBy = new User
-                            {
-                                Name = x.Maintenance.RequestBy == null ? string.Empty : x.Maintenance.RequestBy.Name
-                            }
+                            Name = x.Product == null ? string.Empty : x.Product.Name
                         }
                     });
 
@@ -141,7 +132,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<MaintenanceProductDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
@@ -185,8 +176,9 @@ namespace McDermott.Application.Features.Queries.Inventory
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
+                            EF.Functions.Like(v.SerialNumber, $"%{request.SearchTerm}%") ||
                             EF.Functions.Like(v.Product.Name, $"%{request.SearchTerm}%") ||
-                            EF.Functions.Like(v.SerialNumber, $"%{request.SearchTerm}%")
+                            EF.Functions.Like(v.Note, $"%{request.SearchTerm}%")
                             );
                 }
 
@@ -200,36 +192,112 @@ namespace McDermott.Application.Features.Queries.Inventory
                         SerialNumber = x.SerialNumber,
                         Note = x.Note,
                         Expired = x.Expired,
-                        ProductId = x.ProductId,
                         Status = x.Status,
+                        MaintenanceId = x.MaintenanceId,
+                        ProductId = x.ProductId,
                         Product = new Product
                         {
-                            Name = x.Product == null ? string.Empty : x.Product.Name,
-                        },
-                        MaintenanceId = x.MaintenanceId,
-                        Maintenance = new Maintenance
-                        {
-                            Title = x.Maintenance == null ? string.Empty : x.Maintenance.Title,
-                            RequestById = x.Maintenance.RequestById,
-                            ResponsibleById = x.Maintenance.ResponsibleById,
-                            ResponsibleBy = new User
-                            {
-                                Name = x.Maintenance.ResponsibleBy == null ? string.Empty : x.Maintenance.ResponsibleBy.Name
-                            },
-                            RequestBy = new User
-                            {
-                                Name = x.Maintenance.RequestBy == null ? string.Empty : x.Maintenance.RequestBy.Name
-                            }
+                            Name = x.Product == null ? string.Empty : x.Product.Name
                         }
+
                     });
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<MaintenanceProductDto>();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
             }
+        }
+
+        public Task<IQueryable<MaintenanceProduct>> Handle(GetQueryMaintenanceProduct request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<MaintenanceProduct>(request, cancellationToken, request.Select is null ? x => new MaintenanceProduct
+            {
+                Id = x.Id,
+                SerialNumber = x.SerialNumber,
+                Note = x.Note,
+                Expired = x.Expired,
+                Status = x.Status,
+                MaintenanceId = x.MaintenanceId,
+                ProductId = x.ProductId,
+                Product = new Product
+                {
+                    Name = x.Product == null ? string.Empty : x.Product.Name
+                }
+
+            } : request.Select);
+        }
+        private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)
+    where TEntity : BaseAuditableEntity // Add the constraint here
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<TEntity>().Entities.AsNoTracking();
+
+                // Apply Predicate (filtering)
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply Ordering
+                if (request.OrderByList.Any())
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<TEntity>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<TEntity>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply Includes (eager loading)
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                // Apply Search Term
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = ApplySearchTerm(query, request.SearchTerm);
+                }
+
+                // Apply Select if provided, else return the entity as it is
+                if (select is not null)
+                    query = query.Select(select);
+
+                return Task.FromResult(query.Adapt<IQueryable<TEntity>>());
+            }
+            catch (Exception)
+            {
+                // Return empty IQueryable<TEntity> if there's an exception
+                return Task.FromResult(Enumerable.Empty<TEntity>().AsQueryable());
+            }
+        }
+
+        private IQueryable<TEntity> ApplySearchTerm<TEntity>(IQueryable<TEntity> query, string searchTerm) where TEntity : class
+        {
+            // This method applies the search term based on the entity type
+            if (typeof(TEntity) == typeof(MaintenanceProduct))
+            {
+                var MaintenanceProductQuery = query as IQueryable<MaintenanceProduct>;
+                return (IQueryable<TEntity>)MaintenanceProductQuery.Where(v =>
+                    EF.Functions.Like(v.Product.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.SerialNumber, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Expired.ToString(), $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Status.ToString(), $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Note, $"%{searchTerm}%"));
+            }
+            return query; // No filtering if the type doesn't match
         }
 
         public async Task<bool> Handle(ValidateMaintenanceProductQuery request, CancellationToken cancellationToken)

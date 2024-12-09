@@ -10,13 +10,34 @@
             public bool RemoveCache { get; } = removeCache!;
         }
 
-        public class GetMaintenanceQuery(Expression<Func<Maintenance, bool>>? predicate = null, int pageIndex = 0, int? pageSize = 10, string? searchTerm = "", bool removeCache = false) : IRequest<(List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>
+        public class GetSingleMaintenanceQuery : IRequest<MaintenanceDto>
         {
-            public Expression<Func<Maintenance, bool>> Predicate { get; } = predicate!;
-            public bool RemoveCache { get; } = removeCache!;
-            public string SearchTerm { get; } = searchTerm!;
-            public int PageIndex { get; } = pageIndex;
-            public int PageSize { get; } = pageSize ?? 10;
+            public List<Expression<Func<Maintenance, object>>> Includes { get; set; }
+            public Expression<Func<Maintenance, bool>> Predicate { get; set; }
+            public Expression<Func<Maintenance, Maintenance>> Select { get; set; }
+
+            public List<(Expression<Func<Maintenance, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
+        }
+
+        public class GetMaintenanceQuery : IRequest<(List<MaintenanceDto>, int PageIndex, int PageSize, int PageCount)>
+        {
+            public List<Expression<Func<Maintenance, object>>> Includes { get; set; }
+            public Expression<Func<Maintenance, bool>> Predicate { get; set; }
+            public Expression<Func<Maintenance, Maintenance>> Select { get; set; }
+
+            public List<(Expression<Func<Maintenance, object>> OrderBy, bool IsDescending)> OrderByList { get; set; } = [];
+
+            public bool IsDescending { get; set; } = false; // default to ascending
+            public int PageIndex { get; set; } = 0;
+            public int PageSize { get; set; } = 10;
+            public bool IsGetAll { get; set; } = false;
+            public string SearchTerm { get; set; }
         }
 
         public class ValidateMaintenanceQuery(Expression<Func<Maintenance, bool>>? predicate = null) : IRequest<bool>

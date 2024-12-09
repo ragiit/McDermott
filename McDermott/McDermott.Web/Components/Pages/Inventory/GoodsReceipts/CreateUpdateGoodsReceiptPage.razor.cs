@@ -5,7 +5,7 @@ using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptComma
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using DevExpress.Blazor;
 
-namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
+namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipts
 {
     public partial class CreateUpdateGoodsReceiptPage
     {
@@ -20,7 +20,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            
+
         }
 
         private async Task GetUserInfo()
@@ -396,7 +396,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
             try
             {
                 PanelVisible = true;
-                getProduct = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate = x => x.HospitalType == "Medicament");
+                getProduct = await Mediator.QueryGetComboBox<Product, ProductDto>(e, predicate);
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -772,9 +772,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
                 string referenceNumber = $"GN#{NextReferenceNumber:D3}";
 
-                var checkReceivedProduct = getGoodsReceiptDetails
-    .Where(x => x.GoodsReceiptId == postGoodsReceipt.Id)
-    .ToList();
+                var checkReceivedProduct = getGoodsReceiptDetails.Where(x => x.GoodsReceiptId == postGoodsReceipt.Id).ToList();
 
                 foreach (var a in checkReceivedProduct)
                 {

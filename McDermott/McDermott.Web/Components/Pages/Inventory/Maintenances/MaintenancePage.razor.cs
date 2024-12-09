@@ -1,11 +1,13 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
+﻿using static McDermott.Application.Features.Commands.GetDataCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.Maintenance
+namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 {
     public partial class MaintenancePage
     {
         private List<MaintenanceDto> getMaintenance = [];
         private MaintenanceDto postMaintenance = new();
+        private object Data {  get; set; }
 
         #region Variable
 
@@ -135,9 +137,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenance
             {
                 PanelVisible = true;
                 showForm = false;
-                var result = await Mediator.Send(new GetMaintenanceQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-                getMaintenance = result.Item1;
-                totalCount = result.pageCount;
+                Data = new GridDevExtremeDataSource<Maintenance>(await Mediator.Send(new GetQueryMaintenance()))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
             }
             catch (Exception ex)
             {
