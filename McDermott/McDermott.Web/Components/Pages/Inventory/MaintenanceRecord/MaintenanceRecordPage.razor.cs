@@ -267,9 +267,12 @@ namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
         {
             PanelVisible = true;
             SelectedDataItems = [];
-            var result = await Mediator.Send(new GetMaintenanceQuery(searchTerm: refMaintenanceComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
+            var result = await Mediator.Send(new GetMaintenanceQuery
+            {
+
+            });
             GetMaintenances = result.Item1;
-            totalCount = result.pageCount;
+            totalCount = result.PageCount;
             PanelVisible = false;
         }
 

@@ -1,34 +1,39 @@
-﻿@page "/inventory/Maintenance"
+﻿@page "/inventory/goods-receipts"
 @rendermode InteractiveServer
 
-<PageTitle>@Helper.APP_NAME - Maintenance</PageTitle>
+<PageTitle>@Helper.APP_NAME - Goods Receipt</PageTitle>
 
+<style>
+    .my-style {
+        min-width: 800px;
+    }
+
+</style>
 @if (IsAccess)
 {
     <div class="wrapper">
-        <BaseHeaderPage Title="Maintenance" OnClickBack="@(async () => await LoadData())" ShowBackButton="showForm" />
+
+        <BaseHeaderPage Title="Good Receipt" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col">
-
                         <div class="card">
                             <DxLoadingPanel @bind-Visible="PanelVisible"
                                             IsContentBlocked="true"
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
-                                <MyGridPaginate @ref="Grid"
-                                                Data="@getMaintenance"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                DataItemDeleting="OnDelete"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                SearchTextChanged="OnSearchBoxChanged"
-                                                KeyFieldName="Id">
-
+                                <_BaseMyGrid @ref="Grid"
+                                        Data="Data"
+                                        @bind-SelectedDataItems="@SelectedDataItems"
+                                        DataItemDeleting="OnDelete"
+                                        FocusedRowChanged="Grid_FocusedRowChanged"
+                                        RowDoubleClick="OnRowDoubleClick"
+                                        KeyFieldName="Id">
                                     <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="MaintenanceDto"
-                                                         Items="@getMaintenance"
+                                        <MyDxToolbarBase TItem="GoodsReceipt"
                                                          Grid="Grid"
                                                          SelectedDataItems="@SelectedDataItems"
                                                          NewItem_Click="@NewItem_Click"
@@ -43,28 +48,19 @@
                                     </ToolbarTemplate>
                                     <Columns>
                                         <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Sequence" Caption="Sequence code" />
-                                        <DxGridDataColumn FieldName="Title" Caption="Subject" />
-                                        <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
-                                        <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
-                                        <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                                        <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand" />
-                                        <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
+                                        <DxGridDataColumn FieldName="Destination.Name" Caption="Destination Name" />
+                                        <DxGridDataColumn FieldName="SchenduleDate" Caption="Schendule Date" DisplayFormat="dd MMMM yyyy" />
+                                        <DxGridDataColumn FieldName="NumberPurchase" Caption="Purchase Number" />
                                         <DxGridDataColumn FieldName="Status" Caption="Status">
                                             <CellDisplayTemplate>
-                                                @((MarkupString)GetIssueStatusIconHtml((context.DataItem as MaintenanceDto).Status))
+                                                @GetIssueStatusIconHtml((context.DataItem as GoodsReceipt).Status)
                                             </CellDisplayTemplate>
                                         </DxGridDataColumn>
                                     </Columns>
-                                    <TotalSummary>
-                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                           FieldName="Name"
-                                                           Visible="true" />
-                                    </TotalSummary>
-                                </MyGridPaginate>
+                                </_BaseMyGrid>
                                 <div class="row">
                                     <DxFormLayout>
-                                        <div class="col-md-8">
+                                        <div class="col-md-9">
                                             <DxFormLayoutItem>
                                                 <DxPager PageCount="totalCount"
                                                          ActivePageIndexChanged="OnPageIndexChanged"
@@ -75,7 +71,7 @@
                                                 </DxPager>
                                             </DxFormLayoutItem>
                                         </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
+                                        <div class="col-md-3 d-flex justify-content-end">
                                             <DxFormLayoutItem Caption="Page Size:">
                                                 <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
                                                               NullText="Select Page Size"
@@ -96,4 +92,3 @@
         </section>
     </div>
 }
-

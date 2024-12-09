@@ -44,6 +44,8 @@
 
         #region Inventory
         public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt> { }
+        public class GetQueryMaintenance : BaseQuery<Maintenance> { }
+        public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct> { }
         #endregion
 
         // buat di copy"

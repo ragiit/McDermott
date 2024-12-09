@@ -1,10 +1,14 @@
-﻿using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Commands;
+using McDermott.Application.Features.Services;
+using McDermott.Domain.Common;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class GoodsReceiptQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetGoodsReceiptQuery, (List<GoodsReceiptDto>, int pageIndex, int pageSize, int pageCount)>, //GoodsReceipt
+        IRequestHandler<GetQueryGoodReceipt, IQueryable<GoodsReceipt>>,
         IRequestHandler<GetSingleGoodsReceiptQuery, GoodsReceiptDto>, IRequestHandler<ValidateGoodsReceiptQuery, bool>,
         IRequestHandler<BulkValidateGoodsReceiptQuery, List<GoodsReceiptDto>>,
         IRequestHandler<CreateGoodsReceiptRequest, GoodsReceiptDto>,
@@ -139,7 +143,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<GoodsReceiptDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
@@ -213,11 +217,116 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptDto>();
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
             }
+        }
+
+        public Task<IQueryable<GoodsReceipt>> Handle(GetQueryGoodReceipt request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<GoodsReceipt>(request, cancellationToken, request.Select is null ? x => new GoodsReceipt
+            {
+                Id = x.Id,
+                ReceiptNumber = x.ReceiptNumber,
+                NumberPurchase = x.NumberPurchase,
+                SchenduleDate = x.SchenduleDate,
+                SourceId = x.SourceId,
+                Status = x.Status,
+                DestinationId = x.DestinationId,
+                Source = new Locations
+                {
+                    Name = x.Source.Name
+                },
+                Destination = new Locations
+                {
+                    Name = x.Destination.Name
+                }
+
+            } : request.Select);
+        }
+        private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)
+    where TEntity : BaseAuditableEntity // Add the constraint here
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<TEntity>().Entities.AsNoTracking();
+
+                // Apply Predicate (filtering)
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply Ordering
+                if (request.OrderByList.Any())
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<TEntity>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<TEntity>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply Includes (eager loading)
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                // Apply Search Term
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = ApplySearchTerm(query, request.SearchTerm);
+                }
+
+                // Apply Select if provided, else return the entity as it is
+                if (select is not null)
+                    query = query.Select(select);
+
+                return Task.FromResult(query.Adapt<IQueryable<TEntity>>());
+            }
+            catch (Exception)
+            {
+                // Return empty IQueryable<TEntity> if there's an exception
+                return Task.FromResult(Enumerable.Empty<TEntity>().AsQueryable());
+            }
+        }
+
+        private IQueryable<TEntity> ApplySearchTerm<TEntity>(IQueryable<TEntity> query, string searchTerm) where TEntity : class
+        {
+            // This method applies the search term based on the entity type
+            if (typeof(TEntity) == typeof(Village))
+            {
+                var villageQuery = query as IQueryable<Village>;
+                return (IQueryable<TEntity>)villageQuery.Where(v =>
+                    EF.Functions.Like(v.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.District.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.City.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Province.Name, $"%{searchTerm}%"));
+            }
+            else if (typeof(TEntity) == typeof(District))
+            {
+                var districtQuery = query as IQueryable<District>;
+                return (IQueryable<TEntity>)districtQuery.Where(d => EF.Functions.Like(d.Name, $"%{searchTerm}%"));
+            }
+            else if (typeof(TEntity) == typeof(District))
+            {
+                var districtQuery = query as IQueryable<Occupational>;
+                return (IQueryable<TEntity>)districtQuery.Where(v =>
+                            EF.Functions.Like(v.Name, $"%{searchTerm}%") ||
+                            EF.Functions.Like(v.Description, $"%{searchTerm}%"));
+            }
+
+            return query; // No filtering if the type doesn't match
         }
 
         #endregion GET Goods Receipt
@@ -371,7 +480,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<GoodsReceiptDetailDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
@@ -440,7 +549,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptDetailDto>();
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
@@ -595,7 +704,7 @@ namespace McDermott.Application.Features.Queries.Inventory
                     return ((await query.ToListAsync(cancellationToken)).Adapt<List<GoodsReceiptLogDto>>(), 0, 1, 1);
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;
@@ -672,7 +781,7 @@ namespace McDermott.Application.Features.Queries.Inventory
 
                 return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<GoodsReceiptLogDto>();
             }
-            catch (Exception )
+            catch (Exception)
             {
                 // Consider logging the exception
                 throw;

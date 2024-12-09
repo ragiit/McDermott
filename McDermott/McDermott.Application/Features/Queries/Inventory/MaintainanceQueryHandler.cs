@@ -1,9 +1,16 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using McDermott.Application.Features.Commands;
+using McDermott.Application.Features.Services;
+using McDermott.Domain.Common;
+using static McDermott.Application.Features.Commands.GetDataCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
 {
     public class MaintenanceQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
-        IRequestHandler<GetMaintenanceQuery, (List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetMaintenanceQuery, (List<MaintenanceDto>, int pageIndex, int pageSize, int pageCount)>, //Maintenance
+        IRequestHandler<GetQueryMaintenance, IQueryable<Maintenance>>,
+        IRequestHandler<GetSingleMaintenanceQuery, MaintenanceDto>,
         IRequestHandler<GetAllMaintenanceQuery, List<MaintenanceDto>>,
         IRequestHandler<ValidateMaintenanceQuery, bool>,
         IRequestHandler<CreateMaintenanceRequest, MaintenanceDto>,
@@ -52,41 +59,299 @@ namespace McDermott.Application.Features.Queries.Inventory
         {
             try
             {
-                var query = _unitOfWork.Repository<Maintenance>().Entities
-                    .Include(x => x.RequestBy)
-                    .Include(x => x.Location)
-                    .AsNoTracking()
-                    .AsQueryable();
+                var query = _unitOfWork.Repository<Maintenance>().Entities.AsNoTracking();
 
                 if (request.Predicate is not null)
                     query = query.Where(request.Predicate);
 
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Maintenance>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Maintenance>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
                 if (!string.IsNullOrEmpty(request.SearchTerm))
                 {
                     query = query.Where(v =>
-                        EF.Functions.Like(v.Title, $"%{request.SearchTerm}%") ||
-                        EF.Functions.Like(v.Sequence, $"%{request.SearchTerm}%"));
+                            EF.Functions.Like(v.Sequence, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Title, $"%{request.SearchTerm}%")
+                            );
                 }
 
-                var totalCount = await query.CountAsync(cancellationToken);
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Maintenance
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Sequence = x.Sequence,
+                        RequestDate = x.RequestDate,
+                        ScheduleDate = x.ScheduleDate,
+                        isCorrective = x.isCorrective,
+                        isPreventive = x.isPreventive,
+                        isInternal = x.isInternal,
+                        isExternal = x.isExternal,
+                        VendorBy = x.VendorBy,
+                        Recurrent = x.Recurrent,
+                        RepeatNumber = x.RepeatNumber,
+                        RepeatWork = x.RepeatWork,
+                        Status = x.Status,
+                        ResponsibleById = x.ResponsibleById,
+                        RequestById = x.RequestById,
+                        LocationId = x.LocationId,
+                        CreatedBy = x.CreatedBy,
+                        RequestBy = new User
+                        {
+                            Name = x.RequestBy == null ? string.Empty : x.RequestBy.Name,
+                        },
+                        ResponsibleBy = new User
+                        {
+                            Name = x.ResponsibleBy == null ? string.Empty : x.ResponsibleBy.Name,
+                        },
+                        Location = new Locations
+                        {
+                            Name = x.Location == null ? string.Empty : x.Location.Name,
+                        }
+                    });
 
-                var pagedResult = query
-                            .OrderBy(x => x.Title);
+                if (!request.IsGetAll)
+                { // Paginate and sort
+                    var (totalCount, pagedItems, totalPages) = await PaginateAsyncClass.PaginateAndSortAsync(
+                        query,
+                        request.PageSize,
+                        request.PageIndex,
+                        cancellationToken
+                    );
 
-                var skip = (request.PageIndex) * request.PageSize;
-
-                var paged = pagedResult
-                            .Skip(skip)
-                            .Take(request.PageSize);
-
-                var totalPages = (int)Math.Ceiling((double)totalCount / request.PageSize);
-
-                return (paged.Adapt<List<MaintenanceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                    return (pagedItems.Adapt<List<MaintenanceDto>>(), request.PageIndex, request.PageSize, totalPages);
+                }
+                else
+                {
+                    return ((await query.ToListAsync(cancellationToken)).Adapt<List<MaintenanceDto>>(), 0, 1, 1);
+                }
             }
             catch (Exception)
             {
+                // Consider logging the exception
                 throw;
             }
+        }
+
+        public async Task<MaintenanceDto> Handle(GetSingleMaintenanceQuery request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<Maintenance>().Entities.AsNoTracking();
+
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply ordering
+                if (request.OrderByList.Count != 0)
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<Maintenance>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<Maintenance>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply dynamic includes
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = query.Where(v =>
+                            EF.Functions.Like(v.Sequence, $"%{request.SearchTerm}%") ||
+                            EF.Functions.Like(v.Title, $"%{request.SearchTerm}%")
+                            );
+                }
+
+                // Apply dynamic select if provided
+                if (request.Select is not null)
+                    query = query.Select(request.Select);
+                else
+                    query = query.Select(x => new Maintenance
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Sequence = x.Sequence,
+                        RequestDate = x.RequestDate,
+                        ScheduleDate = x.ScheduleDate,
+                        isCorrective = x.isCorrective,
+                        isPreventive = x.isPreventive,
+                        isInternal = x.isInternal,
+                        isExternal = x.isExternal,
+                        VendorBy = x.VendorBy,
+                        Recurrent = x.Recurrent,
+                        RepeatNumber = x.RepeatNumber,
+                        RepeatWork = x.RepeatWork,
+                        Status = x.Status,
+                        ResponsibleById = x.ResponsibleById,
+                        RequestById = x.RequestById,
+                        LocationId = x.LocationId,
+                        CreatedBy = x.CreatedBy,
+                        RequestBy = new User
+                        {
+                            Name = x.RequestBy == null ? string.Empty : x.RequestBy.Name,
+                        },
+                        ResponsibleBy = new User
+                        {
+                            Name = x.ResponsibleBy == null ? string.Empty : x.ResponsibleBy.Name,
+                        },
+                        Location = new Locations
+                        {
+                            Name = x.Location == null ? string.Empty : x.Location.Name,
+                        }
+                    });
+
+                return (await query.FirstOrDefaultAsync(cancellationToken)).Adapt<MaintenanceDto>();
+            }
+            catch (Exception)
+            {
+                // Consider logging the exception
+                throw;
+            }
+        }
+
+        public Task<IQueryable<Maintenance>> Handle(GetQueryMaintenance request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<Maintenance>(request, cancellationToken, request.Select is null ? x => new Maintenance
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Sequence = x.Sequence,
+                RequestDate = x.RequestDate,
+                ScheduleDate = x.ScheduleDate,
+                isCorrective = x.isCorrective,
+                isPreventive = x.isPreventive,
+                isInternal = x.isInternal,
+                isExternal = x.isExternal,
+                VendorBy = x.VendorBy,
+                Recurrent = x.Recurrent,
+                RepeatNumber = x.RepeatNumber,
+                RepeatWork = x.RepeatWork,
+                Status = x.Status,
+                ResponsibleById = x.ResponsibleById,
+                RequestById = x.RequestById,
+                LocationId = x.LocationId,
+                CreatedBy = x.CreatedBy,
+                RequestBy = new User
+                {
+                    Name = x.RequestBy == null ? string.Empty : x.RequestBy.Name,
+                },
+                ResponsibleBy = new User
+                {
+                    Name = x.ResponsibleBy == null ? string.Empty : x.ResponsibleBy.Name,
+                },
+                Location = new Locations
+                {
+                    Name = x.Location == null ? string.Empty : x.Location.Name,
+                }
+
+            } : request.Select);
+        }
+        private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)
+    where TEntity : BaseAuditableEntity // Add the constraint here
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<TEntity>().Entities.AsNoTracking();
+
+                // Apply Predicate (filtering)
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply Ordering
+                if (request.OrderByList.Any())
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<TEntity>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<TEntity>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply Includes (eager loading)
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                // Apply Search Term
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = ApplySearchTerm(query, request.SearchTerm);
+                }
+
+                // Apply Select if provided, else return the entity as it is
+                if (select is not null)
+                    query = query.Select(select);
+
+                return Task.FromResult(query.Adapt<IQueryable<TEntity>>());
+            }
+            catch (Exception)
+            {
+                // Return empty IQueryable<TEntity> if there's an exception
+                return Task.FromResult(Enumerable.Empty<TEntity>().AsQueryable());
+            }
+        }
+
+        private IQueryable<TEntity> ApplySearchTerm<TEntity>(IQueryable<TEntity> query, string searchTerm) where TEntity : class
+        {
+            // This method applies the search term based on the entity type
+            if (typeof(TEntity) == typeof(Maintenance))
+            {
+                var MaintenanceQuery = query as IQueryable<Maintenance>;
+                return (IQueryable<TEntity>)MaintenanceQuery.Where(v =>
+                    EF.Functions.Like(v.Title, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.ResponsibleBy.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Sequence, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.RequestBy.Name, $"%{searchTerm}%"));
+            }
+            return query; // No filtering if the type doesn't match
         }
 
         public async Task<bool> Handle(ValidateMaintenanceQuery request, CancellationToken cancellationToken)

@@ -1,6 +1,10 @@
-﻿using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
+﻿using static McDermott.Application.Features.Commands.GetDataCommand;
+using static McDermott.Domain.Entities.GoodsReceipt;
+using DevExpress.Data.Linq;
+using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.Inventory.GoodsReceiptCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
+namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipts
 {
     public partial class GoodsReceiptPage
     {
@@ -13,6 +17,7 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         private StockProductDto FormStockProduct = new();
         private GoodsReceiptDto postGoodsReceipts = new();
         private TransactionStockDto FormTransactionStock = new();
+        private object Data { get; set; }
 
         #endregion Relation Data
 
@@ -95,18 +100,14 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
         {
             PanelVisible = true;
-            var result = await Mediator.Send(new GetGoodsReceiptQuery
+            Data = new GridDevExtremeDataSource<GoodsReceipt>(await Mediator.Send(new GetQueryGoodReceipt()))
             {
-                OrderByList = [
-                    (x=>x.Status == EnumStatusGoodsReceipt.Draft, true)
-                    ],
-                SearchTerm = searchTerm,
-                PageSize = pageSize,
-                PageIndex = pageIndex,
-            });
-            getGoodsReceipts = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
+                CustomizeLoadOptions = (loadOptions) =>
+                {
+                    loadOptions.PrimaryKey = ["Id"];
+                    loadOptions.PaginateViaPrimaryKey = true;
+                }
+            };
             PanelVisible = false;
         }
 
@@ -175,10 +176,10 @@ namespace McDermott.Web.Components.Pages.Inventory.GoodsReceipt
 
             try
             {
-                if ((GoodsReceiptDto)args.DataItem is null)
+                if ((GoodsReceipt)args.DataItem is null)
                     return;
 
-                isActiveButton = ((GoodsReceiptDto)args.DataItem)!.Status!.Equals(EnumStatusGoodsReceipt.Draft);
+                isActiveButton = ((GoodsReceipt)args.DataItem)!.Status!.Equals(EnumStatusGoodsReceipt.Draft);
             }
             catch (Exception ex)
             {
