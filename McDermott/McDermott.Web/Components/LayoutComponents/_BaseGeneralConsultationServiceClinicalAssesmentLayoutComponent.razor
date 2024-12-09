@@ -217,6 +217,8 @@
                                 </Template>
                             </DxFormLayoutItem>
 
+                           
+
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Prognosa" ColSpanMd="12">
                                 <MyDxComboBox Data="@PrognosaRequests"
                                               NullText="Select Prognosa"
@@ -234,6 +236,13 @@
                                 </MyDxComboBox>
 
                             </DxFormLayoutItem>
+
+                            @if (IsAccident)
+                            {
+                                <DxFormLayoutItem CssClass="mt-3" CaptionCssClass="normal-caption" Caption=" " ColSpanMd="12">
+                                    <DxButton Text="Localization Status" Click="(() => IsPopUpAccident = true)" IconCssClass="fas fa-map-marker-alt" />
+                                </DxFormLayoutItem> 
+                            }
                         </DxFormLayout>
                     </div>
                 </div>
@@ -245,21 +254,26 @@
 <PopUpPainScale IsPopUpPainScale="@IsPopUpPainScale"
                 OnClosePopup="(() => IsPopUpPainScale = false)" />
 
-@code {
-    private bool IsReadOnlyForm => ReadOnlyForm?.Invoke() ?? true;
+<PopUpGCAccident IsPopUp="@IsPopUpAccident"
+                 OnClosePopup="(() => IsPopUpAccident = false)" />
 
-    public List<PrognosaRequest> PrognosaRequests { get; set; } = [];
-    [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
-    [Parameter] public Func<bool> ReadOnlyForm { get; set; }
+    @code {
+        private bool IsReadOnlyForm => ReadOnlyForm?.Invoke() ?? true;
+
+        public List<PrognosaRequest> PrognosaRequests { get; set; } = [];
+        [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
+        [Parameter] public Func<bool> ReadOnlyForm { get; set; }
 
 
-    private List<AwarenessDto> Awareness { get; set; } = [];
+        private List<AwarenessDto> Awareness { get; set; } = [];
 
-    private bool IsPopUpPainScale = false;
+        private bool IsPopUpPainScale = false;
+        private bool IsPopUpAccident = false;
+        [Parameter] public bool IsAccident { get; set; } = false;
 
-    private List<string> RiskOfFallingDetail = [];
-    private void OnSelectRiskOfFalling(string e)
-    {
+        private List<string> RiskOfFallingDetail = [];
+        private void OnSelectRiskOfFalling(string e)
+        {
         RiskOfFallingDetail.Clear();
         GeneralConsultanService.RiskOfFallingDetail = null;
         if (e is null)
@@ -279,15 +293,15 @@
         {
             RiskOfFallingDetail = Helper.Geriati.ToList();
         }
-    }
+        }
 
-    private async Task LoadPrognosaData()
-    {
+        private async Task LoadPrognosaData()
+        {
         PrognosaRequests = await GetPrognosaData();
-    }
+        }
 
-    private async Task<List<PrognosaRequest>> GetPrognosaData()
-    {
+        private async Task<List<PrognosaRequest>> GetPrognosaData()
+        {
         try
         {
             var result = await PcareService.SendPCareService(nameof(SystemParameter.PCareBaseURL), $"prognosa", HttpMethod.Get);
@@ -319,10 +333,10 @@
         }
 
         return [];
-    }
+        }
 
-    protected override async Task OnInitializedAsync()
-    {
+        protected override async Task OnInitializedAsync()
+        {
         Awareness = await Mediator.Send(new GetAwarenessQuery());
-    }
+        }
 }

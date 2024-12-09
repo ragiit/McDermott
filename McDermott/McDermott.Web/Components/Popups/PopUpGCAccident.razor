@@ -1,0 +1,80 @@
+﻿<DxPopup HeaderText="Localization Status" Closed="@OnClosePopup"
+         @bind-Visible="@IsPopUp" HeaderCssClass="fw-bold"
+         CloseOnOutsideClick="false" Width="90%">
+
+    <div class="row">
+    <div class="col-12-md"></div>
+        <!-- Canvas Container -->   
+        <div class="canvas-container" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+            <canvas id="imageCanvas" width="664" height="741"></canvas>
+        </div>
+
+    <div class="col-12-md">
+        <div class="row justify-content-around">
+        <DxButton Text="Refresh" Click="ClearCanvas2"  />
+        <DxButton Text="Clear" Click="ClearCanvas"  />
+        <DxButton Text="Save" Click="ClearCanvas" CssClass="btn btn-danger" /></div>
+        </div>
+    </div>
+</DxPopup>
+
+@code {
+    [Parameter] public bool IsPopUp { get; set; } = false;
+    [Parameter] public EventCallback<bool> IsPopUpChanged { get; set; }
+    [Parameter] public EventCallback OnClosePopup { get; set; }
+
+    private bool _canvasInitialized = false;
+
+    private async Task ClearCanvas()
+    {
+        try
+        {
+            var imageUrl = "http://localhost:5000/image/aciddent.png";
+            await JsRuntime.InvokeVoidAsync("fabricEditor.clearCanvas");
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+
+    private async Task ClearCanvas2()
+    {
+        try
+        {
+            var imageUrl = "http://localhost:5000/image/aciddent.png";
+            await JsRuntime.InvokeVoidAsync("fabricEditor.clearCanvas");
+            await JsRuntime.InvokeVoidAsync("fabricEditor.initCanvas", imageUrl);
+        }
+        catch (Exception ex)
+        {
+            ex.HandleException(ToastService);
+        }
+    }
+
+    // Memastikan canvas diinisialisasi saat popup terbuka
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender || IsPopUp)
+        {
+            if (IsPopUp && !_canvasInitialized)
+            {
+                _canvasInitialized = true;
+                var imageUrl = "http://localhost:5000/image/aciddent.png";
+                await JsRuntime.InvokeVoidAsync("fabricEditor.initCanvas", imageUrl);
+            }
+
+            StateHasChanged(); // Memaksa render ulang setelah canvas siap
+        }
+    }
+
+    // Menggunakan StateHasChanged untuk merender ulang komponen ketika pop-up terbuka
+    protected override void OnParametersSet()
+    {
+        if (IsPopUp && !_canvasInitialized)
+        {
+            _canvasInitialized = true;
+            StateHasChanged(); // Memastikan canvas di-render ulang saat popup terlihat
+        }
+    }
+}

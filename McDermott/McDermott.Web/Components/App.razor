@@ -122,57 +122,96 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script>
-            window.fabricEditor = {
-            canvas: null,
-            initCanvas: function (baseUri) {
-                this.canvas = new fabric.Canvas('imageCanvas');
-                const img = new Image();
-                img.src = baseUri; // Dinamis berdasarkan BaseUri
-                img.onload = () => {
-                    const fabricImage = new fabric.Image(img, {
-                        left: 0,
-                        top: 0,
-                        selectable: false
-                    });
-                    this.canvas.add(fabricImage);
-                };
+           window.fabricEditor = {
+    canvas: null,
+    currentNumber: 1, // Penomoran objek dimulai dari 1
 
-                // Tambah event klik untuk menggambar lingkaran dengan angka
-                let currentNumber = 1;
-                       this.canvas.on('mouse:down', function (e) {
-                const pointer = this.canvas.getPointer(e.e);
+    initCanvas: function (baseUri) {
+        // Initialize the fabric canvas
+        this.canvas = new fabric.Canvas('imageCanvas');
 
-                // Lingkaran
-                const circle = new fabric.Circle({
-                    left: pointer.x - 20,
-                    top: pointer.y - 20,
-                    radius: 20,
-                    fill: 'transparent',
-                    stroke: 'red'
-                });
-
-                // Teks di tengah lingkaran
-                const text = new fabric.Text(currentNumber.toString(), {
-                    left: pointer.x,
-                    top: pointer.y,
-                    fontSize: 18, // Ukuran font lebih besar
-                    fontWeight: 'bold', // Teks bold
-                    fill: 'black',
-                    originX: 'center', // Posisikan teks ke tengah horizontal
-                    originY: 'center'  // Posisikan teks ke tengah vertikal
-                });
-
-                this.canvas.add(circle);
-                this.canvas.add(text);
-                currentNumber++;
-                }.bind(this));
-
-            },
-
-            clearCanvas: function () {
-                this.canvas.clear();
-            }
+        // Load the image to set as the background
+        const img = new Image();
+        img.src = baseUri; // Dynamically set based on the baseUri
+        img.onload = () => {
+            const fabricImage = new fabric.Image(img, {
+                left: 0,
+                top: 0,
+                selectable: false // Ensure the background image is not selectable
+            });
+            this.canvas.setBackgroundImage(fabricImage, this.canvas.renderAll.bind(this.canvas)); // Set image as background
         };
+
+        // Handle mouse:down event for drawing objects on the canvas
+        this.canvas.on('mouse:down', (e) => {
+            // Ignore clicks on elements other than the canvas
+            if (e.target && !(e.target.type === 'image')) return;
+
+            const pointer = this.canvas.getPointer(e.e);
+
+            // Create a circle
+            const circle = new fabric.Circle({
+                left: 0, // Relative to group
+                top: 0,  // Relative to group
+                radius: 20,
+                fill: 'transparent',
+                stroke: 'red',
+                originX: 'center', // Center within the group
+                originY: 'center'
+            });
+
+            // Create text in the center of the circle
+            const text = new fabric.Text(this.currentNumber.toString(), {
+                left: 0, // Relative to group
+                top: 0,  // Relative to group
+                fontSize: 18,
+                fontWeight: 'bold',
+                fill: 'black',
+                originX: 'center', // Center horizontally
+                originY: 'center'  // Center vertically
+            });
+
+            // Group the circle and text together
+            const group = new fabric.Group([circle, text], {
+                left: pointer.x, // Set position to where the user clicked
+                top: pointer.y,
+                originX: 'center', // Center the group at the click position
+                originY: 'center'
+            });
+
+            this.canvas.add(group); // Add the group to the canvas
+            this.currentNumber++; // Increment the number for the next object
+        });
+    },
+
+    clearCanvas: function () {
+        if (!this.canvas) {
+            console.error("Canvas not initialized yet.");
+            return;
+        }
+
+        // Clear all objects from the canvas
+        this.canvas.clear();
+
+        // Reset the current number to 1 after clearing
+        this.currentNumber = 1;
+
+        // Reload the background image if necessary
+        const img = new Image();
+        img.src = this.canvas.backgroundImage ? this.canvas.backgroundImage.src : ''; // Ensure the background image exists
+        img.onload = () => {
+            const fabricImage = new fabric.Image(img, {
+                left: 0,
+                top: 0,
+                selectable: false
+            });
+            this.canvas.setBackgroundImage(fabricImage, this.canvas.renderAll.bind(this.canvas)); // Re-add background image
+        };
+
+        // Ensure canvas is updated and rendered again
+        this.canvas.renderAll();
+    }
+};
 
     </script>
 
