@@ -17,8 +17,10 @@ global using Microsoft.CodeAnalysis;
 global using System.Globalization;
 global using Microsoft.AspNetCore.SignalR.Client;
 global using static McDermott.Application.Extentions.EnumHelper;
-
+global using DevExtreme.AspNet.Data;
+global using DevExtreme.AspNet.Data.ResponseModel;
 global using McDermott.Web.Extentions;
+global using Group = McDermott.Domain.Entities.Group;
 
 global using McDermott.Application.Dtos.Bpjs;
 global using McDermott.Application.Dtos.Config;

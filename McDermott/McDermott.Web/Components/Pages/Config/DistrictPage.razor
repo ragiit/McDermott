@@ -50,51 +50,50 @@
 
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
-                                        var a = (DistrictDto)EditFormContext.EditModel;
-                                        if (a.ProvinceId is null)
+                                        District = (District)EditFormContext.EditModel;
+                                        if (District.ProvinceId is null)
                                         {
                                             Cities = [];
 
-                                            a.CityId = null;
+                                            District.CityId = null;
                                         }
                                     }
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
-                                            <ValidationMessage For="@(()=> a.Name)"   />
+                                            <DxTextBox @bind-Text="@District.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                            <ValidationMessage For="@(()=> District.Name)"   />
                                         </DxFormLayoutItem>
 
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Province" ColSpanMd="12">
-                                            <MyDxComboBox Data="Provinces"
-                                                          NullText="Select Province"
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"
-                                                          @oninput="OnInputProvince"
-                                                          SelectedItemChanged="((ProvinceDto e) => SelectedItemChanged(e))"
-                                                          @bind-Value="a.ProvinceId">
+                                            <_BaseMyComboBox TData="Province"
+                                                             TValue="long?"
+                                                             CustomData="@LoadCustomDataProvince"
+                                                             @bind-Value="@District.ProvinceId"
+                                                             TextFieldName="Name"
+                                                             ValueFieldName="Id">
                                                 <Columns>
                                                     <DxListEditorColumn FieldName="@nameof(ProvinceDto.Name)" Caption="Name" />
                                                     <DxListEditorColumn FieldName="Country.Name" Caption="Country" />
                                                 </Columns>
-                                            </MyDxComboBox>
-                                            <ValidationMessage For="@(()=>a.ProvinceId)" />
+                                            </_BaseMyComboBox>
+                                            <ValidationMessage For="@(()=>District.ProvinceId)" />
                                         </DxFormLayoutItem>
 
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="City" ColSpanMd="12">
-                                            <MyDxComboBox Data="Cities"
-                                                          NullText="Select City"
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"
-                                                          @oninput="OnInputCity"
-                                                          SelectedItemChanged="((CityDto e) => SelectedItemCityChanged(e))"
-                                                          @bind-Value="a.CityId">
+                                            <_BaseMyComboBox TData="City"
+                                                             TValue="long?"
+                                                             CustomData="@LoadCustomDataCity"
+                                                             @bind-Value="@District.CityId"
+                                                             TextFieldName="Name"
+                                                             ValueFieldName="Id">
                                                 <Columns>
                                                     <DxListEditorColumn FieldName="@nameof(CityDto.Name)" Caption="Name" />
                                                     <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
                                                 </Columns>
-                                            </MyDxComboBox>
-                                            <ValidationMessage For="@(()=>a.CityId)" />
+                                            </_BaseMyComboBox>
+                                            <ValidationMessage For="@(()=>District.CityId)" />
                                         </DxFormLayoutItem>
+
                                     </DxFormLayout>
                                 </EditFormTemplate>
 

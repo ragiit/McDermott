@@ -48,30 +48,27 @@
 
                                 <EditFormTemplate Context="EditFormContext">
                                     @{
-                                        var a = (Province)EditFormContext.EditModel;
+                                        Province = (Province)EditFormContext.EditModel;
                                     }
                                     <DxFormLayout CssClass="w-100">
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                            <DxTextBox @bind-Text="@a.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
-                                            <ValidationMessage For="@(()=> a.Name)"   />
+                                            <DxTextBox @bind-Text="@Province.Name" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Name" />
+                                            <ValidationMessage For="@(()=> Province.Name)"   />
                                         </DxFormLayoutItem>
 
-
                                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Country" ColSpanMd="12">
-                                            <MyDxComboBox Data="Countries"
-                                                          NullText="Select Country"
-                                                          TextFieldName="Name"
-                                                          ValueFieldName="Id"
-                                                          @oninput="OnInputCountry"
-                                                          
-                                                          SelectedItemChanged="((CountryDto e) => SelectedItemChanged(e))"
-                                                          @bind-Value="a.CountryId">
+                                            <_BaseMyComboBox TData="Country"
+                                                             TValue="long"
+                                                             CustomData="@LoadCustomDataCountry"
+                                                             @bind-Value="@Province.CountryId"
+                                                             TextFieldName="Name"
+                                                             ValueFieldName="Id">
                                                 <Columns>
                                                     <DxListEditorColumn FieldName="@nameof(Country.Name)" Caption="Name" />
                                                     <DxListEditorColumn FieldName="@nameof(Country.Code)" Caption="Code" />
                                                 </Columns>
-                                            </MyDxComboBox>
-                                            <ValidationMessage For="@(()=>a.CountryId)" />
+                                            </_BaseMyComboBox>
+                                            <ValidationMessage For="@(()=>Province.CountryId)" />
                                         </DxFormLayoutItem>
 
                                     </DxFormLayout>

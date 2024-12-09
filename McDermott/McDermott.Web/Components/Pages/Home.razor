@@ -3,6 +3,8 @@
 @using DevExpress.Blazor.Reporting
 @using DevExpress.Data.Linq
 @using DevExpress.XtraReports
+@using DevExtreme.AspNet.Data
+@using DevExtreme.AspNet.Data.ResponseModel
 @using DinkToPdf
 @using DinkToPdf.Contracts
 @using Google.Apis.Auth.OAuth2
@@ -21,6 +23,7 @@
 @using iTextSharp.text
 @using iTextSharp.text.pdf
 @using System.IO
+@using static McDermott.Application.Features.Commands.GetDataCommand
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
@@ -39,11 +42,11 @@
     <div class="content-header">
         <div class="container-fluid">
 
-            <h1><label>Home</label></h1>
+            <h1><label @onclick="test">Home</label></h1>
 
             <p>Welcome, @UserLogin.Name. @Greeting</p>
 
-          @*   <div class="row">
+            @*   <div class="row">
                 <div class="col">
                     <div class="card"> 
                         <div class="grid-container">
@@ -111,6 +114,32 @@
         </Columns>
         </DxGrid> *@
 
+            @* <DxComboBox TData="VillageDto"
+                        TValue="VillageDto"
+                        CustomData="@LoadCustomData"
+                        @bind-Value="@Villagez"
+                        TextFieldName="Name"
+                        FilteringMode="DataGridFilteringMode.Contains"
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        ListRenderMode="ListRenderMode.Virtual" /> *@
+
+            <DxComboBox TData="Village"
+                        TValue="long"
+                        CustomData="@LoadCustomDataz"
+                        @bind-Value="@meetLink2x"
+                        TextFieldName="Name"
+                        ValueFieldName="Id"
+                        FilteringMode="DataGridFilteringMode.Contains"
+                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                        ListRenderMode="ListRenderMode.Virtual">
+                <Columns>
+                    <DxListEditorColumn FieldName="@nameof(VillageDto.Name)" Caption="Name" />
+                    <DxListEditorColumn FieldName="Province.Name" Caption="Province" />
+                    <DxListEditorColumn FieldName="City.Name" Caption="City" />
+                    <DxListEditorColumn FieldName="District.Name" Caption="District" />
+                </Columns>
+            </DxComboBox>
+
 
         </div>
     </div>
@@ -124,7 +153,178 @@ else
 @code {
     private string meetLink { get; set; }
     private string meetLink2;
+    private long meetLink2x { get; set; }
+    private List<VillageDto> Villages { get; set; } = [];
+    private VillageDto Villagez { get; set; }
+    protected async Task<LoadResult> LoadCustomDataz(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        options.DefaultSort = "Name";
+        var villagesQuery = await Mediator.Send(new GetQueryVillage());
+        return await DataSourceLoader.LoadAsync(villagesQuery, options, cancellationToken);
+    }
 
+
+    protected async Task<LoadResult> LoadCustomData(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        // var result = await Mediator.Send(new GetVillageQueryNew
+        //     {
+        //         PageIndex = options.Skip / options.Take, // Ensure it's properly divided for paging
+        //         PageSize = options.Take,
+        //         SearchTerm = options.Filter[2].ToString() // Handle search term if available
+        //     });
+
+        // options.DefaultSort = "Name";
+
+        // Ensure GetQueryVillage returns the actual data
+        var villages = await Mediator.Send(new GetQueryVillage());
+
+        // Apply pagination and filtering to the results
+        var query = villages.Skip(options.Skip).Take(options.Take);
+
+        // You can use DataSourceLoader if you want to handle sorting, filtering, etc.
+        return await DataSourceLoader.LoadAsync(query, options);
+
+        // return await DataSourceLoader.LoadAsync(await Mediator.Send(new GetQueryVillage()), options);
+
+        // Villages.Add(result.Item1.FirstOrDefault());
+
+        // // Return the data wrapped in LoadResult
+        // return new LoadResult
+        //     {
+        //         data = result.Item1,
+        //         totalCount = result.Item4
+        //     };
+    }
+
+    private void test()
+    {
+        // Villagez = Villages.FirstOrDefault();
+
+        meetLink2x = 3000;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        PanelVisible = true;
+        // var z = await Mediator.Send(new GetVillageQuerylable());
+        // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
+        // {
+        //     e.KeyExpression = "Id";
+        //     e.QueryableSource = z;
+        // });
+
+        // Report = new ReportRujukanBPJS();
+        // var client = ClientFactory.CreateClient("ServerAPI");
+        // var response = await client.GetAsync($"api/file/yeay");
+
+        // if (response.IsSuccessStatusCode)
+        // {
+        //     // Read the JSON response as a string
+        //     var jsonString = await response.Content.ReadAsStringAsync();
+
+        //     // Deserialize JSON into a DataResponse<District> object
+        //     var dataResponse = JsonConvert.DeserializeObject<DataResponse<District>>(jsonString);
+
+        //     // Extract the list of districts
+        //     Data = dataResponse?.Data ?? new List<District>();
+        // }
+        // else
+        // {
+        //     // Handle error case (e.g., file not found)
+        // }
+
+        // var aaa = await PcareService.SendPCareService($"poli/fktp/0/10", HttpMethod.Get);
+        // var aaab = await PcareService.SendPCareService($"provider/0/10", HttpMethod.Get);
+        // var aaabc = await PcareService.SendPCareService($"statuspulang/rawatInap/false", HttpMethod.Get);
+        // var aaabcd = await PcareService.SendPCareService($"statuspulang/rawatInap/true", HttpMethod.Get);
+        // var aaabcde = await PcareService.SendPCareService($"kesadaran", HttpMethod.Get);
+        // var aaabb = aaa;
+
+        // Console.WriteLine(Convert.ToString(JsonConvert.DeserializeObject<dynamic>(aaabcde.Item1)));
+
+        // Response += Convert.ToString("Provider" + aaab);
+        // Response += Convert.ToString("rawatInap" + aaabc);
+        // Response += Convert.ToString("rawatInapTrue" + aaabcd);
+        // Response += Convert.ToString("kesadaran" + aaabcde);
+        // Response += Convert.ToString(aaa);
+
+        // // POST DATA
+        // var regis = new PendaftaranRequest
+        //     {
+        //         kdProviderPeserta = "00010001",
+        //         tglDaftar = "06-05-2024",
+        //         noKartu = "0001113569638",
+        //         kdPoli = "001",
+        //         keluhan = null,
+        //     };
+
+        // var responseApi = await PcareService.SendPCareService($"pendaftaran", HttpMethod.Post, regis);
+        // dynamic data = responseApi.Item1;
+        // data = JsonConvert.DeserializeObject<dynamic>(data);
+
+        // Response += "\n" + Convert.ToString(data);
+        // string akk = $"\n Field \"{data.field} \" {data.message}";
+        // ToastService.ShowInfo(akk.ToString());
+
+        // var result = await PcareService.SendPCareService($"poli/fktp/1/1000", HttpMethod.Get);
+
+        // await Send();
+        // var aa = await AuthenticationState;
+        // var bb = aa.User.Identity.Name;
+        // SalesData2 = await Sales.GetSalesAsync();
+
+        ///Decrypted
+        // DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        // TimeSpan timeSpan = DateTime.UtcNow - epoch;
+        // long tStamp = (long)timeSpan.TotalSeconds;
+        ///
+        // string r = "Wcem5CYDCbnmR5fcoBtip3UDpHUxcq1N7hUfK4uMm3xs3L+vPboELhK6PMjvxX1QP0o9DpVcEsLBjmswszbku3pFH2HR3S+iLcSP65JFYJlGwXUDtd9TF+PFQuPo3YaqRGhLQ3YBLCkPifnTcuGqAQdIw5cNT5RhF8tKcmOWB6tTc29heTSp5mTf4S81FDl9jY55n1OkQsirSzYGgGzXdolW4K6mMc6loYstTR1GVQXaTEsl7z4HhzXtEVB7W2IYaTcrUetUW6Tad0EGaaAznwOs8ek8YDd+4CQcbFCq/K30RZg9uiKyLeFtfsQCyA9ZDOS7sKhTUdGiGqIyW6uLsBSEq4ysZJpMcIZc/8D0aps56auvLmJY+HNWKklfbl88+DJmpxud7hFuYZo9jTlkrIA/gnIJZcKTa6gMUpzEH1RyHdzOTNogRxvpwGb3dRkcHfjvOHo0kI9DM2236XWfjIypa2RkhF8KsKtBjoSnVnMNDZNTXX6Sp/k/vmaJcU+8RJbh1ah1E1tgLnyGQY7+nu8CjCBqv0ODOChG7JKKz6dU6KZC/VWX7cXH8+/SGXOSKiijsJJEAiOX2Okqv87m9rmhHL6VcoCNFhQXtOYo1U2RCQVXhcpxOsl6gsQWqAMYFc95zMSjkBCot6975LQVhETzt2AAd67L6Abd+ylRBzlpfX2PZrIab0i8rjwdstNE3xg+r/tTayvSRzMHyoX/PYTr6FKtky4u2sjx/3wH+WLqMFvKzbiNSgbT/lRrGaS1FMxVR75/7qYchVCJieauSg==";
+        // string aa = "15793";
+        // string a1 = "8nDF24C2AD";
+        // // string a2 = "1714373200";
+        // string a2 = tStamp.ToString();
+        // string a3 = aa + a1 + a2;
+        // string LZDecrypted = Decrypt(a3, r);
+        // string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
+
+        // var a = await HttpClient.GetStringAsync("https://dummyjson.com/products?limit=99999999999999")!;
+
+        // var jsonObject = JsonConvert.DeserializeObject<dynamic>(a);
+
+        // // Mengambil nilai dari properti 'products'
+        // var productsJson = jsonObject["products"].ToString();
+
+        // // Mengonversi string produk menjadi List<ProductTemp>
+        // var products = JsonConvert.DeserializeObject<List<ProductTemp>>(productsJson);
+
+        // ProductTemps = products;
+
+        var hour = DateTime.Now.Hour;
+
+        if (hour < 12)
+            Greeting = "Good Morning!";
+        else if (hour < 17)
+            Greeting = "Good Afternoon!";
+        else
+            Greeting = "Good Evening!";
+
+        // var users = await Mediator.Send(new GetUserQuery());
+        // // Dashboard.UserCount = users.Where(x => x.IsUser == true).Count();
+        // Dashboard.UserCount = users.Count();
+        // Dashboard.PatientCount = users.Where(x => x.IsUser == true).Count();
+        // Dashboard.PhysicianCount = users.Where(x => x.IsPhysicion == true).Count();
+        // Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
+        // Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
+
+        PanelVisible = false;
+        // try
+        // {
+        //     var result = await NavigationManager.CheckAccessUser(oLocal);
+        //     IsAccess = result.Item1;
+        //     UserAccessCRUID = result.Item2;
+        // }
+        // catch { }
+    }
 
 
     private async Task CreateTeamsLink()
@@ -684,128 +884,6 @@ else
     DxReportViewer reportViewer { get; set; }
     IReport Report { get; set; }
     EntityInstantFeedbackSource InstantFeedbackSource { get; set; }
-    protected override async Task OnInitializedAsync()
-    {
-        PanelVisible = true;
-        // var z = await Mediator.Send(new GetVillageQuerylable());
-        // InstantFeedbackSource = new EntityInstantFeedbackSource(e =>
-        // {
-        //     e.KeyExpression = "Id";
-        //     e.QueryableSource = z;
-        // });
-
-        // Report = new ReportRujukanBPJS();
-        // var client = ClientFactory.CreateClient("ServerAPI");
-        // var response = await client.GetAsync($"api/file/yeay");
-
-        // if (response.IsSuccessStatusCode)
-        // {
-        //     // Read the JSON response as a string
-        //     var jsonString = await response.Content.ReadAsStringAsync();
-
-        //     // Deserialize JSON into a DataResponse<District> object
-        //     var dataResponse = JsonConvert.DeserializeObject<DataResponse<District>>(jsonString);
-
-        //     // Extract the list of districts
-        //     Data = dataResponse?.Data ?? new List<District>();
-        // }
-        // else
-        // {
-        //     // Handle error case (e.g., file not found)
-        // }
-
-        // var aaa = await PcareService.SendPCareService($"poli/fktp/0/10", HttpMethod.Get);
-        // var aaab = await PcareService.SendPCareService($"provider/0/10", HttpMethod.Get);
-        // var aaabc = await PcareService.SendPCareService($"statuspulang/rawatInap/false", HttpMethod.Get);
-        // var aaabcd = await PcareService.SendPCareService($"statuspulang/rawatInap/true", HttpMethod.Get);
-        // var aaabcde = await PcareService.SendPCareService($"kesadaran", HttpMethod.Get);
-        // var aaabb = aaa;
-
-        // Console.WriteLine(Convert.ToString(JsonConvert.DeserializeObject<dynamic>(aaabcde.Item1)));
-
-        // Response += Convert.ToString("Provider" + aaab);
-        // Response += Convert.ToString("rawatInap" + aaabc);
-        // Response += Convert.ToString("rawatInapTrue" + aaabcd);
-        // Response += Convert.ToString("kesadaran" + aaabcde);
-        // Response += Convert.ToString(aaa);
-
-        // // POST DATA
-        // var regis = new PendaftaranRequest
-        //     {
-        //         kdProviderPeserta = "00010001",
-        //         tglDaftar = "06-05-2024",
-        //         noKartu = "0001113569638",
-        //         kdPoli = "001",
-        //         keluhan = null,
-        //     };
-
-        // var responseApi = await PcareService.SendPCareService($"pendaftaran", HttpMethod.Post, regis);
-        // dynamic data = responseApi.Item1;
-        // data = JsonConvert.DeserializeObject<dynamic>(data);
-
-        // Response += "\n" + Convert.ToString(data);
-        // string akk = $"\n Field \"{data.field} \" {data.message}";
-        // ToastService.ShowInfo(akk.ToString());
-
-        // var result = await PcareService.SendPCareService($"poli/fktp/1/1000", HttpMethod.Get);
-
-        // await Send();
-        // var aa = await AuthenticationState;
-        // var bb = aa.User.Identity.Name;
-        // SalesData2 = await Sales.GetSalesAsync();
-
-        ///Decrypted
-        // DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        // TimeSpan timeSpan = DateTime.UtcNow - epoch;
-        // long tStamp = (long)timeSpan.TotalSeconds;
-        ///
-        // string r = "Wcem5CYDCbnmR5fcoBtip3UDpHUxcq1N7hUfK4uMm3xs3L+vPboELhK6PMjvxX1QP0o9DpVcEsLBjmswszbku3pFH2HR3S+iLcSP65JFYJlGwXUDtd9TF+PFQuPo3YaqRGhLQ3YBLCkPifnTcuGqAQdIw5cNT5RhF8tKcmOWB6tTc29heTSp5mTf4S81FDl9jY55n1OkQsirSzYGgGzXdolW4K6mMc6loYstTR1GVQXaTEsl7z4HhzXtEVB7W2IYaTcrUetUW6Tad0EGaaAznwOs8ek8YDd+4CQcbFCq/K30RZg9uiKyLeFtfsQCyA9ZDOS7sKhTUdGiGqIyW6uLsBSEq4ysZJpMcIZc/8D0aps56auvLmJY+HNWKklfbl88+DJmpxud7hFuYZo9jTlkrIA/gnIJZcKTa6gMUpzEH1RyHdzOTNogRxvpwGb3dRkcHfjvOHo0kI9DM2236XWfjIypa2RkhF8KsKtBjoSnVnMNDZNTXX6Sp/k/vmaJcU+8RJbh1ah1E1tgLnyGQY7+nu8CjCBqv0ODOChG7JKKz6dU6KZC/VWX7cXH8+/SGXOSKiijsJJEAiOX2Okqv87m9rmhHL6VcoCNFhQXtOYo1U2RCQVXhcpxOsl6gsQWqAMYFc95zMSjkBCot6975LQVhETzt2AAd67L6Abd+ylRBzlpfX2PZrIab0i8rjwdstNE3xg+r/tTayvSRzMHyoX/PYTr6FKtky4u2sjx/3wH+WLqMFvKzbiNSgbT/lRrGaS1FMxVR75/7qYchVCJieauSg==";
-        // string aa = "15793";
-        // string a1 = "8nDF24C2AD";
-        // // string a2 = "1714373200";
-        // string a2 = tStamp.ToString();
-        // string a3 = aa + a1 + a2;
-        // string LZDecrypted = Decrypt(a3, r);
-        // string result = LZString.DecompressFromEncodedURIComponent(LZDecrypted);
-
-        // var a = await HttpClient.GetStringAsync("https://dummyjson.com/products?limit=99999999999999")!;
-
-        // var jsonObject = JsonConvert.DeserializeObject<dynamic>(a);
-
-        // // Mengambil nilai dari properti 'products'
-        // var productsJson = jsonObject["products"].ToString();
-
-        // // Mengonversi string produk menjadi List<ProductTemp>
-        // var products = JsonConvert.DeserializeObject<List<ProductTemp>>(productsJson);
-
-        // ProductTemps = products;
-
-        var hour = DateTime.Now.Hour;
-
-        if (hour < 12)
-            Greeting = "Good Morning!";
-        else if (hour < 17)
-            Greeting = "Good Afternoon!";
-        else
-            Greeting = "Good Evening!";
-
-        // var users = await Mediator.Send(new GetUserQuery());
-        // // Dashboard.UserCount = users.Where(x => x.IsUser == true).Count();
-        // Dashboard.UserCount = users.Count();
-        // Dashboard.PatientCount = users.Where(x => x.IsUser == true).Count();
-        // Dashboard.PhysicianCount = users.Where(x => x.IsPhysicion == true).Count();
-        // Dashboard.NurseCount = users.Where(x => x.IsNurse == true).Count();
-        // Dashboard.EmployeeCount = users.Where(x => x.IsEmployee == true).Count();
-
-        PanelVisible = false;
-        // try
-        // {
-        //     var result = await NavigationManager.CheckAccessUser(oLocal);
-        //     IsAccess = result.Item1;
-        //     UserAccessCRUID = result.Item2;
-        // }
-        // catch { }
-    }
 
     #region UserLoginAndAccessRole
 

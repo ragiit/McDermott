@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using DevExtreme.AspNet.Data;
+using DevExtreme.AspNet.Data.ResponseModel;
+using MediatR;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
@@ -9,6 +11,24 @@ namespace McDermott.Web.Extentions
 {
     public static class QueryComboBoxHelper
     {
+        public static async Task<LoadResult> LoadCustomData<TData>(
+             DataSourceLoadOptionsBase options,
+             Func<Task<IQueryable<TData>>> queryProvider,
+             string defaultSortColumn = "Name", // Default sort column parameter
+             Expression<Func<TData, bool>>? filter = null,
+             CancellationToken cancellationToken = default)
+        {
+            options.DefaultSort = defaultSortColumn; // Use the provided default sort column
+
+            var query = await queryProvider();
+
+            // Apply the filter if provided
+            if (filter != null)
+                query = query.Where(filter);
+
+            return await DataSourceLoader.LoadAsync(query/*.Skip(options.Skip).Take(options.Take)*/, options, cancellationToken);
+        }
+
         private const short PAGE_SIZE = 20;
 
         /// <summary>

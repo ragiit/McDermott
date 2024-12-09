@@ -6,17 +6,23 @@ namespace McDermott.Application.Features.Queries
 {
     public class GetDataQueryHandler(IUnitOfWork unitOfWork) :
 
+    #region Transactions
+
+        IRequestHandler<GetQueryGeneralConsultanService, IQueryable<GeneralConsultanService>>,
+
+    #endregion Transactions
+
     #region Configuration
 
-        IRequestHandler<GetQueryUserlable, IQueryable<User>>,
-        IRequestHandler<GetQueryGrouplable, IQueryable<Group>>,
-        IRequestHandler<GetQueryGroupMenulable, IQueryable<GroupMenu>>,
-        IRequestHandler<GetQueryMenulable, IQueryable<Menu>>,
-        IRequestHandler<GetQueryCompanylable, IQueryable<Company>>,
-        IRequestHandler<GetQueryCountrylable, IQueryable<Country>>,
-        IRequestHandler<GetQueryProvincelable, IQueryable<Province>>,
-        IRequestHandler<GetQueryCitylable, IQueryable<City>>,
-        IRequestHandler<GetQueryOccupationallable, IQueryable<Occupational>>,
+        IRequestHandler<GetQueryUser, IQueryable<User>>,
+        IRequestHandler<GetQueryGroup, IQueryable<Group>>,
+        IRequestHandler<GetQueryGroupMenu, IQueryable<GroupMenu>>,
+        IRequestHandler<GetQueryMenu, IQueryable<Menu>>,
+        IRequestHandler<GetQueryCompany, IQueryable<Company>>,
+        IRequestHandler<GetQueryCountry, IQueryable<Country>>,
+        IRequestHandler<GetQueryProvince, IQueryable<Province>>,
+        IRequestHandler<GetQueryCity, IQueryable<City>>,
+        IRequestHandler<GetQueryOccupational, IQueryable<Occupational>>,
         IRequestHandler<GetQueryVillage, IQueryable<Village>>,
         IRequestHandler<GetQueryDistrict, IQueryable<District>>
 
@@ -25,10 +31,21 @@ namespace McDermott.Application.Features.Queries
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+        #region Transactions
+
+        // GeneralConsultanService
+        public Task<IQueryable<GeneralConsultanService>> Handle(GetQueryGeneralConsultanService request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select);
+        }
+
+        #endregion Transactions
+
         #region Configurations
 
         // User
-        public Task<IQueryable<User>> Handle(GetQueryUserlable request, CancellationToken cancellationToken)
+        public Task<IQueryable<User>> Handle(GetQueryUser request, CancellationToken cancellationToken)
         {
             return HandleQuery<User>(request, cancellationToken, request.Select is null ? x => new User
             {
@@ -38,7 +55,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // Group
-        public Task<IQueryable<Group>> Handle(GetQueryGrouplable request, CancellationToken cancellationToken)
+        public Task<IQueryable<Group>> Handle(GetQueryGroup request, CancellationToken cancellationToken)
         {
             return HandleQuery<Group>(request, cancellationToken, request.Select is null ? x => new Group
             {
@@ -48,7 +65,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // GroupMenu
-        public Task<IQueryable<GroupMenu>> Handle(GetQueryGroupMenulable request, CancellationToken cancellationToken)
+        public Task<IQueryable<GroupMenu>> Handle(GetQueryGroupMenu request, CancellationToken cancellationToken)
         {
             return HandleQuery<GroupMenu>(request, cancellationToken, request.Select is null ? x => new GroupMenu
             {
@@ -73,7 +90,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // Menu
-        public Task<IQueryable<Menu>> Handle(GetQueryMenulable request, CancellationToken cancellationToken)
+        public Task<IQueryable<Menu>> Handle(GetQueryMenu request, CancellationToken cancellationToken)
         {
             return HandleQuery<Menu>(request, cancellationToken, request.Select is null ? x => new Menu
             {
@@ -92,7 +109,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // Company
-        public Task<IQueryable<Company>> Handle(GetQueryCompanylable request, CancellationToken cancellationToken)
+        public Task<IQueryable<Company>> Handle(GetQueryCompany request, CancellationToken cancellationToken)
         {
             return HandleQuery<Company>(request, cancellationToken, request.Select is null ? x => new Company
             {
@@ -126,7 +143,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // Country
-        public Task<IQueryable<Country>> Handle(GetQueryCountrylable request, CancellationToken cancellationToken)
+        public Task<IQueryable<Country>> Handle(GetQueryCountry request, CancellationToken cancellationToken)
         {
             return HandleQuery<Country>(request, cancellationToken, request.Select is null ? x => new Country
             {
@@ -137,7 +154,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // Province
-        public Task<IQueryable<Province>> Handle(GetQueryProvincelable request, CancellationToken cancellationToken)
+        public Task<IQueryable<Province>> Handle(GetQueryProvince request, CancellationToken cancellationToken)
         {
             return HandleQuery<Province>(request, cancellationToken, request.Select is null ? x => new Province
             {
@@ -154,7 +171,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // City
-        public Task<IQueryable<City>> Handle(GetQueryCitylable request, CancellationToken cancellationToken)
+        public Task<IQueryable<City>> Handle(GetQueryCity request, CancellationToken cancellationToken)
         {
             return HandleQuery<City>(request, cancellationToken, request.Select is null ? x => new City
             {
@@ -169,7 +186,7 @@ namespace McDermott.Application.Features.Queries
         }
 
         // Occupational
-        public Task<IQueryable<Occupational>> Handle(GetQueryOccupationallable request, CancellationToken cancellationToken)
+        public Task<IQueryable<Occupational>> Handle(GetQueryOccupational request, CancellationToken cancellationToken)
         {
             return HandleQuery<Occupational>(request, cancellationToken, request.Select is null ? x => new Occupational
             {
@@ -313,7 +330,7 @@ namespace McDermott.Application.Features.Queries
 
 // Buat di Copy
 // User
-//public Task<IQueryable<User>> Handle(GetQueryUserlable request, CancellationToken cancellationToken)
+//public Task<IQueryable<User>> Handle(GetQueryUser request, CancellationToken cancellationToken)
 //{
 //    return HandleQuery<User>(request, cancellationToken, request.Select is null ? x => new User
 //    {

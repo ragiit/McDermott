@@ -2,33 +2,40 @@
 {
     public class GetDataCommand
     {
-        public class GetQueryUserlable : BaseQuery<User>
+        public class GetQueryUser : BaseQuery<User>
         { }
+
+        #region Transactions
+
+        public class GetQueryGeneralConsultanService : BaseQuery<GeneralConsultanService>
+        { }
+
+        #endregion Transactions
 
         #region Configurations
 
-        public class GetQueryGrouplable : BaseQuery<Group>
+        public class GetQueryGroup : BaseQuery<Group>
         { }
 
-        public class GetQueryGroupMenulable : BaseQuery<GroupMenu>
+        public class GetQueryGroupMenu : BaseQuery<GroupMenu>
         { }
 
-        public class GetQueryMenulable : BaseQuery<Menu>
+        public class GetQueryMenu : BaseQuery<Menu>
         { }
 
-        public class GetQueryCompanylable : BaseQuery<Company>
+        public class GetQueryCompany : BaseQuery<Company>
         { }
 
-        public class GetQueryCountrylable : BaseQuery<Country>
+        public class GetQueryCountry : BaseQuery<Country>
         { }
 
-        public class GetQueryProvincelable : BaseQuery<Province>
+        public class GetQueryProvince : BaseQuery<Province>
         { }
 
-        public class GetQueryCitylable : BaseQuery<City>
+        public class GetQueryCity : BaseQuery<City>
         { }
 
-        public class GetQueryOccupationallable : BaseQuery<Occupational>
+        public class GetQueryOccupational : BaseQuery<Occupational>
         { }
 
         public class GetQueryDistrict : BaseQuery<District>
@@ -37,14 +44,14 @@
         public class GetQueryVillage : BaseQuery<Village>
         { }
 
-        public class GetQueryUser : BaseQuery<User>
-        { }
-
         #endregion Configurations
 
         #region Inventory
-        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt> { }
-        #endregion
+
+        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt>
+        { }
+
+        #endregion Inventory
 
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }

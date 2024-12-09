@@ -68,7 +68,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var dataSource = new GridDevExtremeDataSource<Country>(await Mediator.Send(new GetQueryCountrylable()))
+                var dataSource = new GridDevExtremeDataSource<Country>(await Mediator.Send(new GetQueryCountry()))
                 {
                     CustomizeLoadOptions = (loadOptions) =>
                     {

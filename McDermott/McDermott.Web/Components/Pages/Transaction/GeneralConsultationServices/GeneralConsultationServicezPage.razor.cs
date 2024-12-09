@@ -2,6 +2,7 @@
 using DevExpress.Blazor.Reporting.Models;
 using DevExpress.XtraReports;
 using McDermott.Web.Components.Pages.Reports;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 {
@@ -211,6 +212,87 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         private async Task OnPageIndexChanged(int newPageIndex)
         {
             await LoadData(newPageIndex, pageSize);
+        }
+
+        private object Data { get; set; }
+
+        private async Task LoadData()
+        {
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<GeneralConsultanService>(await Mediator.Send(new GetQueryGeneralConsultanService
+                {
+                    OrderByList =
+                    [
+                        (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
+                        (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
+                        (x => x.ClassType != null, true),               // ThenByDescending ClassType is not null
+                        (x=>x.IsClaim, true),
+                    ],
+                    Select = x => new GeneralConsultanService
+                    {
+                        Id = x.Id,
+                        Status = x.Status,
+                        PatientId = x.PatientId,
+                        Patient = new User
+                        {
+                            Name = x.Patient.Name,
+                        },
+                        PratitionerId = x.PratitionerId,
+                        Pratitioner = new User
+                        {
+                            Name = x.Pratitioner.Name,
+                        },
+                        ServiceId = x.ServiceId,
+                        Service = new Service
+                        {
+                            Name = x.Service.Name,
+                            IsMaternity = x.Service.IsMaternity,
+                            IsTelemedicine = x.Service.IsTelemedicine,
+                            IsMcu = x.Service.IsMcu,
+                            IsVaccination = x.Service.IsVaccination
+                        },
+                        Payment = x.Payment,
+
+                        AppointmentDate = x.AppointmentDate,
+                        IsAlertInformationSpecialCase = x.IsAlertInformationSpecialCase,
+                        RegistrationDate = x.RegistrationDate,
+                        TypeRegistration = x.TypeRegistration,
+                        ClassType = x.ClassType,
+                        SerialNo = x.SerialNo,
+                        Reference = x.Reference,
+                        VisitNumber = x.VisitNumber,
+                        KioskQueue = new KioskQueue
+                        {
+                            QueueNumber = x.KioskQueue == null ? null : x.KioskQueue.QueueNumber
+                        },
+                        IsClaim = x.IsClaim,
+                    }
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        //loadOptions.Sort =
+                        //[
+                        //    new SortingInfo { Selector = "RegistrationDate", Desc = true }, // Sort by RegistrationDate in descending order
+                        //    new SortingInfo { Selector = "IsAlertInformationSpecialCase", Desc = true }, // Sort by IsAlertInformationSpecialCase in descending order
+                        //    new SortingInfo { Selector = "IsClaim", Desc = true } // Sort by IsClaim in descending order
+                        //];
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+
+                Data = dataSource;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
