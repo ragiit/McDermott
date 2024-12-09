@@ -345,7 +345,7 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var editModel = (DistrictDto)e.EditModel;
+                var editModel = (District)e.EditModel;
 
                 bool validate = await Mediator.Send(new ValidateDistrictQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.ProvinceId == editModel.ProvinceId && x.CityId == editModel.CityId));
 
@@ -357,9 +357,9 @@ namespace McDermott.Web.Components.Pages.Config
                 }
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateDistrictRequest(editModel));
+                    await Mediator.Send(new CreateDistrictRequest(editModel.Adapt<DistrictDto>()));
                 else
-                    await Mediator.Send(new UpdateDistrictRequest(editModel));
+                    await Mediator.Send(new UpdateDistrictRequest(editModel.Adapt<DistrictDto>()));
 
                 await LoadData();
             }

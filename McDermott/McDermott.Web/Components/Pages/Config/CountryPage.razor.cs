@@ -246,7 +246,7 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var editModel = (CountryDto)e.EditModel;
+                var editModel = (Country)e.EditModel;
 
                 bool validate = await Mediator.Send(new ValidateCountryQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
@@ -258,9 +258,9 @@ namespace McDermott.Web.Components.Pages.Config
                 }
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateCountryRequest(editModel));
+                    await Mediator.Send(new CreateCountryRequest(editModel.Adapt<CountryDto>()));
                 else
-                    await Mediator.Send(new UpdateCountryRequest(editModel));
+                    await Mediator.Send(new UpdateCountryRequest(editModel.Adapt<CountryDto>()));
 
                 SelectedDataItems = [];
                 await LoadData();

@@ -107,7 +107,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             try
             {
-                var editModel = (CompanyDto)e.EditModel;
+                var editModel = (Company)e.EditModel;
 
                 bool validate = await Mediator.Send(new ValidateCompanyQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
 
@@ -119,9 +119,9 @@ namespace McDermott.Web.Components.Pages.Config
                 }
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateCompanyRequest(editModel));
+                    await Mediator.Send(new CreateCompanyRequest(editModel.Adapt<CompanyDto>()));
                 else
-                    await Mediator.Send(new UpdateCompanyRequest(editModel));
+                    await Mediator.Send(new UpdateCompanyRequest(editModel.Adapt<CompanyDto>()));
 
                 SelectedDataItems = [];
                 await LoadData();

@@ -209,7 +209,7 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var editModel = (ProvinceDto)e.EditModel;
+                var editModel = (Province)e.EditModel;
 
                 bool exists = await Mediator.Send(new ValidateProvinceQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.CountryId == editModel.CountryId));
                 if (exists)
@@ -221,11 +221,11 @@ namespace McDermott.Web.Components.Pages.Config
 
                 if (editModel.Id == 0)
                 {
-                    await Mediator.Send(new CreateProvinceRequest(editModel));
+                    await Mediator.Send(new CreateProvinceRequest(editModel.Adapt<ProvinceDto>()));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateProvinceRequest(editModel));
+                    await Mediator.Send(new UpdateProvinceRequest(editModel.Adapt<ProvinceDto>()));
                 }
 
                 await LoadData();
