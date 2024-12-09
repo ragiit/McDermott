@@ -1,6 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
-using Group = McDermott.Domain.Entities.Group;
 
 namespace McDermott.Web.Components.Pages.Config.Users
 {

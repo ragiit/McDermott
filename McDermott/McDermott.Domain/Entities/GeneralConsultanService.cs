@@ -4,6 +4,9 @@ namespace McDermott.Domain.Entities
 {
     public partial class GeneralConsultanService : BaseAuditableEntity
     {
+        [NotMapped]
+        public string StatusName => Status.GetDisplayName();
+
         public long? KioskQueueId { get; set; }
         public long? PatientId { get; set; }
         public long? InsurancePolicyId { get; set; }

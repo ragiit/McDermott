@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using DevExtreme.AspNet.Data;
+using DevExtreme.AspNet.Data.ResponseModel;
+using MediatR;
 using System.Linq.Expressions;
 using static McDermott.Application.Features.Commands.Pharmacies.SignaCommand;
 

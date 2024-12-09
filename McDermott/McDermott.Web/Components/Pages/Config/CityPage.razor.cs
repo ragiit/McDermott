@@ -76,7 +76,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var dataSource = new GridDevExtremeDataSource<City>(await Mediator.Send(new GetQueryCitylable()))
+                var dataSource = new GridDevExtremeDataSource<City>(await Mediator.Send(new GetQueryCity()))
                 {
                     CustomizeLoadOptions = (loadOptions) =>
                     {
@@ -101,7 +101,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
-            await LoadProvince();
+            City = new();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -259,8 +259,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as CityDto ?? new());
-                await LoadProvince(predicate: x => x.Id == a.ProvinceId);
+                City = (Grid.GetDataItem(FocusedRowVisibleIndex) as City ?? new());
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -329,51 +328,14 @@ namespace McDermott.Web.Components.Pages.Config
 
         #region ComboBox Province
 
-        private ProvinceDto SelectedProvince { get; set; } = new();
+        private City City { get; set; } = new();
 
-        private async Task SelectedItemChanged(ProvinceDto e)
+        protected async Task<LoadResult> LoadCustomDataProvince(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
         {
-            if (e is null)
-            {
-                SelectedProvince = new();
-                await LoadProvince();
-            }
-            else
-                SelectedProvince = e;
-        }
-
-        private CancellationTokenSource? _cts;
-
-        private async Task OnInputProvince(ChangeEventArgs e)
-        {
-            try
-            {
-                _cts?.Cancel();
-                _cts?.Dispose();
-                _cts = new CancellationTokenSource();
-
-                await Task.Delay(Helper.CBX_DELAY, _cts.Token);
-
-                await LoadProvince(e.Value?.ToString() ?? "");
-            }
-            finally
-            {
-                _cts?.Dispose();
-                _cts = null;
-            }
-        }
-
-        private async Task LoadProvince(string? e = "", Expression<Func<Province, bool>>? predicate = null)
-        {
-            try
-            {
-                Provinces = await Mediator.QueryGetComboBox<Province, ProvinceDto>(e, predicate);
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally { PanelVisible = false; }
+            return await QueryComboBoxHelper.LoadCustomData<Province>(
+                options: options,
+                queryProvider: async () => await Mediator.Send(new GetQueryProvince()),
+                cancellationToken: cancellationToken);
         }
 
         #endregion ComboBox Province

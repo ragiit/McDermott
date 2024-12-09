@@ -1,4 +1,6 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Domain.Entities
 {
     public class KioskQueue : BaseAuditableEntity
     {
@@ -21,5 +23,10 @@
 
         [SetToNull]
         public virtual ClassType? ClassType { get; set; }
+
+        [NotMapped]
+        public string? QueueNumberString => QueueNumber.HasValue
+           ? QueueNumber.Value.ToString().PadLeft(3, '0')
+           : null;
     }
 }

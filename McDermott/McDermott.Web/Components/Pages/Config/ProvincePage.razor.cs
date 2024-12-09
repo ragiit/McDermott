@@ -57,7 +57,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var dataSource = new GridDevExtremeDataSource<Province>(await Mediator.Send(new GetQueryProvincelable()))
+                var dataSource = new GridDevExtremeDataSource<Province>(await Mediator.Send(new GetQueryProvince()))
                 {
                     CustomizeLoadOptions = (loadOptions) =>
                     {
@@ -76,6 +76,16 @@ namespace McDermott.Web.Components.Pages.Config
         }
 
         #region ComboBox Country
+
+        private Province Province { get; set; } = new();
+
+        protected async Task<LoadResult> LoadCustomDataCountry(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+        {
+            return await QueryComboBoxHelper.LoadCustomData<Country>(
+                options: options,
+                queryProvider: async () => await Mediator.Send(new GetQueryCountry()),
+                cancellationToken: cancellationToken);
+        }
 
         private CountryDto SelectedCountry { get; set; } = new();
 
@@ -168,7 +178,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task NewItem_Click()
         {
-            await LoadCounty();
+            Province = new();
             await Grid.StartEditNewRowAsync();
         }
 
@@ -183,8 +193,7 @@ namespace McDermott.Web.Components.Pages.Config
             {
                 PanelVisible = true;
                 await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-                var a = (Grid.GetDataItem(FocusedRowVisibleIndex) as ProvinceDto ?? new());
-                await LoadCounty(predicate: x => x.Id == a.CountryId);
+                Province = (Grid.GetDataItem(FocusedRowVisibleIndex) as Province ?? new());
                 PanelVisible = false;
             }
             catch (Exception ex)

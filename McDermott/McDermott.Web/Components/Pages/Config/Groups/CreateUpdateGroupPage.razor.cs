@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using Group = McDermott.Domain.Entities.Group;
 
 namespace McDermott.Web.Components.Pages.Config.Groups
 {
