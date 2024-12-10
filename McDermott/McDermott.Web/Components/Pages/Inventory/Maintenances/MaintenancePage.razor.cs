@@ -231,10 +231,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 
             try
             {
-                if ((MaintenanceDto)args.DataItem is null)
+                if ((Maintenance)args.DataItem is null)
                     return;
 
-                isActiveButton = ((MaintenanceDto)args.DataItem)!.Status!.Equals(EnumStatusMaintenance.Request);
+                isActiveButton = ((Maintenance)args.DataItem)!.Status!.Equals(EnumStatusMaintenance.Request);
             }
             catch (Exception ex)
             {

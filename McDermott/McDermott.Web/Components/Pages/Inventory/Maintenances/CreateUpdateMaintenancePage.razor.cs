@@ -23,7 +23,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         private MaintenanceDto postMaintenance = new();
         private MaintenanceDto getMaintenanceById = new();
         private MaintenanceProductDto getMaintenanceProductById = new();
-        private MaintenanceProductDto postMaintenanceProduct = new();
+        private MaintenanceProduct postMaintenanceProduct { get; set; } = new();
         private TransactionStockDto postTransactionStock = new();
 
         #endregion Relation data
@@ -159,26 +159,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                     UpdateFormProductDetail(firstStockProduct ?? new(), e);
                 }
 
-                return;
-                var stockProducts2 = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == e.Id && s.LocationId == postMaintenance.LocationId));
+                
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
 
-            //if (postMaintenance.LocationId != 0 || postMaintenance.LocationId != null)
-            //{
-            //    var stockProducts = await Mediator.Send(new GetTransactionStockQuery(s => s.ProductId == value.Id && s.LocationId == postMaintenance.LocationId));
-            //    Batch = stockProducts?.Select(x => x.Batch)?.ToList() ?? [];
-            //    Batch = Batch.Distinct().ToList();
-            //    currentExpiryDate = stockProducts?.Select(x=>x.ExpiredDate).FirstOrDefault();
-            //}
-            //else
-            //{
-            //    ToastService.ShowInfo("Select Location Or Location Not Null..");
-            //    return;
-            //}
         }
 
         private void ResetFormProductDetail()
@@ -429,7 +416,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                         loadOptions.PaginateViaPrimaryKey = true;
                     }
                 };
-                await HandlerData();
+                Console.WriteLine(DataDetailProduct);
             }
             finally
             {
@@ -437,13 +424,53 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             }
         }
 
-        private async Task HandlerData()
+        public MarkupString GetIssueStatusIconHtml(EnumStatusMaintenance? status)
         {
-            foreach (var item in getMaintenanceProduct)
+            string priorityClass;
+            string title;
+
+            switch (status)
             {
-                postMaintenanceProduct = item ?? new();
+                case EnumStatusMaintenance.Request:
+                    priorityClass = "info";
+                    title = "Request";
+                    break;
+
+                case EnumStatusMaintenance.InProgress:
+                    priorityClass = "primary";
+                    title = "In Progress";
+                    break;
+
+                case EnumStatusMaintenance.Repaired:
+                    priorityClass = "warning";
+                    title = "Repaire";
+                    break;
+
+                case EnumStatusMaintenance.Scrap:
+                    priorityClass = "warning";
+                    title = "Scrap";
+                    break;
+
+                case EnumStatusMaintenance.Done:
+                    priorityClass = "success";
+                    title = "Done";
+                    break;
+
+                case EnumStatusMaintenance.Canceled:
+                    priorityClass = "danger";
+                    title = "Cancel";
+                    break;
+
+                default:
+                    return new MarkupString("");
             }
+
+            string html = $"<div class='row '><div class='col-3'>" +
+                          $"<span class='badge bg-{priorityClass} py-1 px-3' title='{title}'>{title}</span></div></div>";
+
+            return new MarkupString(html);
         }
+
 
         private List<string> listString = [
             "Scrap",
@@ -782,7 +809,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 
                 //update Maintenance
                 postMaintenance.Status = EnumStatusMaintenance.Scrap;
-                getMaintenanceProductById = await Mediator.Send(new UpdateMaintenanceProductRequest(postMaintenanceProduct));
+                getMaintenanceProductById = await Mediator.Send(new UpdateMaintenanceProductRequest(postMaintenanceProduct.Adapt<MaintenanceProductDto>()));
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -797,7 +824,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             {
                 PanelVisible = true;
                 postMaintenanceProduct.Status = EnumStatusMaintenance.Done;
-                getMaintenanceProductById = await Mediator.Send(new UpdateMaintenanceProductRequest(postMaintenanceProduct));
+                getMaintenanceProductById = await Mediator.Send(new UpdateMaintenanceProductRequest(postMaintenanceProduct.Adapt<MaintenanceProductDto>()));
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -826,9 +853,47 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 
         private async Task EditItem_Click(IGrid context)
         {
+            // Memulai edit baris berdasarkan indeks
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
-            postMaintenanceProduct = (MaintenanceProductDto)context.SelectedDataItem;
+
+            // Ambil data MaintenanceProduct dari Grid
+            postMaintenanceProduct = Grid.GetDataItem(FocusedRowVisibleIndex) as MaintenanceProduct ?? new();
+
+            // Cek apakah ada tanggal kadaluarsa
+            if (postMaintenance.Recurrent == false)
+            {
+                currentExpiryDate = postMaintenanceProduct.Expired;
+
+            }
+            else { 
+
+            // Ambil detail produk jika tidak ada tanggal kadaluarsa
+            ProductDto productData = await Mediator.Send(new GetSingleProductQueryNew
+            {
+                Predicate = x => x.Id == postMaintenanceProduct.ProductId
+            });
+
+                if (productData != null)
+                {
+                    // Panggil metode selectByProduct untuk memproses data produk
+                    var stockProducts = await Mediator.Send(new GetSingleTransactionStockQueryNew
+                    {
+                        Predicate = s => s.ProductId == productData.Id && s.LocationId == postMaintenance.LocationId && s.Batch == postMaintenanceProduct.SerialNumber,
+                        Select = x => new TransactionStock
+                        {
+                            Batch = x.Batch,
+                            ExpiredDate = x.ExpiredDate,
+                            ProductId = x.ProductId,
+
+                        }
+                    });
+
+
+                    currentExpiryDate = stockProducts.ExpiredDate;
+                }
+            }
         }
+
 
         private void DeleteItem_Click()
         {
@@ -911,7 +976,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         {
             try
             {
-                var dataItems = (MaintenanceProduct)e.EditModel; 
+                var dataItems = (MaintenanceProduct)e.EditModel;
                 if (dataItems is null || dataItems is null)
                 {
                     ToastService.ShowError("Maintenance product or main data is null.");
@@ -921,7 +986,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                 // Create a new Maintenance product
                 if (dataItems.Id == 0)
                 {
-                    postMaintenanceProduct.MaintenanceId = dataItems.Id;
+                    postMaintenanceProduct.MaintenanceId = postMaintenance.Id;
                     if (postMaintenance.Recurrent == false)
                     {
                         postMaintenanceProduct.Expired = currentExpiryDate;

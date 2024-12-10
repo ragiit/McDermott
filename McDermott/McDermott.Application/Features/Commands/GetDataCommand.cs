@@ -52,11 +52,7 @@
         public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct> { }
         #endregion
 
-        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt>
-        { }
-
-        #endregion Inventory
-
+      
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }
     }

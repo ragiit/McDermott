@@ -18,8 +18,8 @@
                                             ApplyBackgroundShading="true"
                                             IndicatorAreaVisible="true"
                                             Text="Fetching Data...">
-                                <MyGridPaginate @ref="Grid"
-                                                Data="@getMaintenance"
+                                <_BaseMyGrid @ref="Grid"
+                                                Data="@Data"
                                                 @bind-SelectedDataItems="@SelectedDataItems"
                                                 DataItemDeleting="OnDelete"
                                                 FocusedRowChanged="Grid_FocusedRowChanged"
@@ -27,8 +27,7 @@
                                                 KeyFieldName="Id">
 
                                     <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="MaintenanceDto"
-                                                         Items="@getMaintenance"
+                                        <MyDxToolbarBase TItem="Maintenance"
                                                          Grid="Grid"
                                                          SelectedDataItems="@SelectedDataItems"
                                                          NewItem_Click="@NewItem_Click"
@@ -47,12 +46,10 @@
                                         <DxGridDataColumn FieldName="Title" Caption="Subject" />
                                         <DxGridDataColumn FieldName="RequestBy.Name" Caption="Employee" />
                                         <DxGridDataColumn FieldName="ResponsibleBy.Name" Caption="Technical" />
-                                        <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                                        <DxGridDataColumn FieldName="Equipment.Brand" Caption="Brand" />
                                         <DxGridDataColumn FieldName="RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
                                         <DxGridDataColumn FieldName="Status" Caption="Status">
                                             <CellDisplayTemplate>
-                                                @((MarkupString)GetIssueStatusIconHtml((context.DataItem as MaintenanceDto).Status))
+                                                @((MarkupString)GetIssueStatusIconHtml((context.DataItem as Maintenance).Status))
                                             </CellDisplayTemplate>
                                         </DxGridDataColumn>
                                     </Columns>
@@ -61,7 +58,7 @@
                                                            FieldName="Name"
                                                            Visible="true" />
                                     </TotalSummary>
-                                </MyGridPaginate>
+                                </_BaseMyGrid>
                                 <div class="row">
                                     <DxFormLayout>
                                         <div class="col-md-8">

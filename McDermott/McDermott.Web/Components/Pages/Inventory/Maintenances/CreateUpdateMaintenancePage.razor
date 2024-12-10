@@ -34,7 +34,7 @@
                                     <div class="card-body">
                                         <div class="row justify-content-between">
                                             <div class="col-auto align-self-start">
-                                                @if (getMaintenanceProduct.Count > 0)
+                                                @if (DataDetailProduct is not null)
                                                 {
                                                     <DxButton Text="In Progress" Visible="@(postMaintenance.Status == EnumStatusMaintenance.Request)" RenderStyle="ButtonRenderStyle.Primary" IconCssClass="fa-solid fa-check" Click="InProgress_Click"></DxButton>
                                                     <DxButton Text="Cancel" Visible="@(postMaintenance.Status == EnumStatusMaintenance.Request)" RenderStyle="ButtonRenderStyle.Danger" IconCssClass="fa-solid fa-xmark" Click="Cancel_Click"></DxButton>
@@ -92,7 +92,6 @@
 
                                                             <Columns>
                                                                 <DxListEditorColumn FieldName="@nameof(User.Name)" Caption="Name" />
-                                                                @* <DxListEditorColumn FieldName="@nameof(Locations.Type)" Caption="Code" /> *@
                                                             </Columns>
                                                         </MyDxComboBox>
                                                     </DxFormLayoutItem>
@@ -156,13 +155,18 @@
                                                 <DxFormLayout CssClass="mt w-100">
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Responsible">
                                                         <MyDxComboBox Data="@getResponsibleBy"
-                                                                      NullText="select Responsible..."
+                                                                      NullText="Select Responsible By.."
                                                                       AllowUserInput="true"
                                                                       @bind-Value="@postMaintenance.ResponsibleById"
-                                                                      ReadOnly="@(postMaintenance.Id != 0 && postMaintenance.Status != EnumStatusMaintenance.Request)"
                                                                       TextFieldName="Name"
+                                                                      ReadOnly="@(postMaintenance.Id != 0 && postMaintenance.Status != EnumStatusMaintenance.Request)"
                                                                       ValueFieldName="Id"
-                                                                      @oninput="OnInputResponsibleBy"></MyDxComboBox>
+                                                                      @oninput="OnInputResponsibleBy">
+
+                                                            <Columns>
+                                                                <DxListEditorColumn FieldName="@nameof(User.Name)" Caption="Name" />
+                                                            </Columns>
+                                                        </MyDxComboBox>
                                                     </DxFormLayoutItem>
                                                     <DxFormLayoutItem CaptionCssClass="normal-caption" ColSpanMd="12" Caption="Schedule Date">
                                                         <DxDateEdit @bind-Date="@postMaintenance.ScheduleDate" DisplayFormat="dd MMMM yyyy" ReadOnly="@(postMaintenance.Id != 0 && postMaintenance.Status != EnumStatusMaintenance.Request)"></DxDateEdit>
@@ -276,13 +280,17 @@
                                                                     }
                                                                     else if (postMaintenance.Status == EnumStatusMaintenance.Done)
                                                                     {
-                                                                        <DxGridDataColumn FieldName="Status" Caption="Status" />
+                                                                        <DxGridDataColumn FieldName="Status" Caption="Status">
+                                                                            <CellDisplayTemplate>
+                                                                                @((MarkupString)GetIssueStatusIconHtml((context.DataItem as MaintenanceProduct).Status))
+                                                                            </CellDisplayTemplate>
+                                                                        </DxGridDataColumn>
                                                                     }
                                                                 </Columns>
 
                                                                 <EditFormTemplate Context="EditFormContextt">
                                                                     @{
-                                                                        var a = (MaintenanceProduct)EditFormContextt.EditModel;
+                                                                        postMaintenanceProduct = (MaintenanceProduct)EditFormContextt.EditModel;
                                                                     }
                                                                     <div class="row">
                                                                         <div class="col-6">
@@ -291,7 +299,7 @@
                                                                                     <MyDxComboBox Data="@getProduct"
                                                                                                   NullText="Select Product..."
                                                                                                   AllowUserInput="true"
-                                                                                                  @bind-Value="@a.ProductId"
+                                                                                                  @bind-Value="@postMaintenanceProduct.ProductId"
                                                                                                   TextFieldName="Name"
                                                                                                   ValueFieldName="Id"
                                                                                                   SelectedItemChanged="((ProductDto value)=>selectByProduct(value))"
@@ -305,10 +313,10 @@
                                                                                 <DxFormLayoutItem Caption="Batch" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <MyDxComboBox Data="@Batch"
                                                                                                   NullText="Select Batch..."
-                                                                                                  @bind-Value="@a.SerialNumber"
+                                                                                                  @bind-Value="@postMaintenanceProduct.SerialNumber"
                                                                                                   SelectedItemChanged="((string value) => selectByBatch(value))"></MyDxComboBox>
                                                                                 </DxFormLayoutItem>
-                                                                                <DxFormLayoutItem Caption="current Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                <DxFormLayoutItem Caption="current Maintenance Date" CaptionCssClass="normal-caption" ColSpanMd="12">
                                                                                     <DxDateEdit @bind-Date="@currentExpiryDate" ReadOnly></DxDateEdit>
                                                                                 </DxFormLayoutItem>
                                                                             </DxFormLayout>
@@ -317,12 +325,12 @@
                                                                             <DxFormLayout CssClass="w-100">
                                                                                 @if (postMaintenance.Recurrent == true)
                                                                                 {
-                                                                                    <DxFormLayoutItem Caption="Next Expiry Date" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                                        <DxDateEdit @bind-Date="@a.Expired" ReadOnly></DxDateEdit>
+                                                                                    <DxFormLayoutItem Caption="Next Maintenance Date" CaptionCssClass="normal-caption" ColSpanMd="12">
+                                                                                        <DxDateEdit @bind-Date="@postMaintenanceProduct.Expired" ReadOnly></DxDateEdit>
                                                                                     </DxFormLayoutItem>
                                                                                 }
                                                                                 <DxFormLayoutItem Caption="Note" CaptionCssClass="normal-caption" ColSpanMd="12">
-                                                                                    <DxMemo @bind-Text="@a.Note" NullText="Entri Note Here..."></DxMemo>
+                                                                                    <DxMemo @bind-Text="@postMaintenanceProduct.Note" NullText="Entri Note Here..."></DxMemo>
                                                                                 </DxFormLayoutItem>
 
                                                                             </DxFormLayout>
