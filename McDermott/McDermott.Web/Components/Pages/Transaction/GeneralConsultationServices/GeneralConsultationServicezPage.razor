@@ -187,8 +187,55 @@
                                             <DxGridDataColumn MinWidth="200" FieldName="Reference" Caption="Reference" />
                                             <DxGridDataColumn MinWidth="200" FieldName="VisitNumber" Caption="Visit Number" />
                                             <DxGridDataColumn MinWidth="200" FieldName="SerialNo" Caption="Serial No" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="KioskQueue.QueueNumberString" Caption="Kiosk Queue Number" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" />
+
+                                            <DxGridDataColumn MinWidth="200" Caption="Kiosk Queue Number" UnboundType="GridUnboundColumnType.String">
+                                                <CellDisplayTemplate>
+                                                    @{
+                                                        var dataItem = context.DataItem as GeneralConsultanService;
+                                                        var queueNumber = dataItem?.KioskQueue?.QueueNumber.GetValueOrDefault() ?? 0;
+                                                        <span>@(queueNumber == 0 ? "" : queueNumber.ToString().PadLeft(3, '0'))</span>
+                                                    }
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
+
+                                            @*<DxGridDataColumn MinWidth="200" FieldName="KioskQueue.QueueNumberString" Caption="Kiosk Queue Number" /> *@
+                                           
+@* 
+
+                                          @*   <DxGridDataColumn MinWidth="200" FieldName="KioskQueue.QueueNumber" Caption="Kiosk Queue Number">
+                                                <CellDisplayTemplate>
+                                                    @{
+                                                        // QueueNumber.Value.ToString().PadLeft(3, '0')
+                                                        var dataItem = context.DataItem as GeneralConsultanService;
+                                                        if (dataItem != null && (dataItem.KioskQueue is null || dataItem.KioskQueue.QueueNumber is null))
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (dataItem != null && dataItem.KioskQueue is not null && dataItem.KioskQueue.QueueNumber is not null)
+                                                            {
+                                                                <span>@dataItem.KioskQueue.QueueNumber.GetValueOrDefault().ToString().PadLeft(3, '0')</span>
+                                                            }
+                                                        }
+                                                    }
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn> *@
+
+
+
+                                            @* <DxGridDataColumn MinWidth="200" FieldName="StatusName" Caption="Status" /> *@
+                                              
+                                            <DxGridDataColumn MinWidth="200" FieldName="Status" Caption="Status">
+                                                <CellDisplayTemplate>
+                                                    @{
+                                                        var dataItem = context.DataItem as GeneralConsultanService;
+                                                        var dataItemz = dataItem;
+                                                        <span>@dataItem?.Status.GetDisplayName()</span>
+                                                    } 
+                                                </CellDisplayTemplate>
+                                            </DxGridDataColumn>
+
                                             <DxGridDataColumn MinWidth="200" FieldName="IsClaim"   Caption="Claim">
                                                 <CellDisplayTemplate>
                                                     @GetIssueClaimIconHtml((context.DataItem as GeneralConsultanServiceDto))

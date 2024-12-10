@@ -180,7 +180,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
             if (args.DataItem is null)
                 return;
 
-            var d = ((GeneralConsultanServiceDto)args.DataItem).Status;
+            var d = ((GeneralConsultanService)args.DataItem).Status;
 
             IsDeleteGC = d == EnumStatusGeneralConsultantService.Planned || d == EnumStatusGeneralConsultantService.Canceled;
         }
@@ -228,8 +228,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     [
                         (x => x.RegistrationDate, true),               // OrderByDescending RegistrationDate
                         (x => x.IsAlertInformationSpecialCase, true),  // ThenByDescending IsAlertInformationSpecialCase
-                        (x => x.ClassType != null, true),               // ThenByDescending ClassType is not null
-                        (x=>x.IsClaim, true),
+                        (x => x.IsClaim, true),
                     ],
                     Select = x => new GeneralConsultanService
                     {
@@ -248,11 +247,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         ServiceId = x.ServiceId,
                         Service = new Service
                         {
-                            Name = x.Service.Name,
-                            IsMaternity = x.Service.IsMaternity,
-                            IsTelemedicine = x.Service.IsTelemedicine,
-                            IsMcu = x.Service.IsMcu,
-                            IsVaccination = x.Service.IsVaccination
+                            Name = x.Service == null ? string.Empty : x.Service.Name,
+                            IsMaternity = x.Service == null ? false : x.Service.IsMaternity,
+                            IsTelemedicine = x.Service == null ? false : x.Service.IsTelemedicine,
+                            IsMcu = x.Service == null ? false : x.Service.IsMcu,
+                            IsVaccination = x.Service == null ? false : x.Service.IsVaccination
                         },
                         Payment = x.Payment,
 
@@ -266,7 +265,7 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         VisitNumber = x.VisitNumber,
                         KioskQueue = new KioskQueue
                         {
-                            QueueNumber = x.KioskQueue == null ? null : x.KioskQueue.QueueNumber
+                            QueueNumber = x.KioskQueue.QueueNumber
                         },
                         IsClaim = x.IsClaim,
                     }
@@ -274,12 +273,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 {
                     CustomizeLoadOptions = (loadOptions) =>
                     {
-                        //loadOptions.Sort =
-                        //[
-                        //    new SortingInfo { Selector = "RegistrationDate", Desc = true }, // Sort by RegistrationDate in descending order
-                        //    new SortingInfo { Selector = "IsAlertInformationSpecialCase", Desc = true }, // Sort by IsAlertInformationSpecialCase in descending order
-                        //    new SortingInfo { Selector = "IsClaim", Desc = true } // Sort by IsClaim in descending order
-                        //];
                         loadOptions.PrimaryKey = ["Id"];
                         loadOptions.PaginateViaPrimaryKey = true;
                     }

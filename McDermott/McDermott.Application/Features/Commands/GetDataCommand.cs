@@ -47,12 +47,14 @@
         #endregion Configurations
 
         #region Inventory
-        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt> { }
-        public class GetQueryMaintenance : BaseQuery<Maintenance> { }
-        public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct> { }
-        #endregion
 
         public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt>
+        { }
+
+        public class GetQueryMaintenance : BaseQuery<Maintenance>
+        { }
+
+        public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct>
         { }
 
         #endregion Inventory

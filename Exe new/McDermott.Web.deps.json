@@ -17,7 +17,6 @@
           "Blazored.TextEditor": "1.1.0",
           "Blazored.Toast": "4.2.1",
           "DevExpress.Blazor": "23.2.6",
-          "DevExpress.Blazor.ProjectTemplates": "23.2.4",
           "DevExpress.Blazor.Reporting.Viewer": "23.2.6",
           "DevExpress.Blazor.RichEdit": "23.2.6",
           "DinkToPdf": "1.0.8",
@@ -233,7 +232,6 @@
           }
         }
       },
-      "DevExpress.Blazor.ProjectTemplates/23.2.4": {},
       "DevExpress.Blazor.Reporting.Viewer/23.2.6": {
         "dependencies": {
           "DevExpress.Blazor": "23.2.6",
@@ -4618,13 +4616,6 @@
       "sha512": "sha512-yY+7+7NOTuW3VmlHiONjOf25RkKQSjG+kcuAFRW5l+YHkYMJxrieYYSmnYFE0f63ULkhZAV6QLFJPd3AEYcNrw==",
       "path": "devexpress.blazor/23.2.6",
       "hashPath": "devexpress.blazor.23.2.6.nupkg.sha512"
-    },
-    "DevExpress.Blazor.ProjectTemplates/23.2.4": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-UhMNcYre71Zna6NpFxGXWwcGHE9YSmrTfs4fR4PtBCDtCu+roBN1UKDVhWxCvuWNAdMB8FeQwYw3UKxFzEg+uQ==",
-      "path": "devexpress.blazor.projecttemplates/23.2.4",
-      "hashPath": "devexpress.blazor.projecttemplates.23.2.4.nupkg.sha512"
     },
     "DevExpress.Blazor.Reporting.Viewer/23.2.6": {
       "type": "package",
