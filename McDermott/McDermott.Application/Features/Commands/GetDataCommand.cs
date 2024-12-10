@@ -52,7 +52,6 @@
         public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct> { }
         #endregion
 
-      
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }
     }

@@ -1480,7 +1480,7 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("CityId")
+                    b.Property<long?>("CityId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("CreatedBy")
@@ -1494,7 +1494,7 @@ namespace McDermott.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<long>("ProvinceId")
+                    b.Property<long?>("ProvinceId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("UpdatedBy")
@@ -6644,7 +6644,8 @@ namespace McDermott.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("CityId")
+                    b.Property<long?>("CityId")
+                        .IsRequired()
                         .HasColumnType("bigint");
 
                     b.Property<string>("CreatedBy")
@@ -6653,7 +6654,8 @@ namespace McDermott.Persistence.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("DistrictId")
+                    b.Property<long?>("DistrictId")
+                        .IsRequired()
                         .HasColumnType("bigint");
 
                     b.Property<string>("Name")
@@ -6665,7 +6667,8 @@ namespace McDermott.Persistence.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<long>("ProvinceId")
+                    b.Property<long?>("ProvinceId")
+                        .IsRequired()
                         .HasColumnType("bigint");
 
                     b.Property<string>("UpdatedBy")
@@ -7276,14 +7279,12 @@ namespace McDermott.Persistence.Migrations
                     b.HasOne("McDermott.Domain.Entities.City", "City")
                         .WithMany("Districts")
                         .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("McDermott.Domain.Entities.Province", "Province")
                         .WithMany("Districts")
                         .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("City");
 
