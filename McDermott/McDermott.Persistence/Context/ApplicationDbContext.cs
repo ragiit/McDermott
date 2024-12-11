@@ -205,6 +205,9 @@ namespace McDermott.Persistence.Context
             modelBuilder.Entity<Menu>()
                .HasIndex(v => v.Name)
                .HasDatabaseName("IX_Menus_Name");
+            modelBuilder.Entity<GeneralConsultanService>()
+               .Property(e => e.Temp)
+               .HasColumnType("decimal(18,4)"); // Atur tipe dan presisi sesuai kebutuhan
 
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
             {

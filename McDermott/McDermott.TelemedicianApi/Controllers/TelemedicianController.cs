@@ -10,14 +10,13 @@ using McDermott.Application.Dtos.Config;
 
 namespace McDermott.TelemedicianApi.Controllers
 {
-    [ApiController]
+    [NonController]
     [Route("api/[controller]")]
     public class TelemedicianController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
         private readonly IMediator _mediator;
-
 
         public TelemedicianController(ApplicationDbContext context, IMediator mediator)
         {
@@ -52,17 +51,13 @@ namespace McDermott.TelemedicianApi.Controllers
                 });
             }
 
-
             // Ambil daftar dokter, misalnya berdasarkan serviceId jika diperlukan
-
 
             // Kembalikan data user dan dokter dalam response API
             return Ok(new
             {
-
                 User = user,
                 Docter = filteredDoctors,
-
             });
         }
     }

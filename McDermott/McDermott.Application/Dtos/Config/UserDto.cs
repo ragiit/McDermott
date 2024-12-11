@@ -10,6 +10,9 @@ namespace McDermott.Application.Dtos.Config
         [Required]
         public string Name { get; set; } = string.Empty;
 
+        [NotMapped]
+        public string NameWithMasked => string.Concat(Name.AsSpan(0, 2), new string('*', Name.Length - 2));
+
         public string PhysicanCode { get; set; } = string.Empty;
 
         //[Required]

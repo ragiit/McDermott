@@ -7,6 +7,7 @@ using McDermott.Persistence.Extensions;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,17 @@ builder.Services.AddControllers()
         .AddOData(options =>
             options.Select().Filter().OrderBy().Expand().Count()
             .AddRouteComponents("odata", GetEdmModel()));
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Telemedicine API",
+        Version = "v1",
+        Description = "API untuk layanan Telemedicine yang menyediakan fitur konsultasi jarak jauh."
+    });
+});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
@@ -44,23 +56,26 @@ var metrics = new MetricsBuilder()
 builder.Services.AddMetrics(metrics);
 builder.Services.AddMetricsReportingHostedService();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Telemedicine API v1");
+    options.RoutePrefix = string.Empty; // Swagger UI di root
+});
+
+app.UseStaticFiles();
 // Tambahkan middleware logging untuk rate limiting
 app.UseMiddleware<RateLimitLoggingMiddleware>();
 app.UseMiddleware<MetricsMiddleware>();
 app.UseRouting();
 app.UseIpRateLimiting();
-app.UseSwagger();
-app.UseSwaggerUI();
 app.UseResponseCaching();
 app.UseHttpsRedirection();
 
