@@ -7,7 +7,7 @@
               KeyFieldName="Id">
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="Country"
+         <MyDxToolbarBase TItem="Diagnosis"
                           SelectedDataItems="@SelectedDataItems"
                           NewItem_Click="@NewItem_Click"
                           EditItem_Click="@EditItem_Click"
@@ -35,7 +35,7 @@ private async Task LoadData()
     {
         PanelVisible = true;
         SelectedDataItems = []; 
-        var dataSource = new GridDevExtremeDataSource<Country>(await Mediator.Send(new GetQueryCountrylable()))
+        var dataSource = new GridDevExtremeDataSource<Diagnosis>(await Mediator.Send(new GetQueryDiagnosis()))
         {
             CustomizeLoadOptions = (loadOptions) =>
             {

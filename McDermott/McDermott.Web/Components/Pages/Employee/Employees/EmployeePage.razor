@@ -18,93 +18,61 @@
                             {
                                 <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
 
-                                <DxLoadingPanel @bind-Visible="PanelVisible"
-                                                IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                                IsContentBlocked="true"
-                                                ApplyBackgroundShading="true"
-                                                IndicatorAreaVisible="false"
-                                                Text="Fetching Data...">
-                                    <MyGridPaginate @ref="Grid"
-                                                    Data="Users"
-                                                    @bind-SelectedDataItems="@SelectedDataItems"
-                                                    FocusedRowChanged="Grid_FocusedRowChanged"
-                                                    RowDoubleClick="OnRowDoubleClick"
-                                                    SearchTextChanged="OnSearchBoxChanged"
-                                                    KeyFieldName="Id">
+                                 <_BaseMyGrid @ref="Grid"
+                                             Data="@Data"
+                                             @bind-SelectedDataItems="@SelectedDataItems"
+                                             EditModelSaving="OnSave"
+                                             DataItemDeleting="OnDelete"
+                                             FocusedRowChanged="Grid_FocusedRowChanged"
+                                             KeyFieldName="Id">
 
-                                        <ToolbarTemplate>
-                                            <MyDxToolbarBase TItem="UserDto"
-                                                             Items="@Users"
-                                                             SelectedDataItems="@SelectedDataItems"
-                                                             NewItem_Click="@NewItem_Click"
-                                                             EditItem_Click="@EditItem_Click"
-                                                             DeleteItem_Click="@DeleteItem_Click"
-                                                             Refresh_Click="@Refresh_Click"
-                                                             ImportFile="ImportFile"
-                                                             ExportToExcel="ExportToExcel"
-                                                             EnableDelete="!IsDeleted"
-                                                             Grid="Grid"
-                                                             IsImport="UserAccessCRUID.IsImport"
-                                                             VisibleNew="UserAccessCRUID.IsCreate"
-                                                             VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                             VisibleDelete="UserAccessCRUID.IsDelete" />
-                                        </ToolbarTemplate>
+                                    <ToolbarTemplate>
+                                        <MyDxToolbarBase TItem="UserDto"
+                                                         Items="@Users"
+                                                         SelectedDataItems="@SelectedDataItems"
+                                                         NewItem_Click="@NewItem_Click"
+                                                         EditItem_Click="@EditItem_Click"
+                                                         DeleteItem_Click="@DeleteItem_Click"
+                                                         Refresh_Click="@Refresh_Click"
+                                                         ImportFile="ImportFile"
+                                                         ExportToExcel="ExportToExcel"
+                                                         EnableDelete="!IsDeleted"
+                                                         Grid="Grid"
+                                                         IsImport="UserAccessCRUID.IsImport"
+                                                         VisibleNew="UserAccessCRUID.IsCreate"
+                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
+                                    </ToolbarTemplate>
 
-                                        <Columns>
-                                            <DxGridSelectionColumn Width="15px" />
-                                            <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" /> 
-                                            <DxGridDataColumn MinWidth="200" FieldName="Email" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="MobilePhone" Caption="Mobile Phone" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Gender" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date Of Birth" DisplayFormat="@Helper.DefaultFormatDate" />
+                                    <Columns>
+                                        <DxGridSelectionColumn Width="15px" />
+                                        <DxGridDataColumn FieldName="Name" MinWidth="200" SortIndex="0" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Email" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="MobilePhone" Caption="Mobile Phone" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Gender" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="DateOfBirth" Caption="Date Of Birth" DisplayFormat="@Helper.DefaultFormatDate" />
 
-                                            <DxGridDataColumn MinWidth="200" FieldName="Supervisor.Name" Caption="Supervisor" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="JobPosition.Name" Caption="Job Position" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Occupational.Name" Caption="Occupational" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="EmployeeType" Caption="Employee Type" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="JoinDate" Caption="Join Date" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="NoBpjsKs" Caption="BPJS KS Number" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="NoBpjsTk" Caption="BPJS TK Number" />
-                                            <DxGridDataColumn MinWidth="200" FieldName="Legacy"/>
-                                            <DxGridDataColumn MinWidth="200" FieldName="SAP"/>
-                                            <DxGridDataColumn MinWidth="200" FieldName="NIP"/>
-                                            <DxGridDataColumn MinWidth="200" FieldName="Oracle"/>          
-                                          
-                                        </Columns>
+                                        <DxGridDataColumn MinWidth="200" FieldName="Supervisor.Name" Caption="Supervisor" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="JobPosition.Name" Caption="Job Position" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Department.Name" Caption="Department" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Occupational.Name" Caption="Occupational" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="EmployeeType" Caption="Employee Type" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="JoinDate" Caption="Join Date" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="NoBpjsKs" Caption="BPJS KS Number" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="NoBpjsTk" Caption="BPJS TK Number" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Legacy" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="SAP" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="NIP" />
+                                        <DxGridDataColumn MinWidth="200" FieldName="Oracle" />
 
-                                        <TotalSummary>
-                                            <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                               FieldName="Name"
-                                                               Visible="true" />
-                                        </TotalSummary>
-                                    </MyGridPaginate>
-                                    <div class="row">
-                                        <DxFormLayout>
-                                            <div class="col-md-9">
-                                                <DxFormLayoutItem>
-                                                    <DxPager PageCount="totalCount"
-                                                             ActivePageIndexChanged="OnPageIndexChanged"
-                                                             ActivePageIndex="activePageIndex"
-                                                             VisibleNumericButtonCount="10"
-                                                             SizeMode="SizeMode.Medium"
-                                                             NavigationMode="PagerNavigationMode.Auto">
-                                                    </DxPager>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                            <div class="col-md-3 d-flex justify-content-end">
-                                                <DxFormLayoutItem Caption="Page Size:">
-                                                    <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                                  NullText="Select Page Size"
-                                                                  ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                                  SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                                  @bind-Value="pageSize">
-                                                    </MyDxComboBox>
-                                                </DxFormLayoutItem>
-                                            </div>
-                                        </DxFormLayout>
-                                    </div>
-                                </DxLoadingPanel>
+                                    </Columns>
+
+                                    <TotalSummary>
+                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                           FieldName="Email"
+                                                           Visible="true" />
+                                    </TotalSummary>
+                                </_BaseMyGrid>  
                             }
                         </div>
                     </div>

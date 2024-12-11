@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Medical.Practitioners
+﻿using static McDermott.Application.Features.Commands.GetDataCommand;
+
+namespace McDermott.Web.Components.Pages.Medical.Practitioners
 {
     public partial class PractitionerPage
     {
@@ -235,7 +237,7 @@
                         ).ToList();
 
                         await Mediator.Send(new CreateListUserRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -364,45 +366,6 @@
             "Unmarried"
         };
 
-        private void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
-        {
-            if (e.ElementType == GridElementType.DataRow && e.VisibleIndex % 2 == 1)
-            {
-                e.CssClass = "alt-item";
-            }
-            if (e.ElementType == GridElementType.HeaderCell)
-            {
-                e.Style = "background-color: rgba(0, 0, 0, 0.08)";
-                e.CssClass = "header-bold";
-            }
-        }
-
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -412,45 +375,55 @@
 
             return;
 
+            //try
+            //{
+            //    _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+            //    await GetUserInfo();
+            //}
+            //catch (Exception ex)
+            //{
+            //    ex.HandleException(ToastService);
+            //}
+        }
+
+        private object Data { get; set; }
+
+        private async Task LoadData()
+        {
             try
             {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<User>(await Mediator.Send(new GetQueryUser
+                {
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        IsPhysicion = x.IsPhysicion,
+                        IsNurse = x.IsNurse,
+                    }
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(
-                x => x.IsDoctor == true,
-                searchTerm: searchTerm,
-                pageSize: pageSize,
-                pageIndex:
-                pageIndex,
-                includes: [],
-                select: x => new User
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Email = x.Email,
-                    MobilePhone = x.MobilePhone,
-                    Gender = x.Gender,
-                    DateOfBirth = x.DateOfBirth,
-                    IsPhysicion = x.IsPhysicion,
-                    IsNurse = x.IsNurse,
-                }
-            ));
-            Users = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            finally { PanelVisible = false; }
         }
 
         #region Grid

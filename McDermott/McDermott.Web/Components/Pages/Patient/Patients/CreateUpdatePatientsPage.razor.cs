@@ -199,7 +199,10 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
                     if (TempFamilyRelation.FamilyMemberId == editModel.FamilyMemberId && TempFamilyRelation.PatientId == UserForm.Id)
                     {
-                        var b = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == editModel.FamilyMemberId && x.FamilyMemberId == editModel.PatientId))).Item1.FirstOrDefault() ?? null;
+                        var b = (await Mediator.Send(new GetSinglePatientFamilyRelationQuery
+                        {
+                            Predicate = x => x.PatientId == editModel.FamilyMemberId && x.FamilyMemberId == editModel.PatientId
+                        }));
 
                         if (b is not null)
                         {
@@ -214,7 +217,11 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                     }
                     else
                     {
-                        var b = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == TempFamilyRelation.FamilyMemberId && x.FamilyMemberId == TempFamilyRelation.PatientId && x.FamilyId == TempFamilyRelation.Family.InverseRelationId))).Item1.FirstOrDefault() ?? null;
+                        //var b = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == TempFamilyRelation.FamilyMemberId && x.FamilyMemberId == TempFamilyRelation.PatientId && x.FamilyId == TempFamilyRelation.Family.InverseRelationId))).Item1.FirstOrDefault() ?? null;
+                        var b = await Mediator.Send(new GetSinglePatientFamilyRelationQuery
+                        {
+                            Predicate = x => x.PatientId == TempFamilyRelation.FamilyMemberId && x.FamilyMemberId == TempFamilyRelation.PatientId && x.FamilyId == TempFamilyRelation.Family.InverseRelationId
+                        });
 
                         patients.Add(new PatientFamilyRelationDto
                         {
@@ -245,7 +252,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 if (SelectedDataItemsFamilyRelation is null || SelectedDataItemsFamilyRelation.Count == 1)
                 {
                     var a = ((PatientFamilyRelationDto)e.DataItem);
-                    var p = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.FamilyMemberId == a.PatientId && x.PatientId == a.FamilyMemberId))).Item1.FirstOrDefault() ?? new();
+                    var p = await Mediator.Send(new GetSinglePatientFamilyRelationQuery { Predicate = x => x.FamilyMemberId == a.PatientId && x.PatientId == a.FamilyMemberId });
 
                     await Mediator.Send(new DeletePatientFamilyRelationRequest(a.Id));
                     await Mediator.Send(new DeletePatientFamilyRelationRequest(p.Id));
@@ -258,8 +265,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                     foreach (var item in selectedMenus)
                     {
                         // Query for a related PatientFamilyRelation for each selected item
-                        var p = (await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.FamilyMemberId == item.PatientId && x.PatientId == item.FamilyMemberId)))
-                                .Item1.FirstOrDefault() ?? new();
+                        var p = await Mediator.Send(new GetSinglePatientFamilyRelationQuery { Predicate = x => x.FamilyMemberId == item.PatientId && x.PatientId == item.FamilyMemberId });
 
                         // Delete both the selected relation and the counterpart relation
                         await Mediator.Send(new DeletePatientFamilyRelationRequest(item.Id));

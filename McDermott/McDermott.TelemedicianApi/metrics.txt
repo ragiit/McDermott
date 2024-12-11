@@ -1,4 +1,4 @@
-# TIMESTAMP: 638694873032080579
+# TIMESTAMP: 638694886617159585
 # MEASUREMENT: [appmetrics.internal] report_success  items
 # TAGS:
                    item = App.Metrics.Reporting.TextFile.TextFileMetricsReporter
@@ -8,7 +8,7 @@
                   total = 1
                 percent = 100
 --------------------------------------------------------------
-# TIMESTAMP: 638694873032080579
+# TIMESTAMP: 638694886617159585
 # MEASUREMENT: [appmetrics.internal] report_success
 # TAGS:
                   mtype = counter
@@ -16,7 +16,7 @@
 # FIELDS:
                   value = 1
 --------------------------------------------------------------
-# TIMESTAMP: 638694873032080579
+# TIMESTAMP: 638694886617159585
 # MEASUREMENT: [Application] Request Duration
 # TAGS:
                   mtype = timer
@@ -24,23 +24,23 @@
                unit_dur = ms
               unit_rate = min
 # FIELDS:
-            count.meter = 6
-                 rate1m = 0.6770565037076572
-                 rate5m = 28.31333190253908
-                rate15m = 52.74953767722349
-              rate.mean = 1.2596329828791546
-                samples = 6
-                   last = 4.1088
-             count.hist = 6
-                    sum = 86.8801
-                    min = 1.4657
-                    max = 72.10979999999999
-                   mean = 14.165682760375503
-                 median = 3.8933999999999997
-                 stddev = 25.503993987896116
-                   p999 = 72.10979999999999
-                    p99 = 72.10979999999999
-                    p98 = 72.10979999999999
-                    p95 = 72.10979999999999
-                    p75 = 4.1088
+            count.meter = 21
+                 rate1m = 13.50674753239655
+                 rate5m = 20.943563536033658
+                rate15m = 22.90687637687766
+              rate.mean = 13.049105045772015
+                samples = 21
+                   last = 1.2561
+             count.hist = 21
+                    sum = 9506.4066
+                    min = 0.7111999999999999
+                    max = 7007.3142
+                   mean = 452.07697349316607
+                 median = 113.04299999999999
+                 stddev = 1435.5842013279746
+                   p999 = 7007.3142
+                    p99 = 7007.3142
+                    p98 = 7007.3142
+                    p95 = 913.6003
+                    p75 = 147.12189999999998
 --------------------------------------------------------------

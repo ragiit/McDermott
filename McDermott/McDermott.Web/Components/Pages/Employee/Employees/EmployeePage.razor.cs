@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Employee.Employees
 {
@@ -98,43 +99,17 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
             PanelVisible = false;
         }
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetUserQueryNew
+                var dataSource = new GridDevExtremeDataSource<User>(await Mediator.Send(new GetQueryUser
                 {
-                    SearchTerm = searchTerm ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
+                    Predicate = x => x.IsEmployee == true,
                     Select = x => new User
                     {
                         Id = x.Id,
@@ -143,22 +118,22 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         MobilePhone = x.MobilePhone,
                         Gender = x.Gender,
                         DateOfBirth = x.DateOfBirth,
-                        Supervisor = x.Supervisor != null ? new Domain.Entities.User
+                        Supervisor = new Domain.Entities.User
                         {
                             Name = x.Supervisor.Name
-                        } : null,
-                        JobPosition = x.JobPosition != null ? new Domain.Entities.JobPosition
+                        },
+                        JobPosition = new Domain.Entities.JobPosition
                         {
                             Name = x.JobPosition.Name
-                        } : null,
-                        Department = x.Department != null ? new Domain.Entities.Department
+                        },
+                        Department = new Domain.Entities.Department
                         {
                             Name = x.Department.Name
-                        } : null,
-                        Occupational = x.Occupational != null ? new Domain.Entities.Occupational
+                        },
+                        Occupational = new Domain.Entities.Occupational
                         {
                             Name = x.Occupational.Name
-                        } : null,
+                        },
                         EmployeeType = x.EmployeeType,
                         JoinDate = x.JoinDate,
                         NoBpjsKs = x.NoBpjsKs,
@@ -168,20 +143,22 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         NIP = x.NIP,
                         Oracle = x.Oracle,
                     }
-                });
-                Users = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-            finally
-            {
-                PanelVisible = false;
-            }
+            finally { PanelVisible = false; }
         }
 
         #region Grid
@@ -678,7 +655,7 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
                         ).ToList();
 
                         await Mediator.Send(new CreateListUserRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

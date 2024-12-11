@@ -1,5 +1,6 @@
 ﻿using McDermott.Application.Features.Services;
 using static McDermott.Application.Features.Commands.Config.OccupationalCommand;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Config.Users
 {
@@ -301,7 +302,7 @@ namespace McDermott.Web.Components.Pages.Config.Users
                         ).ToList();
 
                         await Mediator.Send(new CreateListUserRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -455,125 +456,59 @@ namespace McDermott.Web.Components.Pages.Config.Users
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            //await LoadComboBox();
             PanelVisible = false;
         }
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
+        private async Task LoadData()
         {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            //var result = await Mediator.Send(new GetUserQuery2(
-            //    searchTerm: searchTerm,
-            //    pageSize: pageSize,
-            //    pageIndex:
-            //    pageIndex,
-            //    includes:
-            //    [
-            //        user => user.Group
-            //    ],
-            //    select: x => new User
-            //    {
-            //        Id = x.Id,
-            //        Name = x.Name,
-            //        Email = x.Email,
-            //        MobilePhone = x.MobilePhone,
-            //        Gender = x.Gender,
-            //        DateOfBirth = x.DateOfBirth,
-            //        Group = new Domain.Entities.Group
-            //        {
-            //            Name = x.Group.Name
-            //        },
-            //        IsEmployee = x.IsEmployee,
-            //        IsPatient = x.IsPatient,
-            //        IsUser = x.IsUser,
-            //        IsPhysicion = x.IsPhysicion,
-            //        IsNurse = x.IsNurse,
-            //        IsPharmacy = x.IsPharmacy,
-            //        IsMcu = x.IsMcu,
-            //        IsHr = x.IsHr,
-            //    }
-            //));
-
-            var result = await Mediator.Send(new GetUserQueryNew
+            try
             {
-                SearchTerm = searchTerm ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                Includes =
-                [
-                    x => x.Group
-                ],
-                Select = x => new User
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<User>(await Mediator.Send(new GetQueryUser
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Email = x.Email,
-                    MobilePhone = x.MobilePhone,
-                    Gender = x.Gender,
-                    DateOfBirth = x.DateOfBirth,
-                    Group = new Domain.Entities.Group
+                    Select = x => new User
                     {
-                        Name = x.Group.Name
-                    },
-                    IsEmployee = x.IsEmployee,
-                    IsPatient = x.IsPatient,
-                    IsUser = x.IsUser,
-                    IsPhysicion = x.IsPhysicion,
-                    IsNurse = x.IsNurse,
-                    IsPharmacy = x.IsPharmacy,
-                    IsMcu = x.IsMcu,
-                    IsHr = x.IsHr,
-                }
-            });
-            Users = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+                        Id = x.Id,
+                        Name = x.Name,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        Group = new Domain.Entities.Group
+                        {
+                            Name = x.Group.Name
+                        },
+                        IsEmployee = x.IsEmployee,
+                        IsPatient = x.IsPatient,
+                        IsUser = x.IsUser,
+                        IsPhysicion = x.IsPhysicion,
+                        IsNurse = x.IsNurse,
+                        IsPharmacy = x.IsPharmacy,
+                        IsMcu = x.IsMcu,
+                        IsHr = x.IsHr,
+                    }
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private bool IsLoading { get; set; } = false;
-
-        private async Task LoadComboBox()
-        {
-            await LoadDataVillage(0, 10);
-            await LoadDataCountry(0, 10);
-            await LoadDataProvince(0, 10);
-            await LoadDataCity(0, 10);
-            await LoadDataGroup(0, 10);
-            await LoadDataDistrict(0, 10);
-            await LoadDataOccupational(0, 10);
-            Departments = (await Mediator.Send(new GetDepartmentQuery())).Item1;
-            JobPositions = (await Mediator.Send(new GetJobPositionQuery())).Item1;
-
-            Religions = await Mediator.Send(new GetReligionQuery());
-        }
 
         private async Task OnSave()
         {
@@ -869,369 +804,5 @@ namespace McDermott.Web.Components.Pages.Config.Users
                 ExportSelectedRowsOnly = true,
             });
         }
-
-        #region ComboboxVillage
-
-        private DxComboBox<VillageDto, long?> refVillageComboBox { get; set; }
-        private int VillageComboBoxIndex { get; set; } = 0;
-        private int totalCountVillage = 0;
-
-        private async Task OnSearchVillage()
-        {
-            await LoadDataVillage(0, 10);
-        }
-
-        private async Task OnSearchVillageIndexIncrement()
-        {
-            if (VillageComboBoxIndex < (totalCountVillage - 1))
-            {
-                VillageComboBoxIndex++;
-                await LoadDataVillage(VillageComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchVillagendexDecrement()
-        {
-            if (VillageComboBoxIndex > 0)
-            {
-                VillageComboBoxIndex--;
-                await LoadDataVillage(VillageComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputVillageChanged(string e)
-        {
-            VillageComboBoxIndex = 0;
-            await LoadDataVillage(0, 10);
-        }
-
-        private async Task LoadDataVillage(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetVillageQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refVillageComboBox?.Text ?? ""));
-            Villages = result.Item1;
-            totalCountVillage = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxVillage
-
-        #region ComboboxCountry
-
-        private DxComboBox<CountryDto, long?> refCountryComboBox { get; set; }
-        private int CountryComboBoxIndex { get; set; } = 0;
-        private int totalCountCountry = 0;
-
-        private async Task OnSearchCountry()
-        {
-            await LoadDataCountry(0, 10);
-        }
-
-        private async Task OnSearchCountryIndexIncrement()
-        {
-            if (CountryComboBoxIndex < (totalCountCountry - 1))
-            {
-                CountryComboBoxIndex++;
-                await LoadDataCountry(CountryComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchCountryndexDecrement()
-        {
-            if (CountryComboBoxIndex > 0)
-            {
-                CountryComboBoxIndex--;
-                await LoadDataCountry(CountryComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputCountryChanged(string e)
-        {
-            CountryComboBoxIndex = 0;
-            await LoadDataCountry(0, 10);
-        }
-
-        private async Task LoadDataCountry(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetCountryQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refCountryComboBox?.Text ?? ""
-            });
-            Countries = result.Item1;
-            totalCount = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCountry
-
-        #region ComboboxCity
-
-        private DxComboBox<CityDto, long?> refCityComboBox { get; set; }
-        private int CityComboBoxIndex { get; set; } = 0;
-        private int totalCountCity = 0;
-
-        private async Task OnSearchCity()
-        {
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task OnSearchCityIndexIncrement()
-        {
-            if (CityComboBoxIndex < (totalCountCity - 1))
-            {
-                CityComboBoxIndex++;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchCityndexDecrement()
-        {
-            if (CityComboBoxIndex > 0)
-            {
-                CityComboBoxIndex--;
-                await LoadDataCity(CityComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputCityChanged(string e)
-        {
-            CityComboBoxIndex = 0;
-            await LoadDataCity(0, 10);
-        }
-
-        private async Task LoadDataCity(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            //var result = await Mediator.Send(new GetCityQuery(pageIndex: pageIndex, pageSize: pageSize, searchTerm: refCityComboBox?.Text ?? ""));
-            //Cities = result.Item1;
-            //totalCountCity = result.pageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxCity
-
-        #region ComboboxProvince
-
-        private DxComboBox<ProvinceDto, long?> refProvinceComboBox { get; set; }
-        private int ProvinceComboBoxIndex { get; set; } = 0;
-        private int totalCountProvince = 0;
-
-        private async Task OnSearchProvince()
-        {
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task OnSearchProvinceIndexIncrement()
-        {
-            if (ProvinceComboBoxIndex < (totalCountProvince - 1))
-            {
-                ProvinceComboBoxIndex++;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchProvincendexDecrement()
-        {
-            if (ProvinceComboBoxIndex > 0)
-            {
-                ProvinceComboBoxIndex--;
-                await LoadDataProvince(ProvinceComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputProvinceChanged(string e)
-        {
-            ProvinceComboBoxIndex = 0;
-            await LoadDataProvince(0, 10);
-        }
-
-        private async Task LoadDataProvince(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetProvinceQuery
-            {
-                SearchTerm = refProvinceComboBox?.Text ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-            });
-            Provinces = result.Item1;
-            totalCountProvince = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxProvince
-
-        #region ComboboxDistrict
-
-        private DxComboBox<DistrictDto, long?> refDistrictComboBox { get; set; }
-        private int DistrictComboBoxIndex { get; set; } = 0;
-        private int totalCountDistrict = 0;
-
-        private async Task OnSearchDistrict()
-        {
-            await LoadDataDistrict(0, 10);
-        }
-
-        private async Task OnSearchDistrictIndexIncrement()
-        {
-            if (DistrictComboBoxIndex < (totalCountDistrict - 1))
-            {
-                DistrictComboBoxIndex++;
-                await LoadDataDistrict(DistrictComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchDistrictndexDecrement()
-        {
-            if (DistrictComboBoxIndex > 0)
-            {
-                DistrictComboBoxIndex--;
-                await LoadDataDistrict(DistrictComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputDistrictChanged(string e)
-        {
-            DistrictComboBoxIndex = 0;
-            await LoadDataDistrict(0, 10);
-        }
-
-        private async Task LoadDataDistrict(int pageIndex = 0, int pageSize = 10)
-        {
-            try
-            {
-                PanelVisible = true;
-                var result = await Mediator.Send(new GetDistrictQuery
-                {
-                    SearchTerm = refDistrictComboBox?.Text ?? "",
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
-                Districts = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
-            finally
-            {
-                PanelVisible = false;
-            }
-        }
-
-        #endregion ComboboxDistrict
-
-        #region ComboboxGroup
-
-        private DxComboBox<GroupDto, long?> refGroupComboBox { get; set; }
-        private int GroupComboBoxIndex { get; set; } = 0;
-        private int totalCountGroup = 0;
-
-        private async Task OnSearchGroup()
-        {
-            await LoadDataGroup(0, 10);
-        }
-
-        private async Task OnSearchGroupIndexIncrement()
-        {
-            if (GroupComboBoxIndex < (totalCountGroup - 1))
-            {
-                GroupComboBoxIndex++;
-                await LoadDataGroup(GroupComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchGroupndexDecrement()
-        {
-            if (GroupComboBoxIndex > 0)
-            {
-                GroupComboBoxIndex--;
-                await LoadDataGroup(GroupComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputGroupChanged(string e)
-        {
-            GroupComboBoxIndex = 0;
-            await LoadDataGroup(0, 10);
-        }
-
-        private async Task LoadDataGroup(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetGroupQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refGroupComboBox?.Text ?? ""
-            });
-            Groups = result.Item1;
-            totalCountGroup = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxGroup
-
-        #region ComboboxOccupational
-
-        private DxComboBox<OccupationalDto, long?> refOccupationalComboBox { get; set; }
-        private int OccupationalComboBoxIndex { get; set; } = 0;
-        private int totalCountOccupational = 0;
-
-        private async Task OnSearchOccupational()
-        {
-            await LoadDataOccupational(0, 10);
-        }
-
-        private async Task OnSearchOccupationalIndexIncrement()
-        {
-            if (OccupationalComboBoxIndex < (totalCountOccupational - 1))
-            {
-                OccupationalComboBoxIndex++;
-                await LoadDataOccupational(OccupationalComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchOccupationalndexDecrement()
-        {
-            if (OccupationalComboBoxIndex > 0)
-            {
-                OccupationalComboBoxIndex--;
-                await LoadDataOccupational(OccupationalComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputOccupationalChanged(string e)
-        {
-            OccupationalComboBoxIndex = 0;
-            await LoadDataOccupational(0, 10);
-        }
-
-        private async Task LoadDataOccupational(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetOccupationalQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = refOccupationalComboBox?.Text ?? ""
-            });
-            Occupationals = result.Item1;
-            totalCountOccupational = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion ComboboxOccupational
     }
 }

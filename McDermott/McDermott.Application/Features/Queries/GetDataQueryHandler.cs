@@ -9,6 +9,7 @@ namespace McDermott.Application.Features.Queries
     #region Transactions
 
         IRequestHandler<GetQueryGeneralConsultanService, IQueryable<GeneralConsultanService>>,
+        IRequestHandler<GetQueryGeneralConsultanServiceCPPT, IQueryable<GeneralConsultanCPPT>>,
 
     #endregion Transactions
 
@@ -24,9 +25,15 @@ namespace McDermott.Application.Features.Queries
         IRequestHandler<GetQueryCity, IQueryable<City>>,
         IRequestHandler<GetQueryOccupational, IQueryable<Occupational>>,
         IRequestHandler<GetQueryVillage, IQueryable<Village>>,
-        IRequestHandler<GetQueryDistrict, IQueryable<District>>
+        IRequestHandler<GetQueryDistrict, IQueryable<District>>,
 
     #endregion Configuration
+
+    #region Medicals
+
+        IRequestHandler<GetQueryDiagnosis, IQueryable<Diagnosis>>
+
+    #endregion Medicals
 
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -38,6 +45,37 @@ namespace McDermott.Application.Features.Queries
         {
             //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
             return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select);
+        }
+
+        public Task<IQueryable<GeneralConsultanCPPT>> Handle(GetQueryGeneralConsultanServiceCPPT request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<GeneralConsultanCPPT>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanCPPT
+            {
+                Id = x.Id,
+                Subjective = x.Subjective,
+                Objective = x.Objective,
+                NursingDiagnosesId = x.NursingDiagnosesId,
+                NursingDiagnoses = new NursingDiagnoses
+                {
+                    Problem = x.NursingDiagnoses != null ? x.NursingDiagnoses.Problem : "",
+                },
+                DiagnosisId = x.DiagnosisId,
+                Diagnosis = new Diagnosis
+                {
+                    Name = x.Diagnosis != null ? x.Diagnosis.Name : "",
+                },
+                UserId = x.UserId,
+                User = new User
+                {
+                    Name = x.User != null ? x.User.Name : "",
+                },
+                Planning = x.Planning,
+                MedicationTherapy = x.MedicationTherapy,
+                NonMedicationTherapy = x.NonMedicationTherapy,
+                Anamnesa = x.Anamnesa,
+                DateTime = x.DateTime,
+            } : request.Select);
         }
 
         #endregion Transactions
@@ -241,6 +279,27 @@ namespace McDermott.Application.Features.Queries
         }
 
         #endregion Configurations
+
+        #region Medicals
+
+        public Task<IQueryable<Diagnosis>> Handle(GetQueryDiagnosis request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<Diagnosis>(request, cancellationToken, request.Select is null ? x => new Diagnosis
+            {
+                Id = x.Id,
+                Name = x.Name,
+                NameInd = x.NameInd,
+                Code = x.Code,
+                CronisCategoryId = x.CronisCategoryId,
+                CronisCategory = new CronisCategory
+                {
+                    Name = x.CronisCategory == null ? "-" : x.CronisCategory.Name,
+                }
+            } : request.Select);
+        }
+
+        #endregion Medicals
 
         // Add constraint to ensure TEntity is a type of BaseAuditableEntity
         private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)

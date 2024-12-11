@@ -203,7 +203,7 @@ namespace McDermott.Web.Components.Pages.Medical
                         ).ToList();
 
                         await Mediator.Send(new CreateListDiagnosisRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -321,47 +321,23 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #endregion ComboboxDiseaseCategory
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var a = await Mediator.Send(new GetDiagnosisQuery
+                var dataSource = new GridDevExtremeDataSource<Diagnosis>(await Mediator.Send(new GetQueryDiagnosis()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = searchTerm ?? "",
-                });
-                Diagnoses = a.Item1;
-                totalCount = a.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -424,7 +400,7 @@ namespace McDermott.Web.Components.Pages.Medical
                     var a = SelectedDataItems.Adapt<List<DiagnosisDto>>();
                     await Mediator.Send(new DeleteDiagnosisRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData(0, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -437,7 +413,7 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                var editModel = (DiagnosisDto)e.EditModel;
+                var editModel = (Diagnosis)e.EditModel;
 
                 var checkNameEn = await Mediator.Send(new ValidateDiagnosisQuery(x
                     => x.Id != editModel.Id && x.Name == editModel.Name));
@@ -458,11 +434,11 @@ namespace McDermott.Web.Components.Pages.Medical
                 }
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateDiagnosisRequest(editModel));
+                    await Mediator.Send(new CreateDiagnosisRequest(editModel.Adapt<DiagnosisDto>()));
                 else
-                    await Mediator.Send(new UpdateDiagnosisRequest(editModel));
+                    await Mediator.Send(new UpdateDiagnosisRequest(editModel.Adapt<DiagnosisDto>()));
 
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
