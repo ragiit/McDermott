@@ -269,10 +269,10 @@
                                                                                      EditItem_Click="@(()=>EditItem_Click(context.Grid))"
                                                                                      DeleteItem_Click="@DeleteItem_Click"
                                                                                      Refresh_Click="@Refresh_Click"
-                                                                                     IsImport="false"
+                                                                                     IsImport="false"                                                                                     
                                                                                      VisibleNew="UserAccessCRUID.IsCreate"
                                                                                      VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                                                                     VisibleDelete="@isActiveButton" />
                                                                 </ToolbarTemplate>
                                                                 <Columns>
                                                                     <DxGridSelectionColumn Width="15px" />
@@ -325,6 +325,21 @@
                                                                     }
                                                                     else if (postMaintenance.Status == EnumStatusMaintenance.Done)
                                                                     {
+                                                                        <DxGridDataColumn Caption="Document">
+                                                                            <CellDisplayTemplate>
+                                                                                @{
+                                                                                    var Doc = (context.DataItem as MaintenanceProduct);
+                                                                                }
+                                                                                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                                                                    <DxButton RenderStyle="ButtonRenderStyle.Primary"
+                                                                                              CssClass="align-self-center"
+                                                                                              Attributes="@(new Dictionary<string, object> { ["title"] = "Upload Document Maintenance" })"
+                                                                                              IconCssClass="fa-solid fa-file"
+                                                                                              Click="@(() => OpenFile(Doc))" /> <!-- Pass the extracted object to the method -->
+
+                                                                                </div>
+                                                                            </CellDisplayTemplate>
+                                                                        </DxGridDataColumn>
                                                                         <DxGridDataColumn FieldName="Status" Caption="Status">
                                                                             <CellDisplayTemplate>
                                                                                 @((MarkupString)GetIssueStatusIconHtml((context.DataItem as MaintenanceProduct).Status))
