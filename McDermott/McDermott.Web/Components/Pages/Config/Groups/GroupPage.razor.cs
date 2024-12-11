@@ -79,7 +79,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                     var a = SelectedDataItems.Adapt<List<GroupDto>>();
                     await Mediator.Send(new DeleteGroupRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData(0, pageSize);
+                await LoadData();
             }
             catch (Exception ee)
             {
@@ -193,32 +193,6 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             IsLoading = false;
         }
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         private void DeleteItem_Click()
         {
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
@@ -277,25 +251,30 @@ namespace McDermott.Web.Components.Pages.Config.Groups
             UpdateEditItemsEnabled(state);
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private object Data { get; set; }
+
+        private async Task LoadData()
         {
-            PanelVisible = true;
-            SelectedDataItemsGroupMenu = [];
-            GroupMenu = new();
-            SelectedDataItems = [];
-            Group = new();
-            ShowForm = false;
-            GroupMenus = [];
-            var result = await Mediator.Send(new GetGroupQuery
+            try
             {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SearchTerm = searchTerm ?? "",
-            });
-            Groups = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<Group>(await Mediator.Send(new GetQueryGroup()))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         //private async Task LoadData()
@@ -668,7 +647,7 @@ namespace McDermott.Web.Components.Pages.Config.Groups
                         ).ToList();
 
                         await Mediator.Send(new CreateListGroupRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

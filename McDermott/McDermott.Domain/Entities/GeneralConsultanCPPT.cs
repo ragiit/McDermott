@@ -5,7 +5,7 @@
         public long GeneralConsultanServiceId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
-        public DateTime DateTime { get; set; } = DateTime.Now;
+        public DateTime DateTime { get; set; }
         public long? UserId { get; set; }
         public string? Subjective { get; set; }
         public string? Objective { get; set; }

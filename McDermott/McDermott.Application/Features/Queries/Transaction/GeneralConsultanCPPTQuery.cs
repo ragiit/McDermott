@@ -82,6 +82,7 @@ namespace McDermott.Application.Features.Queries.Transaction
                         Subjective = x.Subjective,
                         Objective = x.Objective,
                         NursingDiagnosesId = x.NursingDiagnosesId,
+                        DateTime = x.DateTime,
                         NursingDiagnoses = new NursingDiagnoses
                         {
                             Problem = x.NursingDiagnoses != null ? x.NursingDiagnoses.Problem : "",

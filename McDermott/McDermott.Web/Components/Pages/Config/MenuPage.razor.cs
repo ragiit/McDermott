@@ -70,50 +70,31 @@ namespace McDermott.Web.Components.Pages.Config
 
         #endregion User and Access Management
 
-        #region Data Loading and Searching
+        private object Data { get; set; }
 
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetMenuQuery
+                var dataSource = new GridDevExtremeDataSource<Menu>(await Mediator.Send(new GetQueryMenu()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = searchTerm ?? ""
-                });
-                Menus = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
             {
-                PanelVisible = false;
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
         }
-
-        #endregion Data Loading and Searching
 
         #region CRUD Operations
 
@@ -130,7 +111,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var selectedMenus = SelectedDataItems.Adapt<List<MenuDto>>();
                     await Mediator.Send(new DeleteMenuRequest(ids: selectedMenus.Select(x => x.Id).ToList()));
                 }
-                await LoadData(0, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -140,7 +121,7 @@ namespace McDermott.Web.Components.Pages.Config
 
         private async Task OnSave(GridEditModelSavingEventArgs e)
         {
-            var editModel = (MenuDto)e.EditModel;
+            var editModel = (Menu)e.EditModel;
 
             bool exists = await Mediator.Send(new ValidateMenuQuery(x =>
                 x.Name == editModel.Name &&
@@ -157,9 +138,9 @@ namespace McDermott.Web.Components.Pages.Config
             }
 
             if (editModel.Id == 0)
-                await Mediator.Send(new CreateMenuRequest(editModel));
+                await Mediator.Send(new CreateMenuRequest(editModel.Adapt<MenuDto>()));
             else
-                await Mediator.Send(new UpdateMenuRequest(editModel));
+                await Mediator.Send(new UpdateMenuRequest(editModel.Adapt<MenuDto>()));
 
             await LoadData();
         }
@@ -350,7 +331,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListMenuRequest(importedMenus));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

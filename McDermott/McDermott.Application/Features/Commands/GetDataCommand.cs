@@ -7,6 +7,9 @@
 
         #region Transactions
 
+        public class GetQueryGeneralConsultanServiceCPPT : BaseQuery<GeneralConsultanCPPT>
+        { }
+
         public class GetQueryGeneralConsultanService : BaseQuery<GeneralConsultanService>
         { }
 
@@ -46,11 +49,25 @@
 
         #endregion Configurations
 
+        #region Medicals
+
+        public class GetQueryDiagnosis : BaseQuery<Diagnosis>
+        { }
+
+        #endregion Medicals
+
         #region Inventory
-        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt> { }
-        public class GetQueryMaintenance : BaseQuery<Maintenance> { }
-        public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct> { }
-        #endregion
+
+        public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt>
+        { }
+
+        public class GetQueryMaintenance : BaseQuery<Maintenance>
+        { }
+
+        public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct>
+        { }
+
+        #endregion Inventory
 
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }

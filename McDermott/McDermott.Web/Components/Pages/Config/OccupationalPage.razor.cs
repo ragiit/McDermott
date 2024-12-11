@@ -58,7 +58,7 @@ namespace McDermott.Web.Components.Pages.Config
         {
             PanelVisible = true;
             await LoadData();
-            StateHasChanged();
+            PanelVisible = false;
         }
 
         private async Task OnDelete(GridDataItemDeletingEventArgs e)
@@ -75,7 +75,7 @@ namespace McDermott.Web.Components.Pages.Config
                     var a = SelectedDataItems.Adapt<List<OccupationalDto>>();
                     await Mediator.Send(new DeleteOccupationalRequest(ids: a.Select(x => x.Id).ToList()));
                 }
-                await LoadData(0, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -131,47 +131,23 @@ namespace McDermott.Web.Components.Pages.Config
             Grid.ShowRowDeleteConfirmation(FocusedRowVisibleIndex);
         }
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetOccupationalQuery
+                var dataSource = new GridDevExtremeDataSource<Occupational>(await Mediator.Send(new GetQueryOccupational()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = searchTerm ?? "",
-                });
-                Occupationals = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -186,17 +162,17 @@ namespace McDermott.Web.Components.Pages.Config
             try
             {
                 PanelVisible = true;
-                var editModel = (OccupationalDto)e.EditModel;
+                var editModel = (Occupational)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Name))
                     return;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateOccupationalRequest(editModel));
+                    await Mediator.Send(new CreateOccupationalRequest(editModel.Adapt<OccupationalDto>()));
                 else
-                    await Mediator.Send(new UpdateOccupationalRequest(editModel));
+                    await Mediator.Send(new UpdateOccupationalRequest(editModel.Adapt<OccupationalDto>()));
 
-                await LoadData(activePageIndex, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -278,7 +254,7 @@ namespace McDermott.Web.Components.Pages.Config
                         ).ToList();
 
                         await Mediator.Send(new CreateListOccupationalRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

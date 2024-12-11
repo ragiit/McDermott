@@ -16,6 +16,8 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using McDermott.TelemedicianApi.Controllers;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.IO.Compression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,31 @@ builder.Services.AddRouting(options =>
 {
     options.LowercaseUrls = true; // Semua URL menjadi lowercase
 });
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.SmallestSize;
+});
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;  // Aktifkan kompresi untuk HTTPS
+
+    // Menentukan jenis mime types yang akan dikompresi
+    //options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat([
+        "application/json",
+        "application/xml",
+        "text/plain"
+    ]);
+    //options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+    //    ["application/json", "application/xml", "text/plain"]);
+});
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 builder.Services.AddResponseCaching();
@@ -74,6 +101,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Mengaktifkan ResponseCompression middleware
+app.UseResponseCompression();
 
 // Daftarkan middleware sebelum UseRouting
 //app.UseMiddleware<ApiHeaderMiddleware>();

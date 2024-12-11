@@ -1,4 +1,5 @@
 ﻿using McDermott.Application.Features.Services;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 
 namespace McDermott.Web.Components.Pages.Patient.Patients
 {
@@ -175,58 +176,43 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             PanelVisible = false;
         }
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
+        private async Task LoadData()
         {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetUserQuery2(
-                x => x.IsPatient == true,
-                searchTerm: searchTerm,
-                pageSize: pageSize,
-                pageIndex:
-                pageIndex,
-                includes: [],
-                select: x => new User
+            try
+            {
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<User>(await Mediator.Send(new GetQueryUser
                 {
-                    Id = x.Id,
-                    Name = x.Name,
-                    NoRm = x.NoRm,
-                    Email = x.Email,
-                    MobilePhone = x.MobilePhone,
-                    Gender = x.Gender,
-                    DateOfBirth = x.DateOfBirth,
-                }
-            ));
-            Users = result.Item1;
-            totalCount = result.pageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+                    Predicate = x => x.IsPatient == true,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                    }
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+            finally { PanelVisible = false; }
         }
 
         private bool IsLoading { get; set; } = false;
@@ -714,7 +700,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                         ).ToList();
 
                         await Mediator.Send(new CreateListUserRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

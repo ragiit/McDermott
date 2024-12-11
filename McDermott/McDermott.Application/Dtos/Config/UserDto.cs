@@ -11,7 +11,16 @@ namespace McDermott.Application.Dtos.Config
         public string Name { get; set; } = string.Empty;
 
         [NotMapped]
-        public string NameWithMasked => string.Concat(Name.AsSpan(0, 2), new string('*', Name.Length - 2));
+        public string NameWithMasked
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Name) || Name.Length <= 2)
+                    return Name;
+
+                return string.Concat(Name.AsSpan(0, 2), new string('*', Name.Length - 2));
+            }
+        }
 
         public string PhysicanCode { get; set; } = string.Empty;
 
