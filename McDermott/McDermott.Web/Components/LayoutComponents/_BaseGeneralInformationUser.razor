@@ -16,17 +16,14 @@
                                            NullText="Name" />
                                 <ValidationMessage For="@(() => UserForm.Name)"   />
                             </DxFormLayoutItem>
-                            @if (Convert.ToBoolean(UserForm.IsPatient))
-                            {
-                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medical Record" ColSpanMd="12">
-                                    <DxTextBox @bind-Text="@UserForm.NoRm"
-                                               ShowValidationIcon="true"
-                                               ReadOnly
-                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                               NullText="Medical Record" />
-                                    <ValidationMessage For="@(() => UserForm.NoRm)"   />
-                                </DxFormLayoutItem>
-                            }
+                            <DxFormLayoutItem Visible="IsPatientForm" CaptionCssClass="normal-caption" Caption="Medical Record" ColSpanMd="12">
+                                <DxTextBox @bind-Text="@UserForm.NoRm"
+                                           ShowValidationIcon="true"
+                                           ReadOnly
+                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                           NullText="Medical Record" />
+                                <ValidationMessage For="@(() => UserForm.NoRm)"   />
+                            </DxFormLayoutItem>
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Email" ColSpanMd="12">
                                 <DxMaskedInput @bind-Value="@UserForm.Email"
                                                Mask="@Helper.EmailMask"
@@ -376,6 +373,9 @@
                                     </DxGridLayout>
                                 </Template>
                             </DxFormLayoutItem>
+                            <DxFormLayoutItem Visible="IsPatientForm" CaptionCssClass="normal-caption" Caption="Employee Relation" ColSpanMd="12">
+                                <DxCheckBox @bind-Checked="@UserForm.IsEmployee" />
+                            </DxFormLayoutItem>
                         </DxFormLayout>
                     </div>
                 </div>
@@ -385,6 +385,12 @@
 </div>
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        Religions = await Mediator.Send(new GetReligionQuery());
+    }
+
+    [Parameter] public bool IsPatientForm { get; set; } = false;
     [Parameter] public UserDto UserForm { get; set; } = new();
 
     [Parameter] public List<ReligionDto> Religions { get; set; } = [];
@@ -477,7 +483,7 @@
     private void ProvinceSelectedItemChanged(Province e)
     {
         if (e is null)
-        { 
+        {
             UserForm.IdCardProvinceId = null;
             UserForm.IdCardCityId = null;
             UserForm.IdCardDistrictId = null;
@@ -492,7 +498,7 @@
     private void ProvinceSelectedItemChanged1(Province e)
     {
         if (e is null)
-        { 
+        {
             UserForm.DomicileProvinceId = null;
             UserForm.DomicileCityId = null;
             UserForm.DomicileDistrictId = null;
@@ -507,7 +513,7 @@
     private void CitySelectedItemChanged(City e)
     {
         if (e is null)
-        { 
+        {
             UserForm.IdCardCityId = null;
             UserForm.IdCardDistrictId = null;
             UserForm.IdCardVillageId = null;
@@ -521,7 +527,7 @@
     private void CitySelectedItemChanged1(City e)
     {
         if (e is null)
-        { 
+        {
             UserForm.DomicileCityId = null;
             UserForm.DomicileDistrictId = null;
             UserForm.DomicileVillageId = null;
@@ -535,7 +541,7 @@
     private void DistrictSelectedItemChanged(District e)
     {
         if (e is null)
-        { 
+        {
             UserForm.IdCardDistrictId = null;
             UserForm.IdCardVillageId = null;
         }
@@ -548,7 +554,7 @@
     private void DistrictSelectedItemChanged1(District e)
     {
         if (e is null)
-        { 
+        {
             UserForm.DomicileDistrictId = null;
             UserForm.DomicileVillageId = null;
         }
@@ -602,7 +608,7 @@
             cancellationToken: cancellationToken);
     }
 
-     protected async Task<LoadResult> LoadCustomDataProvince1(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    protected async Task<LoadResult> LoadCustomDataProvince1(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
     {
         return await QueryComboBoxHelper.LoadCustomData<Province>(
             options: options,

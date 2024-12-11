@@ -31,9 +31,15 @@ namespace McDermott.Application.Features.Queries
 
     #region Medicals
 
-        IRequestHandler<GetQueryDiagnosis, IQueryable<Diagnosis>>
+        IRequestHandler<GetQueryDiagnosis, IQueryable<Diagnosis>>,
 
     #endregion Medicals
+
+    #region Patients
+
+        IRequestHandler<GetQueryPatientFamilyRelation, IQueryable<PatientFamilyRelation>>
+
+    #endregion Patients
 
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -300,6 +306,21 @@ namespace McDermott.Application.Features.Queries
         }
 
         #endregion Medicals
+
+        #region Patients
+
+        public Task<IQueryable<PatientFamilyRelation>> Handle(GetQueryPatientFamilyRelation request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<PatientFamilyRelation>(request, cancellationToken, request.Select is null ? x => new PatientFamilyRelation
+            {
+                Id = x.Id,
+                PatientId = x.PatientId,
+                FamilyId = x.FamilyId,
+                FamilyMemberId = x.FamilyMemberId,
+            } : request.Select);
+        }
+
+        #endregion Patients
 
         // Add constraint to ensure TEntity is a type of BaseAuditableEntity
         private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)

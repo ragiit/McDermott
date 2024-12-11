@@ -69,6 +69,13 @@
 
         #endregion Inventory
 
+        #region Patients
+
+        public class GetQueryPatientFamilyRelation : BaseQuery<PatientFamilyRelation>
+        { }
+
+        #endregion Patients
+
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }
     }
