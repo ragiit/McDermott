@@ -1,8 +1,14 @@
+using McDermott.Application.Features.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using static McDermott.Application.Features.Commands.Config.CountryCommand;
+using static McDermott.Application.Features.Commands.GetDataCommand;
+using static McDermott.Application.Features.TelemedicineServices.TelemedicineServiceCommand;
 
 namespace McDermott.TelemedicianApi.Controllers
 {
-    [ApiController]
+    [NonController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -12,10 +18,12 @@ namespace McDermott.TelemedicianApi.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IMediator mediator;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IMediator mediator)
         {
             _logger = logger;
+            this.mediator = mediator;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
@@ -28,6 +36,15 @@ namespace McDermott.TelemedicianApi.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [EnableQuery]
+        [HttpGet("GetUsersz")]
+        public async Task<IActionResult> GetUsersz()
+        {
+            var x = await mediator.Send(new GetUserTelemedicine());
+            var xz = await mediator.Send(new GetCountryQuery());
+            return Ok(x);
         }
     }
 }

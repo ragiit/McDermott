@@ -1,4 +1,6 @@
-﻿namespace McDermott.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace McDermott.Domain.Entities
 {
     public partial class User : BaseAuditableEntity
     {
@@ -6,6 +8,19 @@
 
         [Required]
         public string Name { get; set; } = string.Empty;
+
+        // Properti yang tidak dipetakan ke database
+        [NotMapped]
+        public string NameWithMasked
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Name) || Name.Length <= 2)
+                    return Name;
+
+                return string.Concat(Name.AsSpan(0, 2), new string('*', Name.Length - 2));
+            }
+        }
 
         //[Required]
         //public string UserName { get; set; } = string.Empty;
