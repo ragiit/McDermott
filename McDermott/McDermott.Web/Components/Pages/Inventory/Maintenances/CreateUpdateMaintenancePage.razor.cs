@@ -9,6 +9,7 @@ using static McDermott.Application.Features.Commands.Inventory.TransactionStockC
 using System.IO.Compression;
 using System.Net;
 using McDermott.Domain.Entities;
+using McDermott.Application.Dtos.AwarenessEvent;
 
 namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 {
@@ -47,6 +48,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         private bool PanelVisibleProduct { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
         private bool showPopUpUpload { get; set; } = false;
+        private bool isActiveButton { get; set; } = false;
         private bool IsReadOnly => postMaintenance.Id != 0 && postMaintenance.Status != EnumStatusMaintenance.Request;
         private string? StatusString { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
@@ -56,6 +58,18 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
             FocusedRowVisibleIndex = args.VisibleIndex;
+            try
+            {
+                if ((MaintenanceProduct)args.DataItem is null)
+                    return;
+
+                isActiveButton = ((EducationProgramDto)args.DataItem)!.Status!.Equals(EnumStatusEducationProgram.Draft);
+            }
+            catch (Exception ex)
+            {
+                ex.HandleException(ToastService);
+            }
+
         }
 
         #endregion variable Static
@@ -1136,9 +1150,19 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         {
             return $"{url}?productId={productId}&maintenanceId={maintenanceId}&sequenceNumber={sequenceNumber}";
         }
-        
 
 
+
+        #endregion
+
+        #region Read Document
+        private bool showPopUpFile { get; set; } = false;
+        private bool isLoadingFile { get; set; } = false;
+
+        private async Task OpenFile(MaintenanceProduct e)
+        {
+            showPopUpFile = true;
+        }
         #endregion
     }
 }
