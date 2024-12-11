@@ -515,7 +515,7 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
         {
             if (args.DataItem is not null)
             {
-                IsDeleted = ((UserDto)args.DataItem).Id == UserLogin.Id;
+                IsDeleted = ((User)args.DataItem).Id == UserLogin.Id;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;

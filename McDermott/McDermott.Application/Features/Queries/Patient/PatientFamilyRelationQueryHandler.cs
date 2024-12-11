@@ -4,6 +4,7 @@ namespace McDermott.Application.Features.Queries.Patient
 {
     public class PatientFamilyRelationQueryHandler(IUnitOfWork _unitOfWork, IMemoryCache _cache) :
         IRequestHandler<GetPatientFamilyRelationQuery, (List<PatientFamilyRelationDto>, int pageIndex, int pageSize, int pageCount)>,
+        IRequestHandler<GetSinglePatientFamilyRelationQuery, PatientFamilyRelationDto>,
         IRequestHandler<ValidatePatientFamilyRelationQuery, bool>,
         IRequestHandler<BulkValidatePatientFamilyRelationQuery, List<PatientFamilyRelationDto>>,
         IRequestHandler<GetPatientFamilyByPatientQuery, List<PatientFamilyRelationDto>>,

@@ -354,7 +354,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         {
             if (args.DataItem is not null)
             {
-                IsDeleted = ((UserDto)args.DataItem).Id == UserLogin.Id;
+                IsDeleted = ((User)args.DataItem).Id == UserLogin.Id;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;

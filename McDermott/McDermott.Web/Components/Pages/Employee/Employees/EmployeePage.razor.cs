@@ -321,7 +321,7 @@ namespace McDermott.Web.Components.Pages.Employee.Employees
         {
             if (args.DataItem is not null)
             {
-                IsDeleted = UserLogin.Id == ((UserDto)args.DataItem).Id;
+                IsDeleted = UserLogin.Id == ((User)args.DataItem).Id;
             }
 
             FocusedRowVisibleIndex = args.VisibleIndex;

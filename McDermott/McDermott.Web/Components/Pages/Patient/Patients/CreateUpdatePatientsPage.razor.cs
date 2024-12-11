@@ -84,70 +84,46 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             FocusedRowVisibleIndexUserClaim = args.VisibleIndex;
         }
 
-        #region Searching
+        private object Data { get; set; }
 
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadDataFamilyRelation(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadDataFamilyRelation(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadDataFamilyRelation(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
-        private int totalCountFamilyRelation { get; set; } = 0;
-
-        private async Task LoadDataFamilyRelation(int pageIndex = 0, int pageSize = 10)
+        private async Task LoadDataFamilyRelation()
         {
             try
             {
                 PanelVisible = true;
-                SelectedDataItemsFamilyRelation = [];
-                //var a = await Mediator.Send(new GetPatientFamilyRelationQuery(x => x.PatientId == UserForm.Id, searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-                var a = await Mediator.QueryGetHelper<PatientFamilyRelation, PatientFamilyRelationDto>(pageIndex, pageSize, searchTerm, x => x.PatientId == UserForm.Id,
-                includes:
-                [
-                    x => x.Family,
-                    x => x.Family.InverseRelation,
-                    x => x.FamilyMember,
-                ],
-                select: x => new PatientFamilyRelation
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<PatientFamilyRelation>(await Mediator.Send(new GetQueryPatientFamilyRelation
                 {
-                    Id = x.Id,
-                    FamilyMemberId = x.FamilyMemberId,
-                    FamilyMember = new User
+                    Predicate = x => x.PatientId == UserForm.Id,
+                    Select = x => new PatientFamilyRelation
                     {
-                        Name = x.FamilyMember.Name
-                    },
-                    FamilyId = x.FamilyId,
-                    Family = new Family
-                    {
-                        Name = x.Family.Name,
-                        InverseRelation = new Family
+                        Id = x.Id,
+                        PatientId = x.PatientId,
+                        FamilyMemberId = x.FamilyMemberId,
+                        FamilyMember = new User
                         {
-                            Name = x.Family.InverseRelation.Name
-                        }
-                    },
-                });
-
-                PatientFamilyRelations = a.Item1;
-                totalCountFamilyRelation = a.pageCount;
-                activePageIndex = pageIndex;
+                            Name = x.FamilyMember.Name
+                        },
+                        FamilyId = x.FamilyId,
+                        Family = new Family
+                        {
+                            Name = x.Family.Name,
+                            InverseRelation = new Family
+                            {
+                                Name = x.Family.InverseRelation.Name
+                            }
+                        },
+                    }
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -161,7 +137,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
             try
             {
                 PanelVisible = true;
-                var editModel = (PatientFamilyRelationDto)e.EditModel;
+                var editModel = (PatientFamilyRelation)e.EditModel;
 
                 var pat2 = (await Mediator.Send(new GetFamilyQuery(x => x.Id == editModel.FamilyId))).Item1.FirstOrDefault() ?? new();
                 if (editModel.Id == 0)
@@ -235,7 +211,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                     await Mediator.Send(new UpdateListPatientFamilyRelationRequest(patients));
                 }
 
-                await LoadDataFamilyRelation(activePageIndex, pageSize);
+                await LoadDataFamilyRelation();
             }
             catch (Exception ex)
             {
@@ -251,7 +227,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 PanelVisible = true;
                 if (SelectedDataItemsFamilyRelation is null || SelectedDataItemsFamilyRelation.Count == 1)
                 {
-                    var a = ((PatientFamilyRelationDto)e.DataItem);
+                    var a = ((PatientFamilyRelation)e.DataItem);
                     var p = await Mediator.Send(new GetSinglePatientFamilyRelationQuery { Predicate = x => x.FamilyMemberId == a.PatientId && x.PatientId == a.FamilyMemberId });
 
                     await Mediator.Send(new DeletePatientFamilyRelationRequest(a.Id));
@@ -259,7 +235,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 }
                 else
                 {
-                    var selectedMenus = SelectedDataItemsFamilyRelation.Adapt<List<PatientFamilyRelationDto>>();
+                    var selectedMenus = SelectedDataItemsFamilyRelation.Adapt<List<PatientFamilyRelation>>();
 
                     // Loop through each selected family relation and delete the corresponding relations
                     foreach (var item in selectedMenus)
@@ -272,7 +248,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                         await Mediator.Send(new DeletePatientFamilyRelationRequest(p.Id));
                     }
                 }
-                await LoadDataFamilyRelation(0, pageSize);
+                await LoadDataFamilyRelation();
             }
             catch (Exception ex)
             {
@@ -740,24 +716,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
 
         private List<SpecialityDto> Specialities = [];
 
-        private async Task LoadGroupMenus(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetGroupMenuQuery
-            {
-                SearchTerm = searchTerm ?? "",
-                Predicate = x => x.GroupId == Group.Id,
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            });
-            GroupMenus = result.Item1;
-            totalCount = result.Item4;
-            var aa = GroupMenus.Where(x => x.MenuId == 66).ToList();
-            activePageIndex = pageIndex;
-            PanelVisible = false;
-        }
-
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
@@ -841,27 +799,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         }
 
         private bool IsLoading { get; set; } = false;
-
-        private async Task EditItem_Click()
-        {
-            try
-            {
-                IsLoading = true;
-                Group = SelectedDataItems[0].Adapt<GroupDto>();
-                ShowForm = true;
-
-                if (Group != null)
-                {
-                    await LoadGroupMenus();
-                }
-            }
-            catch (Exception e)
-            {
-                var zz = e;
-            }
-            //await GridGropMenu.StartEditRowAsync(FocusedRowVisibleIndexGroupMenu);
-            IsLoading = false;
-        }
 
         private void UpdateEditItemsEnabled(bool enabled)
         {
@@ -1234,123 +1171,6 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 catch (Exception ex)
                 {
                     ToastService.ShowError(ex.Message);
-                }
-            }
-            PanelVisible = false;
-        }
-
-        public async Task ImportExcelFile2(InputFileChangeEventArgs e)
-        {
-            PanelVisible = true;
-            foreach (var file in e.GetMultipleFiles(1))
-            {
-                try
-                {
-                    using MemoryStream ms = new();
-                    await file.OpenReadStream().CopyToAsync(ms);
-                    ms.Position = 0;
-
-                    ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
-                    using ExcelPackage package = new(ms);
-                    ExcelWorksheet ws = package.Workbook.Worksheets.FirstOrDefault();
-
-                    var headerNames = ExportFileDatasGroupMenus.Select(x => x.Column).ToList();
-
-                    if (Enumerable.Range(1, ws.Dimension.End.Column)
-                        .Any(i => headerNames[i - 1].Trim().ToLower() != ws.Cells[1, i].Value?.ToString()?.Trim().ToLower()))
-                    {
-                        ToastService.ShowInfo("The header must match with the template.");
-                        return;
-                    }
-
-                    var gg = new List<GroupMenuDto>();
-                    var parentCache = new List<MenuDto>();
-
-                    for (int row = 2; row <= ws.Dimension.End.Row; row++)
-                    {
-                        string menu = ws.Cells[row, 1].Value?.ToString()?.Trim();
-                        string parentName = ws.Cells[row, 2].Value?.ToString()?.Trim();
-                        string isCreate = ws.Cells[row, 3].Value?.ToString()?.Trim();
-                        string isRead = ws.Cells[row, 4].Value?.ToString().Trim();
-                        string isUpdate = ws.Cells[row, 5].Value?.ToString()?.Trim();
-                        string isDelete = ws.Cells[row, 6].Value?.ToString()?.Trim();
-                        string isImport = ws.Cells[row, 7].Value?.ToString()?.Trim();
-
-                        bool isValid = true;
-
-                        if (menu.Contains("Chronic Diagnoses"))
-                        {
-                            var a = "a";
-                        }
-
-                        long? menuId = null;
-                        if (!string.IsNullOrEmpty(parentName))
-                        {
-                            //var cachedParent = parentCache.FirstOrDefault(x => x.Name == parentName);
-                            //if (cachedParent is null)
-                            //{
-                            //    var parentMenu = (await Mediator.Send(new GetMenuQuery(
-                            //        x => x.Parent != null && x.Parent.Name == parentName,
-                            //        searchTerm: menu, pageSize: 1, pageIndex: 0))).Item1.FirstOrDefault();
-
-                            //    if (parentMenu is null)
-                            //    {
-                            //        isValid = false;
-                            //        ToastService.ShowErrorImport(row, 2, $"Menu {menu ?? string.Empty} and Parent Menu {parentName ?? string.Empty}");
-                            //    }
-                            //    else
-                            //    {
-                            //        menuId = parentMenu.Id;
-                            //        parentCache.Add(parentMenu);
-                            //    }
-                            //}
-                            //else
-                            //{
-                            //    menuId = cachedParent.Id;
-                            //}
-                        }
-
-                        if (!isValid)
-                            continue;
-
-                        var g = new GroupMenuDto
-                        {
-                            GroupId = Group.Id,
-                            MenuId = menuId,
-                            IsCreate = isCreate == "Yes",
-                            IsRead = isRead == "Yes",
-                            IsUpdate = isUpdate == "Yes",
-                            IsDelete = isDelete == "Yes",
-                            IsImport = isImport == "Yes",
-                        };
-
-                        bool exists = await Mediator.Send(new ValidateGroupMenuQuery(x =>
-                                x.GroupId == g.GroupId &&
-                                x.MenuId == g.MenuId));
-
-                        if (!exists)
-                            gg.Add(g);
-                    }
-
-                    if (gg.Count > 0)
-                    {
-                        SelectedDataItemsGroupMenu = [];
-                        gg = gg.DistinctBy(x => x.MenuId).ToList();
-                        await Mediator.Send(new CreateListGroupMenuRequest(gg));
-                        await LoadGroupMenus(0, pageSize);
-                    }
-
-                    ToastService.ShowSuccess($"{gg.Count} items were successfully imported.");
-
-                    //NavigationManager.NavigateTo($"patient/patients/{EnumPageMode.Update.GetDisplayName()}?Id={Group.Id}");
-                }
-                catch (Exception ex)
-                {
-                    ToastService.ShowError(ex.Message);
-                }
-                finally
-                {
-                    PanelVisible = false;
                 }
             }
             PanelVisible = false;
@@ -2044,6 +1864,11 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
         #endregion ComboboxDistrictResidence
 
         #endregion Residence Address
+
+        private int pageSize { get; set; } = 10;
+        private int totalCount = 0;
+        private int activePageIndex { get; set; } = 0;
+        private string searchTerm { get; set; } = string.Empty;
 
         private async Task LoadData_userClaim()
         {
