@@ -139,7 +139,8 @@ namespace McDermott.Web.Extentions
 
         public static List<string> RegisType = new List<string>
         {
-            "Accident"
+            "Accident",
+            "General Consultation",
         };
 
         public static List<string> ClinicVisitTypes = new List<string>

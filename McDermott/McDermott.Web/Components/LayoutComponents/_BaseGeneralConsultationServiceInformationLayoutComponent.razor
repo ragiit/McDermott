@@ -287,7 +287,7 @@
                             <ValidationMessage For="@(()=>GeneralConsultanService.PratitionerId)" />
                         </DxFormLayoutItem>
 
-                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Safety Personel" ColSpanMd="12">
+                        <DxFormLayoutItem Visible="@(IsAccident)" CaptionCssClass="required-caption normal-caption" Caption="Safety Personel" ColSpanMd="12">
                             <MyDxComboBox Data="SafetyPersonels"
                                           NullText="Select Physicion"
                                           TextFieldName="Name"
