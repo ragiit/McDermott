@@ -1,79 +1,134 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.IO.Compression;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using McDermott.Persistence.Context;
+using MediatR;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
+using System;
+using System.IO;
 
 namespace McDermott.Web.Controllers
 {
-    [Microsoft.AspNetCore.Components.Route("api/upload-file")]
+    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
     [ApiController]
     public class UploadFilesController : ControllerBase
     {
-        [HttpPost("UploadMultipleFiles")]
-        public async Task<IActionResult> UploadMultipleFiles(
-            [FromForm] List<IFormFile> files,
-            [FromForm] MaintenanceProduct Data)
+
+        private readonly ILogger<UploadFilesController> _logger;
+        private readonly IMediator _mediator;
+        private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _environment;
+
+        public UploadFilesController(ILogger<UploadFilesController> logger, IMediator mediator, ApplicationDbContext context, IWebHostEnvironment environment)
         {
-            if (Data.ProductId <= 0 || Data.MaintenanceId <= 0)
-                return BadRequest("Invalid parameters.");
+            _logger = logger;
+            _mediator = mediator;
+            _environment = environment;
+            _context = context;
+        }
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UploadMultipleFiles(IFormFileCollection myFile, long? productId, long? maintenanceId, string? sequenceNumber)
+        {
 
-            if (files == null || !files.Any())
-                return BadRequest("No files uploaded.");
+            string uploadFolder = System.IO.Path.Combine(_environment.WebRootPath, "files", "DocumentMaintenance");
 
-            var allowedExtensions = new List<string> { ".pdf", ".docx" };
-            foreach (var file in files)
+            // Buat folder jika belum ada
+            if (!Directory.Exists(uploadFolder))
             {
-                var fileExtension = System.IO.Path.GetExtension(file.FileName).ToLower();
-                if (!allowedExtensions.Contains(fileExtension))
-                    return BadRequest($"File type {fileExtension} is not allowed.");
+                Directory.CreateDirectory(uploadFolder);
+            }
 
-                if (file.Length > 15_000_000) // 15 MB
-                    return BadRequest("File size exceeds the maximum allowed size.");
+            // Cek apakah ada file yang diupload
+            if (myFile == null || myFile.Count == 0)
+            {
+                return BadRequest("Tidak ada file yang diupload.");
+            }
 
-                using (var memoryStream = new MemoryStream())
+            // List untuk menyimpan dokumen yang berhasil diupload
+            var uploadedDocuments = new List<MaintenanceRecord>();
+
+            foreach (var file in myFile)
+            {
+                try
                 {
-                    await file.CopyToAsync(memoryStream);
-                    var fileBytes = memoryStream.ToArray();
+                    if (file.Length > 0)
+                    {
+                        string originalFileName = file.FileName;
 
-                    var base64Compressed = await CompressBase64Async(Convert.ToBase64String(fileBytes));
-                    SaveToDatabase(file.FileName, base64Compressed, Data);
+                        // Pastikan nama file unik
+                        string uniqueFileName = originalFileName;
+                        string filePath = System.IO.Path.Combine(uploadFolder, uniqueFileName);
+
+                        // Jika file dengan nama yang sama sudah ada, tambahkan nomor unik
+                        int counter = 1;
+                        while (System.IO.File.Exists(filePath))
+                        {
+                            // Tambahkan angka sebelum ekstensi file
+                            string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(originalFileName);
+                            string fileExtension = System.IO.Path.GetExtension(originalFileName);
+                            uniqueFileName = $"{fileNameWithoutExtension}_{counter}{fileExtension}";
+                            filePath = System.IO.Path.Combine(uploadFolder, uniqueFileName);
+                            counter++;
+                        }
+
+                        // Simpan file ke folder yang ditentukan
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        // Buat objek FileDocument
+                        var fileDocument = new MaintenanceRecord
+                        {
+                            DocumentName = uniqueFileName,
+                            ProductId = productId,
+                            MaintenanceId = maintenanceId,
+                            SequenceProduct = sequenceNumber
+                            //FilePath = System.IO.Path.Combine("files", "DocumentMaintenance", uniqueFileName), // Path relatif untuk disimpan di database
+                            //FileSize = file.Length,
+                            //FileExtension = System.IO.Path.GetExtension(file.FileName),
+                            //UploadDate = DateTime.UtcNow
+                        };
+
+                        // Simpan ke database
+                        try
+                        {
+                            var dataxs = await _mediator.Send(new CreateMaintenanceRecordRequest(fileDocument.Adapt<MaintenanceRecordDto>()));
+                            uploadedDocuments.Add(fileDocument);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log error atau tangani kesalahan penyimpanan
+                            return StatusCode(500, $"Kesalahan database: {ex.Message}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Gagal menyimpan file {file.FileName}: {ex.Message}");
                 }
             }
 
-            return Ok("Files uploaded successfully.");
+            // Simpan perubahan ke database
+
+            // Kembalikan daftar dokumen yang berhasil diupload
+            return Ok(new
+            {
+                message = "Files uploaded successfully.",
+                files = uploadedDocuments.Select(doc => new
+                {
+                    doc.DocumentName,
+                    doc.ProductId,
+                    doc.MaintenanceId,
+                    doc.SequenceProduct
+                })
+            });
+
         }
 
-        private async Task<string> CompressBase64Async(string base64String)
-        {
-            var bytes = Convert.FromBase64String(base64String);
-            using (var memoryStream = new MemoryStream())
-            using (var gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
-            {
-                await gzipStream.WriteAsync(bytes, 0, bytes.Length);
-                await gzipStream.FlushAsync();
-                return Convert.ToBase64String(memoryStream.ToArray());
-            }
-        }
 
-        private void SaveToDatabase(string fileName, string base64Data, MaintenanceProduct Data)
-        {
-            // Simulasi penyimpanan ke database
-            Console.WriteLine($"File {fileName} saved with data length: {base64Data.Length}");
-            Console.WriteLine($"ProductId: {Data.ProductId}, MaintenanceId: {Data.MaintenanceId}");
-        }
-
-        [HttpPost("upload")]
-        public ActionResult Upload(IFormFile myFile)
-        {
-            try
-            {
-                Console.WriteLine($"Uploading {myFile.FileName}");
-            }
-            catch
-            {
-                return BadRequest();
-            }
-            return Ok();
-        }
     }
 }
 

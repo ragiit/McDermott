@@ -410,19 +410,22 @@
             </div>
             <DxUpload Name="myFile"
                       AllowMultiFileUpload="true"
-                      UploadUrl="@GetUploadUrl("api/upload-file/upload/")"
+                      UploadUrl="@GetUploadUrl($"api/UploadFiles/UploadMultipleFiles")"
                       SelectedFilesChanged="@OnSelectedFilesChanged"
-                      MaxFileSize="15000000"
+                      MaxFileSize="300000"
                       AllowedFileExtensions="@(new List<string> { ".pdf", ".docx" })"
                       UploadMode="UploadMode.Instant"
-                      UploadError="OnUploadError">
+                      UploadError="OnUploadError"
+                      UploadCompleted="OnUploadCompleted">
             </DxUpload>
-            <div class="spinner-border text-primary" role="status" style="@(SelectedFilesCount > 0 ? "" : "display: none")">
-                <span class="visually-hidden">Uploading...</span>
-            </div>
+                        
             @if (!string.IsNullOrEmpty(UploadErrorMessage))
             {
                 <div class="alert alert-danger mt-3">@UploadErrorMessage</div>
+            }
+            @if (UploadSuccessMessage != null)
+            {
+                <div class="alert alert-success mt-3">@UploadSuccessMessage</div>
             }
         </div>
     </DxPopup>

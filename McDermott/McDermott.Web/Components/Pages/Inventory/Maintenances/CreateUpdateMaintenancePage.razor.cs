@@ -8,6 +8,7 @@ using static McDermott.Application.Features.Commands.Inventory.MaintenanceProduc
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using System.IO.Compression;
 using System.Net;
+using McDermott.Domain.Entities;
 
 namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 {
@@ -1093,15 +1094,24 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 
         #region Upload Document
         private int SelectedFilesCount = 0;
-        private string UploadErrorMessage { get; set; }
         private long? productId { get; set; }
-        private MaintenanceProduct postMaintenanceProductup;
+        private long? maintenanceId { get; set; }
+        private string? sequenceNumber { get; set; }
+        private bool UploadSuccess = false;  // Status upload sukses
+
+        private string UploadErrorMessage = string.Empty;
+        private string UploadSuccessMessage = string.Empty;
 
         private async Task OpenPopUp(MaintenanceProduct dataDoc)
         {
-            showPopUpUpload = true;
+            var cekDataMaintenance = await Mediator.Send(new GetSingleMaintenanceQuery
+            {
+                Predicate = x => x.Id == dataDoc.MaintenanceId,
+            });
             productId = dataDoc.ProductId;
-            postMaintenanceProductup = dataDoc;
+            maintenanceId = dataDoc.MaintenanceId;
+            sequenceNumber = cekDataMaintenance.Sequence;
+            showPopUpUpload = true;
         }
 
         private async Task OnPopupClosed()
@@ -1114,21 +1124,20 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         protected void OnSelectedFilesChanged(IEnumerable<UploadFileInfo> files)
         {
             SelectedFilesCount = files.ToList().Count;
+            UploadSuccess = false; // Reset status sukses saat file baru dipilih
+            UploadErrorMessage = string.Empty;
             InvokeAsync(StateHasChanged);
-        }
-
-        protected void OnUploadError(Exception ex)
-        {
-            UploadErrorMessage = $"Error uploading files: {ex.Message}";
-            InvokeAsync(StateHasChanged);
-        }
-
-        protected string GetUploadUrl(string url)
-        {
-             return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
         }
 
        
+
+
+        protected string GetUploadUrl(string url)
+        {
+            return $"{url}?productId={productId}&maintenanceId={maintenanceId}&sequenceNumber={sequenceNumber}";
+        }
+        
+
 
         #endregion
     }

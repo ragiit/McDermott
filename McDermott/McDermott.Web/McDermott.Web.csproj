@@ -60,8 +60,8 @@
   <ItemGroup>
     <Folder Include="Components\Layout\NewFolder\" />
     <Folder Include="Logs\" />
-    <Folder Include="wwwroot\files\" />
     <Folder Include="wwwroot\Dokumen\" />
+    <Folder Include="wwwroot\files\DocumentMaintenance\" />
   </ItemGroup>
 
   <ItemGroup>
