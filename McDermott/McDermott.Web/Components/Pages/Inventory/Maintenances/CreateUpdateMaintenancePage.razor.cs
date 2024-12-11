@@ -1,10 +1,13 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
 using McDermott.Web.Extentions;
 using System.Linq.Expressions;
+using DevExpress.Blazor.Upload;
 using static McDermott.Application.Features.Commands.GetDataCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
+using System.IO.Compression;
+using System.Net;
 
 namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 {
@@ -42,6 +45,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         private bool PanelVisible { get; set; } = false;
         private bool PanelVisibleProduct { get; set; } = false;
         private bool FormValidationState { get; set; } = false;
+        private bool showPopUpUpload { get; set; } = false;
+        private bool IsReadOnly => postMaintenance.Id != 0 && postMaintenance.Status != EnumStatusMaintenance.Request;
         private string? StatusString { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
         private int FocusedRowVisibleIndex { get; set; }
@@ -159,7 +164,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                     UpdateFormProductDetail(firstStockProduct ?? new(), e);
                 }
 
-                
+
             }
             catch (Exception ex)
             {
@@ -321,7 +326,10 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 
         private async Task selectedStatus(long? Id, string value)
         {
-            var DataProduct = getMaintenanceProduct.FirstOrDefault(x => x.Id == Id);
+            var DataProduct = await Mediator.Send(new GetSingleMaintenanceProductQuery
+            {
+                Predicate = x => x.Id == Id,
+            });
 
             if (DataProduct is not null)
             {
@@ -865,13 +873,14 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                 currentExpiryDate = postMaintenanceProduct.Expired;
 
             }
-            else { 
-
-            // Ambil detail produk jika tidak ada tanggal kadaluarsa
-            ProductDto productData = await Mediator.Send(new GetSingleProductQueryNew
+            else
             {
-                Predicate = x => x.Id == postMaintenanceProduct.ProductId
-            });
+
+                // Ambil detail produk jika tidak ada tanggal kadaluarsa
+                ProductDto productData = await Mediator.Send(new GetSingleProductQueryNew
+                {
+                    Predicate = x => x.Id == postMaintenanceProduct.ProductId
+                });
 
                 if (productData != null)
                 {
@@ -1081,5 +1090,46 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         }
 
         #endregion Handler Vaidation
+
+        #region Upload Document
+        private int SelectedFilesCount = 0;
+        private string UploadErrorMessage { get; set; }
+        private long? productId { get; set; }
+        private MaintenanceProduct postMaintenanceProductup;
+
+        private async Task OpenPopUp(MaintenanceProduct dataDoc)
+        {
+            showPopUpUpload = true;
+            productId = dataDoc.ProductId;
+            postMaintenanceProductup = dataDoc;
+        }
+
+        private async Task OnPopupClosed()
+        {
+            showPopUpUpload = false;
+            await LoadDataDetail();
+            StateHasChanged();
+        }
+
+        protected void OnSelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+        {
+            SelectedFilesCount = files.ToList().Count;
+            InvokeAsync(StateHasChanged);
+        }
+
+        protected void OnUploadError(Exception ex)
+        {
+            UploadErrorMessage = $"Error uploading files: {ex.Message}";
+            InvokeAsync(StateHasChanged);
+        }
+
+        protected string GetUploadUrl(string url)
+        {
+             return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+        }
+
+       
+
+        #endregion
     }
 }

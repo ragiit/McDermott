@@ -65,32 +65,21 @@ function getCanvasDataUrl(canvasId) {
     return canvas.toDataURL('image/png'); // atau format lain seperti 'image/jpeg'
 }
 
-//function getCompressedCanvasDataUrl(canvasId, quality = 0.8) {
-//    return new Promise((resolve, reject) => {
-//        var canvas = document.getElementById(canvasId);
-//        var compressedCanvas = document.createElement('canvas');
-//        compressedCanvas.width = canvas.width / 2; // Mengurangi ukuran gambar
-//        compressedCanvas.height = canvas.height / 2;
-//        var ctx = compressedCanvas.getContext('2d');
-
-//        // Menggambar ulang dengan ukuran lebih kecil
-//        ctx.drawImage(canvas, 0, 0, compressedCanvas.width, compressedCanvas.height);
-
-//        compressedCanvas.toBlob((blob) => {
-//            if (blob) {
-//                var reader = new FileReader();
-//                reader.onloadend = () => {
-//                    resolve(reader.result);
-//                };
-//                reader.onerror = reject;
-//                reader.readAsDataURL(blob);
-//            } else {
-//                reject('Blob creation failed');
-//            }
-//        }, 'image/jpeg', quality);
-//    });
-//}
-
+function uploadFile(formData) {
+    fetch('api/UploadFiles/UploadFiles', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        console.log('Success:', data);
+    }).catch((error) => {
+        console.error('Error:', error);
+    });
+}
 window.BlazorDownloadFile = async (fileName) => {
     const response = await fetch(`/${fileName}`);
     const blob = await response.blob();
