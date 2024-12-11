@@ -52,8 +52,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         private bool IsReadOnly => postMaintenance.Id != 0 && postMaintenance.Status != EnumStatusMaintenance.Request;
         private string? StatusString { get; set; }
         private IReadOnlyList<object> SelectedDataItems { get; set; } = [];
-        private int FocusedRowVisibleIndex { get; set; }
         private DateTime? currentExpiryDate { get; set; }
+        private int FocusedRowVisibleIndex { get; set; }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -63,7 +63,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                 if ((MaintenanceProduct)args.DataItem is null)
                     return;
 
-                isActiveButton = ((EducationProgramDto)args.DataItem)!.Status!= null;
+                isActiveButton = ((MaintenanceProduct)args.DataItem)!.Status!= null;
             }
             catch (Exception ex)
             {
@@ -1133,7 +1133,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             showPopUpUpload = false;
             await LoadDataDetail();
             StateHasChanged();
-        }
+        } 
+        
 
         protected void OnSelectedFilesChanged(IEnumerable<UploadFileInfo> files)
         {
@@ -1158,12 +1159,63 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         #region Read Document
         private bool showPopUpFile { get; set; } = false;
         private bool isLoadingFile { get; set; } = false;
-        private MaintenanceProduct eData { get; set; }
+        private IReadOnlyList<object> SelectedDataItemsFile { get; set; } = [];
+
+        private object eData { get; set; }
+        private MaintenanceProduct zsh {  get; set; }
 
         private async Task OpenFile(MaintenanceProduct e)
         {
-            edata = e;
+            zsh = e;
+            await LoadDataFile(e);
             showPopUpFile = true;
+        }
+
+        private async Task LoadDataFile(MaintenanceProduct f)
+        {
+            await InvokeAsync(() => isLoadingFile = true);
+
+            try
+            {
+                var xsx = await Mediator.Send(new GetSingleMaintenanceQuery
+                {
+                    Predicate = x => x.Id == f.MaintenanceId,
+                });
+
+                eData = new GridDevExtremeDataSource<MaintenanceRecord>(await Mediator.Send(new GetQueryMaintenanceRecord
+                {
+                    Predicate= x=>x.ProductId == f.ProductId && x.MaintenanceId== xsx.Id && x.SequenceProduct == xsx.Sequence,
+                    
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+            }
+            finally
+            {
+                await InvokeAsync(() => isLoadingFile = false);
+            }
+        }
+        private int FocusedRowVisibleIndexFile { get; set; }
+
+        private void GridFile_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexFile = args.VisibleIndex;
+        }
+
+        private async Task RefreshFile_Click()
+        {
+            await LoadDataFile(zsh);
+        }
+        private async Task OnPopupFileClosed()
+        {
+            showPopUpFile = false;
+            await LoadDataDetail();
+            StateHasChanged();
         }
         #endregion
     }

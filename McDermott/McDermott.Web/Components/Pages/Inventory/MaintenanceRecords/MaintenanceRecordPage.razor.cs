@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
 
-namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecord
+namespace McDermott.Web.Components.Pages.Inventory.MaintenanceRecords
 {
     public partial class MaintenanceRecordPage
     {

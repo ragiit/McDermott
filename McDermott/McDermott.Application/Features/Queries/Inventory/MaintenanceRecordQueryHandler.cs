@@ -1,4 +1,7 @@
-﻿using McDermott.Application.Features.Services;
+﻿using McDermott.Application.Features.Commands;
+using McDermott.Application.Features.Services;
+using McDermott.Domain.Common;
+using static McDermott.Application.Features.Commands.GetDataCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
 
 namespace McDermott.Application.Features.Queries.Inventory
@@ -7,6 +10,7 @@ namespace McDermott.Application.Features.Queries.Inventory
         IRequestHandler<GetAllMaintenanceRecordQuery, List<MaintenanceRecordDto>>,
         IRequestHandler<GetMaintenanceRecordQuery, (List<MaintenanceRecordDto>, int pageIndex, int pageSize, int pageCount)>, //MaintenanceRecord
         IRequestHandler<GetSingleMaintenanceRecordQuery, MaintenanceRecordDto>, IRequestHandler<ValidateMaintenanceRecordQuery, bool>,
+        IRequestHandler<GetQueryMaintenanceRecord, IQueryable<MaintenanceRecord>>,
         IRequestHandler<CreateMaintenanceRecordRequest, MaintenanceRecordDto>,
         IRequestHandler<CreateListMaintenanceRecordRequest, List<MaintenanceRecordDto>>,
         IRequestHandler<UpdateMaintenanceRecordRequest, MaintenanceRecordDto>,
@@ -223,6 +227,96 @@ namespace McDermott.Application.Features.Queries.Inventory
                 // Consider logging the exception
                 throw;
             }
+        }
+
+        public Task<IQueryable<MaintenanceRecord>> Handle(GetQueryMaintenanceRecord request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<MaintenanceRecord>(request, cancellationToken, request.Select is null ? x => new MaintenanceRecord
+            {
+                Id = x.Id,
+                DocumentName=x.DocumentName, 
+                SequenceProduct = x.SequenceProduct,
+                ProductId = x.ProductId,
+                MaintenanceId =x.MaintenanceId,
+                Product = new Product
+                {
+                    Name= x.Product == null ? string.Empty : x.Product.Name
+                },
+                Maintenance= new Maintenance
+                {
+                    Title = x.Maintenance == null ? string.Empty : x.Maintenance.Title
+                }
+
+
+            } : request.Select);
+        }
+        private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)
+    where TEntity : BaseAuditableEntity // Add the constraint here
+        {
+            try
+            {
+                var query = _unitOfWork.Repository<TEntity>().Entities.AsNoTracking();
+
+                // Apply Predicate (filtering)
+                if (request.Predicate is not null)
+                    query = query.Where(request.Predicate);
+
+                // Apply Ordering
+                if (request.OrderByList.Any())
+                {
+                    var firstOrderBy = request.OrderByList.First();
+                    query = firstOrderBy.IsDescending
+                        ? query.OrderByDescending(firstOrderBy.OrderBy)
+                        : query.OrderBy(firstOrderBy.OrderBy);
+
+                    foreach (var additionalOrderBy in request.OrderByList.Skip(1))
+                    {
+                        query = additionalOrderBy.IsDescending
+                            ? ((IOrderedQueryable<TEntity>)query).ThenByDescending(additionalOrderBy.OrderBy)
+                            : ((IOrderedQueryable<TEntity>)query).ThenBy(additionalOrderBy.OrderBy);
+                    }
+                }
+
+                // Apply Includes (eager loading)
+                if (request.Includes is not null)
+                {
+                    foreach (var includeExpression in request.Includes)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
+
+                // Apply Search Term
+                if (!string.IsNullOrEmpty(request.SearchTerm))
+                {
+                    query = ApplySearchTerm(query, request.SearchTerm);
+                }
+
+                // Apply Select if provided, else return the entity as it is
+                if (select is not null)
+                    query = query.Select(select);
+
+                return Task.FromResult(query.Adapt<IQueryable<TEntity>>());
+            }
+            catch (Exception)
+            {
+                // Return empty IQueryable<TEntity> if there's an exception
+                return Task.FromResult(Enumerable.Empty<TEntity>().AsQueryable());
+            }
+        }
+
+        private IQueryable<TEntity> ApplySearchTerm<TEntity>(IQueryable<TEntity> query, string searchTerm) where TEntity : class
+        {
+            // This method applies the search term based on the entity type
+            if (typeof(TEntity) == typeof(MaintenanceRecord))
+            {
+                var MaintenanceRecordQuery = query as IQueryable<MaintenanceRecord>;
+                return (IQueryable<TEntity>)MaintenanceRecordQuery.Where(v =>
+                    EF.Functions.Like(v.Product.Name, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.SequenceProduct, $"%{searchTerm}%") ||
+                    EF.Functions.Like(v.Maintenance.Title, $"%{searchTerm}%"));
+            }
+            return query; // No filtering if the type doesn't match
         }
 
         #endregion GET

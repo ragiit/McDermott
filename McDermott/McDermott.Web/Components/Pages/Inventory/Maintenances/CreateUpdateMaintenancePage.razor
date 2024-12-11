@@ -269,7 +269,7 @@
                                                                                      EditItem_Click="@(()=>EditItem_Click(context.Grid))"
                                                                                      DeleteItem_Click="@DeleteItem_Click"
                                                                                      Refresh_Click="@Refresh_Click"
-                                                                                     IsImport="false"                                                                                     
+                                                                                     IsImport="false"
                                                                                      VisibleNew="UserAccessCRUID.IsCreate"
                                                                                      VisibleEdit="UserAccessCRUID.IsUpdate"
                                                                                      VisibleDelete="@isActiveButton" />
@@ -433,7 +433,7 @@
                       UploadError="OnUploadError"
                       UploadCompleted="OnUploadCompleted">
             </DxUpload>
-                        
+
             @if (!string.IsNullOrEmpty(UploadErrorMessage))
             {
                 <div class="alert alert-danger mt-3">@UploadErrorMessage</div>
@@ -443,6 +443,58 @@
                 <div class="alert alert-success mt-3">@UploadSuccessMessage</div>
             }
         </div>
+    </DxPopup>
+
+    <DxPopup HeaderText="Upload Document" HeaderCssClass="fw-bold" Width="auto"
+             HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+             VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center"
+             @bind-Visible="@showPopUpFile" ShowCloseButton="true" Closed="OnPopupFileClosed">
+
+        <DxLoadingPanel @bind-Visible="PanelVisibleProduct"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="true"
+                        Text="Fetching Data...">
+            <_BaseMyGrid @ref="Grid"
+                         Data="eData"
+                         @bind-SelectedDataItems="@SelectedDataItemsFile"                        
+                         FocusedRowChanged="GridFile_FocusedRowChanged"
+                         SearchTextChanged="OnSearchBoxChanged"
+                         KeyFieldName="Id">
+                <ToolbarTemplate>
+                    <MyDxToolbarBase TItem="MaintenanceRecord"
+                                     SelectedDataItems="@SelectedDataItemsFile"
+                                     Refresh_Click="@RefreshFile_Click"
+                                     IsExport="false"
+                                     IsImport="false"
+                                     VisibleNew="false"
+                                     VisibleEdit="false"
+                                     VisibleDelete="false"/>
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Width="15px" />
+                    <DxGridDataColumn FieldName="Product.Name" Caption="Product Name" SortIndex="0" />
+                    <DxGridDataColumn FieldName="SequenceProduct" Caption="Sequence" />
+                    <DxGridDataColumn FieldName="DocumentName" Caption="Document Name" />
+                    <DxGridDataColumn Caption="Action">
+                        <CellDisplayTemplate>
+                            @{
+                                var Doc = (context.DataItem as MaintenanceRecord); // Extract the current Maintenance object
+                            }
+
+                            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+                                          CssClass="align-self-center"
+                                          Attributes="@(new Dictionary<string, object> { ["title"] = "Download Document Maintenance" })"
+                                          IconCssClass="fa-solid fa-file-arrow-down"/> <!-- Pass the extracted object to the method -->
+
+                            </div>
+
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </_BaseMyGrid>
+        </DxLoadingPanel>
     </DxPopup>
 }
 else if (UserAccessCRUID is not null && !UserAccessCRUID.IsRead)

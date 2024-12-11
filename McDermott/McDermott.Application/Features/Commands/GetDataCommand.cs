@@ -66,6 +66,8 @@
 
         public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct>
         { }
+        public class GetQueryMaintenanceRecord : BaseQuery<MaintenanceRecord>
+        { }
 
         #endregion Inventory
 
