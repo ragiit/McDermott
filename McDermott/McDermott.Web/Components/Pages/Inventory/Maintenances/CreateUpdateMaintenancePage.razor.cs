@@ -63,7 +63,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                 if ((MaintenanceProduct)args.DataItem is null)
                     return;
 
-                isActiveButton = ((EducationProgramDto)args.DataItem)!.Status!.Equals(EnumStatusEducationProgram.Draft);
+                isActiveButton = ((EducationProgramDto)args.DataItem)!.Status!= null;
             }
             catch (Exception ex)
             {
@@ -1158,9 +1158,11 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         #region Read Document
         private bool showPopUpFile { get; set; } = false;
         private bool isLoadingFile { get; set; } = false;
+        private MaintenanceProduct eData { get; set; }
 
         private async Task OpenFile(MaintenanceProduct e)
         {
+            edata = e;
             showPopUpFile = true;
         }
         #endregion
