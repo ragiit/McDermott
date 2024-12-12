@@ -8,6 +8,7 @@ using MediatR;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
 using System;
 using System.IO;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace McDermott.Web.Controllers
 {
@@ -55,52 +56,35 @@ namespace McDermott.Web.Controllers
                 {
                     if (file.Length > 0)
                     {
-                        string originalFileName = file.FileName;
+                        string originalFileName = System.IO.Path.GetFileName(file.FileName);
 
                         // Pastikan nama file unik
-                        string uniqueFileName = originalFileName;
+                        string timestamp = DateTime.UtcNow.ToString("ddMMyyy"); // Format: TahunBulanTanggalJamMenitDetikMilidetik
+                        string uniqueFileName = $"{timestamp}_{originalFileName}";
                         string filePath = System.IO.Path.Combine(uploadFolder, uniqueFileName);
 
                         // Jika file dengan nama yang sama sudah ada, tambahkan nomor unik
-                        int counter = 1;
-                        while (System.IO.File.Exists(filePath))
-                        {
-                            // Tambahkan angka sebelum ekstensi file
-                            string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(originalFileName);
-                            string fileExtension = System.IO.Path.GetExtension(originalFileName);
-                            uniqueFileName = $"{fileNameWithoutExtension}_{counter}{fileExtension}";
-                            filePath = System.IO.Path.Combine(uploadFolder, uniqueFileName);
-                            counter++;
-                        }
+                        // Simpan file
+                        await using var stream = new FileStream(filePath, FileMode.Create);
+                        await file.CopyToAsync(stream);
 
-                        // Simpan file ke folder yang ditentukan
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                        }
-
-                        // Buat objek FileDocument
+                        // Simpan metadata file ke database
                         var fileDocument = new MaintenanceRecord
                         {
                             DocumentName = uniqueFileName,
                             ProductId = productId,
                             MaintenanceId = maintenanceId,
                             SequenceProduct = sequenceNumber
-                            //FilePath = System.IO.Path.Combine("files", "DocumentMaintenance", uniqueFileName), // Path relatif untuk disimpan di database
-                            //FileSize = file.Length,
-                            //FileExtension = System.IO.Path.GetExtension(file.FileName),
-                            //UploadDate = DateTime.UtcNow
                         };
 
-                        // Simpan ke database
                         try
                         {
-                            var dataxs = await _mediator.Send(new CreateMaintenanceRecordRequest(fileDocument.Adapt<MaintenanceRecordDto>()));
+                            var savedDocument = await _mediator.Send(new CreateMaintenanceRecordRequest(fileDocument.Adapt<MaintenanceRecordDto>()));
                             uploadedDocuments.Add(fileDocument);
                         }
                         catch (Exception ex)
                         {
-                            // Log error atau tangani kesalahan penyimpanan
+                            // Log error, proses file lainnya tetap dilanjutkan
                             return StatusCode(500, $"Kesalahan database: {ex.Message}");
                         }
                     }
@@ -129,6 +113,23 @@ namespace McDermott.Web.Controllers
         }
 
 
+        [HttpGet("DownloadFile")]
+        public IActionResult DownloadFile(string fileName)
+        {
+            string filePath = System.IO.Path.Combine(_environment.WebRootPath, "files/DocumentMaintenance", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("File not found.");
+            }
+
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+            string contentType = "application/octet-stream"; // Sesuaikan tipe file
+            return File(fileBytes, contentType, fileName);
+        }
+
+        // Fungsi untuk mendapatkan content type
+        
     }
 }
 

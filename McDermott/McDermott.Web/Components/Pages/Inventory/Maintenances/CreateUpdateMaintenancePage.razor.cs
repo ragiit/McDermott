@@ -10,6 +10,10 @@ using System.IO.Compression;
 using System.Net;
 using McDermott.Domain.Entities;
 using McDermott.Application.Dtos.AwarenessEvent;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
+using static System.Net.WebRequestMethods;
+using System.Security.Policy;
+using System.Reflection.Metadata;
 
 namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 {
@@ -63,7 +67,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                 if ((MaintenanceProduct)args.DataItem is null)
                     return;
 
-                isActiveButton = ((MaintenanceProduct)args.DataItem)!.Status!= null;
+                isActiveButton = ((MaintenanceProduct)args.DataItem)!.Status != null;
             }
             catch (Exception ex)
             {
@@ -1133,8 +1137,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             showPopUpUpload = false;
             await LoadDataDetail();
             StateHasChanged();
-        } 
-        
+        }
+
 
         protected void OnSelectedFilesChanged(IEnumerable<UploadFileInfo> files)
         {
@@ -1144,15 +1148,19 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             InvokeAsync(StateHasChanged);
         }
 
-       
 
 
         protected string GetUploadUrl(string url)
         {
             return $"{url}?productId={productId}&maintenanceId={maintenanceId}&sequenceNumber={sequenceNumber}";
         }
+        protected async Task GetUploadUrlsx(string url)
+        {
+            var link = $"{url}?productId={productId}&maintenanceId={maintenanceId}&sequenceNumber={sequenceNumber}";
+            var succes = NavigationManager.ToAbsoluteUri(link).AbsoluteUri;
 
 
+        }
 
         #endregion
 
@@ -1160,9 +1168,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
         private bool showPopUpFile { get; set; } = false;
         private bool isLoadingFile { get; set; } = false;
         private IReadOnlyList<object> SelectedDataItemsFile { get; set; } = [];
-
         private object eData { get; set; }
-        private MaintenanceProduct zsh {  get; set; }
+        private MaintenanceProduct zsh { get; set; }
 
         private async Task OpenFile(MaintenanceProduct e)
         {
@@ -1184,8 +1191,8 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
 
                 eData = new GridDevExtremeDataSource<MaintenanceRecord>(await Mediator.Send(new GetQueryMaintenanceRecord
                 {
-                    Predicate= x=>x.ProductId == f.ProductId && x.MaintenanceId== xsx.Id && x.SequenceProduct == xsx.Sequence,
-                    
+                    Predicate = x => x.ProductId == f.ProductId && x.MaintenanceId == xsx.Id && x.SequenceProduct == xsx.Sequence,
+
                 }))
                 {
                     CustomizeLoadOptions = (loadOptions) =>
@@ -1217,6 +1224,47 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             await LoadDataDetail();
             StateHasChanged();
         }
+
+        private async Task DownloadFile(MaintenanceRecord file)
+        {
+            try
+            {
+                // URL API endpoint Anda
+                string url = $"{NavigationManager.BaseUri}api/UploadFiles/DownloadFile?fileName={file.DocumentName}";
+
+                // Permintaan file
+                var response = await HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Dapatkan stream file
+                    var fileStream = await response.Content.ReadAsStreamAsync();
+
+                    // Nama file yang diunduh
+                    var fileName = file.DocumentName;
+
+                    // Simpan file ke local (folder Downloads atau lokasi lain)
+                    string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", fileName);
+
+                    using (var files = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        await fileStream.CopyToAsync(files);
+                    }
+                    ToastService.ClearAll();
+                    ToastService.ShowSuccess($"Success Download File {file.DocumentName}");
+                }
+                else
+                {
+                    ToastService.ClearAll();
+                    ToastService.ShowError($"Failed to download file: {response.ReasonPhrase}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowInfo($"Error during file download: {ex.Message}");
+            }
+        }
+
         #endregion
     }
 }

@@ -445,7 +445,7 @@
         </div>
     </DxPopup>
 
-    <DxPopup HeaderText="Upload Document" HeaderCssClass="fw-bold" Width="auto"
+    <DxPopup HeaderText="List Document" HeaderCssClass="fw-bold" Width="auto"
              HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
              VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center"
              @bind-Visible="@showPopUpFile" ShowCloseButton="true" Closed="OnPopupFileClosed">
@@ -479,14 +479,15 @@
                     <DxGridDataColumn Caption="Action">
                         <CellDisplayTemplate>
                             @{
-                                var Doc = (context.DataItem as MaintenanceRecord); // Extract the current Maintenance object
+                                var Docx = (context.DataItem as MaintenanceRecord); // Extract the current Maintenance object
                             }
 
                             <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
                                 <DxButton RenderStyle="ButtonRenderStyle.Secondary"
                                           CssClass="align-self-center"
                                           Attributes="@(new Dictionary<string, object> { ["title"] = "Download Document Maintenance" })"
-                                          IconCssClass="fa-solid fa-file-arrow-down"/> <!-- Pass the extracted object to the method -->
+                                          IconCssClass="fa-solid fa-file-arrow-down"
+                                          Click="@(()=>DownloadFile(Docx))"/> <!-- Pass the extracted object to the method -->
 
                             </div>
 

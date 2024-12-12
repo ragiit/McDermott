@@ -65,9 +65,10 @@
                                             }
                                             else
                                             {
-                                                <a href="#" class="toolbar-item">
+                                                <a @onclick="showFile_Maintenance" class="toolbar-item">
                                                     <span class="me-2"><i class="fa-solid fa-file-arrow-up"></i></span>
-                                                    <span>Upload</span>
+                                                    <span>Document</span>
+                                                    <span class="ms-2 badge bg-secondary">@TotalDocument Unit</span>
                                                 </a>
                                                 <div class="divider border-start"></div>
                                                 <a @onclick="NewTableEquipment_Scrap" class="toolbar-item">
@@ -545,7 +546,7 @@
 <DxPopup Visible="@showScrapProduct" HeaderText="Scrap Product" Width="85%" CloseOnOutsideClick="false" ShowCloseButton="true" Closed="Back_Click">
     <div class="card">
         <div class="card-header">
-             <span class="normal-caption">Product Name : </span><h4 class="fw-bolder"> @NameProduct</h4> 
+            <span class="normal-caption">Product Name : </span><h4 class="fw-bolder"> @NameProduct</h4>
         </div>
         <DxLoadingPanel @bind-Visible="PanelVisible"
                         IsContentBlocked="true"
@@ -553,10 +554,10 @@
                         IndicatorAreaVisible="true"
                         Text="Fetching Data...">
             <MyGrid @ref="GridScrap"
-                            Data="@GetMaintenanceScrap"
-                            FocusedRowEnabled="false"
-                            KeyFieldName="Id"
-                            AllowSelectRowByClick="false">
+                    Data="@GetMaintenanceScrap"
+                    FocusedRowEnabled="false"
+                    KeyFieldName="Id"
+                    AllowSelectRowByClick="false">
                 <ToolbarTemplate>
                     <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
                         <DxToolbarItem BeginGroup="true" Text="Back To Product" Click="Back_Click" IconCssClass="fa-solid fa-arrow-left" />
@@ -568,17 +569,17 @@
                     <DxGridDataColumn FieldName="Maintenance.RequestBy.Name" Caption="Employee" />
                     <DxGridDataColumn FieldName="Maintenance.ResponsibleBy.Name" Caption="Technical" />
                     <DxGridDataColumn FieldName="SerialNumber" Caption="Batch" GroupIndex="0" />
-                    <DxGridDataColumn FieldName="Product.Name" Caption="Product" /> 
+                    <DxGridDataColumn FieldName="Product.Name" Caption="Product" />
                     <DxGridDataColumn FieldName="Maintenance.RequestDate" DisplayFormat="dd MMMM yyyy" Caption="Schedule Date" />
-                     <DxGridDataColumn FieldName="Status" Caption="Status">
+                    <DxGridDataColumn FieldName="Status" Caption="Status">
                         <CellDisplayTemplate>
                             @((MarkupString)GetIssueStatusIconHtmlMaintenance((context.DataItem as MaintenanceProductDto).Status))
                         </CellDisplayTemplate>
-                    </DxGridDataColumn> 
+                    </DxGridDataColumn>
                 </Columns>
-                
+
             </MyGrid>
-            
+
 
         </DxLoadingPanel>
     </div>
@@ -623,4 +624,63 @@
         </DxLoadingPanel>
     </div>
 </DxPopup>
- 
+
+<!-- List Document -->
+<DxPopup HeaderText="List Document" HeaderCssClass="fw-bold" Width="auto"
+         HorizontalAlignment="@DevExpress.Blazor.HorizontalAlignment.Center"
+         VerticalAlignment="@DevExpress.Blazor.VerticalAlignment.Center"
+         @bind-Visible="@showPopUpFile" ShowCloseButton="true" Closed="OnPopupFileClosed">
+    <div class="card">
+        <div class="card-header">
+            <span class="normal-caption">Name Product : </span> <h4 class="fw-bolder"> @NameProduct</h4>
+        </div>
+        <DxLoadingPanel @bind-Visible="PanelVisibleProduct"
+                        IsContentBlocked="true"
+                        ApplyBackgroundShading="true"
+                        IndicatorAreaVisible="true"
+                        Text="Fetching Data...">
+            <_BaseMyGrid @ref="Grid"
+                         Data="DataListDocument"
+                         @bind-SelectedDataItems="@SelectedDataItemsFile"
+                         FocusedRowChanged="GridFile_FocusedRowChanged"
+                         SearchTextChanged="OnSearchBoxChanged"
+                         KeyFieldName="Id">
+                <ToolbarTemplate>
+                    <MyDxToolbarBase TItem="MaintenanceRecord"
+                                     SelectedDataItems="@SelectedDataItemsFile"
+                                     Refresh_Click="@RefreshFile_Click"
+                                     IsExport="false"
+                                     IsImport="false"
+                                     VisibleNew="false"
+                                     VisibleEdit="false"
+                                     VisibleDelete="false" />
+                </ToolbarTemplate>
+                <Columns>
+                    <DxGridSelectionColumn Width="15px" />
+                    <DxGridDataColumn FieldName="Maintenance.Title" Caption="Maintenance Name" SortIndex="0" AllowGroup="true" />
+                    <DxGridDataColumn FieldName="Product.batch" Caption="Batch" />
+                    <DxGridDataColumn FieldName="SequenceProduct" Caption="Sequence" />
+                    <DxGridDataColumn FieldName="DocumentName" Caption="Document Name" />
+                    <DxGridDataColumn Caption="Action">
+                        <CellDisplayTemplate>
+                            @{
+                                var Docx = (context.DataItem as MaintenanceRecord); // Extract the current Maintenance object
+                            }
+
+                            <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                <DxButton RenderStyle="ButtonRenderStyle.Secondary"
+                                          CssClass="align-self-center"
+                                          Attributes="@(new Dictionary<string, object> { ["title"] = "Download Document Maintenance" })"
+                                          IconCssClass="fa-solid fa-file-arrow-down"
+                                          Click="@(()=>DownloadFile(Docx))" /> <!-- Pass the extracted object to the method -->
+
+                            </div>
+
+                        </CellDisplayTemplate>
+                    </DxGridDataColumn>
+                </Columns>
+            </_BaseMyGrid>
+        </DxLoadingPanel>
+    </div>
+</DxPopup>
+

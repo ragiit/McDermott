@@ -366,3 +366,4 @@ function printDocument(base64String) {
         URL.revokeObjectURL(url);
     }, 1000); // Sesuaikan waktu tunggu jika diperlukan
 }
+

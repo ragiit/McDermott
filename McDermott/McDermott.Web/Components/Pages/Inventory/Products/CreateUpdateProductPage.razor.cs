@@ -1,5 +1,6 @@
 ﻿using static McDermott.Application.Features.Commands.Inventory.MaintenanceCommand;
 using static McDermott.Application.Features.Commands.Inventory.MaintenanceProductCommand;
+using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecordCommand;
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
@@ -29,6 +30,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<MaintenanceProductDto> GetMaintenanceProduct = [];
         private List<MaintenanceProductDto> GetMaintenanceScrap = [];
         private List<MaintenanceProductDto> GetMaintenanceHistory = [];
+        private List<MaintenanceRecordDto> GetMaintenanceDocument= [];
 
         //Post data
         private ProductDto PostProduct = new();
@@ -61,6 +63,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private bool showMaintaiananaceProduct { get; set; } = false;
         private long TotalQty { get; set; } = 0;
         private long? TotalScrapQty { get; set; }
+        private long? TotalDocument{ get; set; }
         private long? TotalMaintenanceQty { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private string? NameUom { get; set; }
@@ -297,6 +300,9 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
 
             var resultScrap = await Mediator.Send(new GetMaintenanceProductQuery());
             GetMaintenanceProduct = resultScrap.Item1;
+
+            var resultFile = await Mediator.Send(new GetMaintenanceRecordQuery());
+            GetMaintenanceDocument = resultFile.Item1;
         }
 
         private async Task LoadData(int pageIndex = 0, int pageSize = 10)
@@ -397,6 +403,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             TotalQty = getTransactionStocks
                 .Where(x => x.ProductId == PostProduct.Id && x.Validate)
                 .Sum(z => z.Quantity);
+            TotalDocument = GetMaintenanceDocument.Count(x => x.ProductId == PostProduct.Id);
         }
 
         // Handles default values for new products
@@ -1170,5 +1177,99 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         }
 
         #endregion Save
+
+        #region File Pdf Maintenance
+
+        private bool showPopUpFile { get; set; } = false;
+        private bool PanelVisibleProduct { get; set; } = false;
+        private object DataListDocument { get; set; }
+        private IReadOnlyList<object> SelectedDataItemsFile { get; set; } = [];
+        private int FocusedRowVisibleIndexFile { get; set; }
+
+        private void GridFile_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndexFile = args.VisibleIndex;
+        }
+
+        private async Task showFile_Maintenance()
+        {
+            await LoadListDataDocument();
+            showPopUpFile = true;
+        }
+
+        private async Task LoadListDataDocument()
+        {
+            try
+            {
+                PanelVisibleProduct = true;
+                DataListDocument = new GridDevExtremeDataSource<MaintenanceRecord>(await Mediator.Send(new GetQueryMaintenanceRecord
+                {
+                    Predicate = x => x.ProductId == PostProduct.Id,
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                PanelVisibleProduct = false;
+            }
+            catch { }
+        }
+
+        private async Task DownloadFile(MaintenanceRecord file)
+        {
+            try
+            {
+                // URL API endpoint Anda
+                string url = $"{NavigationManager.BaseUri}api/UploadFiles/DownloadFile?fileName={file.DocumentName}";
+
+                // Permintaan file
+                var response = await HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Dapatkan stream file
+                    var fileStream = await response.Content.ReadAsStreamAsync();
+
+                    // Nama file yang diunduh
+                    var fileName = file.DocumentName;
+
+                    // Simpan file ke local (folder Downloads atau lokasi lain)
+                    string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", fileName);
+
+                    using (var files = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        await fileStream.CopyToAsync(files);
+                    }
+                    ToastService.ClearAll();
+                    ToastService.ShowSuccess($"Success Download File {file.DocumentName}");
+                }
+                else
+                {
+                    ToastService.ClearAll();
+                    ToastService.ShowError($"Failed to download file: {response.ReasonPhrase}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ToastService.ShowInfo($"Error during file download: {ex.Message}");
+            }
+        }
+
+
+        private async Task RefreshFile_Click()
+        {
+            await LoadListDataDocument();
+        }
+
+        private async Task OnPopupFileClosed()
+        {
+            showPopUpFile = false;
+            await LoadData();
+            StateHasChanged();
+        }
+        #endregion
     }
 }
