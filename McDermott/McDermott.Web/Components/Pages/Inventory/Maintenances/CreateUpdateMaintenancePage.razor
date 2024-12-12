@@ -427,7 +427,7 @@
                       AllowMultiFileUpload="true"
                       UploadUrl="@GetUploadUrl($"api/UploadFiles/UploadMultipleFiles")"
                       SelectedFilesChanged="@OnSelectedFilesChanged"
-                      MaxFileSize="300000"
+                      MaxFileSize="3145728"
                       AllowedFileExtensions="@(new List<string> { ".pdf", ".docx" })"
                       UploadMode="UploadMode.Instant"
                       UploadError="OnUploadError"
