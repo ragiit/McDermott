@@ -32,14 +32,23 @@ namespace McDermott.Application.Features.Queries
     #region Medicals
 
         IRequestHandler<GetQueryDiagnosis, IQueryable<Diagnosis>>,
+        IRequestHandler<GetQuerySpeciality, IQueryable<Speciality>>,
+        IRequestHandler<GetQueryService, IQueryable<Service>>,
 
     #endregion Medicals
 
     #region Patients
 
-        IRequestHandler<GetQueryPatientFamilyRelation, IQueryable<PatientFamilyRelation>>
+        IRequestHandler<GetQueryPatientFamilyRelation, IQueryable<PatientFamilyRelation>>,
 
     #endregion Patients
+
+    #region Employees
+
+        IRequestHandler<GetQueryJobPosition, IQueryable<JobPosition>>,
+        IRequestHandler<GetQueryDepartment, IQueryable<Department>>
+
+    #endregion Employees
 
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -305,6 +314,40 @@ namespace McDermott.Application.Features.Queries
             } : request.Select);
         }
 
+        public Task<IQueryable<Speciality>> Handle(GetQuerySpeciality request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<Speciality>(request, cancellationToken, request.Select is null ? x => new Speciality
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code,
+            } : request.Select);
+        }
+
+        public Task<IQueryable<Service>> Handle(GetQueryService request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<Service>(request, cancellationToken, request.Select is null ? x => new Service
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code,
+                Quota = x.Quota,
+                IsKiosk = x.IsKiosk,
+                IsMcu = x.IsMcu,
+                IsMaternity = x.IsMaternity,
+                IsPatient = x.IsPatient,
+                IsTelemedicine = x.IsTelemedicine,
+                IsVaccination = x.IsVaccination,
+                ServicedId = x.ServicedId,
+                Serviced = new Service
+                {
+                    Name = x.Serviced.Name
+                }
+            } : request.Select);
+        }
+
         #endregion Medicals
 
         #region Patients
@@ -322,7 +365,51 @@ namespace McDermott.Application.Features.Queries
 
         #endregion Patients
 
-        // Add constraint to ensure TEntity is a type of BaseAuditableEntity
+        #region Employees
+
+        public Task<IQueryable<JobPosition>> Handle(GetQueryJobPosition request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<JobPosition>(request, cancellationToken, request.Select is null ? x => new JobPosition
+            {
+                Id = x.Id,
+                Name = x.Name,
+                DepartmentId = x.DepartmentId,
+                Department = new Department
+                {
+                    Name = x.Department.Name
+                }
+            } : request.Select);
+        }
+
+        public Task<IQueryable<Department>> Handle(GetQueryDepartment request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<Department>(request, cancellationToken, request.Select is null ? x => new Department
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ParentDepartmentId = x.ParentDepartmentId,
+                CompanyId = x.CompanyId,
+                ManagerId = x.ManagerId,
+                ParentDepartment = new Domain.Entities.Department
+                {
+                    Name = x.ParentDepartment.Name
+                },
+                Company = new Domain.Entities.Company
+                {
+                    Name = x.Company.Name
+                },
+                Manager = new Domain.Entities.User
+                {
+                    Name = x.Manager.Name
+                },
+                DepartmentCategory = x.DepartmentCategory
+            } : request.Select);
+        }
+
+        #endregion Employees
+
+        #region Add constraint to ensure TEntity is a type of BaseAuditableEntity
+
         private Task<IQueryable<TEntity>> HandleQuery<TEntity>(BaseQuery<TEntity> request, CancellationToken cancellationToken, Expression<Func<TEntity, TEntity>>? select = null)
             where TEntity : BaseAuditableEntity // Add the constraint here
         {
@@ -405,6 +492,8 @@ namespace McDermott.Application.Features.Queries
 
             return query; // No filtering if the type doesn't match
         }
+
+        #endregion Add constraint to ensure TEntity is a type of BaseAuditableEntity
     }
 }
 

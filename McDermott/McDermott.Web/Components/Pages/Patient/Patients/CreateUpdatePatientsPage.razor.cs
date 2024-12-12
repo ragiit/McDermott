@@ -1004,7 +1004,7 @@ namespace McDermott.Web.Components.Pages.Patient.Patients
                 UserForm.Password = Helper.HashMD5(UserForm.Password);
 
             var ax = SelectedServices.Select(x => x.Id).ToList();
-            UserForm.DoctorServiceIds?.AddRange(ax);
+            //UserForm.DoctorServiceIds?.AddRange(ax);
 
             UserForm.WeatherPatientAllergyIds = UserForm.IsWeatherPatientAllergyIds
                 ? SelectedWeatherAllergies.Select(x => x.Id).ToList()

@@ -1,1 +1,174 @@
-﻿
+﻿@if (@Convert.ToBoolean(UserForm.IsEmployee))
+{
+    <div class="w-100">
+        <div class="w-100">
+            <div class="card">
+                <div class="card-header">
+                    <span class="fw-bolder">Employee Information </span>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <DxFormLayout>
+
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Supervisor" ColSpanMd="12">
+                                    <_BaseMyComboBox TData="User"
+                                                     TValue="long?"
+                                                     NullText="Select Supervisor"
+                                                     CustomData="@LoadCustomDataUser"
+                                                     @bind-Value="@UserForm.SupervisorId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(UserDto.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="@nameof(UserDto.Email)" Caption="Email" />
+                                        </Columns>
+                                    </_BaseMyComboBox>
+                                    <ValidationMessage For="@(()=>UserForm.SupervisorId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Job Position" ColSpanMd="12">
+                                    <_BaseMyComboBox TData="JobPosition"
+                                                     TValue="long?"
+                                                     NullText="Select Job Position"
+                                                     CustomData="@LoadCustomDataJobPosition"
+                                                     @bind-Value="@UserForm.JobPositionId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(JobPositionDto.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="Department.Name" Caption="Department" />
+                                        </Columns>
+                                    </_BaseMyComboBox>
+                                    <ValidationMessage For="@(()=>UserForm.JobPositionId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Department" ColSpanMd="12">
+                                    <_BaseMyComboBox TData="Department"
+                                                     TValue="long?"
+                                                     NullText="Select Department"
+                                                     CustomData="@LoadCustomDataDepartment"
+                                                     @bind-Value="@UserForm.DepartmentId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(DepartmentDto.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="ParentDepartment.Name" Caption="Parent Department" />
+                                            <DxListEditorColumn FieldName="Company.Name" Caption="Company" />
+                                            <DxListEditorColumn FieldName="Manager.Name" Caption="Manager" />
+                                            <DxListEditorColumn FieldName="DepartmentCategory" Caption="Category" />
+                                        </Columns>
+                                    </_BaseMyComboBox>
+                                    <ValidationMessage For="@(()=>UserForm.DepartmentId)" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS KS Number" ColSpanMd="12">
+                                    <DxMaskedInput @bind-Value="@UserForm.NoBpjsKs"
+                                                   NullText="BPJS KS Number"
+                                                   ShowValidationIcon="true"
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                    </DxMaskedInput>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="Legacy Number" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@UserForm.Legacy" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Legacy" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="caption normal-caption" Caption="SAP Number" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@UserForm.SAP" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="SAP" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+                        <div class="col-md-6">
+                            <DxFormLayout>
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Occupational" ColSpanMd="12">
+                                    <_BaseMyComboBox TData="Occupational"
+                                                     TValue="long?"
+                                                     NullText="Select Occupational"
+                                                     CustomData="@LoadCustomDataOccupational"
+                                                     @bind-Value="@UserForm.OccupationalId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(Occupational.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="@nameof(Occupational.Description)" Caption="Description" />
+                                        </Columns>
+                                    </_BaseMyComboBox>
+                                    <ValidationMessage For="@(()=>UserForm.OccupationalId)" />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="BPJS TK Number" ColSpanMd="12">
+                                    <DxMaskedInput @bind-Value="@UserForm.NoBpjsTk"
+                                                   NullText="BPJS TK Number"
+                                                   ShowValidationIcon="true"
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                    </DxMaskedInput>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Join Date" ColSpanMd="12">
+                                    <DxDateEdit @bind-Date="@UserForm.JoinDate" Mask="@DateTimeMask.ShortDate" NullText="Join Date" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="NIP Number" ColSpanMd="12">
+                                    <DxMaskedInput @bind-Value="@UserForm.NIP"
+                                                   NullText="NIP"
+                                                   ShowValidationIcon="true"
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                    </DxMaskedInput>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Oracle Number" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@UserForm.Oracle" ShowValidationIcon="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" NullText="Oracle" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Employee Type" ColSpanMd="12">
+                                    <MyDxComboBox Data="@Helper.EmployeeTypes" @bind-Value="@UserForm.EmployeeType" NullText="Select Employee Type" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+
+    [Parameter] public bool IsPatientForm { get; set; } = false;
+    [Parameter] public UserDto UserForm { get; set; } = new();
+
+    protected async Task<LoadResult> LoadCustomDataUser(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<User>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryUser
+                {
+                    Predicate = x => x.IsEmployee == true,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Email = x.Email
+                    }
+                }),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataJobPosition(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<JobPosition>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryJobPosition()),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataDepartment(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<Department>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryDepartment()),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataOccupational(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<Occupational>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryOccupational()),
+            cancellationToken: cancellationToken);
+    }
+}

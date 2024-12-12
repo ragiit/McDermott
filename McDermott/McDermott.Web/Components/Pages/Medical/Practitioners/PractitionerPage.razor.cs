@@ -397,6 +397,7 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
                 SelectedDataItems = [];
                 var dataSource = new GridDevExtremeDataSource<User>(await Mediator.Send(new GetQueryUser
                 {
+                    Predicate = x => x.IsDoctor == true,
                     Select = x => new User
                     {
                         Id = x.Id,
@@ -463,7 +464,7 @@ namespace McDermott.Web.Components.Pages.Medical.Practitioners
             {
                 await FileUploadService.UploadFileAsync(BrowserFile);
                 var a = SelectedServices.Select(x => x.Id).ToList();
-                UserForm.DoctorServiceIds?.AddRange(a);
+                //UserForm.DoctorServiceIds?.AddRange(a);
                 await Mediator.Send(new CreateUserRequest(UserForm));
             }
             else

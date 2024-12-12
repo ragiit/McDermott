@@ -54,6 +54,12 @@
         public class GetQueryDiagnosis : BaseQuery<Diagnosis>
         { }
 
+        public class GetQuerySpeciality : BaseQuery<Speciality>
+        { }
+
+        public class GetQueryService : BaseQuery<Service>
+        { }
+
         #endregion Medicals
 
         #region Inventory
@@ -66,6 +72,7 @@
 
         public class GetQueryMaintenanceProduct : BaseQuery<MaintenanceProduct>
         { }
+
         public class GetQueryMaintenanceRecord : BaseQuery<MaintenanceRecord>
         { }
 
@@ -77,6 +84,16 @@
         { }
 
         #endregion Patients
+
+        #region Employees
+
+        public class GetQueryJobPosition : BaseQuery<JobPosition>
+        { }
+
+        public class GetQueryDepartment : BaseQuery<Department>
+        { }
+
+        #endregion Employees
 
         // buat di copy"
         //public class GetQuerylable : BaseQuery<>{ }

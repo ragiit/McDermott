@@ -165,6 +165,10 @@ namespace McDermott.Application.Dtos.Config
         public string? setNameFamily => $"{Name} ({FamilyRelation})";
         public DateTime? JoinDate { get; set; }
         public List<long>? DoctorServiceIds { get; set; } = [];
+
+        [NotMapped]
+        public IEnumerable<long> SelectedServiceDoctorServiceIds { get; set; } = [];
+
         public List<long> PatientAllergyIds { get; set; } = [];
         public bool IsWeatherPatientAllergyIds { get; set; }
         public bool IsPharmacologyPatientAllergyIds { get; set; }
