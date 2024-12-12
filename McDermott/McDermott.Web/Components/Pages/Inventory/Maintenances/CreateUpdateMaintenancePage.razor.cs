@@ -1224,13 +1224,13 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
             await LoadDataDetail();
             StateHasChanged();
         }
-
+        private int downloadCount { get; set; } = 1;
         private async Task DownloadFile(MaintenanceRecord file)
         {
             try
             {
                 // URL API endpoint Anda
-                string url = $"{NavigationManager.BaseUri}api/UploadFiles/DownloadFile?fileName={file.DocumentName}";
+                string url = $"{NavigationManager.BaseUri}api/UploadFiles/DownloadFile?fileName={file.DocumentName}&DownoadCount={downloadCount}";
 
                 // Permintaan file
                 var response = await HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
@@ -1238,20 +1238,30 @@ namespace McDermott.Web.Components.Pages.Inventory.Maintenances
                 if (response.IsSuccessStatusCode)
                 {
                     // Dapatkan stream file
-                    var fileStream = await response.Content.ReadAsStreamAsync();
+                    var fileStream = await response.Content.ReadAsByteArrayAsync();
+
+                    // Gunakan JavaScript Interop untuk download
+                    await JsRuntime.InvokeVoidAsync("saveAsFile",
+                        file.DocumentName,
+                        Convert.ToBase64String(fileStream));
 
                     // Nama file yang diunduh
-                    var fileName = file.DocumentName;
+                    //var fileName = file.DocumentName;
 
-                    // Simpan file ke local (folder Downloads atau lokasi lain)
-                    string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", fileName);
+                    //// Simpan file ke local (folder Downloads atau lokasi lain)
+                    //string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", fileName);
 
-                    using (var files = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                    {
-                        await fileStream.CopyToAsync(files);
-                    }
+                    //using (var files = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    //{
+                    //    await fileStream.CopyToAsync(files);
+                    //}
+
+
                     ToastService.ClearAll();
                     ToastService.ShowSuccess($"Success Download File {file.DocumentName}");
+
+                    // Meningkatkan nomor urut untuk unduhan berikutnya
+                    downloadCount++;
                 }
                 else
                 {

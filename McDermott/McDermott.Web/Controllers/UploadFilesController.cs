@@ -114,7 +114,7 @@ namespace McDermott.Web.Controllers
 
 
         [HttpGet("DownloadFile")]
-        public IActionResult DownloadFile(string fileName)
+        public IActionResult DownloadFile(string fileName, int DownoadCount)
         {
             string filePath = System.IO.Path.Combine(_environment.WebRootPath, "files/DocumentMaintenance", fileName);
 

@@ -4,6 +4,8 @@ using static McDermott.Application.Features.Commands.Inventory.MaintenanceRecord
 using static McDermott.Application.Features.Commands.Inventory.TransactionStockCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.DrugFormCommand;
 using static McDermott.Application.Features.Commands.Pharmacies.MedicamentCommand;
+using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace McDermott.Web.Components.Pages.Inventory.Products
 {
@@ -30,7 +32,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private List<MaintenanceProductDto> GetMaintenanceProduct = [];
         private List<MaintenanceProductDto> GetMaintenanceScrap = [];
         private List<MaintenanceProductDto> GetMaintenanceHistory = [];
-        private List<MaintenanceRecordDto> GetMaintenanceDocument= [];
+        private List<MaintenanceRecordDto> GetMaintenanceDocument = [];
 
         //Post data
         private ProductDto PostProduct = new();
@@ -63,7 +65,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private bool showMaintaiananaceProduct { get; set; } = false;
         private long TotalQty { get; set; } = 0;
         private long? TotalScrapQty { get; set; }
-        private long? TotalDocument{ get; set; }
+        private long? TotalDocument { get; set; }
         private long? TotalMaintenanceQty { get; set; }
         private int FocusedRowVisibleIndex { get; set; }
         private string? NameUom { get; set; }
@@ -1185,6 +1187,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
         private object DataListDocument { get; set; }
         private IReadOnlyList<object> SelectedDataItemsFile { get; set; } = [];
         private int FocusedRowVisibleIndexFile { get; set; }
+        private int downloadCount = 1;
 
         private void GridFile_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
         {
@@ -1223,7 +1226,7 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
             try
             {
                 // URL API endpoint Anda
-                string url = $"{NavigationManager.BaseUri}api/UploadFiles/DownloadFile?fileName={file.DocumentName}";
+                string url = $"{NavigationManager.BaseUri}api/UploadFiles/DownloadFile?fileName={file.DocumentName}&DownoadCount={downloadCount}";
 
                 // Permintaan file
                 var response = await HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
@@ -1231,20 +1234,30 @@ namespace McDermott.Web.Components.Pages.Inventory.Products
                 if (response.IsSuccessStatusCode)
                 {
                     // Dapatkan stream file
-                    var fileStream = await response.Content.ReadAsStreamAsync();
+                    var fileStream = await response.Content.ReadAsByteArrayAsync();
+
+                    // Gunakan JavaScript Interop untuk download
+                    await JsRuntime.InvokeVoidAsync("saveAsFile",
+                        file.DocumentName,
+                        Convert.ToBase64String(fileStream));
 
                     // Nama file yang diunduh
-                    var fileName = file.DocumentName;
+                    //var fileName = file.DocumentName;
 
-                    // Simpan file ke local (folder Downloads atau lokasi lain)
-                    string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", fileName);
+                    //// Simpan file ke local (folder Downloads atau lokasi lain)
+                    //string filePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads", fileName);
 
-                    using (var files = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                    {
-                        await fileStream.CopyToAsync(files);
-                    }
+                    //using (var files = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    //{
+                    //    await fileStream.CopyToAsync(files);
+                    //}
+
+
                     ToastService.ClearAll();
                     ToastService.ShowSuccess($"Success Download File {file.DocumentName}");
+
+                    // Meningkatkan nomor urut untuk unduhan berikutnya
+                    downloadCount++;
                 }
                 else
                 {
