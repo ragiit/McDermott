@@ -1,5 +1,270 @@
-﻿<h3>_BasePractitionerLicenseInformationUser</h3>
+﻿@if (Convert.ToBoolean(UserForm.IsDoctor))
+{
+    <div class="w-100">
+        <div class="w-100">
+            <div class="card">
+                <div class="card-header">
+                    <span class="fw-bolder">Practitioner License Information</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <DxFormLayout>
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Physicion">
+                                    <DxCheckBox @bind-Checked="@UserForm.IsPhysicion" />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem ColSpanMd="12" Visible="UserForm.IsPhysicion" CaptionCssClass="required-caption normal-caption" Caption="Physician Code">
+                                    <DxTextBox @bind-Text="@UserForm.PhysicanCode"
+                                               ShowValidationIcon="true"
+                                               ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                               NullText="Physican Code" />
+                                    <ValidationMessage For="@(() => UserForm.PhysicanCode)"   />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="required-caption normal-caption" Caption="Sip Number">
+                                    <DxMaskedInput @bind-Value="@UserForm.SipNo"
+                                                   NullText="Sip Number"
+                                                   ShowValidationIcon="true"
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                    </DxMaskedInput>
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="-caption normal-caption" Caption="Sip File">
+                                    <DxMaskedInput @bind-Value="@UserForm.SipFile"
+                                                   ShowValidationIcon="true"
+                                                   ReadOnly="true"
+                                                   MaskMode="MaskMode.RegEx">
+                                        <Buttons>
+                                            <InputFile id="sipFile" accept=".txt, .pdf, .docx" OnChange="@HandleFileSelected" multiple="false" style="display:none" />
+                                            <DxEditorButton Click="SelectFile" IconCssClass="fa-solid fa-upload" />
+                                            @if (!string.IsNullOrEmpty(UserForm.SipFile))
+                                            {
+                                                <DxEditorButton Click="DownloadFile" IconCssClass="fa-solid fa-download" />
+                                                <DxEditorButton Click="RemoveSelectedFile" IconCssClass="fa-solid fa-trash" />
+                                            }
+                                        </Buttons>
+                                    </DxMaskedInput>
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Sip Expired">
+                                    <DxDateEdit @bind-Date="@UserForm.SipExp" NullText="Sip Expired" Mask="@DateTimeMask.ShortDate" />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Speciality" ColSpanMd="12">
+                                    <_BaseMyComboBox TData="Speciality"
+                                                     TValue="long?"
+                                                     NullText="Select Speciality"
+                                                     CustomData="@LoadCustomDataSpeciality"
+                                                     @bind-Value="@UserForm.SpecialityId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(SpecialityDto.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="Speciality.Name" Caption="Speciality" />
+                                            <DxListEditorColumn FieldName="@nameof(SpecialityDto.Code)" Caption="Code" />
+                                        </Columns>
+                                    </_BaseMyComboBox>
+                                    <ValidationMessage For="@(()=>UserForm.SpecialityId)" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+
+                        <div class="col-md-6">
+                            <DxFormLayout>
+
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Nurse:">
+                                    <DxCheckBox @bind-Checked="@UserForm.IsNurse" />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Number">
+                                    <DxMaskedInput @bind-Value="@UserForm.StrNo"
+                                                   NullText="Str Number"
+                                                   ShowValidationIcon="true"
+                                                   ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto">
+                                    </DxMaskedInput>
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem ColSpanMd="12" CaptionCssClass="normal-caption" Caption="Str Expired">
+                                    <DxDateEdit @bind-Date="@UserForm.StrExp" NullText="Str Expired" Mask="@DateTimeMask.ShortDate" />
+                                </DxFormLayoutItem>
+
+
+                                <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Speciality" ColSpanMd="12">
+                                    <DxTagBox TData="Service"
+                                              TValue="long"
+                                              NullText="Select Services"
+                                              CustomData="@LoadCustomDataService"
+                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                              FilteringMode="DataGridFilteringMode.Contains"
+                                              ListRenderMode="ListRenderMode.Virtual"
+                                              TextFieldName="@nameof(Service.Name)"
+                                              ValueFieldName="Id"
+                                              @bind-Values="@SelectedServices">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
+                                        </Columns>
+                                    </DxTagBox>
+                                    <ValidationMessage For="@(() => UserForm.DoctorServiceIds)" />
+
+
+                                    @* <DxTagBox TData="Service"
+                                              TValue="Service"
+                                              NullText="Select Services"
+                                              CustomData="@LoadCustomDataService"
+                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                              FilteringMode="DataGridFilteringMode.Contains"
+                                              ListRenderMode="ListRenderMode.Virtual"
+                                              TextFieldName="@nameof(Service.Name)"
+                                              ValueFieldName="Id"
+                                              Values="@SelectedServices">
+                                        <Columns>
+                                            <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
+                                            <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
+                                        </Columns>
+                                    </DxTagBox> *@
+                                    <ValidationMessage For="@(()=>UserForm.DoctorServiceIds)" />
+                                </DxFormLayoutItem>
+                            </DxFormLayout>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    [Parameter] public bool IsPatientForm { get; set; } = false;
+    [Parameter] public UserDto UserForm { get; set; } = new(); 
 
+      // Backing field for DoctorServiceIds
+    private List<long> _doctorServiceIds;
+
+    // Public property for SelectedServices that automatically updates DoctorServiceIds
+    public IEnumerable<long> SelectedServices 
+    {
+        get => _doctorServiceIds;
+        set
+        {
+            if (value != null)
+            {
+                _doctorServiceIds = value.ToList(); // Update backing field
+                // If you want to also automatically update DoctorServiceIds, you can set it here
+                UserForm.DoctorServiceIds = _doctorServiceIds; // Assuming UserForm is your model
+            }
+        }
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        SelectedServices = UserForm.DoctorServiceIds ?? [];
+    }
+
+
+    protected async Task<LoadResult> LoadCustomDataSpeciality(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<Speciality>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQuerySpeciality()),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataService(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<Service>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryService
+                {
+                    Select = x => new Service
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code
+                    }
+                }),
+            cancellationToken: cancellationToken);
+    }
+
+    private void RemoveSelectedFile()
+    {
+        UserForm.SipFile = null;
+        UserForm.SipFileContent = [];
+        UserForm.SipFileContentType = null;
+    }
+
+    private async Task SelectFile()
+    {
+        await JsRuntime.InvokeVoidAsync("clickInputFile", "sipFile");
+    }
+
+    private async Task DownloadFile()
+    {
+        if (UserForm.SipFileContent != null && !string.IsNullOrEmpty(UserForm.SipFile))
+        {
+            var fileBytes = UserForm.SipFileContent;
+            var contentType = UserForm.SipFileContentType;
+            var fileName = UserForm.SipFile;
+
+            // Unduh file menggunakan Blazor download
+            var fileBase64 = Convert.ToBase64String(fileBytes);
+            var href = $"data:{contentType};base64,{fileBase64}";
+
+            await JsRuntime.InvokeVoidAsync("downloadFileNew", href, fileName);
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        // Check if the file is a PDF
+        if (file.ContentType != "application/pdf")
+        {
+            ToastService.ShowInfo("Only PDF files are allowed.");
+            return;
+        }
+
+        // Limit file size (example: max 2MB)
+        const long MaxFileSize = 2 * 1024 * 1024;
+        if (file.Size > MaxFileSize)
+        {
+            ToastService.ShowInfo("The file size is too large (maximum is 2MB).");
+            return;
+        }
+
+        try
+        {
+            // Read the file in chunks
+            const int ChunkSize = 64 * 1024; // 64KB per chunk
+            var buffer = new byte[file.Size];
+            long totalBytesRead = 0;
+
+            using var stream = file.OpenReadStream(MaxFileSize);
+            while (totalBytesRead < file.Size)
+            {
+                // Calculate chunk size to read (last chunk might be smaller)
+                var bytesToRead = (int)Math.Min(ChunkSize, file.Size - totalBytesRead);
+
+                // Read the chunk into the buffer
+                var chunkBuffer = new byte[bytesToRead];
+                var bytesRead = await stream.ReadAsync(chunkBuffer, 0, bytesToRead);
+
+                // Copy the chunk into the main buffer
+                Array.Copy(chunkBuffer, 0, buffer, totalBytesRead, bytesRead);
+                totalBytesRead += bytesRead;
+            }
+
+            UserForm.SipFile = file.Name;
+            UserForm.SipFileContentType = file.ContentType;
+            UserForm.SipFileContent = buffer;
+
+            ToastService.ShowSuccess($"The file '{file.Name}' has been uploaded successfully.");
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"An error occurred while uploading the file: {ex.Message}");
+        }
+    }
 }
