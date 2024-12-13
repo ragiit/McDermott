@@ -208,15 +208,15 @@
         {
             try
             {
-                var editModel = (NursingDiagnosesDto)e.EditModel;
+                var editModel = (NursingDiagnoses)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Problem))
                     return;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateNursingDiagnosesRequest(editModel));
+                    await Mediator.Send(new CreateNursingDiagnosesRequest(editModel.Adapt<NursingDiagnosesDto>()));
                 else
-                    await Mediator.Send(new UpdateNursingDiagnosesRequest(editModel));
+                    await Mediator.Send(new UpdateNursingDiagnosesRequest(editModel.Adapt<NursingDiagnosesDto>()));
 
                 await LoadData();
             }
