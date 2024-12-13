@@ -1292,7 +1292,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                     }
                 }
 
-                // Execute the validator
                 ValidationResult results2 = new GCGUserFormValidator().Validate(UserForm);
 
                 // Inspect any validation failures.
@@ -2609,12 +2608,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 throw;
             }
         }
-        #endregion
 
+        #endregion Print Rujukan BPJS + PRB
 
         #region Print Refert To Mcd
-        DxReportViewer reportViewerReferToMcD { get; set; }
-        IReport ReportReferToMcD { get; set; }
+
+        private DxReportViewer reportViewerReferToMcD { get; set; }
+        private IReport ReportReferToMcD { get; set; }
         private bool IsPrintReferToMcD = false;
 
         private async Task OnPrintRujukanMCReferTo()
@@ -2627,11 +2627,10 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         {
             try
             {
-                
                 var ExtraReport = new McDReferral();
                 var gs = await Mediator.Send(new GetSingleGCReferToInternalQuery
                 {
-                    Predicate = x => x.GeneralConsultanServiceId ==GeneralConsultanService.Id,
+                    Predicate = x => x.GeneralConsultanServiceId == GeneralConsultanService.Id,
                     Select = x => new GCReferToInternal
                     {
                         GeneralConsultanServiceId = x.GeneralConsultanServiceId,
@@ -2663,7 +2662,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         VisitNumber = x.VisitNumber,
                         ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
                         InsurancePolicyId = x.InsurancePolicyId,
-
                     }
                 }) ?? new();
 
@@ -2678,14 +2676,13 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             Name = x.Occupational.Name
                         },
                         Name = x.Name,
-
                     }
                 });
 
                 ExtraReport.xrDateRJ.Text = gs.DateRJMCINT.ToString("dd MMMM yyyy");
                 ExtraReport.xrNumber.Text = gs.Number ?? "-";
                 ExtraReport.xrTo.Text = gs.ReferTo ?? "-";
-                ExtraReport.xrPatientName.Text = gp.Name ??"-";
+                ExtraReport.xrPatientName.Text = gp.Name ?? "-";
                 ExtraReport.xrOccupational.Text = gp.Occupational.Name ?? "-";
                 ExtraReport.xrNoEmployee.Text = gp.NIP ?? "-";
                 ExtraReport.xrTempDiagnosis.Text = gs.TempDiagnosis ?? "-";
@@ -2745,16 +2742,18 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 ReportReferToMcD = ExtraReport;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
         }
-        #endregion
+
+        #endregion Print Refert To Mcd
 
         #region McD Glasses Referal
-        DxReportViewer reportViewerMcDGlasessReferral { get; set; }
-        IReport ReportMcDGlasessReferral { get; set; }
+
+        private DxReportViewer reportViewerMcDGlasessReferral { get; set; }
+        private IReport ReportMcDGlasessReferral { get; set; }
         private bool IsPrintMcDGlasessReferral = false;
 
         private async Task OnPrintMcDGlasessReferral()
@@ -2803,7 +2802,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         VisitNumber = x.VisitNumber,
                         ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
                         InsurancePolicyId = x.InsurancePolicyId,
-
                     }
                 }) ?? new();
 
@@ -2818,7 +2816,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             Name = x.Occupational.Name
                         },
                         Name = x.Name,
-
                     }
                 });
 
@@ -2832,7 +2829,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 ExtraReport.xrTherapyProvide.Text = gs.TherapyProvide ?? "-";
                 ExtraReport.xrNotes.Text = "";
 
-
                 // Dynamically set the checkbox for Category
                 ExtraReport.xrKanker.Checked = gs.CategoryRJMCINT == "KANKER";
                 ExtraReport.xrDependent.Checked = gs.CategoryRJMCINT == "DEPENDENT";
@@ -2840,7 +2836,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 ExtraReport.xrAccidentInside.Checked = gs.CategoryRJMCINT == "ACCIDENT Inside";
                 ExtraReport.xrAccidentOutside.Checked = gs.CategoryRJMCINT == "ACCIDENT Outside";
                 ExtraReport.xrKelainan.Checked = gs.CategoryRJMCINT == "KELAINAN BAWAAN";
-
 
                 // Dynamically set the checkbox for Examp For
                 ExtraReport.xrFurther.Checked = gs.ExamFor == "Pemeriksaan / penanganan lebih lanjut";
@@ -2852,19 +2847,20 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
 
                 ReportMcDGlasessReferral = ExtraReport;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
         }
-        #endregion
+
+        #endregion McD Glasses Referal
 
         #region Safety Glasses Referral
-        DxReportViewer reportViewerSafetyGlasessReferral { get; set; }
-        IReport ReportSafetyGlasessReferral { get; set; }
+
+        private DxReportViewer reportViewerSafetyGlasessReferral { get; set; }
+        private IReport ReportSafetyGlasessReferral { get; set; }
         private bool IsPrintSafetyGlasessReferral = false;
 
-      
         private async Task OnPrintSafetyGlasessReferral()
         {
             await LoadPrintSafetyGlasessReferral();
@@ -2907,7 +2903,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                         VisitNumber = x.VisitNumber,
                         ReferVerticalSpesialisSaranaName = x.ReferVerticalSpesialisSaranaName,
                         InsurancePolicyId = x.InsurancePolicyId,
-
                     }
                 }) ?? new();
 
@@ -2922,7 +2917,6 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                             Name = x.Occupational.Name
                         },
                         Name = x.Name,
-
                     }
                 });
 
@@ -2941,7 +2935,9 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
                 throw;
             }
         }
-        #endregion
+
+        #endregion Safety Glasses Referral
+
         private async Task OnPrint()
         {
             try
@@ -3104,5 +3100,11 @@ namespace McDermott.Web.Components.Pages.Transaction.GeneralConsultationServices
         }
 
         #endregion ReferToMC
+
+        private void HandleUserFormChanged(UserDto updatedUserForm)
+        {
+            UserForm = updatedUserForm;
+            StateHasChanged(); // Pastikan Parent diperbarui
+        }
     }
 }

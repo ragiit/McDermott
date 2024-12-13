@@ -15,10 +15,12 @@ namespace McDermott.Web.Extentions
              DataSourceLoadOptionsBase options,
              Func<Task<IQueryable<TData>>> queryProvider,
              string defaultSortColumn = "Name", // Default sort column parameter
+             bool isSortColumn = true,
              Expression<Func<TData, bool>>? filter = null,
              CancellationToken cancellationToken = default)
         {
-            options.DefaultSort = defaultSortColumn; // Use the provided default sort column
+            if (isSortColumn)
+                options.DefaultSort = defaultSortColumn; // Use the provided default sort column
 
             var query = await queryProvider();
 

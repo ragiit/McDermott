@@ -129,30 +129,11 @@
                                     </div>
                                 }
 
-                                @* General Information Services *@
                                 <_BaseGeneralConsultationServiceInformationLayoutComponent GeneralConsultanService="GeneralConsultanService"
-                                                                                           Patients="Patients"
-                                                                                           OnInputPatient="OnInputPatient"
-                                                                                           OnSelectedPatientChanged="SelectedItemChanged"
-                                                                                           UserForm="UserForm"
-                                                                                           Services="Services"
-                                                                                           SelectedItemChangedService="SelectedItemChanged"
-                                                                                           OnInputService="OnInputService"
-                                                                                           Physicions="Physicions"
-                                                                                           OnInputPhysicion="OnInputPhysicion"
-                                                                                           SelectedItemChangedPhysicion="SelectedItemChangedPhysicion"
-                                                                                           SelectedItemPayment="SelectedItemPaymentChanged"
-                                                                                           InsurancePolicies="InsurancePolicies"
-                                                                                           OnInputInsurancePolicy="OnInputInsurancePolicy"
-                                                                                           SelectedItemChangedInsurancePolicy="SelectedItemChanged"
-                                                                                           ReadOnlyForm="ReadOnlyForm"
-                                                                                           SelectedDateMaternityChanged="SelectedDateMaternityChanged"
+                                                                                           OnUserFormChanged="HandleUserFormChanged"
                                                                                            IsVaccination="true"
-                                                                                           Locations="Locations"
-                                                                                           OnInputLocation="OnInputLocation"
-                                                                                           SelectedItemChangedLocation="SelectedItemChanged">
-                                </_BaseGeneralConsultationServiceInformationLayoutComponent>
-
+                                                                                           UserForm="UserForm"
+                                                                                           ReadOnlyForm="ReadOnlyForm" />
 
                                 @* History Medical *@
                                 <div class="w-100">

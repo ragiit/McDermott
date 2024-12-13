@@ -1,6 +1,29 @@
-@McDermott.TelemedicianApi_HostAddress = http://localhost:5252
+@McDermott.TelemedicianApi_HostAddress = http://localhost:5252/api
 
-GET {{McDermott.TelemedicianApi_HostAddress}}/weatherforecast/
+GET {{McDermott.TelemedicianApi_HostAddress}}/telemedicine/user/1122
 Accept: application/json
+user_key: s3l3m84R<4!|V<3H!DLip4N
+secret_key: S-,9JC&CwNg&khf9_@WwxnQBA_XR#X
+timestamp: 123
+###
 
+GET {{McDermott.TelemedicianApi_HostAddress}}/telemedicine/send-otp/122
+Accept: application/json
+user_key: s3l3m84R<4!|V<3H!DLip4N
+secret_key: S-,9JC&CwNg&khf9_@WwxnQBA_XR#X
+timestamp: 123
+###
+
+GET {{McDermott.TelemedicianApi_HostAddress}}/telemedicine/submit-otp/{otp}/{userId}
+Accept: application/json
+user_key: s3l3m84R<4!|V<3H!DLip4N
+secret_key: S-,9JC&CwNg&khf9_@WwxnQBA_XR#X
+timestamp: 123
+###
+
+GET {{McDermott.TelemedicianApi_HostAddress}}/telemedicine/decrypt-response?data=BKd4243mM54lmjJ3DzMRAeqTSZZ43hqSVeE3wWkiRzw/8j/K9/skrCOM79f98CN54FXnl6BO5yQ6blBQ2H2PR6ZL8qMTQD48HNvbVQng21VlahhjbHYNkD1MbGQUbCh4HsUtKDYC2UoXUEjIGB6YGVJcca4wSBVpWcS6f+I1cREzj4jZhkvAtWh06I7ijzOCZZKhTIeobVVcmcnWr37lslrf3ESCbaiD+saNhbfpy+kKrjRPGxK4wjLzGq18gIbvuq51gE9vlq+SjgMiqZgDiPVbOQP7svs7GF1lkw5JX0mAQ+UDLArhFOkAaF4bdBmlcDWjqmij9wARjlB5tYRtVX7RKbNijiTJ9fc2L5NAsG/nfFMi160WDQMy4OwPtwtHvW2kZXJCmdSH2IRrI/06fA==
+Accept: application/json
+user_key: s3l3m84R<4!|V<3H!DLip4N
+secret_key: S-,9JC&CwNg&khf9_@WwxnQBA_XR#X
+timestamp: 123
 ###

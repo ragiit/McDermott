@@ -99,137 +99,27 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
             }
         }
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadLabTestDetails(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadLabTestDetails(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadLabTestDetails(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         #region Load ComboBox
 
         #region ComboBox Sampel Type
 
-        private DxComboBox<SampleTypeDto, long?> refSampleTypesComboBox { get; set; }
-        private int SampleTypesComboBoxIndex { get; set; } = 0;
-        private int totalCountSampleTypes = 0;
-
-        private async Task OnSearchSampleTypes()
+        protected async Task<LoadResult> LoadCustomDataSampleType(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
         {
-            await LoadDataSampleTypes(0, 10);
-        }
-
-        private async Task OnSearchSampleTypesIndexIncrement()
-        {
-            if (SampleTypesComboBoxIndex < (totalCountSampleTypes - 1))
-            {
-                SampleTypesComboBoxIndex++;
-                await LoadDataSampleTypes(SampleTypesComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchSampleTypesIndexDecrement()
-        {
-            if (SampleTypesComboBoxIndex > 0)
-            {
-                SampleTypesComboBoxIndex--;
-                await LoadDataSampleTypes(SampleTypesComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputSampleTypesChanged(string e)
-        {
-            SampleTypesComboBoxIndex = 0;
-            await LoadDataSampleTypes(0, 10);
-        }
-
-        private async Task LoadDataSampleTypesEdit()
-        {
-            SampleTypes = (await Mediator.Send(new GetSampleTypeQuery(x => x.Id == LabTest.SampleTypeId))).Item1;
-        }
-
-        private async Task LoadDataSampleTypes(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetSampleTypeQuery(searchTerm: refSampleTypesComboBox?.Text, pageSize: pageSize, pageIndex: pageIndex));
-            SampleTypes = result.Item1;
-            totalCountSampleTypes = result.pageCount;
-            PanelVisible = false;
+            return await QueryComboBoxHelper.LoadCustomData<SampleType>(
+                options: options,
+                queryProvider: async () => await Mediator.Send(new GetQuerySampleType()),
+                cancellationToken: cancellationToken);
         }
 
         #endregion ComboBox Sampel Type
 
-        #region Combo Box Lab Uoms
-
-        private DxComboBox<LabUomDto, long?> refLabUomComboBox { get; set; }
-        private int LabUomComboBoxIndex { get; set; } = 0;
-        private int totalCountLabUom = 0;
-
-        private async Task OnSearchLabUom()
+        protected async Task<LoadResult> LoadCustomDataLabUom(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
         {
-            await LoadDataLabUom(0, 10);
+            return await QueryComboBoxHelper.LoadCustomData<LabUom>(
+                options: options,
+                queryProvider: async () => await Mediator.Send(new GetQueryLabUom()),
+                cancellationToken: cancellationToken);
         }
-
-        private async Task OnSearchLabUomIndexIncrement()
-        {
-            if (LabUomComboBoxIndex < (totalCountLabUom - 1))
-            {
-                LabUomComboBoxIndex++;
-                await LoadDataLabUom(LabUomComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnSearchLabUomIndexDecrement()
-        {
-            if (LabUomComboBoxIndex > 0)
-            {
-                LabUomComboBoxIndex--;
-                await LoadDataLabUom(LabUomComboBoxIndex, 10);
-            }
-        }
-
-        private async Task OnInputLabUomChanged(string e)
-        {
-            LabUomComboBoxIndex = 0;
-            await LoadDataLabUom(0, 10);
-        }
-
-        private async Task LoadDataLabUom(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLabUomQuery
-            {
-                SearchTerm = refLabUomComboBox?.Text ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            });
-            LabUoms = result.Item1;
-            totalCountLabUom = result.PageCount;
-            PanelVisible = false;
-        }
-
-        #endregion Combo Box Lab Uoms
 
         #endregion Load ComboBox
 
@@ -241,39 +131,36 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
             await GetUserInfo();
             await LoadData();
             await LoadLabTestDetails();
-            await LoadDataSampleTypesEdit();
-            await LoadDataLabUom();
             PanelVisible = false;
+        }
 
-            return;
+        private object Data { get; set; }
 
+        private async Task LoadLabTestDetails()
+        {
             try
             {
-                _timer = new Timer(async (_) => await LoadLabTestDetails(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<LabTestDetail>(await Mediator.Send(new GetQueryLabTestDetail
+                {
+                    Predicate = x => x.LabTestId == LabTest.Id
+                }))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private async Task LoadLabTestDetails(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            SelectedDetailDataItems = [];
-            var result = await Mediator.Send(new GetLabTestDetailQuery
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                Predicate = x => x.LabTestId == LabTest.Id,
-                SearchTerm = searchTerm ?? ""
-            });
-            LabTestDetailForms = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            finally { PanelVisible = false; }
         }
 
         private async Task LoadData()
@@ -367,16 +254,16 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
                 if (e is null)
                     return;
 
-                var labTestDetail = (LabTestDetailDto)e.EditModel;
+                var labTestDetail = (LabTestDetail)e.EditModel;
 
                 if (labTestDetail.Id == 0)
                 {
                     labTestDetail.LabTestId = LabTest.Id;
-                    await Mediator.Send(new CreateLabTestDetailRequest(labTestDetail));
+                    await Mediator.Send(new CreateLabTestDetailRequest(labTestDetail.Adapt<LabTestDetailDto>()));
                 }
                 else
                 {
-                    await Mediator.Send(new UpdateLabTestDetailRequest(labTestDetail));
+                    await Mediator.Send(new UpdateLabTestDetailRequest(labTestDetail.Adapt<LabTestDetailDto>()));
                 }
                 await LoadLabTestDetails();
             }
@@ -469,9 +356,9 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
         private async Task EditItemDetail_Click(IGrid context)
         {
             await GridDetail.StartEditRowAsync(FocusedRowVisibleIndex);
-            var a = (GridDetail.GetDataItem(FocusedRowVisibleIndex) as LabTestDetailDto ?? new());
+            //var a = (GridDetail.GetDataItem(FocusedRowVisibleIndex) as LabTestDetailDto ?? new());
 
-            await LoadComboboxEdit(a);
+            //await LoadComboboxEdit(a);
         }
 
         private async Task LoadComboboxEdit(LabTestDetailDto a)

@@ -33,22 +33,36 @@ namespace McDermott.Application.Features.Queries
 
         IRequestHandler<GetQueryDiagnosis, IQueryable<Diagnosis>>,
         IRequestHandler<GetQuerySpeciality, IQueryable<Speciality>>,
+        IRequestHandler<GetQueryProject, IQueryable<Project>>,
         IRequestHandler<GetQueryService, IQueryable<Service>>,
+        IRequestHandler<GetQueryUom, IQueryable<Uom>>,
+        IRequestHandler<GetQueryLabUom, IQueryable<LabUom>>,
+        IRequestHandler<GetQueryNursingDiagnoses, IQueryable<NursingDiagnoses>>,
+        IRequestHandler<GetQueryLabTest, IQueryable<LabTest>>,
+        IRequestHandler<GetQueryLabTestDetail, IQueryable<LabTestDetail>>,
+        IRequestHandler<GetQuerySampleType, IQueryable<SampleType>>,
 
     #endregion Medicals
 
     #region Patients
 
         IRequestHandler<GetQueryPatientFamilyRelation, IQueryable<PatientFamilyRelation>>,
+        IRequestHandler<GetQueryInsurancePolicy, IQueryable<InsurancePolicy>>,
 
     #endregion Patients
 
     #region Employees
 
         IRequestHandler<GetQueryJobPosition, IQueryable<JobPosition>>,
-        IRequestHandler<GetQueryDepartment, IQueryable<Department>>
+        IRequestHandler<GetQueryDepartment, IQueryable<Department>>,
 
     #endregion Employees
+
+    #region Inventories
+
+        IRequestHandler<GetQueryUomCategory, IQueryable<UomCategory>>
+
+    #endregion Inventories
 
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
@@ -314,6 +328,100 @@ namespace McDermott.Application.Features.Queries
             } : request.Select);
         }
 
+        public Task<IQueryable<Project>> Handle(GetQueryProject request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<Project>(request, cancellationToken, request.Select is null ? x => new Project
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code
+            } : request.Select);
+        }
+
+        public Task<IQueryable<Uom>> Handle(GetQueryUom request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<Uom>(request, cancellationToken, request.Select is null ? x => new Uom
+            {
+                Id = x.Id,
+                Name = x.Name,
+                UomCategoryId = x.UomCategoryId,
+                UomCategory = new UomCategory
+                {
+                    Name = x.UomCategory == null ? "" : x.UomCategory.Name,
+                },
+                Active = x.Active,
+                BiggerRatio = x.BiggerRatio,
+                RoundingPrecision = x.RoundingPrecision,
+                Type = x.Type,
+            } : request.Select);
+        }
+
+        public Task<IQueryable<LabUom>> Handle(GetQueryLabUom request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<LabUom>(request, cancellationToken, request.Select is null ? x => new LabUom
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code
+            } : request.Select);
+        }
+
+        public Task<IQueryable<SampleType>> Handle(GetQuerySampleType request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<SampleType>(request, cancellationToken, request.Select is null ? x => new SampleType
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description
+            } : request.Select);
+        }
+
+        public Task<IQueryable<LabTest>> Handle(GetQueryLabTest request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<LabTest>(request, cancellationToken, request.Select is null ? x => new LabTest
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Code = x.Code,
+                ResultType = x.ResultType,
+                SampleTypeId = x.SampleTypeId,
+                SampleType = new SampleType
+                {
+                    Name = x.SampleType.Name
+                }
+            } : request.Select);
+        }
+
+        public Task<IQueryable<LabTestDetail>> Handle(GetQueryLabTestDetail request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<LabTestDetail>(request, cancellationToken, request.Select is null ? x => new LabTestDetail
+            {
+                Id = x.Id,
+                Name = x.Name,
+                NormalRangeFemale = x.NormalRangeFemale,
+                NormalRangeMale = x.NormalRangeMale,
+                LabTestId = x.LabTestId,
+                LabTest = new LabTest
+                {
+                    Name = x.LabTest.Name
+                },
+                LabUomId = x.LabUomId,
+                LabUom = new LabUom
+                {
+                    Name = x.LabUom.Name
+                },
+                ResultValueType = x.ResultValueType,
+                Remark = x.Remark,
+                ResultType = x.ResultType
+            } : request.Select);
+        }
+
         public Task<IQueryable<Speciality>> Handle(GetQuerySpeciality request, CancellationToken cancellationToken)
         {
             //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
@@ -322,6 +430,17 @@ namespace McDermott.Application.Features.Queries
                 Id = x.Id,
                 Name = x.Name,
                 Code = x.Code,
+            } : request.Select);
+        }
+
+        public Task<IQueryable<NursingDiagnoses>> Handle(GetQueryNursingDiagnoses request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<NursingDiagnoses>(request, cancellationToken, request.Select is null ? x => new NursingDiagnoses
+            {
+                Id = x.Id,
+                Problem = x.Problem,
+                Code = x.Code
             } : request.Select);
         }
 
@@ -363,7 +482,70 @@ namespace McDermott.Application.Features.Queries
             } : request.Select);
         }
 
+        public Task<IQueryable<InsurancePolicy>> Handle(GetQueryInsurancePolicy request, CancellationToken cancellationToken)
+        {
+            return HandleQuery<InsurancePolicy>(request, cancellationToken, request.Select is null ? x => new InsurancePolicy
+            {
+                Id = x.Id,
+                UserId = x.UserId, // Patient
+                User = new User
+                {
+                    Name = x.User.Name,
+                },
+                InsuranceId = x.InsuranceId,
+                Insurance = new Insurance
+                {
+                    Name = x.Insurance.Name,
+                },
+                PolicyNumber = x.PolicyNumber,
+                Active = x.Active,
+
+                // BPJS Integration fields
+                NoKartu = x.NoKartu,
+                Nama = x.Nama,
+                HubunganKeluarga = x.HubunganKeluarga,
+                TglLahir = x.TglLahir,
+                TglMulaiAktif = x.TglMulaiAktif,
+                TglAkhirBerlaku = x.TglAkhirBerlaku,
+                GolDarah = x.GolDarah,
+                NoHP = x.NoHP,
+                NoKTP = x.NoKTP,
+                PstProl = x.PstProl,
+                PstPrb = x.PstPrb,
+                Aktif = x.Aktif,
+                KetAktif = x.KetAktif,
+                Tunggakan = x.Tunggakan,
+                KdProviderPstKdProvider = x.KdProviderPstKdProvider,
+                KdProviderPstNmProvider = x.KdProviderPstNmProvider,
+                KdProviderGigiKdProvider = x.KdProviderGigiKdProvider,
+                KdProviderGigiNmProvider = x.KdProviderGigiNmProvider,
+                JnsKelasNama = x.JnsKelasNama,
+                JnsKelasKode = x.JnsKelasKode,
+                JnsPesertaNama = x.JnsPesertaNama,
+                JnsPesertaKode = x.JnsPesertaKode,
+                AsuransiKdAsuransi = x.AsuransiKdAsuransi,
+                AsuransiNmAsuransi = x.AsuransiNmAsuransi,
+                AsuransiNoAsuransi = x.AsuransiNoAsuransi,
+                AsuransiCob = x.AsuransiCob
+            } : request.Select);
+        }
+
         #endregion Patients
+
+        #region Inventories
+
+        public Task<IQueryable<UomCategory>> Handle(GetQueryUomCategory request, CancellationToken cancellationToken)
+        {
+            //return HandleQuery<GeneralConsultanService>(request, cancellationToken, request.Select is null ? x => new GeneralConsultanService
+            return HandleQuery<UomCategory>(request, cancellationToken, request.Select is null ? x => new UomCategory
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Type = x.Type
+            } : request.Select);
+        }
+
+        #endregion Inventories
 
         #region Employees
 
@@ -488,6 +670,15 @@ namespace McDermott.Application.Features.Queries
                 return (IQueryable<TEntity>)districtQuery.Where(v =>
                             EF.Functions.Like(v.Name, $"%{searchTerm}%") ||
                             EF.Functions.Like(v.Description, $"%{searchTerm}%"));
+            }
+            else if (typeof(TEntity) == typeof(District))
+            {
+                var districtQuery = query as IQueryable<Diagnosis>;
+                return (IQueryable<TEntity>)districtQuery.Where(v =>
+                           EF.Functions.Like(v.Name, $"%{searchTerm}%") ||
+                           EF.Functions.Like(v.NameInd, $"%{searchTerm}%") ||
+                           EF.Functions.Like(v.CronisCategory.Name, $"%{searchTerm}%") ||
+                           EF.Functions.Like(v.Code, $"%{searchTerm}%"));
             }
 
             return query; // No filtering if the type doesn't match

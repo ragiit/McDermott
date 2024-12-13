@@ -5,7 +5,7 @@
 
 @if (IsAccess && UserAccessCRUID is not null && UserAccessCRUID.IsRead)
 {
-    <div class="wrapper"> 
+    <div class="wrapper">
         <BaseHeaderPage Title="Nursing Diagnoses" OnClickBack="@(async () => await LoadData())" ShowBackButton="false" />
 
         <section class="content">
@@ -14,95 +14,57 @@
                     <div class="col">
                         <div class="card">
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                            <_BaseMyGrid @ref="Grid"
+                                         Data="@Data"
+                                         @bind-SelectedDataItems="@SelectedDataItems"
+                                         EditModelSaving="OnSave"
+                                         DataItemDeleting="OnDelete"
+                                         FocusedRowChanged="Grid_FocusedRowChanged"
+                                         KeyFieldName="Id">
 
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
-                                <MyGridPaginate @ref="Grid"
-                                                Data="NursingDiagnoses"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                EditModelSaving="OnSave"
-                                                DataItemDeleting="OnDelete"
-                                                SearchTextChanged="OnSearchBoxChanged"
-                                                KeyFieldName="Id">
-                                    <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="NursingDiagnosesDto"
-                                                         Items="@NursingDiagnoses"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         IsImport="UserAccessCRUID.IsImport"
-                                                         Grid="Grid"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.IsCreate"
-                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Problem" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Code" />
-                                    </Columns>
-                                    <EditFormTemplate Context="EditFormContext">
-                                        @{
-                                            var a = (NursingDiagnosesDto)EditFormContext.EditModel;
-                                        }
-                                        <DxFormLayout CssClass="w-100">
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Problem" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Problem"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                           NullText="Problem" />
-                                                <ValidationMessage For="@(()=>a.Problem)"   />
-                                            </DxFormLayoutItem>
+                                <ToolbarTemplate>
+                                    <MyDxToolbarBase TItem="NursingDiagnosesDto"
+                                                     SelectedDataItems="@SelectedDataItems"
+                                                     NewItem_Click="@NewItem_Click"
+                                                     EditItem_Click="@EditItem_Click"
+                                                     DeleteItem_Click="@DeleteItem_Click"
+                                                     Refresh_Click="@Refresh_Click"
+                                                     IsImport="UserAccessCRUID.IsImport"
+                                                     Grid="Grid"
+                                                     ImportFile="ImportFile"
+                                                     ExportToExcel="ExportToExcel"
+                                                     VisibleNew="UserAccessCRUID.IsCreate"
+                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Problem" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Code" />
+                                </Columns>
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var a = (NursingDiagnosesDto)EditFormContext.EditModel;
+                                    }
+                                    <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Problem" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Problem"
+                                                       ShowValidationIcon="true"
+                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                       NullText="Problem" />
+                                            <ValidationMessage For="@(()=>a.Problem)"   />
+                                        </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Code" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Code"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                           NullText="Code" />
-                                            </DxFormLayoutItem>
-                                        </DxFormLayout>
-                                    </EditFormTemplate>
-                                    <TotalSummary>
-                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                           FieldName="Name"
-                                                           Visible="true" />
-                                    </TotalSummary>
-                                </MyGridPaginate>
-                                <div class="row">
-                                    <DxFormLayout>
-                                        <div class="col-md-8">
-                                            <DxFormLayoutItem>
-                                                <DxPager PageCount="totalCount"
-                                                         ActivePageIndexChanged="OnPageIndexChanged"
-                                                         ActivePageIndex="activePageIndex"
-                                                         VisibleNumericButtonCount="10"
-                                                         SizeMode="SizeMode.Medium"
-                                                         NavigationMode="PagerNavigationMode.Auto">
-                                                </DxPager>
-                                            </DxFormLayoutItem>
-                                        </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
-                                            <DxFormLayoutItem Caption="Page Size:">
-                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                              NullText="Select Page Size"
-                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                              @bind-Value="pageSize">
-                                                </MyDxComboBox>
-                                            </DxFormLayoutItem>
-                                        </div>
+                                        <DxFormLayoutItem CaptionCssClass="-caption normal-caption" Caption="Code" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Code"
+                                                       ShowValidationIcon="true"
+                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                       NullText="Code" />
+                                        </DxFormLayoutItem>
                                     </DxFormLayout>
-                                </div>
+                                </EditFormTemplate>
 
-                            </DxLoadingPanel>
+                            </_BaseMyGrid>
                         </div>
                     </div>
                 </div>

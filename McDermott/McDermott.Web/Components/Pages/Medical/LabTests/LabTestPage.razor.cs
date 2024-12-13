@@ -62,32 +62,6 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
 
         #endregion Static
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         #region SaveDelete
 
         private async Task OnDelete()
@@ -132,36 +106,26 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
             await GetUserInfo();
             await LoadData();
             PanelVisible = false;
-
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private object Data { get; set; }
+
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetLabTestQuery
+                var dataSource = new GridDevExtremeDataSource<LabTest>(await Mediator.Send(new GetQueryLabTest()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = searchTerm ?? ""
-                });
-                LabTests = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
@@ -225,7 +189,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
             }
         }
 
-        private async Task NewItem_Click()
+        private void NewItem_Click()
         {
             NavigationManager.NavigateTo($"medical/lab-tests/{EnumPageMode.Create.GetDisplayName()}");
             return;
@@ -353,7 +317,7 @@ namespace McDermott.Web.Components.Pages.Medical.LabTests
                         ).ToList();
 
                         await Mediator.Send(new CreateListLabTestRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

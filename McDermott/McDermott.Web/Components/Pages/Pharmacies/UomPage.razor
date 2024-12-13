@@ -15,143 +15,99 @@
                     <div class="col">
                         <div class="card">
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
+                            <_BaseMyGrid @ref="Grid"
+                                         Data="@Data"
+                                         @bind-SelectedDataItems="@SelectedDataItems"
+                                         EditModelSaving="OnSave"
+                                         DataItemDeleting="OnDelete"
+                                         FocusedRowChanged="Grid_FocusedRowChanged"
+                                         KeyFieldName="Id">
 
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="true"
-                                            Text="Fetching Data...">
+                                <ToolbarTemplate>
+                                    <MyDxToolbarBase TItem="UomDto"
+                                                     Items="@Uoms"
+                                                     SelectedDataItems="@SelectedDataItems"
+                                                     NewItem_Click="@NewItem_Click"
+                                                     EditItem_Click="@EditItem_Click"
+                                                     DeleteItem_Click="@DeleteItem_Click"
+                                                     Refresh_Click="@Refresh_Click"
+                                                     IsImport="UserAccessCRUID.IsImport"
+                                                     Grid="Grid"
+                                                     ImportFile="ImportFile"
+                                                     ExportToExcel="ExportToExcel"
+                                                     VisibleNew="UserAccessCRUID.IsCreate"
+                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn FieldName="Name" Caption="Name" SortIndex="0" />
+                                    <DxGridDataColumn FieldName="UomCategory.Name" Caption="Category" />
+                                    <DxGridDataColumn FieldName="BiggerRatio" Caption="Bigger Ratio" />
+                                    <DxGridDataColumn FieldName="Type" />
+                                    <DxGridDataColumn FieldName="Active" />
+                                </Columns>
+                                <TotalSummary>
+                                    <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
+                                                       FieldName="Name"
+                                                       Visible="true" />
+                                </TotalSummary>
+                                <EditFormTemplate Context="EditFormContext">
+                                    @{
+                                        var a = (Uom)EditFormContext.EditModel;
+                                    }
+                                    <DxFormLayout CssClass="w-100">
 
-                                <MyGridPaginate @ref="Grid"
-                                                Data="Uoms"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                EditModelSaving="OnSave"
-                                                DataItemDeleting="OnDelete"
-                                                SearchTextChanged="OnSearchBoxChanged"
-                                                FocusedRowChanged="Grid_FocusedRowChanged"
-                                                KeyFieldName="Id">
-                                    <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="UomDto"
-                                                         Items="@Uoms"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         IsImport="UserAccessCRUID.IsImport"
-                                                         Grid="Grid"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.IsCreate"
-                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn FieldName="Name" Caption="Name" SortIndex="0" />
-                                        <DxGridDataColumn FieldName="UomCategory.Name" Caption="Category" />
-                                        <DxGridDataColumn FieldName="BiggerRatio" Caption="Bigger Ratio" />
-                                        <DxGridDataColumn FieldName="Type" />
-                                        <DxGridDataColumn FieldName="Active" /> 
-                                    </Columns>
-                                    <TotalSummary>
-                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                           FieldName="Name"
-                                                           Visible="true" />
-                                    </TotalSummary>
-                                    <EditFormTemplate Context="EditFormContext">
-                                        @{
-                                            var a = (UomDto)EditFormContext.EditModel;
-                                        }
-                                        <DxFormLayout CssClass="w-100">
+                                        <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
+                                            <DxTextBox @bind-Text="@a.Name"
+                                                       ShowValidationIcon="true"
+                                                       ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                       NullText="Name" />
+                                            <ValidationMessage For="@(()=> a.Name)"   />
+                                        </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Name" ColSpanMd="12">
-                                                <DxTextBox @bind-Text="@a.Name"
-                                                           ShowValidationIcon="true"
-                                                           ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                           NullText="Name" />
-                                                <ValidationMessage For="@(()=> a.Name)"   />
-                                            </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM Category" ColSpanMd="12">
+                                            <_BaseMyComboBox TData="UomCategory"
+                                                             TValue="long?"
+                                                             NullText="Select Job Position"
+                                                             CustomData="@LoadCustomDataUomCategory"
+                                                             @bind-Value="@a.UomCategoryId"
+                                                             TextFieldName="Name"
+                                                             ValueFieldName="Id">
+                                                <Columns>
+                                                    <DxListEditorColumn FieldName="@nameof(UomCategory.Name)" Caption="Name" />
+                                                    <DxListEditorColumn FieldName="@nameof(UomCategory.Type)" Caption="Type" />
+                                                </Columns>
+                                            </_BaseMyComboBox> 
+                                        </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="UoM Category" ColSpanMd="12">
-                                                <MyDxComboBox Data="@UomCategories"
-                                                              NullText="Select UoM Category"
-                                                              @ref="refUomCategoryComboBox"
-                                                              @bind-Value="@a.UomCategoryId"
-                                                              TextFieldName="Name"
-                                                              ValueFieldName="Id"
-                                                              TextChanged="((string e) => OnInputUomCategoryChanged(e))">
-                                                    <Buttons>
-                                                        <DxEditorButton Click="OnSearchUomCategoryIndexDecrement"
-                                                                        IconCssClass="fa-solid fa-caret-left"
-                                                                        Tooltip="Previous Index" />
-                                                        <DxEditorButton Click="OnSearchUomCategory"
-                                                                        IconCssClass="fa-solid fa-magnifying-glass"
-                                                                        Tooltip="Search" />
-                                                        <DxEditorButton Click="OnSearchUomCategoryIndexIncrement"
-                                                                        IconCssClass="fa-solid fa-caret-right"
-                                                                        Tooltip="Next Index" />
-                                                    </Buttons>
-                                                    <Columns>
-                                                        <DxListEditorColumn FieldName="@nameof(UomCategory.Name)" Caption="Name" />
-                                                        <DxListEditorColumn FieldName="@nameof(UomCategory.Type)" Caption="Type" />
-                                                    </Columns>
-                                                </MyDxComboBox>
-                                            </DxFormLayoutItem>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Type" ColSpanMd="12">
+                                            <DxComboBox ShowValidationIcon="true"
+                                                        FilteringMode="@DataGridFilteringMode.Contains"
+                                                        Data="@Types"
+                                                        NullText="Select Type..."
+                                                        @bind-Value="@a.Type">
+                                            </DxComboBox>
+                                            <ValidationMessage For="@(()=>a.Type)" />
+                                        </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption required-caption" Caption="Type" ColSpanMd="12">
-                                                <DxComboBox ShowValidationIcon="true"
-                                                            FilteringMode="@DataGridFilteringMode.Contains"
-                                                            Data="@Types"
-                                                            NullText="Select Type..."
-                                                            @bind-Value="@a.Type">
-                                                </DxComboBox>
-                                                <ValidationMessage For="@(()=>a.Type)" />
-                                            </DxFormLayoutItem>
+                                        <DxFormLayoutItem Visible="@(!a.Type.Equals("Reference Unit of Measure for this category"))" CaptionCssClass="normal-caption" Caption="Ratio" ColSpanMd="12">
+                                            <DxSpinEdit @bind-Value="@a.BiggerRatio"
+                                                        NullText="Bigger Ratio..."
+                                                        MinValue="1"
+                                                        ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                                                        BindValueMode="BindValueMode.OnInput" />
+                                            <ValidationMessage For="@(()=> a.BiggerRatio)"   />
+                                        </DxFormLayoutItem>
 
-                                            <DxFormLayoutItem Visible="@(!a.Type.Equals("Reference Unit of Measure for this category"))" CaptionCssClass="normal-caption" Caption="Ratio" ColSpanMd="12">
-                                                <DxSpinEdit @bind-Value="@a.BiggerRatio"
-                                                            NullText="Bigger Ratio..."
-                                                            MinValue="1"
-                                                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
-                                                            BindValueMode="BindValueMode.OnInput" />
-                                                <ValidationMessage For="@(()=> a.BiggerRatio)"   />
-                                            </DxFormLayoutItem>
-
-                                            <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Active" ColSpanMd="12">
-                                                <DxCheckBox @bind-Checked="@a.Active" />
-                                                <ValidationMessage For="@(()=> a.Active)"   />
-                                            </DxFormLayoutItem> 
-                                        </DxFormLayout>
-                                    </EditFormTemplate>
-                                </MyGridPaginate>
-                                <div class="row">
-                                    <DxFormLayout>
-                                        <div class="col-md-8">
-                                            <DxFormLayoutItem>
-                                                <DxPager PageCount="totalCount"
-                                                         ActivePageIndexChanged="OnPageIndexChanged"
-                                                         ActivePageIndex="activePageIndex"
-                                                         VisibleNumericButtonCount="10"
-                                                         SizeMode="SizeMode.Medium"
-                                                         NavigationMode="PagerNavigationMode.Auto">
-                                                </DxPager>
-                                            </DxFormLayoutItem>
-                                        </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
-                                            <DxFormLayoutItem Caption="Page Size:">
-                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                              NullText="Select Page Size"
-                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                              @bind-Value="pageSize">
-                                                </MyDxComboBox>
-                                            </DxFormLayoutItem>
-                                        </div>
+                                        <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Active" ColSpanMd="12">
+                                            <DxCheckBox @bind-Checked="@a.Active" />
+                                            <ValidationMessage For="@(()=> a.Active)"   />
+                                        </DxFormLayoutItem>
                                     </DxFormLayout>
-                                </div>
+                                </EditFormTemplate>
 
-                            </DxLoadingPanel>
+                            </_BaseMyGrid> 
                         </div>
                     </div>
                 </div>

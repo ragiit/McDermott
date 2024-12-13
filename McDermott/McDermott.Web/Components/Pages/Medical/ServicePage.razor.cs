@@ -89,19 +89,6 @@
             await GetUserInfo();
             await LoadDataService();
             PanelVisible = false;
-
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
         }
 
         #region ComboboxService

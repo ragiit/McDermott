@@ -1,4 +1,6 @@
-﻿namespace McDermott.Web.Components.Pages.Medical
+﻿using Project = McDermott.Domain.Entities.Project;
+
+namespace McDermott.Web.Components.Pages.Medical
 {
     public partial class ProjectPage
     {
@@ -48,83 +50,44 @@
 
         private bool PanelVisible { get; set; } = true;
         public IGrid Grid { get; set; }
-        private Timer _timer;
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         private int FocusedRowVisibleIndex { get; set; }
         private bool EditItemsEnabled { get; set; }
         private string names { get; set; }
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             PanelVisible = false;
-
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private object Data { get; set; }
+
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
-                var result = await Mediator.Send(new GetProjectQuery
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<Project>(await Mediator.Send(new GetQueryProject()))
                 {
-                    SearchTerm = searchTerm,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                });
-                Projects = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-            finally
-            {
-                PanelVisible = false;
-            }
+            finally { PanelVisible = false; }
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -196,7 +159,7 @@
                         ).ToList();
 
                         await Mediator.Send(new CreateListProjectRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -266,7 +229,7 @@
         {
             try
             {
-                var editModel = (ProjectDto)e.EditModel;
+                var editModel = (Project)e.EditModel;
 
                 bool validate = await Mediator.Send(new ValidateProjectQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
@@ -278,9 +241,9 @@
                 }
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateProjectRequest(editModel));
+                    await Mediator.Send(new CreateProjectRequest(editModel.Adapt<ProjectDto>()));
                 else
-                    await Mediator.Send(new UpdateProjectRequest(editModel));
+                    await Mediator.Send(new UpdateProjectRequest(editModel.Adapt<ProjectDto>()));
 
                 await LoadData();
             }

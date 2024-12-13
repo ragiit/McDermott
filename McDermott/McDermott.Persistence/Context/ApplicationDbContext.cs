@@ -183,6 +183,12 @@ namespace McDermott.Persistence.Context
 
         #endregion Claim User Management
 
+        #region Telemedicine
+
+        public DbSet<OTPRequest> OTPRequests { get; set; }
+
+        #endregion Telemedicine
+
         #endregion DbSet
 
         #region OnModelCreating
