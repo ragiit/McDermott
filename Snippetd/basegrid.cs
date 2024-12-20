@@ -7,7 +7,7 @@
               KeyFieldName="Id">
 
      <ToolbarTemplate>
-         <MyDxToolbarBase TItem="PatientFamilyRelation"
+         <MyDxToolbarBase TItem="NursingDiagnoses"
                           SelectedDataItems="@SelectedDataItems"
                           NewItem_Click="@NewItem_Click"
                           EditItem_Click="@EditItem_Click"
@@ -35,7 +35,7 @@ private async Task LoadData()
     {
         PanelVisible = true;
         SelectedDataItems = []; 
-        var dataSource = new GridDevExtremeDataSource<PatientFamilyRelation>(await Mediator.Send(new GetQueryPatientFamilyRelation()))
+        var dataSource = new GridDevExtremeDataSource<NursingDiagnoses>(await Mediator.Send(new GetQueryNursingDiagnoses()))
         {
             CustomizeLoadOptions = (loadOptions) =>
             {

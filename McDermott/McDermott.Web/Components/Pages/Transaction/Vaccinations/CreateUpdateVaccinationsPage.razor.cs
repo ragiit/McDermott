@@ -2731,5 +2731,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Vaccinations
         }
 
         #endregion ComboBox Location
+
+        private void HandleUserFormChanged(UserDto updatedUserForm)
+        {
+            UserForm = updatedUserForm;
+            StateHasChanged(); // Pastikan Parent diperbarui
+        }
     }
 }

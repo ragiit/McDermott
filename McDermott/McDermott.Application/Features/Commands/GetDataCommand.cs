@@ -54,7 +54,28 @@
         public class GetQueryDiagnosis : BaseQuery<Diagnosis>
         { }
 
+        public class GetQueryNursingDiagnoses : BaseQuery<NursingDiagnoses>
+        { }
+
         public class GetQuerySpeciality : BaseQuery<Speciality>
+        { }
+
+        public class GetQueryUom : BaseQuery<Uom>
+        { }
+
+        public class GetQueryProject : BaseQuery<Project>
+        { }
+
+        public class GetQueryLabUom : BaseQuery<LabUom>
+        { }
+
+        public class GetQueryLabTest : BaseQuery<LabTest>
+        { }
+
+        public class GetQueryLabTestDetail : BaseQuery<LabTestDetail>
+        { }
+
+        public class GetQuerySampleType : BaseQuery<SampleType>
         { }
 
         public class GetQueryService : BaseQuery<Service>
@@ -63,6 +84,9 @@
         #endregion Medicals
 
         #region Inventory
+
+        public class GetQueryUomCategory : BaseQuery<UomCategory>
+        { }
 
         public class GetQueryGoodReceipt : BaseQuery<GoodsReceipt>
         { }
@@ -81,6 +105,9 @@
         #region Patients
 
         public class GetQueryPatientFamilyRelation : BaseQuery<PatientFamilyRelation>
+        { }
+
+        public class GetQueryInsurancePolicy : BaseQuery<InsurancePolicy>
         { }
 
         #endregion Patients

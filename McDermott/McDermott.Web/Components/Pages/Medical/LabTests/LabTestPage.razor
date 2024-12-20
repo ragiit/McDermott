@@ -15,74 +15,40 @@
                     <div class="col">
                         <div class="card">
                             <InputFile id="fileInput" style="display:none" OnChange="@ImportExcelFile" accept=".xlsx" multiple="false"></InputFile>
-                            <DxLoadingPanel @bind-Visible="PanelVisible"
-                                            IndicatorAnimationType="WaitIndicatorAnimationType.Pulse"
-                                            IsContentBlocked="true"
-                                            ApplyBackgroundShading="true"
-                                            IndicatorAreaVisible="false"
-                                            Text="Fetching Data...">
-                                <MyGridPaginate @ref="Grid"
-                                                Data="LabTests"
-                                                @bind-SelectedDataItems="@SelectedDataItems"
-                                                DataItemDeleting="OnDelete"
-                                                SelectAllCheckboxMode="CurrentSelectAllCheckboxMode"
-                                                SearchTextChanged="OnSearchBoxChanged"
-                                                KeyFieldName="Id">
-                                    <ToolbarTemplate>
-                                        <MyDxToolbarBase TItem="LabTestDto"
-                                                         Items="@LabTests"
-                                                         SelectedDataItems="@SelectedDataItems"
-                                                         NewItem_Click="@NewItem_Click"
-                                                         EditItem_Click="@EditItem_Click"
-                                                         DeleteItem_Click="@DeleteItem_Click"
-                                                         Refresh_Click="@Refresh_Click"
-                                                         IsImport="UserAccessCRUID.IsImport"
-                                                         Grid="Grid"
-                                                         ImportFile="ImportFile"
-                                                         ExportToExcel="ExportToExcel"
-                                                         VisibleNew="UserAccessCRUID.IsCreate"
-                                                         VisibleEdit="UserAccessCRUID.IsUpdate"
-                                                         VisibleDelete="UserAccessCRUID.IsDelete" />
-                                    </ToolbarTemplate>
-                                    <Columns>
-                                        <DxGridSelectionColumn Width="15px" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
-                                        <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="ResultType" SortIndex="0" />
-                                    </Columns>
-                                    <TotalSummary>
-                                        <DxGridSummaryItem SummaryType="GridSummaryItemType.Count"
-                                                           FieldName="Name"
-                                                           Visible="true" />
-                                    </TotalSummary>
-                                </MyGridPaginate>
-                                <div class="row">
-                                    <DxFormLayout>
-                                        <div class="col-md-8">
-                                            <DxFormLayoutItem>
-                                                <DxPager PageCount="totalCount"
-                                                         ActivePageIndexChanged="OnPageIndexChanged"
-                                                         ActivePageIndex="activePageIndex"
-                                                         VisibleNumericButtonCount="10"
-                                                         SizeMode="SizeMode.Medium"
-                                                         NavigationMode="PagerNavigationMode.Auto">
-                                                </DxPager>
-                                            </DxFormLayoutItem>
-                                        </div>
-                                        <div class="col-md-4 d-flex justify-content-end">
-                                            <DxFormLayoutItem Caption="Page Size:">
-                                                <MyDxComboBox Data="(new[] { 10, 25, 50, 100 })"
-                                                              NullText="Select Page Size"
-                                                              ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Never"
-                                                              SelectedItemChanged="((int e ) => OnPageSizeIndexChanged(e))"
-                                                              @bind-Value="pageSize">
-                                                </MyDxComboBox>
-                                            </DxFormLayoutItem>
-                                        </div>
-                                    </DxFormLayout>
-                                </div>
-                            </DxLoadingPanel>
+
+                            <_BaseMyGrid @ref="Grid"
+                                         Data="@Data"
+                                         @bind-SelectedDataItems="@SelectedDataItems"
+                                         DataItemDeleting="OnDelete"
+                                         FocusedRowChanged="Grid_FocusedRowChanged"
+                                         KeyFieldName="Id">
+
+                                <ToolbarTemplate>
+                                    <MyDxToolbarBase TItem="LabTestDto"
+                                                     Items="@LabTests"
+                                                     SelectedDataItems="@SelectedDataItems"
+                                                     NewItem_Click="@NewItem_Click"
+                                                     EditItem_Click="@EditItem_Click"
+                                                     DeleteItem_Click="@DeleteItem_Click"
+                                                     Refresh_Click="@Refresh_Click"
+                                                     IsImport="UserAccessCRUID.IsImport"
+                                                     Grid="Grid"
+                                                     ImportFile="ImportFile"
+                                                     ExportToExcel="ExportToExcel"
+                                                     VisibleNew="UserAccessCRUID.IsCreate"
+                                                     VisibleEdit="UserAccessCRUID.IsUpdate"
+                                                     VisibleDelete="UserAccessCRUID.IsDelete" />
+                                </ToolbarTemplate>
+                                <Columns>
+                                    <DxGridSelectionColumn Width="15px" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Name" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="Code" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="SampleType.Name" Caption="Sample Type" SortIndex="0" />
+                                    <DxGridDataColumn MinWidth="200" FieldName="ResultType" Caption="ResultType" SortIndex="0" />
+                                </Columns>
+
+                            </_BaseMyGrid>
+
                         </div>
                     </div>
                 </div>

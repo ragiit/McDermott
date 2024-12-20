@@ -44,14 +44,16 @@
                     }
                     <DxFormLayout>
                         <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="@(IsAccident ? "Employee" : "Patient")" ColSpanMd="12">
-                            <MyDxComboBox Data="@Patients"
-                                          NullText="@(IsAccident ? "Select Employee" : "Select Patient")"
-                                          TextFieldName="Name"
-                                          ValueFieldName="Id"
-                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                          @oninput="@OnInputPatient"
-                                          SelectedItemChanged="@OnSelectedPatientChanged"
-                                          @bind-Value="@GeneralConsultanService.PatientId">
+
+                            <_BaseMyComboBox TData="User"
+                                             TValue="long?"
+                                             NullText="@(IsAccident ? "Select Employee" : "Select Patient")"
+                                             CustomData="@LoadCustomDataUser"
+                                             ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                             @bind-Value="@GeneralConsultanService.PatientId"
+                                             SelectedItemChanged="((User e) => SelectedItemChangedUser(e))"
+                                             TextFieldName="Name"
+                                             ValueFieldName="Id">
                                 <Columns>
                                     @if (IsAccident)
                                     {
@@ -68,7 +70,8 @@
                                     <DxListEditorColumn FieldName="Gender" />
                                     <DxListEditorColumn FieldName="DateOfBirth" Caption="Date Of Birth" />
                                 </Columns>
-                            </MyDxComboBox>
+
+                            </_BaseMyComboBox>
                             <ValidationMessage For="@(() => GeneralConsultanService.PatientId)" />
                         </DxFormLayoutItem>
 
@@ -153,6 +156,7 @@
                             <ValidationMessage For="@(() => GeneralConsultanService.TypeRegistration)" />
                         </DxFormLayoutItem>
 
+                        @* Ini Kondisi Ketika di Form Accident, supaya field nya ada di Kiri *@
                         @if (IsAccident)
                         {
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Payment Method" ColSpanMd="12">
@@ -176,15 +180,15 @@
                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                             {
                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                    <MyDxComboBox Data="InsurancePolicies"
-                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                  NullText="Select Insurance Policy"
-                                                  TextFieldName="Name"
-                                                  EditFormat="{0} - {1}"
-                                                  ValueFieldName="Id"
-                                                  @oninput="OnInputInsurancePolicy"
-                                                  SelectedItemChanged="((InsurancePolicyDto e) => SelectedItemInsurancePolicyChanged(e))"
-                                                  @bind-Value="GeneralConsultanService.InsurancePolicyId">
+                                    <_BaseMyComboBox TData="InsurancePolicy"
+                                                     TValue="long?"
+                                                     NullText="Select Insurance Policy"
+                                                     EditFormat="{0} - {1}"
+                                                     CustomData="@LoadCustomDataInsurancePolicy"
+                                                     ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                     @bind-Value="@GeneralConsultanService.InsurancePolicyId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
                                         <Columns>
                                             <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
                                                                 Caption="No Card" />
@@ -192,10 +196,11 @@
                                             <DxListEditorColumn FieldName="Insurance.Name"
                                                                 Caption="Insurance Company" />
                                         </Columns>
-                                    </MyDxComboBox>
+
+
+                                    </_BaseMyComboBox>
                                     <ValidationMessage For="@(()=> GeneralConsultanService.InsurancePolicyId)" />
                                 </DxFormLayoutItem>
-
 
                                 <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="PRB" ColSpanMd="12">
                                     <DxTextBox @bind-Text="@res" NullText="Medical Record Number" ReadOnly InputCssClass="fw-normal" />
@@ -251,39 +256,44 @@
                         @if (!IsAccident)
                         {
                             <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Service" ColSpanMd="12">
-                                <MyDxComboBox Data="Services"
-                                              NullText="Select Service"
-                                              TextFieldName="Name"
-                                              ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                              ValueFieldName="Id"
-                                              @oninput="OnInputService"
-                                              SelectedItemChanged="((ServiceDto e) => SelectedItemServiceChanged(e))"
-                                              @bind-Value="@GeneralConsultanService.ServiceId">
+
+                                <_BaseMyComboBox TData="Service"
+                                                 TValue="long?"
+                                                 NullText="Select Service"
+                                                 CustomData="@LoadCustomDataService"
+                                                 ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                 SelectedItemChanged="@((Service e) => SelectedItemChanged(e))"
+                                                 @bind-Value="@GeneralConsultanService.ServiceId"
+                                                 TextFieldName="Name"
+                                                 ValueFieldName="Id">
                                     <Columns>
                                         <DxListEditorColumn FieldName="@nameof(Service.Name)" Caption="Name" />
                                         <DxListEditorColumn FieldName="@nameof(Service.Code)" Caption="Code" />
                                     </Columns>
-                                </MyDxComboBox>
+
+                                </_BaseMyComboBox>
                                 <ValidationMessage For="@(()=>GeneralConsultanService.ServiceId)" />
                             </DxFormLayoutItem>
                         }
 
                         <DxFormLayoutItem CaptionCssClass="normal-caption" Caption="Physicion" ColSpanMd="12">
-                            <MyDxComboBox Data="Physicions"
-                                          NullText="Select Physicion"
-                                          TextFieldName="Name"
-                                          ValueFieldName="Id"
-                                          @oninput="OnInputPhysicion"
-                                          ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                          SelectedItemChanged="((UserDto e) => SelectedItemPhysicionChanged(e))"
-                                          @bind-Value="@GeneralConsultanService.PratitionerId">
+
+                            <_BaseMyComboBox TData="User"
+                                             TValue="long?"
+                                             NullText="Select Physicion"
+                                             CustomData="@LoadCustomDataPhysician"
+                                             ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                             @bind-Value="@GeneralConsultanService.PratitionerId"
+                                             TextFieldName="Name"
+                                             ValueFieldName="Id">
                                 <Columns>
                                     <DxListEditorColumn FieldName="Name" />
                                     <DxListEditorColumn FieldName="Email" />
                                     <DxListEditorColumn FieldName="MobilePhone" Caption="Mobile Phone" />
                                     <DxListEditorColumn FieldName="Gender" />
                                 </Columns>
-                            </MyDxComboBox>
+
+                            </_BaseMyComboBox>
                             <ValidationMessage For="@(()=>GeneralConsultanService.PratitionerId)" />
                         </DxFormLayoutItem>
 
@@ -405,15 +415,15 @@
                             @if (GeneralConsultanService.Payment == "Insurance" || GeneralConsultanService.Payment == "BPJS")
                             {
                                 <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Insurance Policy" ColSpanMd="12">
-                                    <MyDxComboBox Data="InsurancePolicies"
-                                                  ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
-                                                  NullText="Select Insurance Policy"
-                                                  TextFieldName="Name"
-                                                  EditFormat="{0} - {1}"
-                                                  ValueFieldName="Id"
-                                                  @oninput="OnInputInsurancePolicy"
-                                                  SelectedItemChanged="((InsurancePolicyDto e) => SelectedItemInsurancePolicyChanged(e))"
-                                                  @bind-Value="GeneralConsultanService.InsurancePolicyId">
+                                    <_BaseMyComboBox TData="InsurancePolicy"
+                                                     TValue="long?"
+                                                     NullText="Select Insurance Policy"
+                                                     EditFormat="{0} - {1}"
+                                                     CustomData="@LoadCustomDataInsurancePolicy"
+                                                     ReadOnly="@(!GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned))"
+                                                     @bind-Value="@GeneralConsultanService.InsurancePolicyId"
+                                                     TextFieldName="Name"
+                                                     ValueFieldName="Id">
                                         <Columns>
                                             <DxListEditorColumn FieldName="@nameof(InsurancePolicyDto.PolicyNumber)"
                                                                 Caption="No Card" />
@@ -421,7 +431,10 @@
                                             <DxListEditorColumn FieldName="Insurance.Name"
                                                                 Caption="Insurance Company" />
                                         </Columns>
-                                    </MyDxComboBox>
+
+
+                                    </_BaseMyComboBox>
+
                                     <ValidationMessage For="@(()=> GeneralConsultanService.InsurancePolicyId)" />
                                 </DxFormLayoutItem>
 
@@ -590,7 +603,9 @@
     [Parameter] public string HeaderText { get; set; } = "General Consultation Service Information";
 
     [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
-    [Parameter] public UserDto UserForm { get; set; } = new();
+    [Parameter] public UserDto UserForm { get; set; } = new();    
+    [Parameter] public EventCallback<UserDto> OnUserFormChanged { get; set; } // Callback ke Parent
+
     [Parameter] public AccidentDto Accident { get; set; } = new();
 
     [Parameter] public List<UserDto> Patients { get; set; } = [];
@@ -639,4 +654,143 @@
     protected override async Task OnInitializedAsync()
     {
     }
+
+    #region ComboBox
+
+    protected async Task<LoadResult> LoadCustomDataUser(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<User>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryUser
+                {
+                    Predicate = x => x.IsPatient == true,
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile,
+
+                        IsWeatherPatientAllergyIds = x.IsWeatherPatientAllergyIds,
+                        IsFoodPatientAllergyIds = x.IsFoodPatientAllergyIds,
+                        IsPharmacologyPatientAllergyIds = x.IsPharmacologyPatientAllergyIds,
+                        WeatherPatientAllergyIds = x.WeatherPatientAllergyIds,
+                        FoodPatientAllergyIds = x.FoodPatientAllergyIds,
+                        PharmacologyPatientAllergyIds = x.PharmacologyPatientAllergyIds,
+
+                        IsFamilyMedicalHistory = x.IsFamilyMedicalHistory,
+                        FamilyMedicalHistory = x.FamilyMedicalHistory,
+                        FamilyMedicalHistoryOther = x.FamilyMedicalHistoryOther,
+
+                        IsMedicationHistory = x.IsMedicationHistory,
+                        MedicationHistory = x.MedicationHistory,
+                        PastMedicalHistory = x.PastMedicalHistory
+                    }
+                }),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataPhysician(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<User>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryUser
+                {
+                    Predicate = x => x.IsDoctor == true && x.IsPhysicion == true && x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(GeneralConsultanService.ServiceId.GetValueOrDefault()),
+                    Select = x => new User
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        NoRm = x.NoRm,
+                        Email = x.Email,
+                        MobilePhone = x.MobilePhone,
+                        Gender = x.Gender,
+                        PhysicanCode = x.PhysicanCode,
+                        DateOfBirth = x.DateOfBirth,
+                        NoId = x.NoId,
+                        CurrentMobile = x.CurrentMobile
+                    }
+                }),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataService(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<Service>(
+            options: options,
+            queryProvider: async () => await Mediator.Send(new GetQueryService
+                {
+                    Select = x => new Service
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Code = x.Code
+                    }
+                }),
+            cancellationToken: cancellationToken);
+    }
+
+    protected async Task<LoadResult> LoadCustomDataInsurancePolicy(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+    {
+        return await QueryComboBoxHelper.LoadCustomData<InsurancePolicy>(
+            options: options,
+            defaultSortColumn: "PolicyNumber",
+            queryProvider: async () => await Mediator.Send(new GetQueryInsurancePolicy
+                {
+                    Predicate = x => x.UserId == GeneralConsultanService.PatientId && x.Insurance != null && x.Insurance.IsBPJS == GeneralConsultanService.Payment.Equals("BPJS") && x.Active == true,
+                    Select = x => new InsurancePolicy
+                    {
+                        Id = x.Id,
+                        PolicyNumber = x.PolicyNumber,
+                        Insurance = new Insurance
+                        {
+                            Name = x.Insurance == null ? "" : x.Insurance.Name,
+                        },
+                        NoKartu = x.NoKartu,
+                        KdProviderPstKdProvider = x.KdProviderPstKdProvider,
+                        PstPrb = x.PstPrb,
+                        PstProl = x.PstProl
+                    }
+                }),
+            cancellationToken: cancellationToken);
+    }
+
+    private async Task SelectedItemChangedUser(User e)
+    {
+        if (e is null)
+        {
+            UserForm = new();
+            GeneralConsultanService.InsurancePolicyId = null;
+            GeneralConsultanService.PatientId = null;
+            GeneralConsultanService.Patient = new UserDto();
+        }
+        else
+        {
+            GeneralConsultanService.PatientId = e.Id;
+            GeneralConsultanService.Patient = e.Adapt<UserDto>();
+            UserForm = e.Adapt<UserDto>();
+
+        }
+            await OnUserFormChanged.InvokeAsync(UserForm); // Update Parent
+        StateHasChanged();
+    }
+
+    private void SelectedItemChanged(Service e)
+    {
+        if (e is null)
+        {
+            GeneralConsultanService.ServiceId = null;
+            GeneralConsultanService.PratitionerId = null;
+        }
+        else
+        {
+            GeneralConsultanService.ServiceId = e.Id;
+        }
+    }
+    #endregion
 }

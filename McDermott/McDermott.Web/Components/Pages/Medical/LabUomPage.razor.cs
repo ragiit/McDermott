@@ -56,32 +56,6 @@
 
         #endregion Static
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         #region LoadData
 
         protected override async Task OnInitializedAsync()
@@ -89,37 +63,32 @@
             PanelVisible = true;
             await GetUserInfo();
             await LoadData();
-            PanelVisible = false;
+        }
 
-            return;
+        private object Data { get; set; }
 
+        private async Task LoadData()
+        {
             try
             {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<LabUom>(await Mediator.Send(new GetQueryLabUom()))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            LabUom = new();
-            SelectedDataItems = [];
-            var result = await Mediator.Send(new GetLabUomQuery
-            {
-                SearchTerm = searchTerm ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            });
-            LabUoms = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            PanelVisible = false;
+            finally { PanelVisible = false; }
         }
 
         #endregion LoadData
@@ -152,7 +121,7 @@
             try
             {
                 PanelVisible = true;
-                var editModel = ((LabUomDto)e.EditModel);
+                var editModel = ((LabUom)e.EditModel);
 
                 bool validate = await Mediator.Send(new ValidateLabUomQuery(x => x.Id != editModel.Id && x.Name == editModel.Name && x.Code == editModel.Code));
 
@@ -164,9 +133,9 @@
                 }
 
                 if (LabUom.Id == 0)
-                    await Mediator.Send(new CreateLabUomRequest(editModel));
+                    await Mediator.Send(new CreateLabUomRequest(editModel.Adapt<LabUomDto>()));
                 else
-                    await Mediator.Send(new UpdateLabUomRequest(editModel));
+                    await Mediator.Send(new UpdateLabUomRequest(editModel.Adapt<LabUomDto>()));
 
                 await LoadData();
             }
@@ -236,7 +205,7 @@
                         ).ToList();
 
                         await Mediator.Send(new CreateListLabUomRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

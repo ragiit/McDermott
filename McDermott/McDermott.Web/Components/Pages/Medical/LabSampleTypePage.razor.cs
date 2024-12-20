@@ -43,7 +43,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         #region Relations
 
-        private SampleTypeDto SampleType = new();
+        private SampleType SampleType = new();
         private List<SampleTypeDto> SampleTypes = [];
 
         #endregion Relations
@@ -57,32 +57,6 @@ namespace McDermott.Web.Components.Pages.Medical
         private IReadOnlyList<object> SelectedDataItems { get; set; } = new ObservableRangeCollection<object>();
 
         #endregion Static
-
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
 
         #region SaveDelete
 
@@ -112,21 +86,21 @@ namespace McDermott.Web.Components.Pages.Medical
         {
             try
             {
-                SampleType = ((SampleTypeDto)e.EditModel);
+                SampleType = ((SampleType)e.EditModel);
 
-                bool validate = await Mediator.Send(new ValidateSampleTypeQuery(x => x.Id != SampleType.Id && x.Name == SampleType.Name));
+                //bool validate = await Mediator.Send(new ValidateSampleTypeQuery(x => x.Id != SampleType.Id && x.Name == SampleType.Name));
 
-                if (validate)
-                {
-                    ToastService.ShowInfo($"Sample Type with name '{SampleType.Name}' is already exists");
-                    e.Cancel = true;
-                    return;
-                }
+                //if (validate)
+                //{
+                //    ToastService.ShowInfo($"Sample Type with name '{SampleType.Name}' is already exists");
+                //    e.Cancel = true;
+                //    return;
+                //}
 
                 if (SampleType.Id == 0)
-                    await Mediator.Send(new CreateSampleTypeRequest(SampleType));
+                    await Mediator.Send(new CreateSampleTypeRequest(SampleType.Adapt<SampleTypeDto>()));
                 else
-                    await Mediator.Send(new UpdateSampleTypeRequest(SampleType));
+                    await Mediator.Send(new UpdateSampleTypeRequest(SampleType.Adapt<SampleTypeDto>()));
 
                 await LoadData();
             }
@@ -147,32 +121,25 @@ namespace McDermott.Web.Components.Pages.Medical
             await LoadData();
             await GetUserInfo();
             PanelVisible = false;
-
-            return;
-
-            try
-            {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
-            }
-            catch (Exception ex)
-            {
-                ex.HandleException(ToastService);
-            }
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private object Data { get; set; }
+
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
-                SampleType = new();
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetSampleTypeQuery(searchTerm: searchTerm, pageSize: pageSize, pageIndex: pageIndex));
-                SampleTypes = result.Item1;
-                totalCount = result.pageCount;
-                activePageIndex = pageIndex;
+                var dataSource = new GridDevExtremeDataSource<SampleType>(await Mediator.Send(new GetQuerySampleType()))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
@@ -245,7 +212,7 @@ namespace McDermott.Web.Components.Pages.Medical
                         ).ToList();
 
                         await Mediator.Send(new CreateListSampleTypeRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -272,7 +239,7 @@ namespace McDermott.Web.Components.Pages.Medical
 
         private async Task EditItem_Click()
         {
-            SampleType = SelectedDataItems[0].Adapt<SampleTypeDto>();
+            SampleType = SelectedDataItems[0].Adapt<SampleType>();
             await Grid.StartEditRowAsync(FocusedRowVisibleIndex);
         }
 

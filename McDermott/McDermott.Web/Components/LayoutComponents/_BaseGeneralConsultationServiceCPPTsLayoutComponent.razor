@@ -23,7 +23,7 @@
                             <Columns>
                                 <DxGridDataColumn FieldName="DateTime" Caption="Date" DisplayFormat="@Helper.DefaultFormatDateTime" SortOrder="GridColumnSortOrder.Descending" SortIndex="0" />
 
-                               @*  <DxGridDataColumn MinWidth="200"
+                                @*  <DxGridDataColumn MinWidth="200"
                                                   FieldName="DateTime"
                                                   FilterRowOperatorType="GridFilterRowOperatorType.Contains"
                                                   DisplayFormat="ddd, dd MMM yyyy"
@@ -91,46 +91,43 @@
                                         </DxMaskedInput>
                                     </DxFormLayoutItem>
 
-                                    @*   @if (IsStatus(EnumStatusGeneralConsultantService.NurseStation))
-                                                                                    { *@
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Nursing Diagnoses" ColSpanMd="12">
-                                        <MyDxComboBox Data="NursingDiagnoses"
-                                                      NullText="Select Nursing Diagnoses"
-                                                      TextFieldName="Problem"
-                                                      ValueFieldName="Id"
-                                                      @oninput="OnInputNursingDiagnoses"
-                                                      SelectedItemChanged="((NursingDiagnosesDto e) => SelectedItemChanged(e))"
-                                                      @bind-Value="a.NursingDiagnosesId">
+                                        <_BaseMyComboBox TData="NursingDiagnoses"
+                                                         TValue="long?"
+                                                         NullText="Select Nursing Diagnoses"
+                                                         CustomData="@LoadCustomDataNursingDiagnoses"
+                                                         @bind-Value="@a.NursingDiagnosesId"
+                                                         TextFieldName="Problem"
+                                                         ValueFieldName="Id">
                                             <Columns>
                                                 <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Problem)" Caption="Name" />
                                                 <DxListEditorColumn FieldName="@nameof(NursingDiagnosesDto.Code)" Caption="Code" />
                                             </Columns>
-                                        </MyDxComboBox>
+                                        </_BaseMyComboBox>
                                         <ValidationMessage For="@(()=>a.NursingDiagnosesId)" />
                                     </DxFormLayoutItem>
 
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Diagnoses" ColSpanMd="12">
-                                        <MyDxComboBox Data="Diagnoses"
-                                                      NullText="Select Diagnoses"
-                                                      TextFieldName="Name"
-                                                      ValueFieldName="Id"
-                                                      @oninput="OnInputDiagnosis"
-                                                      SelectedItemChanged="((DiagnosisDto e) => SelectedItemChanged(e))"
-                                                      @bind-Value="a.DiagnosisId">
+                                        <_BaseMyComboBox TData="Diagnosis"
+                                                         TValue="long?"
+                                                         NullText="Select Diagnosis"
+                                                         CustomData="@LoadCustomDataDiagnoses"
+                                                         @bind-Value="@a.DiagnosisId"
+                                                         TextFieldName="Name"
+                                                         ValueFieldName="Id">
                                             <Columns>
                                                 <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Code)" />
                                                 <DxListEditorColumn FieldName="@nameof(DiagnosisDto.Name)" Caption="Name" />
                                                 <DxListEditorColumn FieldName="CronisCategory.Name" Caption="Chronic Category" />
                                             </Columns>
-
-                                        </MyDxComboBox>
+                                        </_BaseMyComboBox>
                                         <ValidationMessage For="@(()=>a.DiagnosisId)" />
                                     </DxFormLayoutItem>
                                     @* } *@
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Planning" ColSpanMd="12">
                                         @*  <MyTextBox @bind-Text="@a.Planning"
                                                                                                                NullText="Name" /> *@ 
-                                        </DxFormLayoutItem>
+                                    </DxFormLayoutItem>
                                     <DxFormLayoutItem CaptionCssClass="required-caption normal-caption" Caption="Medication Therapy" ColSpanMd="12">
                                         <MyTextBox @bind-Text="@a.MedicationTherapy"
                                                    NullText="Medication Therapy" />
@@ -161,8 +158,6 @@
     [Parameter] public GeneralConsultanServiceDto GeneralConsultanService { get; set; } = new();
     [Parameter] public User UserLogin { get; set; } = new();
 
-
-
     private bool IsStatus(EnumStatusGeneralConsultantService status) => GeneralConsultanService.Status == status;
     private bool IsLoading = false;
     private bool PanelVisible = false;
@@ -179,11 +174,6 @@
 
     private async Task NewItemCPPT_Click()
     {
-        if (NursingDiagnoses.Count == 0)
-            await LoadDataNursingDiagnoses();
-        if (Diagnoses.Count == 0)
-            await LoadDataDiagnoses();
-
         await Grid.StartEditNewRowAsync();
     }
 
@@ -192,6 +182,10 @@
         await LoadData();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
 
     private object Data { get; set; }
     private async Task LoadData()
@@ -218,28 +212,11 @@
         finally { PanelVisible = false; }
     }
 
-
     private async Task EditItemCPPT_Click()
     {
         try
         {
             await Grid.StartEditRowAsync(FocusedGridTabCPPTRowVisibleIndex);
-
-            var a = (Grid.GetDataItem(FocusedGridTabCPPTRowVisibleIndex) as GeneralConsultanCPPT ?? new());
-            NursingDiagnoses = (await Mediator.Send(new GetNursingDiagnosesQuery
-                {
-                    Predicate = x => x.Id == a.NursingDiagnosesId
-                })).Item1;
-            Diagnoses = (await Mediator.Send(new GetDiagnosisQuery
-                {
-                    Predicate = x => x.Id == a.DiagnosisId
-                })).Item1;
-
-            if (NursingDiagnoses.Count == 0)
-                await LoadDataNursingDiagnoses();
-            if (Diagnoses.Count == 0)
-                await LoadDataDiagnoses();
-
             IsLoading = false;
         }
         catch (Exception ex)
@@ -318,107 +295,54 @@
         finally { IsLoading = false; }
     }
 
-    #region ComboBox NursingDiagnoses
-
-    private NursingDiagnosesDto SelectedNursingDiagnoses { get; set; } = new();
-
-    private async Task SelectedItemChanged(NursingDiagnosesDto e)
+    #region ComboBox
+    protected async Task<LoadResult> LoadCustomDataNursingDiagnoses(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
     {
-        if (e is null)
-        {
-            SelectedNursingDiagnoses = new();
-            await LoadDataNursingDiagnoses();
-        }
-        else
-            SelectedNursingDiagnoses = e;
+        return await QueryComboBoxHelper.LoadCustomData<NursingDiagnoses>(
+            options: options,
+            defaultSortColumn: "Problem",
+            queryProvider: async () => await Mediator.Send(new GetQueryNursingDiagnoses()),
+            cancellationToken: cancellationToken);
     }
 
-    private CancellationTokenSource? _ctsNursingDiagnoses;
+    private string searchTextDiagnosis = string.Empty;
 
-    private async Task OnInputNursingDiagnoses(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    private async Task OnSearchTextChangedDiagnosis(ChangeEventArgs e)
     {
-        try
-        {
-            _ctsNursingDiagnoses?.Cancel();
-            _ctsNursingDiagnoses?.Dispose();
-            _ctsNursingDiagnoses = new CancellationTokenSource();
+        searchTextDiagnosis = e.Value?.ToString() ?? string.Empty;
 
-            await Task.Delay(Helper.CBX_DELAY, _ctsNursingDiagnoses.Token);
-
-            await LoadDataNursingDiagnoses(e.Value?.ToString() ?? "");
-        }
-        finally
-        {
-            _ctsNursingDiagnoses?.Dispose();
-            _ctsNursingDiagnoses = null;
-        }
+        // Jika perlu, Anda bisa memanggil LoadCustomDataDiagnoses lagi dengan filter baru
+        await LoadCustomDataDiagnoses(new DataSourceLoadOptionsBase(), CancellationToken.None);
     }
 
-    private async Task LoadDataNursingDiagnoses(string? e = "", Expression<Func<NursingDiagnoses, bool>>? predicate = null)
+    protected async Task<LoadResult> LoadCustomDataDiagnoses(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
     {
-        try
-        {
-            NursingDiagnoses = await Mediator.QueryGetComboBox<NursingDiagnoses, NursingDiagnosesDto>(e, predicate);
-        }
-        catch (Exception ex)
-        {
-            ex.HandleException(ToastService);
-        }
-        finally { IsLoading = false; }
+        // options.Sort = new SortingInfo[3]
+        // {
+        //     new SortingInfo
+        //     {
+
+        //         Selector = "Name",
+        //         Desc = true
+        //     },
+        //     new SortingInfo
+        //     {
+        //         Selector = "Code",
+        //         Desc = true
+        //     },
+        //     new SortingInfo
+        //     {
+        //         Selector = "CronisCategory.Name",
+        //         Desc = true
+        //     }
+        // };
+        return await QueryComboBoxHelper.LoadCustomData<Diagnosis>(
+            options: options,
+            isSortColumn: false,
+            queryProvider: async () => await Mediator.Send(new GetQueryDiagnosis()),
+            cancellationToken: cancellationToken);
     }
 
-    #endregion ComboBox NursingDiagnoses
-
-    #region ComboBox Diagnosis
-
-    private DiagnosisDto SelectedDiagnosis { get; set; } = new();
-
-    private async Task SelectedItemChanged(DiagnosisDto e)
-    {
-        if (e is null)
-        {
-            SelectedDiagnosis = new();
-            await LoadDataDiagnoses();
-        }
-        else
-            SelectedDiagnosis = e;
-    }
-
-    private CancellationTokenSource? _ctsDiagnosis;
-
-    private async Task OnInputDiagnosis(Microsoft.AspNetCore.Components.ChangeEventArgs e)
-    {
-        try
-        {
-            _ctsDiagnosis?.Cancel();
-            _ctsDiagnosis?.Dispose();
-            _ctsDiagnosis = new CancellationTokenSource();
-
-            await Task.Delay(Helper.CBX_DELAY, _ctsDiagnosis.Token);
-
-            await LoadDataDiagnoses(e.Value?.ToString() ?? "");
-        }
-        finally
-        {
-            _ctsDiagnosis?.Dispose();
-            _ctsDiagnosis = null;
-        }
-    }
-
-    private async Task LoadDataDiagnoses(string? e = "", Expression<Func<Diagnosis, bool>>? predicate = null)
-    {
-        try
-        {
-            Diagnoses = await Mediator.QueryGetComboBox<Diagnosis, DiagnosisDto>(e, predicate);
-        }
-        catch (Exception ex)
-        {
-            ex.HandleException(ToastService);
-        }
-        finally { IsLoading = false; }
-    }
-
-    #endregion ComboBox Diagnosis
-
+    #endregion
 
 }

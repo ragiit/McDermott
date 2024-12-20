@@ -586,6 +586,12 @@ namespace McDermott.Web.Components.Pages.Transaction.Maternities
 
         [SupplyParameterFromQuery] public long? Id { get; set; }
 
+        private void HandleUserFormChanged(UserDto updatedUserForm)
+        {
+            UserForm = updatedUserForm;
+            StateHasChanged(); // Pastikan Parent diperbarui
+        }
+
         private bool ReadOnlyForm()
         {
             var a = ((GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Planned) || GeneralConsultanService.Status.Equals(EnumStatusGeneralConsultantService.Midwife)));

@@ -70,62 +70,46 @@
 
         #endregion Static
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         #region Load
 
         protected override async Task OnInitializedAsync()
         {
             await GetUserInfo();
-            await LoadDataUomCategory();
             await LoadData();
         }
 
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
+        private object Data { get; set; }
+
+        private async Task LoadData()
         {
             try
             {
                 PanelVisible = true;
                 SelectedDataItems = [];
-                var result = await Mediator.Send(new GetUomQuery
+                var dataSource = new GridDevExtremeDataSource<Uom>(await Mediator.Send(new GetQueryUom()))
                 {
-                    PageIndex = pageIndex,
-                    PageSize = pageSize,
-                    SearchTerm = searchTerm ?? ""
-                });
-                Uoms = result.Item1;
-                totalCount = result.PageCount;
-                activePageIndex = pageIndex;
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
                 PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
+            finally { PanelVisible = false; }
+        }
+
+        protected async Task<LoadResult> LoadCustomDataUomCategory(DataSourceLoadOptionsBase options, CancellationToken cancellationToken)
+        {
+            return await QueryComboBoxHelper.LoadCustomData<UomCategory>(
+                options: options,
+                queryProvider: async () => await Mediator.Send(new GetQueryUomCategory()),
+                cancellationToken: cancellationToken);
         }
 
         #endregion Load
@@ -239,7 +223,7 @@
             PanelVisible = true;
             try
             {
-                var editModel = (UomDto)e.EditModel;
+                var editModel = (Uom)e.EditModel;
                 bool exists = await Mediator.Send(new ValidateUomQuery(x => x.Id != editModel.Id && x.Name == editModel.Name));
                 if (exists)
                 {
@@ -259,11 +243,11 @@
                 editModel.BiggerRatio ??= 1;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateUomRequest(editModel));
+                    await Mediator.Send(new CreateUomRequest(editModel.Adapt<UomDto>()));
                 else
-                    await Mediator.Send(new UpdateUomRequest(editModel));
+                    await Mediator.Send(new UpdateUomRequest(editModel.Adapt<UomDto>()));
 
-                await LoadData(0, pageSize);
+                await LoadData();
             }
             catch (Exception ex)
             {
@@ -432,7 +416,7 @@
                         ).ToList();
 
                         await Mediator.Send(new CreateListUomRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 

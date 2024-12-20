@@ -1950,5 +1950,11 @@ namespace McDermott.Web.Components.Pages.Transaction.Accidents
         private AccidentDto Accident { get; set; } = new();
 
         #endregion Assesment of Injury
+
+        private void HandleUserFormChanged(UserDto updatedUserForm)
+        {
+            UserForm = updatedUserForm;
+            StateHasChanged(); // Pastikan Parent diperbarui
+        }
     }
 }

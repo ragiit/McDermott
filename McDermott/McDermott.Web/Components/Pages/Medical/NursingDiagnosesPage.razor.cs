@@ -4,32 +4,6 @@
     {
         private List<NursingDiagnosesDto> NursingDiagnoses = [];
 
-        #region Searching
-
-        private int pageSize { get; set; } = 10;
-        private int totalCount = 0;
-        private int activePageIndex { get; set; } = 0;
-        private string searchTerm { get; set; } = string.Empty;
-
-        private async Task OnSearchBoxChanged(string searchText)
-        {
-            searchTerm = searchText;
-            await LoadData(0, pageSize);
-        }
-
-        private async Task OnPageSizeIndexChanged(int newPageSize)
-        {
-            pageSize = newPageSize;
-            await LoadData(0, newPageSize);
-        }
-
-        private async Task OnPageIndexChanged(int newPageIndex)
-        {
-            await LoadData(newPageIndex, pageSize);
-        }
-
-        #endregion Searching
-
         #region Grid Properties
 
         #region UserLoginAndAccessRole
@@ -83,38 +57,40 @@
         protected override async Task OnInitializedAsync()
         {
             PanelVisible = true;
-            await LoadData();
             await GetUserInfo();
+            await LoadData();
             PanelVisible = false;
+        }
 
-            return;
+        private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
+        {
+            FocusedRowVisibleIndex = args.VisibleIndex;
+        }
 
+        private object Data { get; set; }
+
+        private async Task LoadData()
+        {
             try
             {
-                _timer = new Timer(async (_) => await LoadData(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
-
-                await GetUserInfo();
+                PanelVisible = true;
+                SelectedDataItems = [];
+                var dataSource = new GridDevExtremeDataSource<NursingDiagnoses>(await Mediator.Send(new GetQueryNursingDiagnoses()))
+                {
+                    CustomizeLoadOptions = (loadOptions) =>
+                    {
+                        loadOptions.PrimaryKey = ["Id"];
+                        loadOptions.PaginateViaPrimaryKey = true;
+                    }
+                };
+                Data = dataSource;
+                PanelVisible = false;
             }
             catch (Exception ex)
             {
                 ex.HandleException(ToastService);
             }
-        }
-
-        private async Task LoadData(int pageIndex = 0, int pageSize = 10)
-        {
-            PanelVisible = true;
-            var result = await Mediator.Send(new GetNursingDiagnosesQuery
-            {
-                SearchTerm = searchTerm ?? "",
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            });
-            NursingDiagnoses = result.Item1;
-            totalCount = result.PageCount;
-            activePageIndex = pageIndex;
-            SelectedDataItems = [];
-            PanelVisible = false;
+            finally { PanelVisible = false; }
         }
 
         #endregion LoadData
@@ -178,7 +154,7 @@
                         ).ToList();
 
                         await Mediator.Send(new CreateListNursingDiagnosesRequest(list));
-                        await LoadData(0, pageSize);
+                        await LoadData();
                         SelectedDataItems = [];
                     }
 
@@ -232,15 +208,15 @@
         {
             try
             {
-                var editModel = (NursingDiagnosesDto)e.EditModel;
+                var editModel = (NursingDiagnoses)e.EditModel;
 
                 if (string.IsNullOrWhiteSpace(editModel.Problem))
                     return;
 
                 if (editModel.Id == 0)
-                    await Mediator.Send(new CreateNursingDiagnosesRequest(editModel));
+                    await Mediator.Send(new CreateNursingDiagnosesRequest(editModel.Adapt<NursingDiagnosesDto>()));
                 else
-                    await Mediator.Send(new UpdateNursingDiagnosesRequest(editModel));
+                    await Mediator.Send(new UpdateNursingDiagnosesRequest(editModel.Adapt<NursingDiagnosesDto>()));
 
                 await LoadData();
             }
