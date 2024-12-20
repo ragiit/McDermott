@@ -5,9 +5,9 @@
 
 <PageTitle>McHealthCare - View Display</PageTitle>
 
-    <section class="cx">
-        <div class="row no-gutter">
-            <div class="headerx">
+<section class="cx">
+    <div class="row no-gutter mb-4">
+        @* <div class="headerx">
                 <div class="col-sm-2">
                     <div class="logo">
                         <img src="image/logo.png" alt="Logo McDermott Indonesia" />
@@ -27,63 +27,82 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="row no-gutter mt-4">
-            <!-- Card kiri -->
-            <div class="col-md-6 align-self-center">
-                <div class="card ">
-                    <div class="card-header bg-red">
-                        <h1 class="ticket-text">Memanggil Antrian</h1>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="ticket-number">001</h5>
-                    </div>
-                    <div class="card-footer">
-                        <h1 class="ticket-text">Counter Accident</h1>
-                    </div>
+            </div> *@
+        <div class="contentx">
+            <div class="panel-left">
+                <div class="logo">
+                    <img src="image/logo.png" alt="Logo McDermott Indonesia" />
                 </div>
-            </div>
-            <!-- Card kanan -->
-            <div class="col-md-6">
-                <div class="card ">
-                    <div class="card-body padding-body">
-                        <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item"
-                                    src="https://www.youtube.com/embed/hKGPH9C-EFc?autoplay=1&loop=1&controls=0&rel=0&showinfo=0"
-                                    title="YouTube video player"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; muted; encrypted-media;"
-                                    allowfullscreen>
-                            </iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row no-gutter mt-3 justify-content-center">
-            @foreach (var i in getCount)
-            {
-                <div class="col-md-3 align-self-center">
-                    <div class="card ">
-                        <div class="card-body ">
-                            <h4 class="ticket-text"></h4>
-                        </div>
-                        <div class="card-footer bg-red">
-                            <h1 class="text-number-footer">@i.Name</h1>
-                        </div>
-                    </div>
-                </div>
-            }
 
-        </div>
-        <div class="running-text-wrapper">
-            <div class="running-text">
-            <span><i class="fa-solid fa-jet-fighter fa-rotate-180"></i>Selamat datang di Klinik Pratama PT. McDermott Indonesia. Tetap jaga kesehatan Anda! | Informasi terkini dapat diakses di website kami. </span>
+                <div class="text-title">
+                    <h1>KLINIK PRATAMA</h1>
+                    <h2>PT.McDERMOTT INDONESIA</h2>
+                </div>
+            </div>
+            <div class="panel-rigth">
+                <div class="date-time">
+                    <div class="day">@daysNow</div>
+                    <div class="date">@datesNow</div>
+                </div>
+                    <div class="time">@currentTime</div>
             </div>
         </div>
+    </div>
+    <div class="row no-gutter mt-4">
+        <!-- Card kiri -->
+        <div class="col-md-6 align-self-center">
+            <div class="card ">
+                <div class="card-header bg-info">
+                    <h1 class="ticket-text">Memanggil Antrian</h1>
+                </div>
+                <div class="card-body">
+                    <h5 class="ticket-number">001</h5>
+                </div>
+                <div class="card-footer bg-ligth">
+                    <h1 class="ticket-text ">Counter Accident</h1>
+                </div>
+            </div>
+        </div>
+        <!-- Card kanan -->
+        <div class="col-md-6">
+            <div class="card ">
+                <div class="card-body padding-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item"
+                                src="https://www.youtube.com/embed/hKGPH9C-EFc?autoplay=1&loop=1&controls=0&rel=0&showinfo=0"
+                                title="YouTube video player"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; muted; encrypted-media;"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row no-gutter mt-3 justify-content-center">
+        @foreach (var i in getCount)
+        {
+            <div class="col-md-3 align-self-center">
+                <div class="card ">
+                    <div class="card-body ">
+                        <h3 class="ticket-text">009</h3>
+                    </div>
+                    <div class="card-footer bg-blue">
+                        <h1 class="text-number-footer">@i.Name</h1>
+                    </div>
+                </div>
+            </div>
+        }
 
-    </section>
+    </div>
+    <div class="running-text-wrapper">
+        <div class="running-text">
+            <span><i class="fa-solid fa-jet-fighter fa-rotate-180 mr-1"></i>Selamat datang di Klinik Pratama PT. McDermott Indonesia. Tetap jaga kesehatan Anda! | Informasi terkini dapat diakses di website kami. </span>
+        </div>
+    </div>
+
+</section>
 
 
 <script>

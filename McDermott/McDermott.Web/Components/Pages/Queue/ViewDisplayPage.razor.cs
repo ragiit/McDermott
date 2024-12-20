@@ -47,11 +47,12 @@ namespace McDermott.Web.Components.Pages.Queue
 
         private async Task UpdateTime()
         {
+            var culture = new CultureInfo("id-ID");
             while (true)
             {
-                currentTime = DateTime.Now.ToString("HH:mm:ss");
-                datesNow = DateTime.Now.ToString("dd MMMM yyyy");
-                daysNow = DateTime.Now.ToString("dddd");
+                currentTime = DateTime.Now.ToString("HH:mm:ss", culture);
+                datesNow = DateTime.Now.ToString("dd MMMM yyyy", culture);
+                daysNow = DateTime.Now.ToString("dddd", culture);
                 StateHasChanged();
                 await Task.Delay(100); // Update every 1 second
             }
