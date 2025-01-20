@@ -924,9 +924,10 @@ namespace McDermott.Web.Components.Pages.Transaction
             }
         }
 
-        private void NewItem_Click()
+        private async Task NewItem_Click()
         {
             ShowForm = true;
+            await LoadComboBox();
         }
 
         private void Grid_FocusedRowChanged(GridFocusedRowChangedEventArgs args)
@@ -940,6 +941,7 @@ namespace McDermott.Web.Components.Pages.Transaction
             IsLoading = true;
             try
             {
+                await LoadComboBox();
                 GeneralConsultanService = (await Mediator.Send(new GetGeneralConsultanServiceQuery(x => x.Id == SelectedDataItems[0].Adapt<GeneralConsultanServiceDto>().Id))).Item1.FirstOrDefault() ?? new();
                 UserForm = GeneralConsultanService.Patient ?? new();
                 Physicions = (await Mediator.Send(new GetUserQuery(x => x.DoctorServiceIds != null && x.DoctorServiceIds.Contains(GeneralConsultanService.ServiceId.GetValueOrDefault()))));
